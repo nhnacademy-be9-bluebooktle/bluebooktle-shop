@@ -1,0 +1,6 @@
+server:
+  port: 10211
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_URL}

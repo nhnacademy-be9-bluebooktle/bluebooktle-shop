@@ -1,0 +1,8 @@
+server:
+  port: 10210 # Dev Eureka 포트
+eureka:
+  instance:
+    hostname: ${EUREKA_INSTANCE_HOSTNAME:eureka-dev-01} # Dev 환경 호스트명 (환경변수 없으면 기본값)
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_URL} # Dev 환경 Eureka 주소 (다른 Peer 포함 가능)
