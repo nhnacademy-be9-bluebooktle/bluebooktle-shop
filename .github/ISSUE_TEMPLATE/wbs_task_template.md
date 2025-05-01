@@ -2,7 +2,7 @@
 name: WBS Task
 about: 기능 단위 작업에 대한 이슈를 작성합니다.
 title: '[작업 영역][기능 분류] - 상세 설명'
-labels: ✨feat
+labels: ✨ feat
 assignees: ''
 ---
 
