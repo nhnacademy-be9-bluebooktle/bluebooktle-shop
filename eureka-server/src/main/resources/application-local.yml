@@ -1,0 +1,10 @@
+server:
+  port: 9761 # 로컬 Eureka 포트
+eureka:
+  instance:
+    hostname: localhost # 로컬 호스트명
+logging:
+  level:
+    com.netflix.eureka: OFF
+    com.netflix.discovery: OFF # 로컬에서 Eureka 관련 로그 줄이기 (필요시 DEBUG)
+    shop.bluebooktle.eureka: DEBUG

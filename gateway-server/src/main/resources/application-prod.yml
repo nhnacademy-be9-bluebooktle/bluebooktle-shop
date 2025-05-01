@@ -1,0 +1,19 @@
+server:
+  port: 10221
+
+#eureka:
+#  client:
+#    serviceUrl:
+#      defaultZone: ${EUREKA_URL}
+
+logging:
+  level:
+    shop.bluebooktle.gateway: INFO
+
+# 운영 환경용 타임아웃, 재시도, Rate Limiting 등 추가 설정 고려
+# spring:
+#   cloud:
+#     gateway:
+#       httpclient:
+#         connect-timeout: 5000
+#         response-timeout: 10s
