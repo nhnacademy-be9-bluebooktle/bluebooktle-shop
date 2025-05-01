@@ -1,0 +1,22 @@
+server:
+  port: 10222 # Prod Member 포트
+
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL} # GitHub Secrets -> 환경변수로 주입될 값
+    username: ${SPRING_DATASOURCE_USERNAME} # GitHub Secrets -> 환경변수로 주입될 값
+    password: ${SPRING_DATASOURCE_PASSWORD} # GitHub Secrets -> 환경변수로 주입될 값
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: none # 운영 서버에서는 스키마 변경 금지
+    show-sql: false # 운영 서버에서는 SQL 로그 비활성화
+
+#eureka:
+#  client:
+#    serviceUrl:
+#      defaultZone: ${EUREKA_URL} # 운영 환경 Eureka
+
+logging:
+  level:
+    shop.bluebooktle.member: INFO # 운영 서버 로깅 레벨 INFO
