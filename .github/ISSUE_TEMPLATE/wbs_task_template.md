@@ -2,7 +2,7 @@
 name: WBS Task
 about: 기능 단위 작업에 대한 이슈를 작성합니다.
 title: '[작업 영역][기능 분류] - 상세 설명'
-labels: WBS
+labels: ✨feat
 assignees: ''
 ---
 
@@ -15,32 +15,33 @@ assignees: ''
   - 기능의 분류
     - 회원, 태스크, 마일스톤, 댓글, 알림 등
 3. 상세 설명
-  - 무슨 작업인지 이해할 수 있도록 작성
-  - BACK 작업의 경우 레이어 명시(Entity, Repository, Service, Controller 등)
-    - 회원 작성(Entity)
-    - 주문 CRUD 작성(Repository)
-    - 회원가입 로직 추가(Service) & 회원가입 API 개발(Controller)
+  - 무슨 기능인지 이해할 수 있도록 작성
+  예) 회원가입 기능
 -->
 
 ### 작업 목적
 
 <!--
 - 이 작업이 왜 필요한지, 어떤 기능/문제 해결을 위한 작업인지 간단하게 작성
-  예) 회원가입 화면에서 사용자가 정보를 입력하고 가입 요청을 보낼 수 있도록 UI 구성
+  예) 회원가입 화면에서 사용자가 입력한 정보를 받아 가입 요청을 처리할 수 있는 Api 개발
 -->
 
 ---
 
-### 작업 상세
+### 작업 상세(Task)
 
 <!--
 - 실제로 해야 할 세부 작업들을 나열
+- BACK 기능 작업의 경우 레이어 명시(Entity, Repository, Service, Controller 등)
   예)
-  - 이름, 이메일, 비밀번호 input 마크업
-  - 유효성 검사 로직 추가
-  - 가입 버튼 클릭 시 서버에 POST 요청
-  - 입력 오류 시 에러 메시지 출력
+    - [ ] Member 엔티티 및 Repository 생성
+    - [ ] 에 회원 가입 정보 유효성 검증 Service, Controller 로직 추가
+    - [ ] Controller에 비밀번호 암호화 로직 구현
+    - [ ] 회원 가입 처리 Service 및 Controller API 구현
 -->
+이 기능을 완료하기 위해 다음 작업들이 필요합니다:
+
+- [ ] 세부 작업을 적어주세요
 
 ---
 
@@ -49,11 +50,9 @@ assignees: ''
 <!--
 - 디자인, API 문서, 다른 이슈 링크 등 참고할 자료가 있다면 추가
 - 첨부파일인 경우 첨부파일명 작성 
-  예) docs/api작성법.txt
-
-  예)
-  - ERD 설계: [링크]
+  예) 
   - 관련 이슈: #13 회원가입 API
+  - docs/api작성법.txt
 -->
 
 ---
