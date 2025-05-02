@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>shop.bluebooktle</groupId>
-        <artifactId>bluebooktle-backend</artifactId>
+        <artifactId>bluebooktle-shop</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 

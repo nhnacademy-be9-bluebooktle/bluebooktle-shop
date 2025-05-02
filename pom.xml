@@ -12,11 +12,11 @@
     </parent>
 
     <groupId>shop.bluebooktle</groupId>
-    <artifactId>bluebooktle-backend</artifactId>
+    <artifactId>bluebooktle-shop</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>bluebooktle-backend</name>
-    <description>Parent project for BlueBooktle Backend Microservices</description>
+    <name>bluebooktle-shop</name>
+    <description>Parent project for BlueBooktle Service</description>
 
     <properties>
         <java.version>21</java.version>
@@ -29,12 +29,10 @@
         <module>common-module</module>
         <module>eureka-server</module>
         <module>gateway-server</module>
-        <module>member-service</module>
-        <module>book-service</module>
-        <module>coupon-service</module>
-        <module>order-payment-service</module>
-        <module>cart-service</module>
+        <module>backend-server</module>
+        <module>frontend-server</module>
         <module>coverage-report</module>
+        <!-- TODO: auth-server 추가 -->
     </modules>
 
     <dependencyManagement>

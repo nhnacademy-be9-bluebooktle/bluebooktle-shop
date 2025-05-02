@@ -18,121 +18,122 @@
 * **주문 관리:** 주문 생성, 상태 관리(배송 추적 포함), 반품/취소 처리
 * **결제 관리:** 외부 결제 시스템(Toss Payments 등) 연동 및 결제 처리
 
-## 🏗️ 프로젝트 구조 (`bluebooktle-backend` Monorepo)
+## 🏗️ 프로젝트 구조 (`bluebooktle-shop` Monorepo)
 
-이 프로젝트는 Maven 멀티 모듈 구조를 따릅니다. 각 모듈은 특정 책임 또는 도메인을 가집니다.
+이 프로젝트는 Maven 멀티 모듈 구조를 따릅니다. 주요 모듈과 역할은 다음과 같습니다.
 
-* **`bluebooktle-backend` (Parent):** 최상위 부모 모듈. 공통 설정, 의존성 버전, 모듈 목록 관리 (`packaging: pom`).
-    * **`eureka-server`**: 서비스 디스커버리 서버 (Spring Cloud Eureka). 다른 서비스들의 위치 정보를 등록하고 조회할 수 있게 합니다.
-    * **`gateway-server`**: API 게이트웨이 (Spring Cloud Gateway). 시스템의 단일 진입점으로, 요청 라우팅, 인증/인가 필터링 등을 수행합니다.
-    * **`common-module`**: 공통 코드 모듈. 여러 모듈에서 공유하는 DTO, 유틸리티, 공통 예외 등을 정의합니다. (라이브러리 역할)
-    * **`member-service`**: 회원, 인증 지원, 포인트 관리 담당 REST API 서버. (JPA, MySQL 사용)
-    * **`book-service`**: 도서, 리뷰 관리 및 검색 기능 제공 REST API 서버. (JPA, MySQL, Elasticsearch 사용)
-    * **`coupon-service`**: 쿠폰 정책 및 기능 제공 REST API 서버. (JPA, MySQL 사용)
-    * **`order-payment-service`**: 주문 생성/관리 및 결제 연동 처리 REST API 서버. (JPA, MySQL 사용, 필요시 RabbitMQ 연동)
-    * **`cart-service`**: 장바구니 관리 REST API 서버. (JPA, MySQL 사용 - DB 기반)
-    * **`coverage-report`**: 테스트 커버리지 리포트 집계용 모듈.
+* **`bluebooktle-shop` (Parent):** 최상위 부모 모듈. 공통 설정, 의존성 버전, 모듈 목록 관리 (`packaging: pom`).
+    * **`common-module`**: 여러 모듈에서 공유하는 공통 코드(DTO, Util, Exception 등) 정의. (라이브러리)
+    * **`eureka-server`**: 서비스 디스커버리 서버 (Spring Cloud Eureka). 실행 중인 다른 서버(Gateway, Auth, Backend)들의 위치를 등록/관리합니다.
+    * **`gateway-server`**: API 게이트웨이 (Spring Cloud Gateway). 시스템의 단일 진입점. 외부(`frontend-server`) 요청을 받아 인증 확인 후(
+      `auth-server` 연동) 적절한 내부 서버(`auth-server`, `backend-server`)로 라우팅합니다.
+    * **`auth-server`**: 인증/인가 서버. 사용자 로그인(OAuth/JWT 등), 토큰 발급/검증 등 인증/인가 관련 기능을 전담합니다. (JPA, MySQL 사용)
+    * **`backend-server`**: **통합 비즈니스 로직 서버.** 인증을 제외한 모든 핵심 백엔드 기능(도서, 회원, 주문, 결제, 쿠폰, 장바구니, 포인트, 리뷰, 검색 등)의 API를
+      제공합니다. (JPA, MySQL, Elasticsearch 등 사용)
+    * **`coverage-report`**: 테스트 커버리지 리포트 집계용 유틸리티 모듈.
 
 ## 🚀 시작하기 (Getting Started)
 
-개발 환경을 설정하고 프로젝트를 실행하는 방법입니다.
+로컬 개발 환경을 설정하고 프로젝트를 실행하는 방법입니다.
 
 ### 사전 요구 사항
 
 * **Java 21 (JDK):** Corretto JDK 또는 Temurin JDK 권장.
 * **Maven 3.8+:** 프로젝트 빌드 도구.
-* **IntelliJ IDEA:** 권장 IDE.
-* **실행 환경:**
-    * MySQL Server (8.x 권장)
-    * Redis Server (인증 세션)
-    * Elasticsearch Server (8.x 권장 - `book-service` 실행 시 필요)
-    * RabbitMQ Server (필요시 - `order-payment-service` 등에서 사용 시)
+* **IntelliJ IDEA:** 권장 IDE (Ultimate Edition 권장).
+* **실행 환경 (Local):**
+    * **H2 Database:** 기본적으로 로컬 프로파일은 H2 인메모리 DB를 사용합니다. (별도 DB 서버 불필요)
+    * **Elasticsearch Server (8.x 권장):** `backend-server`의 검색 기능 실행 시 필요.
+    * **Redis Server:** (필요시 - 예: Gateway 에서 Rate Limiting 등 다른 용도)
+    * **RabbitMQ Server:** (필요시 - 예: `backend-server` 비동기 처리)
+    * *참고: 로컬에서 실제 MySQL을 테스트하고 싶다면, `application-local.yml`의 datasource 설정을 수정하고 로컬 MySQL 서버를 실행해야 합니다.*
 
 ### 로컬 개발 환경 설정
 
-1. **저장소 복제:**
+1. **저장소 복제 (`bluebooktle-shop`):**
    ```bash
-   git clone <bluebooktle-backend 레포지토리 주소>
-   cd bluebooktle-backend
+   git clone <bluebooktle-shop 레포지토리 주소>
+   cd bluebooktle-shop
    ```
-
-2. **IDE에서 프로젝트 열기:** IntelliJ IDEA에서 `bluebooktle-backend` 디렉토리를 Maven 프로젝트로 엽니다.
-
-3. **로컬 환경 설정 파일 확인:**
-    * 각 서비스 모듈의 `src/main/resources/` 아래에는 `application.yml` (공통), `application-local.yml`, `application-dev.yml`,
-      `application-prod.yml` 파일이 있습니다.
-    * 로컬 개발 시에는 `local` 프로파일을 사용합니다 (`spring.profiles.active=local`).
-
-4. **Secrets(민감 정보) 설정:**
-    * `application-{profile}.yml` 파일 내 DB 비밀번호, 외부 API 키 등 민감 정보는 `${...}` 플레이스홀더로 되어 있습니다. (예:
-      `password: ${DB_PASSWORD}`)
-    * **이 플레이스홀더에 실제 값을 제공해야 합니다.** 가장 권장되는 방법은 **IntelliJ IDEA의 실행 구성(Run/Debug Configuration)**에서 **환경 변수(Environment
-      Variables)**를 설정하는 것입니다.
-    * **방법 (IntelliJ):**
-        1. Run > Edit Configurations... 선택
-        2. 실행할 서비스(예: `MemberServiceApplication`) 선택
-        3. 'Environment variables' 필드에 필요한 환경 변수와 로컬 개발용 값을 입력합니다. (세미콜론 `;` 으로 구분 또는 각 줄에 입력)
-           ```
-           DB_PASSWORD=myLocalDbPassword;TOSS_SECRET_KEY_DEV=sk_dev_xxxxxx;
-           ```
-
-5. **기타 인프라 설정:**
-    * Elasticsearch, RabbitMQ 등을 로컬에서 사용하는 경우, 관련 접속 정보를 `application-local.yml`에 설정하거나 환경 변수로 제공합니다.
+2. **IDE에서 프로젝트 열기:** IntelliJ IDEA에서 `bluebooktle-shop` 디렉토리를 Maven 프로젝트로 엽니다(Open). Maven이 의존성을 다운로드하고 프로젝트 구조를 인식할
+   때까지 기다립니다.
+3. **(별도) Frontend 저장소 복제:** `bluebooktle-frontend` 레포지토리도 별도로 클론합니다.
+4. **로컬 프로파일 확인 (`local`):**
+    * 각 실행 모듈(`eureka-server`, `gateway-server`, `auth-server`, `backend-server`)의 `src/main/resources/` 아래
+      `application-local.yml` 파일이 로컬 개발용 설정 파일입니다.
+    * 이 파일들은 로컬 H2 DB, `localhost` 기준의 서비스 URL(Gateway, Feign 설정) 등을 사용하도록 기본 설정되어 있습니다.
+    * **`application-local.yml`은 `.gitignore`에 포함되어 Git 추적에서 제외됩니다.**
+5. **Secrets(민감 정보) 설정:**
+    * `application-local.yml` 내 민감 정보(예: `DB_PASSWORD_LOCAL`, `JWT_SECRET_KEY_LOCAL`, `TOSS_SECRET_KEY_DEV` 등)는 `${...}`
+      플레이스홀더로 되어 있습니다.
+    * **IntelliJ IDEA 실행 구성(Run/Debug Configuration)**에서 **환경 변수(Environment Variables)**를 설정하여 이 플레이스홀더에 **로컬 개발용 값**을
+      제공해야 합니다.
+    * **방법 (IntelliJ):** Run > Edit Configurations... > 해당 Application 선택 > Environment variables 필드에 `변수명1=값1;변수명2=값2`
+      형식으로 입력.
+        ```
+        # 예시: H2 비밀번호가 필요하다면
+        DB_PASSWORD_LOCAL=localH2Password;JWT_SECRET_KEY_LOCAL=your-very-secure-local-jwt-secret;TOSS_SECRET_KEY_DEV=sk_test_xxxx;PAYCO_CLIENT_ID_LOCAL=dummyid;PAYCO_CLIENT_SECRET_LOCAL=dummysecret
+        ```
+    * 팀 내 `DEV_SECRETS_GUIDE.md` (생성 필요) 문서를 참고하여 필요한 변수와 형식을 확인하세요.
+6. **데이터베이스 초기화 (로컬 H2 사용 시):**
+    * `application-local.yml`에 `ddl-auto: create-drop` 또는 `create`가 설정되어 있으므로, 앱 실행 시 H2 DB 스키마가 자동으로 생성/삭제됩니다. 별도 DDL
+      실행 불필요.
 
 ### 빌드 및 실행
 
 1. **프로젝트 빌드:**
-    * 프로젝트 루트 디렉토리(`bluebooktle-backend`)에서 Maven을 사용하여 전체 프로젝트를 빌드합니다.
+    * `bluebooktle-shop` 루트 디렉토리에서 전체 백엔드 모듈을 빌드합니다.
    ```bash
-   # 의존성 다운로드 및 컴파일, 테스트 실행, 패키징
-   mvn clean install
-   # 테스트 스킵하고 빌드만 하려면
-   # mvn clean install -DskipTests
+   mvn clean install -DskipTests
    ```
 
 2. **애플리케이션 실행 (로컬):**
-    * MSA는 여러 서비스가 함께 실행되어야 제대로 동작합니다. **실행 순서**가 중요할 수 있습니다.
-        * **1순위:** `eureka-server`
-        * **2순위 (선택):** `config-service` (현재는 미사용)
-        * **3순위:** 핵심 서비스들 (`member-service`, `book-service`, `coupon-service`, `order-payment-service`,
-          `cart-service`) - 서로 의존성이 적다면 병렬 실행 가능.
-        * **4순위:** `gateway-server` (다른 서비스들이 Eureka에 등록된 후 실행 권장)
-    * **IntelliJ IDEA에서 실행:** 각 모듈의 `*Application.java` 파일을 열고 `main` 메소드를 실행합니다. 이때 **반드시 'local' 프로파일이 활성화**되고 **필요한
-      환경 변수가 설정된 실행 구성**을 사용해야 합니다.
-
+    * **실행 순서:** Eureka -> Auth -> Backend -> Gateway -> Frontend 순서로 실행하는 것이 안전합니다.
+    * **IntelliJ IDEA에서 실행:** 각 실행 모듈(`eureka-server`, `gateway-server`, `auth-server`, `backend-server`)의
+      `*Application.java` 에서 `main` 메소드를 실행합니다. **반드시 'local' 프로파일이 활성화되고 필요한 환경 변수가 설정된 실행 구성**을 사용해야 합니다. 할당된 로컬 포트는
+      다음과 같습니다.
+        * `EurekaServerApplication` (Port: 9761)
+        * `AuthServerApplication` (Port: 9001)
+        * `BackendServerApplication` (Port: 9002)
+        * `GatewayServerApplication` (Port: 9000)
+    * **(별도 프로젝트) `bluebooktle-frontend` 실행:** Frontend 프로젝트의 실행 가이드에 따라 Frontend 서버(BFF)를 실행합니다. (Port: 9080)
 
 3. **애플리케이션 접속:**
-    * 모든 백엔드 서비스가 정상적으로 실행된 후, 별도로 실행된 **`bluebooktle-frontend` (프론트엔드 BFF 서버)**의 주소로 웹 브라우저를 통해 접속하여 기능을 확인합니다. 백엔드
-      API는 주로 API Gateway를 통해 호출됩니다.
+    * 모든 서버가 정상 실행된 후, 웹 브라우저에서 **`bluebooktle-frontend` 서버 주소 (예: `http://localhost:9080`)** 로 접속하여 서비스를 이용합니다. 백엔드
+      API는 주로 API Gateway(로컬 포트: 9000)를 통해 호출됩니다.
 
 ## 🏛️ 아키텍처 (Architecture)
 
-* **MSA (Microservices Architecture):** 각 주요 도메인(회원, 도서, 주문 등)을 독립적인 마이크로서비스로 분리하여 개발, 배포, 확장의 유연성을 높입니다.
-* **Spring Cloud:** MSA 구축을 위한 주요 기술로 사용됩니다.
-    * `Eureka`: Service Discovery (서비스 등록 및 검색)
-    * `Spring Cloud Gateway`: API Gateway (단일 진입점, 라우팅, 필터링)
-    * `OpenFeign`: 서비스 간 동기식 REST API 호출을 위한 선언적 HTTP 클라이언트
-* **Maven Multi-module:** Monorepo 내에서 각 마이크로서비스 및 공통 모듈을 관리합니다.
-* **Layered Architecture:** 각 마이크로서비스 내부는 일반적으로 다음과 같은 계층형 구조를 따릅니다.
-    * **Controller:** HTTP 요청 처리, 입력값 검증, Service 계층 호출
-    * **Service:** 비즈니스 로직 수행, 트랜잭션 관리, Repository 계층 호출
-    * **Repository:** 데이터 영속성 처리 (DB 접근), Spring Data JPA 활용
-    * **Entity/Model:** 데이터베이스 테이블과 매핑되는 객체 (JPA Entity), DTO (Data Transfer Object)
-* **데이터 저장소:** 각 서비스는 필요에 따라 MySQL(JPA), Elasticsearch, Redis 등 적합한 데이터 저장소를 사용합니다.
+* **주요 구성:** API Gateway, Eureka Server, 인증 서버(`auth-server`), 통합 백엔드 서버(`backend-server`)로 구성된 백엔드 시스템과 별도의 프론트엔드 BFF
+  서버(`frontend-server`).
+* **Spring Cloud:** 시스템 구성 및 연동을 위해 사용됩니다.
+    * `Eureka`: Service Discovery
+    * `Spring Cloud Gateway`: API Gateway 역할 (라우팅, 인증 연동 필터링 등)
+    * `OpenFeign`: 프론트엔드 BFF 서버와 백엔드 내부(Gateway -> Auth/Backend) 간 동기식 REST API 호출에 사용.
+* **Maven Multi-module:** `bluebooktle-shop` 백엔드 시스템 내 모듈들을 관리합니다.
+* **Layered Architecture:** `auth-server`와 `backend-server` 내부 코드는 역할(Controller, Service, Repository, Entity/DTO) 기반의
+  계층형 구조를 따릅니다. `backend-server` 내부는 추가적으로 도메인(`book`, `member` 등)별 패키지로 구성됩니다.
+* **데이터 저장소:** MySQL(JPA), Elasticsearch, H2(로컬), Redis(필요시) 등을 사용합니다.
 * **통신:**
-    * **동기:** 서비스 간 직접 호출이 필요한 경우 Feign Client를 사용합니다. 모든 외부 요청은 API Gateway를 통합니다.
-    * **비동기 (필요시):** 서비스 간 결합도를 낮추거나 특정 작업(예: 포인트 적립, 쿠폰 발급)을 비동기적으로 처리해야 할 때 RabbitMQ 같은 메시지 큐 사용을 고려할 수 있습니다.
+    * **Frontend -> Backend:** Frontend BFF가 API Gateway를 호출합니다.
+    * **Gateway -> Internal:** Gateway는 Eureka를 통해 Auth 서버 또는 Backend 서버를 찾아 라우팅합니다. 요청 전 Auth 서버를 통해 인증 토큰 검증 등을 수행할 수
+      있습니다.
+    * **Backend -> Auth:** Backend 서버는 필요시 Feign Client를 사용하여 Auth 서버에 사용자 정보 등을 요청할 수 있습니다.
+    * **비동기 (필요시):** RabbitMQ 등을 이용한 이벤트 기반 통신을 도입할 수 있습니다.
 
 ## 🛠️ 기술 스택 (Technology Stack)
 
 * **Language:** Java 21
-* **Framework:** Spring Boot 3.4.4, Spring Cloud 2024.0.1
-* **Data:** Spring Data JPA, MySQL 8.x, Elasticsearch 8.x
+* **Framework:** Spring Boot 3.4.4, Spring Cloud 2024.0.1 (⚠️ 버전 호환성 최종 확인 필수)
+* **Data:** Spring Data JPA, MySQL 8.x, Elasticsearch 8.x, H2 Database
 * **Cache/Queue (필요시):** Redis, RabbitMQ
-* **MSA Components:** Spring Cloud Netflix Eureka, Spring Cloud Gateway, Spring Cloud OpenFeign
+* **Infra Components:** Spring Cloud Netflix Eureka, Spring Cloud Gateway
+* **Communication:** Spring Cloud OpenFeign (HTTP Client)
+* **Security:** Spring Security, JWT (Json Web Token), OAuth2 (Client for Payco)
 * **Build Tool:** Maven 3.8+
-* **Testing:** JUnit 5, Mockito, AssertJ, Spring Boot Test
+* **Testing:** JUnit 5, Mockito, AssertJ, Spring Boot Test, Spring Security Test
 * **Code Coverage:** Jacoco
+* **Utilities:** Lombok
 * **Code Style:** Naver Code Style
 * **Commit Convention:** Conventional Commits
 * **CI/CD:** GitHub Actions (JAR 배포 + Shell Script)
@@ -140,8 +141,8 @@
 
 ## 📜 API 문서 (API Documentation)
 
-* 각 서비스의 REST API 명세는 추후 **Swagger/SpringDoc**을 적용하여 제공할 예정입니다. ([Swagger UI 링크 - 추가 예정]())
-* 또는, 프로젝트 내 `*.http` 파일을 참고할 수 있습니다. (IntelliJ IDEA 등에서 바로 실행 가능) ([API Spec 파일 위치 - 추가 예정]())
+* API 명세는 추후 **Swagger/SpringDoc**을 적용하여 제공할 예정입니다. ([Swagger UI 링크 - 추가 예정]())
+* 또는, 프로젝트 내 `*.http` 파일을 참고할 수 있습니다. ([API Spec 파일 위치 - 추가 예정]())
 
 ## 🌳 Git Flow 및 PR 전략 (Git Flow & PR Strategy)
 
