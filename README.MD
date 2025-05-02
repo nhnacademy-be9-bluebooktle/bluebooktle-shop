@@ -220,7 +220,7 @@
 * **IntelliJ 설정 방법:**
     * `Preferences (Settings)` > `Editor` > `Code Style` > `Java` 로 이동합니다.
     * `Scheme` 옆의 톱니바퀴 아이콘 클릭 > `Import Scheme` > `IntelliJ IDEA code style XML`
-      선택 > [naver-intellij-formatter.xml](https://raw.githubusercontent.com/naver/hackday-conventions-java/master/rule-config/naver-intellij-formatter.xml)
+      선택 > [naver-intellij-formatter.xml](https://github.com/naver/hackday-conventions-java/blob/master/rule-config/naver-intellij-formatter.xml)
       파일 URL을 사용하거나 다운로드하여 임포트합니다.
     * Scheme 이름(예: `Naver`)을 지정하고 적용합니다.
 
