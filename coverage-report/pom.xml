@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>shop.bluebooktle</groupId>
-        <artifactId>bluebooktle-backend</artifactId>
+        <artifactId>bluebooktle-shop</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
@@ -31,36 +31,6 @@
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>shop.bluebooktle</groupId>
-            <artifactId>member-service</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>shop.bluebooktle</groupId>
-            <artifactId>book-service</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>shop.bluebooktle</groupId>
-            <artifactId>coupon-service</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>shop.bluebooktle</groupId>
-            <artifactId>order-payment-service</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>shop.bluebooktle</groupId>
-            <artifactId>cart-service</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 
     <build>
@@ -71,9 +41,10 @@
                 <executions>
                     <execution>
                         <id>report-aggregate</id>
-                        <phase>verify</phase> <goals>
-                        <goal>report-aggregate</goal>
-                    </goals>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>report-aggregate</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>

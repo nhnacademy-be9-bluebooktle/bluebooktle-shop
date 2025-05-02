@@ -2,7 +2,6 @@ spring:
   application:
     name: eureka-server
 
-# Eureka 서버 설정: 자신은 등록/조회하지 않음
 eureka:
   client:
     register-with-eureka: false
@@ -12,4 +11,4 @@ eureka:
 
 logging:
   level:
-    shop.bluebooktle.eureka: INFO # 기본 로깅 레벨
+    shop.bluebooktle.eureka: INFO

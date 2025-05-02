@@ -1,8 +1,22 @@
 server:
   port: 9000
-
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: auth-server-route
+          uri: http://localhost:9001
+          predicates:
+            - Path=/auth/**
+        - id: backend-server-route
+          uri: http://localhost:9002
+          predicates:
+            - Path=/api/**
+eureka:
+  client:
+    enabled: false
 logging:
   level:
     shop.bluebooktle.gateway: DEBUG
-    org.springframework.cloud.gateway: DEBUG
+    org.springframework.cloud.gateway: TRACE
     reactor.netty.http.client: DEBUG

@@ -4,37 +4,25 @@ spring:
   cloud:
     gateway:
       routes:
-        - id: member-service-route
-          uri: lb://MEMBER-SERVICE
+        - id: auth-server-route
+          uri: lb://AUTH-SERVER
           predicates:
-            - Path=/members/**, /auth/**
-        - id: book-service-route
-          uri: lb://BOOK-SERVICE
+            - Path=/auth/**
+        - id: backend-server-route
+          uri: lb://BACKEND-SERVER
           predicates:
-            - Path=/books/**, /reviews/**, /search/**
-        - id: coupon-service-route
-          uri: lb://COUPON-SERVICE
-          predicates:
-            - Path=/coupons/**
-        - id: order-payment-service-route
-          uri: lb://ORDER-PAYMENT-SERVICE
-          predicates:
-            - Path=/orders/**, /payments/**
-        - id: cart-service-route
-          uri: lb://CART-SERVICE
-          predicates:
-            - Path=/carts/**
+            - Path=/api/**
 
       default-filters:
         - AddResponseHeader=X-Request-Source, ${spring.application.name}
 
-#eureka:
-#  client:
-#    register-with-eureka: true
-#    fetch-registry: true
-#  instance:
-#    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
-#    prefer-ip-address: true
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+    prefer-ip-address: true
 
 logging:
   level:
