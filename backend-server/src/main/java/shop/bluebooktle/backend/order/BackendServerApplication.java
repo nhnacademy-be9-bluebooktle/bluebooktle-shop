@@ -1,4 +1,4 @@
-package shop.bluebooktle.coupon;
+package shop.bluebooktle.backend.order;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -6,10 +6,10 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 
 @SpringBootApplication
 @EnableFeignClients
-public class CouponServiceApplication {
+public class BackendServerApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(CouponServiceApplication.class, args);
+		SpringApplication.run(BackendServerApplication.class, args);
 	}
 
 }
