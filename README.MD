@@ -216,7 +216,7 @@
 
 ## ✨ 코드 컨벤션 (Code Convention)
 
-* **[NAVER CAMPUS HACKDAY Java 코딩 컨벤션](https://naver.github.io/hackday-conventions-java/)** 을 따릅니다.
+* **[NAVER CAMPUS HACKDAY Java 코딩 컨벤션](https://naver.github.io/hackday-conventions-java/)** 을 따릅니다. 자세한 정보는 [문서](https://docs.google.com/document/d/1Spp44rc09BkJpojqlVp9ic_5h9FzlaKH_enXqGSuYGk/edit?usp=sharing)를 참고해주세요.
 * **IntelliJ 설정 방법:**
     * `Preferences (Settings)` > `Editor` > `Code Style` > `Java` 로 이동합니다.
     * `Scheme` 옆의 톱니바퀴 아이콘 클릭 > `Import Scheme` > `IntelliJ IDEA code style XML`
