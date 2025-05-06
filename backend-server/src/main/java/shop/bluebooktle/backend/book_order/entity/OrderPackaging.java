@@ -1,5 +1,9 @@
 package shop.bluebooktle.backend.book_order.entity;
 
+import java.time.LocalDateTime;
+
+import org.hibernate.annotations.CreationTimestamp;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -10,24 +14,19 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
-import shop.bluebooktle.common.entity.BaseEntity;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "order_packaging")
-@EqualsAndHashCode(of = "id", callSuper = false)
-@ToString(exclude = {"packagingOption", "bookOrder"})
-public class OrderPackaging extends BaseEntity {
+public class OrderPackaging {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "order_packaging_id")
-	private Long id;
+	private Long orderPackagingId;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "package_id", nullable = false)
@@ -40,4 +39,11 @@ public class OrderPackaging extends BaseEntity {
 	@Column(name = "quantity", nullable = false)
 	private Integer quantity;
 
+	@CreationTimestamp
+	@Column(name = "created_at", nullable = false, updatable = false)
+	private LocalDateTime createdAt;
+
+	@Column(name = "deleted_at")
+	private LocalDateTime deletedAt;
+	
 }

@@ -1,6 +1,8 @@
 package shop.bluebooktle.backend.book_order.entity;
 
-import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
+import org.hibernate.annotations.CreationTimestamp;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -12,25 +14,20 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 import shop.bluebooktle.backend.order.entity.Order;
-import shop.bluebooktle.common.entity.BaseEntity;
 
 @Entity
 @Table(name = "book_order")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-@EqualsAndHashCode(of = "id", callSuper = false)
-@ToString(exclude = {"order", "book"})
-public class BookOrder extends BaseEntity {
+public class BookOrder {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "book_order_id")
-	private Long id;
+	private Long bookOrderId;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "order_id", nullable = false)
@@ -43,7 +40,14 @@ public class BookOrder extends BaseEntity {
 	@Column(name = "quantity", nullable = false)
 	private Integer quantity;
 
-	@Column(name = "price", precision = 10, scale = 2, nullable = false)
-	private BigDecimal price;
+	@Column(name = "price", nullable = false)
+	private Integer price;
+
+	@CreationTimestamp
+	@Column(name = "created_at", nullable = false)
+	private LocalDateTime createdAt;
+
+	@Column(name = "deleted_at")
+	private LocalDateTime deletedAt;
 
 }

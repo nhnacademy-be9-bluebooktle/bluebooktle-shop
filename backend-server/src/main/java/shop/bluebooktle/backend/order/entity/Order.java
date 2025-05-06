@@ -1,6 +1,5 @@
 package shop.bluebooktle.backend.order.entity;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -14,18 +13,15 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
 @Entity
 @Getter
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "order")
-@EqualsAndHashCode(of = "id", callSuper = false)
-@ToString(exclude = {"orderState", "deliveryRule"})
 public class Order {
 
 	@Id
@@ -41,21 +37,17 @@ public class Order {
 	@JoinColumn(name = "delivery_rule_id", nullable = false)
 	private DeliveryRule deliveryRule;
 
-	// @ManyToOne(fetch = FetchType.LAZY)
-	// @JoinColumn(name = "user_id", nullable = false)
-	// private User user;
-
-	@Column(name = "order_date", nullable = false, updatable = false)
+	@Column(name = "order_date", nullable = false)
 	private LocalDateTime orderDate;
 
-	@Column(name = "requested_delivery_date", nullable = false)
-	private LocalDateTime requestedDeliveryDate;
+	@Column(name = "delivery_date", nullable = false)
+	private LocalDateTime deliveryDate;
 
 	@Column(name = "shipped_at")
 	private LocalDateTime shippedAt;
 
-	@Column(name = "delivery_fee", nullable = false, precision = 10, scale = 2)
-	private BigDecimal deliveryFee;
+	@Column(name = "delivery_fee", nullable = false)
+	private Integer deliveryFee;
 
 	@Column(name = "orderer_name", nullable = false, length = 20)
 	private String ordererName;

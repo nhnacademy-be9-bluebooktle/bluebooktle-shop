@@ -1,6 +1,6 @@
 package shop.bluebooktle.backend.payment.entity;
 
-import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -13,20 +13,15 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 import shop.bluebooktle.backend.order.entity.Order;
-import shop.bluebooktle.common.entity.BaseEntity;
 
 @Entity
 @Table(name = "payment")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@EqualsAndHashCode(of = "id", callSuper = false)
-@ToString(exclude = {"order", "paymentDetail"})
-public class Payment extends BaseEntity {
+public class Payment {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,9 +33,15 @@ public class Payment extends BaseEntity {
 	private Order order;
 
 	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "payment_detail_id", nullable = false, unique = true)
+	@JoinColumn(name = "payment_detail_id", nullable = false)
 	private PaymentDetail paymentDetail;
 
-	@Column(name = "price", nullable = false, precision = 10, scale = 2)
-	private BigDecimal price;
+	@Column(name = "price", nullable = false)
+	private Integer price;
+
+	@Column(name = "created_at", nullable = false)
+	private LocalDateTime createdAt;
+
+	@Column(name = "deleted_at")
+	private LocalDateTime deletedAt;
 }

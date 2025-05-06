@@ -1,5 +1,7 @@
 package shop.bluebooktle.backend.payment.entity;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -10,19 +12,14 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
-import shop.bluebooktle.common.entity.BaseEntity;
 
 @Entity
 @Getter
 @Table(name = "payment_detail")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@EqualsAndHashCode(of = "id", callSuper = false)
-@ToString(exclude = {"paymentType"})
-public class PaymentDetail extends BaseEntity {
+public class PaymentDetail {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,4 +32,10 @@ public class PaymentDetail extends BaseEntity {
 
 	@Column(name = "key", length = 255)
 	private String key;
+
+	@Column(name = "created_at", nullable = false)
+	private LocalDateTime createdAt;
+
+	@Column(name = "deleted_at")
+	private LocalDateTime deletedAt;
 }
