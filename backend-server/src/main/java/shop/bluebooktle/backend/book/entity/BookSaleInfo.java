@@ -71,5 +71,4 @@ public class BookSaleInfo extends BaseEntity {
 		SALE_ENDED,
 		DELETED
 	}
-
 }

@@ -1,5 +1,9 @@
 package shop.bluebooktle.backend.book.entity;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -22,6 +26,8 @@ import shop.bluebooktle.common.entity.BaseEntity;
 @ToString(exclude = {"book", "category"})
 @Getter
 @EqualsAndHashCode(of = "id", callSuper = false)
+@SQLDelete(sql = "UPDATE book_category SET deleted_at = CURRENT_TIMESTAMP WHERE book_category_id = ?")
+@SQLRestriction("deleted_at IS NULL")
 public class BookCategory extends BaseEntity {
 
 	@Id
