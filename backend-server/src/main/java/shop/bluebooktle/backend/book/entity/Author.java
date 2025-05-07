@@ -25,9 +25,6 @@ public class Author extends BaseEntity {
 	@Column(name = "name", nullable = false, length = 10)
 	private String name;
 
-	// created_at
-	// deleted_at
-
 	public Author(String name) {
 		this.name = name;
 	}
