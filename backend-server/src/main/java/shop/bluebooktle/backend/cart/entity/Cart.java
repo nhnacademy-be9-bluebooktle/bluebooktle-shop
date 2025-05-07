@@ -3,6 +3,9 @@ package shop.bluebooktle.backend.cart.entity;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,6 +17,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import shop.bluebooktle.backend.user.entity.User;
@@ -23,6 +27,9 @@ import shop.bluebooktle.common.entity.BaseEntity;
 @Entity
 @Getter
 @Table(name = "cart")
+@SQLDelete(sql = "UPDATE cart SET deleted_at = CURRENT_TIMESTAMP WHERE cart_id = ?")
+@SQLRestriction("deleted_at IS NULL")
+@EqualsAndHashCode(of = "id", callSuper = false)
 public class Cart extends BaseEntity {
 
 	@Id

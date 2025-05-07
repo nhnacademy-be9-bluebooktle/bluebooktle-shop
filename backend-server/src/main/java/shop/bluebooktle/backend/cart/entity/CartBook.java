@@ -1,5 +1,8 @@
 package shop.bluebooktle.backend.cart.entity;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -11,6 +14,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -22,6 +26,9 @@ import shop.bluebooktle.common.entity.BaseEntity;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString(exclude = {"book", "cart"})
+@SQLDelete(sql = "UPDATE cart_book SET deleted_at = CURRENT_TIMESTAMP WHERE cart_book_id = ?")
+@SQLRestriction("deleted_at IS NULL")
+@EqualsAndHashCode(of = "id", callSuper = false)
 public class CartBook extends BaseEntity {
 
 	@Id
