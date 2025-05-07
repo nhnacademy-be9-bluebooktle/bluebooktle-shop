@@ -20,6 +20,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import shop.bluebooktle.common.entity.BaseEntity;
 
 @Entity
 @Table(name = "refund")
@@ -27,14 +28,14 @@ import lombok.ToString;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(of = "id", callSuper = false)
 @ToString(exclude = {"order"})
-public class Refund {
+public class Refund extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "return_id")
 	private Long id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "order_id", nullable = false,unique = true)
+	@JoinColumn(name = "order_id", nullable = false, unique = true)
 	private Order order;
 
 	@Column(name = "date", nullable = false)

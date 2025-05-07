@@ -1,7 +1,6 @@
 package shop.bluebooktle.backend.order.entity;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -13,15 +12,14 @@ import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import shop.bluebooktle.common.entity.BaseEntity;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "delivery_rule")
 @EqualsAndHashCode(of = "id", callSuper = false)
-public class DeliveryRule {
+public class DeliveryRule extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "delivery_rule_id")
