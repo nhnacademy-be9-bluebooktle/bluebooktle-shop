@@ -14,6 +14,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -44,4 +45,14 @@ public class Coupon extends BaseEntity {
 	private LocalDateTime availableEndAt;
 	@Column(name = "minimum_payment", nullable = false)
 	private int minimumPayment;
+
+	@Builder
+	public Coupon(CouponType type, String couponName, LocalDateTime availableStartAt, LocalDateTime availableEndAt,
+		int minimumPayment) {
+		this.couponType = type;
+		this.couponName = couponName;
+		this.availableStartAt = availableStartAt;
+		this.availableEndAt = availableEndAt;
+		this.minimumPayment = minimumPayment;
+	}
 }

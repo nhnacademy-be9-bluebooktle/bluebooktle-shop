@@ -14,6 +14,7 @@ import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -38,4 +39,9 @@ public class AbsoluteCoupon extends BaseEntity {
 
 	@Column(name = "discount_price", precision = 10, scale = 2, nullable = false)
 	private BigDecimal discountPrice;
+
+	@Builder
+	public AbsoluteCoupon(BigDecimal discountPrice) {
+		this.discountPrice = discountPrice;
+	}
 }
