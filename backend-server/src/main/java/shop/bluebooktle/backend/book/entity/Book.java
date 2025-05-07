@@ -27,7 +27,6 @@ import shop.bluebooktle.common.entity.BaseEntity;
 
 @Entity
 @Getter
-@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "book")
 @EqualsAndHashCode(of = "bookId", callSuper = false)
