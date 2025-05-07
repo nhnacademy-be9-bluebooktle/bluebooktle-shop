@@ -14,6 +14,7 @@ import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -38,4 +39,10 @@ public class RelativeCoupon extends BaseEntity {
 	private BigDecimal maximumDiscountPrice;
 	@Column(name = "discount_percent", nullable = false)
 	private int discountPercent;
+
+	@Builder
+	public RelativeCoupon(BigDecimal maximumDiscountPrice, int discountPercent) {
+		this.maximumDiscountPrice = maximumDiscountPrice;
+		this.discountPercent = discountPercent;
+	}
 }
