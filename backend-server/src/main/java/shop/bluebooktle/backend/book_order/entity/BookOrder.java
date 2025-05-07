@@ -15,6 +15,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -51,5 +52,13 @@ public class BookOrder extends BaseEntity {
 
 	@Column(name = "price", precision = 10, scale = 2, nullable = false)
 	private BigDecimal price;
+
+	@Builder
+	public BookOrder(Order order, Book book, Integer quantity, BigDecimal price) {
+		this.order = order;
+		this.book = book;
+		this.quantity = quantity;
+		this.price = price;
+	}
 
 }

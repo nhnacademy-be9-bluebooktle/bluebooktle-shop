@@ -19,6 +19,7 @@ import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -62,5 +63,16 @@ public class Refund extends BaseEntity {
 
 	@Column(name = "price", nullable = false, precision = 10, scale = 2)
 	private BigDecimal price;
+
+	@Builder
+	public Refund(Order order, LocalDateTime date, RefundReason reason, String reasonDetail,
+		RefundStatus status, BigDecimal price) {
+		this.order = order;
+		this.date = date;
+		this.reason = reason;
+		this.reasonDetail = reasonDetail;
+		this.status = status;
+		this.price = price;
+	}
 
 }

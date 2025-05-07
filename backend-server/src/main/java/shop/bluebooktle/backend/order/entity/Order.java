@@ -17,6 +17,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -91,4 +92,26 @@ public class Order {
 
 	@Column(name = "order_key")
 	private UUID orderKey;
+
+	@Builder
+	public Order(OrderState orderState, DeliveryRule deliveryRule, User user, LocalDateTime orderDate,
+		LocalDateTime requestedDeliveryDate, LocalDateTime shippedAt, BigDecimal deliveryFee, String ordererName,
+		String ordererPhoneNumber, String receiverName, String receiverPhoneNumber, String address,
+		String detailAddress, String postalCode, String trackingNumber) {
+		this.orderState = orderState;
+		this.deliveryRule = deliveryRule;
+		this.user = user;
+		this.orderDate = orderDate;
+		this.requestedDeliveryDate = requestedDeliveryDate;
+		this.shippedAt = shippedAt;
+		this.deliveryFee = deliveryFee;
+		this.ordererName = ordererName;
+		this.ordererPhoneNumber = ordererPhoneNumber;
+		this.receiverName = receiverName;
+		this.receiverPhoneNumber = receiverPhoneNumber;
+		this.address = address;
+		this.detailAddress = detailAddress;
+		this.postalCode = postalCode;
+		this.trackingNumber = trackingNumber;
+	}
 }
