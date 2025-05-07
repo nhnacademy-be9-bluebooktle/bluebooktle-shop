@@ -1,7 +1,5 @@
 package shop.bluebooktle.backend.cart.entity;
 
-import java.awt.print.Book;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -16,6 +14,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import shop.bluebooktle.backend.book.entity.Book;
 import shop.bluebooktle.common.entity.BaseEntity;
 
 @Entity
@@ -27,7 +26,7 @@ public class CartBook extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "cart_book_id)")
+	@Column(name = "cart_book_id")
 	private Long id;
 
 	@Column(name = "quantity")
@@ -42,9 +41,10 @@ public class CartBook extends BaseEntity {
 	private Cart cart;
 
 	@Builder
-	public CartBook(Book book, Cart cart) {
+	public CartBook(Book book, Cart cart, int quantity) {
 		this.book = book;
 		this.cart = cart;
+		this.quantity = quantity;
 	}
 
 }

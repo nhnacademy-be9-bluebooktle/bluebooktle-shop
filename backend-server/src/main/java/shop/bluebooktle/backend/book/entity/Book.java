@@ -17,6 +17,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import shop.bluebooktle.backend.cart.entity.Cart;
+import shop.bluebooktle.backend.cart.entity.CartBook;
 
 @Entity
 @Getter
@@ -48,9 +50,14 @@ public class Book {
 	@OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
 	private List<CartBook> cartBooks = new ArrayList<>();
 
-	public void addCart(Cart cart) {
-		CartBook cartBook = CartBook.builder().book(this).cart(cart).build();
+	public void addCart(Cart cart, int quantity) {
+		CartBook cartBook = CartBook.builder()
+			.book(this)
+			.cart(cart)
+			.quantity(quantity)
+			.build();
 
 		this.cartBooks.add(cartBook);
+		cart.getCartBooks().add(cartBook);
 	}
 }
