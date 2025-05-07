@@ -4,9 +4,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -20,7 +20,6 @@ import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import shop.bluebooktle.backend.cart.entity.Cart;
 import shop.bluebooktle.backend.cart.entity.CartBook;
 import shop.bluebooktle.common.entity.BaseEntity;
@@ -58,11 +57,7 @@ public class Book extends BaseEntity {
 	private List<CartBook> cartBooks = new ArrayList<>();
 
 	public void addCart(Cart cart, int quantity) {
-		CartBook cartBook = CartBook.builder()
-			.book(this)
-			.cart(cart)
-			.quantity(quantity)
-			.build();
+		CartBook cartBook = CartBook.builder().book(this).cart(cart).quantity(quantity).build();
 
 		this.cartBooks.add(cartBook);
 		cart.getCartBooks().add(cartBook);

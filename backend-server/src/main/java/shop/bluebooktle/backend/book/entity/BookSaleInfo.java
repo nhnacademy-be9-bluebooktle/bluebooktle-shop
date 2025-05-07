@@ -66,9 +66,6 @@ public class BookSaleInfo extends BaseEntity {
 	private Long searchCount;
 
 	public enum State {
-		AVAILABLE,
-		LOW_STOCK,
-		SALE_ENDED,
-		DELETED
+		AVAILABLE, LOW_STOCK, SALE_ENDED, DELETED
 	}
 }
