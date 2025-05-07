@@ -8,6 +8,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
@@ -15,6 +16,7 @@ import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import shop.bluebooktle.backend.book.entity.Category;
 import shop.bluebooktle.common.entity.BaseEntity;
 
 @Entity
@@ -33,9 +35,8 @@ public class CategoryCoupon extends BaseEntity {
 	@JoinColumn(name = "coupon_id", nullable = false)
 	private Coupon coupon;
 
-	//TODO Category Entity 생성 시 주석제거
-	// @ManyToOne(fetch = FetchType.LAZY)
-	// @JoinColumn(name = "category_id",nullable = false)
-	// private Category category;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "category_id", nullable = false)
+	private Category category;
 
 }
