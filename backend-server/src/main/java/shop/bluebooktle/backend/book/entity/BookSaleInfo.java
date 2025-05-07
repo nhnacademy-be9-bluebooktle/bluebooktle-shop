@@ -20,25 +20,21 @@ import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
 import shop.bluebooktle.common.entity.BaseEntity;
 
 @Entity
 @Getter
-@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "book_sale_info")
 @EqualsAndHashCode(of = {"bookSaleInfoId"}, callSuper = false)
-@SQLDelete(sql = "UPDATE book_sail_info SET deleted_at = CURRENT_TIMESTAMP WHERE book_sail_info_id = ?")
+@SQLDelete(sql = "UPDATE book_sale_info SET deleted_at = CURRENT_TIMESTAMP WHERE book_sale_info_id = ?")
 @SQLRestriction("deleted_at IS NULL")
-@ToString(exclude = {"book"})
 public class BookSaleInfo extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "book_sale_info_id")
-	private Long Id;
+	private Long id;
 
 	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "book_id", nullable = false, unique = true)
