@@ -14,19 +14,23 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "order_packaging")
+@EqualsAndHashCode(of = "id", callSuper = false)
+@ToString(exclude = {"packagingOption", "bookOrder"})
 public class OrderPackaging {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "order_packaging_id")
-	private Long orderPackagingId;
+	private Long id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "package_id", nullable = false)
@@ -38,12 +42,5 @@ public class OrderPackaging {
 
 	@Column(name = "quantity", nullable = false)
 	private Integer quantity;
-
-	@CreationTimestamp
-	@Column(name = "created_at", nullable = false, updatable = false)
-	private LocalDateTime createdAt;
-
-	@Column(name = "deleted_at")
-	private LocalDateTime deletedAt;
 	
 }

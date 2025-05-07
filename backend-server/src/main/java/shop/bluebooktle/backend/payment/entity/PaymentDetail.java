@@ -12,13 +12,17 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
 @Getter
 @Table(name = "payment_detail")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EqualsAndHashCode(of = "id", callSuper = false)
+@ToString(exclude = {"paymentType"})
 public class PaymentDetail {
 
 	@Id
@@ -32,10 +36,4 @@ public class PaymentDetail {
 
 	@Column(name = "key", length = 255)
 	private String key;
-
-	@Column(name = "created_at", nullable = false)
-	private LocalDateTime createdAt;
-
-	@Column(name = "deleted_at")
-	private LocalDateTime deletedAt;
 }

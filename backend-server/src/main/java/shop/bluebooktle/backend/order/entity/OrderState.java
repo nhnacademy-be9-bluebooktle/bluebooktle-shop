@@ -11,15 +11,17 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 @Entity
 @Table(name = "order_state")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-@Setter
+@EqualsAndHashCode(of = "id", callSuper = false)
 public class OrderState {
 
 	@Id
@@ -28,14 +30,8 @@ public class OrderState {
 	private Long id;
 
 	@Enumerated(EnumType.STRING)
-	@Column(name = "state", nullable = false)
+	@Column(name = "state", nullable = false, length = 10)
 	private State state;
-
-	@Column(name = "created_at", nullable = false)
-	private LocalDateTime createdAt;
-
-	@Column(name = "deleted_at")
-	private LocalDateTime deletedAt;
 
 	public enum State {
 		PENDING,
