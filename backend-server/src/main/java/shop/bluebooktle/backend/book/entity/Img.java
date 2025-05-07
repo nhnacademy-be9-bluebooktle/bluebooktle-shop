@@ -16,11 +16,11 @@ import shop.bluebooktle.common.entity.BaseEntity;
 @Table(name = "img")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@EqualsAndHashCode(of = "imgId", callSuper = false)
+@EqualsAndHashCode(of = "id", callSuper = false)
 public class Img extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long imgId;
+	private Long id;
 
 	@Column(name = "img_url", nullable = false, length = 255)
 	private String imgUrl;

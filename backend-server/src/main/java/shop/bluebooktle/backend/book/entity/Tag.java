@@ -16,12 +16,12 @@ import shop.bluebooktle.common.entity.BaseEntity;
 @Table(name = "tag")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@EqualsAndHashCode(of = "tagId", callSuper = false)
+@EqualsAndHashCode(of = "id", callSuper = false)
 public class Tag extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long tagId;
+	private Long id;
 
 	@Column(name = "name", nullable = false, length = 20)
 	private String name;

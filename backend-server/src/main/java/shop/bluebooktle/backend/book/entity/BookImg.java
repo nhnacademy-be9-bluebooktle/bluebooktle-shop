@@ -20,12 +20,12 @@ import lombok.ToString;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString(exclude = {"book, img"})
-@EqualsAndHashCode(of = "bookImgId", callSuper = false)
+@EqualsAndHashCode(of = "id", callSuper = false)
 public class BookImg {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long bookImgId;
+	private Long id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "book_id", nullable = false)

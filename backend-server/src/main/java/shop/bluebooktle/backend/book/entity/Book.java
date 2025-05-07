@@ -29,7 +29,7 @@ import shop.bluebooktle.common.entity.BaseEntity;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "book")
-@EqualsAndHashCode(of = "bookId", callSuper = false)
+@EqualsAndHashCode(of = "id", callSuper = false)
 @SQLDelete(sql = "UPDATE book SET deleted_at = CURRENT_TIMESTAMP WHERE book_id = ?")
 @SQLRestriction("deleted_at IS NULL")
 public class Book extends BaseEntity {

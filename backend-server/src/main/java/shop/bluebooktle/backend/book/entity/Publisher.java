@@ -16,12 +16,12 @@ import shop.bluebooktle.common.entity.BaseEntity;
 @Table(name = "publisher")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@EqualsAndHashCode(of = "publisherId", callSuper = false)
+@EqualsAndHashCode(of = "id", callSuper = false)
 public class Publisher extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long publisherId;
+	private Long id;
 
 	@Column(name = "name", nullable = false, length = 20)
 	private String name;
