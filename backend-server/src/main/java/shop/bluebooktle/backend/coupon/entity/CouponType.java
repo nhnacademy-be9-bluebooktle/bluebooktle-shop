@@ -35,7 +35,12 @@ public class CouponType extends BaseEntity {
 	@Column(name = "target", nullable = false, length = 5)
 	private Target target;
 
-	private enum Target {
+	public enum Target {
 		ORDER, BOOK
+	}
+
+	public CouponType(String name, Target target) {
+		this.name = name;
+		this.target = target;
 	}
 }

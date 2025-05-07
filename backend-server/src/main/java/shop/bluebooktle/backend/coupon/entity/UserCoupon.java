@@ -18,6 +18,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import shop.bluebooktle.backend.user.entity.User;
 import shop.bluebooktle.common.entity.BaseEntity;
 
 @Entity
@@ -39,8 +40,7 @@ public class UserCoupon extends BaseEntity {
 	@Column(name = "used_at", nullable = false)
 	private LocalDateTime usedAt;
 
-	//TODO User Entity 생성 시 주석 제거
-	// @ManyToOne
-	// @JoinColumn(name = "user_id", nullable = false)
-	// private User user;
+	@ManyToOne
+	@JoinColumn(name = "user_id", nullable = false)
+	private User user;
 }
