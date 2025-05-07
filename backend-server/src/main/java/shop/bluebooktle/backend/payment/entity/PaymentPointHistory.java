@@ -20,7 +20,7 @@ import lombok.ToString;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(of = "id", callSuper = false)
-@ToString(exclude = {"payment", "pointHistory","user"})
+@ToString(exclude = {"payment", "pointHistory", "user"})
 public class PaymentPointHistory {
 
 	@Id
@@ -35,8 +35,8 @@ public class PaymentPointHistory {
 	// @OneToOne(fetch = FetchType.LAZY)
 	// @JoinColumn(name = "point_id", nullable = false,unique = true)
 	// private PointHistory pointHistory;
-	//
+
 	// @OneToOne(fetch = FetchType.LAZY)
-	// @JoinColumn(name = "user_id", nullable = false,unique = true)
+	// @JoinColumn(name = "user_id", nullable = false, unique = true)
 	// private User user;
 }

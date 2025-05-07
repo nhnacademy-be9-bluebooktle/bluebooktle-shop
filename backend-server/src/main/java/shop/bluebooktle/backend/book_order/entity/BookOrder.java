@@ -1,9 +1,6 @@
 package shop.bluebooktle.backend.book_order.entity;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-
-import org.hibernate.annotations.CreationTimestamp;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -20,6 +17,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import shop.bluebooktle.backend.order.entity.Order;
+import shop.bluebooktle.common.entity.BaseEntity;
 
 @Entity
 @Table(name = "book_order")
@@ -27,7 +25,7 @@ import shop.bluebooktle.backend.order.entity.Order;
 @Getter
 @EqualsAndHashCode(of = "id", callSuper = false)
 @ToString(exclude = {"order", "book"})
-public class BookOrder {
+public class BookOrder extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -45,7 +43,7 @@ public class BookOrder {
 	@Column(name = "quantity", nullable = false)
 	private Integer quantity;
 
-	@Column(name ="price", precision = 10, scale = 2, nullable = false)
+	@Column(name = "price", precision = 10, scale = 2, nullable = false)
 	private BigDecimal price;
 
 }
