@@ -24,6 +24,17 @@
         <jacoco.version>0.8.13</jacoco.version>
         <maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version>
     </properties>
+    <dependencies>
+        <dependency>
+            <groupId>jakarta.persistence</groupId>
+            <artifactId>jakarta.persistence-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
 
     <modules>
         <module>common-module</module>
