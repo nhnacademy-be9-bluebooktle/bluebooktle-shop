@@ -24,8 +24,6 @@ import shop.bluebooktle.common.entity.BaseEntity;
 @Table(name = "coupon")
 @SQLDelete(sql = "UPDATE coupon SET deleted_at = CURRENT_TIMESTAMP WHERE coupon_id = ?")
 @SQLRestriction("deleted_at IS NULL")
-// @Inheritance(strategy = InheritanceType.JOINED)
-// @DiscriminatorColumn(name = "target", discriminatorType = DiscriminatorType.STRING)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(of = "id", callSuper = false)
@@ -46,5 +44,4 @@ public class Coupon extends BaseEntity {
 	private LocalDateTime availableEndAt;
 	@Column(name = "minimum_payment", nullable = false)
 	private int minimumPayment;
-
 }
