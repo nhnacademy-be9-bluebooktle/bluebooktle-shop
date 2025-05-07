@@ -6,14 +6,10 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.DiscriminatorColumn;
-import jakarta.persistence.DiscriminatorType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Inheritance;
-import jakarta.persistence.InheritanceType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -28,8 +24,8 @@ import shop.bluebooktle.common.entity.BaseEntity;
 @Table(name = "coupon")
 @SQLDelete(sql = "UPDATE coupon SET deleted_at = CURRENT_TIMESTAMP WHERE coupon_id = ?")
 @SQLRestriction("deleted_at IS NULL")
-@Inheritance(strategy = InheritanceType.JOINED)
-@DiscriminatorColumn(name = "target", discriminatorType = DiscriminatorType.STRING)
+// @Inheritance(strategy = InheritanceType.JOINED)
+// @DiscriminatorColumn(name = "target", discriminatorType = DiscriminatorType.STRING)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(of = "id", callSuper = false)
@@ -50,4 +46,5 @@ public class Coupon extends BaseEntity {
 	private LocalDateTime availableEndAt;
 	@Column(name = "minimum_payment", nullable = false)
 	private int minimumPayment;
+
 }

@@ -34,4 +34,8 @@ public class CouponType extends BaseEntity {
 	@Enumerated(EnumType.STRING)
 	@Column(name = "target", nullable = false, length = 5)
 	private Target target;
+
+	private enum Target {
+		ORDER, BOOK
+	}
 }

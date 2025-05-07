@@ -3,6 +3,7 @@ package shop.bluebooktle.backend.coupon.entity;
 import java.math.BigDecimal;
 
 import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -21,6 +22,7 @@ import shop.bluebooktle.common.entity.BaseEntity;
 @Entity
 @Table(name = "absolute_coupon")
 @SQLDelete(sql = "UPDATE absolute_coupon SET deleted_at = CURRENT_TIMESTAMP WHERE coupon_type_id = ?")
+@SQLRestriction("deleted_at IS NULL")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(of = "id", callSuper = false)
