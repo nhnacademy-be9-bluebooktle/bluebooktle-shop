@@ -13,7 +13,6 @@ import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -39,10 +38,4 @@ public class BookCoupon extends BaseEntity {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "book_id", nullable = false)
 	private Book book;
-
-	@Builder
-	public BookCoupon(Coupon coupon, Book book) {
-		this.coupon = coupon;
-		this.book = book;
-	}
 }

@@ -38,11 +38,10 @@ public class RelativeCoupon extends BaseEntity {
 	@Column(name = "maximum_discount_price", precision = 10, scale = 2, nullable = false)
 	private BigDecimal maximumDiscountPrice;
 	@Column(name = "discount_percent", nullable = false)
-	private Integer discountPercent;
+	private int discountPercent;
 
 	@Builder
-	public RelativeCoupon(CouponType couponType, BigDecimal maximumDiscountPrice, Integer discountPercent) {
-		this.couponType = couponType;
+	public RelativeCoupon(BigDecimal maximumDiscountPrice, int discountPercent) {
 		this.maximumDiscountPrice = maximumDiscountPrice;
 		this.discountPercent = discountPercent;
 	}

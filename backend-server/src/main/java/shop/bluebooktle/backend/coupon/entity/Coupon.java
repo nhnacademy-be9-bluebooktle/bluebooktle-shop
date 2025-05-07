@@ -1,11 +1,12 @@
 package shop.bluebooktle.backend.coupon.entity;
 
+import java.time.LocalDateTime;
+
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -33,19 +34,25 @@ public class Coupon extends BaseEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "coupon_id", nullable = false)
 	private Long id;
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(optional = false)
 	@JoinColumn(name = "coupon_type_id", nullable = false)
 	private CouponType couponType;
-	@Column(name = "name", nullable = false, length = 100)
+	@Column(name = "coupon_name", nullable = false, length = 100)
 	private String couponName;
+	@Column(name = "available_start_at", nullable = false)
+	private LocalDateTime availableStartAt;
+	@Column(name = "available_end_at", nullable = false)
+	private LocalDateTime availableEndAt;
+	@Column(name = "minimum_payment", nullable = false)
+	private int minimumPayment;
 
 	@Builder
-	public Coupon(CouponType type, String couponName) {
+	public Coupon(CouponType type, String couponName, LocalDateTime availableStartAt, LocalDateTime availableEndAt,
+		int minimumPayment) {
 		this.couponType = type;
 		this.couponName = couponName;
-	}
-
-	public void update(String couponName) {
-		this.couponName = couponName;
+		this.availableStartAt = availableStartAt;
+		this.availableEndAt = availableEndAt;
+		this.minimumPayment = minimumPayment;
 	}
 }
