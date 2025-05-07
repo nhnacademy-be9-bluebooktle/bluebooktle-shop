@@ -1,5 +1,8 @@
 package shop.bluebooktle.backend.payment.entity;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -17,6 +20,8 @@ import shop.bluebooktle.common.entity.BaseEntity;
 @Table(name = "payment_type")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(of = "id", callSuper = false)
+@SQLDelete(sql = "UPDATE payment_type SET deleted_at = CURRENT_TIMESTAMP WHERE payment_type_id = ?")
+@SQLRestriction("deleted_at IS NULL")
 public class PaymentType extends BaseEntity {
 
 	@Id

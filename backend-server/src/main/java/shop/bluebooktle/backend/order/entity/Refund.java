@@ -3,6 +3,9 @@ package shop.bluebooktle.backend.order.entity;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -20,6 +23,8 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import shop.bluebooktle.common.domain.RefundReason;
+import shop.bluebooktle.common.domain.RefundStatus;
 import shop.bluebooktle.common.entity.BaseEntity;
 
 @Entity
@@ -28,6 +33,8 @@ import shop.bluebooktle.common.entity.BaseEntity;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(of = "id", callSuper = false)
 @ToString(exclude = {"order"})
+@SQLDelete(sql = "UPDATE refund SET deleted_at = CURRENT_TIMESTAMP WHERE return_id = ?")
+@SQLRestriction("deleted_at IS NULL")
 public class Refund extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,7 +49,7 @@ public class Refund extends BaseEntity {
 	private LocalDateTime date;
 
 	@Column(name = "reason", nullable = false)
-	private Reason reason;
+	private RefundReason reason;
 
 	//TODO @Lob이 mysql에서 TEXT type인지 확인
 	@Lob
@@ -51,23 +58,9 @@ public class Refund extends BaseEntity {
 
 	@Enumerated(EnumType.STRING)
 	@Column(name = "status", nullable = false)
-	private Status status;
+	private RefundStatus status;
 
 	@Column(name = "price", nullable = false, precision = 10, scale = 2)
 	private BigDecimal price;
 
-	public enum Status {
-		PENDING,
-		PROGRESS,
-		COMPLETE,
-		CANCELED
-	}
-
-	public enum Reason {
-		CHANGE_OF_MIND,
-		DEFECT,
-		DAMAGED,
-		WRONG_DELIVERY,
-		OTHER
-	}
 }

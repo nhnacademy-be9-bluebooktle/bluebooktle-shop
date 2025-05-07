@@ -2,6 +2,9 @@ package shop.bluebooktle.backend.order.entity;
 
 import java.math.BigDecimal;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -19,6 +22,8 @@ import shop.bluebooktle.common.entity.BaseEntity;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "delivery_rule")
 @EqualsAndHashCode(of = "id", callSuper = false)
+@SQLDelete(sql = "UPDATE delivery_rule SET deleted_at = CURRENT_TIMESTAMP WHERE delivery_rule_id = ?")
+@SQLRestriction("deleted_at IS NULL")
 public class DeliveryRule extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

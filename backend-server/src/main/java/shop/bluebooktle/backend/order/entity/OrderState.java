@@ -1,5 +1,8 @@
 package shop.bluebooktle.backend.order.entity;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -12,6 +15,7 @@ import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import shop.bluebooktle.common.domain.OrderStatus;
 import shop.bluebooktle.common.entity.BaseEntity;
 
 @Entity
@@ -19,6 +23,8 @@ import shop.bluebooktle.common.entity.BaseEntity;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @EqualsAndHashCode(of = "id", callSuper = false)
+@SQLDelete(sql = "UPDATE order_state SET deleted_at = CURRENT_TIMESTAMP WHERE order_state_id = ?")
+@SQLRestriction("deleted_at IS NULL")
 public class OrderState extends BaseEntity {
 
 	@Id
@@ -28,13 +34,6 @@ public class OrderState extends BaseEntity {
 
 	@Enumerated(EnumType.STRING)
 	@Column(name = "state", nullable = false, length = 10)
-	private State state;
+	private OrderStatus state;
 
-	public enum State {
-		PENDING,
-		SHIPPING,
-		COMPLETED,
-		RETURNED,
-		CANCELED
-	}
 }

@@ -4,6 +4,9 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -17,8 +20,8 @@ import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.ToString;
+import shop.bluebooktle.backend.user.entity.User;
 
 @Entity
 @Getter
@@ -26,6 +29,8 @@ import lombok.ToString;
 @Table(name = "order")
 @EqualsAndHashCode(of = "id", callSuper = false)
 @ToString(exclude = {"orderState", "deliveryRule"})
+@SQLDelete(sql = "UPDATE order SET deleted_at = CURRENT_TIMESTAMP WHERE order_id = ?")
+@SQLRestriction("deleted_at IS NULL")
 public class Order {
 
 	@Id
@@ -41,9 +46,9 @@ public class Order {
 	@JoinColumn(name = "delivery_rule_id", nullable = false)
 	private DeliveryRule deliveryRule;
 
-	// @ManyToOne(fetch = FetchType.LAZY)
-	// @JoinColumn(name = "user_id", nullable = false)
-	// private User user;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "user_id", nullable = false)
+	private User user;
 
 	@Column(name = "order_date", nullable = false, updatable = false)
 	private LocalDateTime orderDate;
