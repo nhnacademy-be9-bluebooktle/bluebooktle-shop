@@ -38,7 +38,7 @@ public class Book extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "book_id")
-	private Long bookId;
+	private Long Id;
 
 	@Column(name = "title", nullable = false, length = 255)
 	private String title;

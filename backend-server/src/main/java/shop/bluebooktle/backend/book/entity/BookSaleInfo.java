@@ -36,7 +36,7 @@ public class BookSaleInfo extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "book_sale_info_id")
-	private Long bookSaleInfoId;
+	private Long Id;
 
 	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "book_id", nullable = false, unique = true)
@@ -59,13 +59,13 @@ public class BookSaleInfo extends BaseEntity {
 
 	@Column(name = "state")
 	@Enumerated(EnumType.STRING)
-	private State state;
+	private State state = State.AVAILABLE;
 
-	@Column(name = "view_count", nullable = false)
-	private Integer viewCount;
+	@Column(name = "view_count", nullable = false, columnDefinition = "BIGINT DEFALUT 0")
+	private Long viewCount;
 
-	@Column(name = "search_count", nullable = false)
-	private Integer searchCount;
+	@Column(name = "search_count", nullable = false, columnDefinition = "BIGINT DEFALUT 0")
+	private Long searchCount;
 
 	public enum State {
 		AVAILABLE,
