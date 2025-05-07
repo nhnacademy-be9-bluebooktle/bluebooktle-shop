@@ -25,6 +25,7 @@ public class Tag extends BaseEntity {
 	@Column(name = "name", nullable = false, length = 20)
 	private String name;
 
-	// created_at
-	// deleted_at
+	public Tag(String name) {
+		this.name = name;
+	}
 }

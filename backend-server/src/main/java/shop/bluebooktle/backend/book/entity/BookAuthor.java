@@ -34,4 +34,9 @@ public class BookAuthor {
 	@JoinColumn(name = "book_id", nullable = false)
 	private Book book;
 
+	public BookAuthor(Author author, Book book) {
+		this.author = author;
+		this.book = book;
+	}
+
 }

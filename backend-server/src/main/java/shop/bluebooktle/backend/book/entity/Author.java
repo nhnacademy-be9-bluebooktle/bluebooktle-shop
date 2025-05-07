@@ -27,4 +27,8 @@ public class Author extends BaseEntity {
 
 	// created_at
 	// deleted_at
+
+	public Author(String name) {
+		this.name = name;
+	}
 }

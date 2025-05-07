@@ -25,4 +25,8 @@ public class BookSaleInfo {
 
 	@Column(name = "book_id")
 	private Long bookId;
+
+	public BookSaleInfo(Long bookId) {
+		this.bookId = bookId;
+	}
 }

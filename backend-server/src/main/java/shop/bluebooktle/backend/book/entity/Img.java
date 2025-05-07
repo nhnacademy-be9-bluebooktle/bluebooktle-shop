@@ -24,6 +24,7 @@ public class Img extends BaseEntity {
 	@Column(name = "img_url", nullable = false, length = 255)
 	private String imgUrl;
 
-	// created_at
-	// deleted_at
+	public Img(String imgUrl) {
+		this.imgUrl = imgUrl;
+	}
 }

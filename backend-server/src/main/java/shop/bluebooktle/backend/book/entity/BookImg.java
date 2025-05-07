@@ -37,4 +37,10 @@ public class BookImg {
 
 	@Column(name = "isThumbnail", nullable = false)
 	private boolean isThumbnail;
+
+	public BookImg(Book book, Img img, boolean isThumbnail) {
+		this.book = book;
+		this.img = img;
+		this.isThumbnail = isThumbnail;
+	}
 }
