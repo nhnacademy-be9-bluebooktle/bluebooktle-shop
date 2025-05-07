@@ -14,18 +14,20 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import lombok.Getter;
 import lombok.ToString;
 import shop.bluebooktle.backend.user.entity.User;
 import shop.bluebooktle.common.entity.BaseEntity;
 
 @ToString(exclude = "cartBooks")
 @Entity
+@Getter
 @Table(name = "cart")
 public class Cart extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "cart_id)")
+	@Column(name = "cart_id")
 	private Long id;
 
 	@OneToOne(fetch = FetchType.LAZY)
