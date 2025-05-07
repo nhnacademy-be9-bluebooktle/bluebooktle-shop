@@ -21,9 +21,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -55,29 +52,21 @@ public class User extends BaseEntity {
 	@JoinColumn(name = "membership_id", nullable = false)
 	private MembershipLevel membershipLevel;
 
-	@NotBlank
 	@Column(name = "login_id", nullable = false, unique = true, length = 50)
 	private String loginId;
 
-	@NotBlank
 	@Column(name = "password", nullable = false, length = 255)
 	private String password;
 
-	@NotBlank
-	@Size(max = 20)
 	@Column(name = "name", nullable = false, length = 20)
 	private String name;
 
-	@Email
-	@NotBlank
 	@Column(name = "email", nullable = false, unique = true, length = 50)
 	private String email;
 
 	@Column(name = "birth", nullable = false)
 	private LocalDateTime birth;
 
-	@NotBlank
-	@Size(max = 11)
 	@Column(name = "phone_number", nullable = false, length = 11)
 	private String phoneNumber;
 
@@ -136,5 +125,4 @@ public class User extends BaseEntity {
 	public void updateStatus(UserStatus newStatus) {
 		this.status = newStatus;
 	}
-
 }

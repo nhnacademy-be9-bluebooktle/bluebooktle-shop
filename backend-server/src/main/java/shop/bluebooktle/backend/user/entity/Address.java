@@ -12,8 +12,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -41,23 +39,15 @@ public class Address extends BaseEntity {
 	@JoinColumn(name = "user_id", nullable = false)
 	private User user;
 
-	@NotBlank
-	@Size(max = 50)
 	@Column(name = "alias", nullable = false, length = 50)
 	private String alias;
 
-	@NotBlank
-	@Size(max = 255)
-	@Column(name = "road_address", nullable = false, length = 255)
+	@Column(name = "road_address", nullable = false)
 	private String roadAddress;
 
-	@NotBlank
-	@Size(max = 255)
-	@Column(name = "detail_address", nullable = false, length = 255)
+	@Column(name = "detail_address", nullable = false)
 	private String detailAddress;
 
-	@NotBlank
-	@Size(max = 5)
 	@Column(name = "postal_code", nullable = false, length = 5)
 	private String postalCode;
 
