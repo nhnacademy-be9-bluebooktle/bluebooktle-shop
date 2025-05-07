@@ -1,5 +1,6 @@
 package shop.bluebooktle.backend.order.entity;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
@@ -9,30 +10,29 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 @Entity
 @Getter
-@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "delivery_rule")
+@EqualsAndHashCode(of = "id", callSuper = false)
 public class DeliveryRule {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "delivery_rule_id")
 	private Long id;
 
-	@Column(name = "name", nullable = false)
+	@Column(name = "name", nullable = false, length = 50)
 	private String name;
 
-	@Column(name = "price", nullable = false)
-	private Integer price;
+	@Column(name = "price", nullable = false, precision = 10, scale = 2)
+	private BigDecimal price;
 
-	@Column(name = "created_at", nullable = false)
-	private LocalDateTime createdAt;
-
-	@Column(name = "deleted_at")
-	private LocalDateTime deletedAt;
+	@Column(name = "delivery_fee", nullable = false, precision = 10, scale = 2)
+	private BigDecimal deliveryFee;
 }

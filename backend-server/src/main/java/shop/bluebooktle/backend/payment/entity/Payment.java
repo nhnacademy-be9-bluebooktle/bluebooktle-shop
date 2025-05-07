@@ -1,5 +1,6 @@
 package shop.bluebooktle.backend.payment.entity;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
@@ -13,14 +14,18 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import shop.bluebooktle.backend.order.entity.Order;
 
 @Entity
 @Table(name = "payment")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EqualsAndHashCode(of = "id", callSuper = false)
+@ToString(exclude = {"order", "paymentDetail"})
 public class Payment {
 
 	@Id
@@ -33,15 +38,9 @@ public class Payment {
 	private Order order;
 
 	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "payment_detail_id", nullable = false)
+	@JoinColumn(name = "payment_detail_id", nullable = false,unique = true)
 	private PaymentDetail paymentDetail;
 
-	@Column(name = "price", nullable = false)
-	private Integer price;
-
-	@Column(name = "created_at", nullable = false)
-	private LocalDateTime createdAt;
-
-	@Column(name = "deleted_at")
-	private LocalDateTime deletedAt;
+	@Column(name = "price", nullable = false, precision = 10, scale = 2)
+	private BigDecimal price;
 }

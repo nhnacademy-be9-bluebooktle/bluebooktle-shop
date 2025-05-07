@@ -10,13 +10,17 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
 @Table(name = "payment_point_history")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EqualsAndHashCode(of = "id", callSuper = false)
+@ToString(exclude = {"payment", "pointHistory","user"})
 public class PaymentPointHistory {
 
 	@Id
@@ -29,10 +33,10 @@ public class PaymentPointHistory {
 	private Payment payment;
 
 	// @OneToOne(fetch = FetchType.LAZY)
-	// @JoinColumn(name = "point_id", nullable = false)
+	// @JoinColumn(name = "point_id", nullable = false,unique = true)
 	// private PointHistory pointHistory;
 	//
 	// @OneToOne(fetch = FetchType.LAZY)
-	// @JoinColumn(name = "user_id", nullable = false)
+	// @JoinColumn(name = "user_id", nullable = false,unique = true)
 	// private User user;
 }

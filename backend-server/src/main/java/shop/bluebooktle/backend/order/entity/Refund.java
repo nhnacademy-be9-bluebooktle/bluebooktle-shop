@@ -1,5 +1,6 @@
 package shop.bluebooktle.backend.order.entity;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
@@ -14,19 +15,18 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.ToString;
 
 @Entity
 @Table(name = "refund")
 @Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EqualsAndHashCode(of = "id", callSuper = false)
+@ToString(exclude = {"order"})
 public class Refund {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,15 +34,14 @@ public class Refund {
 	private Long id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "order_id", nullable = false)
+	@JoinColumn(name = "order_id", nullable = false,unique = true)
 	private Order order;
 
 	@Column(name = "date", nullable = false)
 	private LocalDateTime date;
 
-	//TODO enum으로 교체
 	@Column(name = "reason", nullable = false)
-	private String reason;
+	private Reason reason;
 
 	//TODO @Lob이 mysql에서 TEXT type인지 확인
 	@Lob
@@ -53,19 +52,21 @@ public class Refund {
 	@Column(name = "status", nullable = false)
 	private Status status;
 
-	@Column(name = "price", nullable = false)
-	private Integer price;
-
-	@Column(name = "created_at", nullable = false, updatable = false)
-	private LocalDateTime createdAt;
-
-	@Column(name = "deleted_at")
-	private LocalDateTime deletedAt;
+	@Column(name = "price", nullable = false, precision = 10, scale = 2)
+	private BigDecimal price;
 
 	public enum Status {
 		PENDING,
 		PROGRESS,
 		COMPLETE,
 		CANCELED
+	}
+
+	public enum Reason {
+		CHANGE_OF_MIND,
+		DEFECT,
+		DAMAGED,
+		WRONG_DELIVERY,
+		OTHER
 	}
 }
