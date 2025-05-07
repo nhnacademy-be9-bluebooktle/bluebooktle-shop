@@ -1,8 +1,7 @@
-package shop.bluebooktle.backend.book.entity;
+package shop.bluebooktle.backend.book_order.entity;
 
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
-
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -20,27 +19,30 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import shop.bluebooktle.common.entity.BaseEntity;
 
-@Entity
-@Table(name = "book_category")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@ToString(exclude = {"book", "category"})
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Entity
+@Table(name = "order_packaging")
 @EqualsAndHashCode(of = "id", callSuper = false)
-@SQLDelete(sql = "UPDATE book_category SET deleted_at = CURRENT_TIMESTAMP WHERE book_category_id = ?")
+@ToString(exclude = {"packagingOption", "bookOrder"})
+@SQLDelete(sql = "UPDATE order_packaging SET deleted_at = CURRENT_TIMESTAMP WHERE order_packaging_id = ?")
 @SQLRestriction("deleted_at IS NULL")
-public class BookCategory extends BaseEntity {
+public class OrderPackaging extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "book_category_id")
+	@Column(name = "order_packaging_id")
 	private Long id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "book_id", nullable = false)
-	private Book book;
+	@JoinColumn(name = "package_id", nullable = false)
+	private PackagingOption packagingOption;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "category_id", nullable = false)
-	private Category category;
+	@JoinColumn(name = "book_order_id", nullable = false)
+	private BookOrder bookOrder;
+
+	@Column(name = "quantity", nullable = false)
+	private Integer quantity;
 
 }

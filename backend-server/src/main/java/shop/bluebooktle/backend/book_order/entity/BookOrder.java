@@ -1,8 +1,9 @@
-package shop.bluebooktle.backend.book.entity;
+package shop.bluebooktle.backend.book_order.entity;
+
+import java.math.BigDecimal;
 
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
-
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -18,29 +19,37 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import shop.bluebooktle.backend.book.entity.Book;
+import shop.bluebooktle.backend.order.entity.Order;
 import shop.bluebooktle.common.entity.BaseEntity;
 
 @Entity
-@Table(name = "book_category")
+@Table(name = "book_order")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@ToString(exclude = {"book", "category"})
 @Getter
 @EqualsAndHashCode(of = "id", callSuper = false)
-@SQLDelete(sql = "UPDATE book_category SET deleted_at = CURRENT_TIMESTAMP WHERE book_category_id = ?")
+@ToString(exclude = {"order", "book"})
+@SQLDelete(sql = "UPDATE book_order SET deleted_at = CURRENT_TIMESTAMP WHERE book_order_id = ?")
 @SQLRestriction("deleted_at IS NULL")
-public class BookCategory extends BaseEntity {
+public class BookOrder extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "book_category_id")
+	@Column(name = "book_order_id")
 	private Long id;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "order_id", nullable = false)
+	private Order order;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "book_id", nullable = false)
 	private Book book;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "category_id", nullable = false)
-	private Category category;
+	@Column(name = "quantity", nullable = false)
+	private Integer quantity;
+
+	@Column(name = "price", precision = 10, scale = 2, nullable = false)
+	private BigDecimal price;
 
 }

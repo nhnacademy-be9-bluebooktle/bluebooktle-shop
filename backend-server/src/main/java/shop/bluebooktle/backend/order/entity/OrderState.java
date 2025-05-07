@@ -1,46 +1,39 @@
-package shop.bluebooktle.backend.book.entity;
+package shop.bluebooktle.backend.order.entity;
 
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
+import shop.bluebooktle.common.domain.OrderStatus;
 import shop.bluebooktle.common.entity.BaseEntity;
 
 @Entity
-@Table(name = "book_category")
+@Table(name = "order_state")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@ToString(exclude = {"book", "category"})
 @Getter
 @EqualsAndHashCode(of = "id", callSuper = false)
-@SQLDelete(sql = "UPDATE book_category SET deleted_at = CURRENT_TIMESTAMP WHERE book_category_id = ?")
+@SQLDelete(sql = "UPDATE order_state SET deleted_at = CURRENT_TIMESTAMP WHERE order_state_id = ?")
 @SQLRestriction("deleted_at IS NULL")
-public class BookCategory extends BaseEntity {
+public class OrderState extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "book_category_id")
+	@Column(name = "order_state_id")
 	private Long id;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "book_id", nullable = false)
-	private Book book;
-
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "category_id", nullable = false)
-	private Category category;
+	@Enumerated(EnumType.STRING)
+	@Column(name = "state", nullable = false, length = 10)
+	private OrderStatus state;
 
 }

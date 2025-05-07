@@ -1,8 +1,7 @@
-package shop.bluebooktle.backend.book.entity;
+package shop.bluebooktle.backend.payment.entity;
 
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
-
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -11,7 +10,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -21,26 +20,24 @@ import lombok.ToString;
 import shop.bluebooktle.common.entity.BaseEntity;
 
 @Entity
-@Table(name = "book_category")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@ToString(exclude = {"book", "category"})
 @Getter
+@Table(name = "payment_detail")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(of = "id", callSuper = false)
-@SQLDelete(sql = "UPDATE book_category SET deleted_at = CURRENT_TIMESTAMP WHERE book_category_id = ?")
+@ToString(exclude = {"paymentType"})
+@SQLDelete(sql = "UPDATE payment_detail SET deleted_at = CURRENT_TIMESTAMP WHERE payment_detail_id = ?")
 @SQLRestriction("deleted_at IS NULL")
-public class BookCategory extends BaseEntity {
+public class PaymentDetail extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "book_category_id")
+	@Column(name = "payment_detail_id")
 	private Long id;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "book_id", nullable = false)
-	private Book book;
+	@OneToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "payment_type_id", nullable = false)
+	private PaymentType paymentType;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "category_id", nullable = false)
-	private Category category;
-
+	@Column(name = "key", length = 255)
+	private String key;
 }
