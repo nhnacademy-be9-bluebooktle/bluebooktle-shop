@@ -31,13 +31,13 @@ import shop.bluebooktle.common.entity.BaseEntity;
 @ToString(exclude = {"parentCategory", "childCategories"})
 @SQLDelete(sql = "UPDATE category SET deleted_at = CURRENT_TIMESTAMP WHERE category_id = ?")
 @SQLRestriction("deleted_at IS NULL")
-@EqualsAndHashCode(of = "categoryId", callSuper = false)
+@EqualsAndHashCode(of = "id", callSuper = false)
 public class Category extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "category_id")
-	private Long categoryId;
+	private Long id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "parent_category_id")

@@ -21,13 +21,13 @@ import shop.bluebooktle.common.entity.BaseEntity;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString(exclude = {"book", "category"})
 @Getter
-@EqualsAndHashCode(of = "bookCategoryId", callSuper = false)
+@EqualsAndHashCode(of = "id", callSuper = false)
 public class BookCategory extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "book_category_id")
-	private Long bookCategoryId;
+	private Long id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "book_id", nullable = false)
