@@ -21,6 +21,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import shop.bluebooktle.common.entity.BaseEntity;
 
 @Entity
@@ -31,6 +32,7 @@ import shop.bluebooktle.common.entity.BaseEntity;
 @EqualsAndHashCode(of = {"bookSaleInfoId"}, callSuper = false)
 @SQLDelete(sql = "UPDATE book_sail_info SET deleted_at = CURRENT_TIMESTAMP WHERE book_sail_info_id = ?")
 @SQLRestriction("deleted_at IS NULL")
+@ToString(exclude = {"book"})
 public class BookSaleInfo extends BaseEntity {
 
 	@Id
