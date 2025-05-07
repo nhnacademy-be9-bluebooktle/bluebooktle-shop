@@ -1,5 +1,6 @@
 package shop.bluebooktle.backend.coupon.entity;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import org.hibernate.annotations.SQLDelete;
@@ -43,12 +44,12 @@ public class Coupon extends BaseEntity {
 	private LocalDateTime availableStartAt;
 	@Column(name = "available_end_at", nullable = false)
 	private LocalDateTime availableEndAt;
-	@Column(name = "minimum_payment", nullable = false)
-	private int minimumPayment;
+	@Column(name = "minimum_payment", nullable = false, precision = 10, scale = 2)
+	private BigDecimal minimumPayment;
 
 	@Builder
 	public Coupon(CouponType type, String couponName, LocalDateTime availableStartAt, LocalDateTime availableEndAt,
-		int minimumPayment) {
+		BigDecimal minimumPayment) {
 		this.couponType = type;
 		this.couponName = couponName;
 		this.availableStartAt = availableStartAt;

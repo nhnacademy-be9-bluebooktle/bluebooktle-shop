@@ -15,6 +15,7 @@ import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import shop.bluebooktle.common.domain.CouponTypeTarget;
 import shop.bluebooktle.common.entity.BaseEntity;
 
 @Entity
@@ -33,13 +34,9 @@ public class CouponType extends BaseEntity {
 	private String name;
 	@Enumerated(EnumType.STRING)
 	@Column(name = "target", nullable = false, length = 5)
-	private Target target;
+	private CouponTypeTarget target;
 
-	public enum Target {
-		ORDER, BOOK
-	}
-
-	public CouponType(String name, Target target) {
+	public CouponType(String name, CouponTypeTarget target) {
 		this.name = name;
 		this.target = target;
 	}
