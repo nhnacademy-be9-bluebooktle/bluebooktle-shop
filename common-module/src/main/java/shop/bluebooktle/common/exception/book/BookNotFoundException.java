@@ -1,4 +1,4 @@
-package shop.bluebooktle.common.exception;
+package shop.bluebooktle.common.exception.book;
 
 public class BookNotFoundException extends RuntimeException {
 	public BookNotFoundException(String message) {
