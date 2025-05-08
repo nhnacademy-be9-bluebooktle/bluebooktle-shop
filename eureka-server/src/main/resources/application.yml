@@ -9,6 +9,16 @@ eureka:
   server:
     wait-time-in-ms-when-sync-empty: 0 # 단일 서버 운영 시 설정 (클러스터 시 변경)
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: always
+
+
 logging:
   level:
     shop.bluebooktle.eureka: INFO
