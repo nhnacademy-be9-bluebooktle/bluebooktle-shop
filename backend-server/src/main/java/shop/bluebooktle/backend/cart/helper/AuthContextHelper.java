@@ -2,7 +2,7 @@ package shop.bluebooktle.backend.cart.helper;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.experimental.UtilityClass;
-import shop.bluebooktle.common.entity.auth.User;
+import shop.bluebooktle.common.entity.User;
 
 @UtilityClass
 public class AuthContextHelper {

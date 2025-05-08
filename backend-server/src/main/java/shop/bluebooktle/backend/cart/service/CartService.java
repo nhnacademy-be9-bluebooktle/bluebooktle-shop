@@ -1,40 +1,17 @@
 package shop.bluebooktle.backend.cart.service;
 
-import java.util.List;
-
-import shop.bluebooktle.backend.cart.dto.CartItemResponse;
-import shop.bluebooktle.common.entity.auth.User;
+import shop.bluebooktle.backend.book.entity.Book;
+import shop.bluebooktle.backend.cart.entity.Cart;
+import shop.bluebooktle.common.entity.User;
 
 public interface CartService {
-	// 회원용
-	void addBookToUserCart(User user, Long bookId, int quantity);
 
-	List<CartItemResponse> getUserCartItems(User user);
+	Cart getCartByUser(User user, String guestId);
 
-	void increaseUserQuantity(User user, Long bookId);
+	void addBookToCart(User user, String guestId, Book book, int quantity);
 
-	void decreaseUserQuantity(User user, Long bookId);
+	void removeBookFromCart(User user, String guestId, Book book);
 
-	void removeBookFromUserCart(User user, Long bookId);
-
-	void removeSelectedBooksFromUserCart(User user, List<Long> bookIds);
-
-	// 비회원용
-	void addBookToGuestCart(String guestId, Long bookId, int quantity);
-
-	List<CartItemResponse> getGuestCartItems(String guestId);
-
-	void increaseGuestQuantity(String guestId, Long bookId);
-
-	void decreaseGuestQuantity(String guestId, Long bookId);
-
-	void removeBookFromGuestCart(String guestId, Long bookId);
-
-	void removeSelectedBooksFromGuestCart(String guestId, List<Long> bookIds);
-
-	public void convertGuestCartToMemberCart(String guestId, User user);
-
-	public void mergeGuestCartToMemberCart(String guestId, User user);
+	void clearCart(User user, String guestId);
 
 }
-

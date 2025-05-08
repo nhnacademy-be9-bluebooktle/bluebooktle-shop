@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 
 import shop.bluebooktle.backend.book.entity.Book;
 import shop.bluebooktle.backend.cart.entity.Cart;
@@ -11,21 +13,14 @@ import shop.bluebooktle.backend.cart.entity.CartBook;
 
 public interface CartBookRepository extends JpaRepository<CartBook, Long> {
 
-	// 특정 장바구니 안에 특정 도서가 있는지 조회
+	List<CartBook> findByCart(Cart cart);
+
 	Optional<CartBook> findByCartAndBook(Cart cart, Book book);
 
-	// 특정 장바구니에 담긴 모든 항목 조회
-	List<CartBook> findAllByCart(Cart cart);
+	boolean existsByCartAndBook(Cart cart, Book book);
 
-	// 특정 장바구니에서 bookId 리스트로 항목 일괄 조회
-	List<CartBook> findAllByCartAndBookIdIn(Cart cart, List<Long> bookIds);
+	@Modifying
+	@Query("UPDATE CartBook cb SET cb.quantity = cb.quantity + :amount WHERE cb.cart = :cart AND cb.book = :book")
+	int addQuantity(Cart cart, Book book, int amount);
 
-	// 개별 삭제
-	void delete(CartBook cartBook);
-
-	// 일괄 삭제 TODO 기본 jpa 와 충돌
-	// void deleteAll(List<CartBook> cartBooks);
-
-	// 저장 (수량 증가 등)
-	CartBook save(CartBook cartBook);
 }
