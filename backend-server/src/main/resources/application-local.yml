@@ -28,10 +28,11 @@ spring:
 #  rabbitmq:
 #    host: localhost
 
-# 로컬에서는 Eureka 클라이언트 비활성화
+
 eureka:
   client:
-    enabled: false
+    service-url:
+      defaultZone: http://localhost:9761/eureka
 
 
 logging:
