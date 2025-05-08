@@ -11,6 +11,12 @@ spring:
     hibernate:
       ddl-auto: none
     show-sql: false
+  data:
+    redis:
+      host: s4.java21.net
+      port: 6379
+      password: "*N2vya7H@muDTwdNMR!"
+      database: 285
 #  elasticsearch:
 #    uris: ${SPRING_ELASTICSEARCH_URIS}
 #    username: ${SPRING_ELASTICSEARCH_USERNAME}
