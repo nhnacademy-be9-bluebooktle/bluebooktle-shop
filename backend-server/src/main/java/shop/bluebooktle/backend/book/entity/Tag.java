@@ -26,6 +26,7 @@ public class Tag extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "tag_id")
 	private Long id;
 
 	@Column(name = "name", nullable = false, length = 20)

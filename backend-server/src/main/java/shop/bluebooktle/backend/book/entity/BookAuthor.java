@@ -1,5 +1,6 @@
 package shop.bluebooktle.backend.book.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -24,6 +25,7 @@ public class BookAuthor {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "book_author_id")
 	private Long id;
 
 	@ManyToOne(fetch = FetchType.LAZY)

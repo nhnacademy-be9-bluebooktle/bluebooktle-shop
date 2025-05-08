@@ -25,6 +25,7 @@ import shop.bluebooktle.common.entity.BaseEntity;
 public class Img extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "img_id")
 	private Long id;
 
 	@Column(name = "img_url", nullable = false, length = 255)
