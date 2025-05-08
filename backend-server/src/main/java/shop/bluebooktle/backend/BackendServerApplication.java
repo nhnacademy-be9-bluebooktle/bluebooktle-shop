@@ -5,16 +5,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 
-@SpringBootApplication(scanBasePackages = {
-	"shop.bluebooktle.backend",
-	"shop.bluebooktle.common"
-})
+@SpringBootApplication
 @EnableFeignClients
-@EntityScan(basePackages = {
-	"shop.bluebooktle.backend",
-	"shop.bluebooktle.common.entity"
-})
+@EntityScan(basePackages = {"shop.bluebooktle.common.entity"})
 public class BackendServerApplication {
+
 	public static void main(String[] args) {
 		SpringApplication.run(BackendServerApplication.class, args);
 	}
