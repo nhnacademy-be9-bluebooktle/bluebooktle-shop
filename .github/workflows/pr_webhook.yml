@@ -1,0 +1,79 @@
+name: PR Webhook Notifier (for MessageSendService)
+
+on:
+  pull_request:
+    types: [ opened, reopened ]
+
+jobs:
+  send_webhook_notification:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Gather PR Information and Send Webhook
+        env:
+          WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          PR_USER: ${{ github.event.pull_request.user.login }}
+          REPO_NAME: ${{ github.repository }}
+          BOT_NAME: "GitHub PR 알림"
+          ATTACHMENT_COLOR: "blue"
+          ICON_FILE_PATH: "https://github.githubassets.com/assets/GitHub-Mark-ea2971cee799.png"
+
+        run: |
+          USER_REVIEWERS=$(echo '${{ toJSON(github.event.pull_request.requested_reviewers) }}' | jq -r '.[].login' | tr '\n' ',' | sed 's/,$//')
+          if [ -n "$USER_REVIEWERS" ]; then
+            USER_REVIEWERS=$(echo "$USER_REVIEWERS" | sed 's/,/, /g') 
+          fi
+
+          TEAM_REVIEWERS=$(echo '${{ toJSON(github.event.pull_request.requested_teams) }}' | jq -r '.[].name' | tr '\n' ',' | sed 's/,$//')
+          if [ -n "$TEAM_REVIEWERS" ]; then
+            TEAM_REVIEWERS=$(echo "$TEAM_REVIEWERS" | sed 's/,/, 팀: /g' | sed 's/^/팀: /') 
+          fi
+
+          ALL_REVIEWERS=""
+          if [ -n "$USER_REVIEWERS" ]; then
+            ALL_REVIEWERS="$USER_REVIEWERS"
+          fi
+          if [ -n "$TEAM_REVIEWERS" ]; then
+            if [ -n "$ALL_REVIEWERS" ]; then
+              ALL_REVIEWERS="$ALL_REVIEWERS, $TEAM_REVIEWERS"
+            else
+              ALL_REVIEWERS="$TEAM_REVIEWERS"
+            fi
+          fi
+          if [ -z "$ALL_REVIEWERS" ]; then
+            ALL_REVIEWERS="지정되지 않음"
+          fi
+
+          ATTACHMENT_TEXT="저장소: ${REPO_NAME}\n작성자: ${PR_USER}\n리뷰어: ${ALL_REVIEWERS}"
+
+          MESSAGE_TEXT="NEW PR: ${PR_TITLE}"
+
+          JSON_PAYLOAD=$(cat <<EOF
+          {
+            "botName": "${BOT_NAME}",
+            "text": "${MESSAGE_TEXT}",
+            "botIconImage": "${ICON_FILE_PATH}",
+            "attachments": [
+              {
+                "title": "${PR_TITLE}",
+                "text": "${ATTACHMENT_TEXT}",
+                "titleLink": "${PR_URL}",
+                "color": "${ATTACHMENT_COLOR}"
+              }
+            ]
+          }
+          EOF
+          )
+
+          echo "보내는 페이로드:"
+          echo "$JSON_PAYLOAD"
+
+          RESPONSE_CODE=$(curl -s -o /dev/stderr -w "%{http_code}" -X POST -H "Content-Type: application/json" --data "$JSON_PAYLOAD" "$WEBHOOK_URL")
+
+          if [ "$RESPONSE_CODE" -ge 200 ] && [ "$RESPONSE_CODE" -lt 300 ]; then
+            echo "웹훅이 성공적으로 전송되었습니다. 응답 코드: $RESPONSE_CODE"
+          else
+            echo "웹훅 전송에 실패했습니다. 응답 코드: $RESPONSE_CODE"
+            # exit 1 # 필요시 실패 처리
+          fi
