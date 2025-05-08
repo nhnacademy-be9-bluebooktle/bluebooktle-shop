@@ -16,6 +16,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -48,4 +49,11 @@ public class Payment extends BaseEntity {
 
 	@Column(name = "price", nullable = false, precision = 10, scale = 2)
 	private BigDecimal price;
+
+	@Builder
+	public Payment(Order order, PaymentDetail paymentDetail, BigDecimal price) {
+		this.order = order;
+		this.paymentDetail = paymentDetail;
+		this.price = price;
+	}
 }

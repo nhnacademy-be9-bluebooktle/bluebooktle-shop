@@ -12,6 +12,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -38,4 +39,11 @@ public class DeliveryRule extends BaseEntity {
 
 	@Column(name = "delivery_fee", nullable = false, precision = 10, scale = 2)
 	private BigDecimal deliveryFee;
+
+	@Builder
+	public DeliveryRule(String name, BigDecimal price, BigDecimal deliveryFee) {
+		this.name = name;
+		this.price = price;
+		this.deliveryFee = deliveryFee;
+	}
 }

@@ -13,6 +13,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -44,5 +45,12 @@ public class OrderPackaging extends BaseEntity {
 
 	@Column(name = "quantity", nullable = false)
 	private Integer quantity;
+
+	@Builder
+	public OrderPackaging(PackagingOption packagingOption, BookOrder bookOrder, Integer quantity) {
+		this.packagingOption = packagingOption;
+		this.bookOrder = bookOrder;
+		this.quantity = quantity;
+	}
 
 }

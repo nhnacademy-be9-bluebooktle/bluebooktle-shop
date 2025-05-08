@@ -13,6 +13,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -40,4 +41,10 @@ public class PaymentDetail extends BaseEntity {
 
 	@Column(name = "key", length = 255)
 	private String key;
+
+	@Builder
+	public PaymentDetail(PaymentType paymentType, String key) {
+		this.paymentType = paymentType;
+		this.key = key;
+	}
 }
