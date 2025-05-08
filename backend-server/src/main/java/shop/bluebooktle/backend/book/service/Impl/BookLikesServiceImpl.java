@@ -21,7 +21,7 @@ import shop.bluebooktle.common.exception.UserNotFoundException;
 
 @Service
 @RequiredArgsConstructor
-public class BookLikesImpl implements BookLikesService {
+public class BookLikesServiceImpl implements BookLikesService {
 	private final BookLikesRepository bookLikesRepository;
 	private final BookRepository bookRepository;
 	private final UserRepository userRepository;
