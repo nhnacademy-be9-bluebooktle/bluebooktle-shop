@@ -2,6 +2,8 @@ server:
   port: 9002
 
 spring:
+  application:
+    name: backend-server
   datasource:
     url: jdbc:h2:mem:bluebooktle_backend_dev;MODE=MySQL;DB_CLOSE_DELAY=-1
     username: sa
@@ -28,10 +30,14 @@ spring:
 #  rabbitmq:
 #    host: localhost
 
-# 로컬에서는 Eureka 클라이언트 비활성화
+# 유레카 활성화
 eureka:
   client:
-    enabled: false
+    enabled: true              # 클라이언트 기능 전체 켜기/끄기
+    register-with-eureka: true # 자신을 레지스트리에 등록할지
+    fetch-registry: true       # 레지스트리 정보를 가져올지
+    service-url:
+      defaultZone: http://localhost:9761/eureka
 
 
 logging:

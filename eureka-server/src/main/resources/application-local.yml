@@ -1,8 +1,17 @@
+spring:
+  application:
+    name: eureka-server
 server:
   port: 9761
+
 eureka:
+  client:
+    register-with-eureka: false   # 서버는 레지스트리에 자신을 등록할 필요 없음
+    fetch-registry: false         # 서버는 다른 레지스트리를 조회할 필요 없음
+
   instance:
-    hostname: localhost
+    hostname: localhost      # 실제 접근 가능한 호스트명 또는 IP
+
 logging:
   level:
     com.netflix.eureka: OFF
