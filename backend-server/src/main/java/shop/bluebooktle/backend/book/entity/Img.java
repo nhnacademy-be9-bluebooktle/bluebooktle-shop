@@ -20,7 +20,7 @@ import shop.bluebooktle.common.entity.BaseEntity;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(of = "id", callSuper = false)
-@SQLDelete(sql = "UPDATE book SET deleted_at = CURRENT_TIMESTAMP WHERE book_id = ?")
+@SQLDelete(sql = "UPDATE img SET deleted_at = CURRENT_TIMESTAMP WHERE img_id = ?")
 @SQLRestriction("deleted_at IS NULL")
 public class Img extends BaseEntity {
 	@Id
