@@ -12,7 +12,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import shop.bluebooktle.common.entity.auth.User;
+import shop.bluebooktle.common.entity.User;
 
 @Entity
 @Table(name = "book_likes")
