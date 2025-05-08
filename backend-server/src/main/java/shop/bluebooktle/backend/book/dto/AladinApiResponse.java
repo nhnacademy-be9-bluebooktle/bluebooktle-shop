@@ -2,10 +2,12 @@ package shop.bluebooktle.backend.book.dto;
 
 import java.util.List;
 
-import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import lombok.Getter;
 
-@Data
+@Getter
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class AladinApiResponse {
 	private List<AladinBookItem> item;
 }

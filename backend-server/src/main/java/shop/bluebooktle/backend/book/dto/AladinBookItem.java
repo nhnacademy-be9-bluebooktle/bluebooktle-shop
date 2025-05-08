@@ -1,12 +1,15 @@
 package shop.bluebooktle.backend.book.dto;
 
-import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import lombok.Getter;
 
-@Data
+@Getter
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class AladinBookItem {
 	private String title;
 	private String author;
+	private String description;
 	private String pubDate;
 	private String isbn13;
 	private int priceStandard;
