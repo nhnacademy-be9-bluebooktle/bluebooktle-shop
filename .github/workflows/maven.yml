@@ -61,6 +61,6 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           script: |
             mkdir -p ~/app/jars
-            mv *.jar ~/app/jars/
+            # JAR은 이미 ~/app/jars 로 복사됨
             chmod +x ~/startup.sh
             ~/startup.sh
