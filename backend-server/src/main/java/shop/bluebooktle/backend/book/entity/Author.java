@@ -1,5 +1,8 @@
 package shop.bluebooktle.backend.book.entity;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -16,12 +19,15 @@ import shop.bluebooktle.common.entity.BaseEntity;
 @Table(name = "author")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@EqualsAndHashCode(of = "authorId", callSuper = false)
+@EqualsAndHashCode(of = "id", callSuper = false)
+@SQLDelete(sql = "UPDATE author SET deleted_at = CURRENT_TIMESTAMP WHERE author_id = ?")
+@SQLRestriction("deleted_at IS NULL")
 public class Author extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long authorId;
+	@Column(name = "author_id")
+	private Long id;
 
 	@Column(name = "name", nullable = false, length = 10)
 	private String name;
