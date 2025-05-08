@@ -1,0 +1,10 @@
+server:
+  port: 10220
+eureka:
+  instance:
+    hostname: ${EUREKA_INSTANCE_HOSTNAME}
+  server:
+    enable-self-preservation: true
+logging:
+  level:
+    shop.bluebooktle.eureka: INFO

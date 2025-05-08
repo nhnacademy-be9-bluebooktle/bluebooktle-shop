@@ -12,10 +12,10 @@ spring:
       ddl-auto: validate
     show-sql: false
 
-#eureka:
-#  client:
-#    serviceUrl:
-#      defaultZone: ${EUREKA_URL}
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_URL}
 
 logging:
   level:
