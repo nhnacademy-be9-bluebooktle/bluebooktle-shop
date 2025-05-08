@@ -21,7 +21,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import shop.bluebooktle.backend.user.entity.User;
+import shop.bluebooktle.common.entity.User;
 
 @Entity
 @Getter

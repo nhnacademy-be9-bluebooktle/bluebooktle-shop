@@ -20,8 +20,8 @@ import jakarta.persistence.Table;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
-import shop.bluebooktle.backend.user.entity.User;
 import shop.bluebooktle.common.entity.BaseEntity;
+import shop.bluebooktle.common.entity.User;
 
 @ToString(exclude = "cartBooks")
 @Entity
