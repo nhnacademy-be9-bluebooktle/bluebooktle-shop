@@ -28,9 +28,4 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
 	// 부모 ID 기준으로 자식 카테고리를 이름 순으로 정렬
 	List<Category> findByParentCategoryOrderByNameAsc(Category parent);
 
-	// 최상위 카테고리인지 여부 판단
-	boolean existsByIdAndParentCategoryIsNull(Long id);
-
-	Category findParentCategoryById(Long id);
-	
 }

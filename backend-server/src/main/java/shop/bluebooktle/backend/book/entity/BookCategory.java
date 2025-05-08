@@ -1,5 +1,8 @@
 package shop.bluebooktle.backend.book.entity;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -9,27 +12,22 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.ToString;
+import shop.bluebooktle.common.entity.BaseEntity;
 
 @Entity
-@Table(
-	name = "book_category",
-	uniqueConstraints = @UniqueConstraint(
-		name = "UK_book_category_book_category",
-		columnNames = {"book_id", "category_id"}
-	)
-)
+@Table(name = "book_category")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString(exclude = {"book", "category"})
 @Getter
 @EqualsAndHashCode(of = "id", callSuper = false)
-public class BookCategory {
+@SQLDelete(sql = "UPDATE book_category SET deleted_at = CURRENT_TIMESTAMP WHERE book_category_id = ?")
+@SQLRestriction("deleted_at IS NULL")
+public class BookCategory extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,12 +40,6 @@ public class BookCategory {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "category_id", nullable = false)
-	@Setter
 	private Category category;
-
-	public BookCategory(Book book, Category category) {
-		this.book = book;
-		this.category = category;
-	}
 
 }
