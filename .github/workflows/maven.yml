@@ -25,7 +25,7 @@ jobs:
         run: mvn -B clean install -DskipTests
 
       - name: Upload all JARs
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v2
         with:
           name: all-jars
           path: '**/target/*.jar'
@@ -35,7 +35,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download all JARs
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v2
         with:
           name: all-jars
 
