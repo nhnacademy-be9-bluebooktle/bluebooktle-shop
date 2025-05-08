@@ -3,9 +3,6 @@ server:
 eureka:
   instance:
     hostname: ${EUREKA_INSTANCE_HOSTNAME}
-  client:
-    serviceUrl:
-      defaultZone: ${EUREKA_URL}
   server:
     enable-self-preservation: true
 logging:

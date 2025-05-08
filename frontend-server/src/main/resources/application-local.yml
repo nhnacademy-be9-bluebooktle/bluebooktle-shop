@@ -2,8 +2,6 @@ server:
   port: 9080
 
 spring:
-  application:
-    name: frontend-server
   # H2 DB 설정
   datasource:
     url: jdbc:h2:mem:bluebooktle_dev;MODE=MySQL;DB_CLOSE_DELAY=-1
@@ -25,9 +23,6 @@ spring:
 
 eureka:
   client:
-    enabled: true              # 클라이언트 기능 전체 켜기/끄기
-    register-with-eureka: true # 자신을 레지스트리에 등록할지
-    fetch-registry: true       # 레지스트리 정보를 가져올지
     service-url:
       defaultZone: http://localhost:9761/eureka
 
