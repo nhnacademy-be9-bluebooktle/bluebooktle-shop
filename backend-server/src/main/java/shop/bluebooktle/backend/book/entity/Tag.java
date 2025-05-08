@@ -10,6 +10,7 @@ import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import shop.bluebooktle.common.entity.BaseEntity;
 
 @Entity
 @Table(name = "tag")

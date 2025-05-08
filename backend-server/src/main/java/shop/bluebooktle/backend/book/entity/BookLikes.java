@@ -38,6 +38,6 @@ public class BookLikes {
 	public BookLikes(Book book, User user) {
 		this.book = book;
 		this.user = user;
-		this.id = new BookLikesId(book.getBookId(), user.getUserId());
+		this.id = new BookLikesId(book.getId(), user.getId());
 	}
 }
