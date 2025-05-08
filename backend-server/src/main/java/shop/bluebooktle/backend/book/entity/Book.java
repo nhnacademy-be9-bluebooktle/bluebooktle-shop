@@ -20,7 +20,6 @@ import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import shop.bluebooktle.backend.cart.entity.Cart;
 import shop.bluebooktle.backend.cart.entity.CartBook;
 import shop.bluebooktle.common.entity.BaseEntity;
@@ -29,7 +28,7 @@ import shop.bluebooktle.common.entity.BaseEntity;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "book")
-@EqualsAndHashCode(of = "bookId", callSuper = false)
+@EqualsAndHashCode(of = "id", callSuper = false)
 @SQLDelete(sql = "UPDATE book SET deleted_at = CURRENT_TIMESTAMP WHERE book_id = ?")
 @SQLRestriction("deleted_at IS NULL")
 public class Book extends BaseEntity {
@@ -58,11 +57,7 @@ public class Book extends BaseEntity {
 	private List<CartBook> cartBooks = new ArrayList<>();
 
 	public void addCart(Cart cart, int quantity) {
-		CartBook cartBook = CartBook.builder()
-			.book(this)
-			.cart(cart)
-			.quantity(quantity)
-			.build();
+		CartBook cartBook = CartBook.builder().book(this).cart(cart).quantity(quantity).build();
 
 		this.cartBooks.add(cartBook);
 		cart.getCartBooks().add(cartBook);

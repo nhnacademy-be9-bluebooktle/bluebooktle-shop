@@ -26,7 +26,7 @@ import shop.bluebooktle.common.entity.BaseEntity;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "book_sale_info")
-@EqualsAndHashCode(of = {"bookSaleInfoId"}, callSuper = false)
+@EqualsAndHashCode(of = "id", callSuper = false)
 @SQLDelete(sql = "UPDATE book_sale_info SET deleted_at = CURRENT_TIMESTAMP WHERE book_sale_info_id = ?")
 @SQLRestriction("deleted_at IS NULL")
 public class BookSaleInfo extends BaseEntity {
@@ -66,10 +66,6 @@ public class BookSaleInfo extends BaseEntity {
 	private Long searchCount;
 
 	public enum State {
-		AVAILABLE,
-		LOW_STOCK,
-		SALE_ENDED,
-		DELETED
+		AVAILABLE, LOW_STOCK, SALE_ENDED, DELETED
 	}
-
 }

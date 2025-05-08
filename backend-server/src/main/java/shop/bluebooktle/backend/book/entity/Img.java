@@ -1,5 +1,8 @@
 package shop.bluebooktle.backend.book.entity;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -10,16 +13,20 @@ import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import shop.bluebooktle.common.entity.BaseEntity;
 
 @Entity
 @Table(name = "img")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@EqualsAndHashCode(of = "imgId", callSuper = false)
+@EqualsAndHashCode(of = "id", callSuper = false)
+@SQLDelete(sql = "UPDATE img SET deleted_at = CURRENT_TIMESTAMP WHERE img_id = ?")
+@SQLRestriction("deleted_at IS NULL")
 public class Img extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long imgId;
+	@Column(name = "img_id")
+	private Long id;
 
 	@Column(name = "img_url", nullable = false, length = 255)
 	private String imgUrl;
