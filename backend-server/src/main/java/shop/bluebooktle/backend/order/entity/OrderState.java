@@ -12,6 +12,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -36,4 +37,8 @@ public class OrderState extends BaseEntity {
 	@Column(name = "state", nullable = false, length = 10)
 	private OrderStatus state;
 
+	@Builder
+	public OrderState(OrderStatus state) {
+		this.state = state;
+	}
 }
