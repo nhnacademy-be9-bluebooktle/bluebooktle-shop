@@ -7,7 +7,10 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 
 @SpringBootApplication
 @EnableFeignClients
-@EntityScan(basePackages = {"shop.bluebooktle.common.entity"})
+@EntityScan(basePackages = {
+	"shop.bluebooktle.backend",
+	"shop.bluebooktle.common.entity"
+})
 public class BackendServerApplication {
 
 	public static void main(String[] args) {
