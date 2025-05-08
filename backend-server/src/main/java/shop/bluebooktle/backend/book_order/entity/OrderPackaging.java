@@ -17,12 +17,10 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.ToString;
 import shop.bluebooktle.common.entity.BaseEntity;
 
 @Getter
-@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "order_packaging")
@@ -54,4 +52,5 @@ public class OrderPackaging extends BaseEntity {
 		this.bookOrder = bookOrder;
 		this.quantity = quantity;
 	}
+
 }

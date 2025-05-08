@@ -37,8 +37,4 @@ public class PaymentType extends BaseEntity {
 	public PaymentType(String method) {
 		this.method = method;
 	}
-
-	public void changeMethod(String method) {
-		this.method = method;
-	}
 }
