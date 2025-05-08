@@ -10,6 +10,6 @@ import lombok.Value;
 @Value
 @Builder
 public class BookLikesRequest {
-	private long bookId;
-	private long userId;
+	long bookId;
+	long userId;
 }
