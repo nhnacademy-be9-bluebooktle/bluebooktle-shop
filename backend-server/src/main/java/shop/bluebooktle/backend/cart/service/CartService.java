@@ -2,7 +2,7 @@ package shop.bluebooktle.backend.cart.service;
 
 import shop.bluebooktle.backend.book.entity.Book;
 import shop.bluebooktle.backend.cart.entity.Cart;
-import shop.bluebooktle.backend.user.entity.User;
+import shop.bluebooktle.common.entity.User;
 
 public interface CartService {
 

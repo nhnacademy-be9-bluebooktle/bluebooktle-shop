@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import shop.bluebooktle.backend.cart.entity.Cart;
-import shop.bluebooktle.backend.user.entity.User;
+import shop.bluebooktle.common.entity.User;
 
 public interface CartRepository extends JpaRepository<Cart, Long> {
 
