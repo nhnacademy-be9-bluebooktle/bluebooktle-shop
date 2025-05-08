@@ -44,7 +44,8 @@
         <module>backend-server</module>
         <module>frontend-server</module>
         <module>coverage-report</module>
-        <module>auth-server</module>
+        <!--        TODO auth server 추가시 주석 해제-->
+        <!--        <module>auth-server</module>-->
     </modules>
 
     <dependencyManagement>
