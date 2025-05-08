@@ -19,7 +19,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import shop.bluebooktle.common.entity.BaseEntity;
-import shop.bluebooktle.common.entity.User;
+import shop.bluebooktle.common.entity.auth.User;
 
 @Entity
 @Table(name = "user_coupon")

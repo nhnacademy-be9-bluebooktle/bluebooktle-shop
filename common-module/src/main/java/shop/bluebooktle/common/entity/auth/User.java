@@ -1,4 +1,4 @@
-package shop.bluebooktle.common.entity;
+package shop.bluebooktle.common.entity.auth;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -28,8 +28,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import shop.bluebooktle.common.domain.UserStatus;
-import shop.bluebooktle.common.domain.UserType;
+import shop.bluebooktle.common.domain.auth.UserStatus;
+import shop.bluebooktle.common.domain.auth.UserType;
+import shop.bluebooktle.common.entity.BaseEntity;
 
 @Entity
 @Table(name = "user")
@@ -88,7 +89,7 @@ public class User extends BaseEntity {
 
 	@Builder
 	public User(MembershipLevel membershipLevel, String loginId, String encodedPassword, String name, String email,
-		String birth, String phoneNumber, BigDecimal pointBalance, UserType type, UserStatus status,
+		String birth, String phoneNumber, UserType type, UserStatus status,
 		LocalDateTime lastLoginAt) {
 		this.membershipLevel = membershipLevel;
 		this.loginId = loginId;

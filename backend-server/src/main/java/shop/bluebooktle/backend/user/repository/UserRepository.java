@@ -6,8 +6,8 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import shop.bluebooktle.common.domain.UserStatus;
-import shop.bluebooktle.common.entity.User;
+import shop.bluebooktle.common.domain.auth.UserStatus;
+import shop.bluebooktle.common.entity.auth.User;
 
 public interface UserRepository extends JpaRepository<User, Long> {
 
