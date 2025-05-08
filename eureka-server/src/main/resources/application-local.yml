@@ -1,8 +1,10 @@
 server:
   port: 9761
+
 eureka:
   instance:
     hostname: localhost
+
 logging:
   level:
     com.netflix.eureka: OFF
