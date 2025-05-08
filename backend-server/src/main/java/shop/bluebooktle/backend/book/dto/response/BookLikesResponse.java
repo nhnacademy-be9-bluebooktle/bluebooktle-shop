@@ -10,7 +10,7 @@ import lombok.Value;
 @Value
 @Builder
 public class BookLikesResponse {
-	private Long bookId;
-	private boolean isLiked;
-	private int countLikes;
+	Long bookId;
+	boolean isLiked;
+	int countLikes;
 }
