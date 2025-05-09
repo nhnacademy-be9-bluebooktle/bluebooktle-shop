@@ -3,7 +3,6 @@ package shop.bluebooktle.backend.coupon.service.impl;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.coupon.entity.AbsoluteCoupon;
@@ -15,12 +14,10 @@ import shop.bluebooktle.backend.coupon.repository.RelativeCouponRepository;
 import shop.bluebooktle.backend.coupon.service.CouponTypeService;
 import shop.bluebooktle.common.dto.coupon.request.CouponTypeRegisterRequest;
 import shop.bluebooktle.common.dto.coupon.response.CouponTypeResponse;
-import shop.bluebooktle.common.exception.InvalidInputValueException;
 import shop.bluebooktle.common.exception.coupon.CouponTypeNameAlreadyException;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class CouponTypeServiceImpl implements CouponTypeService {
 
 	private final CouponTypeRepository couponTypeRepository;
@@ -60,15 +57,29 @@ public class CouponTypeServiceImpl implements CouponTypeService {
 					.build()
 			);
 		} else {
-			throw new InvalidInputValueException("절대값 또는 상대값 할인 정보 중 하나는 필수입니다.");
+			throw new IllegalArgumentException("절대값 또는 상대값 할인 정보 중 하나는 필수입니다.");
 		}
 
 	}
 
 	//쿠폰 정책 전체 조회
 	@Override
-	@Transactional(readOnly = true)
 	public Page<CouponTypeResponse> getAllCouponTypeList(Pageable pageable) {
-		return couponTypeRepository.findAllByCouponType(pageable);
+		return couponTypeRepository.findAllCouponTypeList(pageable).map(couponType -> {
+			AbsoluteCoupon absoluteCoupon = absoluteCouponRepository.findByCouponTypeId(couponType.getId())
+				.orElse(null);
+			RelativeCoupon relativeCoupon = relativeCouponRepository.findByCouponTypeId(couponType.getId())
+				.orElse(null);
+
+			return CouponTypeResponse.builder()
+				.id(couponType.getId())
+				.name(couponType.getName())
+				.target(couponType.getTarget())
+				.minimumPayment(couponType.getMinimumPayment())
+				.discountPrice(absoluteCoupon != null ? absoluteCoupon.getDiscountPrice() : null)
+				.discountPercent(relativeCoupon != null ? relativeCoupon.getDiscountPercent() : null)
+				.maximumDiscountPrice(relativeCoupon != null ? relativeCoupon.getMaximumDiscountPrice() : null)
+				.build();
+		});
 	}
 }

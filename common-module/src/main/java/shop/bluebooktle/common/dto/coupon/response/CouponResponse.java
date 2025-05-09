@@ -2,26 +2,18 @@ package shop.bluebooktle.common.dto.coupon.response;
 
 import java.time.LocalDateTime;
 
-import com.querydsl.core.annotations.QueryProjection;
-
+import lombok.Builder;
 import lombok.Value;
 import shop.bluebooktle.common.domain.CouponTypeTarget;
 
 @Value
+@Builder
 public class CouponResponse {
 	Long id;
 	String couponName;
 	String couponTypeName;
 	CouponTypeTarget target;
+	LocalDateTime availableStartAt;
+	LocalDateTime availableEndAt;
 	LocalDateTime createdAt;
-
-	@QueryProjection
-	public CouponResponse(Long id, String couponName, String couponTypeName, CouponTypeTarget target,
-		LocalDateTime createdAt) {
-		this.id = id;
-		this.couponName = couponName;
-		this.couponTypeName = couponTypeName;
-		this.target = target;
-		this.createdAt = createdAt;
-	}
 }

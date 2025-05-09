@@ -21,7 +21,7 @@ import shop.bluebooktle.common.dto.coupon.response.CouponTypeResponse;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/admin/coupon-type")
+@RequestMapping("/admin/coupon-type")
 public class CouponTypeController {
 
 	private final CouponTypeService couponTypeService;
