@@ -36,7 +36,7 @@ public class BookImg {
 	@JoinColumn(name = "img_id", nullable = false)
 	private Img img;
 
-	@Column(name = "isThumbnail", nullable = false)
+	@Column(name = "is_thumbnail", nullable = false)
 	private boolean isThumbnail;
 
 	public BookImg(Book book, Img img, boolean isThumbnail) {
