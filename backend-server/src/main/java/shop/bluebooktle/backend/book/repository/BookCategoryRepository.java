@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
+import shop.bluebooktle.backend.book.dto.response.CategoryResponse;
 import shop.bluebooktle.backend.book.entity.Book;
 import shop.bluebooktle.backend.book.entity.BookCategory;
 import shop.bluebooktle.backend.book.entity.Category;
@@ -26,12 +27,22 @@ public interface BookCategoryRepository extends JpaRepository<BookCategory, Long
 	// 카테고리 ID로 연결된 BookCategory 조회 (연관된 책 목록용)
 	List<BookCategory> findByCategory_Id(Long categoryId);
 
+	// 특정 책에 연결된 카테고리 개수 조회
+	long countByBook(Book book);
+
 	// 특정 책과 카테고리의 연결 여부 확인 (중복 방지 체크용)
 	boolean existsByBookAndCategory(Book book, Category category);
 
-	// 특정 책의 모든 카테고리 ID만 조회
-	@Query("select bc.category.id from BookCategory bc where bc.book.id = :bookId")
-	List<Long> findCategoryIdsByBookId(@Param("bookId") Long bookId);
+	// 특정 책의 모든 카테고리 (id, name) 조회
+	@Query("""
+			select new  shop.bluebooktle.backend.book.dto.response.CategoryResponse(
+				bc.category.id,
+				bc.category.name
+			)
+			from BookCategory bc
+			where bc.book.id = :bookId
+		""")
+	List<CategoryResponse> findCategoryIdsByBookId(@Param("bookId") Long bookId);
 
 	// 특정 책의 모든 카테고리들을 조회
 	@Query("select bc.category from BookCategory bc where bc.book.id = :bookId")

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.book.dto.request.CategoryRegisterRequest;
@@ -13,8 +14,8 @@ import shop.bluebooktle.backend.book.entity.Category;
 import shop.bluebooktle.backend.book.repository.BookCategoryRepository;
 import shop.bluebooktle.backend.book.repository.CategoryRepository;
 import shop.bluebooktle.backend.book.service.CategoryService;
-import shop.bluebooktle.common.exception.CategoryAlreadyExistsException;
-import shop.bluebooktle.common.exception.CategoryNotFoundException;
+import shop.bluebooktle.common.exception.book.CategoryAlreadyExistsException;
+import shop.bluebooktle.common.exception.book.CategoryNotFoundException;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +25,7 @@ public class CategoryServiceImpl implements CategoryService {
 	BookCategoryRepository bookCategoryRepository;
 
 	@Override
+	@Transactional
 	public void registerCategory(CategoryRegisterRequest request) {
 		if (categoryRepository.existsByName(request.name())) {
 			throw new CategoryAlreadyExistsException("Category name already exists: " + request.name());
@@ -45,6 +47,7 @@ public class CategoryServiceImpl implements CategoryService {
 	}
 
 	@Override
+	@Transactional
 	public void updateCategory(CategoryUpdateRequest request) {
 		if (!categoryRepository.existsById(request.id())) {
 			throw new CategoryNotFoundException(request.id());
@@ -58,6 +61,7 @@ public class CategoryServiceImpl implements CategoryService {
 	}
 
 	@Override
+	@Transactional
 	public void deleteCategory(Long id) {
 		Category category = categoryRepository.findById(id)
 			.orElseThrow(() -> new CategoryNotFoundException(id));
@@ -82,6 +86,7 @@ public class CategoryServiceImpl implements CategoryService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public boolean isRootCategory(Long id) {
 		Category selectedCategory = categoryRepository.findById(id)
 			.orElseThrow(() -> new CategoryNotFoundException(id));
@@ -89,6 +94,7 @@ public class CategoryServiceImpl implements CategoryService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public CategoryResponse getCategory(Long id) {
 		Category selectedCategory = categoryRepository.findById(id)
 			.orElseThrow(() -> new CategoryNotFoundException(id));
@@ -97,6 +103,7 @@ public class CategoryServiceImpl implements CategoryService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public List<CategoryResponse> getSubcategoriesByParentCategoryId(Long parentCategoryId) {
 		Category parentCategory = categoryRepository.findById(parentCategoryId)
 			.orElseThrow(() -> new CategoryNotFoundException(parentCategoryId));
@@ -110,6 +117,7 @@ public class CategoryServiceImpl implements CategoryService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public List<CategoryResponse> getParentCategoriesByLeafCategoryId(Long leafCategoryId) {
 		List<Category> parents = new ArrayList<>();
 		List<CategoryResponse> parentcategories = new ArrayList<>();
@@ -127,13 +135,15 @@ public class CategoryServiceImpl implements CategoryService {
 		return parentcategories;
 	}
 
-	private List<Category> getAllDescendantCategories(Category parent) {
+	@Transactional(readOnly = true)
+	protected List<Category> getAllDescendantCategories(Category parent) {
 		List<Category> result = new ArrayList<>();
 		collectDescendants(parent, result);
 		return result;
 	}
 
-	private void collectDescendants(Category category, List<Category> result) {
+	@Transactional(readOnly = true)
+	protected void collectDescendants(Category category, List<Category> result) {
 		for (Category child : category.getChildCategories()) {
 			result.add(child);
 			collectDescendants(child, result); // 재귀 호출로 카테고리에 있는 모든 하위 카테고리를 추가

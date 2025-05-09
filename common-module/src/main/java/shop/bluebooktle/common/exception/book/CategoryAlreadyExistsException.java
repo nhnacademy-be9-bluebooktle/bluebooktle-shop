@@ -1,4 +1,4 @@
-package shop.bluebooktle.common.exception;
+package shop.bluebooktle.common.exception.book;
 
 public class CategoryAlreadyExistsException extends RuntimeException {
 	public CategoryAlreadyExistsException(String name) {

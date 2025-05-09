@@ -1,4 +1,4 @@
-package shop.bluebooktle.common.exception;
+package shop.bluebooktle.common.exception.book;
 
 public class CategoryNotFoundException extends RuntimeException {
 	public CategoryNotFoundException(Long id) {
