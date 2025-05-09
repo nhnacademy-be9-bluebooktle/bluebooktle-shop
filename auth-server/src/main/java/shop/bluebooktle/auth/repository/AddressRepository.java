@@ -1,4 +1,4 @@
-package shop.bluebooktle.backend.user.repository;
+package shop.bluebooktle.auth.repository;
 
 import java.util.List;
 

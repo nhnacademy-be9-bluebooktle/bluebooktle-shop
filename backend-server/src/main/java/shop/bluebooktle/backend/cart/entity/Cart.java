@@ -21,7 +21,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import shop.bluebooktle.common.entity.BaseEntity;
-import shop.bluebooktle.common.entity.User;
+import shop.bluebooktle.common.entity.auth.User;
 
 @ToString(exclude = "cartBooks")
 @Entity

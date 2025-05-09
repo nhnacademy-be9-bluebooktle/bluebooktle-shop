@@ -1,0 +1,153 @@
+### Auth Server API Tests
+
+@baseUrl = http://localhost:9001/auth
+
+# 변수 설정 (필요에 따라 수정)
+@validLoginId = testuser123
+@validPassword = password123!
+@validName = 테스트사용자
+@validEmail = testuser@example.com
+@validBirth = 19900101
+@validPhoneNumber = 01012345678
+
+
+### 1. 회원가입 성공
+POST {{baseUrl}}/signup
+Content-Type: application/json
+
+{
+  "loginId": "{{validLoginId}}",
+  "password": "{{validPassword}}",
+  "name": "{{validName}}",
+  "email": "{{validEmail}}",
+  "birth": "{{validBirth}}",
+  "phoneNumber": "{{validPhoneNumber}}"
+}
+
+### 2. 회원가입 실패 (아이디 중복) - A002 예상
+# 위의 회원가입 성공 요청을 먼저 실행하여 사용자를 생성한 후 실행하세요.
+POST {{baseUrl}}/signup
+Content-Type: application/json
+
+{
+  "loginId": "{{validLoginId}}",
+  "password": "anotherpassword!",
+  "name": "중복 테스트",
+  "email": "anotheremail@example.com",
+  "birth": "19910101",
+  "phoneNumber": "01098765432"
+}
+
+### 3. 회원가입 실패 (이메일 중복) - A003 예상
+# 위의 회원가입 성공 요청을 먼저 실행하여 사용자를 생성한 후 실행하세요.
+POST {{baseUrl}}/signup
+Content-Type: application/json
+
+{
+  "loginId": "anotherId",
+  "password": "anotherpassword!",
+  "name": "이메일 중복 테스트",
+  "email": "{{validEmail}}",
+  "birth": "19920101",
+  "phoneNumber": "01011112222"
+}
+
+### 4. 회원가입 실패 (유효성 검사 오류 - 필수 필드 누락) - JSend fail 예상
+# password, name, email, phoneNumber 누락
+POST {{baseUrl}}/signup
+Content-Type: application/json
+
+{
+  "loginId": "invalidUser",
+  "birth": "{{validBirth}}"
+}
+
+### 5. 회원가입 실패 (유효성 검사 오류 - 잘못된 형식) - JSend fail 예상
+# email, birth, phoneNumber 형식 오류 및 password 길이 부족
+POST {{baseUrl}}/signup
+Content-Type: application/json
+
+{
+  "loginId": "invalidFormatUser",
+  "password": "short",
+  "name": "형식 오류 테스트",
+  "email": "invalid-email",
+  "birth": "900101",
+  "phoneNumber": "010123"
+}
+
+### 6. 로그인 성공
+# 위의 회원가입 성공 요청으로 생성한 사용자로 로그인
+POST {{baseUrl}}/login
+Content-Type: application/json
+
+{
+  "loginId": "{{validLoginId}}",
+  "password": "{{validPassword}}"
+}
+
+> {%
+    client.global.set("accessToken", response.body.data.accessToken);
+    client.global.set("refreshToken", response.body.data.refreshToken);
+%}
+
+### 7. 로그인 실패 (아이디/비밀번호 불일치) - A001 예상
+POST {{baseUrl}}/login
+Content-Type: application/json
+
+{
+  "loginId": "{{validLoginId}}",
+  "password": "wrongpassword"
+}
+
+### 8. 로그인 실패 (없는 아이디) - A001 예상
+POST {{baseUrl}}/login
+Content-Type: application/json
+
+{
+  "loginId": "nonexistentuser",
+  "password": "anypassword"
+}
+
+### 9. 토큰 갱신 성공
+# 위 로그인 성공 요청 후 실행하여 refreshToken 변수에 저장된 값을 사용합니다.
+POST {{baseUrl}}/refresh
+Content-Type: application/json
+
+{
+  "refreshToken": "{{refreshToken}}"
+}
+
+> {%
+    client.global.set("newAccessToken", response.body.data.accessToken);
+    client.global.set("newRefreshToken", response.body.data.refreshToken);
+%}
+
+
+### 10. 토큰 갱신 실패 (유효하지 않거나 만료된 토큰) - A005 예상
+POST {{baseUrl}}/refresh
+Content-Type: application/json
+
+{
+  "refreshToken": "invalid.or.expired.token"
+}
+
+### (추가 테스트) 휴면 계정 로그인 시도 - A004 예상
+# 테스트를 위해 데이터베이스에서 특정 사용자의 status를 DORMANT로 직접 변경한 후 시도하세요.
+# POST {{baseUrl}}/login
+# Content-Type: application/json
+#
+# {
+#   "loginId": "dormantuserloginid",
+#   "password": "dormantuserpassword"
+# }
+
+### (추가 테스트) 탈퇴 계정 로그인 시도 - A011 예상
+# 테스트를 위해 데이터베이스에서 특정 사용자의 status를 WITHDRAWN으로 직접 변경한 후 시도하세요.
+# POST {{baseUrl}}/login
+# Content-Type: application/json
+#
+# {
+#   "loginId": "withdrawnuserloginid",
+#   "password": "withdrawnuserpassword"
+# }

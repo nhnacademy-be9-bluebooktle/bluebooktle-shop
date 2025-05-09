@@ -1,4 +1,4 @@
-package shop.bluebooktle.backend.user.repository;
+package shop.bluebooktle.auth.repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -24,4 +24,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
 	// 특정 상태이고 마지막 로그인 시간이 특정 시간 이전인 사용자 목록을 조회합니다.
 	// (예: 휴면 계정 조회)
 	List<User> findByStatusAndLastLoginAtBefore(UserStatus status, LocalDateTime lastLoginTime);
+
 }
