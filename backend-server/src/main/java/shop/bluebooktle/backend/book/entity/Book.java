@@ -26,7 +26,7 @@ import shop.bluebooktle.common.entity.BaseEntity;
 
 @Entity
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 @Table(name = "book")
 @EqualsAndHashCode(of = "id", callSuper = false)
 @SQLDelete(sql = "UPDATE book SET deleted_at = CURRENT_TIMESTAMP WHERE book_id = ?")
