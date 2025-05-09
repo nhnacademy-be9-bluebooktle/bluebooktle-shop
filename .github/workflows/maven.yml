@@ -98,8 +98,6 @@ jobs:
     needs: build
     if: needs.detect_changes.outputs.changed != ''
     runs-on: ubuntu-latest
-    env:
-      MODULES: ${{ needs.detect_changes.outputs.changed }}
     steps:
       - name: Download JARs
         uses: actions/download-artifact@v4
@@ -109,7 +107,7 @@ jobs:
 
       - name: Debug deploy modules
         run: |
-          echo ">>> Deploy sees modules: '$MODULES'"
+          echo ">>> Deploy sees modules: '${{ needs.detect_changes.outputs.changed }}'"
 
       - name: Upload JARs to remote
         uses: appleboy/scp-action@master
@@ -131,8 +129,8 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           capture_stdout: true
           script: |
-            echo ">>> SSH sees modules: $MODULES"
-            for MOD in $MODULES; do
+            echo ">>> SSH sees modules: ${{ needs.detect_changes.outputs.changed }}"
+            for MOD in ${{ needs.detect_changes.outputs.changed }}; do
               echo "▶ Rolling deploy: $MOD"
               ~/startup.sh "$MOD"
             done
