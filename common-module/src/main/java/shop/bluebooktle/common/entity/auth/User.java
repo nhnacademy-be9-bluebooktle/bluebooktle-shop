@@ -33,12 +33,12 @@ import shop.bluebooktle.common.domain.auth.UserType;
 import shop.bluebooktle.common.entity.BaseEntity;
 
 @Entity
-@Table(name = "user")
+@Table(name = "users")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString(exclude = {"addresses", "membershipLevel"})
 @EqualsAndHashCode(of = "id", callSuper = false)
-@SQLDelete(sql = "UPDATE `user` SET deleted_at = CURRENT_TIMESTAMP WHERE user_id = ?")
+@SQLDelete(sql = "UPDATE `users` SET deleted_at = CURRENT_TIMESTAMP WHERE user_id = ?")
 @SQLRestriction("deleted_at IS NULL AND status <> 'WITHDRAWN'")
 public class User extends BaseEntity {
 

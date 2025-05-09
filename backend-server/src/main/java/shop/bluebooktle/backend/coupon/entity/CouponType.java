@@ -1,5 +1,7 @@
 package shop.bluebooktle.backend.coupon.entity;
 
+import java.math.BigDecimal;
+
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
@@ -35,9 +37,12 @@ public class CouponType extends BaseEntity {
 	@Enumerated(EnumType.STRING)
 	@Column(name = "target", nullable = false, length = 5)
 	private CouponTypeTarget target;
+	@Column(name = "minimum_payment", nullable = false, precision = 10, scale = 2)
+	private BigDecimal minimumPayment;
 
-	public CouponType(String name, CouponTypeTarget target) {
+	public CouponType(String name, CouponTypeTarget target, BigDecimal minimumPayment) {
 		this.name = name;
 		this.target = target;
+		this.minimumPayment = minimumPayment;
 	}
 }
