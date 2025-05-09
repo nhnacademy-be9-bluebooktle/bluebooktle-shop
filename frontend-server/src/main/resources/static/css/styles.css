@@ -6,10 +6,10 @@
 }
 
 @font-face {
-    font-family: 'DungGeunMo';
-    src: url('DungGeunMo.woff2') format('woff2'); /* 실제 폰트 경로에 맞게 수정 */
-    font-weight: normal;
-    font-style: normal;
+    font-family: 'DungGeunMo'; /* CSS에서 사용할 폰트 이름 (원하는 대로 지정) */
+    src: url('DungGeunMo.woff2') format('woff2');
+    font-weight: normal; /* 폰트 두께 (폰트 파일에 따라 조절) */
+    font-style: normal;  /* 폰트 스타일 (폰트 파일에 따라 조절) */
 }
 
 :root {
@@ -52,7 +52,7 @@ a {
 
 a:hover {
     color: var(--kitsch-color-3); /* 호버시 핫핑크 */
-    transform: scale(1.03) rotate(-2deg);
+    transform: scale(1.1) rotate(-2deg);
 }
 
 img {
@@ -65,13 +65,12 @@ ul {
     list-style: none;
 }
 
+/* Demo3와 컴포넌트 페이지 공통 컨테이너 클래스명 통일 */
 .container-kitsch {
     width: 90%;
     max-width: 1300px;
     margin: 0 auto;
     padding: 0 15px;
-    position: relative;
-    z-index: 1;
 }
 
 /* 폰트 클래스 */
@@ -91,7 +90,7 @@ ul {
     letter-spacing: 0.5px;
 }
 
-/* 버튼 스타일 (기존 제공된 내용 전체 유지) */
+/* 버튼 스타일 */
 .btn-kitsch {
     display: inline-flex;
     align-items: center;
@@ -114,12 +113,12 @@ ul {
 }
 
 .primary-btn-kitsch {
-    background-color: var(--kitsch-color-2);
+    background-color: var(--kitsch-color-2); /* 머스타드 옐로우 */
     color: var(--kitsch-text-dark);
 }
 
 .primary-btn-kitsch:hover {
-    background-color: var(--kitsch-color-1);
+    background-color: var(--kitsch-color-1); /* 버건디 */
     color: var(--kitsch-text-light);
     border-color: var(--kitsch-color-1);
     transform: scale(1.05) rotate(2deg);
@@ -131,7 +130,6 @@ ul {
     border-color: var(--kitsch-color-5);
 }
 
-/* 헤더용 기본 secondary는 텍스트가 밝아야 함 */
 .secondary-btn-kitsch:hover {
     background-color: var(--kitsch-color-5);
     color: var(--kitsch-text-light);
@@ -140,16 +138,17 @@ ul {
 
 .secondary-btn-kitsch.color1-kitsch {
     background-color: var(--kitsch-color-2);
-    color: var(--kitsch-text-dark);
+    color: var(--kitsch-text-dark); /* 기본 텍스트/테두리: 머스타드 */
     border-color: var(--kitsch-text-dark);
 }
 
 .secondary-btn-kitsch.color1-kitsch:hover {
-    background-color: var(--kitsch-text-dark);
-    color: var(--kitsch-text-light);
-    border-color: var(--kitsch-text-dark);
+    background-color: var(--kitsch-text-dark); /* 호버 배경: 머스타드 */
+    color: var(--kitsch-text-light); /* 호버 텍스트: 어둡게 (category-bubble.color1 규칙) */
+    border-color: var(--kitsch-text-dark); /* 호버 테두리도 배경색과 통일 */
 }
 
+/* Color 2 (Category Bubble Color 2 - 핫핑크) */
 .secondary-btn-kitsch.color2-kitsch {
     background-color: var(--kitsch-color-3);
     color: var(--kitsch-text-light);
@@ -157,11 +156,12 @@ ul {
 }
 
 .secondary-btn-kitsch.color2-kitsch:hover {
-    background-color: var(--kitsch-text-light);
-    color: var(--kitsch-color-3);
+    background-color: var(--kitsch-text-light); /* 호버 배경: 핫핑크 */
+    color: var(--kitsch-color-3); /* 호버 텍스트: 밝게 (category-bubble.color2 규칙) */
     border-color: var(--kitsch-text-light);
 }
 
+/* Color 3 (Category Bubble Color 3 - 터콰이즈) */
 .secondary-btn-kitsch.color3-kitsch {
     background-color: var(--kitsch-color-4);
     color: var(--kitsch-text-light);
@@ -169,43 +169,47 @@ ul {
 }
 
 .secondary-btn-kitsch.color3-kitsch:hover {
-    background-color: var(--kitsch-color-4);
-    color: var(--kitsch-text-light);
+    background-color: var(--kitsch-color-4); /* 호버 배경: 터콰이즈 */
+    color: var(--kitsch-text-light); /* 호버 텍스트: 밝게 (category-bubble.color3 규칙) */
     border-color: var(--kitsch-color-4);
 }
 
+/* Color 4 (Category Bubble Color 4 - 오렌지) */
 .secondary-btn-kitsch.color4-kitsch {
     background-color: var(--kitsch-accent-orange);
-    color: var(--kitsch-text-dark);
+    color: var(--kitsch-text-dark); /* 기본 텍스트/테두리: 오렌지 */
     border-color: var(--kitsch-text-dark);
 }
 
 .secondary-btn-kitsch.color4-kitsch:hover {
-    background-color: var(--kitsch-text-dark);
-    color: var(--kitsch-text-light);
+    background-color: var(--kitsch-text-dark); /* 호버 배경: 오렌지 */
+    color: var(--kitsch-text-light); /* 호버 텍스트: 어둡게 (category-bubble.color4 규칙) */
     border-color: var(--kitsch-text-dark);
 }
 
+/* Color 5 (Category Bubble Color 5 - 보라) */
 .secondary-btn-kitsch.color5-kitsch {
     background-color: var(--kitsch-accent-purple);
-    color: var(--kitsch-text-light);
+    color: var(--kitsch-text-light); /* 기본 텍스트/테두리: 보라 */
     border-color: var(--kitsch-text-dark);
 }
 
 .secondary-btn-kitsch.color5-kitsch:hover {
-    background-color: var(--kitsch-text-dark);
-    color: var(--kitsch-accent-purple);
+    background-color: var(--kitsch-text-dark); /* 호버 배경: 보라 */
+    color: var(--kitsch-accent-purple); /* 호버 텍스트: 밝게 (category-bubble.color5 규칙) */
     border-color: var(--kitsch-text-dark);
 }
 
+
+/* 컴포넌트 페이지용 추가 버튼 스타일 */
 .accent-btn-kitsch {
-    background-color: var(--kitsch-color-3);
+    background-color: var(--kitsch-color-3); /* 핫핑크 */
     color: var(--kitsch-text-light);
     border-color: var(--kitsch-text-dark);
 }
 
 .accent-btn-kitsch:hover {
-    background-color: var(--kitsch-color-1);
+    background-color: var(--kitsch-color-1); /* 버건디 */
     transform: skewX(-5deg);
 }
 
@@ -222,6 +226,7 @@ ul {
     background-color: #ccc;
     color: #888;
 }
+
 
 .retro-shadow-kitsch {
     box-shadow: 4px 4px 0px var(--kitsch-text-dark);
@@ -278,36 +283,28 @@ ul {
 }
 
 
-/* =========================== */
-/* Header Kitsch - 정렬 개선 적용 */
-/* =========================== */
+/* Header Kitsch */
 .site-header-kitsch {
-    background-color: var(--kitsch-color-3); /* 핫핑크 배경 */
-    color: var(--kitsch-text-light); /* 헤더 내 기본 텍스트 밝게 */
-    padding-top: 0.5rem; /* 헤더 상단 내부 여백 */
-    /* padding-bottom은 header-flex-kitsch에서 관리하여 마퀴와 간격 조절 */
-    border-bottom: 4px solid var(--kitsch-text-dark); /* 하단 구분선 */
+    background-color: var(--kitsch-color-3);
+    color: var(--kitsch-text-light);
+    padding: 0.6rem 0 0 0;
+    border-bottom: 4px solid var(--kitsch-text-dark);
 }
 
 .header-flex-kitsch {
     display: flex;
-    justify-content: space-between; /* 자식 요소들을 양 끝으로 정렬 */
-    align-items: center; /* 수직 중앙 정렬 */
-    flex-wrap: nowrap; /* 기본적으로 한 줄에 표시. 작은 화면에서는 wrap으로 변경 */
-    gap: 1rem; /* 자식 요소들 사이의 최소 간격 */
-    padding-bottom: 0.5rem; /* 마퀴와의 간격을 위해 하단 패딩 추가 */
+    justify-content: space-between;
+    align-items: center;
 }
 
 .logo-link-kitsch {
-    flex-shrink: 0; /* 로고 크기가 줄어들지 않도록 함 */
-    display: flex; /* 로고 내부 요소 정렬용 */
+    display: flex;
     flex-direction: column;
     align-items: center;
-    text-decoration: none; /* 링크 기본 밑줄 제거 */
 }
 
 .logo-link-kitsch:hover {
-    transform: none; /* 헤더 로고에는 개별 호버 효과 불필요 */
+    transform: none;
 }
 
 .logo-main-kitsch {
@@ -320,7 +317,6 @@ ul {
     color: var(--kitsch-color-4);
 }
 
-/* BlueBooktle 중 Book 색상 */
 .logo-sub-kitsch {
     font-size: 0.9rem;
     line-height: 1;
@@ -328,103 +324,129 @@ ul {
     color: var(--kitsch-bg-main);
 }
 
+.main-nav-kitsch {
+    display: flex;
+    gap: 1rem;
+}
+
+.nav-item-kitsch {
+    font-family: var(--font-display);
+    color: var(--kitsch-text-light);
+    padding: 0.5em 0.8em;
+    border-radius: 4px;
+    transition: background-color 0.2s, transform 0.2s;
+    font-size: 1.1rem;
+}
+
+.nav-item-kitsch:hover {
+    background-color: var(--kitsch-color-5);
+    transform: translateY(-2px);
+    color: var(--kitsch-bg-main);
+}
+
+.nav-item-kitsch i {
+    margin-right: 0.3em;
+    font-size: 0.9em;
+}
 
 .header-search-form-kitsch {
-    display: flex; /* 내부 input, button 정렬 */
+    display: flex; /* 입력 필드와 버튼을 한 줄로 */
     align-items: center;
-    flex-grow: 1; /* 사용 가능한 공간을 최대한 차지 */
-    flex-basis: 280px; /* 검색창의 기본 최소 너비 (내용에 따라 자동 조절될 수 있음) */
-    min-width: 200px; /* 검색창이 너무 작아지는 것을 방지 */
-    max-width: 480px; /* 검색창이 과도하게 커지는 것을 방지 */
-    margin-left: 1rem; /* 로고와의 간격 */
-    margin-right: 1rem; /* 사용자 액션과의 간격 */
+    flex-grow: 1; /* 가능한 많은 공간 차지 (네비게이션 등 다른 요소와 균형 고려) */
+    max-width: 450px; /* 검색창 최대 너비 제한 */
+    margin: 0 1.5rem; /* 좌우 여백 */
 }
 
 .header-search-input-kitsch {
-    flex-grow: 1;
-    border-right: none;
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-    font-family: var(--font-pixel);
-    font-size: 0.9rem;
-    padding: 0.7em 1em !important; /* 기존 스타일보다 우선 적용 */
+    flex-grow: 1; /* 입력 필드가 남은 공간을 채우도록 */
+    border-right: none; /* 버튼과의 경계선 제거 (버튼과 합쳐진 느낌) */
+    border-top-right-radius: 0; /* 버튼과 이어지도록 오른쪽 상단 모서리 각지게 */
+    border-bottom-right-radius: 0; /* 버튼과 이어지도록 오른쪽 하단 모서리 각지게 */
+    font-family: var(--font-pixel); /* 픽셀 폰트 적용 */
+    font-size: 0.9rem; /* 폰트 크기 조정 */
+    padding: 0.7em 1em !important; /* 패딩 조정 */
 }
 
 .header-search-input-kitsch::placeholder {
-    font-family: var(--font-pixel);
+    font-family: var(--font-pixel); /* 플레이스홀더 폰트 */
     color: var(--kitsch-text-dark);
     opacity: 0.6;
 }
 
 .header-search-btn-kitsch {
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-    padding: 0.6em 1em; /* 입력창과 높이 맞춤 */
-    box-shadow: none !important;
-    border-left: 2px solid var(--kitsch-text-dark); /* 입력창과 버튼 구분선 */
+    border-top-left-radius: 0; /* 입력 필드와 이어지도록 왼쪽 상단 모서리 각지게 */
+    border-bottom-left-radius: 0; /* 입력 필드와 이어지도록 왼쪽 하단 모서리 각지게 */
+    padding: 0.6em 1em; /* 패딩 조정 (input과 높이 맞추기) */
+    box-shadow: none !important; /* 기본 버튼 그림자 제거 */
+    border-left: 2px solid var(--kitsch-text-dark); /* 입력창과 버튼 구분선 (옵션) */
 }
 
 .header-search-btn-kitsch i {
-    margin-right: 0;
+    margin-right: 0; /* 아이콘만 있을 경우 추가 여백 제거 */
+}
+
+/* 헤더 플렉스 컨테이너 수정 (필요시) */
+.header-flex-kitsch {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem; /* 요소 간 간격 */
+    flex-wrap: wrap; /* 모바일에서 줄바꿈 허용 */
 }
 
 
-/* 사용자 액션 영역 (로그인 전/후 공통) */
 .user-actions-kitsch {
     display: flex;
+    gap: 0.5rem;
     align-items: center;
-    gap: 0.5rem; /* 버튼 기본 간격 */
-    flex-shrink: 0; /* 공간 부족 시 줄어들지 않음 */
 }
 
-/* 로그인 전: .user-actions-kitsch > .btn-kitsch 로 스타일링 */
-/* 로그인 후: .user-actions-kitsch.logged-in-actions-kitsch 로 스타일링 */
-.user-actions-kitsch.logged-in-actions-kitsch {
-    gap: 0.8rem; /* 환영 메시지, 버튼들 간의 간격 */
+.icon-only-kitsch {
+    background-color: var(--kitsch-color-2);
+    color: var(--kitsch-text-dark);
+    border: 2px solid var(--kitsch-text-dark);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 1.1rem;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: end;
+    line-height: 1; /* 아이콘 수직 정렬 도움 */
 }
 
-.welcome-message-kitsch {
-    white-space: nowrap; /* 메시지가 여러 줄로 깨지지 않도록 */
-    font-size: 0.85rem; /* 기존 0.9rem에서 약간 줄임 */
+.icon-only-kitsch i {
+    display: block;
+}
+
+.icon-only-kitsch:hover {
+    background-color: var(--kitsch-color-3);
     color: var(--kitsch-text-light);
-    margin-right: 0.5rem; /* 다음 요소와의 간격 */
-    padding: 0.3em 0.6em;
-    background-color: rgba(0, 0, 0, 0.1); /* 배경 약간 어둡게 */
-    border-radius: 4px;
+    border-color: var(--kitsch-text-dark);
 }
 
-.welcome-message-kitsch i {
-    margin: 0 0.2em;
-}
-
-/* 장바구니 버튼과 카운트 */
 .cart-btn-header-kitsch {
-    position: relative; /* 카운트의 기준점 */
-    display: inline-flex; /* 아이콘과 카운트 정렬 위해 */
-    align-items: center;
-    /* gap: 0.3em; 카운트가 absolute면 gap 불필요 */
+    position: relative;
 }
 
 .cart-count-kitsch {
     position: absolute;
-    top: -8px;
-    right: -8px;
+    top: -5px;
+    right: -5px;
     background-color: var(--kitsch-color-1);
     color: var(--kitsch-text-light);
     font-family: var(--font-pixel);
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     border-radius: 50%;
     width: 20px;
     height: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
-    line-height: 1; /* 숫자 수직 정렬 */
     border: 1px solid var(--kitsch-text-dark);
-    box-shadow: 1px 1px 0px var(--kitsch-text-dark);
 }
 
-/* 마퀴 스타일 (기존 유지) */
 .header-marquee-kitsch {
     background-color: var(--kitsch-text-dark);
     color: var(--kitsch-color-2);
@@ -442,10 +464,10 @@ ul {
 }
 
 @keyframes marquee-kitsch {
-    from {
+    0% {
         transform: translateX(0);
     }
-    to {
+    100% {
         transform: translateX(-100%);
     }
 }
@@ -560,7 +582,7 @@ ul {
 .book-grid-kitsch {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 1.5rem;
+    gap: 2.5rem;
 }
 
 .featured-grid-kitsch {
@@ -686,7 +708,6 @@ ul {
 
 /* Category Zone Kitsch (참고용) */
 .category-zone-kitsch {
-    position: relative;
     background-color: var(--kitsch-color-4);
     padding: 1.2rem 0 !important;
 }
@@ -1297,23 +1318,22 @@ ul {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(16, 97, 117, 0.7); /* 기존 스타일 */
-    backdrop-filter: blur(5px) grayscale(50%); /* 기존 스타일 */
+    background-color: rgba(16, 97, 117, 0.7);
+    backdrop-filter: blur(5px) grayscale(50%);
     z-index: 2000;
-    display: none; /* 기본적으로 숨김 */
+    display: flex;
     align-items: center;
     justify-content: center;
     padding: 20px;
     opacity: 0;
     visibility: hidden;
-    transition: opacity 0.3s ease-out, visibility 0s linear 0.3s; /* 숨길 때 */
+    transition: opacity 0.3s ease-out, visibility 0s 0.3s linear;
 }
 
 .modal-overlay-kitsch.active {
-    display: flex !important; /* active 클래스 추가 시 보이도록 */
     opacity: 1;
     visibility: visible;
-    transition: opacity 0.3s ease-out, visibility 0s linear; /* 나타날 때 */
+    transition-delay: 0s;
 }
 
 .modal-content-kitsch {
@@ -1417,101 +1437,6 @@ ul {
 .modal-confirm-btn-kitsch {
     font-size: 1.1rem;
     padding: 0.8em 2em;
-}
-
-/* styles.css 에 추가/확인 */
-
-/* 공통 정보 모달 확장 스타일 */
-.info-modal-kitsch { /* .modal-content-kitsch 기본 스타일 상속 */
-    padding-top: 1rem; /* 마스코트 영역을 위해 상단 패딩 조정 */
-}
-
-/* 마스코트 이미지 영역 */
-.modal-mascot-area-kitsch {
-    width: 100px; /* 마스코트 크기 */
-    height: 100px; /* 1:1 비율 */
-    margin: 0 auto 0.5rem auto; /* 아이콘/제목과의 간격 줄임 */
-    border-radius: 50%;
-    overflow: hidden;
-    border: 4px solid var(--kitsch-text-dark);
-    background-color: var(--kitsch-bg-main);
-    box-shadow: 0px 3px 0px var(--kitsch-text-dark), inset 0 0 10px rgba(0, 0, 0, 0.1);
-    position: relative;
-    /* 모달 상단으로 약간 올리는 효과는 전체적인 디자인과 조화롭게 조정 필요 */
-    /* top: -50px; margin-bottom: -30px; 이 부분은 다른 요소와의 간격에 따라 조절 */
-}
-
-.modal-mascot-area-kitsch img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-
-/* 성공 모달 상태 스타일 */
-.modal-content-kitsch.success-modal-content {
-    border-color: var(--kitsch-color-2) !important; /* 머스타드 테두리 */
-    box-shadow: 0 0 25px rgba(194, 182, 56, 0.4), 4px 4px 0 var(--kitsch-text-dark) !important;
-}
-
-.success-modal-content .modal-mascot-area-kitsch {
-    border-color: var(--kitsch-color-2);
-    box-shadow: 0px 3px 0px var(--kitsch-color-2), inset 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-.success-modal-content .modal-icon-kitsch i {
-    color: var(--kitsch-color-2);
-}
-
-.success-modal-content .modal-title-kitsch {
-    color: var(--kitsch-color-5);
-}
-
-.success-modal-content .modal-confirm-btn-kitsch {
-    background-color: var(--kitsch-color-2);
-    color: var(--kitsch-text-dark);
-}
-
-.success-modal-content .modal-confirm-btn-kitsch:hover {
-    background-color: var(--kitsch-color-5);
-    color: var(--kitsch-text-light);
-}
-
-/* 실패 모달 상태 스타일 */
-.modal-content-kitsch.error-modal-content {
-    border-color: var(--kitsch-color-1) !important; /* 버건디 테두리 */
-    box-shadow: 0 0 25px rgba(117, 11, 48, 0.4), 4px 4px 0 var(--kitsch-text-dark) !important;
-}
-
-.error-modal-content .modal-mascot-area-kitsch {
-    border-color: var(--kitsch-color-1);
-    box-shadow: 0px 3px 0px var(--kitsch-color-1), inset 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-.error-modal-content .modal-icon-kitsch i {
-    color: var(--kitsch-color-1);
-}
-
-.error-modal-content .modal-title-kitsch {
-    color: var(--kitsch-color-1);
-}
-
-.error-modal-content .modal-confirm-btn-kitsch {
-    background-color: var(--kitsch-color-1);
-    color: var(--kitsch-text-light);
-}
-
-.error-modal-content .modal-confirm-btn-kitsch:hover {
-    background-color: var(--kitsch-color-3);
-}
-
-/* 기본 정보 모달 스타일 (색상 등은 success/error에서 덮어쓰기) */
-.modal-content-kitsch.info-modal-kitsch {
-    /* 특별한 색상 변경 없음, 기본 .modal-content-kitsch 스타일 따름 */
-}
-
-.info-modal-kitsch .modal-icon-kitsch i {
-    color: var(--kitsch-color-4); /* 기본 정보 아이콘은 청록색 */
 }
 
 /* Responsive for Modals */
@@ -1872,142 +1797,117 @@ ul {
 
 
 /* Responsive Kitsch */
-@media (max-width: 992px) {
-    /* 브레이크포인트 조정 (기존 920px 보다 약간 넓게) */
+@media (max-width: 768px) {
     .header-flex-kitsch {
         flex-wrap: wrap;
-        justify-content: center; /* 아이템들을 중앙으로 모음 */
+        justify-content: center;
     }
 
     .logo-link-kitsch {
-        width: 100%; /* 로고가 가로 전체 차지 */
-        text-align: center; /* 로고 내부 텍스트 중앙 정렬 */
-        margin-bottom: 0.8rem;
-        order: 1; /* 순서: 1. 로고 */
+        order: -1;
+        margin-bottom: 0.5rem;
+        width: 100%;
     }
 
-    /* 검색창과 사용자 액션의 순서 및 너비 조정 */
-    .header-search-form-kitsch {
-        width: 100%; /* 검색창이 가로 전체 차지 */
-        margin-left: auto; /* 중앙 정렬 효과 */
-        margin-right: auto;
-        margin-bottom: 0.8rem; /* 사용자 액션과의 간격 */
-        order: 2; /* 순서: 2. 검색창 */
-        max-width: 600px; /* 너무 넓어지지 않도록 */
+    .main-nav-kitsch {
+        display: none;
     }
 
+    /* 실제로는 햄버거 메뉴 등으로 대체 필요 */
     .user-actions-kitsch {
-        width: 100%; /* 사용자 액션 영역도 가로 전체 차지 */
-        justify-content: center; /* 내부 버튼들 중앙 정렬 */
-        order: 3; /* 순서: 3. 사용자 액션 */
+        margin-top: 0.5rem;
     }
 
-    /* 로그인 후 사용자 액션이 세로로 쌓이는 것은 더 작은 화면에서 처리 */
-    .user-actions-kitsch.logged-in-actions-kitsch {
-        flex-wrap: wrap; /* 버튼들이 많을 경우 줄바꿈 허용 */
-        justify-content: center;
-        gap: 0.5rem; /* 버튼 간 간격 */
-    }
-
-    .welcome-message-kitsch {
-        width: 100%; /* 환영 메시지도 한 줄 차지 */
-        text-align: center;
-        margin-right: 0;
-        margin-bottom: 0.5rem; /* 다음 버튼 그룹과의 간격 */
-    }
-}
-
-
-@media (max-width: 768px) {
-    /* 기존 styles.css 에 정의된 768px 규칙들 유지 */
-    /* 예: .main-nav-kitsch { display: none; } 등 */
-    /* 992px에서 변경된 헤더 구조에 맞춰 추가 조정 */
-    .logo-main-kitsch {
+    .section-title-kitsch {
         font-size: 2rem;
     }
 
-    .logo-sub-kitsch {
-        font-size: 0.85rem;
+    .book-grid-kitsch {
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 1.5rem;
     }
 
-    .header-search-form-kitsch {
-        /* 검색창 크기나 여백 등 미세 조정 가능 */
-        flex-basis: 100%; /* 확실히 한 줄 차지 */
+    /* Book Detail Page Responsive (from Demo3) - Not used in component page but kept for completeness */
+    .book-detail-layout-kitsch {
+        grid-template-columns: 1fr;
     }
 
-    .user-actions-kitsch.logged-in-actions-kitsch {
-        flex-direction: column; /* 버튼들을 확실히 세로로 쌓음 */
-        align-items: center;
+    .main-book-image-kitsch {
+        max-width: 300px;
     }
 
-    .logged-in-actions-kitsch > .btn-kitsch {
-        width: 70%; /* 버튼 너비 통일 (선택) */
-        max-width: 220px;
-        font-size: 0.9rem;
+    .page-main-title-kitsch {
+        font-size: 2rem;
     }
 
-    .welcome-message-kitsch {
-        font-size: 0.85rem;
-    }
-
-    .page-main-title-kitsch { /* 페이지 제목 폰트 크기 조정 */
-        font-size: 2.5rem; /* 기존 3rem 에서 축소 */
-    }
-
-    .list-controls-kitsch { /* 기존 768px 규칙 적용 */
+    .list-controls-kitsch {
         flex-direction: column;
         gap: 1rem;
+    }
+
+
+    .page-header-kitsch-components h1 {
+        font-size: 2em;
+    }
+
+    .filter-group-kitsch {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .filter-group-kitsch .btn-kitsch {
+        margin-left: 0;
+        width: 100%;
+    }
+
+    .price-range-kitsch .input-kitsch {
+        width: calc(50% - 0.25rem - 10px); /* 10px은 ~ 문자 너비 대략적 고려 */
     }
 }
 
 @media (max-width: 480px) {
-    /* 기존 styles.css 에 정의된 480px 규칙들 유지 */
-    .logo-main-kitsch {
+    /* Hero Section Kitsch Responsive (from Demo3) */
+    .hero-title-kitsch {
+        font-size: 2rem;
+    }
+
+    .hero-subtitle-kitsch {
+        font-size: 1.2rem;
+    }
+
+    .hero-section-kitsch .btn-kitsch {
+        font-size: 1rem;
+    }
+
+    .book-grid-kitsch {
+        grid-template-columns: 1fr;
+    }
+
+    .book-item-kitsch:hover {
+        transform: none;
+        box-shadow: none;
+    }
+
+    .tilt-left-kitsch:hover, .tilt-right-kitsch:hover {
+        transform: none;
+    }
+
+    .category-bubble-kitsch {
+        font-size: 1rem;
+        padding: 0.8em 1.2em;
+    }
+
+    /* Book Detail Page Kitsch Responsive (from Demo3) */
+    .detail-title-kitsch {
         font-size: 1.8rem;
     }
 
-    .logo-sub-kitsch {
-        font-size: 0.8rem;
-    }
-
-    .header-search-input-kitsch {
-        font-size: 0.85rem;
-        padding: 0.6em 0.8em !important;
-    }
-
-    .header-search-btn-kitsch {
-        padding: 0.55em 0.8em;
-    }
-
-    .user-actions-kitsch .btn-kitsch,
-    .logged-in-actions-kitsch > .btn-kitsch {
-        font-size: 0.8rem;
-        padding: 0.6em 1em;
-    }
-
-    .welcome-message-kitsch {
-        font-size: 0.8rem;
-        padding: 0.2em 0.4em;
-    }
-
-    .cart-count-kitsch {
-        width: 18px;
-        height: 18px;
-        font-size: 0.7rem;
-        top: -7px;
-        right: -7px;
-    }
-
-    .header-marquee-kitsch {
-        font-size: 0.8rem;
-        margin-top: 0.8rem;
-    }
-
-    /* 다른 페이지 요소들 (탭, 페이지네이션 등)도 기존 480px 규칙 적용 */
+    /* Component Page specific responsive */
     .tabs-kitsch-container {
         flex-wrap: wrap;
     }
 
+    /* 탭 버튼이 한 줄에 다 안들어가면 다음 줄로 */
     .tab-kitsch-button {
         flex-grow: 1;
         text-align: center;
@@ -2015,211 +1915,34 @@ ul {
         margin-bottom: -2px;
     }
 
+    /* 모바일에서 탭 버튼 균등 너비 */
+    .tab-kitsch-button:not(:last-child) {
+        /* margin-right: -2px; */ /* 겹침 유지 또는 제거 고려 */
+    }
+
     .pagination-kitsch .page-btn-kitsch {
         padding: 0.5em 0.8em;
         font-size: 0.9rem;
     }
-}
 
-/* styles.css */
-/* ... (기존 styles.css 내용: Reset, :root, body, a, .container-kitsch, 폰트 클래스, 버튼 스타일, 헤더, 푸터 등) ... */
-/* =========================== */
-/* Mypage Common Styles        */
-/* =========================== */
-.mypage-header-kitsch {
-    background-color: var(--kitsch-accent-purple); /* 보라 */
-    color: var(--kitsch-text-light);
-    padding: 2rem;
-    text-align: center;
-    border: 5px outset var(--kitsch-color-2); /* 머스타드 */
-    border-radius: 0 0 30px 30px; /* 아래쪽 모서리만 둥글게 */
-    margin-bottom: 2.5rem;
-    box-shadow: 0px 5px 0px var(--kitsch-color-5); /* 짙은 청록 */
-}
-
-.mypage-header-kitsch .page-main-title-kitsch { /* 기존 .page-main-title-kitsch 와 병합 가능 */
-    font-family: var(--font-display); /* 명시적으로 지정 (기존 page-main-title-kitsch에 없을 경우) */
-    font-size: 2.8rem;
-    color: var(--kitsch-bg-main);
-    text-shadow: 2px 2px 0 var(--kitsch-text-dark);
-    margin-bottom: 0.3rem; /* user-summary와의 간격 */
-}
-
-.mypage-user-summary-kitsch {
-    margin-top: 0.5rem;
-    font-family: var(--font-pixel);
-    font-size: 0.9rem;
-    color: var(--kitsch-text-light);
-}
-
-.mypage-user-summary-kitsch span {
-    margin: 0 0.5em;
-}
-
-.mypage-user-summary-kitsch strong { /* highlight 계열 클래스로 대체 가능 */
-    color: var(--kitsch-color-2); /* 머스타드 */
-}
-
-.mypage-layout-kitsch {
-    display: grid; /* 기본적으로 grid 레이아웃 적용 */
-    grid-template-columns: 220px 1fr; /* 넓은 화면에서 사이드바(220px)와 메인 콘텐츠(나머지 공간)로 구성 */
-    gap: 2rem; /* 사이드바와 메인 콘텐츠 사이 간격 */
-    margin-top: 1rem; /* 마이페이지 헤더와의 간격 (선택 사항) */
-}
-
-.mypage-sidebar-kitsch {
-    background-color: var(--kitsch-bg-alt);
-    padding: 1.5rem;
-    border: 3px solid var(--kitsch-text-dark);
-    border-radius: 10px 5px 5px 10px; /* 키치한 비대칭 모서리 */
-    box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.1);
-    align-self: start; /* 내용이 길어져도 사이드바는 상단에 고정 (grid 아이템 속성) */
-}
-
-.mypage-sidebar-kitsch .sidebar-title-kitsch {
-    font-family: var(--font-display);
-    font-size: 1.4rem;
-    color: var(--kitsch-color-1); /* 버건디 */
-    margin-bottom: 1.5rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 3px dashed var(--kitsch-color-3); /* 핫핑크 */
-    text-align: center;
-}
-
-.mypage-sidebar-kitsch .sidebar-menu-kitsch {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.mypage-sidebar-kitsch .sidebar-menu-kitsch li a {
-    display: flex; /* 아이콘과 텍스트 정렬을 위해 flex 사용 */
-    align-items: center;
-    padding: 0.8em 1em;
-    margin-bottom: 0.5rem;
-    border-radius: 5px;
-    font-family: var(--font-pixel);
-    font-size: 0.95rem;
-    color: var(--kitsch-color-5); /* 짙은 청록 */
-    border: 2px solid transparent;
-    transition: all 0.2s ease-out;
-}
-
-.mypage-sidebar-kitsch .sidebar-menu-kitsch li a:hover {
-    background-color: var(--kitsch-color-2); /* 머스타드 */
-    color: var(--kitsch-text-dark);
-    border-color: var(--kitsch-text-dark);
-    transform: translateX(5px) scale(1.02);
-    box-shadow: 2px 2px 0 var(--kitsch-text-dark);
-}
-
-.mypage-sidebar-kitsch .sidebar-menu-kitsch li a.active {
-    background-color: var(--kitsch-color-3); /* 핫핑크 */
-    color: var(--kitsch-text-light);
-    border-color: var(--kitsch-color-1); /* 버건디 */
-    box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.2), 1px 1px 0 var(--kitsch-color-1);
-    transform: scale(1.01);
-    font-weight: bold; /* 활성 메뉴 강조 */
-}
-
-.mypage-sidebar-kitsch .sidebar-menu-kitsch li a i {
-    margin-right: 0.7em; /* 아이콘과 텍스트 사이 간격 */
-    width: 20px; /* 아이콘 영역 너비 고정으로 텍스트 정렬 도움 */
-    text-align: center;
-    font-size: 1em; /* 링크 텍스트와 크기 맞춤 */
-}
-
-.mypage-content-kitsch {
-    /* 이 영역은 각 마이페이지 하위 페이지의 내용이 들어가는 곳 */
-    /* 공통적인 패딩이나 최소 높이 등을 설정할 수 있음 */
-}
-
-/* 마이페이지 공통 섹션 스타일 (프로필, 비밀번호 변경, 주소 목록 헤더 등) */
-.mypage-section-kitsch {
-    background-color: var(--kitsch-bg-alt);
-    padding: 1.5rem 2rem;
-    border: 3px solid var(--kitsch-text-dark);
-    border-radius: 8px;
-    margin-bottom: 2rem; /* 섹션 간 간격 */
-}
-
-.mypage-section-kitsch h3.section-title-kitsch, /* 기존 .section-title-kitsch 와 병합 또는 여기서 상세화 */
-.address-list-header-kitsch h3.section-title-kitsch { /* 주소록 페이지 헤더의 h3도 동일 스타일 적용 */
-    font-family: var(--font-display); /* display-font-kitsch 클래스 대신 직접 지정 */
-    font-size: 1.5rem;
-    color: var(--kitsch-text-light);
-    background-color: var(--kitsch-color-1); /* 버건디 (프로필, 비밀번호 변경 등) */
-    border: 2px solid var(--kitsch-text-dark);
-    border-radius: 5px;
-    padding: 0.4em 0.8em;
-    text-align: left;
-    margin-bottom: 1.5rem; /* 제목과 내용 사이 간격 */
-    display: inline-block; /* 내용만큼만 너비 차지 */
-}
-
-.mypage-section-kitsch h3.section-title-kitsch i,
-.address-list-header-kitsch h3.section-title-kitsch i {
-    margin-right: 0.5em;
-}
-
-/* 주소록 페이지 헤더의 h3는 다른 배경색 사용 */
-.address-list-header-kitsch h3.section-title-kitsch {
-    background-color: var(--kitsch-color-4); /* 청록 */
-    margin-bottom: 0; /* 헤더 내에서는 하단 마진 제거 */
-}
-
-/* 폼 그룹 관련 스타일은 이미 styles.css에 .form-group-kitsch, .label-kitsch, .input-kitsch 등으로 정의되어 있을 것이므로 재활용 */
-/* 마이페이지 내 폼 요소들의 크기나 여백 등 미세 조정이 필요하면 여기서 추가 */
-.mypage-content-kitsch .form-group-kitsch {
-    margin-bottom: 1.2rem; /* 마이페이지 내 폼 그룹 간격 */
-}
-
-.mypage-content-kitsch .input-kitsch[readonly] { /* 프로필 페이지의 읽기전용 필드 */
-    background-color: var(--kitsch-bg-main);
-    color: var(--kitsch-text-dark);
-    opacity: 0.8;
-    border-style: dashed;
-    cursor: not-allowed;
-}
-
-.mypage-actions-kitsch { /* 정보 저장, 비밀번호 변경 등 버튼 그룹 */
-    margin-top: 2rem;
-    text-align: right;
-}
-
-.mypage-actions-kitsch .btn-kitsch {
-    margin-left: 0.8rem;
-}
-
-.mypage-actions-kitsch .btn-kitsch:first-child {
-    margin-left: 0;
-}
-
-
-/* 주문 내역, 주소 관리 등 테이블/카드형 목록 공통 스타일 (필요시 추가) */
-/* ... */
-/* 반응형: 마이페이지 레이아웃 */
-@media (max-width: 992px) {
-    /* 기존 992px와 동일한 브레이크포인트 사용 */
-    .mypage-layout-kitsch {
-        grid-template-columns: 1fr; /* 한 줄로 쌓음 */
+    .quantity-input-kitsch {
+        max-width: 120px;
     }
 
-    .mypage-sidebar-kitsch {
-        margin-bottom: 2rem;
-        border-radius: 8px; /* 전체 모서리 둥글게 */
+    .quantity-value-kitsch {
+        width: 40px;
+        font-size: 0.9rem;
     }
 
-    .mypage-sidebar-kitsch .sidebar-menu-kitsch {
-        display: flex;
-        flex-wrap: wrap; /* 메뉴 아이템 줄바꿈 */
-        justify-content: center; /* 가운데 정렬 */
-        gap: 0.5rem;
+    .star-rating-display-kitsch {
+        font-size: 1.2rem;
     }
 
-    .mypage-sidebar-kitsch .sidebar-menu-kitsch li a {
-        margin-bottom: 0; /* flex gap으로 간격 관리 */
-        text-align: center; /* 아이콘과 텍스트 함께 중앙 정렬 */
-        /* flex-grow: 1; 필요시 버튼들이 공간을 채우도록 */
+    .star-rating-input-kitsch .stars {
+        font-size: 1.5rem;
+    }
+
+    .accordion-header-kitsch {
+        font-size: 1rem;
     }
 }
