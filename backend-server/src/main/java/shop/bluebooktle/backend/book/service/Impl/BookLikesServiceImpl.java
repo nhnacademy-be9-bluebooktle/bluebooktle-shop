@@ -14,17 +14,10 @@ import shop.bluebooktle.backend.book.repository.BookLikesRepository;
 import shop.bluebooktle.backend.book.repository.BookRepository;
 import shop.bluebooktle.backend.book.service.BookLikesService;
 import shop.bluebooktle.backend.user.repository.UserRepository;
-<<<<<<< HEAD
 import shop.bluebooktle.common.entity.auth.User;
-import shop.bluebooktle.common.exception.UserNotFoundException;
 import shop.bluebooktle.common.exception.book.BookLikesAlreadyChecked;
 import shop.bluebooktle.common.exception.book.BookNotFoundException;
-=======
-import shop.bluebooktle.common.entity.User;
-import shop.bluebooktle.common.exception.BookLikesAlreadyChecked;
-import shop.bluebooktle.common.exception.BookNotFoundException;
-import shop.bluebooktle.common.exception.UserNotFoundException;
->>>>>>> 0ff892b (feat(book): 도서 좋아요 Service 추가)
+import shop.bluebooktle.common.exception.user.UserNotFoundException;
 
 @Service
 @RequiredArgsConstructor
