@@ -1,4 +1,4 @@
-name: CI & CD
+name: CI & CD (Optimized for Module Changes)
 
 on:
   push:
@@ -9,6 +9,7 @@ on:
       - 'gateway-server/**'
       - 'eureka-server/**'
       - 'common-module/**'
+      - 'auth-server/**'
   pull_request:
     branches: [ develop ]
     paths:
@@ -17,14 +18,60 @@ on:
       - 'gateway-server/**'
       - 'eureka-server/**'
       - 'common-module/**'
+      - 'auth-server/**'
 
 jobs:
-  build:
+  detect_changes:
     runs-on: ubuntu-latest
     outputs:
-      module: ${{ steps.detect.outputs.module }}
+      changed: ${{ steps.list.outputs.changed }}
     steps:
-      - name: Checkout
+      - name: Checkout full history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Filter changed paths
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            backend-server:
+              - 'backend-server/**'
+            frontend-server:
+              - 'frontend-server/**'
+            gateway-server:
+              - 'gateway-server/**'
+            eureka-server:
+              - 'eureka-server/**'
+            common-module:
+              - 'common-module/**'
+            auth-server:
+              - 'auth-server/**'
+
+      - name: Generate final changed-services list
+        id: list
+        run: |
+          modules=()
+          [[ "${{ steps.filter.outputs.backend-server }}"  == "true" ]] && modules+=("backend-server")
+          [[ "${{ steps.filter.outputs.frontend-server }}" == "true" ]] && modules+=("frontend-server")
+          [[ "${{ steps.filter.outputs.gateway-server }}"  == "true" ]] && modules+=("gateway-server")
+          [[ "${{ steps.filter.outputs.eureka-server }}"   == "true" ]] && modules+=("eureka-server")
+          [[ "${{ steps.filter.outputs.auth-server }}"     == "true" ]] && modules+=("auth-server")
+          if [[ "${{ steps.filter.outputs.common-module }}" == "true" ]]; then
+            for svc in backend-server frontend-server gateway-server eureka-server auth-server; do
+              [[ ! " ${modules[*]} " =~ " $svc " ]] && modules+=("$svc")
+            done
+          fi
+          changed="${modules[*]}"
+          echo "changed=$changed" >> $GITHUB_OUTPUT
+
+  build:
+    needs: detect_changes
+    if: needs.detect_changes.outputs.changed != ''
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Set up Java 21
@@ -34,59 +81,57 @@ jobs:
           java-version: '21'
           cache: maven
 
-      - name: Detect changed module
-        id: detect
+      - name: Clean & Build changed-services
         run: |
-          CHANGED=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} \
-            | grep '/' | head -1)
-          MODULE=${CHANGED%%/*}
-          echo "Changed module: $MODULE"
-          echo "::set-output name=module::$MODULE"
+          MODULE_CSV=$(echo "${{ needs.detect_changes.outputs.changed }}" | sed 's/ /,/g')
+          echo "▶ mvn clean package -pl $MODULE_CSV -am"
+          mvn -B clean package -pl "$MODULE_CSV" -am -DskipTests
 
-      - name: Build changed module
-        run: mvn -B -pl ${{ needs.build.outputs.module }} -am clean install -DskipTests
-
-      - name: Upload JAR artifact
+      - name: Upload built JARs
         uses: actions/upload-artifact@v4
         with:
-          name: jar
-          path: ${{ needs.build.outputs.module }}/target/*.jar
+          name: jars
+          path: '**/target/*.jar'
+          if-no-files-found: error
 
   deploy:
-    needs: build
+    needs: [ detect_changes, build ]
+    if: needs.detect_changes.outputs.changed != ''
     runs-on: ubuntu-latest
     steps:
-      - name: Download JAR artifact
+      - name: Download JARs
         uses: actions/download-artifact@v4
         with:
-          name: jar
+          name: jars
+          path: downloaded_jars
 
-      - name: Ensure remote directory exists
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SSH_IP }}
-          username: ${{ secrets.SSH_ID }}
-          password: ${{ secrets.SSH_PASSWORD }}
-          port: ${{ secrets.SSH_PORT }}
-          script: mkdir -p ~/app/jars
+      - name: Debug deploy modules
+        run: |
+          echo ">>> Deploy sees modules: '${{ needs.detect_changes.outputs.changed }}'"
 
-      - name: Upload JAR to remote
+      - name: Upload JARs to remote
         uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.SSH_IP }}
           username: ${{ secrets.SSH_ID }}
           password: ${{ secrets.SSH_PASSWORD }}
           port: ${{ secrets.SSH_PORT }}
-          source: '*.jar'
-          target: '~/app/jars/'
+          source: "downloaded_jars"
+          target: "~/app/jars/"
+          strip_components: 1
 
-      - name: Run rolling deploy
+      - name: Rolling deploy for services
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SSH_IP }}
           username: ${{ secrets.SSH_ID }}
           password: ${{ secrets.SSH_PASSWORD }}
           port: ${{ secrets.SSH_PORT }}
+          capture_stdout: true
           script: |
+            echo ">>> SSH sees modules: ${{ needs.detect_changes.outputs.changed }}"
             chmod +x ~/startup.sh
-            ~/startup.sh ~/app/jars/${{ needs.build.outputs.module }}-*.jar
+            for MOD in ${{ needs.detect_changes.outputs.changed }}; do
+              echo "▶ Rolling deploy: $MOD"
+              ~/startup.sh "$MOD"
+            done
