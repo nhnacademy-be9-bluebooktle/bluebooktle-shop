@@ -1,0 +1,8 @@
+### 테스트임
+GET http://www.aladin.co.kr/ttb/api/ItemSearch.aspx?ttbkey=ttbehfk11131717001&Query=aladdin&QueryType=Title&
+    MaxResults=10&start=1&SearchTarget=Book&output=js&Version=20131101
+Accept: application/json
+
+### 알라딘 책 제목으로 검색 요청
+GET http://localhost:9002/api/aladin/search?query=요리
+Accept: application/json
