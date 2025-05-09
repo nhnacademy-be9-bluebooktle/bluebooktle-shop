@@ -11,5 +11,4 @@ public class FrontendServerApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(FrontendServerApplication.class, args);
 	}
-
 }
