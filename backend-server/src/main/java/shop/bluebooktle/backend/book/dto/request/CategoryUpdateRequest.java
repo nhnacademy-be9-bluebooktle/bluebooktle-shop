@@ -1,12 +1,12 @@
 package shop.bluebooktle.backend.book.dto.request;
 
-import org.hibernate.validator.constraints.Length;
-
-import jakarta.validation.constraints.NotBlank;
+import shop.bluebooktle.backend.book.entity.Category;
 
 public record CategoryUpdateRequest(
-	@NotBlank
-	@Length(max = 50)
+	Long id,
 	String name
 ) {
+	public Category toEntity(Category parentCategory) {
+		return new Category(parentCategory, this.name);
+	}
 }

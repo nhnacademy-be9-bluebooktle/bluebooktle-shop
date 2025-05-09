@@ -1,9 +1,11 @@
 package shop.bluebooktle.backend.order.entity;
 
 import java.math.BigDecimal;
+import java.sql.Types;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
@@ -27,10 +29,10 @@ import shop.bluebooktle.common.entity.auth.User;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "order")
+@Table(name = "orders")
 @EqualsAndHashCode(of = "id", callSuper = false)
 @ToString(exclude = {"orderState", "deliveryRule"})
-@SQLDelete(sql = "UPDATE order SET deleted_at = CURRENT_TIMESTAMP WHERE order_id = ?")
+@SQLDelete(sql = "UPDATE orders SET deleted_at = CURRENT_TIMESTAMP WHERE order_id = ?")
 @SQLRestriction("deleted_at IS NULL")
 public class Order {
 
@@ -90,7 +92,8 @@ public class Order {
 	@Column(name = "deleted_at")
 	private LocalDateTime deletedAt;
 
-	@Column(name = "order_key")
+	@Column(name = "order_key", length = 36)
+	@JdbcTypeCode(Types.VARCHAR)
 	private UUID orderKey;
 
 	@Builder

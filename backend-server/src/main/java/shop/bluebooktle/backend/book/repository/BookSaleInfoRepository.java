@@ -5,6 +5,5 @@ import org.springframework.stereotype.Repository;
 
 import shop.bluebooktle.backend.book.entity.BookSaleInfo;
 
-@Repository
-public interface BookSaleInfoRepository extends JpaRepository<BookSaleInfo,Long> {
+public interface BookSaleInfoRepository extends JpaRepository<BookSaleInfo, Long> {
 }
