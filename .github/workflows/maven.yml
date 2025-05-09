@@ -141,9 +141,11 @@ jobs:
           username: ${{ secrets.SSH_ID }}
           password: ${{ secrets.SSH_PASSWORD }}
           port: ${{ secrets.SSH_PORT }}
+          capture_stdout: true        # ← 이 줄을 추가
           script: |
             echo ">>> SSH sees modules: ${{ needs.detect_changes.outputs.changed }}"
             for MOD in ${{ needs.detect_changes.outputs.changed }}; do
               echo "▶ Rolling deploy: $MOD"
               ~/startup.sh "$MOD"
             done
+
