@@ -80,28 +80,11 @@
             <h2 class="form-title-kitsch display-font-kitsch"><i class="fas fa-compact-disc"></i> 로그인 <i
                     class="fas fa-gamepad"></i></h2>
 
-            <div class="alert-kitsch error-kitsch" style="margin-bottom: 1rem;"
-                 th:if="${error == 'true' && errorMessage != null && !errorMessage.isEmpty()}">
-                <i class="fas fa-exclamation-triangle"></i>
-                <span class="pixel-font-kitsch" th:text="${errorMessage}">에러 메시지가 여기에 표시됩니다.</span>
-            </div>
-
-            <div class="alert-kitsch error-kitsch" style="margin-bottom: 1rem;"
-                 th:if="${param.error != null && (errorMessage == null || errorMessage.isEmpty())}">
-                <i class="fas fa-exclamation-triangle"></i>
-                <span class="pixel-font-kitsch">아이디 또는 비밀번호가 잘못되었습니다.</span>
-            </div>
-
-            <div class="alert-kitsch success-kitsch" style="margin-bottom: 1rem;" th:if="${param.logout}">
-                <i class="fas fa-ghost"></i>
-                <span class="pixel-font-kitsch">로그아웃 되었습니다. 다음에 또 만나요!</span>
-            </div>
-
             <form method="post" th:action="@{/login}">
                 <div class="form-group-kitsch">
-                    <label class="label-kitsch handwriting-font-kitsch" for="loginId">아이디:</label> <input
-                        class="input-kitsch pixel-font-kitsch" id="loginId" name="loginId" placeholder="아이디를 입력하세요"
-                        required type="text">
+                    <label class="label-kitsch handwriting-font-kitsch" for="username">아이디:</label>
+                    <input class="input-kitsch pixel-font-kitsch" id="username" name="username" placeholder="아이디를 입력하세요"
+                           required type="text">
                 </div>
 
                 <div class="form-group-kitsch">
@@ -111,6 +94,16 @@
                            required type="password">
                 </div>
 
+                <div class="alert-kitsch error-kitsch" style="margin-bottom: 1rem;" th:if="${param.error}">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span class="pixel-font-kitsch">아이디 또는 비밀번호가 잘못되었습니다.</span>
+                </div>
+                <div class="alert-kitsch success-kitsch" style="margin-bottom: 1rem;" th:if="${param.logout}">
+                    <i class="fas fa-ghost"></i>
+                    <span class="pixel-font-kitsch">로그아웃 되었습니다. 다음에 또 만나요!</span>
+                </div>
+
+
                 <button class="btn-kitsch secondary-btn-kitsch color5-kitsch retro-shadow-kitsch" style="width: 100%;"
                         type="submit">
                     <i class="fas fa-sign-in-alt"></i> 로그인
@@ -118,7 +111,7 @@
             </form>
 
             <div class="login-options-kitsch">
-                <a class="text-btn-kitsch pixel-font-kitsch" th:href="@{/signup}"><i class="fas fa-user-plus"></i>
+                <a class="text-btn-kitsch pixel-font-kitsch" th:href="@{/auth/signup}"><i class="fas fa-user-plus"></i>
                     회원가입</a>
             </div>
 

@@ -109,7 +109,7 @@
             margin-right: 0.5em;
         }
 
-        .detail-price-section-kitsch .original-price-kitsch { /* styles.css 와 동일하므로 생략 가능 */
+        .detail-price-section-kitsch .original-price-kitsch {
             font-family: var(--font-pixel);
             font-size: 1.1rem;
             color: var(--kitsch-text-dark);
@@ -139,8 +139,8 @@
             color: var(--kitsch-color-5);
         }
 
-        .book-meta-info-kitsch .highlight-text-kitsch { /* styles.css 와 동일하므로 생략 가능 */
-            color: var(--kitsch-color-3);
+        .book-meta-info-kitsch .highlight-text-kitsch {
+            color: var(--kitsch-color-3); /* 핫핑크 */
             font-weight: bold;
         }
 
@@ -150,6 +150,7 @@
             border-radius: 3px;
             color: var(--kitsch-text-light);
         }
+
 
         .book-actions-kitsch {
             display: flex;
@@ -178,224 +179,49 @@
         }
 
         /* 탭 메뉴는 styles.css의 .tab-ui-kitsch 관련 스타일 사용 */
-        /* .tab-content-kitsch 등은 styles.css에 이미 정의됨 */
-        /* .tab-pane-kitsch h3 는 .tab-pane-title-kitsch 로 대체 (styles.css) */
 
-        /* Review Item Demo (상세페이지용, styles.css 에 유사한 .review-item-kitsch-detail 등과 병합/선택) */
-        .review-item-kitsch-detail {
-            border: 2px dashed var(--kitsch-color-4);
-            padding: 1rem;
-            margin-bottom: 1.5rem;
-            border-radius: 5px;
-            background-color: var(--kitsch-bg-alt);
-        }
-
-        .review-header-kitsch {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 0.5rem;
-            font-family: var(--font-pixel);
-        }
-
-        .review-author-kitsch {
-            font-size: 1rem;
-            color: var(--kitsch-color-1);
-        }
-
-        .review-date-kitsch {
-            font-size: 0.8rem;
-            color: var(--kitsch-text-dark);
-        }
-
-        .review-stars-kitsch i {
-            color: var(--kitsch-accent-orange);
-            font-size: 1rem;
-        }
-
-        .review-text-kitsch {
-            font-family: var(--font-handwriting);
-            font-size: 1.1rem;
-            margin-bottom: 0.8rem;
-        }
-
-        .review-image-kitsch {
-            max-width: 150px;
-            border-radius: 5px;
-            border: 2px solid var(--kitsch-color-2);
-            cursor: pointer;
-        }
-
-
-        .book-detail-layout-kitsch {
-            display: grid;
-            grid-template-columns: 1fr 1.5fr;
-            gap: 2.5rem;
-            margin-top: 2rem;
-            margin-bottom: 3rem;
+        .tab-content-kitsch { /* 상세페이지용 탭 내용 */
             padding: 2rem;
-            background-color: var(--kitsch-bg-alt);
-            border: 4px dashed var(--kitsch-color-3);
-            border-radius: 15px;
-        }
-
-        .book-image-column-kitsch .main-book-image-kitsch {
-            width: 100%;
-            max-width: 350px;
-            border: 5px solid var(--kitsch-text-dark);
-            border-radius: 5px;
-            box-shadow: 5px 5px 0 var(--kitsch-color-5);
-            margin: 0 auto 1rem auto;
-            display: block;
-        }
-
-        .book-thumbnails-kitsch {
-            display: flex;
-            justify-content: center;
-            gap: 0.5rem;
-        }
-
-        .book-thumbnails-kitsch img {
-            width: 60px;
-            height: 90px;
-            border: 2px solid var(--kitsch-color-2);
-            border-radius: 3px;
-            cursor: pointer;
-            transition: transform 0.2s, border-color 0.2s;
-        }
-
-        .book-thumbnails-kitsch img:hover,
-        .book-thumbnails-kitsch img.active-thumbnail-kitsch {
-            border-color: var(--kitsch-color-1);
-            transform: scale(1.1);
-        }
-
-        .book-info-column-kitsch .detail-title-kitsch {
-            font-family: var(--font-display);
-            font-size: 2.4rem;
-            color: var(--kitsch-color-1);
-            margin-bottom: 0.5rem;
-            line-height: 1.3;
-        }
-
-        .book-info-column-kitsch .detail-author-publisher-kitsch {
-            font-family: var(--font-handwriting);
-            font-size: 1.1rem;
-            color: var(--kitsch-text-dark);
-            margin-bottom: 1rem;
-        }
-
-        .book-info-column-kitsch .detail-rating-kitsch {
-            margin-bottom: 1rem;
-            font-family: var(--font-pixel);
-        }
-
-        .detail-rating-kitsch .stars i {
-            color: var(--kitsch-color-2);
-            font-size: 1.2rem;
-            margin-right: 2px;
-        }
-
-        .detail-rating-kitsch .rating-score-text-kitsch {
-            font-size: 1rem;
-            color: var(--kitsch-text-dark);
-            margin-left: 0.3em;
-            margin-right: 0.5em;
-        }
-
-        .detail-rating-kitsch .review-count-link-kitsch {
-            font-size: 0.9rem;
-            color: var(--kitsch-color-4);
-            text-decoration: underline dotted;
-        }
-
-        .detail-rating-kitsch .review-count-link-kitsch:hover {
-            color: var(--kitsch-color-3);
-        }
-
-        .detail-price-section-kitsch {
+            border: 2px solid var(--kitsch-text-dark);
+            border-top: none; /* 탭 버튼과 연결 */
+            border-radius: 0 0 8px 8px;
             background-color: var(--kitsch-bg-main);
-            border: 2px solid var(--kitsch-color-4);
-            padding: 1rem;
-            border-radius: 5px;
-            margin-bottom: 1.5rem;
+            min-height: 200px; /* 최소 높이 */
         }
 
-        .detail-price-section-kitsch .final-price-kitsch {
+        .tab-content-kitsch h3 {
             font-family: var(--font-display);
-            font-size: 2rem;
-            color: var(--kitsch-color-3);
+            font-size: 1.8rem;
+            color: var(--kitsch-color-5);
+            margin-bottom: 1rem;
+            border-bottom: 3px dotted var(--kitsch-color-2);
+            padding-bottom: 0.5rem;
+        }
+
+        .tab-content-kitsch p, .tab-content-kitsch ul {
+            font-family: var(--font-handwriting);
+            font-size: 1.2rem;
+            line-height: 1.7;
+            color: var(--kitsch-text-dark);
+            margin-bottom: 1rem;
+        }
+
+        .tab-content-kitsch ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .tab-content-kitsch ul li {
+            padding: 0.3em 0;
+            border-bottom: 1px dashed var(--kitsch-bg-alt);
+        }
+
+        .tab-content-kitsch ul li:before {
+            content: "🎮"; /* 키치한 아이콘 */
             margin-right: 0.5em;
         }
 
-        .detail-price-section-kitsch .original-price-kitsch {
-            font-family: var(--font-pixel);
-            font-size: 1.1rem;
-            color: var(--kitsch-text-dark);
-            text-decoration: line-through;
-            opacity: 0.7;
-            margin-right: 0.5em;
-        }
-
-        .detail-price-section-kitsch .discount-rate-kitsch {
-            font-family: var(--font-pixel);
-            font-size: 1.1rem;
-            color: var(--kitsch-color-5);
-            background-color: var(--kitsch-color-2);
-            padding: 0.2em 0.5em;
-            border-radius: 3px;
-        }
-
-        .book-meta-info-kitsch {
-            font-family: var(--font-pixel);
-            font-size: 0.9rem;
-            line-height: 1.6;
-            margin-bottom: 1.5rem;
-            color: var(--kitsch-text-dark);
-        }
-
-        .book-meta-info-kitsch strong {
-            color: var(--kitsch-color-5);
-        }
-
-        .book-meta-info-kitsch .highlight-text-kitsch {
-            color: var(--kitsch-color-3);
-            font-weight: bold;
-        }
-
-        .book-meta-info-kitsch .delivery-date-kitsch {
-            background-color: var(--kitsch-accent-orange);
-            padding: 2px 5px;
-            border-radius: 3px;
-            color: var(--kitsch-text-light);
-        }
-
-        .book-actions-kitsch {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            padding: 1rem;
-            border: 2px solid var(--kitsch-color-1);
-            border-radius: 5px;
-            background-color: rgba(255, 255, 255, 0.3);
-        }
-
-        .action-buttons-kitsch {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-            gap: 0.8rem;
-        }
-
-        .action-buttons-kitsch .btn-kitsch {
-            padding: 0.8em 1em;
-            font-size: 0.95rem;
-        }
-
-        .like-btn-kitsch i.fas {
-            color: var(--kitsch-color-3);
-        }
-
-        /* 리뷰 탭 내 아이템 스타일은 유지 */
+        /* Review Item Demo (상세페이지용) */
         .review-item-kitsch-detail {
             border: 2px dashed var(--kitsch-color-4);
             padding: 1rem;
@@ -423,7 +249,7 @@
         }
 
         .review-stars-kitsch i {
-            color: var(--kitsch-accent-orange);
+            color: var(--kitsch-accent-orange); /* 오렌지 별 */
             font-size: 1rem;
         }
 
@@ -437,14 +263,11 @@
             max-width: 150px;
             border-radius: 5px;
             border: 2px solid var(--kitsch-color-2);
-            cursor: pointer;
         }
-
-        /* 리뷰 카드 내 수정/삭제 버튼 스타일은 더 이상 필요 없음 */
 
         @media (max-width: 768px) {
             .book-detail-layout-kitsch {
-                grid-template-columns: 1fr;
+                grid-template-columns: 1fr; /* 모바일에선 한 줄로 */
             }
 
             .book-image-column-kitsch .main-book-image-kitsch {
@@ -455,6 +278,7 @@
                 font-size: 2rem;
             }
         }
+
     </style>
 </head>
 
@@ -463,7 +287,7 @@
     <div class="container-kitsch section-padding-kitsch">
         <div class="book-detail-layout-kitsch">
             <div class="book-image-column-kitsch">
-                <img alt="판타지 소설 표지" class="main-book-image-kitsch"
+                <img alt="키치 판타지 소설 표지" class="main-book-image-kitsch"
                      id="mainBookImage" src="https://picsum.photos/350/520?random=201"> 
                 <div class="book-thumbnails-kitsch">
                     <img alt="썸네일1" class="active-thumbnail-kitsch"
@@ -479,7 +303,7 @@
             </div>
 
             <div class="book-info-column-kitsch">
-                <h1 class="detail-title-kitsch">초절정 판타지 대모험 DX <i class="fas fa-dragon"></i></h1>
+                <h1 class="detail-title-kitsch">초절정 키치 판타지 대모험 DX <i class="fas fa-dragon"></i></h1>
                 <p class="detail-author-publisher-kitsch">
                     <span class="pixel-font-kitsch">글/그림:</span> 맥시멈 오버드라이브 <span
                         class="pixel-font-kitsch">| 출판사:</span> 레트로퓨처북스
@@ -491,25 +315,28 @@
                     </span>
                     <span class="rating-score-text-kitsch">4.7점</span>
                     <a class="review-count-link-kitsch handwriting-font-kitsch" href="#bookTabs"
-                       onclick="activateTab('reviews')">(<span id="totalReviewCount">1988</span>개 리뷰 보기)</a>
+                       onclick="activateTab('reviews')">(1988 리뷰 보기)</a>
                 </div>
+
                 <div class="detail-price-section-kitsch">
                     <span class="final-price-kitsch">33,300원</span>
                     <span class="original-price-kitsch">37,000원</span>
                     <span class="discount-rate-kitsch">10%↓ + 3%P</span>
                 </div>
+
                 <div class="book-meta-info-kitsch">
                     <p><strong><i class="fas fa-coins"></i> 포인트 적립:</strong> <span
                             class="highlight-text-kitsch">999 P</span> (골드회원 기준)</p>
                     <p><strong><i class="fas fa-truck"></i> 배송비:</strong> <span class="highlight-text-kitsch">무료!</span>
                         (3만원 이상 구매 시)</p>
-                    <p><strong><i class="fas fa-calendar-alt"></i> 배송예정:</strong> <span class="delivery-date-kitsch">05월 13일 (화)</span>
+                    <p><strong><i class="fas fa-calendar-alt"></i> 배송예정:</strong> <span class="delivery-date-kitsch">05월 12일 (월)</span>
                         도착! (지금 주문 시)</p>
                     <p><strong><i class="fas fa-box-open"></i> 재고상태:</strong> <span
                             style="color: var(--kitsch-color-4);">재고있음! 어서 주문하세요!</span></p>
                     <p><strong><i class="fas fa-gift"></i> 포장:</strong> <span
                             class="highlight-text-kitsch">반짝이 포장 가능!</span> (+2,000원)</p>
                 </div>
+
                 <div class="book-actions-kitsch">
                     <div class="quantity-input-kitsch" style="margin-bottom: 0.5rem;">
                         <button class="quantity-btn-kitsch minus-btn-kitsch" onclick="changeDetailQuantity(-1)">-
@@ -518,16 +345,18 @@
                         <button class="quantity-btn-kitsch plus-btn-kitsch" onclick="changeDetailQuantity(1)">+</button>
                     </div>
                     <div class="action-buttons-kitsch">
-                        <button class="btn-kitsch primary-btn-kitsch retro-shadow-kitsch"><i class="fas fa-bolt"></i>
-                            바로구매
+                        <button class="btn-kitsch primary-btn-kitsch retro-shadow-kitsch">
+                            <i class="fas fa-bolt"></i> 바로구매
                         </button>
-                        <button class="btn-kitsch secondary-btn-kitsch color2-kitsch retro-shadow-kitsch"><i
-                                class="fas fa-shopping-cart"></i> 장바구니
+                        <button class="btn-kitsch secondary-btn-kitsch color2-kitsch retro-shadow-kitsch">
+                            <i class="fas fa-shopping-cart"></i> 장바구니
                         </button>
                         <button class="btn-kitsch secondary-btn-kitsch color5-kitsch retro-shadow-kitsch like-btn-kitsch"
-                                onclick="toggleBookLike(this)"><i class="far fa-heart"></i> <span>좋아요</span></button>
-                        <button class="btn-kitsch secondary-btn-kitsch color1-kitsch retro-shadow-kitsch"><i
-                                class="fas fa-share-alt"></i> 공유하기
+                                onclick="toggleBookLike(this)">
+                            <i class="far fa-heart"></i> <span>좋아요</span>
+                        </button>
+                        <button class="btn-kitsch secondary-btn-kitsch color1-kitsch retro-shadow-kitsch">
+                            <i class="fas fa-share-alt"></i> 공유하기
                         </button>
                     </div>
                 </div>
@@ -536,24 +365,24 @@
 
         <div class="tab-ui-kitsch" id="bookTabs">
             <div class="tabs-kitsch-container">
-                <button class="tab-kitsch-button active pixel-font-kitsch" data-tab-target="#desc-content"><i
-                        class="fas fa-book-open"></i> 도서 소개
+                <button class="tab-kitsch-button active pixel-font-kitsch" data-tab-target="#desc-content">
+                    <i class="fas fa-book-open"></i> 도서 소개
                 </button>
-                <button class="tab-kitsch-button pixel-font-kitsch" data-tab-target="#toc-content"><i
-                        class="fas fa-list-ul"></i> 목차
+                <button class="tab-kitsch-button pixel-font-kitsch" data-tab-target="#toc-content">
+                    <i class="fas fa-list-ul"></i> 목차
                 </button>
-                <button class="tab-kitsch-button pixel-font-kitsch" data-tab-target="#reviews-content"><i
-                        class="fas fa-comments"></i> 리뷰 <span class="badge-kitsch hot-badge-kitsch review-tab-count"
-                                                              style="font-size:0.7em; padding:0.1em 0.4em;">1988</span>
+                <button class="tab-kitsch-button pixel-font-kitsch" data-tab-target="#reviews-content">
+                    <i class="fas fa-comments"></i> 리뷰 <span class="badge-kitsch hot-badge-kitsch"
+                                                             style="font-size:0.7em; padding:0.1em 0.4em;">1988</span>
                 </button>
-                <button class="tab-kitsch-button pixel-font-kitsch" data-tab-target="#shipping-info-content"><i
-                        class="fas fa-shipping-fast"></i> 배송/반품
+                <button class="tab-kitsch-button pixel-font-kitsch" data-tab-target="#shipping-info-content">
+                    <i class="fas fa-shipping-fast"></i> 배송/반품
                 </button>
             </div>
             <div class="tab-content-area-kitsch">
                 <div class="tab-pane-kitsch active" id="desc-content">
                     <h3><i class="fas fa-scroll"></i> 이 책을 펼치는 순간, 당신의 모험이 시작된다!</h3>
-                    <p>옛날 옛적 컴퓨터가 방 전체를 차지하던 시절, 한 용감한 프로그래머가 세상을 구하기 위한 코드를 짜기 시작했으니... 그 이름하여 '초절정 판타지 대모험 DX'! 이
+                    <p>옛날 옛적 컴퓨터가 방 전체를 차지하던 시절, 한 용감한 프로그래머가 세상을 구하기 위한 코드를 짜기 시작했으니... 그 이름하여 '초절정 키치 판타지 대모험 DX'! 이
                         책은 단순한 소설이 아니다! 이것은 전설이다! 픽셀 하나하나에 장인의 혼이 담겨 있으며, 코드 한 줄 한 줄이 세상을 바꿀 마법 주문이다. </p>
                     <p>주인공 '비트(Bit)'와 함께 버그 몬스터를 물리치고, 메모리 공주를 구출하며, 최종 보스 '커널 패닉'에 맞서 싸워라! 당신의 선택에 따라 이야기가 달라지는 인터랙티브
                         어드벤처! 지금 바로 이 전설에 동참하라!</p>
@@ -561,7 +390,7 @@
                     style="width:100%; border-radius:5px; border:2px solid var(--kitsch-color-2); margin-top:1rem;">
                 </div>
                 <div class="tab-pane-kitsch" id="toc-content">
-                    <h3 class="tab-pane-title-kitsch"><i class="fas fa-map-signs"></i> 모험의 이정표 (목차)</h3>
+                    <h3><i class="fas fa-map-signs"></i> 모험의 이정표 (목차)</h3>
                     <ul>
                         <li>제 1장: 전원이 켜지다 (The Power On)</li>
                         <li>제 2장: 첫 번째 버그와의 만남 (Hello, Bug!)</li>
@@ -576,26 +405,22 @@
                         <li>부록: 전설의 치트키 목록</li>
                     </ul>
                 </div>
-
                 <div class="tab-pane-kitsch" id="reviews-content">
-                    <h3 class="tab-pane-title-kitsch"><i class="fas fa-microphone-alt"></i> 리뷰 <span
-                            class="review-tab-count">1988</span>개</h3>
-
+                    <h3><i class="fas fa-microphone-alt"></i> 용사들의 외침 (리뷰)</h3>
                     <div class="review-item-kitsch-detail">
                         <div class="review-header-kitsch">
                             <div>
-                                <strong class="review-author-kitsch">겜돌이_77</strong>
-                                <span class="review-date-kitsch">2025.05.01</span>
+                                <span class="review-author-kitsch">겜돌이_77</span>
+                                <span class="review-stars-kitsch">
+                                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                                        class="fas fa-star"></i><i class="fas fa-star"></i>
+                                </span>
                             </div>
-                            <div class="review-stars-kitsch">
-                                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
-                                    class="fas fa-star"></i><i class="fas fa-star"></i>
-                            </div>
+                            <span class="review-date-kitsch">2025.05.01</span>
                         </div>
                         <p class="review-text-kitsch">이거 완전 제 인생겜... 아니 인생책입니다! 시간 가는 줄 모르고 읽었어요! 강추!</p>
                         <img alt="리뷰 이미지" class="review-image-kitsch"
-                             onclick="showImageInModal(this.src, 'bookDetailImageModal')"
-                             src="https://picsum.photos/150/100?random=231">
+                             src="https://picsum.photos/150/100?random=231"> 
                     </div>
                     <div class="review-item-kitsch-detail">
                         <div class="review-header-kitsch">
@@ -610,17 +435,12 @@
                         </div>
                         <p class="review-text-kitsch">주인공 비트 너무 귀여워요 ㅠㅠ 근데 포인터 마왕 너무 어려워서 밤샜어요... 그래도 꿀잼!</p>
                         <img alt="리뷰 이미지 2" class="review-image-kitsch"
-                             onclick="showImageInModal(this.src, 'bookDetailImageModal')"
-                             src="https://picsum.photos/150/100?random=232">
+                             src="https://picsum.photos/150/100?random=232"> 
                     </div>
-                    <div style="text-align: center; margin-top: 2rem;">
-                        <button class="btn-kitsch secondary-btn-kitsch color4-kitsch retro-shadow-kitsch-small load-more-reviews-btn-kitsch"
-                                onclick="loadMoreReviews()">
-                            <i class="fas fa-plus-circle"></i> 더보기
-                        </button>
-                    </div>
+                    <button class="btn-kitsch primary-btn-kitsch retro-shadow-kitsch-small" style="margin-top: 1rem;">
+                        <i class="fas fa-plus-circle"></i> 리뷰 더보기 / 작성하기
+                    </button>
                 </div>
-
                 <div class="tab-pane-kitsch" id="shipping-info-content">
                     <h3><i class="fas fa-box"></i> 빛의 속도로 배송! (배송/반품 안내)</h3>
                     <p><strong>배송:</strong> BlueBookttle은 주문하신 용사님들의 모험 아이템(도서)을 최대한 빠르게 전달하기 위해 노력합니다! 평일 오후 2시 이전 주문 시
@@ -634,37 +454,24 @@
             </div>
         </div>
     </div>
-
-
-    <div class="modal-overlay-kitsch" id="bookDetailImageModal" onclick="hideKitschModal('bookDetailImageModal')">
-        <div class="modal-content-kitsch" onclick="event.stopPropagation();" style="max-width:600px; padding:1rem;">
-            <button class="modal-close-btn-kitsch" onclick="hideKitschModal('bookDetailImageModal')"><i
-                    class="fas fa-times"></i></button>
-            <img alt="리뷰 이미지 크게 보기" id="bookDetailModalImageSrc" src="https://picsum.photos/500/300?random=231"
-                 style="width:100%; border-radius:5px;">
-        </div>
-    </div>
 </div>
 
 <th:block layout:fragment="page_scripts">
     <script>
-        // 썸네일, 수량, 좋아요, 탭 기능 JS는 기존과 동일하게 유지
-        function changeMainImage(newSrc, clickedThumbnailElement) {
+        // 썸네일 클릭 시 메인 이미지 변경
+        function changeMainImage(newSrc) {
             document.getElementById('mainBookImage').src = newSrc;
+            // 활성 썸네일 표시 변경 (옵션)
             const thumbnails = document.querySelectorAll('.book-thumbnails-kitsch img');
-            thumbnails.forEach(thumb => thumb.classList.remove('active-thumbnail-kitsch'));
-            if (clickedThumbnailElement) {
-                clickedThumbnailElement.classList.add('active-thumbnail-kitsch');
-            } else {
-                const matchingThumb = Array.from(thumbnails).find(thumb => {
-                    const onclickAttr = thumb.getAttribute('onclick');
-                    return onclickAttr && onclickAttr.includes(newSrc);
-                });
-                if (matchingThumb) matchingThumb.classList.add('active-thumbnail-kitsch');
-                else if (thumbnails.length > 0) thumbnails[0].classList.add('active-thumbnail-kitsch');
-            }
+            thumbnails.forEach(thumb => {
+                thumb.classList.remove('active-thumbnail-kitsch');
+                if (thumb.src === newSrc) {
+                    thumb.classList.add('active-thumbnail-kitsch');
+                }
+            });
         }
 
+        // 상세 페이지 수량 변경
         function changeDetailQuantity(amount) {
             const quantityInput = document.getElementById('detailQuantity');
             let currentValue = parseInt(quantityInput.value);
@@ -709,6 +516,7 @@
             });
         });
 
+        // 특정 탭 활성화 함수 (리뷰 링크용)
         function activateTab(tabIdFragment) {
             let targetButton = null;
             let targetPane = null;
@@ -727,43 +535,6 @@
             }
         }
 
-
-
-        // 이미지 확대 모달 함수는 유지
-        function showImageInModal(src, modalId = 'bookDetailImageModal') {
-            const modalImageElementId = modalId === 'bookDetailImageModal' ? 'bookDetailModalImageSrc' : 'modalImageSrc';
-            const modalImage = document.getElementById(modalImageElementId);
-            if (modalImage) {
-                modalImage.src = src.includes('150/100') ? src.replace('150/100', '500/300') : src.replace('80/80', '500/300');
-                showKitschModal(modalId); // default_layout.html의 전역 함수 사용
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', function () {
-            const firstThumbnail = document.querySelector('.book-thumbnails-kitsch img');
-            if (firstThumbnail && !document.querySelector('.book-thumbnails-kitsch img.active-thumbnail-kitsch')) {
-                const mainImageSrc = document.getElementById('mainBookImage').src;
-                changeMainImage(mainImageSrc, Array.from(document.querySelectorAll('.book-thumbnails-kitsch img')).find(thumb => thumb.getAttribute('onclick').includes(mainImageSrc)) || firstThumbnail);
-            }
-            // 리뷰 모달 초기화 JS 제거
-        });
-
-        // 리뷰 더보기 Mock 함수 유지
-        let mockReviewPage = 1;
-        const mockReviewsPerPage = 2;
-
-        function loadMoreReviews() {
-            mockReviewPage++;
-            alert(`Mock: 리뷰 ${mockReviewPage}페이지 로드 시도! (실제 데이터 추가 로직 없음)`);
-            const loadMoreButton = document.querySelector('.load-more-reviews-btn-kitsch');
-            if (loadMoreButton) {
-                if (mockReviewPage * mockReviewsPerPage >= 2) {
-                    loadMoreButton.textContent = '모든 리뷰를 봤어요!';
-                    loadMoreButton.classList.add('disabled-btn-kitsch');
-                    loadMoreButton.onclick = null;
-                }
-            }
-        }
     </script>
 </th:block>
 </body>

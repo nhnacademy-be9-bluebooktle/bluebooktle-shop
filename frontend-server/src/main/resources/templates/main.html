@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html layout:decorate="~{layout/default_layout}"
+<html layout:decorate="~{_layouts/default_layout}"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -98,7 +98,7 @@
                         <a class="book-link-kitsch" href="/books/1">
                             <div class="book-cover-wrap-kitsch">
                                 <img alt="도서 표지" class="book-cover-kitsch"
-                                     src="https://picsum.photos/250/380?random=101">
+                                     src="https://picsum.photos/255/484?random=101">
 
                                 <div class="book-hover-overlay-kitsch">
                                     <i class="fas fa-search-plus"></i>
@@ -120,7 +120,11 @@
                         <a class="book-link-kitsch" href="/books/2">
                             <div class="book-cover-wrap-kitsch">
                                 <img alt="도서 표지" class="book-cover-kitsch"
-                                     src="https://picsum.photos/250/380?random=102">
+                                     src="https://picsum.photos/255/484?random=102">
+                                <div class="book-hover-overlay-kitsch">
+                                    <i class="fas fa-search-plus"></i>
+                                    <p class="pixel-font-kitsch">상세 보기</p>
+                                </div>
                                 <span class="sticker-hot-kitsch display-font-kitsch">HOT</span>
                             </div>
                             <div class="book-info-kitsch">
@@ -135,7 +139,7 @@
                         <a class="book-link-kitsch" href="/books/3">
                             <div class="book-cover-wrap-kitsch">
                                 <img alt="도서 표지" class="book-cover-kitsch"
-                                     src="https://picsum.photos/250/380?random=103">
+                                     src="https://picsum.photos/255/484?random=103">
                                 <div class="book-hover-overlay-kitsch">
                                     <i class="fas fa-search-plus"></i>
                                     <p class="pixel-font-kitsch">상세 보기</p>
@@ -153,7 +157,7 @@
                         <a class="book-link-kitsch" href="/books/4">
                             <div class="book-cover-wrap-kitsch">
                                 <img alt="도서 표지" class="book-cover-kitsch"
-                                     src="https://picsum.photos/250/380?random=104">
+                                     src="https://picsum.photos/255/484?random=104">
                                 <div class="book-hover-overlay-kitsch">
                                     <i class="fas fa-search-plus"></i>
                                     <p class="pixel-font-kitsch">상세 보기</p>
@@ -178,8 +182,8 @@
                 <h2 class="hero-title-kitsch display-font-kitsch">오늘의 <span class="highlight-pink-kitsch">도서</span>
                     발견!</h2>
                 <p class="hero-subtitle-kitsch pixel-font-kitsch" style="font-size: 1.3em; line-height: 1.5;">지금 바로
-                    BlueBookttle에서 특별하고 재미난 책들을 만나보세요!</p>
-                <form action="/search" class="search-bar-main" method="get">
+                    Bluebooktle에서 특별하고 재미난 책들을 만나보세요!</p>
+                <form action="/books" class="search-bar-main" method="get">
                     <input class="input-kitsch retro-shadow-kitsch-small" name="query" placeholder="어떤 책을 찾으세요?"
                            type="text">
                     <button class="btn-kitsch primary-btn-kitsch retro-shadow-kitsch" type="submit"><i

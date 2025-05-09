@@ -5,24 +5,21 @@
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <title layout:title-pattern="$LAYOUT_TITLE - $CONTENT_TITLE">BlueBooktle</title>
-    <link rel="stylesheet" th:href="@{/css/reset.css}">
     <link rel="stylesheet" th:href="@{/css/styles.css}">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Gaegu:wght@400;700&family=Black+Han+Sans&display=swap"
           rel="stylesheet">
 </head>
 <body>
-<div th:replace="${isLoggedIn} ? ~{_fragments/header :: headerFragment} : ~{_fragments/header :: headerFragmentLoggedOut}"></div>
+<div th:replace="~{_fragments/header :: headerFragment}"></div>
 <div layout:fragment="content">
     <p>Page content goes here</p>
 </div>
 
-<div th:replace="~{_fragments/popup_modal :: successPopup(modalId='globalSuccessModal')}"></div>
-<div th:replace="~{_fragments/popup_modal :: errorPopup(modalId='globalErrorModal')}"></div>
-<div th:replace="~{_fragments/popup_modal :: infoPopup(modalId='globalInfoModal')}"></div>
 <div th:replace="~{_fragments/footer :: footerFragment}"></div>
 
 <script>
+
     function showKitschModal(modalId) {
         const modal = document.getElementById(modalId);
         if (modal) {
@@ -37,32 +34,6 @@
         }
     }
 
-    document.addEventListener('DOMContentLoaded', function () {
-        const modalsToAutoShow = document.querySelectorAll('.modal-overlay-kitsch[data-auto-show="true"]');
-        modalsToAutoShow.forEach(function (modal) {
-            if (modal.id) {
-                showKitschModal(modal.id);
-            }
-        });
-
-        const closeTriggers = document.querySelectorAll('.js-modal-close-trigger');
-        closeTriggers.forEach(function (trigger) {
-            trigger.addEventListener('click', function (event) {
-                const clickedElement = event.currentTarget;
-                const modalIdToHide = clickedElement.getAttribute('data-modal-target');
-
-                if (modalIdToHide) {
-                    if (clickedElement.classList.contains('modal-overlay-kitsch')) {
-                        if (event.target === clickedElement) {
-                            hideKitschModal(modalIdToHide);
-                        }
-                    } else {
-                        hideKitschModal(modalIdToHide);
-                    }
-                }
-            });
-        });
-    });
 </script>
 <th:block layout:fragment="page_scripts"></th:block>
 </body>

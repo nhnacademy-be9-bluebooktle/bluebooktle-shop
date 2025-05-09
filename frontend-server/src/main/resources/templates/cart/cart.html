@@ -400,10 +400,10 @@
                         </label>
                     </div>
                     <div class="cart-item-info-kitsch">
-                        <a th:href="@{/books/101}"><img alt="코딩 대모험"
+                        <a th:href="@{/books/101}"><img alt="키치 코딩 대모험"
                                                         src="https://picsum.photos/80/120?random=101"></a>
                         <div class="cart-item-details-kitsch">
-                            <a class="item-title-kitsch" th:href="@{/books/101}">코딩 대모험</a>
+                            <a class="item-title-kitsch" th:href="@{/books/101}">키치 코딩 대모험</a>
                             <p class="item-author-kitsch">저자: 고냥이 개발자</p>
 
                         </div>
@@ -579,7 +579,7 @@
                 totalProductPrice += pricePerItem * quantity;
 
                 // Mock 포장 옵션 (첫번째 아이템만 포장했다고 가정)
-                if (itemCheckbox.value === "101") { // '코딩 대모험'의 value
+                if (itemCheckbox.value === "101") { // '키치 코딩 대모험'의 value
                     packagingFee += 2000 * quantity; // 수량만큼 포장비
                 }
             });
