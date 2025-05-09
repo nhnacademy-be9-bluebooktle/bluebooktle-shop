@@ -1,5 +1,7 @@
 package shop.bluebooktle.backend.coupon.entity;
 
+import java.math.BigDecimal;
+
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
@@ -12,6 +14,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -35,9 +38,13 @@ public class CouponType extends BaseEntity {
 	@Enumerated(EnumType.STRING)
 	@Column(name = "target", nullable = false, length = 5)
 	private CouponTypeTarget target;
+	@Column(name = "minimum_payment", nullable = false, precision = 10, scale = 2)
+	private BigDecimal minimumPayment;
 
-	public CouponType(String name, CouponTypeTarget target) {
+	@Builder
+	public CouponType(String name, CouponTypeTarget target, BigDecimal minimumPayment) {
 		this.name = name;
 		this.target = target;
+		this.minimumPayment = minimumPayment;
 	}
 }

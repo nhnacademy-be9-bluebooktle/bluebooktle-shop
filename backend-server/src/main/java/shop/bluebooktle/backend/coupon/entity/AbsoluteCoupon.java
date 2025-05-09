@@ -41,7 +41,8 @@ public class AbsoluteCoupon extends BaseEntity {
 	private BigDecimal discountPrice;
 
 	@Builder
-	public AbsoluteCoupon(BigDecimal discountPrice) {
+	public AbsoluteCoupon(CouponType couponType, BigDecimal discountPrice) {
+		this.couponType = couponType;
 		this.discountPrice = discountPrice;
 	}
 }

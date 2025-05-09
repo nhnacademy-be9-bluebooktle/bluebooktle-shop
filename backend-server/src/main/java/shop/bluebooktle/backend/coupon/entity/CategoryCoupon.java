@@ -13,6 +13,7 @@ import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -39,4 +40,9 @@ public class CategoryCoupon extends BaseEntity {
 	@JoinColumn(name = "category_id", nullable = false)
 	private Category category;
 
+	@Builder
+	public CategoryCoupon(Coupon coupon, Category category) {
+		this.coupon = coupon;
+		this.category = category;
+	}
 }

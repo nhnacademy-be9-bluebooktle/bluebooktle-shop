@@ -85,6 +85,9 @@ public enum ErrorCode {
 	K_COUPON_TYPE_NOT_FOUND(HttpStatus.NOT_FOUND, "K006", "쿠폰 타입을 찾을 수 없습니다."),
 	K_INVALID_COUPON_POLICY(HttpStatus.INTERNAL_SERVER_ERROR, "K007", "유효하지 않은 쿠폰 정책 설정입니다."),
 	K_COUPON_ISSUANCE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "K008", "쿠폰 발행에 실패했습니다."),
+	K_COUPON_TYPE_NAME_ALREADY_EXISTS(HttpStatus.CONFLICT, "K009", "이미 존재하는 쿠폰 타입 이름입니다."),
+	K_COUPON_NAME_ALREADY_EXISTS(HttpStatus.CONFLICT, "K010", "이미 존재하는 쿠폰 이름입니다."),
+	K_COUPON_INVALID_TARGET(HttpStatus.BAD_REQUEST, "K011", "잘못된 쿠폰 타겟 등록 선택입니다."),
 
 	// Review & Search Errors (리뷰/검색 오류) - R
 	REVIEW_NOT_FOUND(HttpStatus.NOT_FOUND, "R001", "리뷰를 찾을 수 없습니다."),
