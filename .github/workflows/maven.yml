@@ -95,7 +95,7 @@ jobs:
           if-no-files-found: error
 
   deploy:
-    needs: build
+    needs: [ detect_changes, build ]
     if: needs.detect_changes.outputs.changed != ''
     runs-on: ubuntu-latest
     steps:
