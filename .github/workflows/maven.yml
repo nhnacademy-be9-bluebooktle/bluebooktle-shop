@@ -49,6 +49,15 @@ jobs:
             auth-server:
               - 'auth-server/**'
 
+      - name: Debug filter outputs
+        run: |
+          echo "backend-server: ${{ steps.filter.outputs.backend-server }}"
+          echo "frontend-server: ${{ steps.filter.outputs.frontend-server }}"
+          echo "gateway-server: ${{ steps.filter.outputs.gateway-server }}"
+          echo "eureka-server: ${{ steps.filter.outputs.eureka-server }}"
+          echo "common-module: ${{ steps.filter.outputs.common-module }}"
+          echo "auth-server: ${{ steps.filter.outputs.auth-server }}"
+
       - name: Generate final changed-services list
         id: list
         run: |
@@ -64,21 +73,6 @@ jobs:
             done
           fi
           changed="${modules[*]}"
-          echo "changed=$changed" >> $GITHUB_OUTPUT
-
-      - name: Debug filter outputs
-        run: |
-          echo "backend-server: ${{ steps.filter.outputs.backend-server }}"
-          echo "frontend-server: ${{ steps.filter.outputs.frontend-server }}"
-          echo "gateway-server: ${{ steps.filter.outputs.gateway-server }}"
-          echo "eureka-server: ${{ steps.filter.outputs.eureka-server }}"
-          echo "common-module: ${{ steps.filter.outputs.common-module }}"
-          echo "auth-server: ${{ steps.filter.outputs.auth-server }}"
-
-      - name: Generate final changed-services list
-        id: list
-        run: |
-          # … 기존 모듈 수집 로직 …
           echo "changed=$changed" >> $GITHUB_OUTPUT
 
       - name: Debug final module list
