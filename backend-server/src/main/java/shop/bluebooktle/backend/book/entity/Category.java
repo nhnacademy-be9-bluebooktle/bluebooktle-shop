@@ -21,6 +21,7 @@ import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 import shop.bluebooktle.common.entity.BaseEntity;
 
@@ -43,6 +44,7 @@ public class Category extends BaseEntity {
 	@JoinColumn(name = "parent_category_id")
 	private Category parentCategory;
 
+	@Setter
 	@Column(name = "name", nullable = false, length = 50)
 	private String name;
 
@@ -52,5 +54,10 @@ public class Category extends BaseEntity {
 	public void addChildCategory(Category child) {
 		child.parentCategory = this;
 		this.childCategories.add(child);
+	}
+
+	public Category(Category parentCategory, String name) {
+		this.parentCategory = parentCategory;
+		this.name = name;
 	}
 }

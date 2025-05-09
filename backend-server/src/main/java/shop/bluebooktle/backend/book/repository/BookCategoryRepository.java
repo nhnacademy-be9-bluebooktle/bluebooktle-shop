@@ -3,8 +3,10 @@ package shop.bluebooktle.backend.book.repository;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import shop.bluebooktle.backend.book.entity.Book;
 import shop.bluebooktle.backend.book.entity.BookCategory;
@@ -38,5 +40,13 @@ public interface BookCategoryRepository extends JpaRepository<BookCategory, Long
 	// 특정 카테고리와 연결된 모든 책 ID 조회
 	@Query("select bc.book.id from BookCategory bc where bc.category.id = :categoryId")
 	List<Long> findBookIdsByCategoryId(@Param("categoryId") Long categoryId);
+
+	@Modifying
+	@Transactional
+	void deleteByCategory(Category category);
+
+	@Modifying
+	@Transactional
+	void deleteByCategoryIn(List<Category> categories);
 
 }
