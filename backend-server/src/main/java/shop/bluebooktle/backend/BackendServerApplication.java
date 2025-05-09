@@ -12,7 +12,6 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 	"shop.bluebooktle.common.entity"
 })
 public class BackendServerApplication {
-
 	public static void main(String[] args) {
 		SpringApplication.run(BackendServerApplication.class, args);
 	}
