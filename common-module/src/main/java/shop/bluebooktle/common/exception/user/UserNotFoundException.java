@@ -1,7 +1,7 @@
-package shop.bluebooktle.common.exception;
+package shop.bluebooktle.common.exception.user;
 
 public class UserNotFoundException extends RuntimeException {
 	public UserNotFoundException(String message) {
-		super(message);
+		super("User not found with id, " + message);
 	}
 }
