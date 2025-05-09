@@ -49,16 +49,6 @@ jobs:
             auth-server:
               - 'auth-server/**'
 
-      - name: Debug filter outputs
-        run: |
-          echo "filter outputs:"
-          echo "  backend-server:    ${{ steps.filter.outputs.backend-server }}"
-          echo "  frontend-server:   ${{ steps.filter.outputs.frontend-server }}"
-          echo "  gateway-server:    ${{ steps.filter.outputs.gateway-server }}"
-          echo "  eureka-server:     ${{ steps.filter.outputs.eureka-server }}"
-          echo "  common-module:     ${{ steps.filter.outputs.common-module }}"
-          echo "  auth-server:       ${{ steps.filter.outputs.auth-server }}"
-
       - name: Generate final changed-services list
         id: list
         run: |
@@ -76,16 +66,12 @@ jobs:
           changed="${modules[*]}"
           echo "changed=$changed" >> $GITHUB_OUTPUT
 
-      - name: Debug final module list
-        run: |
-          echo ">>> Final changed list: '${{ steps.list.outputs.changed }}'"
-
   build:
     needs: detect_changes
     if: needs.detect_changes.outputs.changed != ''
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Set up Java 21
@@ -112,6 +98,8 @@ jobs:
     needs: build
     if: needs.detect_changes.outputs.changed != ''
     runs-on: ubuntu-latest
+    env:
+      MODULES: ${{ needs.detect_changes.outputs.changed }}
     steps:
       - name: Download JARs
         uses: actions/download-artifact@v4
@@ -119,9 +107,9 @@ jobs:
           name: jars
           path: downloaded_jars
 
-      - name: Debug detected modules
+      - name: Debug deploy modules
         run: |
-          echo ">>> Deploy sees modules: '${{ needs.detect_changes.outputs.changed }}'"
+          echo ">>> Deploy sees modules: '$MODULES'"
 
       - name: Upload JARs to remote
         uses: appleboy/scp-action@master
@@ -141,11 +129,10 @@ jobs:
           username: ${{ secrets.SSH_ID }}
           password: ${{ secrets.SSH_PASSWORD }}
           port: ${{ secrets.SSH_PORT }}
-          capture_stdout: true        # ← 이 줄을 추가
+          capture_stdout: true
           script: |
-            echo ">>> SSH sees modules: ${{ needs.detect_changes.outputs.changed }}"
-            for MOD in ${{ needs.detect_changes.outputs.changed }}; do
+            echo ">>> SSH sees modules: $MODULES"
+            for MOD in $MODULES; do
               echo "▶ Rolling deploy: $MOD"
               ~/startup.sh "$MOD"
             done
-
