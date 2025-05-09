@@ -38,47 +38,14 @@ public enum ErrorCode {
 	// Book Errors (도서 관련 오류) - B
 	BOOK_NOT_FOUND(HttpStatus.NOT_FOUND, "B001", "도서를 찾을 수 없습니다."),
 	BOOK_INVALID_ISBN(HttpStatus.BAD_REQUEST, "B002", "유효하지 않은 ISBN 입니다."),
-	PUBLISHER_NOT_FOUND(HttpStatus.NOT_FOUND, "B003", "출판사를 찾을 수 없습니다."),
+	BOOK_PUBLISHER_NOT_FOUND(HttpStatus.NOT_FOUND, "B003", "출판사를 찾을 수 없습니다."),
 	BOOK_AUTHOR_NOT_FOUND(HttpStatus.NOT_FOUND, "B004", "작가를 찾을 수 없습니다."),
-	CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "B005", "카테고리를 찾을 수 없습니다."),
-	TAG_NOT_FOUND(HttpStatus.NOT_FOUND, "B006", "태그를 찾을 수 없습니다."),
+	BOOK_CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "B005", "카테고리를 찾을 수 없습니다."),
+	BOOK_TAG_NOT_FOUND(HttpStatus.NOT_FOUND, "B006", "태그를 찾을 수 없습니다."),
 	BOOK_ALREADY_LIKED(HttpStatus.CONFLICT, "B007", "이미 좋아요를 누른 도서입니다."),
 	BOOK_NOT_LIKED(HttpStatus.BAD_REQUEST, "B008", "좋아요 상태가 아닌 도서입니다."), // 좋아요 취소 시
 	BOOK_SALE_INFO_NOT_FOUND(HttpStatus.NOT_FOUND, "B009", "도서 판매 정보를 찾을 수 없습니다."),
 	BOOK_STATE_NOT_AVAILABLE(HttpStatus.BAD_REQUEST, "B010", "현재 구매할 수 없는 도서입니다."), // 재고 부족, 판매 종료 등
-	BOOK_ALREADY_EXISTS_EXCEPTION(HttpStatus.CONFLICT, "B011", "이미 등록된 도서입니다."),
-	BOOK_SALE_INFO_ALREADY_EXISTS(HttpStatus.CONFLICT, "B012", "이미 등록된 도서 판매 정보입니다."),
-
-	// Book - 카테고리
-	BOOK_CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "BC01", "도서에 등록된 카테고리를 찾을 수 없습니다."),
-	CATEGORY_NAME_ALREADY_EXISTS(HttpStatus.CONFLICT, "BC002", "이미 존재하는 카테고리명입니다. "), // 이미 존재하는 카테고리명일 시
-	CATEGORY_DELETE_ROOT_CATEGORY(HttpStatus.BAD_REQUEST, "BC03", "최상위 카테고리는 삭제할 수 없습니다."),
-	CATEGORY_REQUIRED(HttpStatus.BAD_REQUEST, "BC007", "2단계 카테고리는 최소 1개 존재해야 합니다."),
-	BOOK_CATEGORY_ALREADY_EXISTS(HttpStatus.CONFLICT, "BC04", "카테고리에 이미 등록된 도서입니다."),
-	BOOK_CATEGORY_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "BC05", "카테고리는 최대 10개까지 등록할 수 있습니다."),
-	BOOK_CATEGORY_REQUIRED(HttpStatus.BAD_REQUEST, "BC06", "도서는 카테고리를 최소 1개 이상 가져야 합니다."),
-
-	// Book - 출판사
-	PUBLISHER_ALREADY_EXISTS(HttpStatus.CONFLICT, "BP01", "이미 등록된 출판사입니다."),
-	BOOK_PUBLISHER_NOT_FOUND(HttpStatus.NOT_FOUND, "BP02", "도서에 등록된 출판사를 찾을 수 없습니다."),
-	BOOK_PUBLISHER_ALREADY_EXISTS(HttpStatus.CONFLICT, "BP03", "도서에 이미 등록된 출판사입니다."),
-	PUBLISHER_DELETE_NOT_AVAILABLE(HttpStatus.BAD_REQUEST, "BP04", "도서에 등록된 출판사로 삭제할 수 없습니다."),
-	// Book - 태그
-	TAG_ALREADY_EXISTS(HttpStatus.CONFLICT, "BT01", "이미 등록된 태그입니다."),
-	BOOK_TAG_ALREADY_EXISTS(HttpStatus.CONFLICT, "BT03", "도서에 이미 등록된 태그입니다."),
-	BOOK_TAG_NOT_FOUND(HttpStatus.NOT_FOUND, "BP02", "도서에 등록된 태그를 찾을 수 없습니다."),
-	// Book Order (도서 주문 포장 오류) - G (Gift)
-	G_BOOK_ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "G001", "도서 주문 정보를 찾을 수 없습니다."),
-	G_BOOK_ORDER_UPDATE_FAILED(HttpStatus.BAD_REQUEST, "G002", "도서 주문 정보 수정에 실패했습니다."),
-	G_BOOK_ORDER_INVALID_QUANTITY(HttpStatus.BAD_REQUEST, "G003", "도서 주문 수량이 유효하지 않습니다."),
-	G_BOOK_ORDER_INVALID_PRICE(HttpStatus.BAD_REQUEST, "G004", "도서 주문 가격이 유효하지 않습니다."),
-	G_ORDER_PACKAGING_NOT_FOUND(HttpStatus.NOT_FOUND, "G005", "도서 주문 포장 정보를 찾을 수 없습니다."),
-	G_ORDER_PACKAGING_ALREADY_EXISTS(HttpStatus.CONFLICT, "G006", "이미 해당 도서 주문에 포장 옵션이 등록되어 있습니다."),
-	G_ORDER_PACKAGING_INVALID_OPTION(HttpStatus.BAD_REQUEST, "G007", "유효하지 않은 포장 옵션입니다."),
-	G_ORDER_PACKAGING_INVALID_QUANTITY(HttpStatus.BAD_REQUEST, "G008", "포장 수량은 1개 이상이어야 합니다."),
-	G_PACKAGING_QUANTITY_EXCEEDS_BOOK_ORDER(HttpStatus.BAD_REQUEST, "G009", "포장 수량은 도서 주문 수량을 초과할 수 없습니다."),
-	G_ORDER_PACKAGING_DELETE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "G010", "포장 정보 삭제 중 오류가 발생했습니다."),
-	G_ORDER_PACKAGING_OPTION_NOT_FOUND(HttpStatus.NOT_FOUND, "G011", "주문 포장 옵션을 찾을 수 없습니다."),
 
 	// Cart Errors (장바구니 오류) - T (TeaCart)
 	CART_NOT_FOUND(HttpStatus.NOT_FOUND, "T001", "장바구니를 찾을 수 없습니다."), // 예외적인 경우
@@ -95,21 +62,19 @@ public enum ErrorCode {
 	ORDER_PACKAGING_OPTION_NOT_FOUND(HttpStatus.NOT_FOUND, "O005", "포장 옵션을 찾을 수 없습니다."),
 	ORDER_DELIVERY_RULE_NOT_FOUND(HttpStatus.NOT_FOUND, "O006", "배송 정책을 찾을 수 없습니다."),
 	ORDER_INVALID_ORDER_KEY(HttpStatus.UNAUTHORIZED, "O007", "유효하지 않은 주문 확인 정보입니다."), // 비회원 주문 확인
-	ORDER_STATE_NOT_FOUND(HttpStatus.NOT_FOUND, "O008", "해당 주문상태가 존재하지 않습니다."),
 
 	// Payment & Point Errors (결제/포인트 오류) - P
 	PAYMENT_FAILED(HttpStatus.BAD_GATEWAY, "P001", "결제 시스템 오류가 발생했습니다."), // 외부 결제사 오류
 	PAYMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "P002", "결제 정보를 찾을 수 없습니다."),
 	PAYMENT_TYPE_NOT_FOUND(HttpStatus.NOT_FOUND, "P003", "결제 수단을 찾을 수 없습니다."),
-	PAYMENT_TYPE_ALREADY_EXISTS(HttpStatus.CONFLICT, "P004", "이미 존재하는 결제수단입니다."),
-	POINT_INSUFFICIENT_BALANCE(HttpStatus.BAD_REQUEST, "P005", "포인트 잔액이 부족합니다."),
-	POINT_HISTORY_NOT_FOUND(HttpStatus.NOT_FOUND, "P006", "포인트 이력을 찾을 수 없습니다."),
-	POINT_SOURCE_TYPE_NOT_FOUND(HttpStatus.NOT_FOUND, "P007", "포인트 발생/사용 타입을 찾을 수 없습니다."),
-	PAYMENT_INVALID_AMOUNT(HttpStatus.BAD_REQUEST, "P008", "결제 금액이 유효하지 않습니다."),
-	REFUND_NOT_POSSIBLE(HttpStatus.BAD_REQUEST, "P009", "현재 상태에서는 반품/환불이 불가능합니다."),
-	REFUND_ALREADY_PROCESSED(HttpStatus.CONFLICT, "P0010", "이미 처리된 반품/환불 요청입니다."),
-	REFUND_INVALID_REASON(HttpStatus.BAD_REQUEST, "P011", "유효하지 않은 반품 사유입니다."),
-	REFUND_NOT_FOUND(HttpStatus.NOT_FOUND, "P012", "환불 정보를 찾을 수 없습니다."),
+	POINT_INSUFFICIENT_BALANCE(HttpStatus.BAD_REQUEST, "P004", "포인트 잔액이 부족합니다."),
+	POINT_HISTORY_NOT_FOUND(HttpStatus.NOT_FOUND, "P005", "포인트 이력을 찾을 수 없습니다."),
+	POINT_SOURCE_TYPE_NOT_FOUND(HttpStatus.NOT_FOUND, "P006", "포인트 발생/사용 타입을 찾을 수 없습니다."),
+	PAYMENT_INVALID_AMOUNT(HttpStatus.BAD_REQUEST, "P007", "결제 금액이 유효하지 않습니다."),
+	REFUND_NOT_POSSIBLE(HttpStatus.BAD_REQUEST, "P008", "현재 상태에서는 반품/환불이 불가능합니다."),
+	REFUND_ALREADY_PROCESSED(HttpStatus.CONFLICT, "P009", "이미 처리된 반품/환불 요청입니다."),
+	REFUND_INVALID_REASON(HttpStatus.BAD_REQUEST, "P010", "유효하지 않은 반품 사유입니다."),
+	REFUND_NOT_FOUND(HttpStatus.NOT_FOUND, "P011", "환불 정보를 찾을 수 없습니다."),
 
 	// Coupon Errors (쿠폰 오류) - K (Koopon)
 	K_COUPON_NOT_FOUND(HttpStatus.NOT_FOUND, "K001", "쿠폰을 찾을 수 없습니다."),
@@ -120,9 +85,6 @@ public enum ErrorCode {
 	K_COUPON_TYPE_NOT_FOUND(HttpStatus.NOT_FOUND, "K006", "쿠폰 타입을 찾을 수 없습니다."),
 	K_INVALID_COUPON_POLICY(HttpStatus.INTERNAL_SERVER_ERROR, "K007", "유효하지 않은 쿠폰 정책 설정입니다."),
 	K_COUPON_ISSUANCE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "K008", "쿠폰 발행에 실패했습니다."),
-	K_COUPON_TYPE_NAME_ALREADY_EXISTS(HttpStatus.CONFLICT, "K009", "이미 존재하는 쿠폰 타입 이름입니다."),
-	K_COUPON_NAME_ALREADY_EXISTS(HttpStatus.CONFLICT, "K010", "이미 존재하는 쿠폰 이름입니다."),
-	K_COUPON_INVALID_TARGET(HttpStatus.BAD_REQUEST, "K011", "잘못된 쿠폰 타겟 등록 선택입니다."),
 
 	// Review & Search Errors (리뷰/검색 오류) - R
 	REVIEW_NOT_FOUND(HttpStatus.NOT_FOUND, "R001", "리뷰를 찾을 수 없습니다."),
@@ -135,11 +97,7 @@ public enum ErrorCode {
 	SEARCH_INVALID_SORT_CRITERIA(HttpStatus.BAD_REQUEST, "R008", "유효하지 않은 검색 정렬 기준입니다."),
 	SEARCH_INVALID_WEIGHT_CONFIG(HttpStatus.INTERNAL_SERVER_ERROR, "R009", "검색 가중치 설정이 올바르지 않습니다."),
 
-	// Delivery Errors (배송 오류) - D
-	DELIVERY_RULE_CANNOT_DELETE_DEFAULT(HttpStatus.METHOD_NOT_ALLOWED, "D001", "기본 배송 정책은 삭제할 수 없습니다."),
-	DELIVERY_RULE_NOT_FOUND(HttpStatus.NOT_FOUND, "D002", "해당 배송정책이 없습니다."),
-	DEFAULT_DELIVERY_RULE_NOT_FOUND(HttpStatus.NOT_FOUND, "D003", "기본 배송 정책이 없습니다."),
-	DELIVERY_RULE_ALREADY_EXISTS(HttpStatus.CONFLICT, "D004", "해당 이름의 배송정책이 존재합니다.");
+	;
 
 	private final HttpStatus status; // HTTP 상태 코드
 	private final String code;       // 고유 오류 코드 (클라이언트 사용)
@@ -152,12 +110,4 @@ public enum ErrorCode {
 		this.message = message;
 	}
 
-	public static ErrorCode findByStringCode(String code) {
-		for (ErrorCode errorCode : ErrorCode.values()) {
-			if (errorCode.getCode().equals(code)) {
-				return errorCode;
-			}
-		}
-		return INTERNAL_SERVER_ERROR;
-	}
 }

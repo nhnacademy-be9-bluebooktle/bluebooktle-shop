@@ -6,10 +6,7 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
-@SpringBootApplication(scanBasePackages = {
-	"shop.bluebooktle.auth",
-	"shop.bluebooktle.common"
-})
+@SpringBootApplication
 @EnableDiscoveryClient
 @EntityScan(basePackages = {"shop.bluebooktle.common.entity"})
 @EnableJpaAuditing

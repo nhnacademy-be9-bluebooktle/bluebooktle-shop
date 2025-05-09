@@ -43,7 +43,7 @@ public class Category extends BaseEntity {
 	@JoinColumn(name = "parent_category_id")
 	private Category parentCategory;
 
-	@Column(name="name", nullable = false, length = 50)
+	@Column(name = "name", nullable = false, length = 50)
 	private String name;
 
 	@OneToMany(mappedBy = "parentCategory", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
