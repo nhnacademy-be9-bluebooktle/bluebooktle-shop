@@ -15,4 +15,4 @@ MERGE INTO membership_level (membership_id, name, rate, min_net_spent, max_net_s
 
 MERGE INTO membership_level (membership_id, name, rate, min_net_spent, max_net_spent, created_at, deleted_at)
     KEY (name)
-    VALUES (4, '플래티넘', 4, 300000.00, 999999999.99, NOW(), NULL); -- 임의의 rate 값, 확인 필요
+    VALUES (4, '플래티넘', 4, 300000.00, 99999999.99, NOW(), NULL); -- 임의의 rate 값, 확인 필요
