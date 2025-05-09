@@ -124,7 +124,7 @@ jobs:
           password: ${{ secrets.SSH_PASSWORD }}
           port: ${{ secrets.SSH_PORT }}
           script: |
-            chmod +x ~/startup.sh
+            echo ">>> SSH sees modules: ${{ needs.detect_changes.outputs.changed }}"
             for MOD in ${{ needs.detect_changes.outputs.changed }}; do
               echo "▶ Rolling deploy: $MOD"
               ~/startup.sh "$MOD"
