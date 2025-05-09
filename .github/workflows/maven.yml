@@ -130,6 +130,7 @@ jobs:
           capture_stdout: true
           script: |
             echo ">>> SSH sees modules: ${{ needs.detect_changes.outputs.changed }}"
+            chmod +x ~/startup.sh
             for MOD in ${{ needs.detect_changes.outputs.changed }}; do
               echo "▶ Rolling deploy: $MOD"
               ~/startup.sh "$MOD"
