@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html layout:decorate="~{_layouts/default_layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>주문 완료</title>
+    <style>
+        .order-complete-container-kitsch {
+            max-width: 700px;
+            margin: 3rem auto;
+            padding: 3rem 2.5rem;
+            background-color: var(--kitsch-bg-alt);
+            border: 5px groove var(--kitsch-color-3); /* 핫핑크 */
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(194, 37, 92, 0.3); /* 핫핑크 글로우 효과 */
+        }
+
+        .completion-icon-kitsch {
+            font-size: 5rem;
+            color: var(--kitsch-color-2); /* 머스타드 */
+            margin-bottom: 1.5rem;
+            animation: bounceAndSpin 1.2s ease-in-out; /* styles.css 에 정의된 애니메이션 사용 */
+        }
+
+        .completion-title-kitsch {
+            font-family: var(--font-display);
+            font-size: 2.5rem;
+            color: var(--kitsch-color-5); /* 짙은 청록 */
+            margin-bottom: 1rem;
+        }
+
+        .completion-message-kitsch {
+            font-family: var(--font-handwriting);
+            font-size: 1.3rem;
+            color: var(--kitsch-text-dark);
+            line-height: 1.7;
+            margin-bottom: 2rem;
+        }
+
+        .completion-message-kitsch strong {
+            color: var(--kitsch-color-1); /* 버건디 */
+            font-family: var(--font-pixel);
+        }
+
+        .order-summary-box-kitsch {
+            background-color: var(--kitsch-bg-main);
+            border: 2px dashed var(--kitsch-color-4); /* 청록 */
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            text-align: left;
+        }
+
+        .order-summary-box-kitsch h4 {
+            font-family: var(--font-pixel);
+            font-size: 1.2rem;
+            color: var(--kitsch-color-1);
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--kitsch-color-2);
+            padding-bottom: 0.5rem;
+        }
+
+        .summary-item-kitsch {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            font-family: var(--font-pixel);
+        }
+
+        .summary-item-kitsch .label {
+            color: var(--kitsch-text-dark);
+        }
+
+        .summary-item-kitsch .value {
+            color: var(--kitsch-color-5);
+            font-weight: bold;
+        }
+
+        .ordered-product-list-kitsch {
+            margin-top: 1rem;
+            max-height: 150px; /* 여러개일 경우 스크롤 */
+            overflow-y: auto;
+            padding-right: 0.5rem; /* 스크롤바 공간 */
+        }
+
+        .ordered-product-item-kitsch {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px dotted var(--kitsch-bg-alt);
+        }
+
+        .ordered-product-item-kitsch:last-child {
+            border-bottom: none;
+        }
+
+        .ordered-product-item-kitsch img {
+            width: 40px;
+            height: 60px;
+            border-radius: 2px;
+        }
+
+
+        .completion-actions-kitsch {
+            margin-top: 2.5rem;
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .completion-actions-kitsch .btn-kitsch {
+            font-size: 1.1rem;
+        }
+    </style>
+</head>
+
+<body>
+<div layout:fragment="content">
+    <div class="container-kitsch section-padding-kitsch">
+        <div class="order-complete-container-kitsch">
+            <div class="completion-icon-kitsch">
+                <i class="fas fa-party-popper"></i></div>
+            <h1 class="completion-title-kitsch">주문 완료!</h1>
+            <p class="completion-message-kitsch">
+                겜돌이_77님의 주문이 성공적으로 완료되었습니다! <br>
+                주문번호는 <strong class="pixel-font-kitsch">BKTTL-19880515-007</strong> 입니다. <br>
+                키치한 상품들이 곧 용사님을 찾아갈 거예요!
+            </p>
+
+            <div class="order-summary-box-kitsch">
+                <h4><i class="fas fa-receipt"></i> 주문 요약</h4>
+                <div class="summary-item-kitsch">
+                    <span class="label">결제 금액:</span>
+                    <span class="value" style="color:var(--kitsch-color-3); font-size:1.1rem;">84,200원</span>
+                </div>
+                <div class="summary-item-kitsch">
+                    <span class="label">결제 수단:</span>
+                    <span class="value">토스페이먼츠 (카드)</span>
+                </div>
+                <div class="summary-item-kitsch">
+                    <span class="label">배송지:</span>
+                    <span class="value">서울시 키치구 레트로길 88 (우리집)</span>
+                </div>
+
+                <h4><i class="fas fa-cubes"></i> 주문 상품</h4>
+                <div class="ordered-product-list-kitsch">
+                    <div class="ordered-product-item-kitsch">
+                        <img alt="키치 코딩" src="https://picsum.photos/40/60?random=101">
+                        <span>키치 코딩 대모험 x 1 (✨반짝이 포장)</span>
+                    </div>
+                    <div class="ordered-product-item-kitsch">
+                        <img alt="픽셀 알고리즘" src="https://picsum.photos/40/60?random=102">
+                        <span>픽셀 아트로 배우는 알고리즘 x 2</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="completion-actions-kitsch">
+                <a class="btn-kitsch primary-btn-kitsch retro-shadow-kitsch-small" th:href="@{/}">
+                    <i class="fas fa-home"></i> 메인으로 돌아가기
+                </a>
+                <a class="btn-kitsch secondary-btn-kitsch color1-kitsch retro-shadow-kitsch-small"
+                   th:href="@{/mypage/orders}">
+                    <i class="fas fa-list-alt"></i> 주문 내역 확인
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<th:block layout:fragment="page_scripts">
+    <script>
+        // Font Awesome 6 Pro 아이콘이 없는 경우 대체 아이콘으로 변경 (선택적)
+        document.addEventListener('DOMContentLoaded', function () {
+            const partyPopperIcon = document.querySelector('.completion-icon-kitsch .fa-party-popper');
+            if (partyPopperIcon && getComputedStyle(partyPopperIcon).getPropertyValue('font-family').toLowerCase().indexOf('fontawesome') === -1) {
+                partyPopperIcon.classList.remove('fa-party-popper');
+                partyPopperIcon.classList.add('fa-gifts'); // 대체 아이콘
+            }
+
+            // 스크롤바 디자인 (웹킷) - styles.css에도 유사한 내용이 있다면 중복될 수 있음
+            const scrollableLists = document.querySelectorAll('.ordered-product-list-kitsch');
+            scrollableLists.forEach(list => {
+                list.style.setProperty('--kitsch-scrollbar-track', 'var(--kitsch-bg-alt)');
+                list.style.setProperty('--kitsch-scrollbar-thumb', 'var(--kitsch-color-4)');
+                list.style.setProperty('--kitsch-scrollbar-thumb-hover', 'var(--kitsch-color-3)');
+            });
+        });
+    </script>
+</th:block>
+</body>
+</html>
