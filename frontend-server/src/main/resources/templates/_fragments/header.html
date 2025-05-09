@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<header class="site-header-kitsch" th:fragment="headerFragment">
+    <div class="container-kitsch">
+        <div class="header-flex-kitsch">
+            <a class="logo-link-kitsch" href="/" th:href="@{/}">
+                <h1 class="logo-main-kitsch display-font-kitsch">Blue<span class="logo-alt-color-kitsch">Book</span>ttle
+                </h1>
+                <p class="logo-sub-kitsch handwriting-font-kitsch">당신을 위한 서점</p>
+            </a>
+
+            <form action="/books" class="header-search-form-kitsch" method="get" th:action="@{/books}">
+                <input class="input-kitsch header-search-input-kitsch" name="query" placeholder="레트로 감성 책 검색!"
+                       type="text" value="키치 판타지">
+                <button class="btn-kitsch primary-btn-kitsch header-search-btn-kitsch" type="submit">
+                    <i class="fas fa-search"></i>
+                </button>
+            </form>
+
+            <div class="user-actions-kitsch logged-in-actions-kitsch">
+                <a class="btn-kitsch secondary-btn-kitsch color3-kitsch retro-shadow-kitsch-small cart-btn-header-kitsch"
+                   href="/cart" th:href="@{/cart}">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-count-kitsch">3</span>
+                </a>
+                <a class="btn-kitsch secondary-btn-kitsch color1-kitsch retro-shadow-kitsch-small" href="/mypage"
+                   th:href="@{/mypage/profile}">
+                    <i class="fas fa-user-astronaut"></i> 마이페이지
+                </a>
+
+                <a class="btn-kitsch secondary-btn-kitsch color4-kitsch retro-shadow-kitsch-small" href="/logout"
+                   th:href="@{/logout}">
+                    <i class="fas fa-sign-out-alt"></i> 로그아웃
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="header-marquee-kitsch">
+        <p class="pixel-font-kitsch">🎉 겜돌이_77님, 오늘은 어떤 키치한 책을 찾아볼까요? 👾 신규 입고된 레트로 게임 공략집 확인! 📚</p>
+    </div>
+</header>
+
+<header class="site-header-kitsch" th:fragment="headerFragmentLoggedOut">
+    <div class="container-kitsch">
+        <div class="header-flex-kitsch">
+            <a class="logo-link-kitsch" href="/" th:href="@{/}">
+                <h1 class="logo-main-kitsch display-font-kitsch">Blue<span class="logo-alt-color-kitsch">Book</span>ttle
+                </h1>
+                <p class="logo-sub-kitsch handwriting-font-kitsch">당신을 위한 서점</p>
+            </a>
+
+            <form action="/books" class="header-search-form-kitsch" method="get" th:action="@{/books}">
+                <input class="input-kitsch header-search-input-kitsch" name="query" placeholder="어떤 책을 찾으세요?"
+                       type="text">
+                <button class="btn-kitsch primary-btn-kitsch header-search-btn-kitsch" type="submit">
+                    <i class="fas fa-search"></i>
+                </button>
+            </form>
+
+            <div class="user-actions-kitsch">
+                <a class="btn-kitsch secondary-btn-kitsch color3-kitsch retro-shadow-kitsch-small cart-btn-header-kitsch"
+                   href="/cart" th:href="@{/cart}">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-count-kitsch">3</span>
+                </a>
+                <a class="btn-kitsch secondary-btn-kitsch color5-kitsch retro-shadow-kitsch-small" href="/login"
+                   th:href="@{/login}"><i class="fas fa-sign-in-alt"></i> 로그인</a>
+                <a class="btn-kitsch primary-btn-kitsch retro-shadow-kitsch-small" href="/signup"
+                   th:href="@{/signup}"><i
+                        class="fas fa-user-plus"></i> 회원가입</a>
+            </div>
+        </div>
+    </div>
+    <div class="header-marquee-kitsch">
+        <p class="pixel-font-kitsch">✨ BlueBooktle에 오신 것을 환영합니다! 신간 도서 & 이벤트 확인! ✨</p>
+    </div>
+</header>
+
+</body>
+</html>

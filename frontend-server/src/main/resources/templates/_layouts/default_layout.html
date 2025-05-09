@@ -11,13 +11,12 @@
           rel="stylesheet">
 </head>
 <body>
-<div th:replace="~{fragments/header :: headerFragment}"></div>
-
+<div th:replace="~{_fragments/header :: headerFragment}"></div>
 <div layout:fragment="content">
     <p>Page content goes here</p>
 </div>
 
-<div th:replace="~{fragments/footer :: footerFragment}"></div>
+<div th:replace="~{_fragments/footer :: footerFragment}"></div>
 
 <script>
 
@@ -34,7 +33,7 @@
             modal.classList.remove('active');
         }
     }
-    
+
 </script>
 <th:block layout:fragment="page_scripts"></th:block>
 </body>
