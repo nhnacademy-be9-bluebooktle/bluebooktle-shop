@@ -9,6 +9,7 @@ on:
       - 'gateway-server/**'
       - 'eureka-server/**'
       - 'common-module/**'
+      - 'auth-server/**'
   pull_request:
     branches: [ develop ]
     paths:
@@ -17,6 +18,7 @@ on:
       - 'gateway-server/**'
       - 'eureka-server/**'
       - 'common-module/**'
+      - 'auth-server/**'
 
 jobs:
   detect_changes:
@@ -44,23 +46,23 @@ jobs:
               - 'eureka-server/**'
             common-module:
               - 'common-module/**'
+            auth-server:
+              - 'auth-server/**'
 
       - name: Generate final changed-services list
         id: list
         run: |
           modules=()
-          # 서비스 직접 변경된 경우
           [[ "${{ steps.filter.outputs.backend-server }}"  == "true" ]] && modules+=("backend-server")
           [[ "${{ steps.filter.outputs.frontend-server }}" == "true" ]] && modules+=("frontend-server")
           [[ "${{ steps.filter.outputs.gateway-server }}"  == "true" ]] && modules+=("gateway-server")
           [[ "${{ steps.filter.outputs.eureka-server }}"   == "true" ]] && modules+=("eureka-server")
-          # common-module이 변경되면, 참조하는 모든 서비스 자동 추가
+          [[ "${{ steps.filter.outputs.auth-server }}"     == "true" ]] && modules+=("auth-server")
           if [[ "${{ steps.filter.outputs.common-module }}" == "true" ]]; then
-            for svc in backend-server frontend-server gateway-server eureka-server; do
+            for svc in backend-server frontend-server gateway-server eureka-server auth-server; do
               [[ ! " ${modules[*]} " =~ " $svc " ]] && modules+=("$svc")
             done
           fi
-          # 결과 문자열
           changed="${modules[*]}"
           echo "changed=$changed" >> $GITHUB_OUTPUT
 
