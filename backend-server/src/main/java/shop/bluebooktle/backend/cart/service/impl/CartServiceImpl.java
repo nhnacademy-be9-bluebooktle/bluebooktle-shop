@@ -15,7 +15,7 @@ import shop.bluebooktle.backend.cart.entity.CartBook;
 import shop.bluebooktle.backend.cart.repository.CartBookRepository;
 import shop.bluebooktle.backend.cart.repository.CartRepository;
 import shop.bluebooktle.backend.cart.service.CartService;
-import shop.bluebooktle.common.entity.User;
+import shop.bluebooktle.common.entity.auth.User;
 
 @Service
 @RequiredArgsConstructor
