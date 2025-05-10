@@ -1,20 +1,9 @@
 package shop.bluebooktle.backend.payment.service;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-import shop.bluebooktle.backend.payment.dto.request.PaymentTypeRequest;
-import shop.bluebooktle.backend.payment.dto.response.PaymentTypeResponse;
+import shop.bluebooktle.backend.payment.entity.PaymentType;
 
-public interface PaymentTypeService {
+public interface PaymentTypeService{
 
-	void create(PaymentTypeRequest paymentTypeRequest);
-
-	void update(Long id, PaymentTypeRequest newPaymentTypeRequest);
-
-	void delete(Long id);
-
-	PaymentTypeResponse get(PaymentTypeRequest paymentTypeRequest);
-
-	Page<PaymentTypeResponse> getAll(Pageable pageable);
 }
