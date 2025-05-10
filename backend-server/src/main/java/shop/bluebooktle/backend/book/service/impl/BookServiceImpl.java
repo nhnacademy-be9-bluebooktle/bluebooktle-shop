@@ -10,7 +10,7 @@ import shop.bluebooktle.backend.book.entity.Book;
 import shop.bluebooktle.backend.book.repository.BookRepository;
 import shop.bluebooktle.backend.book.service.BookService;
 import shop.bluebooktle.common.exception.BookAlreadyExistsException;
-import shop.bluebooktle.common.exception.BookNotFoundException;
+import shop.bluebooktle.common.exception.book.BookNotFoundException;
 
 @Service
 
