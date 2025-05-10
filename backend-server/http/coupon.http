@@ -1,0 +1,32 @@
+### 쿠폰 정책 등록
+POST localhost:9002/admin/coupon-type
+Content-Type: application/json
+
+{
+  "name": "10,000원 이상 구매 시 1,000원 할인",
+  "target": "ORDER",
+  "minimumPayment": 10000,
+  "discountPrice": 1000,
+  "discountPercent": null,
+  "maximumDiscountPrice": null
+}
+
+### 쿠폰 정책 조회
+GET localhost:9002/admin/coupon-type
+
+### 쿠폰 등록
+POST localhost:9002/admin/coupons
+Content-Type: application/json
+
+{
+  "couponTypeId": 1,
+  "name": "Welcome 쿠폰",
+  "availableStartAt": "2025-05-01T00:00:00",
+  "availableEndAt": "2025-05-31T23:59:59",
+  "bookId": null,
+  "categoryId": null
+}
+
+
+### 쿠폰 조회
+GET localhost:9002  /admin/coupons
