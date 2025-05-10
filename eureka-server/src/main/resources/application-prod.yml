@@ -1,10 +1,9 @@
-server:
-  port: 10220
-eureka:
-  instance:
-    hostname: ${EUREKA_INSTANCE_HOSTNAME}
-  server:
-    enable-self-preservation: true
-logging:
-  level:
-    shop.bluebooktle.eureka: INFO
+spring:
+  application:
+    name: eureka-server
+
+  profiles:
+    active: prod
+
+  config:
+    import: optional:configserver:http://${CONFIG_SERVER_USERNAME}:${CONFIG_SERVER_PASSWORD}@${CONFIG_SERVER_HOST}:${CONFIG_SERVER_PORT}

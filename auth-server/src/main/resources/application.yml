@@ -1,22 +1,9 @@
 spring:
   application:
     name: auth-server
-  jpa:
-    open-in-view: false
 
-eureka:
-  client:
-    register-with-eureka: true
-    fetch-registry: true
-  instance:
-    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
-    prefer-ip-address: true
+  profiles:
+    active: default
 
-jwt:
-  secret: ${JWT_SECRET_KEY}
-  access-token-validity-seconds: ${JWT_ACCESS_EXPIRATION:3600}
-  refresh-token-validity-seconds: ${JWT_REFRESH_EXPIRATION:86400}
-
-logging:
-  level:
-    shop.bluebooktle.auth: INFO
+  config:
+    import: optional:configserver:http://${CONFIG_SERVER_USERNAME}:${CONFIG_SERVER_PASSWORD}@${CONFIG_SERVER_HOST}:${CONFIG_SERVER_PORT}

@@ -1,28 +1,9 @@
-server:
-  port: 10221
-
 spring:
-  cloud:
-    gateway:
-      routes:
-        - id: auth-server-route
-          uri: lb://AUTH-SERVER
-          predicates:
-            - Path=/auth/**
-        - id: backend-server-route
-          uri: lb://BACKEND-SERVER
-          predicates:
-            - Path=/api/**
-      # 운영 환경용 타임아웃 등 설정 추가 고려
-      # httpclient:
-      #   connect-timeout: 5000
-      #   response-timeout: 10s
+  application:
+    name: gateway-server
 
-eureka:
-  client:
-    serviceUrl:
-      defaultZone: ${EUREKA_URL}
+  profiles:
+    active: prod
 
-logging:
-  level:
-    shop.bluebooktle.gateway: INFO
+  config:
+    import: optional:configserver:http://${CONFIG_SERVER_USERNAME}:${CONFIG_SERVER_PASSWORD}@${CONFIG_SERVER_HOST}:${CONFIG_SERVER_PORT}

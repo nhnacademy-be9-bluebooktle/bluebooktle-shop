@@ -1,30 +1,9 @@
 spring:
   application:
     name: gateway-server
-  cloud:
-    gateway:
-      routes:
-        - id: auth-server-route
-          uri: lb://AUTH-SERVER
-          predicates:
-            - Path=/auth/**
-        - id: backend-server-route
-          uri: lb://BACKEND-SERVER
-          predicates:
-            - Path=/api/**
 
-      default-filters:
-        - AddResponseHeader=X-Request-Source, ${spring.application.name}
+  profiles:
+    active: default
 
-eureka:
-  client:
-    enabled: true
-    register-with-eureka: true
-    fetch-registry: true
-  instance:
-    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
-    prefer-ip-address: true
-
-logging:
-  level:
-    shop.bluebooktle.gateway: INFO
+  config:
+    import: optional:configserver:http://${CONFIG_SERVER_USERNAME}:${CONFIG_SERVER_PASSWORD}@${CONFIG_SERVER_HOST}:${CONFIG_SERVER_PORT}
