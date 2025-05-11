@@ -2,11 +2,8 @@ spring:
   application:
     name: frontend-server
 
-eureka:
-  client:
-    register-with-eureka: true
-    fetch-registry: true
-    enabled: true
-  instance:
-    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
-    prefer-ip-address: true
+  profiles:
+    active: default
+
+  config:
+    import: optional:configserver:${CONFIG_SERVER_URI}

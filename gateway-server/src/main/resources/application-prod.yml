@@ -1,9 +1,9 @@
 spring:
   application:
-    name: backend-server
+    name: gateway-server
 
   profiles:
-    active: dev
+    active: prod
 
   config:
     import: optional:configserver:${CONFIG_SERVER_URI}

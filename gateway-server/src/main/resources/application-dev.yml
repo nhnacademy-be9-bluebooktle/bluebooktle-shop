@@ -1,6 +1,6 @@
 spring:
   application:
-    name: backend-server
+    name: gateway-server
 
   profiles:
     active: dev
