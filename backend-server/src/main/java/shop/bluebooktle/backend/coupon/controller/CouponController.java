@@ -25,7 +25,7 @@ public class CouponController {
 
 	private final CouponService couponService;
 
-	@PostMapping("admin/coupons")
+	@PostMapping
 	public ResponseEntity<JsendResponse<Void>> registerCoupon(@RequestBody CouponRegisterRequest request) {
 		couponService.registerCoupon(request);
 		return ResponseEntity.status(HttpStatus.CREATED).body(JsendResponse.success());

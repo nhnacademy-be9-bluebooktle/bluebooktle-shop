@@ -3,8 +3,8 @@ package shop.bluebooktle.backend.coupon.service.impl;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.book.entity.Book;
 import shop.bluebooktle.backend.book.entity.Category;
@@ -92,19 +92,8 @@ public class CouponServiceImpl implements CouponService {
 
 	// 전체 Coupon 조회
 	@Override
-	@Transactional
+	@Transactional(readOnly = true)
 	public Page<CouponResponse> getAllCoupons(Pageable pageable) {
-		return couponRepository.findAllWithCouponType(pageable)
-			.map(coupon -> {
-				CouponType couponType = coupon.getCouponType();
-				return CouponResponse.builder()
-					.couponName(coupon.getCouponName())
-					.couponTypeName(couponType.getName())
-					.target(couponType.getTarget())
-					.availableStartAt(coupon.getAvailableStartAt())
-					.availableEndAt(coupon.getAvailableEndAt())
-					.createdAt(coupon.getCreatedAt())
-					.build();
-			});
+		return couponRepository.findAllWithCouponType(pageable);
 	}
 }
