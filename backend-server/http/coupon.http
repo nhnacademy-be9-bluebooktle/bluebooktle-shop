@@ -29,4 +29,4 @@ Content-Type: application/json
 
 
 ### 쿠폰 조회
-GET localhost:9002  /admin/coupons
+GET localhost:9002/admin/coupons

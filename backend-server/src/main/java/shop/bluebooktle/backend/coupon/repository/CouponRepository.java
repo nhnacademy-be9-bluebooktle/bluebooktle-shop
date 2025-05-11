@@ -2,18 +2,30 @@ package shop.bluebooktle.backend.coupon.repository;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import shop.bluebooktle.backend.coupon.entity.Coupon;
+import shop.bluebooktle.common.dto.coupon.response.CouponResponse;
 
 public interface CouponRepository extends JpaRepository<Coupon, Long> {
 	//이름 존재 여부 확인
 	boolean existsByCouponName(String name);
 
-	@EntityGraph(attributePaths = "couponType")
-	Page<Coupon> findAllWithCouponType(Pageable pageable);
+	@Query("""
+		    SELECT new shop.bluebooktle.common.dto.coupon.response.CouponResponse(
+		        c.id,
+		        c.couponName,
+		        ct.name,
+		        ct.target,
+		        c.availableStartAt,
+		        c.availableEndAt,
+		        c.createdAt
+		    )
+		    FROM Coupon c
+		    JOIN c.couponType ct
+		""")
+	Page<CouponResponse> findAllWithCouponType(Pageable pageable);
 
 	/*
 	TODO [쿠폰] queryDSL 적용 예정
