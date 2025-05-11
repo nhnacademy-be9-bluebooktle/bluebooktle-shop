@@ -46,7 +46,8 @@ public enum ErrorCode {
 	BOOK_NOT_LIKED(HttpStatus.BAD_REQUEST, "B008", "좋아요 상태가 아닌 도서입니다."), // 좋아요 취소 시
 	BOOK_SALE_INFO_NOT_FOUND(HttpStatus.NOT_FOUND, "B009", "도서 판매 정보를 찾을 수 없습니다."),
 	BOOK_STATE_NOT_AVAILABLE(HttpStatus.BAD_REQUEST, "B010", "현재 구매할 수 없는 도서입니다."), // 재고 부족, 판매 종료 등
-
+	CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "BC001", "카테고리를 찾을 수 없습니다."), // 존재하는 카테고리가 아닐 시
+	CATEGORY_NAME_ALREADY_EXISTS(HttpStatus.CONFLICT, "BC002", "이미 존재하는 카테고리명입니다. "), // 이미 존재하는 카테고리명일 시
 	// Cart Errors (장바구니 오류) - T (TeaCart)
 	CART_NOT_FOUND(HttpStatus.NOT_FOUND, "T001", "장바구니를 찾을 수 없습니다."), // 예외적인 경우
 	CART_BOOK_NOT_FOUND(HttpStatus.NOT_FOUND, "T002", "장바구니에서 해당 도서를 찾을 수 없습니다."),

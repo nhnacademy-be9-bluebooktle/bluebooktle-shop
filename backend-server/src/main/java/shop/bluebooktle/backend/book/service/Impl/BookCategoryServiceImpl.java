@@ -74,7 +74,13 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 	@Override
 	public List<CategoryResponse> getCategoryByBookId(BookInfoRequest request) {
 		Book book = requireBook(request.bookId());
-		return bookCategoryRepository.findCategoryIdsByBookId(book.getId());
+		List<Category> categoryList = bookCategoryRepository.findCategoriesByBookId(book.getId());
+
+		List<CategoryResponse> result = new ArrayList<>();
+		for (Category category : categoryList) {
+			result.add(new CategoryResponse(category.getId(), category.getName()));
+		}
+		return result;
 	}
 
 	@Override
