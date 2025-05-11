@@ -19,6 +19,7 @@ import shop.bluebooktle.backend.book.repository.BookCategoryRepository;
 import shop.bluebooktle.backend.book.repository.CategoryRepository;
 import shop.bluebooktle.backend.book.service.CategoryService;
 import shop.bluebooktle.common.exception.book.CategoryAlreadyExistsException;
+import shop.bluebooktle.common.exception.book.CategoryCannotDeleteRootException;
 import shop.bluebooktle.common.exception.book.CategoryNotFoundException;
 
 @Service
@@ -78,8 +79,7 @@ public class CategoryServiceImpl implements CategoryService {
 
 		// 최상위 카테고리는 삭제 불가
 		if (isRootCategory(categoryId)) {
-			// TODO 최상위 카테고리 삭제 불가 예외처리
-			throw new IllegalArgumentException("Root category cannot be deleted.");
+			throw new CategoryCannotDeleteRootException();
 		}
 		// 하위 모든 카테고리 수집
 		List<Category> descendants = getAllDescendantCategories(category);
