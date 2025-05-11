@@ -2,7 +2,10 @@ package shop.bluebooktle.backend.book.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -10,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.book.dto.request.CategoryRegisterRequest;
 import shop.bluebooktle.backend.book.dto.request.CategoryUpdateRequest;
 import shop.bluebooktle.backend.book.dto.response.CategoryResponse;
+import shop.bluebooktle.backend.book.dto.response.CategoryTreeResponse;
 import shop.bluebooktle.backend.book.entity.Category;
 import shop.bluebooktle.backend.book.repository.BookCategoryRepository;
 import shop.bluebooktle.backend.book.repository.CategoryRepository;
@@ -21,29 +25,35 @@ import shop.bluebooktle.common.exception.book.CategoryNotFoundException;
 @RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
 
-	CategoryRepository categoryRepository;
-	BookCategoryRepository bookCategoryRepository;
+	private final CategoryRepository categoryRepository;
+	private final BookCategoryRepository bookCategoryRepository;
 
 	@Override
 	@Transactional
 	public void registerCategory(CategoryRegisterRequest request) {
 		if (categoryRepository.existsByName(request.name())) {
-			throw new CategoryAlreadyExistsException("Category name already exists: " + request.name());
+			throw new CategoryAlreadyExistsException("이미 존재하는 카테고리명입니다. 카테고리명: " + request.name());
 		}
+
 		Category parent = null;
 		if (request.parentCategoryId() != null) {
 			parent = categoryRepository.findById(request.parentCategoryId())
 				.orElseThrow(() -> new CategoryNotFoundException(request.parentCategoryId()));
 		}
 
-		Category newCategory = request.toEntity(parent);
+		// 등록할 카테고리 엔티티 생성
+		Category newCategory = Category.builder()
+			.name(request.name())
+			.parentCategory(parent)
+			.build();
 
-		if (parent != null) {
+		// 최상위 카테고리인 경우 기본 하위 카테고리 등록
+		if (parent == null) {
 			Category defaultChild = new Category(newCategory, newCategory.getName() + "- 기본 하위 카테고리");
 			newCategory.addChildCategory(defaultChild);
 		}
-		categoryRepository.save(newCategory);
 
+		categoryRepository.save(newCategory);
 	}
 
 	@Override
@@ -52,7 +62,7 @@ public class CategoryServiceImpl implements CategoryService {
 		if (!categoryRepository.existsById(request.id())) {
 			throw new CategoryNotFoundException(request.id());
 		}
-		if (!categoryRepository.existsByNameAndIdNot(request.name(), request.id())) {
+		if (categoryRepository.existsByNameAndIdNot(request.name(), request.id())) {
 			throw new CategoryAlreadyExistsException("Category name already exists: " + request.name());
 		}
 		Category category = categoryRepository.findById(request.id()).get();
@@ -62,12 +72,13 @@ public class CategoryServiceImpl implements CategoryService {
 
 	@Override
 	@Transactional
-	public void deleteCategory(Long id) {
-		Category category = categoryRepository.findById(id)
-			.orElseThrow(() -> new CategoryNotFoundException(id));
+	public void deleteCategory(Long categoryId) {
+		Category category = categoryRepository.findById(categoryId)
+			.orElseThrow(() -> new CategoryNotFoundException(categoryId));
 
 		// 최상위 카테고리는 삭제 불가
-		if (isRootCategory(id)) {
+		if (isRootCategory(categoryId)) {
+			// TODO 최상위 카테고리 삭제 불가 예외처리
 			throw new IllegalArgumentException("Root category cannot be deleted.");
 		}
 		// 하위 모든 카테고리 수집
@@ -133,6 +144,40 @@ public class CategoryServiceImpl implements CategoryService {
 			parentcategories.add(response);
 		}
 		return parentcategories;
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public Page<CategoryResponse> getCategories(Pageable pageable) {
+		Page<Category> categoryPage = categoryRepository.findAll(pageable);
+
+		return categoryPage.map(c ->
+			new CategoryResponse(c.getId(), c.getName())
+		);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<CategoryTreeResponse> getCategoryTree() {
+		List<Category> roots = categoryRepository.findByParentCategoryIsNull();
+		return roots.stream()
+			.map(this::toTreeDto)
+			.collect(Collectors.toList());
+	}
+
+	@Override
+	public CategoryTreeResponse getCategoryTreeById(Long categoryId) {
+		Category category = categoryRepository.findById(categoryId)
+			.orElseThrow(() -> new CategoryNotFoundException(categoryId));
+		return toTreeDto(category);
+	}
+
+	private CategoryTreeResponse toTreeDto(Category category) {
+		CategoryTreeResponse response = new CategoryTreeResponse(category.getId(), category.getName());
+		for (Category child : category.getChildCategories()) {
+			response.children().add(toTreeDto(child));
+		}
+		return response;
 	}
 
 	@Transactional(readOnly = true)

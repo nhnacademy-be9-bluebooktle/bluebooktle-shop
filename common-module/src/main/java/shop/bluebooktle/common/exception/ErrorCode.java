@@ -48,6 +48,8 @@ public enum ErrorCode {
 	BOOK_STATE_NOT_AVAILABLE(HttpStatus.BAD_REQUEST, "B010", "현재 구매할 수 없는 도서입니다."), // 재고 부족, 판매 종료 등
 	CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "BC001", "카테고리를 찾을 수 없습니다."), // 존재하는 카테고리가 아닐 시
 	CATEGORY_NAME_ALREADY_EXISTS(HttpStatus.CONFLICT, "BC002", "이미 존재하는 카테고리명입니다. "), // 이미 존재하는 카테고리명일 시
+	CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "BC001", "카테고리를 찾을 수 없습니다."), // 존재하는 카테고리가 아닐 시
+	CATEGORY_NAME_ALREADY_EXISTS(HttpStatus.CONFLICT, "BC002", "이미 존재하는 카테고리명입니다. "), // 이미 존재하는 카테고리명일 시
 	CATEGORY_DELETE_ROOT_CATEGORY(HttpStatus.BAD_REQUEST, "BC03", "최상위 카테고리는 삭제할 수 없습니다."),
 	BOOK_ALREADY_EXISTS_EXCEPTION(HttpStatus.CONFLICT, "B011", "이미 등록된 도서입니다."),
 
