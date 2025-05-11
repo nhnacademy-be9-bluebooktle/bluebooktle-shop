@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 	"shop.bluebooktle.common"
 })
 @EnableFeignClients
+@EnableJpaAuditing //알라딘 도서등록구현하는데 생성일 관련오류나서 추가. 문제생긴다면 삭제해주세요
 @EntityScan(basePackages = {
 	"shop.bluebooktle.backend",
 	"shop.bluebooktle.common.entity"

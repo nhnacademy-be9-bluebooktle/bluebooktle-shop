@@ -3,6 +3,21 @@ GET http://www.aladin.co.kr/ttb/api/ItemSearch.aspx?ttbkey=ttbehfk11131717001&Qu
     MaxResults=10&start=1&SearchTarget=Book&output=js&Version=20131101
 Accept: application/json
 
-### 알라딘 책 제목으로 검색 요청
-GET http://localhost:9002/api/aladin/search?query=요리
+### 알라딘 도서 제목으로 검색
+GET http://localhost:9002/admin/books/search?query=미움받을용기
 Accept: application/json
+
+### 알라딘 도서 검색후 isbn으로 선택
+GET http://localhost:9002/admin/books/select?isbn=9791168340770
+Accept: application/json
+
+### 알라딘 도서 등록
+POST http://localhost:9002/admin/books/register/aladin
+Content-Type: application/json
+
+{
+  "isbn": "9791168340770",
+  "stock": 999,
+  "isPackable": true,
+  "state": "AVAILABLE"
+}
