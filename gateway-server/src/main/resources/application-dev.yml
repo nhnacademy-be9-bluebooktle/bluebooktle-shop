@@ -1,23 +1,9 @@
-server:
-  port: 10211
-
 spring:
-  cloud:
-    gateway:
-      routes:
-        - id: auth-server-route
-          uri: lb://AUTH-SERVER
-          predicates:
-            - Path=/auth/**
-        - id: backend-server-route
-          uri: lb://BACKEND-SERVER
-            - Path=/api/**
+  application:
+    name: gateway-server
 
-eureka:
-  client:
-    serviceUrl:
-      defaultZone: ${EUREKA_URL}
+  profiles:
+    active: dev
 
-logging:
-  level:
-    shop.bluebooktle.gateway: INFO
+  config:
+    import: optional:configserver:${CONFIG_SERVER_URI}
