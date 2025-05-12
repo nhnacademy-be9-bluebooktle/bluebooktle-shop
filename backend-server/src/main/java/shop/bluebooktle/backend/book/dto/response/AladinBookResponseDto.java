@@ -24,21 +24,31 @@ public class AladinBookResponseDto {
 	String isbn;
 	BigDecimal price;
 	BigDecimal salePrice;
-	BigDecimal salePercentage; // 할인율 나중에 책 등록할때 계산해서 넣어야할지?
+	BigDecimal salePercentage;
 	String publisher;
 	String categoryName;
 	String imageUrl;
 
 	public static AladinBookResponseDto from(AladinBookItem item) {
+		BigDecimal price = BigDecimal.valueOf(item.getPriceStandard());
+		BigDecimal salePrice = BigDecimal.valueOf(item.getPriceSales());
+
+		BigDecimal salePercentage = BigDecimal.ZERO;
+		if (price.compareTo(BigDecimal.ZERO) > 0) {
+			salePercentage = price.subtract(salePrice)
+				.multiply(BigDecimal.valueOf(100))
+				.divide(price, 0, BigDecimal.ROUND_HALF_UP);
+		}
+
 		return AladinBookResponseDto.builder()
 			.title(item.getTitle())
 			.author(item.getAuthor())
 			.description(item.getDescription())
 			.publishDate(LocalDate.parse(item.getPubDate(), DateTimeFormatter.ofPattern("yyyy-MM-dd")).atStartOfDay())
 			.isbn(item.getIsbn13())
-			.price(BigDecimal.valueOf(item.getPriceStandard()))
-			.salePrice(BigDecimal.valueOf(item.getPriceSales()))
-			.salePercentage(BigDecimal.valueOf(item.getSaleRate()))
+			.price(price)
+			.salePrice(salePrice)
+			.salePercentage(salePercentage)
 			.publisher(item.getPublisher())
 			.categoryName(item.getCategoryName())
 			.imageUrl(item.getCover())

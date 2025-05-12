@@ -29,7 +29,7 @@ public class Author extends BaseEntity {
 	@Column(name = "author_id")
 	private Long id;
 
-	@Column(name = "name", nullable = false, length = 10)
+	@Column(name = "name", nullable = false, length = 50) //공동, 외국인작가 이름 고려해서 수정해서 테스트중 원래 length10
 	private String name;
 
 	public Author(String name) {
