@@ -10,7 +10,6 @@ import lombok.Value;
 @Getter
 @Builder
 public class OrderPackagingRequest {
-
 	@NotNull(message = "도서 주문 ID는 필수값입니다.")
 	Long bookOrderId;
 
