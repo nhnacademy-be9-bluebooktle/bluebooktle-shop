@@ -21,6 +21,7 @@ public class AladinBookService {
 	private final String TTB_KEY = "ttbehfk11131717001";
 	private final String BASE_URL = "http://www.aladin.co.kr/ttb/api/ItemSearch.aspx";
 
+	//알라딘 도서 조회
 	public List<AladinBookResponseDto> searchBooks(String query) {
 		String url = UriComponentsBuilder
 			.fromHttpUrl(BASE_URL)
@@ -40,5 +41,10 @@ public class AladinBookService {
 			.map(AladinBookResponseDto::from)
 			.collect(Collectors.toList());
 
+	}
+
+	public AladinBookResponseDto getBookByIsbn(String isbn) {
+		List<AladinBookResponseDto> books = searchBooks(isbn);
+		return books.getFirst();
 	}
 }

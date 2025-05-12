@@ -3,6 +3,7 @@ package shop.bluebooktle.backend.coupon.service.impl;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.coupon.entity.AbsoluteCoupon;
@@ -25,6 +26,7 @@ public class CouponTypeServiceImpl implements CouponTypeService {
 	private final RelativeCouponRepository relativeCouponRepository;
 
 	@Override
+	@Transactional
 	public void registerCouponType(CouponTypeRegisterRequest request) { // 쿠폰 정책 등록
 		//이름 중복 예외처리
 		couponTypeRepository.findByName(request.getName())
@@ -64,8 +66,9 @@ public class CouponTypeServiceImpl implements CouponTypeService {
 
 	//쿠폰 정책 전체 조회
 	@Override
+	@Transactional(readOnly = true)
 	public Page<CouponTypeResponse> getAllCouponTypeList(Pageable pageable) {
-		return couponTypeRepository.findAllCouponTypeList(pageable).map(couponType -> {
+		return couponTypeRepository.findAllBy(pageable).map(couponType -> {
 			AbsoluteCoupon absoluteCoupon = absoluteCouponRepository.findByCouponTypeId(couponType.getId())
 				.orElse(null);
 			RelativeCoupon relativeCoupon = relativeCouponRepository.findByCouponTypeId(couponType.getId())

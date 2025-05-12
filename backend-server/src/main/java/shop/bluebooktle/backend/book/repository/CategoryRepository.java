@@ -33,8 +33,8 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
 	// 최상위 카테고리인지 여부 판단
 	boolean existsByIdAndParentCategoryIsNull(Long id);
 
-	@Query("select distinct c.parentCategory from Category c where c.id in :ids and c.parentCategory is not null")
-	List<Category> findParentCategoriesByChildIds(@Param("ids") List<Long> ids);
+	/*@Query("select distinct c.parentCategory from Category c where c.id in :ids and c.parentCategory is not null")
+	List<Category> findParentCategoriesByChildIds(@Param("ids") List<Long> ids);*/
 
 	@Query("select c.parentCategory from Category c where c.id = :id")
 	Category findParentCategoryById(@Param("id") Long id);

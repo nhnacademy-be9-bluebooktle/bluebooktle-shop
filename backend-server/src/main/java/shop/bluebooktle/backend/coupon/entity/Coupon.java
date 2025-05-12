@@ -52,4 +52,10 @@ public class Coupon extends BaseEntity {
 		this.availableStartAt = availableStartAt;
 		this.availableEndAt = availableEndAt;
 	}
+
+	public void update(String couponName, LocalDateTime availableStartAt, LocalDateTime availableEndAt) {
+		this.couponName = couponName;
+		this.availableStartAt = availableStartAt;
+		this.availableEndAt = availableEndAt;
+	}
 }

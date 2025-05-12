@@ -106,7 +106,7 @@ jobs:
     # ← 여기도 동일하게 ENV 주입
     env:
       CONFIG_SERVER_URI: ${{ secrets.CONFIG_SERVER_URI }}
-      SPRING_PROFILES_ACTIVE: prod
+      SPRING_PROFILES_ACTIVE: dev
 
     steps:
       - name: Download JARs

@@ -6,7 +6,10 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = {
+	"shop.bluebooktle.backend",
+	"shop.bluebooktle.common"
+})
 @EnableFeignClients
 @EntityScan(basePackages = {
 	"shop.bluebooktle.backend",
