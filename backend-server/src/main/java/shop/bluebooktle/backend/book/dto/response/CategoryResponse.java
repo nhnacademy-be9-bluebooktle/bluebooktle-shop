@@ -1,7 +1,7 @@
 package shop.bluebooktle.backend.book.dto.response;
 
 public record CategoryResponse(
-	Long id,
+	Long categoryId,
 	String name
 ) {
 }
