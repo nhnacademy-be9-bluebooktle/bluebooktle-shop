@@ -21,12 +21,11 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import shop.bluebooktle.common.entity.BaseEntity;
 
 @Entity
 @Getter
-@Builder(toBuilder = true)
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "book_sale_info")
@@ -56,7 +55,6 @@ public class BookSaleInfo extends BaseEntity {
 	@Column(name = "is_packable")
 	private boolean isPackable;
 
-	@Setter
 	@Column(name = "sale_percentage", nullable = false, precision = 10, scale = 2)
 	private BigDecimal salePercentage;
 
