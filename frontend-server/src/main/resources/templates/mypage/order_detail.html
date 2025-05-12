@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html layout:decorate="~{_layouts/default_layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>마이페이지 - 주문 상세</title>
+    <style>
+        /* 주문 상세 페이지 콘텐츠 스타일 */
+        .order-detail-section-kitsch { /* mypage_profile의 .mypage-section-kitsch 와 유사 */
+            background-color: var(--kitsch-bg-alt);
+            padding: 1.5rem 2rem;
+            border: 3px solid var(--kitsch-text-dark);
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+
+        .order-detail-section-kitsch h3.section-title-kitsch {
+            font-size: 1.5rem;
+            color: var(--kitsch-text-light);
+            background-color: var(--kitsch-color-1);
+            border: 2px solid var(--kitsch-text-dark);
+            border-radius: 5px;
+            padding: 0.4em 0.8em;
+            text-align: left;
+            margin-bottom: 1.5rem;
+            display: inline-block;
+        }
+
+        .order-detail-section-kitsch h3.section-title-kitsch i {
+            margin-right: 0.5em;
+        }
+
+        .detail-info-grid-kitsch { /* 주문정보, 배송정보 표시용 그리드 */
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 0.8rem 1.5rem; /* 행간격, 열간격 */
+        }
+
+        .info-item-kitsch {
+            font-family: var(--font-pixel);
+            font-size: 0.95rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .info-item-kitsch .label {
+            color: var(--kitsch-color-5);
+            margin-right: 0.5em;
+        }
+
+        .info-item-kitsch .value {
+            color: var(--kitsch-text-dark);
+            font-weight: bold;
+        }
+
+        .info-item-kitsch .value.highlight {
+            color: var(--kitsch-color-3);
+        }
+
+        /* 강조 텍스트 */
+        .info-item-kitsch .tracking-link-kitsch {
+            font-family: var(--font-handwriting);
+            font-size: 1.1em;
+            color: var(--kitsch-color-4);
+            text-decoration: underline dotted;
+        }
+
+        /* 주문 상품 테이블 스타일 */
+        .ordered-products-table-kitsch {
+            width: 100%;
+            border-collapse: separate; /* 테두리 간격 주기 위함 */
+            border-spacing: 0 0.5rem; /* 행 간격 */
+            margin-top: 1rem;
+        }
+
+        .ordered-products-table-kitsch th, .ordered-products-table-kitsch td {
+            padding: 0.8rem 1rem;
+            text-align: left;
+            vertical-align: middle;
+            font-family: var(--font-pixel);
+        }
+
+        .ordered-products-table-kitsch thead tr {
+            background-color: var(--kitsch-color-5);
+            color: var(--kitsch-text-light);
+        }
+
+        .ordered-products-table-kitsch thead th {
+            font-size: 0.9rem;
+            border-radius: 3px; /* 약간 둥글게 */
+        }
+
+        .ordered-products-table-kitsch tbody tr {
+            background-color: var(--kitsch-bg-main);
+            border-bottom: 2px dashed var(--kitsch-color-2); /* 구분선 */
+        }
+
+        .ordered-products-table-kitsch tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        .ordered-products-table-kitsch td {
+            font-size: 0.9rem;
+        }
+
+        .ordered-products-table-kitsch .product-info-cell-kitsch {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .ordered-products-table-kitsch .product-info-cell-kitsch img {
+            width: 60px;
+            height: 90px;
+            object-fit: cover;
+            border-radius: 3px;
+            border: 1px solid var(--kitsch-text-dark);
+        }
+
+        .ordered-products-table-kitsch .product-title-kitsch {
+            font-size: 1rem;
+            color: var(--kitsch-color-1);
+        }
+
+        .ordered-products-table-kitsch .product-option-kitsch {
+            font-size: 0.8rem;
+            color: var(--kitsch-text-dark);
+            opacity: 0.8;
+        }
+
+        .ordered-products-table-kitsch .price-kitsch {
+            font-weight: bold;
+        }
+
+        .ordered-products-table-kitsch .discount-kitsch {
+            color: var(--kitsch-accent-orange);
+            font-size: 0.8em;
+        }
+
+        /* 결제 금액 상세 (checkout 페이지의 .payment-summary-kitsch 와 유사) */
+        .payment-details-summary-kitsch { /* .payment-summary-kitsch 와 스타일 공유 가능 */
+            background-color: var(--kitsch-bg-main);
+            padding: 1.5rem 2rem;
+            border: 3px solid var(--kitsch-color-1);
+            border-radius: 8px;
+            box-shadow: 3px 3px 0 var(--kitsch-color-3);
+        }
+
+        /* .summary-row-kitsch, .total-summary-kitsch 등은 동일 스타일 사용 */
+        .order-detail-actions-kitsch {
+            margin-top: 2rem;
+            text-align: center;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .order-detail-actions-kitsch .btn-kitsch {
+            font-size: 1rem;
+            padding: 0.8em 1.5em;
+        }
+
+        /* 리뷰 작성/수정 모달 특화 스타일 (mypage_reviews_kitsch.html에서 가져옴) */
+        .review-form-modal-content {
+            max-width: 600px !important;
+            text-align: left;
+        }
+
+        .review-form-modal-content .modal-title-kitsch {
+            text-align: center;
+            font-size: 1.8rem !important;
+        }
+
+        .review-form-modal-content .form-group-kitsch {
+            margin-bottom: 1rem;
+        }
+
+        .star-rating-input-kitsch {
+            display: inline-block;
+        }
+
+        .star-rating-input-kitsch .stars {
+            font-size: 2rem;
+            color: #ccc;
+            cursor: pointer;
+        }
+
+        .star-rating-input-kitsch .stars i:hover,
+        .star-rating-input-kitsch .stars i.selected {
+            color: var(--kitsch-accent-orange);
+        }
+
+        .selected-rating-text-kitsch {
+            font-family: var(--font-pixel);
+            font-size: 1rem;
+            margin-left: 0.5em;
+            color: var(--kitsch-color-5);
+        }
+
+        .review-form-modal-content .textarea-kitsch {
+            min-height: 120px;
+        }
+
+        .review-form-modal-content .file-input-kitsch-wrapper {
+            margin-top: 0.5rem;
+        }
+
+        .review-form-modal-content .file-input-kitsch {
+            font-size: 0.9rem;
+        }
+
+        .review-form-modal-content .modal-actions-kitsch {
+            margin-top: 1.5rem;
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.8rem;
+        }
+
+
+        @media (max-width: 768px) {
+            .ordered-products-table-kitsch {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+
+            /* 모바일에서 테이블 가로 스크롤 */
+            .ordered-products-table-kitsch thead, .ordered-products-table-kitsch tbody, .ordered-products-table-kitsch tr, .ordered-products-table-kitsch th, .ordered-products-table-kitsch td {
+                display: block;
+            }
+
+            .ordered-products-table-kitsch thead {
+                display: none;
+            }
+
+            /* 헤더는 숨기고 각 셀에 레이블 추가하는 방식도 고려 */
+            .ordered-products-table-kitsch tr {
+                border-bottom: 2px solid var(--kitsch-color-5);
+                margin-bottom: 1rem;
+                padding-bottom: 1rem;
+            }
+
+            .ordered-products-table-kitsch td {
+                display: flex;
+                justify-content: space-between;
+                text-align: right;
+                border-bottom: 1px dotted var(--kitsch-bg-alt);
+                padding: 0.5rem 0;
+            }
+
+            .ordered-products-table-kitsch td::before {
+                content: attr(data-label);
+                float: left;
+                font-weight: bold;
+                margin-right: 1rem;
+                color: var(--kitsch-color-5);
+            }
+
+            .ordered-products-table-kitsch .product-info-cell-kitsch {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .ordered-products-table-kitsch .product-info-cell-kitsch img {
+                margin-bottom: 0.5rem;
+            }
+
+            .payment-details-summary-kitsch {
+                padding: 1rem 1.5rem;
+            }
+        }
+
+    </style>
+</head>
+
+<body>
+<div layout:fragment="content">
+    <div class="container-kitsch section-padding-kitsch">
+
+        <div class="mypage-header-kitsch">
+            <h1 class="page-main-title-kitsch display-font-kitsch"><i class="fas fa-file-invoice-dollar"></i> 주문 상세 내역
+                <i class="fas fa-search-dollar"></i></h1>
+            <div class="mypage-user-summary-kitsch">
+            </div>
+        </div>
+
+        <div class="mypage-layout-kitsch">
+            <div th:replace="~{_fragments/mypage_sidebar :: mypageSidebarFragment(activeMenu='orders')}"></div>
+
+
+            <main class="mypage-content-kitsch">
+                <section class="order-detail-section-kitsch">
+                    <h3 class="section-title-kitsch"><i class="fas fa-info-circle"></i> 주문 정보</h3>
+                    <div class="detail-info-grid-kitsch">
+                        <div class="info-item-kitsch">
+                            <span class="label">주문번호:</span>
+                            <span class="value highlight" th:text="${mockOrderId} ?: 'BKTTL-20250501-001'">BKTTL-20250501-001</span>
+                        </div>
+                        <div class="info-item-kitsch">
+                            <span class="label">주문일자:</span>
+                            <span class="value">2025년 05월 01일</span>
+                        </div>
+                        <div class="info-item-kitsch">
+                            <span class="label">주문자:</span>
+                            <span class="value">겜돌이_77</span>
+                        </div>
+                        <div class="info-item-kitsch">
+                            <span class="label">총 결제금액:</span>
+                            <span class="value" style="color:var(--kitsch-color-1); font-size:1.1em;">48,700원</span>
+                        </div>
+                        <div class="info-item-kitsch">
+                            <span class="label">결제수단:</span>
+                            <span class="value">토스페이먼츠 (신한카드)</span>
+                        </div>
+                        <div class="info-item-kitsch">
+                            <span class="label">주문상태:</span>
+                            <span class="value order-status-kitsch status-delivered">배송완료</span>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="order-detail-section-kitsch">
+                    <h3 class="section-title-kitsch"><i class="fas fa-shipping-fast"></i> 배송 정보</h3>
+                    <div class="detail-info-grid-kitsch">
+                        <div class="info-item-kitsch">
+                            <span class="label">받는 분:</span>
+                            <span class="value">겜돌이_77</span>
+                        </div>
+                        <div class="info-item-kitsch">
+                            <span class="label">연락처:</span>
+                            <span class="value">010-1234-5678</span>
+                        </div>
+                        <div class="info-item-kitsch" style="grid-column: 1 / -1;">
+                            <span class="label">배송지 주소:</span>
+                            <span class="value">(12345) 서울특별시 키치구 레트로길 88, 101동 1988호 (레트로아파트)</span>
+                        </div>
+                        <div class="info-item-kitsch" style="grid-column: 1 / -1;">
+                            <span class="label">배송 요청사항:</span>
+                            <span class="value">문 앞에 놓아주세요. 부재 시 연락 바랍니다.</span>
+                        </div>
+                        <div class="info-item-kitsch">
+                            <span class="label">배송 상태:</span>
+                            <span class="value order-status-kitsch status-delivered">배송완료</span>
+                        </div>
+                        <div class="info-item-kitsch">
+                            <span class="label">운송장 번호:</span>
+                            <span class="value">
+                                123-4567-8900
+                                <a class="tracking-link-kitsch" href="#" onclick="trackDelivery('12345678900')"
+                                   style="margin-left:0.5em;">(배송조회)</a>
+                            </span>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="order-detail-section-kitsch">
+                    <h3 class="section-title-kitsch"><i class="fas fa-cubes"></i> 주문 상품 목록</h3>
+                    <table class="ordered-products-table-kitsch">
+                        <thead>
+                        <tr>
+                            <th style="width:45%;">상품 정보</th>
+                            <th style="text-align:center;">수량</th>
+                            <th>상품 금액</th>
+                            <th>할인/포장</th>
+                            <th>주문 금액</th>
+                            <th style="text-align:center;">리뷰</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td data-label="상품 정보">
+                                <div class="product-info-cell-kitsch">
+                                    <img alt="초절정 판타지" src="https://picsum.photos/60/90?random=301">
+                                    <div>
+                                        <a class="product-title-kitsch" href="#">초절정 판타지 대모험 DX</a>
+                                        <p class="product-option-kitsch">포장: ✨반짝이 (+2,000원)</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td data-label="수량" style="text-align:center;">1</td>
+                            <td class="price-kitsch" data-label="상품 금액">25,200원</td>
+                            <td data-label="할인/포장">
+                                <span class="discount-kitsch">-1,000원 (개별쿠폰)</span><br>
+                                <span class="discount-kitsch">+2,000원 (포장)</span>
+                            </td>
+                            <td class="price-kitsch" data-label="주문 금액">26,200원</td>
+                            <td data-label="리뷰" style="text-align:center;">
+                                <button class="btn-kitsch primary-btn-kitsch retro-shadow-kitsch-small"
+                                        onclick="openOrderReviewModal('PROD_ID_001', '초절정 판타지 대모험 DX', event)">
+                                    <i class="fas fa-pencil-alt"></i> 작성
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td data-label="상품 정보">
+                                <div class="product-info-cell-kitsch">
+                                    <img alt="픽셀 아트 알고리즘" src="https://picsum.photos/60/90?random=302">
+                                    <div>
+                                        <a class="product-title-kitsch" href="#">픽셀 아트로 배우는 알고리즘</a>
+                                        <p class="product-option-kitsch">포장: 없음</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td data-label="수량" style="text-align:center;">1</td>
+                            <td class="price-kitsch" data-label="상품 금액">31,500원</td>
+                            <td data-label="할인/포장">
+                                <span class="discount-kitsch">-3,000원 (개별쿠폰)</span>
+                            </td>
+                            <td class="price-kitsch" data-label="주문 금액">28,500원</td>
+                            <td data-label="리뷰" style="text-align:center;">
+                                <button class="btn-kitsch primary-btn-kitsch retro-shadow-kitsch-small"
+                                        onclick="openOrderReviewModal('PROD_ID_002', '픽셀 아트로 배우는 알고리즘', event)">
+                                    <i class="fas fa-pencil-alt"></i> 작성
+                                </button>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <section class="order-detail-section-kitsch payment-details-summary-kitsch">
+                    <h3 class="section-title-kitsch"
+                        style="background-color:var(--kitsch-color-3); text-align:center;">
+                        <i class="fas fa-file-signature"></i> 결제 금액 상세</h3>
+                    <div class="summary-row-kitsch">
+                        <span class="label pixel-font-kitsch">총 상품 금액 (할인 전):</span>
+                        <span class="value pixel-font-kitsch">56,700원</span>
+                    </div>
+                    <div class="summary-row-kitsch">
+                        <span class="label pixel-font-kitsch">상품 할인 (개별 쿠폰):</span>
+                        <span class="value discount pixel-font-kitsch">- 4,000원</span>
+                    </div>
+                    <div class="summary-row-kitsch">
+                        <span class="label pixel-font-kitsch">주문 전체 할인 (쿠폰):</span>
+                        <span class="value discount pixel-font-kitsch">- 5,000원</span>
+                    </div>
+                    <div class="summary-row-kitsch">
+                        <span class="label pixel-font-kitsch">포장비 합계:</span>
+                        <span class="value pixel-font-kitsch">+ 2,000원</span>
+                    </div>
+                    <div class="summary-row-kitsch">
+                        <span class="label pixel-font-kitsch">포인트 사용:</span>
+                        <span class="value discount pixel-font-kitsch">- 1,000원</span>
+                    </div>
+                    <div class="summary-row-kitsch">
+                        <span class="label pixel-font-kitsch">배송비:</span>
+                        <span class="value pixel-font-kitsch">0원</span>
+                    </div>
+                    <div class="total-summary-kitsch">
+                        <div class="summary-row-kitsch">
+                            <span class="label display-font-kitsch"
+                                  style="color:var(--kitsch-color-1); font-size:1.3em;">최종 결제 금액:</span>
+                            <span class="value display-font-kitsch"
+                                  style="color:var(--kitsch-color-1); font-size:1.6em;">48,700원</span>
+                        </div>
+                    </div>
+                </section>
+
+                <div class="order-detail-actions-kitsch">
+                    <a class="btn-kitsch secondary-btn-kitsch color5-kitsch retro-shadow-kitsch-small"
+                       th:href="@{/mypage/orders}">
+                        <i class="fas fa-list"></i> 목록으로 돌아가기
+                    </a>
+
+                    <button class="btn-kitsch secondary-btn-kitsch color2-kitsch retro-shadow-kitsch-small"
+                            onclick="requestReturn('BKTTL-20250501-001')">
+                        <i class="fas fa-undo-alt"></i> 반품 신청
+                    </button>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <div class="modal-overlay-kitsch" id="orderItemReviewModal">
+        <div class="modal-content-kitsch review-form-modal-content">
+            <button class="modal-close-btn-kitsch" onclick="hideKitschModal('orderItemReviewModal')"><i
+                    class="fas fa-times"></i></button>
+            <h2 class="modal-title-kitsch display-font-kitsch" id="orderItemReviewModalTitle"><i
+                    class="fas fa-pencil-alt"></i> 리뷰 작성</h2>
+            <p class="pixel-font-kitsch" id="orderItemReviewModalProductInfo"
+               style="text-align:center; margin-bottom:1rem; font-size:0.9em;"></p>
+
+            <form id="orderItemReviewForm" onsubmit="handleOrderItemReviewFormSubmit(event)">
+                <input id="orderItemReviewProductIdInput" name="productId" type="hidden">
+                <input id="orderItemReviewOrderIdInput" name="orderId" type="hidden">
+
+                <div class="form-group-kitsch">
+                    <label class="label-kitsch handwriting-font-kitsch">별점:</label>
+                    <div class="star-rating-input-kitsch" id="orderItemModalStarRating">
+                        <span class="stars">
+                            <i class="far fa-star" data-value="1"></i><i class="far fa-star" data-value="2"></i><i
+                                class="far fa-star" data-value="3"></i><i class="far fa-star" data-value="4"></i><i
+                                class="far fa-star" data-value="5"></i>
+                        </span>
+                        <span class="selected-rating-text-kitsch"
+                              id="orderItemModalSelectedRatingText">별점을 선택하세요!</span>
+                        <input id="orderItemRatingInput" name="rating" required type="hidden">
+                    </div>
+                </div>
+                <div class="form-group-kitsch">
+                    <label class="label-kitsch handwriting-font-kitsch" for="orderItemReviewContentInput">리뷰 내용:</label>
+                    <textarea class="textarea-kitsch handwriting-font-kitsch" id="orderItemReviewContentInput"
+                              minlength="10" name="content"
+                              placeholder="이 상품에 대한 솔직한 리뷰를 남겨주세요! (최소 10자 이상)" required rows="5"></textarea>
+                </div>
+                <div class="form-group-kitsch">
+                    <label class="label-kitsch handwriting-font-kitsch">사진 첨부 (최대 3장, Mock):</label>
+                    <div class="file-input-kitsch-wrapper">
+                        <input accept="image/*" class="file-input-kitsch" id="orderItemReviewImagesInput" multiple
+                               name="reviewImages" type="file">
+                        <p class="input-description-kitsch pixel-font-kitsch" style="font-size:0.75em;">첫 번째 이미지가 대표
+                            이미지로 사용됩니다.</p>
+                    </div>
+                    <div id="orderItemReviewImagePreviewContainer"
+                         style="margin-top:0.5rem; display:flex; gap:0.5rem;"></div>
+                </div>
+                <div class="modal-actions-kitsch">
+                    <button class="btn-kitsch secondary-btn-kitsch color5-kitsch retro-shadow-kitsch-small"
+                            onclick="hideKitschModal('orderItemReviewModal')"
+                            type="button">취소
+                    </button>
+                    <button class="btn-kitsch primary-btn-kitsch retro-shadow-kitsch" type="submit">리뷰 등록</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<th:block layout:fragment="page_scripts">
+    <script>
+
+        function showKitschModal(modalId) {
+            const modal = document.getElementById(modalId);
+            console.log("Showing modal:", modalId); // 어떤 모달을 보여주려 하는지 확인
+            if (modal) {
+                // modal.style.display = 'flex'; // 이 줄을 아래와 같이 변경
+                modal.classList.add('active');
+            } else {
+                console.error('Modal not found:', modalId);
+            }
+        }
+
+        function hideKitschModal(modalId) {
+            const modal = document.getElementById(modalId);
+            console.log("Hiding modal:", modalId); // 어떤 모달을 숨기려 하는지 확인
+            if (modal) {
+                // modal.style.display = 'none'; // 이 줄을 아래와 같이 변경
+                modal.classList.remove('active');
+            } else {
+                console.error('Modal not found:', modalId);
+            }
+        }
+
+        // 별점 초기화 및 처리 함수
+        function initializeStarRatingForOrder(containerId, hiddenInputId, displayTextId) {
+            const starContainer = document.getElementById(containerId);
+            if (!starContainer) {
+                // console.warn(`Star container not found: ${containerId}`);
+                return;
+            }
+            const stars = starContainer.querySelectorAll('.stars i');
+            const hiddenInput = document.getElementById(hiddenInputId);
+            const displayText = document.getElementById(displayTextId);
+            let currentRating = 0;
+
+            if (!hiddenInput || !displayText) {
+                // console.warn(`Star rating hidden input or display text not found for ${containerId}`);
+                return;
+            }
+
+            // 기존 선택값 초기화 (모달 열릴 때마다)
+            hiddenInput.value = "";
+            currentRating = 0;
+            resetStarsDisplayForOrder(stars); // 별 모양 초기화
+            displayText.textContent = '별점을 선택하세요!';
+
+
+            stars.forEach(star => {
+                star.addEventListener('mouseover', function () {
+                    resetStarsDisplayForOrder(stars);
+                    highlightStarsDisplayForOrder(stars, parseInt(this.dataset.value));
+                });
+                star.addEventListener('mouseout', function () {
+                    resetStarsDisplayForOrder(stars);
+                    highlightStarsDisplayForOrder(stars, currentRating);
+                });
+                star.addEventListener('click', function () {
+                    currentRating = parseInt(this.dataset.value);
+                    hiddenInput.value = currentRating;
+                    highlightStarsDisplayForOrder(stars, currentRating); // 클릭 시에도 selected 클래스 적용되도록
+                    displayText.textContent = `${currentRating}점 선택됨! ✨`;
+                });
+            });
+
+            function highlightStarsDisplayForOrder(starElements, rating) {
+                for (let i = 0; i < rating; i++) {
+                    if (starElements[i]) {
+                        starElements[i].classList.remove('far');
+                        starElements[i].classList.add('fas', 'selected');
+                    }
+                }
+            }
+
+            function resetStarsDisplayForOrder(starElements) {
+                starElements.forEach(s => {
+                    s.classList.remove('fas', 'selected');
+                    s.classList.add('far');
+                });
+            }
+
+            // 모달 열릴 때 초기화 (기존 값 유지 안 함)
+            // if (hiddenInput && hiddenInput.value && parseInt(hiddenInput.value) > 0) {
+            //     currentRating = parseInt(hiddenInput.value);
+            //     highlightStarsDisplayForOrder(stars, currentRating);
+            //     if (displayText) displayText.textContent = `${currentRating}점 선택됨! ✨`;
+            // } else if (displayText) {
+            //     displayText.textContent = '별점을 선택하세요!';
+            // }
+        }
+
+        // 리뷰 작성 모달 열기
+        function openOrderReviewModal(productId, productName, event) {
+            console.log("openOrderReviewModal called with:", productId, productName);
+            const modalId = 'orderItemReviewModal';
+
+            // 폼 및 내부 요소 ID 직접 지정
+            const modalTitle = document.getElementById('orderItemReviewModalTitle');
+            const modalProductInfo = document.getElementById('orderItemReviewModalProductInfo');
+            const form = document.getElementById('orderItemReviewForm');
+            const imagePreviewContainer = document.getElementById('orderItemReviewImagePreviewContainer');
+            const productIdInput = document.getElementById('orderItemReviewProductIdInput');
+            const orderIdInput = document.getElementById('orderItemReviewOrderIdInput');
+            const ratingInput = document.getElementById('orderItemRatingInput'); // 별점 값 hidden input
+            const contentInput = document.getElementById('orderItemReviewContentInput'); // 리뷰 내용 textarea
+            const selectedRatingText = document.getElementById('orderItemModalSelectedRatingText'); // 별점 선택 텍스트
+
+            if (form) {
+                form.reset(); // 폼 내용 초기화 (텍스트 입력, 파일 등)
+            } else {
+                console.error("리뷰 폼을 찾을 수 없습니다. ID: orderItemReviewForm");
+                return; // 폼이 없으면 더 진행할 수 없음
+            }
+
+            if (imagePreviewContainer) {
+                imagePreviewContainer.innerHTML = ''; // 이미지 미리보기 초기화
+            }
+
+            if (modalTitle) modalTitle.innerHTML = '<i class="fas fa-pencil-alt"></i> 리뷰 작성';
+            if (modalProductInfo) modalProductInfo.textContent = `상품명: ${productName}`;
+            if (productIdInput) productIdInput.value = productId || '';
+
+
+            // 주문 ID 가져오기
+            if (orderIdInput) { // orderIdInput이 존재하는지 먼저 확인
+                if (event && event.target) {
+                    const orderItemCard = event.target.closest('.order-item-card-kitsch');
+                    if (orderItemCard) {
+                        // data-order-id 속성이 있으면 사용, 없으면 .order-id 텍스트에서 추출
+                        orderIdInput.value = orderItemCard.dataset.orderId ||
+                            orderItemCard.querySelector('.order-id')?.textContent.replace('주문번호: ', '').trim() ||
+                            '';
+                        console.log("Order ID set to:", orderIdInput.value);
+                    } else {
+                        orderIdInput.value = ''; // 카드를 못 찾으면 빈 값
+                        console.warn("Order item card not found for event target.");
+                    }
+                } else {
+                    orderIdInput.value = ''; // event 객체가 없으면 빈 값
+                    console.warn("Event object or target not available for orderId.");
+                }
+            } else {
+                console.error("orderIdInput (orderItemReviewOrderIdInput) not found.");
+            }
+
+
+            // 별점 UI 초기화 (폼 리셋 후, 값도 명시적으로 초기화)
+            if (ratingInput) ratingInput.value = '';
+            if (contentInput) contentInput.value = ''; // textarea도 reset() 후 value를 비워주는게 확실할 수 있음
+
+            // initializeStarRatingForOrder 함수는 별점 시각적 표시와 내부 로직을 담당
+            // 이 함수 내부에서 hiddenInput.value와 displayText.textContent도 초기화합니다.
+            initializeStarRatingForOrder('orderItemModalStarRating', 'orderItemRatingInput', 'orderItemModalSelectedRatingText');
+
+            showKitschModal(modalId);
+        }
+
+
+        // 리뷰 폼 제출 처리 (Mock)
+        function handleOrderItemReviewFormSubmit(event) {
+            event.preventDefault();
+            // 폼 ID 직접 지정
+            const form = document.getElementById('orderItemReviewForm');
+            if (!form) {
+                console.error("Submit: Review form not found.");
+                return;
+            }
+
+            const productId = form.querySelector('input[name="productId"]').value;
+            const orderId = form.querySelector('input[name="orderId"]').value;
+            const rating = form.querySelector('input[name="rating"]').value;
+            const content = form.querySelector('textarea[name="content"]').value;
+
+            if (!rating || parseInt(rating) < 1) {
+                alert('별점을 선택해주세요. (Mock)');
+                return;
+            }
+            if (content.length < 10) {
+                alert('리뷰 내용을 10자 이상 입력해주세요. (Mock)');
+                return;
+            }
+
+            console.log(`Mock: 상품(ID: ${productId}, 주문ID: ${orderId})에 대한 리뷰가 등록되었습니다! (별점: ${rating}점)`);
+            alert(`Mock: 상품(ID: ${productId}, 주문ID: ${orderId})에 대한 리뷰가 등록되었습니다! (별점: ${rating}점)`);
+            hideKitschModal('orderItemReviewModal');
+        }
+
+        // 파일 입력 시 미리보기
+        const orderItemReviewImagesInput = document.getElementById('orderItemReviewImagesInput');
+        if (orderItemReviewImagesInput) {
+            orderItemReviewImagesInput.addEventListener('change', function (event) {
+                const previewContainer = document.getElementById('orderItemReviewImagePreviewContainer');
+                if (!previewContainer) return;
+                previewContainer.innerHTML = '';
+                const files = event.target.files;
+                if (files.length > 3) {
+                    alert('사진은 최대 3장까지만 첨부 가능합니다. (Mock)');
+                    event.target.value = ""; // 입력 파일 초기화
+                    return;
+                }
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        const imgEl = document.createElement('img');
+                        imgEl.src = e.target.result;
+                        imgEl.style.width = '50px';
+                        imgEl.style.height = '50px';
+                        imgEl.style.objectFit = 'cover';
+                        imgEl.style.marginRight = '5px';
+                        previewContainer.appendChild(imgEl);
+                    }
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const currentPath = window.location.pathname;
+            const sidebarLinks = document.querySelectorAll('.mypage-sidebar-kitsch .sidebar-menu-kitsch li a');
+            sidebarLinks.forEach(link => {
+                link.classList.remove('active');
+                if (currentPath.startsWith("/mypage/orders") && link.getAttribute('href') === "/mypage/orders") {
+                    link.classList.add('active');
+                } else if (link.getAttribute('href') === currentPath) {
+                    link.classList.add('active');
+                }
+            });
+            toggleNoOrdersMessage();
+        });
+
+        function trackDelivery(trackingNumber) {
+            alert("배송조회 (Mock): " + trackingNumber);
+            // 실제 배송조회 팝업 또는 페이지 이동 로직
+        }
+
+        function writeReviewForOrder(orderId) {
+            alert("주문번호 " + orderId + " 전체 상품 리뷰쓰기 (Mock)");
+        }
+
+        function requestReturn(orderId) {
+            alert("주문번호 " + orderId + " 반품 신청 (Mock)");
+        }
+
+    </script>
+</th:block>
+</body>
+</html>
