@@ -6,8 +6,6 @@ import org.springframework.data.domain.Pageable;
 import shop.bluebooktle.backend.coupon.dto.CouponSearchRequest;
 import shop.bluebooktle.common.dto.coupon.response.CouponResponse;
 import shop.bluebooktle.common.dto.coupon.response.CouponTypeResponse;
-import shop.bluebooktle.common.dto.coupon.response.UserCouponResponse;
-import shop.bluebooktle.common.entity.auth.User;
 
 public interface CouponQueryRepository {
 	// 쿠폰 전체 조회
@@ -15,10 +13,4 @@ public interface CouponQueryRepository {
 
 	// 쿠폰 정책 전체 조회
 	Page<CouponTypeResponse> findAllByCouponType(Pageable pageable);
-
-	// 유저 별 쿠폰 전체 조회
-	Page<UserCouponResponse> findAllByUserCoupon(User user, Pageable pageable);
-
-	// 유저 별 사용 가능 쿠폰 전체 조회
-	Page<UserCouponResponse> findAllByAvailableUserCoupon(User user, Pageable pageable);
 }

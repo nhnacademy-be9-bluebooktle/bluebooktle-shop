@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
@@ -17,15 +18,9 @@ import shop.bluebooktle.backend.coupon.entity.QAbsoluteCoupon;
 import shop.bluebooktle.backend.coupon.entity.QCoupon;
 import shop.bluebooktle.backend.coupon.entity.QCouponType;
 import shop.bluebooktle.backend.coupon.entity.QRelativeCoupon;
-import shop.bluebooktle.backend.coupon.entity.QUserCoupon;
 import shop.bluebooktle.backend.coupon.repository.CouponQueryRepository;
 import shop.bluebooktle.common.dto.coupon.response.CouponResponse;
 import shop.bluebooktle.common.dto.coupon.response.CouponTypeResponse;
-import shop.bluebooktle.common.dto.coupon.response.QCouponResponse;
-import shop.bluebooktle.common.dto.coupon.response.QCouponTypeResponse;
-import shop.bluebooktle.common.dto.coupon.response.QUserCouponResponse;
-import shop.bluebooktle.common.dto.coupon.response.UserCouponResponse;
-import shop.bluebooktle.common.entity.auth.User;
 
 @Repository
 @RequiredArgsConstructor
@@ -44,12 +39,20 @@ public class CouponQueryRepositoryImpl implements CouponQueryRepository {
 		if (request.getTarget() != null) {
 			builder.and(couponType.target.eq(request.getTarget())); // (ORDER, BOOK)
 		}
+		if (Boolean.TRUE.equals(request.getActive())) { // 유효 기간
+			LocalDateTime now = LocalDateTime.now();
+			builder.and(coupon.availableStartAt.loe(now)); // start <= now
+			builder.and(coupon.availableEndAt.goe(now)); // end >= now
+		}
 
-		List<CouponResponse> content = queryFactory.select(new QCouponResponse(
+		List<CouponResponse> content = queryFactory
+			.select(Projections.constructor(CouponResponse.class,
 				coupon.id,
 				coupon.couponName,
 				couponType.name,
 				couponType.target,
+				coupon.availableStartAt,
+				coupon.availableEndAt,
 				coupon.createdAt
 			))
 			.from(coupon)
@@ -79,7 +82,7 @@ public class CouponQueryRepositoryImpl implements CouponQueryRepository {
 		BooleanBuilder builder = new BooleanBuilder();
 		builder.and(couponType.deletedAt.isNull());
 
-		List<CouponTypeResponse> content = queryFactory.select(new QCouponTypeResponse(
+		List<CouponTypeResponse> content = queryFactory.select(Projections.constructor(CouponTypeResponse.class,
 				couponType.id,
 				couponType.name,
 				couponType.target,
@@ -103,59 +106,4 @@ public class CouponQueryRepositoryImpl implements CouponQueryRepository {
 
 		return new PageImpl<>(content, pageable, total != null ? total : 0);
 	}
-
-	//유저 별 쿠폰 전체 조회
-	@Override
-	public Page<UserCouponResponse> findAllByUserCoupon(User user, Pageable pageable) {
-		QUserCoupon userCoupon = QUserCoupon.userCoupon;
-
-		BooleanBuilder builder = new BooleanBuilder();
-		builder.and(userCoupon.user.eq(user));
-		return findUserCoupon(builder, pageable);
-	}
-
-	//유저 별 사용 가능 쿠폰 전체 조회
-	@Override
-	public Page<UserCouponResponse> findAllByAvailableUserCoupon(User user, Pageable pageable) {
-		QUserCoupon userCoupon = QUserCoupon.userCoupon;
-
-		LocalDateTime now = LocalDateTime.now();
-		BooleanBuilder builder = new BooleanBuilder();
-		builder.and(userCoupon.user.eq(user))
-			.and(userCoupon.availableStartAt.loe(now))
-			.and(userCoupon.availableEndAt.goe(now));
-		return findUserCoupon(builder, pageable);
-	}
-
-	//유저 별 쿠폰 조회 공통
-	private Page<UserCouponResponse> findUserCoupon(BooleanBuilder builder, Pageable pageable) {
-		QCoupon coupon = QCoupon.coupon;
-		QUserCoupon userCoupon = QUserCoupon.userCoupon;
-		QCouponType couponType = QCouponType.couponType;
-
-		List<UserCouponResponse> content = queryFactory.select(new QUserCouponResponse(
-				userCoupon.id,
-				userCoupon.createdAt,
-				coupon.couponName,
-				couponType.name,
-				couponType.target,
-				userCoupon.availableStartAt,
-				userCoupon.availableEndAt,
-				userCoupon.usedAt
-			))
-			.from(userCoupon)
-			.join(userCoupon.coupon, coupon)
-			.join(coupon.couponType, couponType)
-			.where(builder)
-			.offset(pageable.getOffset())
-			.limit(pageable.getPageSize())
-			.fetch();
-		Long total = queryFactory
-			.select(userCoupon.count())
-			.from(userCoupon)
-			.where(builder)
-			.fetchOne();
-		return new PageImpl<>(content, pageable, total != null ? total : 0);
-	}
-
 }
