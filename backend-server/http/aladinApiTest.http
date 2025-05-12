@@ -1,23 +1,56 @@
-### 테스트임
-GET http://www.aladin.co.kr/ttb/api/ItemSearch.aspx?ttbkey=ttbehfk11131717001&Query=aladdin&QueryType=Title&
-    MaxResults=10&start=1&SearchTarget=Book&output=js&Version=20131101
+@baseUrl = http://localhost:9002/admin/books
+
+### 알라딘 도서목록 제목으로 검색
+GET {{baseUrl}}/search?query=미움받을용기
 Accept: application/json
 
-### 알라딘 도서 제목으로 검색
-GET http://localhost:9002/admin/books/search?query=미움받을용기
+### 알라딘 도서 isbn으로 검색
+GET {{baseUrl}}/select?isbn=9791168340770
 Accept: application/json
 
-### 알라딘 도서 검색후 isbn으로 선택
-GET http://localhost:9002/admin/books/select?isbn=9791168340770
+### 알라딘 도서 isbn으로 검색 실패 - 올바르지 않은 isbn
+GET {{baseUrl}}/select?isbn=1234567891011
 Accept: application/json
 
 ### 알라딘 도서 등록
-POST http://localhost:9002/admin/books/register/aladin
+POST {{baseUrl}}/register/aladin
 Content-Type: application/json
 
 {
   "isbn": "9791168340770",
   "stock": 999,
+  "isPackable": true,
+  "state": "AVAILABLE"
+}
+
+### 알라딘 도서 등록 실패 - 중복isbn
+POST {{baseUrl}}/register/aladin
+Content-Type: application/json
+
+{
+  "isbn": "9791168340770",
+  "stock": 999,
+  "isPackable": true,
+  "state": "AVAILABLE"
+}
+
+### 알라딘 도서 등록 실패 - 필수필드 stock누락
+POST {{baseUrl}}/register/aladin
+Content-Type: application/json
+
+{
+  "isbn": "9791168340770",
+  "isPackable": true,
+  "state": "AVAILABLE"
+}
+
+### 알라딘 도서 등록 실패 - isbn글자수 잘못된 형식
+POST {{baseUrl}}/register/aladin
+Content-Type: application/json
+
+{
+  "isbn": "97911683407701111111",
+  "stock": "999",
   "isPackable": true,
   "state": "AVAILABLE"
 }

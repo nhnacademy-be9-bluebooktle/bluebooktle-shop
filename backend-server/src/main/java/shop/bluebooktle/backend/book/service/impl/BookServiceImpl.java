@@ -1,4 +1,4 @@
-package shop.bluebooktle.backend.book.service.impl;
+package shop.bluebooktle.backend.book.service.Impl;
 
 import java.util.List;
 
@@ -23,7 +23,7 @@ public class BookServiceImpl implements BookService {
 	@Override
 	public void registerBook(Book book) {
 		if (existsBookById(book.getId())) {
-			throw new BookAlreadyExistsException("Book already exists" + book.getTitle());
+			throw new BookAlreadyExistsException();
 		}
 		bookRepository.save(book);
 	}

@@ -10,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Value;
-import shop.bluebooktle.backend.book.dto.AladinBookItem;
+import shop.bluebooktle.backend.book.dto.request.AladinBookItem;
 
 @Getter
 @Value
