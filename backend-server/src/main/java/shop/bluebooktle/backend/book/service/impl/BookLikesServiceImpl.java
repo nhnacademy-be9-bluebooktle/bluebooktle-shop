@@ -15,9 +15,9 @@ import shop.bluebooktle.backend.book.repository.BookRepository;
 import shop.bluebooktle.backend.book.service.BookLikesService;
 import shop.bluebooktle.backend.user.repository.UserRepository;
 import shop.bluebooktle.common.entity.auth.User;
+import shop.bluebooktle.common.exception.auth.UserNotFoundException;
 import shop.bluebooktle.common.exception.book.BookLikesAlreadyChecked;
 import shop.bluebooktle.common.exception.book.BookNotFoundException;
-import shop.bluebooktle.common.exception.user.UserNotFoundException;
 
 @Service
 @RequiredArgsConstructor
@@ -31,12 +31,12 @@ public class BookLikesServiceImpl implements BookLikesService {
 	@Transactional
 	public void like(BookLikesRequest request) {
 		if (bookLikesRepository.existsByUser_IdAndBook_Id(request.getUserId(), request.getBookId())) {
-			throw new BookLikesAlreadyChecked(Long.valueOf(request.getBookId()).toString());
+			throw new BookLikesAlreadyChecked();
 		}
 		Book book = bookRepository.findById(request.getBookId())
-			.orElseThrow(() -> new BookNotFoundException(Long.valueOf(request.getBookId()).toString()));
+			.orElseThrow(BookNotFoundException::new);
 		User user = userRepository.findById(request.getUserId())
-			.orElseThrow(() -> new UserNotFoundException(Long.valueOf(request.getUserId()).toString()));
+			.orElseThrow(UserNotFoundException::new);
 		bookLikesRepository.save(new BookLikes(book, user));
 	}
 
