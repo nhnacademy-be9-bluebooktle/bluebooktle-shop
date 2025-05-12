@@ -1,5 +1,6 @@
 package shop.bluebooktle.backend.book.repository;
 
+import java.util.Optional;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -9,7 +10,7 @@ import shop.bluebooktle.backend.book.entity.Publisher;
 public interface PublisherRepository extends JpaRepository<Publisher, Long> {
 
 	// 출판사 전체 이름으로 조회 (정확하게 일치하는 이름)
-	List<Publisher> findByName(String name);
+	Optional<Publisher> findByName(String name);
 
 	// 출판사 이름 부분 일치 조회
 	List<Publisher> findByNameContaining(String name);
