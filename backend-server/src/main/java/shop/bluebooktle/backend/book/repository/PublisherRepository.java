@@ -12,6 +12,8 @@ public interface PublisherRepository extends JpaRepository<Publisher, Long> {
 	// 출판사 전체 이름으로 조회 (정확하게 일치하는 이름)
 	Optional<Publisher> findByName(String name);
 
+	boolean existsByName(String name);
+
 	// 출판사 이름 부분 일치 조회
 	List<Publisher> findByNameContaining(String name);
 

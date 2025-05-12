@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.book.dto.request.BookCategoryRequest;
@@ -34,6 +35,7 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 	private final BookCategoryRepository bookCategoryRepository;
 
 	@Override
+	@Transactional
 	public void registerBookCategory(BookCategoryRequest request) {
 		Book book = requireBook(request.bookId());
 		Category category = requireCategory(request.categoryId());
@@ -54,6 +56,7 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 	}
 
 	@Override
+	@Transactional
 	public void deleteBookCategory(BookCategoryRequest request) {
 		Book book = requireBook(request.bookId());
 		Category category = requireCategory(request.categoryId());
@@ -72,6 +75,7 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public List<CategoryResponse> getCategoryByBookId(BookInfoRequest request) {
 		Book book = requireBook(request.bookId());
 
@@ -87,6 +91,7 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public List<BookInfoResponse> searchBooksByCategory(CategoryInfoRequest request) {
 		Category category = requireCategory(request.categoryId());
 
