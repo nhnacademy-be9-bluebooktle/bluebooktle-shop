@@ -6,10 +6,10 @@
 }
 
 @font-face {
-    font-family: 'DungGeunMo'; /* CSS에서 사용할 폰트 이름 (원하는 대로 지정) */
+    font-family: 'DungGeunMo';
     src: url('DungGeunMo.woff2') format('woff2'); /* 실제 폰트 경로에 맞게 수정 */
-    font-weight: normal; /* 폰트 두께 (폰트 파일에 따라 조절) */
-    font-style: normal;  /* 폰트 스타일 (폰트 파일에 따라 조절) */
+    font-weight: normal;
+    font-style: normal;
 }
 
 :root {
@@ -52,7 +52,7 @@ a {
 
 a:hover {
     color: var(--kitsch-color-3); /* 호버시 핫핑크 */
-    transform: scale(1.1) rotate(-2deg);
+    transform: scale(1.03) rotate(-2deg);
 }
 
 img {
@@ -70,6 +70,8 @@ ul {
     max-width: 1300px;
     margin: 0 auto;
     padding: 0 15px;
+    position: relative;
+    z-index: 1;
 }
 
 /* 폰트 클래스 */
@@ -684,6 +686,7 @@ ul {
 
 /* Category Zone Kitsch (참고용) */
 .category-zone-kitsch {
+    position: relative;
     background-color: var(--kitsch-color-4);
     padding: 1.2rem 0 !important;
 }
@@ -1919,5 +1922,208 @@ ul {
     .pagination-kitsch .page-btn-kitsch {
         padding: 0.5em 0.8em;
         font-size: 0.9rem;
+    }
+}
+
+/* styles.css */
+/* ... (기존 styles.css 내용: Reset, :root, body, a, .container-kitsch, 폰트 클래스, 버튼 스타일, 헤더, 푸터 등) ... */
+/* =========================== */
+/* Mypage Common Styles        */
+/* =========================== */
+.mypage-header-kitsch {
+    background-color: var(--kitsch-accent-purple); /* 보라 */
+    color: var(--kitsch-text-light);
+    padding: 2rem;
+    text-align: center;
+    border: 5px outset var(--kitsch-color-2); /* 머스타드 */
+    border-radius: 0 0 30px 30px; /* 아래쪽 모서리만 둥글게 */
+    margin-bottom: 2.5rem;
+    box-shadow: 0px 5px 0px var(--kitsch-color-5); /* 짙은 청록 */
+}
+
+.mypage-header-kitsch .page-main-title-kitsch { /* 기존 .page-main-title-kitsch 와 병합 가능 */
+    font-family: var(--font-display); /* 명시적으로 지정 (기존 page-main-title-kitsch에 없을 경우) */
+    font-size: 2.8rem;
+    color: var(--kitsch-bg-main);
+    text-shadow: 2px 2px 0 var(--kitsch-text-dark);
+    margin-bottom: 0.3rem; /* user-summary와의 간격 */
+}
+
+.mypage-user-summary-kitsch {
+    margin-top: 0.5rem;
+    font-family: var(--font-pixel);
+    font-size: 0.9rem;
+    color: var(--kitsch-text-light);
+}
+
+.mypage-user-summary-kitsch span {
+    margin: 0 0.5em;
+}
+
+.mypage-user-summary-kitsch strong { /* highlight 계열 클래스로 대체 가능 */
+    color: var(--kitsch-color-2); /* 머스타드 */
+}
+
+.mypage-layout-kitsch {
+    display: grid; /* 기본적으로 grid 레이아웃 적용 */
+    grid-template-columns: 220px 1fr; /* 넓은 화면에서 사이드바(220px)와 메인 콘텐츠(나머지 공간)로 구성 */
+    gap: 2rem; /* 사이드바와 메인 콘텐츠 사이 간격 */
+    margin-top: 1rem; /* 마이페이지 헤더와의 간격 (선택 사항) */
+}
+
+.mypage-sidebar-kitsch {
+    background-color: var(--kitsch-bg-alt);
+    padding: 1.5rem;
+    border: 3px solid var(--kitsch-text-dark);
+    border-radius: 10px 5px 5px 10px; /* 키치한 비대칭 모서리 */
+    box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.1);
+    align-self: start; /* 내용이 길어져도 사이드바는 상단에 고정 (grid 아이템 속성) */
+}
+
+.mypage-sidebar-kitsch .sidebar-title-kitsch {
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    color: var(--kitsch-color-1); /* 버건디 */
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 3px dashed var(--kitsch-color-3); /* 핫핑크 */
+    text-align: center;
+}
+
+.mypage-sidebar-kitsch .sidebar-menu-kitsch {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.mypage-sidebar-kitsch .sidebar-menu-kitsch li a {
+    display: flex; /* 아이콘과 텍스트 정렬을 위해 flex 사용 */
+    align-items: center;
+    padding: 0.8em 1em;
+    margin-bottom: 0.5rem;
+    border-radius: 5px;
+    font-family: var(--font-pixel);
+    font-size: 0.95rem;
+    color: var(--kitsch-color-5); /* 짙은 청록 */
+    border: 2px solid transparent;
+    transition: all 0.2s ease-out;
+}
+
+.mypage-sidebar-kitsch .sidebar-menu-kitsch li a:hover {
+    background-color: var(--kitsch-color-2); /* 머스타드 */
+    color: var(--kitsch-text-dark);
+    border-color: var(--kitsch-text-dark);
+    transform: translateX(5px) scale(1.02);
+    box-shadow: 2px 2px 0 var(--kitsch-text-dark);
+}
+
+.mypage-sidebar-kitsch .sidebar-menu-kitsch li a.active {
+    background-color: var(--kitsch-color-3); /* 핫핑크 */
+    color: var(--kitsch-text-light);
+    border-color: var(--kitsch-color-1); /* 버건디 */
+    box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.2), 1px 1px 0 var(--kitsch-color-1);
+    transform: scale(1.01);
+    font-weight: bold; /* 활성 메뉴 강조 */
+}
+
+.mypage-sidebar-kitsch .sidebar-menu-kitsch li a i {
+    margin-right: 0.7em; /* 아이콘과 텍스트 사이 간격 */
+    width: 20px; /* 아이콘 영역 너비 고정으로 텍스트 정렬 도움 */
+    text-align: center;
+    font-size: 1em; /* 링크 텍스트와 크기 맞춤 */
+}
+
+.mypage-content-kitsch {
+    /* 이 영역은 각 마이페이지 하위 페이지의 내용이 들어가는 곳 */
+    /* 공통적인 패딩이나 최소 높이 등을 설정할 수 있음 */
+}
+
+/* 마이페이지 공통 섹션 스타일 (프로필, 비밀번호 변경, 주소 목록 헤더 등) */
+.mypage-section-kitsch {
+    background-color: var(--kitsch-bg-alt);
+    padding: 1.5rem 2rem;
+    border: 3px solid var(--kitsch-text-dark);
+    border-radius: 8px;
+    margin-bottom: 2rem; /* 섹션 간 간격 */
+}
+
+.mypage-section-kitsch h3.section-title-kitsch, /* 기존 .section-title-kitsch 와 병합 또는 여기서 상세화 */
+.address-list-header-kitsch h3.section-title-kitsch { /* 주소록 페이지 헤더의 h3도 동일 스타일 적용 */
+    font-family: var(--font-display); /* display-font-kitsch 클래스 대신 직접 지정 */
+    font-size: 1.5rem;
+    color: var(--kitsch-text-light);
+    background-color: var(--kitsch-color-1); /* 버건디 (프로필, 비밀번호 변경 등) */
+    border: 2px solid var(--kitsch-text-dark);
+    border-radius: 5px;
+    padding: 0.4em 0.8em;
+    text-align: left;
+    margin-bottom: 1.5rem; /* 제목과 내용 사이 간격 */
+    display: inline-block; /* 내용만큼만 너비 차지 */
+}
+
+.mypage-section-kitsch h3.section-title-kitsch i,
+.address-list-header-kitsch h3.section-title-kitsch i {
+    margin-right: 0.5em;
+}
+
+/* 주소록 페이지 헤더의 h3는 다른 배경색 사용 */
+.address-list-header-kitsch h3.section-title-kitsch {
+    background-color: var(--kitsch-color-4); /* 청록 */
+    margin-bottom: 0; /* 헤더 내에서는 하단 마진 제거 */
+}
+
+/* 폼 그룹 관련 스타일은 이미 styles.css에 .form-group-kitsch, .label-kitsch, .input-kitsch 등으로 정의되어 있을 것이므로 재활용 */
+/* 마이페이지 내 폼 요소들의 크기나 여백 등 미세 조정이 필요하면 여기서 추가 */
+.mypage-content-kitsch .form-group-kitsch {
+    margin-bottom: 1.2rem; /* 마이페이지 내 폼 그룹 간격 */
+}
+
+.mypage-content-kitsch .input-kitsch[readonly] { /* 프로필 페이지의 읽기전용 필드 */
+    background-color: var(--kitsch-bg-main);
+    color: var(--kitsch-text-dark);
+    opacity: 0.8;
+    border-style: dashed;
+    cursor: not-allowed;
+}
+
+.mypage-actions-kitsch { /* 정보 저장, 비밀번호 변경 등 버튼 그룹 */
+    margin-top: 2rem;
+    text-align: right;
+}
+
+.mypage-actions-kitsch .btn-kitsch {
+    margin-left: 0.8rem;
+}
+
+.mypage-actions-kitsch .btn-kitsch:first-child {
+    margin-left: 0;
+}
+
+
+/* 주문 내역, 주소 관리 등 테이블/카드형 목록 공통 스타일 (필요시 추가) */
+/* ... */
+/* 반응형: 마이페이지 레이아웃 */
+@media (max-width: 992px) {
+    /* 기존 992px와 동일한 브레이크포인트 사용 */
+    .mypage-layout-kitsch {
+        grid-template-columns: 1fr; /* 한 줄로 쌓음 */
+    }
+
+    .mypage-sidebar-kitsch {
+        margin-bottom: 2rem;
+        border-radius: 8px; /* 전체 모서리 둥글게 */
+    }
+
+    .mypage-sidebar-kitsch .sidebar-menu-kitsch {
+        display: flex;
+        flex-wrap: wrap; /* 메뉴 아이템 줄바꿈 */
+        justify-content: center; /* 가운데 정렬 */
+        gap: 0.5rem;
+    }
+
+    .mypage-sidebar-kitsch .sidebar-menu-kitsch li a {
+        margin-bottom: 0; /* flex gap으로 간격 관리 */
+        text-align: center; /* 아이콘과 텍스트 함께 중앙 정렬 */
+        /* flex-grow: 1; 필요시 버튼들이 공간을 채우도록 */
     }
 }

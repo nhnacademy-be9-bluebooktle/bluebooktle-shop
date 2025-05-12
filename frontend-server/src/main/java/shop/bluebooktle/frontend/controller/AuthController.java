@@ -10,22 +10,11 @@ public class AuthController {
 
 	@GetMapping("/login")
 	public String loginForm() {
-		return "login_form";
+		return "auth/login_form";
 	}
 
 	@GetMapping("/signup")
 	public String joinForm() {
-		return "signup_form";
+		return "auth/signup_form";
 	}
-
-	@GetMapping("/findId")
-	public String findIdForm() {
-		return "auth/findIdForm";
-	}
-
-	@GetMapping("/findPassword")
-	public String findPasswordForm() {
-		return "auth/findPasswordForm";
-	}
-
 }
