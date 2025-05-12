@@ -2,9 +2,6 @@ package shop.bluebooktle.backend.book_order.entity;
 
 import java.math.BigDecimal;
 
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.SQLRestriction;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -19,6 +16,7 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 import shop.bluebooktle.backend.book.entity.Book;
 import shop.bluebooktle.backend.order.entity.Order;
@@ -28,10 +26,11 @@ import shop.bluebooktle.common.entity.BaseEntity;
 @Table(name = "book_order")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
+@Setter
 @EqualsAndHashCode(of = "id", callSuper = false)
 @ToString(exclude = {"order", "book"})
-@SQLDelete(sql = "UPDATE book_order SET deleted_at = CURRENT_TIMESTAMP WHERE book_order_id = ?")
-@SQLRestriction("deleted_at IS NULL")
+// @SQLDelete(sql = "UPDATE book_order SET deleted_at = CURRENT_TIMESTAMP WHERE book_order_id = ?")
+// @SQLRestriction("deleted_at IS NULL")
 public class BookOrder extends BaseEntity {
 
 	@Id
