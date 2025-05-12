@@ -3,8 +3,6 @@ package shop.bluebooktle.backend.book.repository;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
 import shop.bluebooktle.backend.book.entity.Category;
 
@@ -33,9 +31,5 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
 	// 최상위 카테고리인지 여부 판단
 	boolean existsByIdAndParentCategoryIsNull(Long id);
 
-	/*@Query("select distinct c.parentCategory from Category c where c.id in :ids and c.parentCategory is not null")
-	List<Category> findParentCategoriesByChildIds(@Param("ids") List<Long> ids);*/
-
-	@Query("select c.parentCategory from Category c where c.id = :id")
-	Category findParentCategoryById(@Param("id") Long id);
+	Category findParentCategoryById(Long id);
 }

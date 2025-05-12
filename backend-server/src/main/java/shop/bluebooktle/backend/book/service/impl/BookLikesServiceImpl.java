@@ -1,4 +1,4 @@
-package shop.bluebooktle.backend.book.service.Impl;
+package shop.bluebooktle.backend.book.service.impl;
 
 import java.util.List;
 
@@ -21,7 +21,7 @@ import shop.bluebooktle.common.exception.user.UserNotFoundException;
 
 @Service
 @RequiredArgsConstructor
-public class BookLikesImpl implements BookLikesService {
+public class BookLikesServiceImpl implements BookLikesService {
 	private final BookLikesRepository bookLikesRepository;
 	private final BookRepository bookRepository;
 	private final UserRepository userRepository;
