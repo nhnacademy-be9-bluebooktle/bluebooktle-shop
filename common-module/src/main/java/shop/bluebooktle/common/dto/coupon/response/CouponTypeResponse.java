@@ -2,14 +2,12 @@ package shop.bluebooktle.common.dto.coupon.response;
 
 import java.math.BigDecimal;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Value;
 import shop.bluebooktle.common.domain.CouponTypeTarget;
 
 @Value
 @Builder
-@AllArgsConstructor
 public class CouponTypeResponse {
 	Long id;
 	String name;

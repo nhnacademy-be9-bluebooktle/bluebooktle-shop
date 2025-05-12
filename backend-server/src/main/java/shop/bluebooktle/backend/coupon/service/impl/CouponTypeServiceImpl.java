@@ -68,6 +68,21 @@ public class CouponTypeServiceImpl implements CouponTypeService {
 	@Override
 	@Transactional(readOnly = true)
 	public Page<CouponTypeResponse> getAllCouponTypeList(Pageable pageable) {
-		return couponTypeRepository.findAllByCouponType(pageable);
+		return couponTypeRepository.findAllBy(pageable).map(couponType -> {
+			AbsoluteCoupon absoluteCoupon = absoluteCouponRepository.findByCouponTypeId(couponType.getId())
+				.orElse(null);
+			RelativeCoupon relativeCoupon = relativeCouponRepository.findByCouponTypeId(couponType.getId())
+				.orElse(null);
+
+			return CouponTypeResponse.builder()
+				.id(couponType.getId())
+				.name(couponType.getName())
+				.target(couponType.getTarget())
+				.minimumPayment(couponType.getMinimumPayment())
+				.discountPrice(absoluteCoupon != null ? absoluteCoupon.getDiscountPrice() : null)
+				.discountPercent(relativeCoupon != null ? relativeCoupon.getDiscountPercent() : null)
+				.maximumDiscountPrice(relativeCoupon != null ? relativeCoupon.getMaximumDiscountPrice() : null)
+				.build();
+		});
 	}
 }

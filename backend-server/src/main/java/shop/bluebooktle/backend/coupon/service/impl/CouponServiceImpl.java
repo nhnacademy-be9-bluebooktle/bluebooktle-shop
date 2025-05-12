@@ -12,7 +12,6 @@ import shop.bluebooktle.backend.book.entity.Book;
 import shop.bluebooktle.backend.book.entity.Category;
 import shop.bluebooktle.backend.book.repository.BookRepository;
 import shop.bluebooktle.backend.book.repository.CategoryRepository;
-import shop.bluebooktle.backend.coupon.dto.CouponSearchRequest;
 import shop.bluebooktle.backend.coupon.entity.BookCoupon;
 import shop.bluebooktle.backend.coupon.entity.CategoryCoupon;
 import shop.bluebooktle.backend.coupon.entity.Coupon;
@@ -85,8 +84,7 @@ public class CouponServiceImpl implements CouponService {
 	@Override
 	@Transactional(readOnly = true)
 	public Page<CouponResponse> getAllCoupons(Pageable pageable) {
-		CouponSearchRequest request = new CouponSearchRequest();
-		return couponRepository.findAllByCoupon(request, pageable);
+		return couponRepository.findAllWithCouponType(pageable);
 	}
 
 	// 수정
