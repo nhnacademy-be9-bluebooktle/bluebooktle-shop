@@ -5,7 +5,10 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import shop.bluebooktle.backend.coupon.entity.BookCoupon;
+import shop.bluebooktle.backend.coupon.entity.Coupon;
 
 public interface BookCouponRepository extends JpaRepository<BookCoupon, Long> {
-	Optional<BookCoupon> findByCouponId(Long couponId);
+	Optional<BookCoupon> findByCoupon(Coupon coupon);
+
+	void deleteByCoupon(Coupon coupon);
 }
