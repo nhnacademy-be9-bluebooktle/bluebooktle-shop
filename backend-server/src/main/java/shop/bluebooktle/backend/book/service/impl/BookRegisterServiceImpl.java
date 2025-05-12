@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import shop.bluebooktle.backend.book.dto.request.BookRegisterByAladinRequest;
 import shop.bluebooktle.backend.book.dto.request.BookRegisterRequest;
 import shop.bluebooktle.backend.book.dto.response.AladinBookResponseDto;
@@ -30,18 +29,17 @@ import shop.bluebooktle.backend.book.repository.BookSaleInfoRepository;
 import shop.bluebooktle.backend.book.repository.CategoryRepository;
 import shop.bluebooktle.backend.book.repository.ImgRepository;
 import shop.bluebooktle.backend.book.repository.PublisherRepository;
-import shop.bluebooktle.backend.book.service.AladinBookService;
 import shop.bluebooktle.backend.book.service.BookRegisterService;
+import shop.bluebooktle.common.exception.BookAlreadyExistsException;
 import shop.bluebooktle.common.exception.book.AladinBookNotFoundException;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BookRegisterServiceImpl implements BookRegisterService {
 
 	private final BookRepository bookRepository;
 	private final BookSaleInfoRepository bookSaleInfoRepository;
-	private final AladinBookService aladinBookService;
+	private final AladinBookServiceImpl aladinBookService;
 
 	private final AuthorRepository authorRepository;
 	private final PublisherRepository publisherRepository;
@@ -62,13 +60,16 @@ public class BookRegisterServiceImpl implements BookRegisterService {
 	@Transactional
 	@Override
 	public void registerBookByAladin(BookRegisterByAladinRequest request) {
-		// 알라딘 API 도서 정보 선택
+		Optional<Book> existBook = bookRepository.findByIsbn(request.getIsbn());
+		if (existBook.isPresent()) {
+			throw new BookAlreadyExistsException();
+		}
+
 		AladinBookResponseDto aladin = aladinBookService.getBookByIsbn(request.getIsbn());
 		if (aladin == null) {
 			throw new AladinBookNotFoundException("알라딘 API에서 해당 ISBN의 도서를 찾을 수 없습니다.");
 		}
 
-		log.info("알라딘 도서 등록 요청: {}", request);
 		//book 정보 저장
 		Book book = Book.builder()
 			.title(aladin.getTitle())
