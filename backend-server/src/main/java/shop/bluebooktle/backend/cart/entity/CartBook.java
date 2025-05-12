@@ -54,4 +54,12 @@ public class CartBook extends BaseEntity {
 		this.quantity = quantity;
 	}
 
+	public boolean decreaseQuantity() {
+		if (this.quantity > 1) {
+			this.quantity -= 1;
+			return false;
+		}
+		return true;
+	}
+
 }

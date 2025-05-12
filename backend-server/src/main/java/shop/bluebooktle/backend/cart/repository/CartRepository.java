@@ -12,7 +12,4 @@ public interface CartRepository extends JpaRepository<Cart, Long> {
 
 	@EntityGraph(attributePaths = {"cartBooks", "cartBooks.book"})
 	Optional<Cart> findByUser(User user);
-
-	boolean existsByUser(User user);
-
 }

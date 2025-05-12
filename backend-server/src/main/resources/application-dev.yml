@@ -1,4 +1,28 @@
 spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+  data:
+    redis:
+      host: s4.java21.net
+      port: 6379
+      database: 285
+      password: "*N2vya7H@muDTwdNMR!"
+#  elasticsearch:
+#    uris: ${SPRING_ELASTICSEARCH_URIS}
+#    username: ${SPRING_ELASTICSEARCH_USERNAME}
+#    password: ${SPRING_ELASTICSEARCH_PASSWORD}
+#  rabbitmq:
+#    host: ${SPRING_RABBITMQ_HOST}
+#    port: ${SPRING_RABBITMQ_PORT:5672}
+#    username: ${SPRING_RABBITMQ_USERNAME}
+#    password: ${SPRING_RABBITMQ_PASSWORD}
   application:
     name: backend-server
 
@@ -7,3 +31,7 @@ spring:
 
   config:
     import: optional:configserver:${CONFIG_SERVER_URI}
+
+logging:
+  level:
+    shop.bluebooktle.backend: INFO
