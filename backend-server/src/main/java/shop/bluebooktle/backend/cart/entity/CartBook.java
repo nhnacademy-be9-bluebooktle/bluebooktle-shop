@@ -54,4 +54,12 @@ public class CartBook extends BaseEntity {
 		this.quantity = quantity;
 	}
 
+	public void increaseQuantity(int amount) {
+		this.quantity += amount;
+	}
+
+	public void decreaseQuantity(int amount) {
+		this.quantity = Math.max(1, this.quantity - amount);
+	}
+
 }
