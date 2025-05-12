@@ -52,12 +52,13 @@ public class CartServiceImpl implements CartService {
 		Cart cart = getOrCreateCart(user);
 		List<CartBook> cartBooks = cartBookRepository.findAllByCart(cart);
 
-		return cartBooks.stream()
-			.map(cartBook -> {
-				Book book = bookService.getBookById(cartBook.getBook().getId());
-				return CartItemResponse.from(cartBook, book);
-			})
-			.toList();
+		// return cartBooks.stream()
+		// 	.map(cartBook -> {
+		// 		Book book = bookService.getBookById(cartBook.getBook().getId());
+		// 		return CartItemResponse.from(cartBook, book);
+		// 	})
+		// 	.toList();
+		return null;
 	}
 
 	@Override
