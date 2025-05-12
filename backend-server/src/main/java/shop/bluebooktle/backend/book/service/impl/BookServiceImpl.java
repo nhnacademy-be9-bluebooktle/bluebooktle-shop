@@ -1,4 +1,4 @@
-package shop.bluebooktle.backend.book.service.impl;
+package shop.bluebooktle.backend.book.service.Impl;
 
 import java.time.LocalDate;
 import java.util.List;

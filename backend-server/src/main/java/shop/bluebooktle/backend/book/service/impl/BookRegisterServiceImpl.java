@@ -1,4 +1,4 @@
-package shop.bluebooktle.backend.book.service.Impl;
+package shop.bluebooktle.backend.book.service.impl;
 
 import java.math.BigDecimal;
 import java.util.Optional;
@@ -33,8 +33,6 @@ import shop.bluebooktle.backend.book.repository.BookTagRepository;
 import shop.bluebooktle.backend.book.repository.CategoryRepository;
 import shop.bluebooktle.backend.book.repository.ImgRepository;
 import shop.bluebooktle.backend.book.repository.PublisherRepository;
-import shop.bluebooktle.backend.book.repository.TagRepository;
-import shop.bluebooktle.backend.book.service.AladinBookService;
 import shop.bluebooktle.backend.book.repository.TagRepository;
 import shop.bluebooktle.backend.book.service.AladinBookService;
 import shop.bluebooktle.backend.book.service.BookRegisterService;
@@ -135,6 +133,7 @@ public class BookRegisterServiceImpl implements BookRegisterService {
 	}
 
 	//연관테이블 완성되면 수정필요 일단기능구현만
+	//알라딘으로 도서저장할시 태그 추가해야함. 가져오는정보에 없음
 	@Transactional
 	@Override
 	public void registerBookByAladin(BookAllRegisterByAladinRequest request) {
