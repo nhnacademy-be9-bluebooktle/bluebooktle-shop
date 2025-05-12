@@ -49,7 +49,9 @@ public enum ErrorCode {
 	CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "BC001", "카테고리를 찾을 수 없습니다."), // 존재하는 카테고리가 아닐 시
 	CATEGORY_NAME_ALREADY_EXISTS(HttpStatus.CONFLICT, "BC002", "이미 존재하는 카테고리명입니다. "), // 이미 존재하는 카테고리명일 시
 	CATEGORY_DELETE_ROOT_CATEGORY(HttpStatus.BAD_REQUEST, "BC03", "최상위 카테고리는 삭제할 수 없습니다."),
-	
+
+	BOOK_ALREADY_EXISTS_EXCEPTION(HttpStatus.CONFLICT, "B011", "이미 등록된 도서입니다."),
+
 	// Cart Errors (장바구니 오류) - T (TeaCart)
 	CART_NOT_FOUND(HttpStatus.NOT_FOUND, "T001", "장바구니를 찾을 수 없습니다."), // 예외적인 경우
 	CART_BOOK_NOT_FOUND(HttpStatus.NOT_FOUND, "T002", "장바구니에서 해당 도서를 찾을 수 없습니다."),
