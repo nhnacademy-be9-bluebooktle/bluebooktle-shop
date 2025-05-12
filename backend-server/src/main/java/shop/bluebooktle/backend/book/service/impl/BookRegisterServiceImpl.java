@@ -1,4 +1,4 @@
-package shop.bluebooktle.backend.book.service.Impl;
+package shop.bluebooktle.backend.book.service.impl;
 
 import java.math.BigDecimal;
 import java.util.Optional;
@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.book.dto.request.BookRegisterByAladinRequest;
 import shop.bluebooktle.backend.book.dto.request.BookRegisterRequest;
-import shop.bluebooktle.backend.book.dto.response.AladinBookResponse;
+import shop.bluebooktle.backend.book.dto.response.AladinBookResponseDto;
 import shop.bluebooktle.backend.book.entity.Author;
 import shop.bluebooktle.backend.book.entity.Book;
 import shop.bluebooktle.backend.book.entity.BookAuthor;

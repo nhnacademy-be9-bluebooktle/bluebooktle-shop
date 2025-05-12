@@ -1,4 +1,4 @@
-package shop.bluebooktle.backend.book.service.impl;
+package shop.bluebooktle.backend.book.service.Impl;
 
 import java.util.List;
 
