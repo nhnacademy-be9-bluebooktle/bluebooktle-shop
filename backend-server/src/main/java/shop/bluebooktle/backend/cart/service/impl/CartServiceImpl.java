@@ -1,9 +1,6 @@
 package shop.bluebooktle.backend.cart.service.impl;
 
-import java.time.Duration;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -12,9 +9,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.book.entity.Book;
+import shop.bluebooktle.backend.book.service.BookService;
 import shop.bluebooktle.backend.cart.dto.CartItemRequest;
 import shop.bluebooktle.backend.cart.dto.CartItemResponse;
-import shop.bluebooktle.backend.cart.dto.CartOrderRequest;
 import shop.bluebooktle.backend.cart.entity.Cart;
 import shop.bluebooktle.backend.cart.entity.CartBook;
 import shop.bluebooktle.backend.cart.repository.CartBookRepository;
@@ -29,177 +26,194 @@ public class CartServiceImpl implements CartService {
 
 	private final CartRepository cartRepository;
 	private final CartBookRepository cartBookRepository;
-	private final RedisTemplate<String, CartItemRequest> guestCartTemplate;
-	// TODO BookService 아직 미규현
-	// private final BookService bookService;
+	private final RedisTemplate<String, CartItemRequest> redisTemplate;
+	private final BookService bookService;
+	private static final String GUEST_KEY_PREFIX = "guest:";
 
-	private String guestCartKey(String guestId) {
-		return "guest:" + guestId + ":cart";
+	// ----------------- 회원용 -----------------
+
+	@Override
+	@Transactional
+	public void addBookToUserCart(User user, Long bookId, int quantity) {
+		Cart cart = getOrCreateCart(user);
+		Book book = bookService.getBookById(bookId);
+
+		CartBook cartBook = cartBookRepository.findByCartAndBook(cart, book)
+			.orElseGet(() -> new CartBook(book, cart, 0));
+
+		cartBook.increaseQuantity(quantity);
+		cartBookRepository.save(cartBook);
+	}
+
+	// TODO BookInfoService 완성되면 연결
+	@Override
+	@Transactional(readOnly = true)
+	public List<CartItemResponse> getUserCartItems(User user) {
+		Cart cart = getOrCreateCart(user);
+		List<CartBook> cartBooks = cartBookRepository.findAllByCart(cart);
+
+		return cartBooks.stream()
+			.map(cartBook -> {
+				Book book = bookService.getBookById(cartBook.getBook().getId());
+				return CartItemResponse.from(cartBook, book);
+			})
+			.toList();
 	}
 
 	@Override
-	public Cart getCartByUser(User user) {
-		return cartRepository.findByUser(user)
-			.orElseThrow(() -> new RuntimeException("장바구니가 존재하지 않습니다."));
+	@Transactional
+	public void increaseUserQuantity(User user, Long bookId) {
+		Cart cart = getOrCreateCart(user);
+		Book book = bookService.getBookById(bookId);
+
+		cartBookRepository.findByCartAndBook(cart, book)
+			.ifPresent(cartBook -> {
+				cartBook.increaseQuantity(1);
+				cartBookRepository.save(cartBook);
+			});
 	}
 
 	@Override
-	public List<CartItemResponse> getCartItemsForUser(User user) {
-		Cart cart = getCartByUser(user);
-		return cart.getCartBooks().stream()
-			.map(cb -> new CartItemResponse(cb.getBook().getId(), cb.getQuantity()))
-			.collect(Collectors.toList());
+	@Transactional
+	public void decreaseUserQuantity(User user, Long bookId) {
+		Cart cart = getOrCreateCart(user);
+		Book book = bookService.getBookById(bookId);
+
+		cartBookRepository.findByCartAndBook(cart, book)
+			.ifPresent(cartBook -> {
+				if (cartBook.getQuantity() > 1) {
+					cartBook.decreaseQuantity(1);
+					cartBookRepository.save(cartBook);
+				}
+			});
 	}
 
 	@Override
-	public void addBookToUserCart(User user, Book book, int quantity) {
-		Cart cart = getCartByUser(user);
-		Optional<CartBook> existing = cartBookRepository.findByCartAndBook(cart, book);
+	@Transactional
+	public void removeBookFromUserCart(User user, Long bookId) {
+		Cart cart = getOrCreateCart(user);
+		Book book = bookService.getBookById(bookId);
 
-		if (existing.isPresent()) {
-			cartBookRepository.addQuantity(cart, book, quantity);
-		} else {
-			CartBook cartBook = CartBook.builder()
-				.cart(cart)
-				.book(book)
-				.quantity(quantity)
-				.build();
-			cartBookRepository.save(cartBook);
-		}
-	}
-
-	@Override
-	public void removeBookFromUserCart(User user, Book book) {
-		Cart cart = getCartByUser(user);
 		cartBookRepository.findByCartAndBook(cart, book)
 			.ifPresent(cartBookRepository::delete);
 	}
 
 	@Override
-	public void decreaseUserQuantity(User user, Book book) {
-		Cart cart = getCartByUser(user);
-		cartBookRepository.findByCartAndBook(cart, book).ifPresent(cartBook -> {
-			if (cartBook.decreaseQuantity()) {
-				cartBookRepository.delete(cartBook);
-			}
-		});
+	@Transactional
+	public void removeSelectedBooksFromUserCart(User user, List<Long> bookIds) {
+		Cart cart = getOrCreateCart(user);
+		List<CartBook> selectedItems = cartBookRepository.findAllByCartAndBookIdIn(cart, bookIds);
+		cartBookRepository.deleteAll(selectedItems);
+	}
+
+	// ----------------- 비회원용 -----------------
+
+	@Override
+	public void addBookToGuestCart(String guestId, Long bookId, int quantity) {
+		HashOperations<String, String, CartItemRequest> ops = redisTemplate.opsForHash();
+		String key = GUEST_KEY_PREFIX + guestId;
+		String field = bookId.toString();
+
+		CartItemRequest current = ops.get(key, field);
+		int updatedQuantity = (current != null ? current.quantity() : 0) + quantity;
+
+		ops.put(key, field, new CartItemRequest(bookId, updatedQuantity));
 	}
 
 	@Override
-	public void clearUserCart(User user) {
-		Cart cart = getCartByUser(user);
-		cartBookRepository.deleteAll(cart.getCartBooks());
-		cart.getCartBooks().clear();
+	public List<CartItemResponse> getGuestCartItems(String guestId) {
+		HashOperations<String, String, CartItemRequest> ops = redisTemplate.opsForHash();
+		String key = GUEST_KEY_PREFIX + guestId;
+
+		// TODO BookInfoService 완성되면 연결
+		// return ops.values(key).stream()
+		// 	.map(req -> new CartItemResponse(req.bookId(), guestId))
+		// 	.toList();
+		return null;
 	}
 
 	@Override
-	public void orderUserCartItems(User user, List<CartOrderRequest.OrderItem> items) {
-		Cart cart = getCartByUser(user);
-		for (CartOrderRequest.OrderItem item : items) {
-			cartBookRepository.findByCartAndBook(cart, new Book(item.getBookId()))
-				.ifPresent(cartBookRepository::delete);
+	public void increaseGuestQuantity(String guestId, Long bookId) {
+		addBookToGuestCart(guestId, bookId, 1);
+	}
+
+	@Override
+	public void decreaseGuestQuantity(String guestId, Long bookId) {
+		HashOperations<String, String, CartItemRequest> ops = redisTemplate.opsForHash();
+		String key = GUEST_KEY_PREFIX + guestId;
+		String field = bookId.toString();
+
+		CartItemRequest current = ops.get(key, field);
+		if (current != null && current.quantity() > 1) {
+			ops.put(key, field, new CartItemRequest(bookId, current.quantity() - 1));
 		}
 	}
 
 	@Override
-	public List<CartItemResponse> getCartItemsForGuest(String guestId) {
-		HashOperations<String, String, CartItemRequest> hashOps = guestCartTemplate.opsForHash();
-		return hashOps.values(guestCartKey(guestId)).stream()
-			.map(i -> new CartItemResponse(i.getBookId(), i.getQuantity()))
-			.collect(Collectors.toList());
+	public void removeBookFromGuestCart(String guestId, Long bookId) {
+		redisTemplate.opsForHash().delete(GUEST_KEY_PREFIX + guestId, bookId.toString());
 	}
 
 	@Override
-	public void addBookToGuestCart(String guestId, Book book, int quantity) {
-		String key = guestCartKey(guestId);
-		HashOperations<String, String, CartItemRequest> hashOps = guestCartTemplate.opsForHash();
+	public void removeSelectedBooksFromGuestCart(String guestId, List<Long> bookIds) {
+		String key = GUEST_KEY_PREFIX + guestId;
+		Object[] fields = bookIds.stream().map(String::valueOf).toArray();
+		redisTemplate.opsForHash().delete(key, fields);
+	}
 
-		CartItemRequest existing = hashOps.get(key, book.getId().toString());
-		int newQuantity = (existing != null ? existing.getQuantity() : 0) + quantity;
+	// ----------------- 공통 -----------------
 
-		hashOps.put(key, book.getId().toString(), new CartItemRequest(book.getId(), newQuantity));
-		guestCartTemplate.expire(key, Duration.ofDays(2));
+	private Cart getOrCreateCart(User user) {
+		return cartRepository.findByUser(user)
+			.orElseGet(() -> cartRepository.save(
+				Cart.builder()
+					.user(user)
+					.build()
+			));
 	}
 
 	@Override
-	public void removeBookFromGuestCart(String guestId, Book book) {
-		guestCartTemplate.opsForHash().delete(guestCartKey(guestId), book.getId().toString());
-	}
+	@Transactional
+	public void convertGuestCartToMemberCart(String guestId, User user) {
+		HashOperations<String, String, CartItemRequest> ops = redisTemplate.opsForHash();
+		String guestKey = GUEST_KEY_PREFIX + guestId;
 
-	@Override
-	public void decreaseGuestQuantity(String guestId, Book book) {
-		String key = guestCartKey(guestId);
-		HashOperations<String, String, CartItemRequest> hashOps = guestCartTemplate.opsForHash();
-		CartItemRequest item = hashOps.get(key, book.getId().toString());
-
-		if (item != null) {
-			if (item.getQuantity() > 1) {
-				item.setQuantity(item.getQuantity() - 1);
-				hashOps.put(key, book.getId().toString(), item);
-			} else {
-				hashOps.delete(key, book.getId().toString());
-			}
-		}
-	}
-
-	@Override
-	public void clearGuestCart(String guestId) {
-		guestCartTemplate.delete(guestCartKey(guestId));
-	}
-
-	@Override
-	public void orderGuestCartItems(String guestId, List<CartOrderRequest.OrderItem> items) {
-		String key = guestCartKey(guestId);
-		for (CartOrderRequest.OrderItem item : items) {
-			guestCartTemplate.opsForHash().delete(key, item.getBookId().toString());
-		}
-	}
-
-	@Override
-	public void convertGuestCartToMember(String guestId, User user) {
-		String key = guestCartKey(guestId);
-		List<CartItemRequest> guestItems = guestCartTemplate.opsForHash().values(key);
-
-		Cart cart = Cart.builder().user(user).build();
-		cartRepository.save(cart);
+		List<CartItemRequest> guestItems = ops.values(guestKey);
+		Cart cart = getOrCreateCart(user); // 회원 장바구니 DB
 
 		for (CartItemRequest item : guestItems) {
-			Book book = bookService.findById(item.getBookId());
-			CartBook cartBook = CartBook.builder()
-				.cart(cart)
-				.book(book)
-				.quantity(item.getQuantity())
-				.build();
-			cartBookRepository.save(cartBook);
+			Book book = bookService.getBookById(item.bookId());
+
+			cartBookRepository.findByCartAndBook(cart, book)
+				.ifPresentOrElse(
+					existing -> existing.increaseQuantity(item.quantity()),
+					() -> cartBookRepository.save(new CartBook(book, cart, item.quantity()))
+				);
 		}
 
-		guestCartTemplate.delete(key);
+		redisTemplate.delete(guestKey); // 비회원 장바구니 제거
 	}
 
 	@Override
+	@Transactional
 	public void mergeGuestCartToMemberCart(String guestId, User user) {
-		String key = guestCartKey(guestId);
-		List<CartItemRequest> guestItems = guestCartTemplate.opsForHash().values(key);
+		HashOperations<String, String, CartItemRequest> ops = redisTemplate.opsForHash();
+		String guestKey = GUEST_KEY_PREFIX + guestId;
 
-		Cart cart = cartRepository.findByUser(user)
-			.orElseGet(() -> cartRepository.save(Cart.builder().user(user).build()));
+		List<CartItemRequest> guestItems = ops.values(guestKey);
+		Cart cart = getOrCreateCart(user); // 기존 장바구니
 
 		for (CartItemRequest item : guestItems) {
-			Book book = bookService.findById(item.getBookId());
-			Optional<CartBook> existing = cartBookRepository.findByCartAndBook(cart, book);
+			Book book = bookService.getBookById(item.bookId());
 
-			if (existing.isPresent()) {
-				existing.get().setQuantity(existing.get().getQuantity() + item.getQuantity());
-			} else {
-				CartBook cartBook = CartBook.builder()
-					.cart(cart)
-					.book(book)
-					.quantity(item.getQuantity())
-					.build();
-				cartBookRepository.save(cartBook);
-			}
+			cartBookRepository.findByCartAndBook(cart, book)
+				.ifPresentOrElse(
+					existing -> existing.increaseQuantity(item.quantity()),
+					() -> cartBookRepository.save(new CartBook(book, cart, item.quantity()))
+				);
 		}
 
-		guestCartTemplate.delete(key);
+		redisTemplate.delete(guestKey);
 	}
+
 }

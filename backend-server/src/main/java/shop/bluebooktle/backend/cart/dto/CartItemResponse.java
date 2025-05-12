@@ -1,23 +1,24 @@
 package shop.bluebooktle.backend.cart.dto;
 
-import java.io.Serializable;
-
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Value;
+import shop.bluebooktle.backend.book.entity.Book;
 import shop.bluebooktle.backend.cart.entity.CartBook;
 
-@Value
-@Builder
-@AllArgsConstructor
-public class CartItemResponse implements Serializable {
-	Long bookId;
-	int quantity;
-
-	public static CartItemResponse from(CartBook cartBook) {
+public record CartItemResponse(
+	Long bookId,
+	String title,
+	String author,
+	int quantity,
+	int pricePerUnit,
+	String thumbnailUrl
+) {
+	public static CartItemResponse from(CartBook cartBook, Book book) {
 		return new CartItemResponse(
-			cartBook.getBook().getId(),
-			cartBook.getQuantity()
+			book.getId(),
+			book.getTitle(),
+			book.getAuthor(),
+			cartBook.getQuantity(),
+			book.getSalePrice(),
+			book.getThumbnailUrl()
 		);
 	}
 }

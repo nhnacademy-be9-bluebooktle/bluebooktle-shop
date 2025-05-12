@@ -2,44 +2,39 @@ package shop.bluebooktle.backend.cart.service;
 
 import java.util.List;
 
-import shop.bluebooktle.backend.book.entity.Book;
 import shop.bluebooktle.backend.cart.dto.CartItemResponse;
-import shop.bluebooktle.backend.cart.dto.CartOrderRequest;
-import shop.bluebooktle.backend.cart.entity.Cart;
 import shop.bluebooktle.common.entity.auth.User;
 
 public interface CartService {
+	// 회원용
+	void addBookToUserCart(User user, Long bookId, int quantity);
 
-	// 회원 전용
-	Cart getCartByUser(User user);
+	List<CartItemResponse> getUserCartItems(User user);
 
-	List<CartItemResponse> getCartItemsForUser(User user);
+	void increaseUserQuantity(User user, Long bookId);
 
-	void addBookToUserCart(User user, Book book, int quantity);
+	void decreaseUserQuantity(User user, Long bookId);
 
-	void removeBookFromUserCart(User user, Book book);
+	void removeBookFromUserCart(User user, Long bookId);
 
-	void decreaseUserQuantity(User user, Book book);
+	void removeSelectedBooksFromUserCart(User user, List<Long> bookIds);
 
-	void clearUserCart(User user);
+	// 비회원용
+	void addBookToGuestCart(String guestId, Long bookId, int quantity);
 
-	void orderUserCartItems(User user, List<CartOrderRequest.OrderItem> items);
+	List<CartItemResponse> getGuestCartItems(String guestId);
 
-	// 비회원 전용
-	List<CartItemResponse> getCartItemsForGuest(String guestId);
+	void increaseGuestQuantity(String guestId, Long bookId);
 
-	void addBookToGuestCart(String guestId, Book book, int quantity);
+	void decreaseGuestQuantity(String guestId, Long bookId);
 
-	void removeBookFromGuestCart(String guestId, Book book);
+	void removeBookFromGuestCart(String guestId, Long bookId);
 
-	void decreaseGuestQuantity(String guestId, Book book);
+	void removeSelectedBooksFromGuestCart(String guestId, List<Long> bookIds);
 
-	void clearGuestCart(String guestId);
+	public void convertGuestCartToMemberCart(String guestId, User user);
 
-	void orderGuestCartItems(String guestId, List<CartOrderRequest.OrderItem> items);
+	public void mergeGuestCartToMemberCart(String guestId, User user);
 
-	// 회원가입 또는 로그인 시 병합/전환 처리
-	void convertGuestCartToMember(String guestId, User user);
-
-	void mergeGuestCartToMemberCart(String guestId, User user);
 }
+
