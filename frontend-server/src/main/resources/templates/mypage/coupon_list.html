@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html layout:decorate="~{_layouts/default_layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>마이페이지 - 나의 쿠폰함</title>
+    <style>
+        .coupon-summary-kitsch {
+            display: flex;
+            justify-content: space-around;
+            background-color: var(--kitsch-color-4); /* 청록 */
+            color: var(--kitsch-text-light);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            border: 3px solid var(--kitsch-text-dark);
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2), 3px 3px 0 var(--kitsch-color-5);
+        }
+
+        .coupon-summary-item-kitsch {
+            text-align: center;
+        }
+
+        .coupon-summary-item-kitsch .count-kitsch {
+            font-family: var(--font-display);
+            font-size: 2.5rem;
+            color: var(--kitsch-bg-main);
+            display: block;
+            line-height: 1;
+        }
+
+        .coupon-summary-item-kitsch .label-kitsch {
+            font-family: var(--font-pixel);
+            font-size: 0.9rem;
+            margin-top: 0.3rem;
+            display: block;
+            color: var(--kitsch-text-light);
+            opacity: 0.9;
+        }
+
+        .coupon-controls-kitsch { /* 주문내역/포인트내역의 컨트롤과 유사 */
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background-color: var(--kitsch-bg-alt);
+            border: 2px dashed var(--kitsch-color-3); /* 핫핑크 */
+            border-radius: 5px;
+            margin-bottom: 2rem;
+        }
+
+        /* .coupon-controls-kitsch .control-group-kitsch 등은 styles.css 재활용 */
+        .coupon-register-form-kitsch { /* 쿠폰 등록 폼 */
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .coupon-register-form-kitsch .input-kitsch {
+            width: 200px; /* 쿠폰 코드 입력창 너비 */
+            font-size: 0.85rem;
+        }
+
+        .coupon-list-kitsch {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .coupon-card-kitsch {
+            background-color: var(--kitsch-bg-main);
+            border: 3px solid var(--kitsch-text-dark);
+            border-radius: 10px;
+            padding: 1.2rem 1.5rem;
+            box-shadow: 3px 3px 0px var(--kitsch-color-1); /* 버건디 */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between; /* 내용과 유효기간 분리 */
+            position: relative; /* 뱃지 위치 기준 */
+            overflow: hidden; /* 찢어진 효과를 위해 */
+        }
+
+        .coupon-card-kitsch::before, .coupon-card-kitsch::after { /* 찢어진 효과 */
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: var(--kitsch-bg-alt); /* 부모 배경색과 동일하게 */
+            border-radius: 50%;
+            border: 3px solid var(--kitsch-text-dark);
+        }
+
+        .coupon-card-kitsch::before {
+            top: 50%;
+            left: -13px;
+            transform: translateY(-50%);
+        }
+
+        .coupon-card-kitsch::after {
+            top: 50%;
+            right: -13px;
+            transform: translateY(-50%);
+        }
+
+
+        .coupon-card-kitsch.used-coupon-kitsch,
+        .coupon-card-kitsch.expired-coupon-kitsch {
+            opacity: 0.6;
+            background-color: #e0e0e0; /* 회색톤 */
+            border-color: #aaa;
+            box-shadow: 2px 2px 0px #888;
+        }
+
+        .coupon-card-kitsch.used-coupon-kitsch::before, .coupon-card-kitsch.used-coupon-kitsch::after,
+        .coupon-card-kitsch.expired-coupon-kitsch::before, .coupon-card-kitsch.expired-coupon-kitsch::after {
+            background: var(--kitsch-bg-alt); /* 상위 배경색 */
+            border-color: #aaa;
+        }
+
+
+        .coupon-info-kitsch .coupon-name-kitsch {
+            font-family: var(--font-display);
+            font-size: 1.4rem;
+            color: var(--kitsch-color-3); /* 핫핑크 */
+            margin-bottom: 0.5rem;
+        }
+
+        .coupon-info-kitsch .coupon-discount-kitsch {
+            font-family: var(--font-pixel);
+            font-size: 1.8rem; /* 할인액/율 강조 */
+            color: var(--kitsch-color-5); /* 짙은 청록 */
+            margin-bottom: 0.5rem;
+        }
+
+        .coupon-info-kitsch .coupon-condition-kitsch {
+            font-family: var(--font-handwriting);
+            font-size: 0.9rem;
+            color: var(--kitsch-text-dark);
+            margin-bottom: 1rem;
+            line-height: 1.4;
+        }
+
+        .coupon-footer-kitsch {
+            font-family: var(--font-pixel);
+            font-size: 0.8rem;
+            color: var(--kitsch-text-dark);
+            opacity: 0.8;
+            border-top: 2px dashed var(--kitsch-color-2); /* 머스타드 */
+            padding-top: 0.8rem;
+            margin-top: 1rem;
+            text-align: center;
+        }
+
+        .coupon-footer-kitsch .status-badge-kitsch {
+            font-size: 0.75rem;
+            padding: 0.2em 0.5em;
+            border-radius: 3px;
+            color: var(--kitsch-text-light);
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            transform: rotate(5deg);
+            border: 1px solid var(--kitsch-text-dark);
+        }
+
+        .status-badge-kitsch {
+            font-family: var(--font-pixel);
+        }
+
+        .status-badge-kitsch.available {
+            background-color: var(--kitsch-color-4);
+        }
+
+        .status-badge-kitsch.used {
+            background-color: #555;
+        }
+
+        .status-badge-kitsch.expired {
+            background-color: var(--kitsch-color-1);
+        }
+
+        .no-coupons-kitsch { /* 쿠폰 없을 때 */
+            text-align: center;
+            padding: 3rem 1rem;
+            font-family: var(--font-pixel);
+            font-size: 1.3rem;
+            color: var(--kitsch-color-5);
+            background-color: var(--kitsch-bg-alt);
+            border: 2px dashed var(--kitsch-color-2);
+            border-radius: 5px;
+        }
+
+        .no-coupons-kitsch i {
+            font-size: 3rem;
+            display: block;
+            margin-bottom: 1rem;
+            color: var(--kitsch-color-4);
+        }
+
+
+        @media (max-width: 768px) {
+            .coupon-summary-kitsch {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .coupon-controls-kitsch {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .coupon-controls-kitsch .control-group-kitsch,
+            .coupon-controls-kitsch .coupon-register-form-kitsch {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .coupon-register-form-kitsch .input-kitsch {
+                flex-grow: 1;
+            }
+
+            .coupon-list-kitsch {
+                grid-template-columns: 1fr;
+            }
+
+            /* 모바일에서 한 줄로 */
+        }
+    </style>
+</head>
+
+<body>
+<div layout:fragment="content">
+    <div class="container-kitsch section-padding-kitsch">
+        <div class="mypage-header-kitsch">
+            <h1 class="page-main-title-kitsch display-font-kitsch"><i class="fas fa-ticket-alt"></i> 나의 쿠폰함 <i
+                    class="fas fa-percent"></i></h1>
+            <div class="mypage-user-summary-kitsch">
+                <span>회원등급: <strong class="highlight-yellow-kitsch">골드 용사</strong></span> |
+                <span>포인트: <strong class="highlight-pink-kitsch">3,500 P</strong></span> |
+                <span>사용가능 쿠폰: <strong class="highlight-cyan-kitsch">3 장</strong></span>
+            </div>
+        </div>
+        <div class="mypage-layout-kitsch">
+            <div th:replace="~{_fragments/mypage_sidebar :: mypageSidebarFragment(activeMenu='coupons')}"></div>
+
+            <main class="mypage-content-kitsch">
+                <div class="coupon-summary-kitsch">
+                    <div class="coupon-summary-item-kitsch">
+                        <span class="count-kitsch">3</span>
+                        <span class="label-kitsch">사용 가능 쿠폰</span>
+                    </div>
+                    <div class="coupon-summary-item-kitsch">
+                        <span class="count-kitsch">1</span>
+                        <span class="label-kitsch">이달 소멸 예정</span>
+                    </div>
+                </div>
+
+                <div class="coupon-controls-kitsch">
+                    <div class="control-group-kitsch">
+                        <label class="label-kitsch handwriting-font-kitsch" for="couponStatusFilter">쿠폰 상태:</label>
+                        <select class="select-kitsch" id="couponStatusFilter" name="status">
+                            <option selected value="available">사용 가능</option>
+                            <option value="used">사용 완료</option>
+                            <option value="expired">기간 만료</option>
+                        </select>
+                        <button class="btn-kitsch primary-btn-kitsch small-btn-kitsch retro-shadow-kitsch-small"
+                                onclick="alert('Mock: 쿠폰을 조회합니다.')">
+                            <i class="fas fa-search"></i> 조회
+                        </button>
+                    </div>
+                    <form class="coupon-register-form-kitsch" onsubmit="registerCoupon(event)">
+                        <input class="input-kitsch pixel-font-kitsch" id="couponCodeInput" placeholder="쿠폰 코드를 입력하세요"
+                               type="text">
+                        <button class="btn-kitsch secondary-btn-kitsch color1-kitsch small-btn-kitsch retro-shadow-kitsch-small"
+                                type="submit">
+                            <i class="fas fa-plus-circle"></i> 쿠폰 등록
+                        </button>
+                    </form>
+                </div>
+
+                <div class="coupon-list-kitsch">
+                    <div class="coupon-card-kitsch">
+                        <span class="status-badge-kitsch available">사용가능</span>
+                        <div class="coupon-info-kitsch">
+                            <h4 class="coupon-name-kitsch">WELCOME! 신규가입 축하 쿠폰 <i class="fas fa-gift"></i></h4>
+                            <p class="coupon-discount-kitsch">5,000원</p>
+                            <p class="coupon-condition-kitsch">10,000원 이상 구매 시 사용 가능<br>일부 상품 제외</p>
+                        </div>
+                        <div class="coupon-footer-kitsch">
+                            유효기간: 2025-06-30 까지
+                        </div>
+                    </div>
+
+                    <div class="coupon-card-kitsch">
+                        <span class="status-badge-kitsch available">사용가능</span>
+                        <div class="coupon-info-kitsch">
+                            <h4 class="coupon-name-kitsch">키치템 전용 10% 할인 <i class="fas fa-percent"></i></h4>
+                            <p class="coupon-discount-kitsch">10%</p>
+                            <p class="coupon-condition-kitsch">카테고리 상품 전용<br>최대 3,000원 할인</p>
+                        </div>
+                        <div class="coupon-footer-kitsch">
+                            유효기간: 2025-05-31 까지
+                        </div>
+                    </div>
+
+                    <div class="coupon-card-kitsch">
+                        <span class="status-badge-kitsch available">사용가능</span>
+                        <div class="coupon-info-kitsch">
+                            <h4 class="coupon-name-kitsch">무료배송 쿠폰 <i class="fas fa-truck-fast"></i></h4>
+                            <p class="coupon-discount-kitsch">배송비 무료</p>
+                            <p class="coupon-condition-kitsch">기본 배송비 면제 (3,000원 상당)</p>
+                        </div>
+                        <div class="coupon-footer-kitsch">
+                            유효기간: 2025-07-15 까지
+                        </div>
+                    </div>
+
+                    <div class="coupon-card-kitsch used-coupon-kitsch" style="/* display:none; */">
+                        <span class="status-badge-kitsch used">사용완료</span>
+                        <div class="coupon-info-kitsch">
+                            <h4 class="coupon-name-kitsch">봄맞이 깜짝 2,000원 할인</h4>
+                            <p class="coupon-discount-kitsch" style="text-decoration: line-through;">2,000원</p>
+                            <p class="coupon-condition-kitsch">전 상품 대상</p>
+                        </div>
+                        <div class="coupon-footer-kitsch">
+                            사용일: 2025-04-10
+                        </div>
+                    </div>
+                </div>
+
+                <div class="no-coupons-kitsch" id="noCouponsMessage" style="display:none;">
+                    <i class="fas fa-ghost"></i>
+                    <p>사용 가능한 쿠폰이 없어요!</p>
+                    <p class="handwriting-font-kitsch" style="font-size:1.1rem; margin-top:0.5rem;">이벤트에 참여하거나, 특별한 날을
+                        기다려보세요!</p>
+                </div>
+
+                <nav aria-label="Page navigation" class="pagination-kitsch" style="margin-top: 2.5rem;">
+                    <a class="page-btn-kitsch prev-kitsch retro-shadow-kitsch-small disabled" href="#"><i
+                            class="fas fa-angle-left"></i> 이전</a>
+                    <a class="page-btn-kitsch num-kitsch active-kitsch retro-shadow-kitsch-small" href="#">1</a>
+                    <a class="page-btn-kitsch next-kitsch retro-shadow-kitsch-small" href="#">다음 <i
+                            class="fas fa-angle-right"></i></a>
+                </nav>
+
+            </main>
+        </div>
+    </div>
+</div>
+
+<th:block layout:fragment="page_scripts">
+    <script>
+        // 현재 URL 기준으로 활성 메뉴 표시
+        document.addEventListener('DOMContentLoaded', function () {
+            const currentPath = window.location.pathname;
+            const sidebarLinks = document.querySelectorAll('.mypage-sidebar-kitsch .sidebar-menu-kitsch li a');
+            sidebarLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === currentPath) {
+                    link.classList.add('active');
+                }
+            });
+
+            // (Mock) 쿠폰 유무에 따른 메시지 표시 (현재는 항상 데이터가 있으므로 실행 안됨)
+            const couponCards = document.querySelectorAll('.coupon-list-kitsch .coupon-card-kitsch:not(.used-coupon-kitsch):not(.expired-coupon-kitsch)'); // 사용가능 쿠폰만 카운트
+            const noCouponsMsg = document.getElementById('noCouponsMessage');
+            const pagination = document.querySelector('.pagination-kitsch');
+
+            if (couponCards.length === 0 && noCouponsMsg) {
+                noCouponsMsg.style.display = 'block';
+                if (pagination) pagination.style.display = 'none';
+            } else if (noCouponsMsg) {
+                noCouponsMsg.style.display = 'none';
+                if (pagination) pagination.style.display = 'flex';
+            }
+        });
+
+        // (Mock) 쿠폰 등록 함수
+        function registerCoupon(event) {
+            event.preventDefault();
+            const couponCode = document.getElementById('couponCodeInput').value;
+            if (couponCode.trim() === '') {
+                alert('쿠폰 코드를 입력해주세요. (Mock)');
+                return;
+            }
+            alert('쿠폰 코드 "' + couponCode + '"가 등록되었습니다! (Mock - 실제 등록 로직 없음)');
+            document.getElementById('couponCodeInput').value = ''; // 입력창 비우기
+        }
+    </script>
+</th:block>
+</body>
+</html>
