@@ -12,7 +12,6 @@ import shop.bluebooktle.backend.book_order.service.BookOrderService;
 import shop.bluebooktle.backend.order.entity.Order;
 import shop.bluebooktle.backend.order.repository.OrderRepository;
 import shop.bluebooktle.common.dto.book_order.request.BookOrderRequest;
-import shop.bluebooktle.common.dto.book_order.request.BookOrderUpdateRequest;
 import shop.bluebooktle.common.dto.book_order.response.BookOrderResponse;
 import shop.bluebooktle.common.exception.book.BookNotFoundException;
 import shop.bluebooktle.common.exception.book_order.BookOrderNotFoundException;
@@ -20,7 +19,6 @@ import shop.bluebooktle.common.exception.order.OrderNotFoundException;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class BookOrderServiceImpl implements BookOrderService {
 	private final BookOrderRepository bookOrderRepository;
 	private final BookRepository bookRepository;
@@ -28,6 +26,7 @@ public class BookOrderServiceImpl implements BookOrderService {
 
 	/** 도서 주문 생성 */
 	@Override
+	@Transactional
 	public BookOrderResponse createBookOrder(BookOrderRequest request) {
 		Order order = orderRepository.findById(request.getOrderId())
 			.orElseThrow(OrderNotFoundException::new);
@@ -54,6 +53,7 @@ public class BookOrderServiceImpl implements BookOrderService {
 
 	/** 도서 주문 조회 */
 	@Override
+	@Transactional(readOnly = true)
 	public BookOrderResponse getBookOrder(Long bookOrderId) {
 		BookOrder order = bookOrderRepository.findByIdAndDeletedAtIsNull(bookOrderId)
 			.orElseThrow(BookOrderNotFoundException::new);
@@ -69,7 +69,8 @@ public class BookOrderServiceImpl implements BookOrderService {
 
 	/** 도서 주문 수정 */
 	@Override
-	public BookOrderResponse updateBookOrder(BookOrderUpdateRequest request) {
+	@Transactional
+	public BookOrderResponse updateBookOrder(BookOrderRequest request) {
 		BookOrder order = bookOrderRepository.findByIdAndDeletedAtIsNull(request.getBookOrderId())
 			.orElseThrow(BookOrderNotFoundException::new);
 
@@ -87,6 +88,7 @@ public class BookOrderServiceImpl implements BookOrderService {
 
 	/** 도서 주문 삭제 */
 	@Override
+	@Transactional
 	public void deleteBookOrder(Long bookOrderId) {
 		BookOrder order = bookOrderRepository.findByIdAndDeletedAtIsNull(bookOrderId)
 			.orElseThrow(BookOrderNotFoundException::new);

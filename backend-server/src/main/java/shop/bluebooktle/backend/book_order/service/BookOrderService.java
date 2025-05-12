@@ -1,7 +1,6 @@
 package shop.bluebooktle.backend.book_order.service;
 
 import shop.bluebooktle.common.dto.book_order.request.BookOrderRequest;
-import shop.bluebooktle.common.dto.book_order.request.BookOrderUpdateRequest;
 import shop.bluebooktle.common.dto.book_order.response.BookOrderResponse;
 
 public interface BookOrderService {
@@ -12,7 +11,7 @@ public interface BookOrderService {
 	BookOrderResponse getBookOrder(Long bookOrderId);
 
 	/** 도서 주문 수정 */
-	BookOrderResponse updateBookOrder(BookOrderUpdateRequest request);
+	BookOrderResponse updateBookOrder(BookOrderRequest request);
 
 	/** 도서 주문 삭제 */
 	void deleteBookOrder(Long bookOrderId);
