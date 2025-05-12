@@ -1,4 +1,4 @@
-@baseUrl = http://localhost:9002/api/category
+@baseUrl = http://localhost:9002/api/categories
 
 ### 카테고리 등록 성공
 POST {{baseUrl}}

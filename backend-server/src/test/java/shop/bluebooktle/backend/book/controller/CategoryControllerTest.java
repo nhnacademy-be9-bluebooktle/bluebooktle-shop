@@ -1,0 +1,63 @@
+package shop.bluebooktle.backend.book.controller;
+
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.data.jpa.JpaRepositoriesAutoConfiguration;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import shop.bluebooktle.backend.book.dto.request.CategoryRegisterRequest;
+import shop.bluebooktle.backend.book.service.CategoryService;
+
+// @WebMvcTest(CategoryController.class)
+@ActiveProfiles("local")
+@WebMvcTest(controllers = CategoryController.class,
+	excludeAutoConfiguration = {
+		DataSourceAutoConfiguration.class,
+		HibernateJpaAutoConfiguration.class,
+		JpaRepositoriesAutoConfiguration.class
+	}
+)
+public class CategoryControllerTest {
+	@Autowired
+	private MockMvc mockMvc;
+
+	@Autowired
+	private ObjectMapper objectMapper;
+
+	@MockitoBean
+	private CategoryService categoryService;
+
+	@Test
+	@DisplayName("카테고리 등록 성공")
+	void registerCategorySuccess() throws Exception {
+		// given
+		CategoryRegisterRequest req = new CategoryRegisterRequest("테스트", null);
+		String json = objectMapper.writeValueAsString(req);
+		doNothing().when(categoryService).registerCategory(any());
+
+		// when / then
+		mockMvc.perform(post("/api/categories")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(json))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.status").value("success"))
+			.andExpect(jsonPath("$.data").isEmpty());
+
+		// verify
+		verify(categoryService, times(1)).registerCategory(any(CategoryRegisterRequest.class));
+	}
+
+}

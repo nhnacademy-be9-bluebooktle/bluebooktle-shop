@@ -21,7 +21,7 @@ import shop.bluebooktle.backend.book.service.BookCategoryService;
 import shop.bluebooktle.common.exception.book.BookCategoryAlreadyExistsException;
 import shop.bluebooktle.common.exception.book.BookCategoryLimitExceededException;
 import shop.bluebooktle.common.exception.book.BookCategoryNotFoundException;
-import shop.bluebooktle.common.exception.book.BookMustHaveAtLeastOneCategoryException;
+import shop.bluebooktle.common.exception.book.BookCategoryRequiredException;
 import shop.bluebooktle.common.exception.book.BookNotFoundException;
 import shop.bluebooktle.common.exception.book.CategoryNotFoundException;
 
@@ -64,7 +64,7 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 
 		long count = bookCategoryRepository.countByBook(book);
 		if (count <= 1) {
-			throw new BookMustHaveAtLeastOneCategoryException(book.getId());
+			throw new BookCategoryRequiredException(book.getId());
 		}
 
 		BookCategory bookCategory = new BookCategory(book, category);
@@ -82,7 +82,7 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 			Category category = bookCategory.getCategory();
 			result.add(new CategoryResponse(category.getId(), category.getName()));
 		}
-		
+
 		return result;
 	}
 
@@ -96,7 +96,6 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 		for (Long bookId : bookIds) {
 			result.add(new BookInfoResponse(bookId));
 		}
-
 		return result;
 	}
 
