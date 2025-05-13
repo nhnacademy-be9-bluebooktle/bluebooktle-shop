@@ -83,6 +83,10 @@ public enum ErrorCode {
 	AUTHOR_ID_NULL(HttpStatus.BAD_REQUEST,    "B012", "작가 ID는 필수입니다."),
 	AUTHOR_NAME_EMPTY(HttpStatus.BAD_REQUEST, "B013", "작가 이름은 비어 있을 수 없습니다."),
 	AUTHOR_ALREADY_EXISTS(HttpStatus.CONFLICT, "B014", "이미 존재하는 작가 이름입니다."),
+	IMAGE_ID_NULL(HttpStatus.BAD_REQUEST,    "B015", "이미지 ID는 필수입니다."),
+	IMAGE_URL_EMPTY(HttpStatus.BAD_REQUEST, "B016", "이미지 URL은 비어 있을 수 없습니다."),
+	IMAGE_ALREADY_EXISTS(HttpStatus.CONFLICT,"B017", "이미지가 이미 존재합니다."),
+	IMAGE_NOT_FOUND(HttpStatus.NOT_FOUND,    "B018", "이미지를 찾을 수 없습니다."),
 
 	// Cart Errors (장바구니 오류) - T (TeaCart)
 	CART_NOT_FOUND(HttpStatus.NOT_FOUND, "T001", "장바구니를 찾을 수 없습니다."), // 예외적인 경우

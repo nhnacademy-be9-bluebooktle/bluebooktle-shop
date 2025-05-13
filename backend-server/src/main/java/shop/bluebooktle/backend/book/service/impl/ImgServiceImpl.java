@@ -10,6 +10,10 @@ import shop.bluebooktle.backend.book.dto.response.img.ImgResponse;
 import shop.bluebooktle.backend.book.entity.Img;
 import shop.bluebooktle.backend.book.repository.ImgRepository;
 import shop.bluebooktle.backend.book.service.ImgService;
+import shop.bluebooktle.common.exception.book.ImgAlreadyExistsException;
+import shop.bluebooktle.common.exception.book.ImgIdNullException;
+import shop.bluebooktle.common.exception.book.ImgNotFoundException;
+import shop.bluebooktle.common.exception.book.ImgUrlEmptyException;
 
 @Service
 @RequiredArgsConstructor
@@ -21,10 +25,10 @@ public class ImgServiceImpl implements ImgService {
 	@Override
 	public void registerImg(ImgRegisterRequest imgRegisterRequest) {
 		if (imgRegisterRequest.getImgUrl() == null || imgRegisterRequest.getImgUrl().trim().isEmpty()) {
-			throw new IllegalArgumentException("ImgUrl is empty"); // TODO: 프로젝트 에러 처리 방식으로 변경
+			throw new ImgUrlEmptyException();
 		}
 		if (!imgRepository.findByImgUrl(imgRegisterRequest.getImgUrl()).isEmpty()) {
-			throw new IllegalArgumentException("Img already exists"); // TODO: 프로젝트 예외 처리 방식
+			throw new ImgAlreadyExistsException(imgRegisterRequest.getImgUrl());
 		}
 
 		Img img = Img.builder().imgUrl(imgRegisterRequest.getImgUrl()).build();
@@ -37,10 +41,10 @@ public class ImgServiceImpl implements ImgService {
 	@Override
 	public ImgResponse getImg(Long imgId) {
 		if (imgId == null) {
-			throw new IllegalArgumentException("ImgId is empty");
+			throw new ImgIdNullException();
 		}
 
-		Img img = imgRepository.findById(imgId).orElseThrow(() -> new IllegalArgumentException("Img not found"));
+		Img img = imgRepository.findById(imgId).orElseThrow(() -> new ImgNotFoundException());
 
 		ImgResponse imgResponse = ImgResponse.builder()
 			.id(img.getId())
@@ -54,13 +58,13 @@ public class ImgServiceImpl implements ImgService {
 	@Override
 	public void updateImg(Long imgId, ImgUpdateRequest imgUpdateRequest) {
 		if (imgId == null) {
-			throw new IllegalArgumentException("ImgId is empty");
+			throw new ImgIdNullException();
 		}
 		if (imgUpdateRequest.getImgUrl() == null || imgUpdateRequest.getImgUrl().trim().isEmpty()) {
-			throw new IllegalArgumentException("ImgUrl is empty");
+			throw new ImgUrlEmptyException();
 		}
 
-		Img img = imgRepository.findById(imgId).orElseThrow(() -> new IllegalArgumentException("Img not found"));
+		Img img = imgRepository.findById(imgId).orElseThrow(() -> new ImgNotFoundException());
 
 		img.setImgUrl(imgUpdateRequest.getImgUrl());
 
@@ -71,7 +75,7 @@ public class ImgServiceImpl implements ImgService {
 	@Override
 	public void deleteImg(Long imgId) {
 		if (imgId == null) {
-			throw new IllegalArgumentException("ImgId is empty");
+			throw new ImgIdNullException();
 		}
 		imgRepository.deleteById(imgId);
 	}
