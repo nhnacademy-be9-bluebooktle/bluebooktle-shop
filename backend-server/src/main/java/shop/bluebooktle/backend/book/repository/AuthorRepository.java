@@ -4,9 +4,11 @@ import java.util.Optional;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import shop.bluebooktle.backend.book.entity.Author;
 
+@Repository
 public interface AuthorRepository extends JpaRepository<Author, Long> {
 
 	// 작가 전체 이름으로 조회 (정확하게 일치하는 이름)
