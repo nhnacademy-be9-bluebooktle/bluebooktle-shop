@@ -12,6 +12,7 @@ import shop.bluebooktle.backend.book_order.repository.OrderPackagingRepository;
 import shop.bluebooktle.backend.book_order.repository.PackagingOptionRepository;
 import shop.bluebooktle.backend.book_order.service.OrderPackagingService;
 import shop.bluebooktle.common.dto.book_order.request.OrderPackagingRequest;
+import shop.bluebooktle.common.dto.book_order.request.OrderPackagingUpdateRequest;
 import shop.bluebooktle.common.dto.book_order.response.OrderPackagingResponse;
 import shop.bluebooktle.common.exception.book_order.BookOrderNotFoundException;
 import shop.bluebooktle.common.exception.book_order.OrderPackagingNotFoundException;
@@ -19,6 +20,7 @@ import shop.bluebooktle.common.exception.book_order.PackagingOptionNotFoundExcep
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class OrderPackagingServiceImpl implements OrderPackagingService {
 	private final OrderPackagingRepository orderPackagingRepository;
 	private final BookOrderRepository bookOrderRepository;
@@ -26,7 +28,6 @@ public class OrderPackagingServiceImpl implements OrderPackagingService {
 
 	/** 도서 주문에 포장 옵션 추가 */
 	@Override
-	@Transactional
 	public OrderPackagingResponse addOrderPackaging(OrderPackagingRequest request) {
 		BookOrder bookOrder = bookOrderRepository.findById(request.getBookOrderId())
 			.orElseThrow(BookOrderNotFoundException::new);
@@ -53,7 +54,6 @@ public class OrderPackagingServiceImpl implements OrderPackagingService {
 
 	/** 도서 주문 포장 옵션 단건 조회 */
 	@Override
-	@Transactional(readOnly = true)
 	public OrderPackagingResponse getOrderPackaging(Long orderPackagingId) {
 		OrderPackaging op = orderPackagingRepository.findById(orderPackagingId)
 			.orElseThrow(OrderPackagingNotFoundException::new);
@@ -69,8 +69,7 @@ public class OrderPackagingServiceImpl implements OrderPackagingService {
 
 	/** 도서 주문 포장 옵션 수정 */
 	@Override
-	@Transactional
-	public OrderPackagingResponse updateOrderPackaging(Long orderPackagingId, OrderPackagingRequest request) {
+	public OrderPackagingResponse updateOrderPackaging(Long orderPackagingId, OrderPackagingUpdateRequest request) {
 		OrderPackaging op = orderPackagingRepository.findById(orderPackagingId)
 			.orElseThrow(OrderPackagingNotFoundException::new);
 
@@ -91,7 +90,6 @@ public class OrderPackagingServiceImpl implements OrderPackagingService {
 
 	/** 도서 주문 포장 옵션 삭제 */
 	@Override
-	@Transactional
 	public void deleteOrderPackaging(Long orderPackagingId) {
 		OrderPackaging op = orderPackagingRepository.findById(orderPackagingId)
 			.orElseThrow(OrderPackagingNotFoundException::new);

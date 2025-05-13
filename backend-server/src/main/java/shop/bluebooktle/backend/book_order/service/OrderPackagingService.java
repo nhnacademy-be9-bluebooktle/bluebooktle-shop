@@ -1,6 +1,7 @@
 package shop.bluebooktle.backend.book_order.service;
 
 import shop.bluebooktle.common.dto.book_order.request.OrderPackagingRequest;
+import shop.bluebooktle.common.dto.book_order.request.OrderPackagingUpdateRequest;
 import shop.bluebooktle.common.dto.book_order.response.OrderPackagingResponse;
 
 public interface OrderPackagingService {
@@ -11,7 +12,7 @@ public interface OrderPackagingService {
 	OrderPackagingResponse getOrderPackaging(Long orderPackagingId);
 
 	/** 도서 주문 포장 옵션 수정 */
-	OrderPackagingResponse updateOrderPackaging(Long orderPackagingId, OrderPackagingRequest request);
+	OrderPackagingResponse updateOrderPackaging(Long orderPackagingId, OrderPackagingUpdateRequest request);
 
 	/** 도서 주문 포장 옵션 삭제 */
 	void deleteOrderPackaging(Long orderPackagingId);

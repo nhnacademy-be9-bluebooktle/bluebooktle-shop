@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import shop.bluebooktle.common.dto.book_order.request.PackagingOptionRequest;
+import shop.bluebooktle.common.dto.book_order.request.PackagingOptionUpdateRequest;
 import shop.bluebooktle.common.dto.book_order.response.PackagingOptionResponse;
 
 public interface PackagingOptionService {
@@ -15,7 +16,7 @@ public interface PackagingOptionService {
 	Page<PackagingOptionResponse> getPackagingOption(Pageable pageable);
 
 	/** 포장 옵션 수정 */
-	PackagingOptionResponse updatePackagingOption(PackagingOptionRequest request);
+	PackagingOptionResponse updatePackagingOption(PackagingOptionUpdateRequest request);
 
 	/** 포장 옵션 삭제 */
 	void deletePackagingOption(Long packagingOptionId);

@@ -10,13 +10,9 @@ import lombok.Value;
 @Value
 @Getter
 @Builder
-public class OrderPackagingRequest {
-	@NotNull(message = "도서 ID는 필수값입니다.")
-	@Positive(message = "도서 ID는 양수여야 합니다.")
-	Long bookOrderId;
-
-	@NotNull(message = "포장 옵션 ID는 필수값입니다.")
-	@Positive(message = "포장 옵션 ID는 양수여야 합니다.")
+public class OrderPackagingUpdateRequest {
+	@NotNull(message = "도서 포장 ID는 필수값입니다.")
+	@Positive(message = "도서 포장 ID는 양수여야 합니다.")
 	Long packagingOptionId;
 
 	@Min(value = 1, message = "포장 수량은 1개 이상이어야 합니다.")

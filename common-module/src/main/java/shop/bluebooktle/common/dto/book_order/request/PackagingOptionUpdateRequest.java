@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Value;
@@ -12,7 +13,11 @@ import lombok.Value;
 @Value
 @Getter
 @Builder
-public class PackagingOptionRequest {
+public class PackagingOptionUpdateRequest {
+	@Positive(message = "포장 옵션 ID는 필수입니다.")
+	@NotNull(message = "포장 옵션 ID는 필수값입니다.")
+	Long packagingOptionId;
+
 	@NotNull(message = "포장 옵션 이름은 필수입니다.")
 	@Max(value = 20, message = "이름은 20자를 넘어갈 수 없습니다.")
 	String name;
