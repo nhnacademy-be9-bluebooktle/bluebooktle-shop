@@ -1,4 +1,4 @@
-name: CI & CD (Optimized for Module Changes)
+name: CI & CD
 
 on:
   push:
@@ -148,13 +148,11 @@ jobs:
             export SPRING_PROFILES_ACTIVE="${{ env.SPRING_PROFILES_ACTIVE }}"
             export CONFIG_SERVER_URI="${{ env.CONFIG_SERVER_URI }}"
             
-            # 배포 순서 고정 배열
-            ORDER=(eureka-server auth-server backend-server gateway-server frontend-server)
             
-            # 변경된 모듈만 순서대로 배포
-            for MOD in "${ORDER[@]}"; do
-              if [[ " ${{ needs.detect_changes.outputs.changed }} " =~ " $MOD " ]]; then
-                echo "▶ Rolling deploy: $MOD"
-                ~/startup.sh "$MOD"
-              fi
+            export SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
+            export CONFIG_SERVER_URI=${CONFIG_SERVER_URI}
+
+            for MOD in ${{ needs.detect_changes.outputs.changed }}; do
+              echo "▶ Rolling deploy: $MOD"
+              ~/startup.sh "$MOD"
             done
