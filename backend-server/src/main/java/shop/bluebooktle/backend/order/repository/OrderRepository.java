@@ -35,7 +35,8 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 	// 주문 UUID 키로 단일 주문 조회 (비회원용)
 	Optional<Order> findByOrderKey(UUID orderKey);
 
+	// TODO 에러 안나게 변경
 	// 주문 상태 변경
-	void updateOrderStatus(Long orderId, OrderStatus newStatus);
+	// void updateOrderStatus(Long orderId, OrderStatus newStatus);
 
 }
