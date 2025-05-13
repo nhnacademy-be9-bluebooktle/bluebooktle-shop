@@ -1,5 +1,7 @@
 package shop.bluebooktle.backend.book.dto.request;
 
+import java.util.List;
+
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -27,4 +29,7 @@ public class BookRegisterByAladinRequest {
 
 	@NotNull(message = "판매 상태를 입력해주세요.")
 	BookSaleInfo.State state;
+
+	@NotNull(message = "태그는 필수 값입니다.")
+	List<String> tag;
 }

@@ -61,7 +61,9 @@ Content-Type: application/json
     "작가"
   ],
   "publisher": "출판사",
-  "tag": "태그",
+  "tag": [
+    "태그"
+  ],
   "imageUrl": [
     "https://image.aladin.co.kr/product/35650/80/coversum/k762036819_1.jpg"
   ],

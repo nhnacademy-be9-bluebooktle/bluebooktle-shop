@@ -32,6 +32,12 @@ public class BookServiceImpl implements BookService {
 	private final BookTagRepository bookTagRepository;
 	private final BookImgRepository bookImgRepository;
 
+	@Override
+	public Book getBookById(Long bookId) {
+		return bookRepository.findById(bookId)
+			.orElseThrow(() -> new BookNotFoundException("해당 ID를 가진 책을 찾을 수 없습니다: " + bookId));
+	}
+
 	@Transactional(readOnly = true)
 	@Override
 	public BookResponse findBookById(Long id) {

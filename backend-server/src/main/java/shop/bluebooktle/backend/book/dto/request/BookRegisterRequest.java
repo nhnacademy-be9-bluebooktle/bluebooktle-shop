@@ -60,4 +60,7 @@ public class BookRegisterRequest {
 	@NotNull(message = "판매상태는 필수 값입니다.")
 	BookSaleInfo.State state;
 
+	@NotNull(message = "태그는 필수 값입니다.")
+	List<String> tag;
+
 }
