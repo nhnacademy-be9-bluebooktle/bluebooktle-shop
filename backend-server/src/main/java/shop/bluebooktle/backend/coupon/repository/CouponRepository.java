@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import shop.bluebooktle.backend.coupon.entity.Coupon;
+import shop.bluebooktle.backend.coupon.repository.query.CouponQueryRepository;
 
 public interface CouponRepository extends JpaRepository<Coupon, Long>, CouponQueryRepository {
 	//이름 존재 여부 확인

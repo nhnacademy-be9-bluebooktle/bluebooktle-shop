@@ -1,7 +1,5 @@
 package shop.bluebooktle.common.dto.coupon.request;
 
-import java.time.LocalDateTime;
-
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
@@ -10,14 +8,10 @@ import lombok.Value;
 @Value
 @Builder
 public class CouponRegisterRequest {
-	@NotNull
+	@NotNull(message = "쿠폰 정책 선택은 필수입니다.")
 	Long couponTypeId;
-	@NotBlank
+	@NotBlank(message = "쿠폰 이름은 필수입니다.")
 	String name;
-	@NotNull
-	LocalDateTime availableStartAt;
-	@NotNull
-	LocalDateTime availableEndAt;
 
 	Long bookId;
 	Long categoryId;

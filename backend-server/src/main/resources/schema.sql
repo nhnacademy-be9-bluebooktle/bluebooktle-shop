@@ -237,8 +237,6 @@ CREATE TABLE `coupon` (
 	`coupon_id`	bigint	NOT NULL AUTO_INCREMENT,
 	`coupon_type_id`	bigint	NOT NULL,
 	`name`	varchar(100)	NOT NULL,
-	`available_start_at`	timestamp	NOT NULL,
-	`available_end_at`	timestamp	NOT NULL,
 	`created_at`	timestamp	NOT NULL	DEFAULT CURRENT_TIMESTAMP,
 	`deleted_at`	timestamp	NULL,
 
@@ -335,6 +333,8 @@ CREATE TABLE `user_coupon` (
 	`coupon_id`	bigint	NOT NULL,
 	`created_at`	timestamp	NOT NULL	DEFAULT CURRENT_TIMESTAMP,
 	`used_at`	timestamp	NULL,
+    `available_start_at`	timestamp	NOT NULL,
+    `available_end_at`	timestamp	NOT NULL,
 	`deleted_at`	timestamp	NULL,
 	`user_id`	bigint	NOT NULL,
 
