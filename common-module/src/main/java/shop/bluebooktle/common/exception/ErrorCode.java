@@ -49,8 +49,20 @@ public enum ErrorCode {
 	CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "BC001", "카테고리를 찾을 수 없습니다."), // 존재하는 카테고리가 아닐 시
 	CATEGORY_NAME_ALREADY_EXISTS(HttpStatus.CONFLICT, "BC002", "이미 존재하는 카테고리명입니다. "), // 이미 존재하는 카테고리명일 시
 	CATEGORY_DELETE_ROOT_CATEGORY(HttpStatus.BAD_REQUEST, "BC03", "최상위 카테고리는 삭제할 수 없습니다."),
-
 	BOOK_ALREADY_EXISTS_EXCEPTION(HttpStatus.CONFLICT, "B011", "이미 등록된 도서입니다."),
+
+	// Book Order (도서 주문 포장 오류) - G (Gift)
+	G_BOOK_ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "G001", "도서 주문 정보를 찾을 수 없습니다."),
+	G_BOOK_ORDER_UPDATE_FAILED(HttpStatus.BAD_REQUEST, "G002", "도서 주문 정보 수정에 실패했습니다."),
+	G_BOOK_ORDER_INVALID_QUANTITY(HttpStatus.BAD_REQUEST, "G003", "도서 주문 수량이 유효하지 않습니다."),
+	G_BOOK_ORDER_INVALID_PRICE(HttpStatus.BAD_REQUEST, "G004", "도서 주문 가격이 유효하지 않습니다."),
+	G_ORDER_PACKAGING_NOT_FOUND(HttpStatus.NOT_FOUND, "G005", "도서 주문 포장 정보를 찾을 수 없습니다."),
+	G_ORDER_PACKAGING_ALREADY_EXISTS(HttpStatus.CONFLICT, "G006", "이미 해당 도서 주문에 포장 옵션이 등록되어 있습니다."),
+	G_ORDER_PACKAGING_INVALID_OPTION(HttpStatus.BAD_REQUEST, "G007", "유효하지 않은 포장 옵션입니다."),
+	G_ORDER_PACKAGING_INVALID_QUANTITY(HttpStatus.BAD_REQUEST, "G008", "포장 수량은 1개 이상이어야 합니다."),
+	G_ORDER_PACKAGING_UPDATE_FAILED(HttpStatus.BAD_REQUEST, "G009", "주문 포장 정보 수정에 실패했습니다."),
+	G_ORDER_PACKAGING_DELETE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "G010", "포장 정보 삭제 중 오류가 발생했습니다."),
+	G_ORDER_PACKAGING_OPTION_NOT_FOUND(HttpStatus.NOT_FOUND, "G011", "주문 포장 옵션을 찾을 수 없습니다."),
 
 	// Cart Errors (장바구니 오류) - T (TeaCart)
 	CART_NOT_FOUND(HttpStatus.NOT_FOUND, "T001", "장바구니를 찾을 수 없습니다."), // 예외적인 경우

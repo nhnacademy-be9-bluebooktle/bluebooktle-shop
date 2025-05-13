@@ -17,7 +17,7 @@ import shop.bluebooktle.backend.book.service.BookLikesService;
 import shop.bluebooktle.common.dto.common.JsendResponse;
 
 @RestController
-@RequestMapping("/api/book")
+@RequestMapping("/api/books")
 @RequiredArgsConstructor
 public class BookLikesController {
 	private final BookLikesService bookLikesService;
