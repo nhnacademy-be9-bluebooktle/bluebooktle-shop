@@ -54,6 +54,7 @@ public class BookOrderServiceImpl implements BookOrderService {
 
 	/** 도서 주문 조회 */
 	@Override
+	@Transactional(readOnly = true)
 	public BookOrderResponse getBookOrder(Long bookOrderId) {
 		BookOrder order = bookOrderRepository.findByIdAndDeletedAtIsNull(bookOrderId)
 			.orElseThrow(BookOrderNotFoundException::new);

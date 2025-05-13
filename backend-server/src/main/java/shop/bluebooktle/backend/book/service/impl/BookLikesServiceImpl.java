@@ -81,12 +81,11 @@ public class BookLikesServiceImpl implements BookLikesService {
 	@Override
 	@Transactional(readOnly = true)
 	public List<BookLikesResponse> getBooksLikedByUser(BookLikesRequest request) {
-		List<Book> likedBooks = bookLikesRepository.findBooksLikedByUser(request.getUserId());
-		return likedBooks.stream()
-			.map(book -> BookLikesResponse.builder()
-				.bookId(book.getId())
-				.isLiked(true) // 사용자가 좋아요한 책이므로 true 고정
-				.countLikes((int)bookLikesRepository.countByBook_Id(book.getId())) // 몇 명에게 좋아요를 받았는지 세기
+		List<BookLikes> likedBooks = bookLikesRepository.findAllByUser_Id(request.getUserId());
+		return likedBooks.stream().map(bl -> BookLikesResponse.builder()
+				.bookId(bl.getBook().getId())
+				.isLiked(true)
+				.countLikes((int)bookLikesRepository.countByBook_Id(bl.getBook().getId()))
 				.build())
 			.toList();
 	}

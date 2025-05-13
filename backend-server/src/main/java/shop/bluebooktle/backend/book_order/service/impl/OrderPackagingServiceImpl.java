@@ -17,6 +17,7 @@ import shop.bluebooktle.common.dto.book_order.response.OrderPackagingResponse;
 import shop.bluebooktle.common.exception.book_order.BookOrderNotFoundException;
 import shop.bluebooktle.common.exception.book_order.OrderPackagingNotFoundException;
 import shop.bluebooktle.common.exception.book_order.PackagingOptionNotFoundException;
+import shop.bluebooktle.common.exception.book_order.PackagingQuantityExceedException;
 
 @Service
 @RequiredArgsConstructor
@@ -31,9 +32,12 @@ public class OrderPackagingServiceImpl implements OrderPackagingService {
 	public OrderPackagingResponse addOrderPackaging(OrderPackagingRequest request) {
 		BookOrder bookOrder = bookOrderRepository.findById(request.getBookOrderId())
 			.orElseThrow(BookOrderNotFoundException::new);
-
 		PackagingOption option = packagingOptionRepository.findById(request.getPackagingOptionId())
 			.orElseThrow(PackagingOptionNotFoundException::new);
+
+		if (request.getQuantity() > bookOrder.getQuantity()) { // 수량 검증 (주문 포장 개수 > 도서 주문 수량, 에러)
+			throw new PackagingQuantityExceedException();
+		}
 
 		OrderPackaging orderPackaging = OrderPackaging.builder()
 			.bookOrder(bookOrder)
@@ -54,6 +58,7 @@ public class OrderPackagingServiceImpl implements OrderPackagingService {
 
 	/** 도서 주문 포장 옵션 단건 조회 */
 	@Override
+	@Transactional(readOnly = true)
 	public OrderPackagingResponse getOrderPackaging(Long orderPackagingId) {
 		OrderPackaging op = orderPackagingRepository.findById(orderPackagingId)
 			.orElseThrow(OrderPackagingNotFoundException::new);

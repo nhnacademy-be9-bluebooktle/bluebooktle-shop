@@ -42,6 +42,7 @@ public class PackagingOptionServiceImpl implements PackagingOptionService {
 
 	/** 포장 옵션 전체 조회 */
 	@Override
+	@Transactional(readOnly = true)
 	public Page<PackagingOptionResponse> getPackagingOption(Pageable pageable) {
 		List<PackagingOption> options = packagingOptionRepository.findAllByDeletedAtIsNull();
 		List<PackagingOptionResponse> responses = options.stream()
