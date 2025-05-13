@@ -1,17 +1,35 @@
 package shop.bluebooktle.backend.book.dto.response;
 
-import java.time.LocalDate;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Value;
+import shop.bluebooktle.backend.book.entity.BookSaleInfo;
 
 @Getter
 @Builder
+@Value
 @AllArgsConstructor
 public class BookResponse {
+	Long id;
 	String title;
 	String description;
-	LocalDate publishDate;
+	LocalDateTime publishDate;
 	String isbn;
+	BigDecimal price;
+	BigDecimal salePrice;
+	Integer stock;
+	BigDecimal salePercentage;
+	String thumbnailUrl;
+	List<String> authors;
+	String publisher;
+	List<String> categories;
+	List<String> tags;
+	BookSaleInfo.State state;
+	Long viewCount;
+	Long searchCount;
 }

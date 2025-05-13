@@ -1,6 +1,7 @@
 package shop.bluebooktle.backend.book.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -22,4 +23,6 @@ public interface BookPublisherRepository extends JpaRepository<BookPublisher, Lo
 
 	// 특정 출판사의 특정 도서 존재 유무 조회
 	boolean existsByBookAndPublisher(Book book, Publisher publisher);
+
+	Optional<BookPublisher> findByBookId(Long bookId);
 }

@@ -22,4 +22,6 @@ public interface BookAuthorRepository extends JpaRepository<BookAuthor, Long> {
 
 	// 특정 작가의 특정 도서 존재 유무 조회 (존재 시 true)
 	boolean existsByBookAndAuthor(Book book, Author author);
+
+	List<BookAuthor> findByBookId(Long bookId);
 }
