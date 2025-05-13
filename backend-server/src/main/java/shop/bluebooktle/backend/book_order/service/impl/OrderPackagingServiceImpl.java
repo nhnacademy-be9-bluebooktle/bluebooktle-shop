@@ -58,7 +58,6 @@ public class OrderPackagingServiceImpl implements OrderPackagingService {
 
 	/** 도서 주문 포장 옵션 단건 조회 */
 	@Override
-	@Transactional(readOnly = true)
 	public OrderPackagingResponse getOrderPackaging(Long orderPackagingId) {
 		OrderPackaging op = orderPackagingRepository.findById(orderPackagingId)
 			.orElseThrow(OrderPackagingNotFoundException::new);
