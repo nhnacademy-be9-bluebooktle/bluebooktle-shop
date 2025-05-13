@@ -17,6 +17,10 @@ public class BookCategoryNotFoundException extends ApplicationException {
 		super(ErrorCode.BOOK_CATEGORY_NOT_FOUND, cause);
 	}
 
+	public BookCategoryNotFoundException(String message, Throwable cause) {
+		super(ErrorCode.BOOK_CATEGORY_NOT_FOUND, message, cause);
+	}
+
 	public BookCategoryNotFoundException(Long bookId, Long categoryId) {
 		this("Book category with id " + bookId + " does not exist in category " + categoryId);
 	}
