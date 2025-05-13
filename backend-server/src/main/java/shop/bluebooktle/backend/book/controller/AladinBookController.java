@@ -49,5 +49,4 @@ public class AladinBookController {
 		bookRegisterService.registerBookByAladin(request);
 		return ResponseEntity.status(HttpStatus.CREATED).body(JsendResponse.success());
 	}
-
 }
