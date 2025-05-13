@@ -35,7 +35,8 @@ public class TagController {
 
 	// 태그 수정 (태그명 수정)
 	@PutMapping("/{tagId}")
-	public JsendResponse<Void> updateTag(@PathVariable Long tagId, @RequestBody TagRequest request) {
+	public JsendResponse<Void> updateTag(@PathVariable Long tagId,
+		@Valid @RequestBody TagRequest request) {
 		tagService.updateTag(tagId, request);
 		return JsendResponse.success();
 	}
