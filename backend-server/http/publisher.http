@@ -1,0 +1,64 @@
+@baseUrl = http://localhost:9002/api/publishers
+
+### 출판사 등록 성공 - 1
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+  "name": "출판사테스트1"
+}
+
+### 출판사 등록 실패 (중복된 출판사명)
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+  "name": "출판사테스트1"
+}
+
+### 출판사 등록 성공 - 2
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+  "name": "출판사테스트2"
+}
+
+### 출판사 등록 성공 - 3
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+  "name": "출판사테스트3"
+}
+
+
+### 출판사 등록 성공 - 4
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+  "name": "출판사테스트4"
+}
+
+### 출판사명 수정
+PUT {{baseUrl}}/1
+Content-Type: application/json
+
+{
+  "name": "출판사테스트1-수정"
+}
+
+### 출판사 id 1 삭제
+DELETE {{baseUrl}}/1
+
+### 출판사 존재하지 않는 id 삭제
+DELETE {{baseUrl}}/12345
+
+### 출판사 조회
+GET {{baseUrl}}
+Accept: application/json
+
+### 출판사 조회
+GET {{baseUrl}}?page=0&size=2
+Accept: application/json
