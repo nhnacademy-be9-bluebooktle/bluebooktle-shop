@@ -1,0 +1,170 @@
+@baseUrl = http://localhost:9002/api/admin/books
+
+### 알라딘 도서목록 제목으로 검색
+GET {{baseUrl}}/search?query=개발
+Accept: application/json
+
+### 알라딘 도서 isbn으로 검색
+GET {{baseUrl}}/select?isbn=9791193926994
+Accept: application/json
+
+### 알라딘 도서 등록
+POST {{baseUrl}}/register/aladin
+Content-Type: application/json
+
+{
+  "isbn": "9791193926994",
+  "stock": 999,
+  "isPackable": true,
+  "state": "AVAILABLE"
+}
+
+### 알라딘 도서 등록 실패 - 중복isbn
+POST {{baseUrl}}/register/aladin
+Content-Type: application/json
+
+{
+  "isbn": "9791193926994",
+  "stock": 999,
+  "isPackable": true,
+  "state": "AVAILABLE"
+}
+
+### 알라딘 도서 등록 실패 - 필수필드 stock누락
+POST {{baseUrl}}/register/aladin
+Content-Type: application/json
+
+{
+  "isbn": "9791193926994",
+  "isPackable": true,
+  "state": "AVAILABLE"
+}
+
+### 알라딘 도서 등록 실패 - isbn글자수 잘못된 형식
+POST {{baseUrl}}/register/aladin
+Content-Type: application/json
+
+{
+  "isbn": "97911683407701111111",
+  "stock": "999",
+  "isPackable": true,
+  "state": "AVAILABLE"
+}
+
+### 도서 직접 등록
+POST http://localhost:9002/api/book/register
+Content-Type: application/json
+
+{
+  "title": "제목",
+  "author": [
+    "작가"
+  ],
+  "publisher": "출판사",
+  "tag": [
+    "태그"
+  ],
+  "imageUrl": [
+    "https://image.aladin.co.kr/product/35650/80/coversum/k762036819_1.jpg"
+  ],
+  "category": [
+    "카테고리"
+  ],
+  "isbn": "1234567890123",
+  "description": "테스트 설명",
+  "publishDate": "2025-05-12",
+  "price": 20000,
+  "salePrice": 18000,
+  "stock": 99,
+  "isPackable": true,
+  "state": "AVAILABLE"
+}
+
+### 도서 직접 등록 실패 - 중복isbn
+POST http://localhost:9002/api/book/register
+Content-Type: application/json
+
+{
+  "title": "제목",
+  "author": [
+    "작가"
+  ],
+  "publisher": "출판사",
+  "tag": "태그",
+  "imageUrl": [
+    "https://image.aladin.co.kr/product/35650/80/coversum/k762036819_1.jpg"
+  ],
+  "category": [
+    "카테고리"
+  ],
+  "isbn": "1234567890123",
+  "description": "테스트 설명",
+  "publishDate": "2025-05-12",
+  "price": 20000,
+  "salePrice": 18000,
+  "stock": 99,
+  "isPackable": true,
+  "state": "AVAILABLE"
+}
+
+### 도서 직접 등록 실패 - 필수필드 title 누락
+POST http://localhost:9002/api/book/register
+Content-Type: application/json
+
+{
+  "author": [
+    "작가"
+  ],
+  "publisher": "출판사",
+  "tag": "태그",
+  "imageUrl": [
+    "https://image.aladin.co.kr/product/35650/80/coversum/k762036819_1.jpg"
+  ],
+  "category": [
+    "카테고리"
+  ],
+  "isbn": "1234567890123",
+  "description": "테스트 설명",
+  "publishDate": "2025-05-12",
+  "price": 20000,
+  "salePrice": 18000,
+  "stock": 99,
+  "isPackable": true,
+  "state": "AVAILABLE"
+}
+
+### 도서 직접 등록 실패 - isbn글자수 잘못된 형식
+POST http://localhost:9002/api/book/register
+Content-Type: application/json
+
+{
+  "title": "제목",
+  "author": [
+    "작가"
+  ],
+  "publisher": "출판사",
+  "tag": "태그",
+  "imageUrl": [
+    "https://image.aladin.co.kr/product/35650/80/coversum/k762036819_1.jpg"
+  ],
+  "category": [
+    "카테고리"
+  ],
+  "isbn": "1234567890123456",
+  "description": "테스트 설명",
+  "publishDate": "2025-05-12",
+  "price": 20000,
+  "salePrice": 18000,
+  "stock": 99,
+  "isPackable": true,
+  "state": "AVAILABLE"
+}
+
+### 도서 조회 - book id로
+GET http://localhost:9002/api/book/search/1
+Content-Type: application/json
+
+### 모든 도서 조회 - 제목으로
+GET http://localhost:9002/api/book/search/by-title?title=개발
+Content-Type: application/json
+

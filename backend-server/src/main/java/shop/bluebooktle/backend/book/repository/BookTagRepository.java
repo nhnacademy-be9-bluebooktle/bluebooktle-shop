@@ -22,4 +22,6 @@ public interface BookTagRepository extends JpaRepository<BookTag, Long> {
 
 	// 특정 도서의 특정 태그 연결 유무 조회 (연결 시 true)
 	boolean existsByBookAndTag(Book book, Tag tag);
+
+	List<BookTag> findByBookId(Long bookId);
 }

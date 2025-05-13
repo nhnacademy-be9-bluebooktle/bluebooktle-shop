@@ -1,5 +1,6 @@
 package shop.bluebooktle.backend.book.service.impl;
 
+import java.math.BigDecimal;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -8,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.book.dto.request.BookRegisterByAladinRequest;
 import shop.bluebooktle.backend.book.dto.request.BookRegisterRequest;
-import shop.bluebooktle.backend.book.dto.response.AladinBookResponseDto;
+import shop.bluebooktle.backend.book.dto.response.AladinBookResponse;
 import shop.bluebooktle.backend.book.entity.Author;
 import shop.bluebooktle.backend.book.entity.Book;
 import shop.bluebooktle.backend.book.entity.BookAuthor;
@@ -16,9 +17,11 @@ import shop.bluebooktle.backend.book.entity.BookCategory;
 import shop.bluebooktle.backend.book.entity.BookImg;
 import shop.bluebooktle.backend.book.entity.BookPublisher;
 import shop.bluebooktle.backend.book.entity.BookSaleInfo;
+import shop.bluebooktle.backend.book.entity.BookTag;
 import shop.bluebooktle.backend.book.entity.Category;
 import shop.bluebooktle.backend.book.entity.Img;
 import shop.bluebooktle.backend.book.entity.Publisher;
+import shop.bluebooktle.backend.book.entity.Tag;
 import shop.bluebooktle.backend.book.repository.AuthorRepository;
 import shop.bluebooktle.backend.book.repository.BookAuthorRepository;
 import shop.bluebooktle.backend.book.repository.BookCategoryRepository;
@@ -26,9 +29,11 @@ import shop.bluebooktle.backend.book.repository.BookImgRepository;
 import shop.bluebooktle.backend.book.repository.BookPublisherRepository;
 import shop.bluebooktle.backend.book.repository.BookRepository;
 import shop.bluebooktle.backend.book.repository.BookSaleInfoRepository;
+import shop.bluebooktle.backend.book.repository.BookTagRepository;
 import shop.bluebooktle.backend.book.repository.CategoryRepository;
 import shop.bluebooktle.backend.book.repository.ImgRepository;
 import shop.bluebooktle.backend.book.repository.PublisherRepository;
+import shop.bluebooktle.backend.book.repository.TagRepository;
 import shop.bluebooktle.backend.book.service.AladinBookService;
 import shop.bluebooktle.backend.book.service.BookRegisterService;
 import shop.bluebooktle.common.exception.BookAlreadyExistsException;
@@ -46,18 +51,82 @@ public class BookRegisterServiceImpl implements BookRegisterService {
 	private final PublisherRepository publisherRepository;
 	private final CategoryRepository categoryRepository;
 	private final ImgRepository imgRepository;
+	private final TagRepository tagRepository;
 
 	private final BookAuthorRepository bookAuthorRepository;
 	private final BookPublisherRepository bookPublisherRepository;
 	private final BookCategoryRepository bookCategoryRepository;
 	private final BookImgRepository bookImgRepository;
+	private final BookTagRepository bookTagRepository;
 
+	//연관테이블 완성되면 수정필요 일단기능구현만
 	@Transactional
 	@Override
 	public void registerBook(BookRegisterRequest request) {
-		//직접등록 구현해야함
+		Optional<Book> existBook = bookRepository.findByIsbn(request.getIsbn());
+		if (existBook.isPresent()) {
+			throw new BookAlreadyExistsException();
+		}
+		Book book = Book.builder()
+			.title(request.getTitle())
+			.isbn(request.getIsbn())
+			.description(request.getDescription())
+			.publishDate(request.getPublishDate() != null ?
+				request.getPublishDate().atStartOfDay() : null)
+			.build();
+		bookRepository.save(book);
+
+		//할인율 계산 따로 뺄것
+		BigDecimal salePercentage = request.getPrice().subtract(request.getSalePrice())
+			.divide(request.getPrice(), 2, BigDecimal.ROUND_HALF_UP)
+			.multiply(BigDecimal.valueOf(100));
+
+		//작가, 출판사, 태그, 이미지, 카테고리 - 수정필요
+		for (String authorName : request.getAuthor()) {
+			Author author = authorRepository.findByName(authorName)
+				.orElseGet(() -> authorRepository.save(new Author(authorName)));
+			bookAuthorRepository.save(new BookAuthor(author, book));
+		}
+
+		Publisher publisher = publisherRepository.findByName(request.getPublisher())
+			.orElseGet(() -> publisherRepository.save(new Publisher(request.getPublisher())));
+		bookPublisherRepository.save(new BookPublisher(book, publisher));
+
+		for (String categoryName : request.getCategory()) {
+			Category category = Optional.ofNullable(
+				categoryRepository.findByName(categoryName)
+			).orElseGet(() -> categoryRepository.save(new Category(null, categoryName)));
+			bookCategoryRepository.save(new BookCategory(book, category));
+		}
+
+		for (String imageUrl : request.getImageUrl()) {
+			Img img = imgRepository.findByImgUrl(imageUrl)
+				.orElseGet(() -> imgRepository.save(new Img(imageUrl)));
+			bookImgRepository.save(new BookImg(book, img, false));
+		}
+
+		for (String tagName : request.getTag()) {
+			Tag tag = tagRepository.findByName(tagName).stream()
+				.findFirst()
+				.orElseGet(() -> tagRepository.save(new Tag(tagName)));
+			bookTagRepository.save(new BookTag(tag, book));
+		}
+
+		BookSaleInfo bookSaleInfo = BookSaleInfo.builder()
+			.book(book)
+			.price(request.getPrice())
+			.salePrice(request.getSalePrice())
+			.stock(request.getStock())
+			.isPackable(request.getIsPackable() != null &&
+				request.getIsPackable())
+			.state(request.getState())
+			.salePercentage(salePercentage)
+			.build();
+		bookSaleInfoRepository.save(bookSaleInfo);
 	}
 
+	//연관테이블 완성되면 수정필요 일단기능구현만
+	//알라딘으로 도서저장할시 태그 추가해야함. 가져오는정보에 없음
 	@Transactional
 	@Override
 	public void registerBookByAladin(BookRegisterByAladinRequest request) {
@@ -66,7 +135,7 @@ public class BookRegisterServiceImpl implements BookRegisterService {
 			throw new BookAlreadyExistsException();
 		}
 
-		AladinBookResponseDto aladin = aladinBookService.getBookByIsbn(request.getIsbn());
+		AladinBookResponse aladin = aladinBookService.getBookByIsbn(request.getIsbn());
 		if (aladin == null) {
 			throw new AladinBookNotFoundException("알라딘 API에서 해당 ISBN의 도서를 찾을 수 없습니다.");
 		}

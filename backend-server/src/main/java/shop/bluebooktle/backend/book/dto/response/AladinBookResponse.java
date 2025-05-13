@@ -16,7 +16,7 @@ import shop.bluebooktle.backend.book.dto.request.AladinBookItem;
 @Value
 @Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class AladinBookResponseDto {
+public class AladinBookResponse {
 	String title;
 	String author;
 	String description;
@@ -29,7 +29,7 @@ public class AladinBookResponseDto {
 	String categoryName;
 	String imageUrl;
 
-	public static AladinBookResponseDto from(AladinBookItem item) {
+	public static AladinBookResponse from(AladinBookItem item) {
 		BigDecimal price = BigDecimal.valueOf(item.getPriceStandard());
 		BigDecimal salePrice = BigDecimal.valueOf(item.getPriceSales());
 
@@ -40,7 +40,7 @@ public class AladinBookResponseDto {
 				.divide(price, 0, BigDecimal.ROUND_HALF_UP);
 		}
 
-		return AladinBookResponseDto.builder()
+		return AladinBookResponse.builder()
 			.title(item.getTitle())
 			.author(item.getAuthor())
 			.description(item.getDescription())
