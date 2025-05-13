@@ -10,9 +10,11 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import shop.bluebooktle.common.entity.BaseEntity;
 
 @Entity
@@ -29,9 +31,11 @@ public class Author extends BaseEntity {
 	@Column(name = "author_id")
 	private Long id;
 
+	@Setter
 	@Column(name = "name", nullable = false, length = 50) //공동, 외국인작가 이름 고려해서 수정해서 테스트중 원래 length10
 	private String name;
 
+	@Builder
 	public Author(String name) {
 		this.name = name;
 	}
