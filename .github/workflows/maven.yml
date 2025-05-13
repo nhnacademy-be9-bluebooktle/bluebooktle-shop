@@ -147,10 +147,6 @@ jobs:
             # 환경변수로 프로파일과 Config URI를 내보냄
             export SPRING_PROFILES_ACTIVE="${{ env.SPRING_PROFILES_ACTIVE }}"
             export CONFIG_SERVER_URI="${{ env.CONFIG_SERVER_URI }}"
-            
-            
-            export SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
-            export CONFIG_SERVER_URI=${CONFIG_SERVER_URI}
 
             for MOD in ${{ needs.detect_changes.outputs.changed }}; do
               echo "▶ Rolling deploy: $MOD"
