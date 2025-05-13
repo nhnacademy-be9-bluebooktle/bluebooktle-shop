@@ -9,7 +9,7 @@ CREATE TABLE `publisher` (
 
 CREATE TABLE `author` (
 	`author_id`	bigint	NOT NULL AUTO_INCREMENT,
-	`name`	varchar(10)	NOT NULL,
+	`name`	varchar(50)	NOT NULL,
 	`created_at`	timestamp	NOT NULL	DEFAULT CURRENT_TIMESTAMP,
 	`deleted_at`	timestamp	NULL,
 

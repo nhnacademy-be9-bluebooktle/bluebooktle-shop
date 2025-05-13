@@ -10,9 +10,11 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import shop.bluebooktle.common.entity.BaseEntity;
 
 @Entity
@@ -30,8 +32,10 @@ public class Publisher extends BaseEntity {
 	private Long id;
 
 	@Column(name = "name", nullable = false, length = 20)
+	@Setter
 	private String name;
 
+	@Builder
 	public Publisher(String name) {
 		this.name = name;
 	}

@@ -59,14 +59,14 @@ public class CategoryServiceImpl implements CategoryService {
 
 	@Override
 	@Transactional
-	public void updateCategory(CategoryUpdateRequest request) {
-		if (!categoryRepository.existsById(request.id())) {
-			throw new CategoryNotFoundException(request.id());
-		}
-		if (categoryRepository.existsByNameAndIdNot(request.name(), request.id())) {
+	public void updateCategory(Long categoryId, CategoryUpdateRequest request) {
+		Category category = categoryRepository.findById(categoryId)
+			.orElseThrow(() -> new CategoryNotFoundException(categoryId));
+
+		if (categoryRepository.existsByNameAndIdNot(request.name(), categoryId)) {
 			throw new CategoryAlreadyExistsException("Category name already exists: " + request.name());
 		}
-		Category category = categoryRepository.findById(request.id()).get();
+
 		category.setName(request.name());
 		categoryRepository.save(category);
 	}

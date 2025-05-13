@@ -3,10 +3,13 @@ package shop.bluebooktle.backend.book.dto.request;
 import org.hibernate.validator.constraints.Length;
 
 import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
-public record CategoryUpdateRequest(
+@AllArgsConstructor
+@Getter
+public class PublisherRequest {
 	@NotBlank
-	@Length(max = 50)
-	String name
-) {
+	@Length(max = 20)
+	private String name;
 }
