@@ -5,6 +5,7 @@ import java.util.List;
 import shop.bluebooktle.backend.book.dto.response.BookResponse;
 import shop.bluebooktle.backend.book.entity.Book;
 import shop.bluebooktle.backend.book.dto.response.BookResponse;
+import shop.bluebooktle.backend.book.entity.Book;
 
 public interface BookService {
 
