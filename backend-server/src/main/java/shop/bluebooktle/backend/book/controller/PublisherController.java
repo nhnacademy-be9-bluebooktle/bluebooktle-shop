@@ -12,16 +12,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import shop.bluebooktle.backend.book.dto.request.PublisherRegisterRequest;
-import shop.bluebooktle.backend.book.dto.request.PublisherUpdateRequest;
+import shop.bluebooktle.backend.book.dto.request.PublisherRequest;
 import shop.bluebooktle.backend.book.dto.response.PublisherInfoResponse;
 import shop.bluebooktle.backend.book.service.PublisherService;
 import shop.bluebooktle.common.dto.common.JsendResponse;
 
 @RestController
-@RequestMapping("api/publishers")
+@RequestMapping("/api/publishers")
 @RequiredArgsConstructor
 @Slf4j
 public class PublisherController {
@@ -30,16 +30,18 @@ public class PublisherController {
 
 	// 출판사 등록
 	@PostMapping
-	public JsendResponse<Void> addPublisher(@RequestBody PublisherRegisterRequest request) {
-		publisherService.addPublisher(request);
-		return JsendResponse.success();
+	public JsendResponse<String> addPublisher(
+		@Valid @RequestBody PublisherRequest request) {
+
+		publisherService.registerPublisher(request);
+		return JsendResponse.success(null);
 	}
 
 	// 출판사명 수정
 	@PutMapping("/{publisherId}")
 	public JsendResponse<Void> updatePublisher(@PathVariable Long publisherId,
-		@RequestBody PublisherUpdateRequest request) {
-		publisherService.updatePublisher(request);
+		@RequestBody PublisherRequest request) {
+		publisherService.updatePublisher(publisherId, request);
 		return JsendResponse.success();
 	}
 

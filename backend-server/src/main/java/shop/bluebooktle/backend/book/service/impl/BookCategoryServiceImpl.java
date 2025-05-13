@@ -3,13 +3,13 @@ package shop.bluebooktle.backend.book.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
-import shop.bluebooktle.backend.book.dto.request.BookCategoryRequest;
 import shop.bluebooktle.backend.book.dto.request.BookInfoRequest;
-import shop.bluebooktle.backend.book.dto.request.CategoryInfoRequest;
 import shop.bluebooktle.backend.book.dto.response.BookInfoResponse;
 import shop.bluebooktle.backend.book.dto.response.CategoryResponse;
 import shop.bluebooktle.backend.book.entity.Book;
@@ -36,9 +36,9 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 
 	@Override
 	@Transactional
-	public void registerBookCategory(BookCategoryRequest request) {
-		Book book = requireBook(request.bookId());
-		Category category = requireCategory(request.categoryId());
+	public void registerBookCategory(Long bookId, Long categoryId) {
+		Book book = requireBook(bookId);
+		Category category = requireCategory(categoryId);
 
 		// 도서에 이미 등록된 카테고리인 경우 예외 발생
 		if (bookCategoryRepository.existsByBookAndCategory(book, category)) {
@@ -52,14 +52,13 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 		}
 		BookCategory bookCategory = new BookCategory(book, category);
 		bookCategoryRepository.save(bookCategory);
-
 	}
 
 	@Override
 	@Transactional
-	public void deleteBookCategory(BookCategoryRequest request) {
-		Book book = requireBook(request.bookId());
-		Category category = requireCategory(request.categoryId());
+	public void deleteBookCategory(Long bookId, Long categoryId) {
+		Book book = requireBook(bookId);
+		Category category = requireCategory(categoryId);
 
 		if (!bookCategoryRepository.existsByBookAndCategory(book, category)) {
 			throw new BookCategoryNotFoundException(book.getId(), category.getId());
@@ -92,16 +91,11 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<BookInfoResponse> searchBooksByCategory(CategoryInfoRequest request) {
-		Category category = requireCategory(request.categoryId());
+	public Page<BookInfoResponse> searchBooksByCategory(Long categoryId, Pageable pageable) {
+		Category category = requireCategory(categoryId);
 
-		List<Long> bookIds = bookCategoryRepository.findBookIdByCategory_Id(category.getId());
-
-		List<BookInfoResponse> result = new ArrayList<>();
-		for (Long bookId : bookIds) {
-			result.add(new BookInfoResponse(bookId));
-		}
-		return result;
+		Page<BookCategory> bookCategories = bookCategoryRepository.findAllByCategory(category, pageable);
+		return bookCategories.map(bc -> new BookInfoResponse(bc.getBook().getId()));
 	}
 
 	private Book requireBook(Long id) {

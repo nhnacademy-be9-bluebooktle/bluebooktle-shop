@@ -1,12 +1,10 @@
 package shop.bluebooktle.backend.book.controller;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -65,16 +63,8 @@ public class CategoryController {
 	// 카테고리 등록
 	@PostMapping
 	public JsendResponse<String> addCategory(
-		@Valid @RequestBody CategoryRegisterRequest request,
-		BindingResult bindingResult
+		@Valid @RequestBody CategoryRegisterRequest request
 	) {
-		log.info("Add category: {}", request);
-		if (bindingResult.hasErrors()) {
-			String errorMessage = bindingResult.getFieldErrors().stream()
-				.map(fe -> fe.getField() + ": " + fe.getDefaultMessage())
-				.collect(Collectors.joining(", "));
-			return JsendResponse.fail(errorMessage);
-		}
 		categoryService.registerCategory(request);
 		return JsendResponse.success(null);
 	}
@@ -100,16 +90,11 @@ public class CategoryController {
 	// 카테고리명 수정
 	@PutMapping("/{categoryId}")
 	public JsendResponse<String> updateCategory(
-		@Valid @RequestBody CategoryUpdateRequest request,
-		BindingResult bindingResult
+		@PathVariable Long categoryId,
+		@Valid @RequestBody CategoryUpdateRequest request
 	) {
-		if (bindingResult.hasErrors()) {
-			String errorMessage = bindingResult.getFieldErrors().stream()
-				.map(fe -> fe.getField() + ": " + fe.getDefaultMessage())
-				.collect(Collectors.joining(", "));
-			return JsendResponse.fail(errorMessage);
-		}
-		categoryService.updateCategory(request);
+
+		categoryService.updateCategory(categoryId, request);
 		return JsendResponse.success(null);
 	}
 

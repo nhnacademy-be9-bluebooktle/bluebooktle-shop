@@ -3,17 +3,16 @@ package shop.bluebooktle.backend.book.service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import shop.bluebooktle.backend.book.dto.request.PublisherRegisterRequest;
-import shop.bluebooktle.backend.book.dto.request.PublisherUpdateRequest;
+import shop.bluebooktle.backend.book.dto.request.PublisherRequest;
 import shop.bluebooktle.backend.book.dto.response.PublisherInfoResponse;
 
 public interface PublisherService {
 
 	// 출판사 등록
-	void addPublisher(PublisherRegisterRequest request);
+	void registerPublisher(PublisherRequest request);
 
 	// 출판사 수정
-	void updatePublisher(PublisherUpdateRequest request);
+	void updatePublisher(Long publisherId, PublisherRequest request);
 
 	// 출판사 조회
 	PublisherInfoResponse getPublisher(Long publisherId);

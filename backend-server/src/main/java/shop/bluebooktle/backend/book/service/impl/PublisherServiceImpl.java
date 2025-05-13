@@ -6,8 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
-import shop.bluebooktle.backend.book.dto.request.PublisherRegisterRequest;
-import shop.bluebooktle.backend.book.dto.request.PublisherUpdateRequest;
+import shop.bluebooktle.backend.book.dto.request.PublisherRequest;
 import shop.bluebooktle.backend.book.dto.response.PublisherInfoResponse;
 import shop.bluebooktle.backend.book.entity.Publisher;
 import shop.bluebooktle.backend.book.repository.PublisherRepository;
@@ -23,9 +22,9 @@ public class PublisherServiceImpl implements PublisherService {
 
 	@Override
 	@Transactional
-	public void addPublisher(PublisherRegisterRequest request) {
+	public void registerPublisher(PublisherRequest request) {
 		if (publisherRepository.existsByName(request.getName())) {
-			throw new PublisherAlreadyExistsException("출판사명" + request.getName());
+			throw new PublisherAlreadyExistsException("출판사명 : " + request.getName());
 		}
 		Publisher publisher = Publisher.builder()
 			.name(request.getName())
@@ -35,12 +34,10 @@ public class PublisherServiceImpl implements PublisherService {
 
 	@Override
 	@Transactional
-	public void updatePublisher(PublisherUpdateRequest request) {
-		if (!publisherRepository.existsById(request.getPublisherId())) {
-			throw new PublisherNotFoundException(request.getPublisherId());
-		}
+	public void updatePublisher(Long publisherId, PublisherRequest request) {
+		Publisher publisher = publisherRepository.findById(publisherId)
+			.orElseThrow(() -> new PublisherNotFoundException(publisherId));
 
-		Publisher publisher = publisherRepository.findById(request.getPublisherId()).get();
 		publisher.setName(request.getName());
 		publisherRepository.save(publisher);
 	}
@@ -48,11 +45,9 @@ public class PublisherServiceImpl implements PublisherService {
 	@Override
 	@Transactional(readOnly = true)
 	public PublisherInfoResponse getPublisher(Long publisherId) {
-		if (!publisherRepository.existsById(publisherId)) {
-			throw new PublisherNotFoundException(publisherId);
-		}
+		Publisher publisher = publisherRepository.findById(publisherId)
+			.orElseThrow(() -> new PublisherNotFoundException(publisherId));
 
-		Publisher publisher = publisherRepository.findById(publisherId).get();
 		return new PublisherInfoResponse(publisher.getId(), publisher.getName());
 	}
 
@@ -60,18 +55,15 @@ public class PublisherServiceImpl implements PublisherService {
 	@Transactional(readOnly = true)
 	public Page<PublisherInfoResponse> getPublishers(Pageable pageable) {
 		Page<Publisher> publisherPage = publisherRepository.findAll(pageable);
-
 		return publisherPage.map(p -> new PublisherInfoResponse(p.getId(), p.getName()));
 	}
 
 	@Override
 	@Transactional
 	public void deletePublisher(Long publisherId) {
-		if (!publisherRepository.existsById(publisherId)) {
-			throw new PublisherNotFoundException(publisherId);
-		}
+		Publisher publisher = publisherRepository.findById(publisherId)
+			.orElseThrow(() -> new PublisherNotFoundException(publisherId));
 
-		Publisher publisher = publisherRepository.findById(publisherId).get();
 		publisherRepository.delete(publisher);
 	}
 }

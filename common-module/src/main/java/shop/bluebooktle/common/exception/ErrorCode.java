@@ -58,6 +58,9 @@ public enum ErrorCode {
 	PUBLISHER_ALREADY_EXISTS(HttpStatus.CONFLICT, "BP01", "이미 등록된 출판사입니다."),
 	PUBLISHER_NOT_FOUND(HttpStatus.NOT_FOUND, "BP02", "해당 출판사를 찾을 수 없습니다."),
 
+	TAG_ALREADY_EXISTS(HttpStatus.CONFLICT, "BT01", "이미 등록된 태그입니다."),
+	TAG_NOT_FOUND(HttpStatus.NOT_FOUND, "BT02", "해당 태그를 찾을 수 없습니다."),
+
 	// Book Order (도서 주문 포장 오류) - G (Gift)
 	G_BOOK_ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "G001", "도서 주문 정보를 찾을 수 없습니다."),
 	G_BOOK_ORDER_UPDATE_FAILED(HttpStatus.BAD_REQUEST, "G002", "도서 주문 정보 수정에 실패했습니다."),

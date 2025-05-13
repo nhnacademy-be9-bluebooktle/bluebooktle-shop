@@ -8,7 +8,7 @@ import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
-public class PublisherRegisterRequest {
+public class PublisherRequest {
 	@NotBlank
 	@Length(max = 20)
 	private String name;

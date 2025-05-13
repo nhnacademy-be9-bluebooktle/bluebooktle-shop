@@ -1,7 +1,8 @@
 package shop.bluebooktle.backend.book.controller;
 
-import java.util.List;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -11,8 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import shop.bluebooktle.backend.book.dto.request.BookCategoryRequest;
-import shop.bluebooktle.backend.book.dto.request.CategoryInfoRequest;
 import shop.bluebooktle.backend.book.dto.response.BookInfoResponse;
 import shop.bluebooktle.backend.book.service.BookCategoryService;
 import shop.bluebooktle.backend.book.service.CategoryService;
@@ -33,8 +32,7 @@ public class BookCategoryController {
 		@PathVariable Long bookId,
 		@PathVariable Long categoryId
 	) {
-		BookCategoryRequest request = new BookCategoryRequest(bookId, categoryId);
-		bookCategoryService.registerBookCategory(request);
+		bookCategoryService.registerBookCategory(bookId, categoryId);
 		return JsendResponse.success();
 	}
 
@@ -44,18 +42,18 @@ public class BookCategoryController {
 		@PathVariable Long bookId,
 		@PathVariable Long categoryId
 	) {
-		BookCategoryRequest request = new BookCategoryRequest(bookId, categoryId);
-		bookCategoryService.deleteBookCategory(request);
+		bookCategoryService.deleteBookCategory(bookId, categoryId);
 		return JsendResponse.success();
 	}
 
 	// 해당 카테고리에 등록된 도서 목록 반환
 	@GetMapping("/books")
-	public JsendResponse<List<BookInfoResponse>> getBooksByCategory(
-		@PathVariable Long categoryId
+	public JsendResponse<Page<BookInfoResponse>> getBooksByCategory(
+		@PathVariable Long categoryId,
+		@PageableDefault(size = 10, sort = "id") Pageable pageable
 	) {
-		CategoryInfoRequest request = new CategoryInfoRequest(categoryId);
-		List<BookInfoResponse> responses = bookCategoryService.searchBooksByCategory(request);
+		// TODO + title, image 등 보여줘야 함
+		Page<BookInfoResponse> responses = bookCategoryService.searchBooksByCategory(categoryId, pageable);
 		return JsendResponse.success(responses);
 	}
 
