@@ -16,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.book.dto.request.BookRegisterByAladinRequest;
 import shop.bluebooktle.backend.book.dto.response.AladinBookResponseDto;
 import shop.bluebooktle.backend.book.service.BookRegisterService;
-import shop.bluebooktle.backend.book.service.Impl.AladinBookServiceImpl;
+import shop.bluebooktle.backend.book.service.impl.AladinBookServiceImpl;
 import shop.bluebooktle.common.dto.common.JsendResponse;
 import shop.bluebooktle.common.exception.book.AladinBookNotFoundException;
 
