@@ -10,6 +10,9 @@ import shop.bluebooktle.backend.book.dto.response.author.AuthorResponse;
 import shop.bluebooktle.backend.book.entity.Author;
 import shop.bluebooktle.backend.book.repository.AuthorRepository;
 import shop.bluebooktle.backend.book.service.AuthorService;
+import shop.bluebooktle.common.exception.book.AuthorAlreadyExistsException;
+import shop.bluebooktle.common.exception.book.AuthorIdNullException;
+import shop.bluebooktle.common.exception.book.AuthorNameEmptyException;
 
 @Service
 @RequiredArgsConstructor
@@ -21,10 +24,10 @@ public class AuthorServiceImpl implements AuthorService {
 	@Override
 	public void registerAuthor(AuthorRegisterRequest authorRegisterRequest) {
 		if (authorRegisterRequest.getName() == null || authorRegisterRequest.getName().trim().isEmpty()) {
-			throw new IllegalArgumentException("Name cannot be empty"); // TODO: 프로젝트 에러 처리 방식으로 변경
+			throw new AuthorNameEmptyException();
 		}
 		if (!authorRepository.findByName(authorRegisterRequest.getName()).isEmpty()) {
-			throw new IllegalArgumentException("Name already exists"); // TODO: 프로젝트 예외 처리 방식
+			throw new AuthorAlreadyExistsException(authorRegisterRequest.getName());
 		}
 
 		Author author = Author.builder().name(authorRegisterRequest.getName()).build();
@@ -36,7 +39,7 @@ public class AuthorServiceImpl implements AuthorService {
 	@Override
 	public AuthorResponse getAuthor(Long authorId) {
 		if (authorId == null) {
-			throw new IllegalArgumentException("AuthorId cannot be null"); // TODO: 프로젝트 에러 처리 방식으로 변경
+			throw new AuthorIdNullException();
 		}
 
 		Author author = authorRepository.findById(authorId).orElseThrow(() -> new IllegalArgumentException("Author not found"));
@@ -53,10 +56,10 @@ public class AuthorServiceImpl implements AuthorService {
 	@Override
 	public void updateAuthor(Long authorId, AuthorUpdateRequest authorUpdateRequest) {
 		if (authorId == null) {
-			throw new IllegalArgumentException("AuthorId cannot be null"); // TODO: 프로젝트 에러 처리 방식으로 변경
+			throw new AuthorIdNullException();
 		}
 		if (authorUpdateRequest.getName() == null || authorUpdateRequest.getName().trim().isEmpty()) {
-			throw new IllegalArgumentException("Name cannot be empty");
+			throw new AuthorNameEmptyException();
 		}
 
 		Author author = authorRepository.findById(authorId).orElseThrow(() -> new IllegalArgumentException("Author not found"));
@@ -70,7 +73,7 @@ public class AuthorServiceImpl implements AuthorService {
 	@Override
 	public void deleteAuthor(Long authorId) {
 		if (authorId == null) {
-			throw new IllegalArgumentException("AuthorId cannot be null");
+			throw new AuthorIdNullException();
 		}
 		// Author author = authorRepository.findById(authorId).orElseThrow(() -> new IllegalArgumentException("Author not found"));
 		// authorRepository.delete(author);
