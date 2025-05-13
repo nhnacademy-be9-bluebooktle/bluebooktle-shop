@@ -1,4 +1,4 @@
-package shop.bluebooktle.backend.book.service.Impl;
+package shop.bluebooktle.backend.book.service.impl;
 
 import java.util.List;
 
@@ -17,6 +17,7 @@ import shop.bluebooktle.backend.book.repository.BookRepository;
 import shop.bluebooktle.backend.book.repository.BookSaleInfoRepository;
 import shop.bluebooktle.backend.book.repository.BookTagRepository;
 import shop.bluebooktle.backend.book.service.BookService;
+import shop.bluebooktle.common.exception.BookAlreadyExistsException;
 import shop.bluebooktle.common.exception.book.BookNotFoundException;
 
 @Service
@@ -144,5 +145,4 @@ public class BookServiceImpl implements BookService {
 	public boolean existsBookById(Long id) {
 		return bookRepository.existsById(id);
 	}
-
 }
