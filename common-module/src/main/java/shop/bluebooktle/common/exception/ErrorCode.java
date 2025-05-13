@@ -48,6 +48,7 @@ public enum ErrorCode {
 	BOOK_STATE_NOT_AVAILABLE(HttpStatus.BAD_REQUEST, "B010", "현재 구매할 수 없는 도서입니다."), // 재고 부족, 판매 종료 등
 	BOOK_ALREADY_EXISTS_EXCEPTION(HttpStatus.CONFLICT, "B011", "이미 등록된 도서입니다."),
 
+	// Book - 카테고리
 	BOOK_CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "BC01", "도서에 등록된 카테고리를 찾을 수 없습니다."),
 	CATEGORY_NAME_ALREADY_EXISTS(HttpStatus.CONFLICT, "BC002", "이미 존재하는 카테고리명입니다. "), // 이미 존재하는 카테고리명일 시
 	CATEGORY_DELETE_ROOT_CATEGORY(HttpStatus.BAD_REQUEST, "BC03", "최상위 카테고리는 삭제할 수 없습니다."),
@@ -55,9 +56,10 @@ public enum ErrorCode {
 	BOOK_CATEGORY_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "BC05", "카테고리는 최대 10개까지 등록할 수 있습니다."),
 	BOOK_CATEGORY_REQUIRED(HttpStatus.BAD_REQUEST, "BC06", "도서는 카테고리를 최소 1개 이상 가져야 합니다."),
 
+	// Book - 출판사
 	PUBLISHER_ALREADY_EXISTS(HttpStatus.CONFLICT, "BP01", "이미 등록된 출판사입니다."),
 	PUBLISHER_NOT_FOUND(HttpStatus.NOT_FOUND, "BP02", "해당 출판사를 찾을 수 없습니다."),
-
+	// Book - 태그
 	TAG_ALREADY_EXISTS(HttpStatus.CONFLICT, "BT01", "이미 등록된 태그입니다."),
 	TAG_NOT_FOUND(HttpStatus.NOT_FOUND, "BT02", "해당 태그를 찾을 수 없습니다."),
 
