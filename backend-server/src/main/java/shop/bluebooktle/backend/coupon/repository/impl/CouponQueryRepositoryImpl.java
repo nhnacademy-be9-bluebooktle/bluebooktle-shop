@@ -18,7 +18,7 @@ import shop.bluebooktle.backend.coupon.entity.QCoupon;
 import shop.bluebooktle.backend.coupon.entity.QCouponType;
 import shop.bluebooktle.backend.coupon.entity.QRelativeCoupon;
 import shop.bluebooktle.backend.coupon.entity.QUserCoupon;
-import shop.bluebooktle.backend.coupon.repository.query.CouponQueryRepository;
+import shop.bluebooktle.backend.coupon.repository.CouponQueryRepository;
 import shop.bluebooktle.common.dto.coupon.response.CouponResponse;
 import shop.bluebooktle.common.dto.coupon.response.CouponTypeResponse;
 import shop.bluebooktle.common.dto.coupon.response.QCouponResponse;
