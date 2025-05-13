@@ -3,12 +3,13 @@ package shop.bluebooktle.backend.book.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
-import shop.bluebooktle.backend.book.dto.request.BookCategoryRequest;
 import shop.bluebooktle.backend.book.dto.request.BookInfoRequest;
-import shop.bluebooktle.backend.book.dto.request.CategoryInfoRequest;
 import shop.bluebooktle.backend.book.dto.response.BookInfoResponse;
 import shop.bluebooktle.backend.book.dto.response.CategoryResponse;
 import shop.bluebooktle.backend.book.entity.Book;
@@ -21,7 +22,7 @@ import shop.bluebooktle.backend.book.service.BookCategoryService;
 import shop.bluebooktle.common.exception.book.BookCategoryAlreadyExistsException;
 import shop.bluebooktle.common.exception.book.BookCategoryLimitExceededException;
 import shop.bluebooktle.common.exception.book.BookCategoryNotFoundException;
-import shop.bluebooktle.common.exception.book.BookMustHaveAtLeastOneCategoryException;
+import shop.bluebooktle.common.exception.book.BookCategoryRequiredException;
 import shop.bluebooktle.common.exception.book.BookNotFoundException;
 import shop.bluebooktle.common.exception.book.CategoryNotFoundException;
 
@@ -34,9 +35,10 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 	private final BookCategoryRepository bookCategoryRepository;
 
 	@Override
-	public void registerBookCategory(BookCategoryRequest request) {
-		Book book = requireBook(request.bookId());
-		Category category = requireCategory(request.categoryId());
+	@Transactional
+	public void registerBookCategory(Long bookId, Long categoryId) {
+		Book book = requireBook(bookId);
+		Category category = requireCategory(categoryId);
 
 		// 도서에 이미 등록된 카테고리인 경우 예외 발생
 		if (bookCategoryRepository.existsByBookAndCategory(book, category)) {
@@ -50,13 +52,13 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 		}
 		BookCategory bookCategory = new BookCategory(book, category);
 		bookCategoryRepository.save(bookCategory);
-
 	}
 
 	@Override
-	public void deleteBookCategory(BookCategoryRequest request) {
-		Book book = requireBook(request.bookId());
-		Category category = requireCategory(request.categoryId());
+	@Transactional
+	public void deleteBookCategory(Long bookId, Long categoryId) {
+		Book book = requireBook(bookId);
+		Category category = requireCategory(categoryId);
 
 		if (!bookCategoryRepository.existsByBookAndCategory(book, category)) {
 			throw new BookCategoryNotFoundException(book.getId(), category.getId());
@@ -64,7 +66,7 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 
 		long count = bookCategoryRepository.countByBook(book);
 		if (count <= 1) {
-			throw new BookMustHaveAtLeastOneCategoryException(book.getId());
+			throw new BookCategoryRequiredException(book.getId());
 		}
 
 		BookCategory bookCategory = new BookCategory(book, category);
@@ -72,6 +74,7 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public List<CategoryResponse> getCategoryByBookId(BookInfoRequest request) {
 		Book book = requireBook(request.bookId());
 
@@ -82,22 +85,17 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 			Category category = bookCategory.getCategory();
 			result.add(new CategoryResponse(category.getId(), category.getName()));
 		}
-		
+
 		return result;
 	}
 
 	@Override
-	public List<BookInfoResponse> searchBooksByCategory(CategoryInfoRequest request) {
-		Category category = requireCategory(request.categoryId());
+	@Transactional(readOnly = true)
+	public Page<BookInfoResponse> searchBooksByCategory(Long categoryId, Pageable pageable) {
+		Category category = requireCategory(categoryId);
 
-		List<Long> bookIds = bookCategoryRepository.findBookIdByCategory_Id(category.getId());
-
-		List<BookInfoResponse> result = new ArrayList<>();
-		for (Long bookId : bookIds) {
-			result.add(new BookInfoResponse(bookId));
-		}
-
-		return result;
+		Page<BookCategory> bookCategories = bookCategoryRepository.findAllByCategory(category, pageable);
+		return bookCategories.map(bc -> new BookInfoResponse(bc.getBook().getId()));
 	}
 
 	private Book requireBook(Long id) {

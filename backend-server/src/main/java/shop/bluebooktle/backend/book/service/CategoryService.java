@@ -14,7 +14,7 @@ public interface CategoryService {
 
 	void registerCategory(CategoryRegisterRequest request);
 
-	void updateCategory(CategoryUpdateRequest request);
+	void updateCategory(Long categoryId, CategoryUpdateRequest request);
 
 	void deleteCategory(Long categoryId);
 
