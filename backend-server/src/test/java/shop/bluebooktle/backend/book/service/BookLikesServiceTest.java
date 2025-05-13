@@ -23,6 +23,7 @@ import shop.bluebooktle.backend.book.repository.BookRepository;
 import shop.bluebooktle.backend.book.service.impl.BookLikesServiceImpl;
 import shop.bluebooktle.backend.user.repository.UserRepository;
 import shop.bluebooktle.common.entity.auth.User;
+import shop.bluebooktle.common.exception.auth.UserNotFoundException;
 import shop.bluebooktle.common.exception.book.BookLikesAlreadyChecked;
 import shop.bluebooktle.common.exception.book.BookNotFoundException;
 
@@ -108,7 +109,18 @@ public class BookLikesServiceTest {
 	@Test
 	@DisplayName("사용자 조회 불가 예외 발생")
 	void UserNotFoundExceptionTest() {
-		
+		// given
+		BookLikesRequest request = BookLikesRequest.builder()
+			.bookId(1L)
+			.userId(1L)
+			.build();
+
+		when(bookLikesRepository.existsByUser_IdAndBook_Id(1L, 1L)).thenReturn(false);
+		when(bookRepository.findById(1L)).thenReturn(Optional.of(book));
+		when(userRepository.findById(1L)).thenReturn(Optional.empty()); // 유저 없음
+
+		// when & then
+		assertThrows(UserNotFoundException.class, () -> bookLikesService.like(request));
 	}
 
 	@Test
