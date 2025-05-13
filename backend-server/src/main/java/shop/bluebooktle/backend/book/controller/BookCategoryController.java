@@ -3,6 +3,8 @@ package shop.bluebooktle.backend.book.controller;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,6 +18,7 @@ import shop.bluebooktle.backend.book.dto.response.BookInfoResponse;
 import shop.bluebooktle.backend.book.service.BookCategoryService;
 import shop.bluebooktle.backend.book.service.CategoryService;
 import shop.bluebooktle.common.dto.common.JsendResponse;
+import shop.bluebooktle.common.dto.common.PaginationData;
 
 @RestController
 @RequestMapping("/api/categories/{categoryId}")
@@ -28,33 +31,34 @@ public class BookCategoryController {
 
 	// 도서에 카테고리 추가
 	@PostMapping("/books/{bookId}")
-	public JsendResponse<Void> addCategory(
+	public ResponseEntity<JsendResponse<Void>> addCategory(
 		@PathVariable Long bookId,
 		@PathVariable Long categoryId
 	) {
 		bookCategoryService.registerBookCategory(bookId, categoryId);
-		return JsendResponse.success();
+		return ResponseEntity.status(HttpStatus.CREATED).body(JsendResponse.success());
 	}
 
 	// 도서에 해당 카테고리 삭제
 	@DeleteMapping("/books/{bookId}")
-	public JsendResponse<Void> deleteCategory(
+	public ResponseEntity<JsendResponse<Void>> deleteCategory(
 		@PathVariable Long bookId,
 		@PathVariable Long categoryId
 	) {
 		bookCategoryService.deleteBookCategory(bookId, categoryId);
-		return JsendResponse.success();
+		return ResponseEntity.status(HttpStatus.CREATED).body(JsendResponse.success());
 	}
 
 	// 해당 카테고리에 등록된 도서 목록 반환
 	@GetMapping("/books")
-	public JsendResponse<Page<BookInfoResponse>> getBooksByCategory(
+	public ResponseEntity<JsendResponse<PaginationData<BookInfoResponse>>> getBooksByCategory(
 		@PathVariable Long categoryId,
 		@PageableDefault(size = 10, sort = "id") Pageable pageable
 	) {
 		// TODO + title, image 등 보여줘야 함
 		Page<BookInfoResponse> responses = bookCategoryService.searchBooksByCategory(categoryId, pageable);
-		return JsendResponse.success(responses);
+		PaginationData<BookInfoResponse> paginationData = new PaginationData<>(responses);
+		return ResponseEntity.ok(JsendResponse.success(paginationData));
 	}
 
 	// TODO 해당 도서에 등록된 카테고리 목록 반환

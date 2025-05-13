@@ -3,6 +3,8 @@ package shop.bluebooktle.backend.book.controller;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,6 +20,7 @@ import shop.bluebooktle.backend.book.dto.request.TagRequest;
 import shop.bluebooktle.backend.book.dto.response.TagInfoResponse;
 import shop.bluebooktle.backend.book.service.TagService;
 import shop.bluebooktle.common.dto.common.JsendResponse;
+import shop.bluebooktle.common.dto.common.PaginationData;
 
 @RestController
 @RequestMapping("/api/tags")
@@ -28,38 +31,42 @@ public class TagController {
 
 	// 태그 등록
 	@PostMapping
-	public JsendResponse<Void> addTag(@Valid @RequestBody TagRequest request) {
+	public ResponseEntity<JsendResponse<Void>> addTag(@Valid @RequestBody TagRequest request) {
+
 		tagService.registerTag(request);
-		return JsendResponse.success();
+		return ResponseEntity.status(HttpStatus.CREATED).body(JsendResponse.success());
 	}
 
 	// 태그 수정 (태그명 수정)
 	@PutMapping("/{tagId}")
-	public JsendResponse<Void> updateTag(@PathVariable Long tagId,
-		@Valid @RequestBody TagRequest request) {
+	public ResponseEntity<JsendResponse<Void>> updateTag(
+		@PathVariable Long tagId,
+		@Valid @RequestBody TagRequest request
+	) {
 		tagService.updateTag(tagId, request);
-		return JsendResponse.success();
+		return ResponseEntity.ok(JsendResponse.success());
 	}
 
 	// 태그 삭제
 	@DeleteMapping("/{tagId}")
-	public JsendResponse<Void> deleteTag(@PathVariable Long tagId) {
+	public ResponseEntity<JsendResponse<Void>> deleteTag(@PathVariable Long tagId) {
 		tagService.deleteTag(tagId);
-		return JsendResponse.success();
+		return ResponseEntity.ok(JsendResponse.success());
 	}
 
 	// 태그 조회
 	@GetMapping("/{tagId}")
-	public JsendResponse<TagInfoResponse> getTag(@PathVariable Long tagId) {
-		return JsendResponse.success(tagService.getTag(tagId));
+	public ResponseEntity<JsendResponse<TagInfoResponse>> getTag(@PathVariable Long tagId) {
+		return ResponseEntity.ok(JsendResponse.success(tagService.getTag(tagId)));
 	}
 
 	// 태그 목록 조회
 	@GetMapping
-	public JsendResponse<Page<TagInfoResponse>> getTags(
-		@PageableDefault(size = 10, sort = "id") Pageable pageable
-	) {
-		return JsendResponse.success(tagService.getTags(pageable));
+	public ResponseEntity<JsendResponse<PaginationData<TagInfoResponse>>> getTags(
+		@PageableDefault(size = 10, sort = "id") Pageable pageable) {
+		Page<TagInfoResponse> tagPage = tagService.getTags(pageable);
+		PaginationData<TagInfoResponse> paginationData = new PaginationData<>(tagPage);
+		return ResponseEntity.ok(JsendResponse.success(paginationData));
 	}
 
 }
