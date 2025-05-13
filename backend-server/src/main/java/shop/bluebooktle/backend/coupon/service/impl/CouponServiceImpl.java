@@ -34,6 +34,7 @@ import shop.bluebooktle.common.exception.coupon.InvalidCouponTargetException;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class CouponServiceImpl implements CouponService {
 
 	private final CouponRepository couponRepository;
@@ -45,7 +46,6 @@ public class CouponServiceImpl implements CouponService {
 	private final CategoryRepository categoryRepository;
 
 	// Coupon 등록
-	@Transactional
 	@Override
 	public void registerCoupon(CouponRegisterRequest request) {
 		// couponType 없을 경우 예외처리
@@ -62,7 +62,7 @@ public class CouponServiceImpl implements CouponService {
 		// 특정 도서 쿠폰
 		if (request.getBookId() != null) {
 			Book book = bookRepository.findById(request.getBookId())
-				.orElseThrow(() -> new BookNotFoundException("존재하지 않는 도서입니다."));
+				.orElseThrow(BookNotFoundException::new);
 			bookCouponRepository.save(new BookCoupon(coupon, book));
 		}
 		// 특정 카테고리 쿠폰
@@ -84,7 +84,6 @@ public class CouponServiceImpl implements CouponService {
 
 	// 수정
 	@Override
-	@Transactional
 	public void updateCoupon(Long couponId, CouponUpdateRequest request) {
 		Coupon coupon = couponRepository.findById(couponId)
 			.orElseThrow(CouponNotFoundException::new);
@@ -101,7 +100,6 @@ public class CouponServiceImpl implements CouponService {
 
 	//삭제
 	@Override
-	@Transactional
 	public void deleteCoupon(Long couponId) {
 		Coupon coupon = couponRepository.findById(couponId)
 			.orElseThrow(CouponNotFoundException::new);

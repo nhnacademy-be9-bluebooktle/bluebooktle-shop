@@ -15,12 +15,14 @@ import shop.bluebooktle.backend.user.repository.UserRepository;
 import shop.bluebooktle.common.dto.coupon.request.UserCouponRegisterRequest;
 import shop.bluebooktle.common.dto.coupon.response.UserCouponResponse;
 import shop.bluebooktle.common.entity.auth.User;
+import shop.bluebooktle.common.exception.InvalidInputValueException;
 import shop.bluebooktle.common.exception.auth.UserNotFoundException;
 import shop.bluebooktle.common.exception.coupon.CouponNotFoundException;
 import shop.bluebooktle.common.exception.coupon.UserCouponNotFoundException;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class UserCouponServiceImpl implements UserCouponService {
 
 	private final UserCouponRepository userCouponRepository;
@@ -29,12 +31,14 @@ public class UserCouponServiceImpl implements UserCouponService {
 
 	// 쿠폰 발급
 	@Override
-	@Transactional
 	public void registerCoupon(User user, UserCouponRegisterRequest request) {
 		User currentUser = userRepository.findById(user.getId())
 			.orElseThrow(UserNotFoundException::new);
 		Coupon coupon = couponRepository.findById(request.getCouponId())
 			.orElseThrow(CouponNotFoundException::new);
+		if (request.getAvailableStartAt().isAfter(request.getAvailableEndAt())) {
+			throw new InvalidInputValueException("시작일은 종료일보다 앞서야 합니다.");
+		}
 
 		UserCoupon userCoupon = UserCoupon.builder()
 			.coupon(coupon)
@@ -70,7 +74,6 @@ public class UserCouponServiceImpl implements UserCouponService {
 
 	// 유저 쿠폰 삭제
 	@Override
-	@Transactional
 	public void deleteCoupon(Long id) {
 		UserCoupon userCoupon = userCouponRepository.findById(id)
 			.orElseThrow(UserCouponNotFoundException::new);

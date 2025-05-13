@@ -20,6 +20,7 @@ import shop.bluebooktle.common.exception.coupon.CouponTypeNameAlreadyException;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class CouponTypeServiceImpl implements CouponTypeService {
 
 	private final CouponTypeRepository couponTypeRepository;
@@ -27,7 +28,6 @@ public class CouponTypeServiceImpl implements CouponTypeService {
 	private final RelativeCouponRepository relativeCouponRepository;
 
 	@Override
-	@Transactional
 	public void registerCouponType(CouponTypeRegisterRequest request) { // 쿠폰 정책 등록
 		//이름 중복 예외처리
 		couponTypeRepository.findByName(request.getName())
