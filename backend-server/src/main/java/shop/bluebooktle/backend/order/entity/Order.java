@@ -117,4 +117,8 @@ public class Order {
 		this.postalCode = postalCode;
 		this.trackingNumber = trackingNumber;
 	}
+
+	public void changeOrderState(OrderState newState) {
+		this.orderState = newState;
+	}
 }
