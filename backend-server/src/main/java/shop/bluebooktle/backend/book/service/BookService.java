@@ -2,11 +2,13 @@ package shop.bluebooktle.backend.book.service;
 
 import java.util.List;
 
-import shop.bluebooktle.backend.book.entity.Book;
+import shop.bluebooktle.backend.book.dto.response.BookResponse;
 
 public interface BookService {
-	void registerBook(Book book);
-	Book getBookById(Long id);
-	List<Book> getBookByTitle(String title);
+
+	BookResponse findBookById(Long id);
+
+	List<BookResponse> getBookByTitle(String title);
+
 	boolean existsBookById(Long id);
 }

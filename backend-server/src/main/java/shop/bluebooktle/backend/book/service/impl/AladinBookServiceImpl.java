@@ -10,7 +10,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.book.dto.response.AladinApiResponse;
-import shop.bluebooktle.backend.book.dto.response.AladinBookResponseDto;
+import shop.bluebooktle.backend.book.dto.response.AladinBookResponse;
 import shop.bluebooktle.backend.book.service.AladinBookService;
 
 @Service
@@ -23,7 +23,7 @@ public class AladinBookServiceImpl implements AladinBookService {
 	private final String BASE_URL = "http://www.aladin.co.kr/ttb/api/ItemSearch.aspx";
 
 	//알라딘 도서 조회
-	public List<AladinBookResponseDto> searchBooks(String query) {
+	public List<AladinBookResponse> searchBooks(String query) {
 		String url = UriComponentsBuilder
 			.fromHttpUrl(BASE_URL)
 			.queryParam("ttbkey", TTB_KEY)
@@ -39,13 +39,13 @@ public class AladinBookServiceImpl implements AladinBookService {
 		ResponseEntity<AladinApiResponse> response = restTemplate.getForEntity(url, AladinApiResponse.class);
 
 		return response.getBody().getItem().stream()
-			.map(AladinBookResponseDto::from)
+			.map(AladinBookResponse::from)
 			.collect(Collectors.toList());
 
 	}
 
-	public AladinBookResponseDto getBookByIsbn(String isbn) {
-		List<AladinBookResponseDto> books = searchBooks(isbn);
+	public AladinBookResponse getBookByIsbn(String isbn) {
+		List<AladinBookResponse> books = searchBooks(isbn);
 		return books.getFirst();
 	}
 }
