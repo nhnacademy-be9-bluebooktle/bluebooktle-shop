@@ -2,6 +2,8 @@ package shop.bluebooktle.backend.book.repository;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,4 +43,5 @@ public interface BookCategoryRepository extends JpaRepository<BookCategory, Long
 	@Transactional
 	void deleteByCategoryIn(List<Category> categories);
 
+	Page<BookCategory> findAllByCategory(Category category, Pageable pageable);
 }

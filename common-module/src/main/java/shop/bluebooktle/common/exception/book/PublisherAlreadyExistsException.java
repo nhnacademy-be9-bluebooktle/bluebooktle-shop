@@ -10,7 +10,7 @@ public class PublisherAlreadyExistsException extends ApplicationException {
 	}
 
 	public PublisherAlreadyExistsException(String message) {
-		super(ErrorCode.PUBLISHER_ALREADY_EXISTS, ErrorCode.PUBLISHER_ALREADY_EXISTS.getMessage() + message);
+		super(ErrorCode.PUBLISHER_ALREADY_EXISTS, message);
 	}
 
 	public PublisherAlreadyExistsException(Throwable cause) {

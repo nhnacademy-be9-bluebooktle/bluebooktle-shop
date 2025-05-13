@@ -21,7 +21,7 @@ import shop.bluebooktle.common.dto.common.JsendResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
 
 @RestController
-@RequestMapping("/api/categories/{categoryId}/books")
+@RequestMapping("/api/categories/{categoryId}")
 @RequiredArgsConstructor
 @Slf4j
 public class BookCategoryController {
@@ -30,8 +30,8 @@ public class BookCategoryController {
 	private final CategoryService categoryService;
 
 	// 도서에 카테고리 추가
-	@PostMapping("/{bookId}")
-	public ResponseEntity<JsendResponse<Void>> addBookCategory(
+	@PostMapping("/books/{bookId}")
+	public ResponseEntity<JsendResponse<Void>> addCategory(
 		@PathVariable Long bookId,
 		@PathVariable Long categoryId
 	) {
@@ -40,8 +40,8 @@ public class BookCategoryController {
 	}
 
 	// 도서에 해당 카테고리 삭제
-	@DeleteMapping("/{bookId}")
-	public ResponseEntity<JsendResponse<Void>> deleteBookCategory(
+	@DeleteMapping("/books/{bookId}")
+	public ResponseEntity<JsendResponse<Void>> deleteCategory(
 		@PathVariable Long bookId,
 		@PathVariable Long categoryId
 	) {
@@ -50,7 +50,7 @@ public class BookCategoryController {
 	}
 
 	// 해당 카테고리에 등록된 도서 목록 반환
-	@GetMapping
+	@GetMapping("/books")
 	public ResponseEntity<JsendResponse<PaginationData<BookInfoResponse>>> getBooksByCategory(
 		@PathVariable Long categoryId,
 		@PageableDefault(size = 10, sort = "id") Pageable pageable

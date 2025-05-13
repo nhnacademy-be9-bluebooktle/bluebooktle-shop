@@ -31,4 +31,6 @@ public interface TagRepository extends JpaRepository<Tag, Long> {
 
 	// 삭제되지 않은 태그 이름 부분 일치 조회
 	List<Tag> findByNameContainingAndDeletedAtIsNull(String name);
+
+	boolean existsByName(String name);
 }

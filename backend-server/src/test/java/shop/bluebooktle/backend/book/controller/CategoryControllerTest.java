@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.data.jpa.JpaRepositoriesAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
@@ -22,6 +21,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import shop.bluebooktle.backend.book.dto.request.CategoryRegisterRequest;
 import shop.bluebooktle.backend.book.service.CategoryService;
 
+// @WebMvcTest(CategoryController.class)
+@ActiveProfiles("local")
 @WebMvcTest(controllers = CategoryController.class,
 	excludeAutoConfiguration = {
 		DataSourceAutoConfiguration.class,
@@ -29,8 +30,6 @@ import shop.bluebooktle.backend.book.service.CategoryService;
 		JpaRepositoriesAutoConfiguration.class
 	}
 )
-@AutoConfigureMockMvc
-@ActiveProfiles("test")
 public class CategoryControllerTest {
 	@Autowired
 	private MockMvc mockMvc;
@@ -45,18 +44,20 @@ public class CategoryControllerTest {
 	@DisplayName("카테고리 등록 성공")
 	void registerCategorySuccess() throws Exception {
 		// given
-		CategoryRegisterRequest req = new CategoryRegisterRequest("테스트");
+		CategoryRegisterRequest req = new CategoryRegisterRequest("테스트", null);
 		String json = objectMapper.writeValueAsString(req);
-		doNothing().when(categoryService).registerCategory(any(), any());
+		doNothing().when(categoryService).registerCategory(any());
 
 		// when / then
-		mockMvc.perform(post("/api/categories/1")
+		mockMvc.perform(post("/api/categories")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(json))
-			.andExpect(status().isCreated());
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.status").value("success"))
+			.andExpect(jsonPath("$.data").isEmpty());
 
 		// verify
-		verify(categoryService, times(1)).registerCategory(anyLong(), any(CategoryRegisterRequest.class));
+		verify(categoryService, times(1)).registerCategory(any(CategoryRegisterRequest.class));
 	}
 
 }
