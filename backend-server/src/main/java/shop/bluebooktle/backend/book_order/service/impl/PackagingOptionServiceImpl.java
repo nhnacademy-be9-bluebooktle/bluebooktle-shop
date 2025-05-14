@@ -56,8 +56,8 @@ public class PackagingOptionServiceImpl implements PackagingOptionService {
 
 	/** 포장 옵션 수정 */
 	@Override
-	public PackagingOptionResponse updatePackagingOption(PackagingOptionUpdateRequest request) {
-		PackagingOption option = packagingOptionRepository.findByIdAndDeletedAtIsNull(request.getPackagingOptionId())
+	public PackagingOptionResponse updatePackagingOption(Long packagingOptionId, PackagingOptionUpdateRequest request) {
+		PackagingOption option = packagingOptionRepository.findByIdAndDeletedAtIsNull(packagingOptionId)
 			.orElseThrow(PackagingOptionNotFoundException::new);
 
 		option.setName(request.getName());

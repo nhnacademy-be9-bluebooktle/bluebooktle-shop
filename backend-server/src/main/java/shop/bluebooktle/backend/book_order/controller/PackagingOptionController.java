@@ -48,10 +48,12 @@ public class PackagingOptionController {
 	}
 
 	/** 포장 옵션 수정 */
-	@PutMapping
+	@PutMapping("/{packagingOptionId}")
 	public ResponseEntity<JsendResponse<PackagingOptionResponse>> updatePackagingOption(
-		@RequestBody @Valid PackagingOptionUpdateRequest request) {
-		return ResponseEntity.ok(JsendResponse.success(packagingOptionService.updatePackagingOption(request)));
+		@RequestBody @Valid PackagingOptionUpdateRequest request,
+		@PathVariable Long packagingOptionId) {
+		return ResponseEntity.ok(
+			JsendResponse.success(packagingOptionService.updatePackagingOption(packagingOptionId, request)));
 	}
 
 	/** 포장 옵션 삭제 */
