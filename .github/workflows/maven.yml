@@ -163,7 +163,7 @@ jobs:
         with:
           host: ${{ secrets.SSH_IP }}
           username: ${{ secrets.SSH_ID }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }} # SSH 비공개 키 Secret 이름
+          password: ${{ secrets.SSH_PASSWORD }}
           port: ${{ secrets.SSH_PORT }}
           source: "downloaded_jars/" # 다운로드된 JAR들이 있는 디렉토리
           target: "~/app/jars/" # 원격 서버의 업로드 대상 디렉토리 (하위 모듈 디렉토리 구조 유지를 위해 끝에 / 추가)
@@ -174,30 +174,40 @@ jobs:
         with:
           host: ${{ secrets.SSH_IP }}
           username: ${{ secrets.SSH_ID }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }} # SSH 비공개 키 Secret 이름
+          password: ${{ secrets.SSH_PASSWORD }}
           port: ${{ secrets.SSH_PORT }}
           capture_stdout: true
           script: |
             echo "--- Preparing to call startup.sh on remote server ---"
-            # 로깅 목적으로만 값 확인 (실제 값 전달은 인자로)
-            echo "DEBUG_SSH_ACTION: SPRING_PROFILES_ACTIVE from GA env is [${{ env.SPRING_PROFILES_ACTIVE }}]"
-            if [ -n "${{ env.JWT_SECRET_KEY }}" ]; then echo "DEBUG_SSH_ACTION: JWT_SECRET_KEY from GA env is SET (masked)"; else echo "DEBUG_SSH_ACTION: JWT_SECRET_KEY from GA env is NOT SET"; fi
-            
+
+            # GitHub Actions의 env 컨텍스트 및 secrets를 원격 서버의 환경 변수로 export
+            # env 블록을 통해 설정된 변수들
+            export CONFIG_SERVER_URI='${{ env.CONFIG_SERVER_URI }}'
+            export SPRING_PROFILES_ACTIVE='${{ env.SPRING_PROFILES_ACTIVE }}'
+            export JWT_SECRET_KEY='${{ env.JWT_SECRET_KEY }}' # 값에 특수문자가 있을 수 있으므로 작은따옴표로 감싸는 것이 안전합니다.
+            export SPRING_DATASOURCE_URL='${{ env.SPRING_DATASOURCE_URL }}'
+            export SPRING_DATASOURCE_USERNAME='${{ env.SPRING_DATASOURCE_USERNAME }}'
+            export SPRING_DATASOURCE_PASSWORD='${{ env.SPRING_DATASOURCE_PASSWORD }}'
+            export SPRING_DATA_REDIS_PASSWORD='${{ env.SPRING_DATA_REDIS_PASSWORD }}'
+
+            # secrets에서 직접 가져와서 export 하는 변수들 (기존 방식 유지)
+            export EUREKA_ID='${{ secrets.EUREKA_ID }}'
+            export EUREKA_PASSWORD='${{ secrets.EUREKA_PASSWORD }}'
+
+            # (선택적) 디버깅: 원격 서버에 export된 환경 변수 확인 (실제 값 출력은 보안상 주의)
+            echo "DEBUG_SSH_ACTION: Remotely exported SPRING_PROFILES_ACTIVE is [$SPRING_PROFILES_ACTIVE]" # $변수명은 원격 쉘에서 해석됨
+            if [ -n "$JWT_SECRET_KEY" ]; then echo "DEBUG_SSH_ACTION: JWT_SECRET_KEY on remote is SET"; else echo "DEBUG_SSH_ACTION: JWT_SECRET_KEY on remote is NOT SET"; fi
+            # 필요한 다른 변수들도 위와 유사하게 확인 가능합니다.
+
             chmod +x ~/startup.sh
 
+            # 변경된 모듈들에 대해 반복 실행
             for MOD in ${{ needs.detect_changes.outputs.changed }}; do
               echo "▶ Rolling deploy for module: $MOD"
-              # startup.sh 호출 시 필요한 값들을 인자로 전달 (순서 중요!)
-              # 따옴표로 감싸서 공백 포함 값도 안전하게 전달
-              ~/startup.sh \
-                "$MOD" \
-                "${{ env.JWT_SECRET_KEY }}" \
-                "${{ env.SPRING_PROFILES_ACTIVE }}" \
-                "${{ env.CONFIG_SERVER_URI }}" \
-                "${{ env.SPRING_DATA_REDIS_PASSWORD }}" \
-                "${{ secrets.EUREKA_ID }}" \
-                "${{ secrets.EUREKA_PASSWORD }}" \
-                "${{ env.SPRING_DATASOURCE_URL }}" \
-                "${{ env.SPRING_DATASOURCE_USERNAME }}" \
-                "${{ env.SPRING_DATASOURCE_PASSWORD }}"
+              # startup.sh는 이제 위에서 export된 환경 변수들을 직접 참조합니다.
+              # 모듈 이름($MOD)은 여전히 인자로 전달하거나,
+              # 또는 export DEPLOY_MODULE="$MOD" 와 같이 환경변수로 설정하고 startup.sh에서 DEPLOY_MODULE을 사용하도록 할 수 있습니다.
+              # 여기서는 모듈 이름을 첫 번째 인자로 전달하는 방식을 유지합니다.
+              # startup.sh 스크립트가 이 인자와 export된 환경 변수들을 사용하도록 수정되어야 합니다.
+              ~/startup.sh "$MOD"
             done
