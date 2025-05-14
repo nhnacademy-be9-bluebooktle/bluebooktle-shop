@@ -25,7 +25,7 @@ public class PaymentTypeServiceImpl implements PaymentTypeService {
 	@Transactional
 	public void create(PaymentTypeRequest paymentTypeRequest) {
 		if (paymentTypeRepository.existsByMethod(paymentTypeRequest.method())) {
-			throw new PaymentTypeAlreadyExistException("이미 존재하는 결제수단");
+			throw new PaymentTypeAlreadyExistException();
 		}
 
 		paymentTypeRepository.save(paymentTypeRequest.toEntity());
@@ -35,11 +35,11 @@ public class PaymentTypeServiceImpl implements PaymentTypeService {
 	@Transactional
 	public void update(Long id, PaymentTypeRequest newPaymentTypeRequest) {
 		PaymentType pt = paymentTypeRepository.findById(id)
-			.orElseThrow(() -> new PaymentTypeNotFoundException("결제수단 없음"));
+			.orElseThrow(() -> new PaymentTypeNotFoundException());
 
 		if (!pt.getMethod().equals(newPaymentTypeRequest.method())
 			&& paymentTypeRepository.existsByMethod(newPaymentTypeRequest.method())) {
-			throw new PaymentTypeAlreadyExistException("이미 존재하는 결제수단");
+			throw new PaymentTypeAlreadyExistException();
 		}
 		pt.changeMethod(newPaymentTypeRequest.method());
 		paymentTypeRepository.save(pt);
@@ -49,14 +49,14 @@ public class PaymentTypeServiceImpl implements PaymentTypeService {
 	@Transactional
 	public void delete(Long id) {
 		PaymentType pt = paymentTypeRepository.findById(id)
-			.orElseThrow(() -> new PaymentTypeNotFoundException("결제수단 없음"));
+			.orElseThrow(() -> new PaymentTypeNotFoundException());
 		paymentTypeRepository.delete(pt);
 	}
 
 	@Override
 	public PaymentTypeResponse get(PaymentTypeRequest paymentTypeRequest) {
 		PaymentType pt = paymentTypeRepository.findByMethod(paymentTypeRequest.method())
-			.orElseThrow(() -> new PaymentTypeNotFoundException("결제수단 없음"));
+			.orElseThrow(() -> new PaymentTypeNotFoundException());
 		return PaymentTypeResponse.fromEntity(pt);
 	}
 
