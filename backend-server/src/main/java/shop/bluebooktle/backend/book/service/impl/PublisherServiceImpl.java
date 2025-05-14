@@ -17,13 +17,13 @@ import shop.bluebooktle.common.exception.book.PublisherNotFoundException;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class PublisherServiceImpl implements PublisherService {
 
 	private final PublisherRepository publisherRepository;
 	private final BookPublisherRepository bookPublisherRepository;
 
 	@Override
-	@Transactional
 	public void registerPublisher(PublisherRequest request) {
 		if (publisherRepository.existsByName(request.getName())) {
 			throw new PublisherAlreadyExistsException("출판사명 : " + request.getName());
@@ -35,7 +35,6 @@ public class PublisherServiceImpl implements PublisherService {
 	}
 
 	@Override
-	@Transactional
 	public void updatePublisher(Long publisherId, PublisherRequest request) {
 		Publisher publisher = publisherRepository.findById(publisherId)
 			.orElseThrow(() -> new PublisherNotFoundException(publisherId));
@@ -61,7 +60,6 @@ public class PublisherServiceImpl implements PublisherService {
 	}
 
 	@Override
-	@Transactional
 	public void deletePublisher(Long publisherId) {
 		Publisher publisher = publisherRepository.findById(publisherId)
 			.orElseThrow(() -> new PublisherNotFoundException(publisherId));

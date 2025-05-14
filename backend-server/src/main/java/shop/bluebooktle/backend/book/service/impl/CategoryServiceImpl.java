@@ -19,18 +19,19 @@ import shop.bluebooktle.backend.book.repository.BookCategoryRepository;
 import shop.bluebooktle.backend.book.repository.CategoryRepository;
 import shop.bluebooktle.backend.book.service.CategoryService;
 import shop.bluebooktle.common.exception.book.CategoryAlreadyExistsException;
+import shop.bluebooktle.common.exception.book.CategoryCannotDeleteException;
 import shop.bluebooktle.common.exception.book.CategoryCannotDeleteRootException;
 import shop.bluebooktle.common.exception.book.CategoryNotFoundException;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class CategoryServiceImpl implements CategoryService {
 
 	private final CategoryRepository categoryRepository;
 	private final BookCategoryRepository bookCategoryRepository;
 
 	@Override
-	@Transactional
 	public void registerCategory(CategoryRegisterRequest request) {
 		if (categoryRepository.existsByName(request.name())) {
 			throw new CategoryAlreadyExistsException("이미 존재하는 카테고리명입니다. 카테고리명: " + request.name());
@@ -58,7 +59,6 @@ public class CategoryServiceImpl implements CategoryService {
 	}
 
 	@Override
-	@Transactional
 	public void updateCategory(Long categoryId, CategoryUpdateRequest request) {
 		Category category = categoryRepository.findById(categoryId)
 			.orElseThrow(() -> new CategoryNotFoundException(categoryId));
@@ -72,14 +72,22 @@ public class CategoryServiceImpl implements CategoryService {
 	}
 
 	@Override
-	@Transactional
 	public void deleteCategory(Long categoryId) {
 		Category category = categoryRepository.findById(categoryId)
 			.orElseThrow(() -> new CategoryNotFoundException(categoryId));
 
 		// 최상위 카테고리는 삭제 불가
+		// TODO 2단계 카테고리가 1개일 경우도 삭제 불가능 하도록
 		if (isRootCategory(categoryId)) {
 			throw new CategoryCannotDeleteRootException();
+		}
+		// 상위 카테고리가 최상위 카테고리일 경우
+		if (isRootCategory(category.getParentCategory().getId())) {
+			Category rootCategory = categoryRepository.findById(category.getParentCategory().getId())
+				.orElseThrow(() -> new CategoryNotFoundException(category.getParentCategory().getId())); // 최상위 카테고리
+			if (rootCategory.getChildCategories().size() == 1) {
+				throw new CategoryCannotDeleteException();
+			}
 		}
 		// 하위 모든 카테고리 수집
 		List<Category> descendants = getAllDescendantCategories(category);
@@ -166,6 +174,7 @@ public class CategoryServiceImpl implements CategoryService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public CategoryTreeResponse getCategoryTreeById(Long categoryId) {
 		Category category = categoryRepository.findById(categoryId)
 			.orElseThrow(() -> new CategoryNotFoundException(categoryId));

@@ -52,6 +52,7 @@ public enum ErrorCode {
 	BOOK_CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "BC01", "도서에 등록된 카테고리를 찾을 수 없습니다."),
 	CATEGORY_NAME_ALREADY_EXISTS(HttpStatus.CONFLICT, "BC002", "이미 존재하는 카테고리명입니다. "), // 이미 존재하는 카테고리명일 시
 	CATEGORY_DELETE_ROOT_CATEGORY(HttpStatus.BAD_REQUEST, "BC03", "최상위 카테고리는 삭제할 수 없습니다."),
+	CATEGORY_REQUIRED(HttpStatus.BAD_REQUEST, "BC007", "2단계 카테고리는 최소 1개 존재해야 합니다."),
 	BOOK_CATEGORY_ALREADY_EXISTS(HttpStatus.CONFLICT, "BC04", "카테고리에 이미 등록된 도서입니다."),
 	BOOK_CATEGORY_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "BC05", "카테고리는 최대 10개까지 등록할 수 있습니다."),
 	BOOK_CATEGORY_REQUIRED(HttpStatus.BAD_REQUEST, "BC06", "도서는 카테고리를 최소 1개 이상 가져야 합니다."),

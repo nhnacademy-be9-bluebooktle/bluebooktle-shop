@@ -3,6 +3,7 @@ package shop.bluebooktle.backend.book.service.impl;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.book.dto.request.TagRequest;
@@ -15,6 +16,7 @@ import shop.bluebooktle.common.exception.book.TagNotFoundException;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class TagServiceImpl implements TagService {
 
 	private final TagRepository tagRepository;
@@ -40,6 +42,7 @@ public class TagServiceImpl implements TagService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public TagInfoResponse getTag(Long publisherId) {
 		Tag tag = tagRepository.findById(publisherId)
 			.orElseThrow(() -> new TagNotFoundException(publisherId));
@@ -47,6 +50,7 @@ public class TagServiceImpl implements TagService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public Page<TagInfoResponse> getTags(Pageable pageable) {
 		Page<Tag> tags = tagRepository.findAll(pageable);
 		return tags.map(tag -> new TagInfoResponse(tag.getId(), tag.getName()));

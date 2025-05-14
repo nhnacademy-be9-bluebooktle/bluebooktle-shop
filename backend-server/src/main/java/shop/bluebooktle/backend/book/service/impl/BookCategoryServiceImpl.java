@@ -28,6 +28,7 @@ import shop.bluebooktle.common.exception.book.CategoryNotFoundException;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class BookCategoryServiceImpl implements BookCategoryService {
 
 	private final BookRepository bookRepository;
@@ -35,7 +36,6 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 	private final BookCategoryRepository bookCategoryRepository;
 
 	@Override
-	@Transactional
 	public void registerBookCategory(Long bookId, Long categoryId) {
 		Book book = requireBook(bookId);
 		Category category = requireCategory(categoryId);
@@ -55,7 +55,6 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 	}
 
 	@Override
-	@Transactional
 	public void deleteBookCategory(Long bookId, Long categoryId) {
 		Book book = requireBook(bookId);
 		Category category = requireCategory(categoryId);
@@ -98,12 +97,14 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 		return bookCategories.map(bc -> new BookInfoResponse(bc.getBook().getId()));
 	}
 
-	private Book requireBook(Long id) {
+	@Transactional(readOnly = true)
+	protected Book requireBook(Long id) {
 		return bookRepository.findById(id)
 			.orElseThrow(() -> new BookNotFoundException("Book not found with id: " + id));
 	}
 
-	private Category requireCategory(Long id) {
+	@Transactional(readOnly = true)
+	protected Category requireCategory(Long id) {
 		return categoryRepository.findById(id)
 			.orElseThrow(() -> new CategoryNotFoundException(id));
 	}
