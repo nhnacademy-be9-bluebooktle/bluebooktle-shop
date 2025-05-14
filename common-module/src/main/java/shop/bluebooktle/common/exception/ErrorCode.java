@@ -38,7 +38,7 @@ public enum ErrorCode {
 	// Book Errors (도서 관련 오류) - B
 	BOOK_NOT_FOUND(HttpStatus.NOT_FOUND, "B001", "도서를 찾을 수 없습니다."),
 	BOOK_INVALID_ISBN(HttpStatus.BAD_REQUEST, "B002", "유효하지 않은 ISBN 입니다."),
-	BOOK_PUBLISHER_NOT_FOUND(HttpStatus.NOT_FOUND, "B003", "출판사를 찾을 수 없습니다."),
+	PUBLISHER_NOT_FOUND(HttpStatus.NOT_FOUND, "B003", "출판사를 찾을 수 없습니다."),
 	BOOK_AUTHOR_NOT_FOUND(HttpStatus.NOT_FOUND, "B004", "작가를 찾을 수 없습니다."),
 	CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "B005", "카테고리를 찾을 수 없습니다."),
 	BOOK_TAG_NOT_FOUND(HttpStatus.NOT_FOUND, "B006", "태그를 찾을 수 없습니다."),
@@ -58,7 +58,9 @@ public enum ErrorCode {
 
 	// Book - 출판사
 	PUBLISHER_ALREADY_EXISTS(HttpStatus.CONFLICT, "BP01", "이미 등록된 출판사입니다."),
-	PUBLISHER_NOT_FOUND(HttpStatus.NOT_FOUND, "BP02", "해당 출판사를 찾을 수 없습니다."),
+	BOOK_PUBLISHER_NOT_FOUND(HttpStatus.NOT_FOUND, "BP02", "도서에 등록된 출판사를 찾을 수 없습니다."),
+	BOOK_PUBLISHER_ALREADY_EXISTS(HttpStatus.CONFLICT, "BP03", "도서에 이미 등록된 출판사입니다."),
+
 	// Book - 태그
 	TAG_ALREADY_EXISTS(HttpStatus.CONFLICT, "BT01", "이미 등록된 태그입니다."),
 	TAG_NOT_FOUND(HttpStatus.NOT_FOUND, "BT02", "해당 태그를 찾을 수 없습니다."),

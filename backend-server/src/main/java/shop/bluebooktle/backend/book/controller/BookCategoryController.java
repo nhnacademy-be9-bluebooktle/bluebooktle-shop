@@ -31,7 +31,7 @@ public class BookCategoryController {
 
 	// 도서에 카테고리 추가
 	@PostMapping("/books/{bookId}")
-	public ResponseEntity<JsendResponse<Void>> addCategory(
+	public ResponseEntity<JsendResponse<Void>> addBookCategory(
 		@PathVariable Long bookId,
 		@PathVariable Long categoryId
 	) {
@@ -41,7 +41,7 @@ public class BookCategoryController {
 
 	// 도서에 해당 카테고리 삭제
 	@DeleteMapping("/books/{bookId}")
-	public ResponseEntity<JsendResponse<Void>> deleteCategory(
+	public ResponseEntity<JsendResponse<Void>> deleteBookCategory(
 		@PathVariable Long bookId,
 		@PathVariable Long categoryId
 	) {
