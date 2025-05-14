@@ -22,18 +22,16 @@ on:
 
 jobs:
   detect_changes:
-    # PR이 '병합되어' 닫힌 경우에만 이 작업 실행
     runs-on: ubuntu-latest
     outputs:
       changed: ${{ steps.list.outputs.changed }}
     steps:
-      - name: Checkout develop branch (after merge)
+      - name: Checkout full history
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.base.ref }} # 병합된 develop 브랜치 체크아웃
-          fetch-depth: 0 # paths-filter가 이전 커밋과 비교하려면 전체 히스토리 필요
+          fetch-depth: 0
 
-      - name: Filter changed paths (for merged PR)
+      - name: Filter changed paths
         id: filter
         uses: dorny/paths-filter@v3
         with:
@@ -60,29 +58,24 @@ jobs:
           [[ "${{ steps.filter.outputs.gateway-server }}"  == "true" ]] && modules+=("gateway-server")
           [[ "${{ steps.filter.outputs.eureka-server }}"   == "true" ]] && modules+=("eureka-server")
           [[ "${{ steps.filter.outputs.auth-server }}"     == "true" ]] && modules+=("auth-server")
-          # common-module이 변경되면 모든 서비스 재배포
           if [[ "${{ steps.filter.outputs.common-module }}" == "true" ]]; then
             for svc in backend-server frontend-server gateway-server eureka-server auth-server; do
-              # 이미 추가된 모듈은 중복 추가 방지
-              if [[ ! " ${modules[*]} " =~ " $svc " ]]; then
-                modules+=("$svc")
-              fi
+              [[ ! " ${modules[*]} " =~ " $svc " ]] && modules+=("$svc")
             done
           fi
           echo "changed=${modules[*]}" >> $GITHUB_OUTPUT
 
   build:
     needs: detect_changes
-    # PR이 병합되었고, 변경된 모듈이 있을 경우에만 실행
     if: needs.detect_changes.outputs.changed != ''
     runs-on: ubuntu-latest
-    environment:
-      name: 'dev' # develop 브랜치로 병합 시 'dev' 환경 사용
 
+    environment:
+      name: 'dev'
     env:
-      CONFIG_SERVER_URI: ${{ secrets.CONFIG_SERVER_URI }}
+      CONFIG_SERVER_URI: ${{ secrets.CONFIG_SERVER_URI }} # Repository Secret
       SPRING_PROFILES_ACTIVE: 'dev'
-      JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
+      JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }} # 'dev' Environment Secret 또는 Repository Secret (dev 환경 우선)
 
       SPRING_DATASOURCE_URL: ${{ secrets.SPRING_DATASOURCE_URL }}
       SPRING_DATASOURCE_USERNAME: ${{ secrets.SPRING_DATASOURCE_USERNAME }}
@@ -96,36 +89,33 @@ jobs:
       - name: Set up Java 21
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
+          distribution: temurin
           java-version: '21'
-          cache: 'maven'
+          cache: maven
 
       - name: Clean & Build changed-services
         run: |
           MODULE_CSV=$(echo "${{ needs.detect_changes.outputs.changed }}" | sed 's/ /,/g')
-          echo "▶ Building modules: $MODULE_CSV"
-          # 전체 프로젝트를 빌드하되, 변경된 모듈만 패키징 (-pl 옵션)
-          # -am 옵션은 지정된 모듈과 그 의존 관계에 있는 모듈들도 함께 빌드
+          echo "▶ mvn clean package -pl $MODULE_CSV -am"
           mvn -B clean package -pl "$MODULE_CSV" -am -DskipTests
 
       - name: Upload built JARs
         uses: actions/upload-artifact@v4
         with:
           name: jars
-          path: '**/target/*.jar' # 각 모듈의 target/*.jar 파일을 찾아서 업로드
+          path: '**/target/*.jar'
           if-no-files-found: error
 
   deploy:
-    needs: [detect_changes, build]
-    # PR이 병합되었고, 변경된 모듈이 있을 경우에만 실행
+    needs: [ detect_changes, build ]
     if: needs.detect_changes.outputs.changed != ''
     runs-on: ubuntu-latest
+
     environment:
-      name: 'dev' # develop 브랜치로 병합 시 'dev' 환경 사용
+      name: 'dev'
 
     env:
-      # === Secret 값 참조 (build job과 동일하게 설정) ===
-      CONFIG_SERVER_URI: ${{ secrets.CONFIG_SERVER_URI }}
+      CONFIG_SERVER_URI: ${{ secrets.CONFIG_SERVER_URI }} # Repository Secret
       SPRING_PROFILES_ACTIVE: 'dev'
       JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
 
@@ -135,78 +125,131 @@ jobs:
 
       SPRING_DATA_REDIS_PASSWORD: ${{ secrets.SPRING_DATA_REDIS_PASSWORD }}
 
-      # Eureka 관련 정보는 startup.sh에서 직접 사용하므로 여기서 전달할 필요 없음
-      # EUREKA_ID: ${{ secrets.EUREKA_ID }}
-      # EUREKA_PASSWORD: ${{ secrets.EUREKA_PASSWORD }}
-
     steps:
       - name: Download JARs
         uses: actions/download-artifact@v4
         with:
-          name: jars # build 작업에서 업로드한 아티팩트 이름
-          path: downloaded_jars # 다운로드 받을 경로
+          name: jars
+          path: downloaded_jars
 
       - name: Check Variables in Job Environment (Safer Debug)
         run: |
           echo "--- Checking Variables in Job Environment (deploy job) ---"
-          if [ -n "${{ env.CONFIG_SERVER_URI }}" ]; then echo "DEBUG_JOB_ENV: CONFIG_SERVER_URI is SET"; else echo "DEBUG_JOB_ENV: CONFIG_SERVER_URI is NOT SET"; fi
+          if [ -n "${{ env.CONFIG_SERVER_URI }}" ]; then echo "DEBUG_JOB_ENV: CONFIG_SERVER_URI is SET. Value: [${{ env.CONFIG_SERVER_URI }}]"; else echo "DEBUG_JOB_ENV: CONFIG_SERVER_URI is NOT SET"; fi
           if [ -n "${{ env.SPRING_PROFILES_ACTIVE }}" ]; then echo "DEBUG_JOB_ENV: SPRING_PROFILES_ACTIVE is [${{ env.SPRING_PROFILES_ACTIVE }}]"; else echo "DEBUG_JOB_ENV: SPRING_PROFILES_ACTIVE is NOT SET"; fi
-          if [ -n "${{ env.JWT_SECRET_KEY }}" ]; then echo "DEBUG_JOB_ENV: JWT_SECRET_KEY is SET (masked)"; else echo "DEBUG_JOB_ENV: JWT_SECRET_KEY is NOT SET"; fi
+          if [ -n "${{ env.JWT_SECRET_KEY }}" ]; then echo "DEBUG_JOB_ENV: JWT_SECRET_KEY is SET (masked by GitHub Actions if printed directly)"; else echo "DEBUG_JOB_ENV: JWT_SECRET_KEY is NOT SET"; fi
           if [ -n "${{ env.SPRING_DATASOURCE_URL }}" ]; then echo "DEBUG_JOB_ENV: SPRING_DATASOURCE_URL is SET"; else echo "DEBUG_JOB_ENV: SPRING_DATASOURCE_URL is NOT SET"; fi
           if [ -n "${{ env.SPRING_DATASOURCE_USERNAME }}" ]; then echo "DEBUG_JOB_ENV: SPRING_DATASOURCE_USERNAME is SET"; else echo "DEBUG_JOB_ENV: SPRING_DATASOURCE_USERNAME is NOT SET"; fi
-          if [ -n "${{ env.SPRING_DATASOURCE_PASSWORD }}" ]; then echo "DEBUG_JOB_ENV: SPRING_DATASOURCE_PASSWORD is SET (masked)"; else echo "DEBUG_JOB_ENV: SPRING_DATASOURCE_PASSWORD is NOT SET"; fi
-          if [ -n "${{ env.SPRING_DATA_REDIS_PASSWORD }}" ]; then echo "DEBUG_JOB_ENV: SPRING_DATA_REDIS_PASSWORD is SET (masked)"; else echo "DEBUG_JOB_ENV: SPRING_DATA_REDIS_PASSWORD is NOT SET"; fi
+          if [ -n "${{ env.SPRING_DATASOURCE_PASSWORD }}" ]; then echo "DEBUG_JOB_ENV: SPRING_DATASOURCE_PASSWORD is SET (masked by GitHub Actions if printed directly)"; else echo "DEBUG_JOB_ENV: SPRING_DATASOURCE_PASSWORD is NOT SET"; fi
+          if [ -n "${{ env.SPRING_DATA_REDIS_PASSWORD }}" ]; then echo "DEBUG_JOB_ENV: SPRING_DATA_REDIS_PASSWORD is SET (masked by GitHub Actions if printed directly)"; else echo "DEBUG_JOB_ENV: SPRING_DATA_REDIS_PASSWORD is NOT SET"; fi
           echo "------------------------------------------------------------"
 
-      - name: Upload JARs to remote server
+      - name: Upload JARs to remote
         uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.SSH_IP }}
           username: ${{ secrets.SSH_ID }}
           password: ${{ secrets.SSH_PASSWORD }}
           port: ${{ secrets.SSH_PORT }}
-          source: "downloaded_jars/"
+          source: "downloaded_jars"
           target: "~/app/jars/"
+          strip_components: 1
 
-      - name: Execute deployment script on remote server
+      - name: Rolling deploy for services
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SSH_IP }}
           username: ${{ secrets.SSH_ID }}
-          password: ${{ secrets.SSH_PASSWORD }}
+          password: ${{ secrets.SSH_PASSWORD }} # key 사용을 강력히 권장
           port: ${{ secrets.SSH_PORT }}
-          capture_stdout: true
+          capture_stdout: true # 이 옵션이 true여야 echo 출력이 GitHub Actions 로그에 잘 보입니다.
           script: |
-            echo "--- Preparing to call startup.sh on remote server ---"
-
-            # GitHub Actions의 env 컨텍스트 및 secrets를 원격 서버의 환경 변수로 export
-            # env 블록을 통해 설정된 변수들
-            export CONFIG_SERVER_URI='${{ env.CONFIG_SERVER_URI }}'
-            export SPRING_PROFILES_ACTIVE='${{ env.SPRING_PROFILES_ACTIVE }}'
-            export JWT_SECRET_KEY='${{ env.JWT_SECRET_KEY }}' # 값에 특수문자가 있을 수 있으므로 작은따옴표로 감싸는 것이 안전합니다.
-            export SPRING_DATASOURCE_URL='${{ env.SPRING_DATASOURCE_URL }}'
-            export SPRING_DATASOURCE_USERNAME='${{ env.SPRING_DATASOURCE_USERNAME }}'
-            export SPRING_DATASOURCE_PASSWORD='${{ env.SPRING_DATASOURCE_PASSWORD }}'
-            export SPRING_DATA_REDIS_PASSWORD='${{ env.SPRING_DATA_REDIS_PASSWORD }}'
-
-            # secrets에서 직접 가져와서 export 하는 변수들 (기존 방식 유지)
-            export EUREKA_ID='${{ secrets.EUREKA_ID }}'
-            export EUREKA_PASSWORD='${{ secrets.EUREKA_PASSWORD }}'
-
-            # (선택적) 디버깅: 원격 서버에 export된 환경 변수 확인 (실제 값 출력은 보안상 주의)
-            echo "DEBUG_SSH_ACTION: Remotely exported SPRING_PROFILES_ACTIVE is [$SPRING_PROFILES_ACTIVE]" # $변수명은 원격 쉘에서 해석됨
-            if [ -n "$JWT_SECRET_KEY" ]; then echo "DEBUG_SSH_ACTION: JWT_SECRET_KEY on remote is SET"; else echo "DEBUG_SSH_ACTION: JWT_SECRET_KEY on remote is NOT SET"; fi
-            # 필요한 다른 변수들도 위와 유사하게 확인 가능합니다.
-
+            echo "--- Debugging SSH Action Script (Remote Server) ---"
+            
+            # 1. GitHub Actions 워크플로우의 env 변수 값이 ssh-action script 내에서 접근 가능한지 확인
+            #    env 블록에 정의된 각 변수에 대해 확인합니다.
+            echo "STEP 1: Checking values from GitHub Actions env block:"
+            if [ -n "${{ env.JWT_SECRET_KEY }}" ]; then
+              echo "  env.JWT_SECRET_KEY from GA is SET. (Masked by GitHub if printed directly)"
+            else
+              echo "  env.JWT_SECRET_KEY from GA is NOT SET or EMPTY"
+            fi
+            if [ -n "${{ env.SPRING_PROFILES_ACTIVE }}" ]; then
+              echo "  env.SPRING_PROFILES_ACTIVE from GA is [${{ env.SPRING_PROFILES_ACTIVE }}]"
+            else
+              echo "  env.SPRING_PROFILES_ACTIVE from GA is NOT SET or EMPTY"
+            fi
+            if [ -n "${{ env.CONFIG_SERVER_URI }}" ]; then
+              echo "  env.CONFIG_SERVER_URI from GA is [${{ env.CONFIG_SERVER_URI }}]"
+            else
+              echo "  env.CONFIG_SERVER_URI from GA is NOT SET or EMPTY"
+            fi
+            if [ -n "${{ env.SPRING_DATA_REDIS_PASSWORD }}" ]; then
+              echo "  env.SPRING_DATA_REDIS_PASSWORD from GA is SET. (Masked by GitHub if printed directly)"
+            else
+              echo "  env.SPRING_DATA_REDIS_PASSWORD from GA is NOT SET or EMPTY"
+            fi
+            # APP_PORT는 deploy job의 env 블록에 정의되어 있어야 합니다. 예: APP_PORT: ${{ secrets.DEV_PORT || '8080' }}
+            if [ -n "${{ env.APP_PORT }}" ]; then
+              echo "  env.APP_PORT from GA is [${{ env.APP_PORT }}]"
+            else
+              echo "  env.APP_PORT from GA is NOT SET or EMPTY"
+            fi
+            # 데이터소스 관련 변수들도 확인 (env 블록에 SPRING_DATASOURCE_... 로 정의되어 있다고 가정)
+            if [ -n "${{ env.SPRING_DATASOURCE_URL }}" ]; then echo "  env.SPRING_DATASOURCE_URL from GA is SET"; else echo "  env.SPRING_DATASOURCE_URL from GA is NOT SET"; fi
+            if [ -n "${{ env.SPRING_DATASOURCE_USERNAME }}" ]; then echo "  env.SPRING_DATASOURCE_USERNAME from GA is SET"; else echo "  env.SPRING_DATASOURCE_USERNAME from GA is NOT SET"; fi
+            if [ -n "${{ env.SPRING_DATASOURCE_PASSWORD }}" ]; then echo "  env.SPRING_DATASOURCE_PASSWORD from GA is SET (masked)"; else echo "  env.SPRING_DATASOURCE_PASSWORD from GA is NOT SET"; fi
+            
+            
+            # 2. 해당 값들을 사용하여 OS 환경 변수로 export
+            echo "STEP 2: Exporting variables to SSH session..."
+            export JWT_SECRET_KEY="${{ env.JWT_SECRET_KEY }}"
+            export SPRING_PROFILES_ACTIVE="${{ env.SPRING_PROFILES_ACTIVE }}"
+            export CONFIG_SERVER_URI="${{ env.CONFIG_SERVER_URI }}"
+            export SPRING_DATA_REDIS_PASSWORD="${{ env.SPRING_DATA_REDIS_PASSWORD }}"
+            export PORT="${{ env.APP_PORT }}" # APP_PORT 값을 PORT로 export
+            export SPRING_DATASOURCE_URL="${{ env.SPRING_DATASOURCE_URL }}"
+            export SPRING_DATASOURCE_USERNAME="${{ env.SPRING_DATASOURCE_USERNAME }}"
+            export SPRING_DATASOURCE_PASSWORD="${{ env.SPRING_DATASOURCE_PASSWORD }}"
+            echo "  Export commands executed."
+            
+            # 3. export 직후, 현재 SSH 세션에서 해당 OS 환경 변수가 실제로 설정되었는지 확인 (길이 확인 포함)
+            echo "STEP 3: Checking shell variables after export:"
+            if [ -n "$JWT_SECRET_KEY" ]; then 
+              echo "  Shell variable JWT_SECRET_KEY after export is SET. Length: ${#JWT_SECRET_KEY}"
+            else
+              echo "  Shell variable JWT_SECRET_KEY after export is NOT SET or EMPTY"
+            fi
+            if [ -n "$SPRING_PROFILES_ACTIVE" ]; then
+              echo "  Shell variable SPRING_PROFILES_ACTIVE after export is [$SPRING_PROFILES_ACTIVE]"
+            else
+              echo "  Shell variable SPRING_PROFILES_ACTIVE after export is NOT SET or EMPTY"
+            fi
+            if [ -n "$CONFIG_SERVER_URI" ]; then
+              echo "  Shell variable CONFIG_SERVER_URI after export is SET (value not printed for brevity)"
+            else
+              echo "  Shell variable CONFIG_SERVER_URI after export is NOT SET or EMPTY"
+            fi
+            if [ -n "$SPRING_DATA_REDIS_PASSWORD" ]; then
+              echo "  Shell variable SPRING_DATA_REDIS_PASSWORD after export is SET. Length: ${#SPRING_DATA_REDIS_PASSWORD}"
+            else
+              echo "  Shell variable SPRING_DATA_REDIS_PASSWORD after export is NOT SET or EMPTY"
+            fi
+            if [ -n "$PORT" ]; then
+              echo "  Shell variable PORT after export is [$PORT]"
+            else
+              echo "  Shell variable PORT after export is NOT SET or EMPTY"
+            fi
+            # 데이터소스 관련 변수들도 확인
+            if [ -n "$SPRING_DATASOURCE_URL" ]; then echo "  Shell var SPRING_DATASOURCE_URL is SET"; else echo "  Shell var SPRING_DATASOURCE_URL is NOT SET"; fi
+            if [ -n "$SPRING_DATASOURCE_USERNAME" ]; then echo "  Shell var SPRING_DATASOURCE_USERNAME is SET"; else echo "  Shell var SPRING_DATASOURCE_USERNAME is NOT SET"; fi
+            if [ -n "$SPRING_DATASOURCE_PASSWORD" ]; then echo "  Shell var SPRING_DATASOURCE_PASSWORD is SET (masked)"; else echo "  Shell var SPRING_DATASOURCE_PASSWORD is NOT SET"; fi
+            echo "--- End SSH Action Debug ---"
+            
+            echo ">>> SSH sees modules: ${{ needs.detect_changes.outputs.changed }}"
             chmod +x ~/startup.sh
-
-            # 변경된 모듈들에 대해 반복 실행
+            
             for MOD in ${{ needs.detect_changes.outputs.changed }}; do
-              echo "▶ Rolling deploy for module: $MOD"
-              # startup.sh는 이제 위에서 export된 환경 변수들을 직접 참조합니다.
-              # 모듈 이름($MOD)은 여전히 인자로 전달하거나,
-              # 또는 export DEPLOY_MODULE="$MOD" 와 같이 환경변수로 설정하고 startup.sh에서 DEPLOY_MODULE을 사용하도록 할 수 있습니다.
-              # 여기서는 모듈 이름을 첫 번째 인자로 전달하는 방식을 유지합니다.
-              # startup.sh 스크립트가 이 인자와 export된 환경 변수들을 사용하도록 수정되어야 합니다.
-              ~/startup.sh "$MOD"
+              echo "▶ Rolling deploy: $MOD"
+              ~/startup.sh "$MOD" # startup.sh는 위에서 export된 환경 변수들을 사용
             done
