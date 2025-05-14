@@ -2,7 +2,7 @@ name: CI & CD
 
 on:
   push:
-    branches: [ develop ]
+    branches: [ develop, master ]
     paths:
       - 'backend-server/**'
       - 'frontend-server/**'
@@ -11,7 +11,7 @@ on:
       - 'common-module/**'
       - 'auth-server/**'
   pull_request:
-    branches: [ develop ]
+    branches: [ develop, master ]
     paths:
       - 'backend-server/**'
       - 'frontend-server/**'
@@ -101,7 +101,11 @@ jobs:
 
   deploy:
     needs: [ detect_changes, build ]
-    if: needs.detect_changes.outputs.changed != '' && github.event.pull_request.merged == true
+    if: >-
+      github.event_name == 'pull_request' &&
+      github.event.action == 'closed' &&
+      github.event.pull_request.merged == true &&
+      needs.detect_changes.outputs.changed != ''
     runs-on: ubuntu-latest
     environment: ${{ github.ref_name == 'master' && 'prod' || 'dev' }}
 
