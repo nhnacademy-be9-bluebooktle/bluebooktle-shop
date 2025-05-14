@@ -112,7 +112,7 @@ jobs:
     runs-on: ubuntu-latest
 
     environment:
-      name: ${{ (github.ref_name == 'develop' && 'dev') || ((github.ref_name == 'master' || github.ref_name == 'main') && 'prod') }}
+      name: 'dev'
 
     env:
       CONFIG_SERVER_URI: ${{ secrets.CONFIG_SERVER_URI }}
