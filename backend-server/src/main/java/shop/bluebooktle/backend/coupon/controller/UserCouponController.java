@@ -28,7 +28,7 @@ public class UserCouponController {
 		User user = AuthContextHelper.getUserOrNull(); // TODO [쿠폰] getUserOrNull
 		if (user == null) {
 		}
-		userCouponService.registerCoupon(request);
+		userCouponService.registerCoupon(user, request);
 		return ResponseEntity.ok(JsendResponse.success());
 	}
 

@@ -9,7 +9,7 @@ import shop.bluebooktle.common.entity.auth.User;
 
 public interface UserCouponService {
 	// 쿠폰 발급
-	void registerCoupon(UserCouponRegisterRequest request);
+	void registerCoupon(User user, UserCouponRegisterRequest request);
 
 	// 유저 별 쿠폰 전체 조회
 	Page<UserCouponResponse> getAllUserCoupons(User user, Pageable pageable);

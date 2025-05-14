@@ -30,29 +30,28 @@ public class CouponController {
 
 	private final CouponService couponService;
 
-	@PostMapping("/admin/coupons")
-	public ResponseEntity<JsendResponse<Void>> registerCoupon(@RequestBody CouponRegisterRequest request) {
+	@PostMapping("/api/admin/coupons")
+	public ResponseEntity<JsendResponse<Void>> registerCoupon(@Valid @RequestBody CouponRegisterRequest request) {
 		couponService.registerCoupon(request);
 		return ResponseEntity.status(HttpStatus.CREATED).body(JsendResponse.success());
 	}
 
-	@GetMapping("/admin/coupons")
+	@GetMapping("/api/admin/coupons")
 	public ResponseEntity<JsendResponse<PaginationData<CouponResponse>>> getAllCoupons(
 		@PageableDefault(size = 10, sort = "id") Pageable pageable) {
-
 		Page<CouponResponse> couponPage = couponService.getAllCoupons(pageable);
 		PaginationData<CouponResponse> paginationData = new PaginationData<>(couponPage);
 		return ResponseEntity.ok(JsendResponse.success(paginationData));
 	}
 
-	@PatchMapping("/admin/coupon/{id}")
+	@PatchMapping("/api/admin/coupon/{id}")
 	public ResponseEntity<JsendResponse<Void>> updateCoupon(@PathVariable Long id,
 		@Valid @RequestBody CouponUpdateRequest request) {
 		couponService.updateCoupon(id, request);
 		return ResponseEntity.ok(JsendResponse.success());
 	}
 
-	@DeleteMapping("/admin/coupon/{id}")
+	@DeleteMapping("/api/admin/coupon/{id}")
 	public ResponseEntity<JsendResponse<Void>> deleteCoupon(@PathVariable Long id) {
 		couponService.deleteCoupon(id);
 		return ResponseEntity.ok(JsendResponse.success());

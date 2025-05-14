@@ -1,7 +1,5 @@
 package shop.bluebooktle.backend.coupon.entity;
 
-import java.time.LocalDateTime;
-
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
@@ -40,22 +38,14 @@ public class Coupon extends BaseEntity {
 	private CouponType couponType;
 	@Column(name = "name", nullable = false, length = 100)
 	private String couponName;
-	@Column(name = "available_start_at", nullable = false)
-	private LocalDateTime availableStartAt;
-	@Column(name = "available_end_at", nullable = false)
-	private LocalDateTime availableEndAt;
 
 	@Builder
-	public Coupon(CouponType type, String couponName, LocalDateTime availableStartAt, LocalDateTime availableEndAt) {
+	public Coupon(CouponType type, String couponName) {
 		this.couponType = type;
 		this.couponName = couponName;
-		this.availableStartAt = availableStartAt;
-		this.availableEndAt = availableEndAt;
 	}
 
-	public void update(String couponName, LocalDateTime availableStartAt, LocalDateTime availableEndAt) {
+	public void update(String couponName) {
 		this.couponName = couponName;
-		this.availableStartAt = availableStartAt;
-		this.availableEndAt = availableEndAt;
 	}
 }

@@ -1,7 +1,5 @@
 package shop.bluebooktle.backend.coupon.service.impl;
 
-import java.util.List;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -14,11 +12,11 @@ import shop.bluebooktle.backend.coupon.repository.CouponRepository;
 import shop.bluebooktle.backend.coupon.repository.UserCouponRepository;
 import shop.bluebooktle.backend.coupon.service.UserCouponService;
 import shop.bluebooktle.backend.user.repository.UserRepository;
-import shop.bluebooktle.common.domain.auth.UserStatus;
 import shop.bluebooktle.common.dto.coupon.request.UserCouponRegisterRequest;
 import shop.bluebooktle.common.dto.coupon.response.UserCouponResponse;
 import shop.bluebooktle.common.entity.auth.User;
 import shop.bluebooktle.common.exception.InvalidInputValueException;
+import shop.bluebooktle.common.exception.auth.UserNotFoundException;
 import shop.bluebooktle.common.exception.coupon.CouponNotFoundException;
 import shop.bluebooktle.common.exception.coupon.UserCouponNotFoundException;
 
@@ -33,25 +31,22 @@ public class UserCouponServiceImpl implements UserCouponService {
 
 	// 쿠폰 발급
 	@Override
-	public void registerCoupon(UserCouponRegisterRequest request) {
+	public void registerCoupon(User user, UserCouponRegisterRequest request) {
+		User currentUser = userRepository.findById(user.getId())
+			.orElseThrow(UserNotFoundException::new);
 		Coupon coupon = couponRepository.findById(request.getCouponId())
 			.orElseThrow(CouponNotFoundException::new);
 		if (request.getAvailableStartAt().isAfter(request.getAvailableEndAt())) {
 			throw new InvalidInputValueException("시작일은 종료일보다 앞서야 합니다.");
 		}
 
-		List<User> userList = userRepository.findByStatus(UserStatus.ACTIVE);
-
-		List<UserCoupon> userCoupons = userList.stream()
-			.map(user -> UserCoupon.builder()
-				.coupon(coupon)
-				.user(user)
-				.availableStartAt(request.getAvailableStartAt())
-				.availableEndAt(request.getAvailableEndAt())
-				.build())
-			.toList();
-
-		userCouponRepository.saveAll(userCoupons);
+		UserCoupon userCoupon = UserCoupon.builder()
+			.coupon(coupon)
+			.user(currentUser)
+			.availableStartAt(request.getAvailableStartAt())
+			.availableEndAt(request.getAvailableEndAt())
+			.build();
+		userCouponRepository.save(userCoupon);
 	}
 
 	// 유저 별 쿠폰 전체 조회
