@@ -16,7 +16,7 @@ public interface PackagingOptionService {
 	Page<PackagingOptionResponse> getPackagingOption(Pageable pageable);
 
 	/** 포장 옵션 수정 */
-	PackagingOptionResponse updatePackagingOption(PackagingOptionUpdateRequest request);
+	PackagingOptionResponse updatePackagingOption(Long packagingOptionId, PackagingOptionUpdateRequest request);
 
 	/** 포장 옵션 삭제 */
 	void deletePackagingOption(Long packagingOptionId);
