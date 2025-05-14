@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
-import shop.bluebooktle.backend.book.dto.request.BookLikesRequest;
 import shop.bluebooktle.backend.book.dto.response.BookLikesResponse;
 import shop.bluebooktle.backend.book.service.BookLikesService;
 import shop.bluebooktle.common.dto.common.JsendResponse;
@@ -29,10 +28,7 @@ public class BookLikesController {
 	public ResponseEntity<JsendResponse<Void>> likeBook(
 		@PathVariable Long bookId,
 		@RequestParam Long userId) {
-		bookLikesService.like(BookLikesRequest.builder()
-			.bookId(bookId)
-			.userId(userId)
-			.build());
+		bookLikesService.like(bookId, userId);
 		return ResponseEntity.status(HttpStatus.CREATED).body(JsendResponse.success());
 	}
 
@@ -41,10 +37,7 @@ public class BookLikesController {
 	public ResponseEntity<JsendResponse<Void>> unlikeBook(
 		@PathVariable Long bookId,
 		@RequestParam Long userId) {
-		bookLikesService.unlike(BookLikesRequest.builder()
-			.bookId(bookId)
-			.userId(userId)
-			.build());
+		bookLikesService.unlike(bookId, userId);
 		return ResponseEntity.ok(JsendResponse.success());
 	}
 
@@ -53,11 +46,7 @@ public class BookLikesController {
 	public ResponseEntity<JsendResponse<BookLikesResponse>> isLiked(
 		@PathVariable Long bookId,
 		@RequestParam Long userId) {
-		BookLikesResponse response = bookLikesService.isLiked(
-			BookLikesRequest.builder()
-				.bookId(bookId)
-				.userId(userId)
-				.build());
+		BookLikesResponse response = bookLikesService.isLiked(bookId, userId);
 		return ResponseEntity.ok(JsendResponse.success(response));
 	}
 
@@ -65,11 +54,7 @@ public class BookLikesController {
 	@GetMapping("/{bookId}/likes/count")
 	public ResponseEntity<JsendResponse<BookLikesResponse>> countLikes(
 		@PathVariable Long bookId) {
-		BookLikesResponse response = bookLikesService.countLikes(
-			BookLikesRequest.builder()
-				.bookId(bookId)
-				.userId(0L)  // 로그인 사용자 아님을 명시적으로 표현
-				.build());
+		BookLikesResponse response = bookLikesService.countLikes(bookId);
 		return ResponseEntity.ok(JsendResponse.success(response));
 	}
 
@@ -77,10 +62,7 @@ public class BookLikesController {
 	@GetMapping("/likes")
 	public ResponseEntity<JsendResponse<List<BookLikesResponse>>> getBooksLiked(
 		@RequestParam Long userId) {
-		List<BookLikesResponse> response = bookLikesService.getBooksLikedByUser(
-			BookLikesRequest.builder()
-				.userId(userId)
-				.build());
+		List<BookLikesResponse> response = bookLikesService.getBooksLikedByUser(userId);
 		return ResponseEntity.ok(JsendResponse.success(response));
 	}
 }
