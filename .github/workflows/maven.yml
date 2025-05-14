@@ -74,7 +74,6 @@ jobs:
     env:
       CONFIG_SERVER_URI: ${{ secrets.CONFIG_SERVER_URI }}
       SPRING_PROFILES_ACTIVE: ${{ github.ref_name == 'master' && 'prod' || 'dev' }}
-      JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
 
     steps:
       - name: Checkout code
@@ -90,7 +89,7 @@ jobs:
       - name: Clean & Build changed-services
         run: |
           MODULE_CSV=$(echo "${{ needs.detect_changes.outputs.changed }}" | sed 's/ /,/g')
-          echo "▶ mvn clean package -pl $MODULE_CSV -am"
+          echo ":arrow_forward: mvn clean package -pl $MODULE_CSV -am"
           mvn -B clean package -pl "$MODULE_CSV" -am -DskipTests
 
       - name: Upload built JARs
@@ -102,7 +101,7 @@ jobs:
 
   deploy:
     needs: [ detect_changes, build ]
-    if: needs.detect_changes.outputs.changed != ''
+    if: needs.detect_changes.outputs.changed != '' && github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     environment: ${{ github.ref_name == 'master' && 'prod' || 'dev' }}
 
@@ -110,7 +109,6 @@ jobs:
     env:
       CONFIG_SERVER_URI: ${{ secrets.CONFIG_SERVER_URI }}
       SPRING_PROFILES_ACTIVE: ${{ github.ref_name == 'master' && 'prod' || 'dev' }}
-      JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
 
     steps:
       - name: Download JARs
@@ -151,9 +149,8 @@ jobs:
             # 환경변수로 프로파일과 Config URI를 내보냄
             export SPRING_PROFILES_ACTIVE="${{ env.SPRING_PROFILES_ACTIVE }}"
             export CONFIG_SERVER_URI="${{ env.CONFIG_SERVER_URI }}"
-            export JWT_SECRET_KEY="${{ env.JWT_SECRET_KEY }}"
 
             for MOD in ${{ needs.detect_changes.outputs.changed }}; do
-              echo "▶ Rolling deploy: $MOD"
+              echo ":arrow_forward: Rolling deploy: $MOD"
               ~/startup.sh "$MOD"
             done
