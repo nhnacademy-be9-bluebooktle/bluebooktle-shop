@@ -15,10 +15,12 @@ import shop.bluebooktle.backend.coupon.repository.RelativeCouponRepository;
 import shop.bluebooktle.backend.coupon.service.CouponTypeService;
 import shop.bluebooktle.common.dto.coupon.request.CouponTypeRegisterRequest;
 import shop.bluebooktle.common.dto.coupon.response.CouponTypeResponse;
+import shop.bluebooktle.common.exception.InvalidInputValueException;
 import shop.bluebooktle.common.exception.coupon.CouponTypeNameAlreadyException;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class CouponTypeServiceImpl implements CouponTypeService {
 
 	private final CouponTypeRepository couponTypeRepository;
@@ -26,7 +28,6 @@ public class CouponTypeServiceImpl implements CouponTypeService {
 	private final RelativeCouponRepository relativeCouponRepository;
 
 	@Override
-	@Transactional
 	public void registerCouponType(CouponTypeRegisterRequest request) { // 쿠폰 정책 등록
 		//이름 중복 예외처리
 		couponTypeRepository.findByName(request.getName())
@@ -59,7 +60,7 @@ public class CouponTypeServiceImpl implements CouponTypeService {
 					.build()
 			);
 		} else {
-			throw new IllegalArgumentException("절대값 또는 상대값 할인 정보 중 하나는 필수입니다.");
+			throw new InvalidInputValueException("절대값 또는 상대값 할인 정보 중 하나는 필수입니다.");
 		}
 
 	}

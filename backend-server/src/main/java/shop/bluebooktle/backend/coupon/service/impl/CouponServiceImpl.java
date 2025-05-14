@@ -17,24 +17,24 @@ import shop.bluebooktle.backend.coupon.entity.BookCoupon;
 import shop.bluebooktle.backend.coupon.entity.CategoryCoupon;
 import shop.bluebooktle.backend.coupon.entity.Coupon;
 import shop.bluebooktle.backend.coupon.entity.CouponType;
-import shop.bluebooktle.backend.coupon.repository.AbsoluteCouponRepository;
 import shop.bluebooktle.backend.coupon.repository.BookCouponRepository;
 import shop.bluebooktle.backend.coupon.repository.CategoryCouponRepository;
 import shop.bluebooktle.backend.coupon.repository.CouponRepository;
 import shop.bluebooktle.backend.coupon.repository.CouponTypeRepository;
-import shop.bluebooktle.backend.coupon.repository.RelativeCouponRepository;
 import shop.bluebooktle.backend.coupon.service.CouponService;
 import shop.bluebooktle.common.domain.CouponTypeTarget;
 import shop.bluebooktle.common.dto.coupon.request.CouponRegisterRequest;
 import shop.bluebooktle.common.dto.coupon.request.CouponUpdateRequest;
 import shop.bluebooktle.common.dto.coupon.response.CouponResponse;
 import shop.bluebooktle.common.exception.book.BookNotFoundException;
-import shop.bluebooktle.common.exception.coupon.CouponNotFountException;
+import shop.bluebooktle.common.exception.book.CategoryNotFoundException;
+import shop.bluebooktle.common.exception.coupon.CouponNotFoundException;
 import shop.bluebooktle.common.exception.coupon.CouponTypeNotFoundException;
 import shop.bluebooktle.common.exception.coupon.InvalidCouponTargetException;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class CouponServiceImpl implements CouponService {
 
 	private final CouponRepository couponRepository;
@@ -45,11 +45,7 @@ public class CouponServiceImpl implements CouponService {
 	private final BookRepository bookRepository;
 	private final CategoryRepository categoryRepository;
 
-	private final AbsoluteCouponRepository absoluteCouponRepository;
-	private final RelativeCouponRepository relativeCouponRepository;
-
 	// Coupon 등록
-	@Transactional
 	@Override
 	public void registerCoupon(CouponRegisterRequest request) {
 		// couponType 없을 경우 예외처리
@@ -61,21 +57,18 @@ public class CouponServiceImpl implements CouponService {
 		Coupon coupon = couponRepository.save(Coupon.builder()
 			.type(couponType)
 			.couponName(request.getName())
-			.availableStartAt(request.getAvailableStartAt())
-			.availableEndAt(request.getAvailableEndAt())
 			.build());
 
 		// 특정 도서 쿠폰
 		if (request.getBookId() != null) {
 			Book book = bookRepository.findById(request.getBookId())
-				.orElseThrow(() -> new BookNotFoundException("존재하지 않는 도서입니다."));
+				.orElseThrow(BookNotFoundException::new);
 			bookCouponRepository.save(new BookCoupon(coupon, book));
 		}
 		// 특정 카테고리 쿠폰
 		if (request.getCategoryId() != null) {
 			Category category = categoryRepository.findById(request.getCategoryId())
-				.orElseThrow();
-			//.orElseThrow(() -> CategoryNotFoundException("존재하지 않는 카테고리입니다.")); TODO 카테고리 Exception 추가 시 주석 제거
+				.orElseThrow(CategoryNotFoundException::new);
 			categoryCouponRepository.save(new CategoryCoupon(coupon, category));
 		}
 
@@ -91,19 +84,14 @@ public class CouponServiceImpl implements CouponService {
 
 	// 수정
 	@Override
-	@Transactional
 	public void updateCoupon(Long couponId, CouponUpdateRequest request) {
 		Coupon coupon = couponRepository.findById(couponId)
-			.orElseThrow(CouponNotFountException::new);
+			.orElseThrow(CouponNotFoundException::new);
 		CouponType couponType = coupon.getCouponType();
 		validateCouponTarget(couponType, request.getBookId(), request.getCategoryId());
 
 		// dirty checking 방식
-		coupon.update(
-			request.getName(),
-			request.getAvailableStartAt(),
-			request.getAvailableEndAt()
-		);
+		coupon.update(request.getName());
 
 		if (couponType.getTarget() == CouponTypeTarget.BOOK) {
 			updateCouponTarget(coupon, request);
@@ -112,10 +100,9 @@ public class CouponServiceImpl implements CouponService {
 
 	//삭제
 	@Override
-	@Transactional
 	public void deleteCoupon(Long couponId) {
 		Coupon coupon = couponRepository.findById(couponId)
-			.orElseThrow(CouponNotFountException::new);
+			.orElseThrow(CouponNotFoundException::new);
 
 		bookCouponRepository.deleteByCoupon(coupon);
 		categoryCouponRepository.deleteByCoupon(coupon);
@@ -156,7 +143,7 @@ public class CouponServiceImpl implements CouponService {
 			if (currentBook.isEmpty() || !currentBook.get().getBook().getId().equals(newBookId)) {
 				currentBook.ifPresent(bookCouponRepository::delete);
 				Book book = bookRepository.findById(newBookId)
-					.orElseThrow(() -> new BookNotFoundException("존재하지 않는 도서")); // TODO exception 처리 수정 후 변경
+					.orElseThrow(BookNotFoundException::new);
 				bookCouponRepository.save(new BookCoupon(coupon, book));
 			}
 		} else {
@@ -167,8 +154,7 @@ public class CouponServiceImpl implements CouponService {
 			if (currentCategory.isEmpty() || !currentCategory.get().getCategory().getId().equals(newCategoryId)) {
 				currentCategory.ifPresent(categoryCouponRepository::delete);
 				Category category = categoryRepository.findById(newCategoryId)
-					.orElseThrow();
-				//.orElseThrow(() -> CategoryNotFoundException("존재하지 않는 카테고리입니다.")); TODO 카테고리 Exception 추가 시 주석 제거
+					.orElseThrow(CategoryNotFoundException::new);
 				categoryCouponRepository.save(new CategoryCoupon(coupon, category));
 			}
 		} else {
