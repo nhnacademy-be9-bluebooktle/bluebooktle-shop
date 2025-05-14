@@ -2,7 +2,7 @@ name: CI & CD
 
 on:
   push:
-    branches: [ develop ]
+    branches: [ develop, master ]
     paths:
       - 'backend-server/**'
       - 'frontend-server/**'
@@ -11,7 +11,7 @@ on:
       - 'common-module/**'
       - 'auth-server/**'
   pull_request:
-    branches: [ develop ]
+    branches: [ develop, master ]
     paths:
       - 'backend-server/**'
       - 'frontend-server/**'
@@ -69,10 +69,12 @@ jobs:
     needs: detect_changes
     if: needs.detect_changes.outputs.changed != ''
     runs-on: ubuntu-latest
+    environment: ${{ github.ref_name == 'master' && 'prod' || 'dev' }}
 
     env:
       CONFIG_SERVER_URI: ${{ secrets.CONFIG_SERVER_URI }}
-      SPRING_PROFILES_ACTIVE: dev
+      SPRING_PROFILES_ACTIVE: ${{ github.ref_name == 'master' && 'prod' || 'dev' }}
+      JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
 
     steps:
       - name: Checkout code
@@ -102,11 +104,13 @@ jobs:
     needs: [ detect_changes, build ]
     if: needs.detect_changes.outputs.changed != ''
     runs-on: ubuntu-latest
+    environment: ${{ github.ref_name == 'master' && 'prod' || 'dev' }}
 
     # ← 여기도 동일하게 ENV 주입
     env:
       CONFIG_SERVER_URI: ${{ secrets.CONFIG_SERVER_URI }}
-      SPRING_PROFILES_ACTIVE: dev
+      SPRING_PROFILES_ACTIVE: ${{ github.ref_name == 'master' && 'prod' || 'dev' }}
+      JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
 
     steps:
       - name: Download JARs
@@ -147,6 +151,7 @@ jobs:
             # 환경변수로 프로파일과 Config URI를 내보냄
             export SPRING_PROFILES_ACTIVE="${{ env.SPRING_PROFILES_ACTIVE }}"
             export CONFIG_SERVER_URI="${{ env.CONFIG_SERVER_URI }}"
+            export JWT_SECRET_KEY="${{ env.JWT_SECRET_KEY }}"
 
             for MOD in ${{ needs.detect_changes.outputs.changed }}; do
               echo "▶ Rolling deploy: $MOD"
