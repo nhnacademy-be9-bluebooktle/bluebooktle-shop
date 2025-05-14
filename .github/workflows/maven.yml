@@ -73,9 +73,9 @@ jobs:
     environment:
       name: 'dev'
     env:
-      CONFIG_SERVER_URI: ${{ secrets.CONFIG_SERVER_URI }}
+      CONFIG_SERVER_URI: ${{ secrets.CONFIG_SERVER_URI }} # Repository Secret
       SPRING_PROFILES_ACTIVE: 'dev'
-      JWT_SECRET_KEY: ${{ secrets.REPO_JWT_SECRET_KEY }}
+      JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }} # 'dev' Environment Secret 또는 Repository Secret (dev 환경 우선)
 
       SPRING_DATASOURCE_URL: ${{ secrets.SPRING_DATASOURCE_URL }}
       SPRING_DATASOURCE_USERNAME: ${{ secrets.SPRING_DATASOURCE_USERNAME }}
@@ -115,13 +115,13 @@ jobs:
       name: 'dev'
 
     env:
-      CONFIG_SERVER_URI: ${{ secrets.CONFIG_SERVER_URI }}
-      SPRING_PROFILES_ACTIVE: dev
+      CONFIG_SERVER_URI: ${{ secrets.CONFIG_SERVER_URI }} # Repository Secret
+      SPRING_PROFILES_ACTIVE: 'dev'
       JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
 
-      SPRING_DATASOURCE_URL: ${{ secrets.SPROMG_DATASOURCE_URL }}
-      SPRING_DATASOURCE_USERNAME: ${{ secrets.SPROMG_DATASOURCE_USERNAME }}
-      SPRING_DATASOURCE_PASSWORD: ${{ secrets.SPROMG_DATASOURCE_PASSWORD }}
+      SPRING_DATASOURCE_URL: ${{ secrets.SPRING_DATASOURCE_URL }}
+      SPRING_DATASOURCE_USERNAME: ${{ secrets.SPRING_DATASOURCE_USERNAME }}
+      SPRING_DATASOURCE_PASSWORD: ${{ secrets.SPRING_DATASOURCE_PASSWORD }}
 
       SPRING_DATA_REDIS_PASSWORD: ${{ secrets.SPRING_DATA_REDIS_PASSWORD }}
 
@@ -132,11 +132,17 @@ jobs:
           name: jars
           path: downloaded_jars
 
-      - name: Debug deploy modules
+      - name: Check Variables in Job Environment (Safer Debug)
         run: |
-          echo ">>> Deploy sees modules: '${{ needs.detect_changes.outputs.changed }}'"
-          echo ">>> Using CONFIG_SERVER_URI=${CONFIG_SERVER_URI}"
-          echo ">>> Using SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}"
+          echo "--- Checking Variables in Job Environment (deploy job) ---"
+          if [ -n "${{ env.CONFIG_SERVER_URI }}" ]; then echo "DEBUG_JOB_ENV: CONFIG_SERVER_URI is SET. Value: [${{ env.CONFIG_SERVER_URI }}]"; else echo "DEBUG_JOB_ENV: CONFIG_SERVER_URI is NOT SET"; fi
+          if [ -n "${{ env.SPRING_PROFILES_ACTIVE }}" ]; then echo "DEBUG_JOB_ENV: SPRING_PROFILES_ACTIVE is [${{ env.SPRING_PROFILES_ACTIVE }}]"; else echo "DEBUG_JOB_ENV: SPRING_PROFILES_ACTIVE is NOT SET"; fi
+          if [ -n "${{ env.JWT_SECRET_KEY }}" ]; then echo "DEBUG_JOB_ENV: JWT_SECRET_KEY is SET (masked by GitHub Actions if printed directly)"; else echo "DEBUG_JOB_ENV: JWT_SECRET_KEY is NOT SET"; fi
+          if [ -n "${{ env.SPRING_DATASOURCE_URL }}" ]; then echo "DEBUG_JOB_ENV: SPRING_DATASOURCE_URL is SET"; else echo "DEBUG_JOB_ENV: SPRING_DATASOURCE_URL is NOT SET"; fi
+          if [ -n "${{ env.SPRING_DATASOURCE_USERNAME }}" ]; then echo "DEBUG_JOB_ENV: SPRING_DATASOURCE_USERNAME is SET"; else echo "DEBUG_JOB_ENV: SPRING_DATASOURCE_USERNAME is NOT SET"; fi
+          if [ -n "${{ env.SPRING_DATASOURCE_PASSWORD }}" ]; then echo "DEBUG_JOB_ENV: SPRING_DATASOURCE_PASSWORD is SET (masked by GitHub Actions if printed directly)"; else echo "DEBUG_JOB_ENV: SPRING_DATASOURCE_PASSWORD is NOT SET"; fi
+          if [ -n "${{ env.SPRING_DATA_REDIS_PASSWORD }}" ]; then echo "DEBUG_JOB_ENV: SPRING_DATA_REDIS_PASSWORD is SET (masked by GitHub Actions if printed directly)"; else echo "DEBUG_JOB_ENV: SPRING_DATA_REDIS_PASSWORD is NOT SET"; fi
+          echo "------------------------------------------------------------"
 
       - name: Upload JARs to remote
         uses: appleboy/scp-action@master
@@ -158,37 +164,39 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           capture_stdout: true
           script: |
-            echo ">>> SSH sees modules: ${{ needs.detect_changes.outputs.changed }}"
-            chmod +x ~/startup.sh
-            
+            echo "--- Debugging SSH Action Script (Remote Server) ---"
             echo "Attempting to access env.JWT_SECRET_KEY from GitHub Actions workflow:"
             if [ -n "${{ env.JWT_SECRET_KEY }}" ]; then
-              # 이 부분은 *** 로 마스킹될 가능성이 높습니다. 마스킹된다면 값이 있다는 의미입니다.
-              echo "SSH_ACTION_DEBUG_STEP1: env.JWT_SECRET_KEY from GA is SET. Masked value: [${{ env.JWT_SECRET_KEY }}]"
+              echo "SSH_ACTION_DEBUG_STEP1: env.JWT_SECRET_KEY from GA is SET. (Masked by GitHub if printed directly: [${{ env.JWT_SECRET_KEY }}])"
             else
-              echo "SSH_ACTION_DEBUG_STEP1: env.JWT_SECRET_KEY from GA is NOT SET or EMPTY" # 여기가 문제면 job env 설정이나 secret 자체 문제
+              echo "SSH_ACTION_DEBUG_STEP1: env.JWT_SECRET_KEY from GA is NOT SET or EMPTY"
             fi
             
-            # 환경변수로 프로파일과 Config URI를 내보냄
+            # Export all necessary environment variables for startup.sh
             export SPRING_PROFILES_ACTIVE="${{ env.SPRING_PROFILES_ACTIVE }}"
             export CONFIG_SERVER_URI="${{ env.CONFIG_SERVER_URI }}"
             export JWT_SECRET_KEY="${{ env.JWT_SECRET_KEY }}"
-            
+            export SPRING_DATASOURCE_URL="${{ env.SPRING_DATASOURCE_URL }}"
+            export SPRING_DATASOURCE_USERNAME="${{ env.SPRING_DATASOURCE_USERNAME }}"
+            export SPRING_DATASOURCE_PASSWORD="${{ env.SPRING_DATASOURCE_PASSWORD }}"
+            export SPRING_DATA_REDIS_PASSWORD="${{ env.SPRING_DATA_REDIS_PASSWORD }}"
+            export PORT="${{ env.APP_PORT }}" # APP_PORT 값을 PORT로 export
+
             echo "Checking shell variables after export:"
             if [ -n "$JWT_SECRET_KEY" ]; then 
               echo "SSH_ACTION_DEBUG_STEP2: Shell variable JWT_SECRET_KEY after export is SET (value not printed for security)"
             else
-              echo "SSH_ACTION_DEBUG_STEP2: Shell variable JWT_SECRET_KEY after export is NOT SET or EMPTY" # 여기가 문제면 export 과정이나 값 자체의 문제
+              echo "SSH_ACTION_DEBUG_STEP2: Shell variable JWT_SECRET_KEY after export is NOT SET or EMPTY"
             fi
-            
-            if [ -n "$SPRING_PROFILES_ACTIVE" ]; then
-              echo "SSH_ACTION_DEBUG_STEP2: Shell variable SPRING_PROFILES_ACTIVE after export is [$SPRING_PROFILES_ACTIVE]"
-            else
-              echo "SSH_ACTION_DEBUG_STEP2: Shell variable SPRING_PROFILES_ACTIVE after export is NOT SET or EMPTY"
-            fi
-            echo "---------------------------------------------------"
+
+            if [ -n "$SPRING_PROFILES_ACTIVE" ]; then echo "SSH_ACTION_DEBUG_STEP2: Shell var SPRING_PROFILES_ACTIVE is [$SPRING_PROFILES_ACTIVE]"; else echo "SSH_ACTION_DEBUG_STEP2: Shell var SPRING_PROFILES_ACTIVE is NOT SET"; fi
+            if [ -n "$PORT" ]; then echo "SSH_ACTION_DEBUG_STEP2: Shell var PORT is [$PORT]"; else echo "SSH_ACTION_DEBUG_STEP2: Shell var PORT is NOT SET"; fi
+            echo "--- End SSH Action Debug ---"
+
+            echo ">>> SSH sees modules: ${{ needs.detect_changes.outputs.changed }}"
+            chmod +x ~/startup.sh
 
             for MOD in ${{ needs.detect_changes.outputs.changed }}; do
               echo "▶ Rolling deploy: $MOD"
-              ~/startup.sh "$MOD"
+              ~/startup.sh "$MOD" # startup.sh는 PORT 환경변수를 사용
             done
