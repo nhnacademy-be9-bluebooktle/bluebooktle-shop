@@ -118,7 +118,7 @@ jobs:
   deploy:
     needs: [detect_changes, build]
     # PR이 병합되었고, 변경된 모듈이 있을 경우에만 실행
-    if: github.event.pull_request.merged == true && needs.detect_changes.outputs.changed != ''
+    if: needs.detect_changes.outputs.changed != ''
     runs-on: ubuntu-latest
     environment:
       name: 'dev' # develop 브랜치로 병합 시 'dev' 환경 사용
