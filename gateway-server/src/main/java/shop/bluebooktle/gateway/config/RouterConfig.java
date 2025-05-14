@@ -15,6 +15,8 @@ public class RouterConfig {
 				.uri("lb://backend-server"))
 			.route("auth-server", r -> r.path("/auth/**")
 				.uri("lb://auth-server"))
+			// .route("eureka-server", r -> r.path("/eureka/**")
+			// 	.uri("lb://eureka-server"))
 			.route("frontend-server", r -> r.path("/**")
 				.uri("lb://frontend-server"))
 			.build();
