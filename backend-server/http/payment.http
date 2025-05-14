@@ -18,9 +18,5 @@ Content-Type: application/json
 }
 
 ### PaymentType 삭제
-DELETE localhost:9002/api/payments/types/1
+DELETE localhost:9002/api/payments/types/2
 Content-Type: application/json
-
-{
-  "method": "ㅇㅅㅇ카드"
-}
