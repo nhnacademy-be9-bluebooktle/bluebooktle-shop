@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.book.dto.request.PublisherRequest;
 import shop.bluebooktle.backend.book.dto.response.PublisherInfoResponse;
 import shop.bluebooktle.backend.book.entity.Publisher;
+import shop.bluebooktle.backend.book.repository.BookPublisherRepository;
 import shop.bluebooktle.backend.book.repository.PublisherRepository;
 import shop.bluebooktle.backend.book.service.PublisherService;
 import shop.bluebooktle.common.exception.book.PublisherAlreadyExistsException;
@@ -19,6 +20,7 @@ import shop.bluebooktle.common.exception.book.PublisherNotFoundException;
 public class PublisherServiceImpl implements PublisherService {
 
 	private final PublisherRepository publisherRepository;
+	private final BookPublisherRepository bookPublisherRepository;
 
 	@Override
 	@Transactional
@@ -63,7 +65,8 @@ public class PublisherServiceImpl implements PublisherService {
 	public void deletePublisher(Long publisherId) {
 		Publisher publisher = publisherRepository.findById(publisherId)
 			.orElseThrow(() -> new PublisherNotFoundException(publisherId));
-
+		// 출판사에 등록된 도서 삭제 (도서출판사 연관테이블 삭제)
+		bookPublisherRepository.deleteByPublisher(publisher);
 		publisherRepository.delete(publisher);
 	}
 }
