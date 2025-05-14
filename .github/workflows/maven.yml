@@ -71,14 +71,13 @@ jobs:
     runs-on: ubuntu-latest
 
     environment:
-      name: ${{ (github.ref_name == 'develop' && 'dev') || ((github.ref_name == 'master' || github.ref_name == 'main') && 'prod') }}
-
+      name: 'dev'
     env:
       CONFIG_SERVER_URI: ${{ secrets.CONFIG_SERVER_URI }}
-      SPRING_PROFILES_ACTIVE: ${{ (github.ref_name == 'develop' && 'dev') || ((github.ref_name == 'master' || github.ref_name == 'main') && 'prod') }}
+      SPRING_PROFILES_ACTIVE: 'dev'
       JWT_SECRET_KEY: ${{ secrets.REPO_JWT_SECRET_KEY }}
 
-      SPRING_DATASOURCE_URL: ${{ secrets.SPROMG_DATASOURCE_URL }}
+      SPRING_DATASOURCE_URL: ${{ secrets.SPRING_DATASOURCE_URL }}
       SPRING_DATASOURCE_USERNAME: ${{ secrets.SPRING_DATASOURCE_USERNAME }}
       SPRING_DATASOURCE_PASSWORD: ${{ secrets.SPRING_DATASOURCE_PASSWORD }}
 
@@ -138,7 +137,6 @@ jobs:
           echo ">>> Deploy sees modules: '${{ needs.detect_changes.outputs.changed }}'"
           echo ">>> Using CONFIG_SERVER_URI=${CONFIG_SERVER_URI}"
           echo ">>> Using SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}"
-          echo ">>> Using JWT_SECRET_KEY=${JWT_SECRET_KEY}"
 
       - name: Upload JARs to remote
         uses: appleboy/scp-action@master
