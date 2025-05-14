@@ -1,7 +1,7 @@
 package shop.bluebooktle.backend.payment.service.impl;
 
-import java.util.List;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,33 +23,32 @@ public class PaymentTypeServiceImpl implements PaymentTypeService {
 
 	@Override
 	@Transactional
-	public PaymentTypeResponse create(PaymentTypeRequest paymentTypeRequest) {
+	public void create(PaymentTypeRequest paymentTypeRequest) {
 		if (paymentTypeRepository.existsByMethod(paymentTypeRequest.method())) {
-			throw new PaymentTypeAlreadyExistException("이미 존재하는 결제수단: ");
+			throw new PaymentTypeAlreadyExistException("이미 존재하는 결제수단");
 		}
 
-		PaymentType pt = paymentTypeRepository.save(paymentTypeRequest.toEntity());
-		return PaymentTypeResponse.fromEntity(pt);
+		paymentTypeRepository.save(paymentTypeRequest.toEntity());
 	}
 
 	@Override
 	@Transactional
-	public void update(PaymentTypeRequest oldPaymentType, PaymentTypeRequest newPaymentType) {
-		PaymentType pt = paymentTypeRepository.findByMethod(oldPaymentType.method())
+	public void update(Long id, PaymentTypeRequest newPaymentTypeRequest) {
+		PaymentType pt = paymentTypeRepository.findById(id)
 			.orElseThrow(() -> new PaymentTypeNotFoundException("결제수단 없음"));
 
-		if (!pt.getMethod().equals(newPaymentType.method())
-			&& paymentTypeRepository.existsByMethod(newPaymentType.method())) {
+		if (!pt.getMethod().equals(newPaymentTypeRequest.method())
+			&& paymentTypeRepository.existsByMethod(newPaymentTypeRequest.method())) {
 			throw new PaymentTypeAlreadyExistException("이미 존재하는 결제수단");
 		}
-		pt.changeMethod(newPaymentType.method());
+		pt.changeMethod(newPaymentTypeRequest.method());
 		paymentTypeRepository.save(pt);
 	}
 
 	@Override
 	@Transactional
-	public void delete(PaymentTypeRequest paymentTypeRequest) {
-		PaymentType pt = paymentTypeRepository.findByMethod(paymentTypeRequest.method())
+	public void delete(Long id) {
+		PaymentType pt = paymentTypeRepository.findById(id)
 			.orElseThrow(() -> new PaymentTypeNotFoundException("결제수단 없음"));
 		paymentTypeRepository.delete(pt);
 	}
@@ -62,10 +61,7 @@ public class PaymentTypeServiceImpl implements PaymentTypeService {
 	}
 
 	@Override
-	public List<PaymentTypeResponse> getAll() {
-		return paymentTypeRepository.findAll()
-			.stream()
-			.map(PaymentTypeResponse::fromEntity)
-			.toList();
+	public Page<PaymentTypeResponse> getAll(Pageable pageable) {
+		return paymentTypeRepository.findAll(pageable).map(PaymentTypeResponse::fromEntity);
 	}
 }
