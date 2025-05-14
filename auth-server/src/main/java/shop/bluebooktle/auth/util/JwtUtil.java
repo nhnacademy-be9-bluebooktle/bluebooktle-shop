@@ -114,7 +114,4 @@ public class JwtUtil {
 		}
 	}
 
-	public boolean isTokenValid(String token) {
-		return !isTokenExpired(token);
-	}
 }
