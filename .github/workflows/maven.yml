@@ -101,7 +101,11 @@ jobs:
 
   deploy:
     needs: [ detect_changes, build ]
-    if: needs.detect_changes.outputs.changed != ''
+    if: >-
+      github.event_name == 'pull_request' &&
+      github.event.action == 'closed' &&
+      github.event.pull_request.merged == true &&
+      needs.detect_changes.outputs.changed != ''
     runs-on: ubuntu-latest
     environment: ${{ github.ref_name == 'master' && 'prod' || 'dev' }}
 
