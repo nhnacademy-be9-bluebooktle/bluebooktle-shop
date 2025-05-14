@@ -24,6 +24,13 @@ public class SecurityConfig {
 		"/swagger-resources/**",
 	};
 
+	private static final String[] SWAGGER_PATHS = {
+		"/swagger-ui/**",
+		"/swagger-ui.html",
+		"/v3/api-docs/**",
+		"/swagger-resources/**",
+	};
+
 	@Bean
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
@@ -57,6 +64,7 @@ public class SecurityConfig {
 				.requestMatchers(antMatcher("/actuator/**")).permitAll()
 				.requestMatchers(SWAGGER_PATHS).permitAll()
 				.requestMatchers("/auth/**").permitAll()
+				.requestMatchers(SWAGGER_PATHS).permitAll()
 				.anyRequest().authenticated()
 			);
 		return http.build();
