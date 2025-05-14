@@ -1,9 +1,9 @@
 package shop.bluebooktle.backend.order.service.impl;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,7 +26,7 @@ public class OrderServiceImpl implements OrderService {
 	private final OrderStateRepository orderStateRepository;
 
 	@Override
-	public Page<Order> getUserOrders(User user, OrderStatus status, LocalDateTime start, LocalDateTime end,
+	public List<Order> getUserOrders(User user, OrderStatus status, LocalDateTime start, LocalDateTime end,
 		Pageable pageable) {
 		if (status == null && start != null && end != null) {
 			return orderRepository.findByUserAndOrderDateBetween(user, start, end, pageable);
