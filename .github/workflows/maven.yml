@@ -70,10 +70,19 @@ jobs:
     if: needs.detect_changes.outputs.changed != ''
     runs-on: ubuntu-latest
 
+    environment:
+      name: ${{ (github.ref_name == 'develop' && 'dev') || ((github.ref_name == 'master' || github.ref_name == 'main') && 'prod') }}
+
     env:
       CONFIG_SERVER_URI: ${{ secrets.CONFIG_SERVER_URI }}
       SPRING_PROFILES_ACTIVE: dev
+      JWT_SECRET_KEY: ${{ secrets.REPO_JWT_SECRET_KEY }}
 
+      SPRING_DATASOURCE_URL: ${{ secrets.SPROMG_DATASOURCE_URL }}
+      SPRING_DATASOURCE_USERNAME: ${{ secrets.SPROMG_DATASOURCE_USERNAME }}
+      SPRING_DATASOURCE_PASSWORD: ${{ secrets.SPROMG_DATASOURCE_PASSWORD }}
+
+      SPRING_DATA_REDIS_PASSWORD: ${{ secrets.SPRING_DATA_REDIS_PASSWORD }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -103,10 +112,19 @@ jobs:
     if: needs.detect_changes.outputs.changed != ''
     runs-on: ubuntu-latest
 
-    # ← 여기도 동일하게 ENV 주입
+    environment:
+      name: ${{ (github.ref_name == 'develop' && 'dev') || ((github.ref_name == 'master' || github.ref_name == 'main') && 'prod') }}
+
     env:
       CONFIG_SERVER_URI: ${{ secrets.CONFIG_SERVER_URI }}
       SPRING_PROFILES_ACTIVE: dev
+      JWT_SECRET_KEY: ${{ secrets.REPO_JWT_SECRET_KEY }}
+
+      SPRING_DATASOURCE_URL: ${{ secrets.SPROMG_DATASOURCE_URL }}
+      SPRING_DATASOURCE_USERNAME: ${{ secrets.SPROMG_DATASOURCE_USERNAME }}
+      SPRING_DATASOURCE_PASSWORD: ${{ secrets.SPROMG_DATASOURCE_PASSWORD }}
+
+      SPRING_DATA_REDIS_PASSWORD: ${{ secrets.SPRING_DATA_REDIS_PASSWORD }}
 
     steps:
       - name: Download JARs
