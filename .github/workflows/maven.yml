@@ -118,7 +118,7 @@ jobs:
   deploy:
     needs: [detect_changes, build]
     # PR이 병합되었고, 변경된 모듈이 있을 경우에만 실행
-    if: needs.detect_changes.outputs.changed != ''
+    if: github.event.pull_request.merged == true && needs.detect_changes.outputs.changed != ''
     runs-on: ubuntu-latest
     environment:
       name: 'dev' # develop 브랜치로 병합 시 'dev' 환경 사용
@@ -163,18 +163,17 @@ jobs:
         with:
           host: ${{ secrets.SSH_IP }}
           username: ${{ secrets.SSH_ID }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }} # SSH 비공개 키 Secret 이름
+          password: ${{ secrets.SSH_PASSWORD }} # 비밀번호 기반 SSH 접속
           port: ${{ secrets.SSH_PORT }}
-          source: "downloaded_jars/" # 다운로드된 JAR들이 있는 디렉토리
-          target: "~/app/jars/" # 원격 서버의 업로드 대상 디렉토리 (하위 모듈 디렉토리 구조 유지를 위해 끝에 / 추가)
-          # strip_components: 1 # downloaded_jars 디렉토리 자체는 제외하고 내용만 복사하려면 사용. 여기서는 모듈별 디렉토리 유지를 위해 사용 안 함.
+          source: "downloaded_jars/"
+          target: "~/app/jars/"
 
       - name: Execute deployment script on remote server
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SSH_IP }}
           username: ${{ secrets.SSH_ID }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }} # SSH 비공개 키 Secret 이름
+          password: ${{ secrets.SSH_PASSWORD }}
           port: ${{ secrets.SSH_PORT }}
           capture_stdout: true
           script: |
