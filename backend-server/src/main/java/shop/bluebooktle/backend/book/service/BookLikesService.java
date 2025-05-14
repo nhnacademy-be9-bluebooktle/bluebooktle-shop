@@ -2,22 +2,21 @@ package shop.bluebooktle.backend.book.service;
 
 import java.util.List;
 
-import shop.bluebooktle.backend.book.dto.request.BookLikesRequest;
 import shop.bluebooktle.backend.book.dto.response.BookLikesResponse;
 
 public interface BookLikesService {
 	// 사용자가 도서 좋아요 누르기
-	void like(BookLikesRequest request);
+	void like(Long bookId, Long userId);
 
 	// 사용자가 누른 도서 좋아요 취소
-	void unlike(BookLikesRequest request);
+	void unlike(Long bookId, Long userId);
 
 	// 도서 좋아요 여부 확인
-	BookLikesResponse isLiked(BookLikesRequest request);
+	BookLikesResponse isLiked(Long bookId, Long userId);
 
 	// 도서 좋아요 수 확인
-	BookLikesResponse countLikes(BookLikesRequest request);
+	BookLikesResponse countLikes(Long bookId);
 
 	// 좋아요 누른 도서 조회
-	List<BookLikesResponse> getBooksLikedByUser(BookLikesRequest request);
+	List<BookLikesResponse> getBooksLikedByUser(Long userId);
 }
