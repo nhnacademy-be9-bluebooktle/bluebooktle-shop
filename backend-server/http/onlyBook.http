@@ -5,7 +5,7 @@ Content-Type: application/json
 {
   "title": "테스트 제목",
   "description": "테스트 설명",
-  "isbn": "1234567890124",
+  "isbn": "1234567890125",
   "publishDate": "2025-05-15"
 }
 
