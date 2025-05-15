@@ -18,7 +18,6 @@ import shop.bluebooktle.frontend.repository.AuthRepository;
 @Service
 @RequiredArgsConstructor
 public class AuthService {
-
 	private final AuthRepository authRepository;
 
 	public void signup(SignupRequest signupRequest) {
@@ -28,12 +27,12 @@ public class AuthService {
 			throw new ApplicationException(ErrorCode.BAD_GATEWAY, "회원가입 중 외부 서비스 응답이 없습니다.");
 		}
 
-		if (!"success".equals(response.getStatus())) {
+		if (!"success".equals(response.status())) {
 			log.warn("Login failed via auth-server (JSend status: {}) for ID: {}. Message: {}, Code: {}, Data: {}",
-				response.getStatus(), signupRequest.getEmail(), response.getMessage(), response.getCode(),
-				response.getData());
+				response.status(), signupRequest.getEmail(), response.message(), response.code(),
+				response.data());
 			ErrorCode determinedErrorCode = determineErrorCodeFromJsend(response, ErrorCode.INVALID_INPUT_VALUE);
-			String message = response.getMessage() != null ? response.getMessage() : determinedErrorCode.getMessage();
+			String message = response.message() != null ? response.message() : determinedErrorCode.getMessage();
 			throw new ApplicationException(determinedErrorCode, message);
 		}
 	}
@@ -45,16 +44,16 @@ public class AuthService {
 				throw new ApplicationException(ErrorCode.BAD_GATEWAY, "로그인 중 외부 서비스 응답이 없습니다.");
 			}
 
-			if ("success".equals(response.getStatus()) && response.getData() != null) {
-				return response.getData();
+			if ("success".equals(response.status()) && response.data() != null) {
+				return response.data();
 			} else {
 				log.warn("Login failed via auth-server (JSend status: {}) for ID: {}. Message: {}, Code: {}, Data: {}",
-					response.getStatus(), loginRequest.getLoginId(), response.getMessage(), response.getCode(),
-					response.getData());
+					response.status(), loginRequest.getLoginId(), response.message(), response.code(),
+					response.data());
 				ErrorCode determinedErrorCode = determineErrorCodeFromJsend(response,
 					ErrorCode.AUTH_AUTHENTICATION_FAILED);
 				String message =
-					response.getMessage() != null ? response.getMessage() : determinedErrorCode.getMessage();
+					response.message() != null ? response.message() : determinedErrorCode.getMessage();
 				throw new ApplicationException(determinedErrorCode, message);
 			}
 		} catch (FeignException.FeignClientException e) {
@@ -73,20 +72,20 @@ public class AuthService {
 			throw new ApplicationException(ErrorCode.BAD_GATEWAY, "토큰 갱신 중 외부 서비스 응답이 없습니다.");
 		}
 
-		if ("success".equals(response.getStatus()) && response.getData() != null) {
-			return response.getData();
+		if ("success".equals(response.status()) && response.data() != null) {
+			return response.data();
 		} else {
 			log.warn("Token refresh failed via auth-server (JSend status: {}) Message: {}, Code: {}, Data: {}",
-				response.getStatus(), response.getMessage(), response.getCode(), response.getData());
+				response.status(), response.message(), response.code(), response.data());
 			ErrorCode determinedErrorCode = determineErrorCodeFromJsend(response, ErrorCode.AUTH_INVALID_REFRESH_TOKEN);
-			String message = response.getMessage() != null ? response.getMessage() : determinedErrorCode.getMessage();
+			String message = response.message() != null ? response.message() : determinedErrorCode.getMessage();
 			throw new ApplicationException(determinedErrorCode, message);
 		}
 	}
 
 	private ErrorCode determineErrorCodeFromJsend(JsendResponse<?> jsendResponse, ErrorCode defaultErrorCode) {
-		if (jsendResponse != null && jsendResponse.getCode() != null) {
-			ErrorCode found = ErrorCode.findByStringCode(jsendResponse.getCode());
+		if (jsendResponse != null && jsendResponse.code() != null) {
+			ErrorCode found = ErrorCode.findByStringCode(jsendResponse.code());
 			if (found != null) {
 				return found;
 			}
