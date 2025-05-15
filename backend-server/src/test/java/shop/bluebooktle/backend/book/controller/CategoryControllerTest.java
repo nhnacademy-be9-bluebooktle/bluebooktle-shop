@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.data.jpa.JpaRepositoriesAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
@@ -21,8 +22,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import shop.bluebooktle.backend.book.dto.request.CategoryRegisterRequest;
 import shop.bluebooktle.backend.book.service.CategoryService;
 
-// @WebMvcTest(CategoryController.class)
-@ActiveProfiles("local")
 @WebMvcTest(controllers = CategoryController.class,
 	excludeAutoConfiguration = {
 		DataSourceAutoConfiguration.class,
@@ -30,6 +29,8 @@ import shop.bluebooktle.backend.book.service.CategoryService;
 		JpaRepositoriesAutoConfiguration.class
 	}
 )
+@AutoConfigureMockMvc
+@ActiveProfiles("test")
 public class CategoryControllerTest {
 	@Autowired
 	private MockMvc mockMvc;
