@@ -35,22 +35,22 @@ public class BookController {
 	private final BookService bookService;
 	private final BookRegisterService bookRegisterService;
 
-	//도서 테이블 정보만 등록
+	//도서 정보 등록
 	@PostMapping("/register")
 	public ResponseEntity<JsendResponse<BookRegisterResponse>> registerBook(
-		@RequestBody @Valid BookRegisterRequest request) {
+		@Valid @RequestBody BookRegisterRequest request) {
 		BookRegisterResponse response = bookService.registerBook(request);
 		return ResponseEntity.status(HttpStatus.CREATED).body(JsendResponse.success(response));
 	}
 
-	//도서 테이블 정보 조회
+	//도서 정보 조회
 	@GetMapping("/search/{bookId}")
-	public ResponseEntity<JsendResponse<BookResponse>> searchBook(@PathVariable Long bookId) {
+	public ResponseEntity<JsendResponse<BookResponse>> getBook(@PathVariable Long bookId) {
 		BookResponse bookResponse = bookService.findBookById(bookId);
 		return ResponseEntity.ok(JsendResponse.success(bookResponse));
 	}
 
-	//도서테이블 정보 수정
+	//도서 정보 수정
 	@PutMapping("/update/{bookId}")
 	public ResponseEntity<JsendResponse<BookUpdateResponse>> updateBook(
 		@PathVariable Long bookId,
@@ -60,7 +60,7 @@ public class BookController {
 		return ResponseEntity.ok(JsendResponse.success(response));
 	}
 
-	//도서 테이블 정보 삭제
+	//도서 정보 삭제
 	@DeleteMapping("/delete/{bookId}")
 	public ResponseEntity<JsendResponse<Void>> deleteBook(@PathVariable Long bookId) {
 		bookService.deleteBook(bookId);

@@ -10,29 +10,26 @@ import shop.bluebooktle.backend.book.entity.BookSaleInfo;
 @Getter
 @Builder
 @AllArgsConstructor
-public class BookSaleInfoResponse {
+public class BookSaleInfoUpdateResponse {
 	Long id;
 	String title;
 	BigDecimal price;
 	BigDecimal salePrice;
+	BigDecimal salePercentage;
 	Integer stock;
 	Boolean isPackable;
 	String state;
-	Long viewCount;
-	Long searchCount;
 
-	public static BookSaleInfoResponse fromEntity(BookSaleInfo entity) {
-		return BookSaleInfoResponse.builder()
+	public static BookSaleInfoUpdateResponse fromEntity(BookSaleInfo entity) {
+		return BookSaleInfoUpdateResponse.builder()
 			.id(entity.getId())
 			.title(entity.getBook().getTitle())
 			.price(entity.getPrice())
 			.salePrice(entity.getSalePrice())
+			.salePercentage(entity.getSalePercentage())
 			.stock(entity.getStock())
 			.isPackable(entity.isPackable())
 			.state(entity.getState().name())
-			.viewCount(entity.getViewCount())
-			.searchCount(entity.getSearchCount())
 			.build();
 	}
-
 }

@@ -12,20 +12,20 @@ import shop.bluebooktle.backend.book.entity.Book;
 
 public interface BookService {
 
-	BookAllResponse findBookAllById(Long id);
-
-	List<BookAllResponse> getBookAllByTitle(String title);
-
-	boolean existsBookById(Long id);
-
 	BookRegisterResponse registerBook(BookRegisterRequest request);
-
-	Book getBookById(Long bookId);
 
 	BookResponse findBookById(Long bookId);
 
 	BookUpdateResponse updateBook(Long bookId, BookUpdateRequest request);
 
 	void deleteBook(Long bookId);
+
+	Book getBookById(Long bookId);
+
+	BookAllResponse findBookAllById(Long id);
+
+	List<BookAllResponse> getBookAllByTitle(String title);
+
+	boolean existsBookById(Long id);
 
 }

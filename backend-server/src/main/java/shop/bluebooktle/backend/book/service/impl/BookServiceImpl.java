@@ -95,11 +95,16 @@ public class BookServiceImpl implements BookService {
 	@Transactional
 	@Override
 	public void deleteBook(Long bookId) {
-		if (!bookRepository.existsById(bookId)) {
-			throw new BookNotFoundException("삭제할 책이 존재하지 않습니다. ID: " + bookId);
-		}
-		bookRepository.deleteById(bookId);
+		// Book 존재 여부 확인
+		Book book = bookRepository.findById(bookId)
+			.orElseThrow(() -> new BookNotFoundException("도서를 찾을 수 없습니다. ID: " + bookId));
 
+		// book 삭제시 관련 BookSaleInfo 함께 삭제
+		bookSaleInfoRepository.findByBook(book).ifPresent(bookSaleInfo -> {
+			bookSaleInfoRepository.delete(bookSaleInfo);
+		});
+
+		bookRepository.delete(book);
 	}
 
 	//도서 연관 데이터 한번에 id로조회
