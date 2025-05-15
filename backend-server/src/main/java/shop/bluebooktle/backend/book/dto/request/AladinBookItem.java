@@ -9,6 +9,7 @@ import lombok.Getter;
 public class AladinBookItem {
 	private String title;
 	private String author;
+	private Integer authorId;
 	private String description;
 	private String pubDate;
 	private String isbn13;
@@ -17,4 +18,5 @@ public class AladinBookItem {
 	private String publisher;
 	private String categoryName;
 	private String cover;
+
 }

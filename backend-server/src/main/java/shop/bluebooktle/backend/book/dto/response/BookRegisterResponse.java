@@ -9,7 +9,8 @@ import lombok.Getter;
 @Getter
 @Builder
 @AllArgsConstructor
-public class BookResponse {
+public class BookRegisterResponse {
+
 	String title;
 	String description;
 	LocalDate publishDate;

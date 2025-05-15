@@ -1,0 +1,53 @@
+##아직수정필요!!
+
+### 도서 직접 등록 - 테스트 전에 등록 필요
+POST http://localhost:9002/api/book/register
+Content-Type: application/json
+
+{
+  "title": "자바 개발",
+  "author": [
+    "작가1",
+    "작가2"
+  ],
+  "publisher": "출판사",
+  "tag": [
+    "태그1",
+    "태그2"
+  ],
+  "imageUrl": [
+    "https://image.aladin.co.kr/product/35650/80/coversum/k762036819_1.jpg"
+  ],
+  "category": [
+    "카테고리1",
+    "카테고리2"
+  ],
+  "isbn": "1234567890123",
+  "description": "테스트 설명",
+  "publishDate": "2025-05-12",
+  "price": 20000,
+  "salePrice": 18000,
+  "stock": 99,
+  "isPackable": true,
+  "state": "AVAILABLE"
+}
+
+### 도서 판매정보 조회
+GET http://localhost:9002/api/book-sale-info/1
+Content-Type: application/json
+
+### 도서 판매정보 수정
+PUT http://localhost:9002/api/book-sale-info/1
+Content-Type: application/json
+
+{
+  "price": 10000,
+  "salePrice": 9000,
+  "stock": 120,
+  "isPackable": true,
+  "state": "LOW_STOCK"
+}
+
+### 도서 판매정보 삭제
+DELETE http://localhost:9002/api/book-sale-info/1
+Content-Type: application/json
