@@ -113,7 +113,7 @@
             <h2 class="form-title-kitsch display-font-kitsch"><i class="fas fa-ghost"></i> 회원가입 (Mock Data) <i
                     class="fas fa-heart"></i></h2>
 
-            <form action="#" method="post">
+            <form th:action="@{/signup}" method="post">
                 <div class="form-group-kitsch">
                     <label class="label-kitsch handwriting-font-kitsch e" for="name">이름:</label>
                     <input class="input-kitsch pixel-font-kitsch error-kitsch" id="name" name="name"
@@ -151,7 +151,6 @@
                     <input class="input-kitsch pixel-font-kitsch" id="email" name="email"
                            placeholder="예: blue@booktle.com"
                            required type="email" value="test@example.com">
-                    <p class="input-description-kitsch">이메일 인증 기능은 추후 구현</p>
                 </div>
 
                 <div class="form-group-kitsch">
