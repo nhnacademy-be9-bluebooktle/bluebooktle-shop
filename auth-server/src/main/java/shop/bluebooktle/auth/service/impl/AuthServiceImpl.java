@@ -1,5 +1,7 @@
 package shop.bluebooktle.auth.service.impl;
 
+import java.math.BigDecimal;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,7 +33,6 @@ import shop.bluebooktle.common.exception.auth.WithdrawnAccountException;
 @Transactional(readOnly = true)
 public class AuthServiceImpl implements AuthService {
 
-	private static final String DEFAULT_MEMBERSHIP_LEVEL_NAME = "일반";
 	private final UserRepository userRepository;
 	private final MembershipLevelRepository membershipLevelRepository;
 	private final PasswordEncoder passwordEncoder;
@@ -48,9 +49,14 @@ public class AuthServiceImpl implements AuthService {
 			throw new EmailAlreadyExistsException();
 		}
 
-		MembershipLevel defaultLevel = membershipLevelRepository.findByName(DEFAULT_MEMBERSHIP_LEVEL_NAME)
+		MembershipLevel defaultLevel = membershipLevelRepository.findById(1L)
 			.orElseGet(() -> {
-				MembershipLevel newLevel = MembershipLevel.builder().name(DEFAULT_MEMBERSHIP_LEVEL_NAME).build();
+				MembershipLevel newLevel = MembershipLevel.builder()
+					.name("일반")
+					.rate(1)
+					.maxNetSpent(BigDecimal.valueOf(100000L))
+					.minNetSpent(BigDecimal.valueOf(0L))
+					.build();
 				return membershipLevelRepository.save(newLevel);
 			});
 
@@ -93,8 +99,8 @@ public class AuthServiceImpl implements AuthService {
 		user.updateLastLoginAt();
 		userRepository.save(user);
 
-		String accessToken = jwtUtil.createAccessToken(user.getLoginId(), user.getId(), user.getType());
-		String refreshToken = jwtUtil.createRefreshToken(user.getLoginId(), user.getId(), user.getType());
+		String accessToken = jwtUtil.createAccessToken(user.getId(), user.getNickname(), user.getType());
+		String refreshToken = jwtUtil.createRefreshToken(user.getId(), user.getNickname(), user.getType());
 
 		long refreshTokenExpirationMillis = jwtUtil.getRefreshTokenExpirationMillis();
 		refreshTokenService.save(user.getId(), refreshToken, refreshTokenExpirationMillis);
@@ -110,11 +116,11 @@ public class AuthServiceImpl implements AuthService {
 			throw new InvalidRefreshTokenException();
 		}
 
-		String loginId = jwtUtil.getLoginIdFromToken(refreshToken);
+		String userNickname = jwtUtil.getUserNicknameFromToken(refreshToken);
 		Long userId = jwtUtil.getUserIdFromToken(refreshToken);
 		UserType userType = jwtUtil.getUserTypeFromToken(refreshToken);
 
-		User user = userRepository.findByLoginId(loginId)
+		User user = userRepository.findById(userId)
 			.orElseThrow(UserNotFoundException::new);
 
 		if (user.getStatus() == UserStatus.DORMANT) {
@@ -123,8 +129,8 @@ public class AuthServiceImpl implements AuthService {
 			throw new WithdrawnAccountException("탈퇴된 계정입니다.");
 		}
 
-		String newAccessToken = jwtUtil.createAccessToken(loginId, userId, userType);
-		String newRefreshToken = jwtUtil.createRefreshToken(loginId, userId, userType);
+		String newAccessToken = jwtUtil.createAccessToken(userId, userNickname, userType);
+		String newRefreshToken = jwtUtil.createRefreshToken(userId, userNickname, userType);
 
 		long refreshTokenExpirationMillis = jwtUtil.getRefreshTokenExpirationMillis();
 		refreshTokenService.save(user.getId(), newRefreshToken, refreshTokenExpirationMillis);
