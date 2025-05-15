@@ -123,8 +123,8 @@ public class CouponServiceImpl implements CouponService {
 			throw new InvalidCouponTargetException("도서관련 쿠폰은 도서나 카테고리 중 하나를 선택해야 합니다.");
 		}
 		// target = 'ORDER' 인데 도서나 카테고리를 선택한 경우
-		if (couponType.getTarget() == CouponTypeTarget.ORDER && bookId != null
-			|| categoryId != null) {
+		if (couponType.getTarget() == CouponTypeTarget.ORDER && (bookId != null
+			|| categoryId != null)) {
 			throw new InvalidCouponTargetException("주문관련 쿠폰은 도서나 카테고리를 선택할 수 없습니다.");
 		}
 	}

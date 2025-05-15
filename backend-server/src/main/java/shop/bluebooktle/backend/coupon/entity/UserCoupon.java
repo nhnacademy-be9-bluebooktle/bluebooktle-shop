@@ -39,7 +39,7 @@ public class UserCoupon extends BaseEntity {
 	@ManyToOne
 	@JoinColumn(name = "coupon_id", nullable = false)
 	private Coupon coupon;
-	@Column(name = "used_at", nullable = false)
+	@Column(name = "used_at")
 	private LocalDateTime usedAt;
 	@Column(name = "available_start_at", nullable = false)
 	private LocalDateTime availableStartAt;
