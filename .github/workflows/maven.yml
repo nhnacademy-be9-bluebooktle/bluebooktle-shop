@@ -52,16 +52,16 @@ jobs:
       - name: Generate changed-services list
         id: list
         run: |
-          modules=()
-          [[ "${{ steps.filter.outputs.eureka-server }}"   == "true" ]] && modules+=("eureka-server")
-          [[ "${{ steps.filter.outputs.gateway-server }}"  == "true" ]] && modules+=("gateway-server")
-          [[ "${{ steps.filter.outputs.backend-server }}"  == "true" ]] && modules+=("backend-server")
-          [[ "${{ steps.filter.outputs.frontend-server }}" == "true" ]] && modules+=("frontend-server")
-          [[ "${{ steps.filter.outputs.auth-server }}"     == "true" ]] && modules+=("auth-server")
+          # common-module 변경 시 모든 서비스 고정 순서로 배포
           if [[ "${{ steps.filter.outputs.common-module }}" == "true" ]]; then
-            for svc in eureka-server gateway-server backend-server frontend-server auth-server; do
-              [[ ! " ${modules[*]} " =~ " $svc " ]] && modules+=("$svc")
-            done
+            modules=(eureka-server gateway-server backend-server frontend-server auth-server)
+          else
+            modules=()
+            [[ "${{ steps.filter.outputs.eureka-server }}"   == "true" ]] && modules+=("eureka-server")
+            [[ "${{ steps.filter.outputs.gateway-server }}"  == "true" ]] && modules+=("gateway-server")
+            [[ "${{ steps.filter.outputs.backend-server }}"  == "true" ]] && modules+=("backend-server")
+            [[ "${{ steps.filter.outputs.frontend-server }}" == "true" ]] && modules+=("frontend-server")
+            [[ "${{ steps.filter.outputs.auth-server }}"     == "true" ]] && modules+=("auth-server")
           fi
           echo "changed=${modules[*]}" >> $GITHUB_OUTPUT
 
@@ -135,7 +135,6 @@ jobs:
             set -e
             export SPRING_PROFILES_ACTIVE="${{ env.SPRING_PROFILES_ACTIVE }}"
             export CONFIG_SERVER_URI="${{ env.CONFIG_SERVER_URI }}"
-            
             BR=${{ github.ref_name }}
             if [ "$BR" = "master" ]; then
               S=prod_startup.sh
@@ -143,14 +142,8 @@ jobs:
               S=dev_startup.sh
             fi
             chmod +x ~/$S
-
-            # 변경된 서비스 리스트를 변수에 담아서
             CHANGED_SERVICES="${{ needs.detect_changes.outputs.changed }}"
-            
-            # 순서 보장된 리스트 그대로 for 돌리기
             for M in $CHANGED_SERVICES; do
               echo ":arrow_forward: Rolling deploy: $M"
               bash ~/$S "$M"
             done
-
-
