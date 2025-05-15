@@ -6,11 +6,9 @@ import java.util.UUID;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.order.entity.Order;
-import shop.bluebooktle.backend.order.entity.OrderState;
 import shop.bluebooktle.backend.order.repository.OrderRepository;
 import shop.bluebooktle.backend.order.repository.OrderStateRepository;
 import shop.bluebooktle.backend.order.service.OrderService;
@@ -44,14 +42,5 @@ public class OrderServiceImpl implements OrderService {
 		return orderRepository.findByOrderKey(orderKey)
 			.orElseThrow(() -> new OrderNotFoundException("주문을 찾을 수 없습니다."));
 	}
-
-	@Override
-	@Transactional
-	public void updateOrderStatus(Long orderId, OrderStatus newStatus) {
-		Order order = orderRepository.findById(orderId)
-			.orElseThrow(() -> new IllegalArgumentException("주문을 찾을 수 없습니다."));
-		OrderState state = orderStateRepository.findByState(newStatus)
-			.orElseThrow(() -> new IllegalArgumentException("해당 상태가 존재하지 않습니다."));
-		order.changeOrderState(state);
-	}
+	
 }
