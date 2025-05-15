@@ -32,7 +32,7 @@ GET {{baseUrl}}/delivery-rules/all
 Accept: application/json
 
 ### 제주도 배송정책 삭제
-DELETE {{baseUrl}}/delivery-rules?name=제주도 배송 정책
+DELETE {{baseUrl}}/delivery-rules/4
 
 ### 1번 정책 삭제 (기본정책 삭제 - 삭제불가 정책)
-DELETE {{baseUrl}}/delivery-rules?name=기본 배송 정책
+DELETE {{baseUrl}}/delivery-rules/1

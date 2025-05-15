@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -35,6 +36,4 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 	// 주문 UUID 키로 단일 주문 조회 (비회원용)
 	Optional<Order> findByOrderKey(UUID orderKey);
 
-	// 주문 상태 변경
-	// void updateOrderStatus(Long orderId, OrderStatus newStatus);
 }

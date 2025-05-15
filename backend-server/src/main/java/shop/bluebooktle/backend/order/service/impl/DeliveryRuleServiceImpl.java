@@ -10,10 +10,8 @@ import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.order.entity.DeliveryRule;
 import shop.bluebooktle.backend.order.repository.DeliveryRuleRepository;
 import shop.bluebooktle.backend.order.service.DeliveryRuleService;
-import shop.bluebooktle.common.exception.order.delivery_rule.CannotDeleteDefaultPolicyException;
-import shop.bluebooktle.common.exception.order.delivery_rule.DefaultDeliveryRuleNotFoundException;
-import shop.bluebooktle.common.exception.order.delivery_rule.DeliveryRuleAlreadyExistsException;
-import shop.bluebooktle.common.exception.order.delivery_rule.DeliveryRuleNotFoundException;
+import shop.bluebooktle.common.exception.order.CannotDeleteDefaultPolicyException;
+import shop.bluebooktle.common.exception.order.DeliveryRuleNotFoundException;
 
 @Service
 @RequiredArgsConstructor
@@ -27,14 +25,14 @@ public class DeliveryRuleServiceImpl implements DeliveryRuleService {
 	@Transactional(readOnly = true)
 	public DeliveryRule getDefaultRule() {
 		return deliveryRuleRepository.findByName(DEFAULT_RULE_NAME)
-			.orElseThrow(DefaultDeliveryRuleNotFoundException::new);
+			.orElseThrow(() -> new IllegalStateException("기본 배송 정책이 존재하지 않습니다."));
 	}
 
 	@Override
 	@Transactional
 	public DeliveryRule createPolicy(String name, BigDecimal price, BigDecimal deliveryFee) {
 		if (deliveryRuleRepository.existsByName(name)) {
-			throw new DeliveryRuleAlreadyExistsException(name);
+			throw new IllegalArgumentException("이미 존재하는 배송 정책명입니다: " + name);
 		}
 
 		DeliveryRule rule = DeliveryRule.builder()
@@ -61,8 +59,8 @@ public class DeliveryRuleServiceImpl implements DeliveryRuleService {
 
 	@Override
 	@Transactional
-	public void deletePolicy(String name) {
-		DeliveryRule rule = deliveryRuleRepository.findByName(name)
+	public void deletePolicy(Long id) {
+		DeliveryRule rule = deliveryRuleRepository.findById(id)
 			.orElseThrow(DeliveryRuleNotFoundException::new);
 
 		// 기본 배송 정책은 삭제 불가
