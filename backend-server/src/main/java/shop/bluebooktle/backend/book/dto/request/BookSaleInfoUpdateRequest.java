@@ -2,7 +2,7 @@ package shop.bluebooktle.backend.book.dto.request;
 
 import java.math.BigDecimal;
 
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.AllArgsConstructor;
@@ -16,7 +16,7 @@ import shop.bluebooktle.backend.book.entity.BookSaleInfo;
 @Builder
 @AllArgsConstructor
 public class BookSaleInfoUpdateRequest {
-	@NotBlank(message = "도서 ID는 필수 값입니다.")
+	@NotNull(message = "도서 ID는 필수 값입니다.")
 	@Positive(message = "도서 ID는 양수여야 합니다.")
 	Long bookId;
 
