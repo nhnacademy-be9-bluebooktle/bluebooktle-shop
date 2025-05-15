@@ -141,10 +141,13 @@ jobs:
             else
               S=dev_startup.sh
             fi
-            
             chmod +x ~/$S
+
+            # 변경된 서비스 리스트를 변수에 담아서
+            CHANGED_SERVICES="{{ needs.detect_changes.outputs.changed }}"
             
-            for M in ${{ needs.detect_changes.outputs.changed }}; do
+            # 순서 보장된 리스트 그대로 for 돌리기
+            for M in $CHANGED_SERVICES; do
               echo ":arrow_forward: Rolling deploy: $M"
               bash ~/$S "$M"
             done
