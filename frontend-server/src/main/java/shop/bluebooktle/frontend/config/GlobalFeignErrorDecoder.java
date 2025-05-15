@@ -48,9 +48,9 @@ public class GlobalFeignErrorDecoder implements ErrorDecoder {
 			return new ApplicationException(ec, message);
 		}
 
-		if (jsendResponse != null && "error".equals(jsendResponse.getStatus()) && jsendResponse.getCode() != null) {
-			String errorCodeString = jsendResponse.getCode();
-			String messageFromJSend = jsendResponse.getMessage();
+		if (jsendResponse != null && "error".equals(jsendResponse.status()) && jsendResponse.code() != null) {
+			String errorCodeString = jsendResponse.code();
+			String messageFromJSend = jsendResponse.message();
 
 			ErrorCode resolvedErrorCode = ErrorCode.findByStringCode(errorCodeString);
 			if (resolvedErrorCode != null) {
@@ -69,9 +69,9 @@ public class GlobalFeignErrorDecoder implements ErrorDecoder {
 			}
 		}
 
-		if (jsendResponse != null && "fail".equals(jsendResponse.getStatus())) {
-			Object failData = jsendResponse.getData();
-			String failMessage = jsendResponse.getMessage() != null ? jsendResponse.getMessage() :
+		if (jsendResponse != null && "fail".equals(jsendResponse.status())) {
+			Object failData = jsendResponse.data();
+			String failMessage = jsendResponse.message() != null ? jsendResponse.message() :
 				(failData != null ? "클라이언트 요청 실패: " + failData : ErrorCode.INVALID_INPUT_VALUE.getMessage());
 			return new ApplicationException(ErrorCode.INVALID_INPUT_VALUE, failMessage);
 		}

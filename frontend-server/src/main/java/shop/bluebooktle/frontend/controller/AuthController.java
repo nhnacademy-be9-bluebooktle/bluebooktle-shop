@@ -18,8 +18,6 @@ import shop.bluebooktle.common.dto.auth.response.TokenResponse;
 import shop.bluebooktle.common.exception.ApplicationException;
 import shop.bluebooktle.common.exception.ErrorCode;
 import shop.bluebooktle.frontend.service.AuthService;
-// HttpServletResponse 는 현재 직접 사용되지 않으므로 주석 처리 또는 삭제 가능
-// import jakarta.servlet.http.HttpServletResponse;
 
 @Slf4j
 @Controller
