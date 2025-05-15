@@ -19,4 +19,24 @@ Content-Type: application/json
 
 ### PaymentType 삭제
 DELETE localhost:9002/api/payments/types/2
+Accept: application/json
+
+
+### PaymentDetail 삽입
+POST http://localhost:9002/api/payments/details
 Content-Type: application/json
+
+{
+  "paymentTypeId": 1,
+  "key": "exampleKey2"
+}
+
+
+### PaymentDetail 조회
+GET http://localhost:9002/api/payments/details/2
+Accept: application/json
+
+
+### PaymentDetail 삭제
+DELETE http://localhost:9002/api/payments/details/2
+Accept: application/json
