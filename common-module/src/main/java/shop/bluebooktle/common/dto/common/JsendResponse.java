@@ -5,8 +5,10 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 @Getter
+@Setter
 @RequiredArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Schema(description = "Jsend 표준 응답 DTO")
@@ -16,7 +18,7 @@ public class JsendResponse<T> {
 		description = "응답 상태 (항상 'success'를 가정)",
 		example = "success",
 		requiredMode = Schema.RequiredMode.REQUIRED)
-	private final String status;
+	private String status;
 
 	@Schema(description = "응답 데이터", nullable = true)
 	private T data;
@@ -37,6 +39,10 @@ public class JsendResponse<T> {
 		this.data = data;
 		this.message = message;
 		this.code = code;
+	}
+
+	public JsendResponse() {
+		this.status = "success";
 	}
 
 	public static <T> JsendResponse<T> success(T data) {

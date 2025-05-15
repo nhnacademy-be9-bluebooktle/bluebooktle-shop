@@ -1,13 +1,18 @@
 package shop.bluebooktle.common.dto.auth.response;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
+@Setter
 @AllArgsConstructor
+@NoArgsConstructor
 @Schema(description = "토큰 응답 DTO")
 public class TokenResponse {
 	private String accessToken;
 	private String refreshToken;
+
 }

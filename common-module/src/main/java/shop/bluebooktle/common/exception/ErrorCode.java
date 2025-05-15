@@ -143,4 +143,12 @@ public enum ErrorCode {
 		this.message = message;
 	}
 
+	public static ErrorCode findByStringCode(String code) {
+		for (ErrorCode errorCode : ErrorCode.values()) {
+			if (errorCode.getCode().equals(code)) {
+				return errorCode;
+			}
+		}
+		return INTERNAL_SERVER_ERROR;
+	}
 }

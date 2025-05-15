@@ -1,7 +1,6 @@
-package shop.bluebooktle.frontend.Repository;
+package shop.bluebooktle.frontend.repository;
 
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -10,16 +9,17 @@ import shop.bluebooktle.common.dto.auth.request.SignupRequest;
 import shop.bluebooktle.common.dto.auth.request.TokenRefreshRequest;
 import shop.bluebooktle.common.dto.auth.response.TokenResponse;
 import shop.bluebooktle.common.dto.common.JsendResponse;
+import shop.bluebooktle.frontend.config.FeignGlobalConfig;
 
-@FeignClient(name = "auth-server", path = "/auth")
+@FeignClient(name = "auth-server", path = "/auth", configuration = FeignGlobalConfig.class)
 public interface AuthRepository {
-	
+
 	@PostMapping("/signup")
-	ResponseEntity<JsendResponse<Void>> signup(@RequestBody SignupRequest signupRequest);
+	JsendResponse<Void> signup(@RequestBody SignupRequest signupRequest);
 
 	@PostMapping("/login")
-	ResponseEntity<JsendResponse<TokenResponse>> login(@RequestBody LoginRequest loginRequest);
+	JsendResponse<TokenResponse> login(@RequestBody LoginRequest loginRequest);
 
 	@PostMapping("/refresh")
-	ResponseEntity<JsendResponse<TokenResponse>> refreshToken(@RequestBody TokenRefreshRequest tokenRefreshRequest);
+	JsendResponse<TokenResponse> refreshToken(@RequestBody TokenRefreshRequest tokenRefreshRequest);
 }
