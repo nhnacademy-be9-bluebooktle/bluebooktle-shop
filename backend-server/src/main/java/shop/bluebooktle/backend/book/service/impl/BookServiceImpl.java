@@ -24,7 +24,6 @@ import shop.bluebooktle.backend.book.repository.BookSaleInfoRepository;
 import shop.bluebooktle.backend.book.repository.BookTagRepository;
 import shop.bluebooktle.backend.book.service.BookService;
 import shop.bluebooktle.common.exception.book.BookAlreadyExistsException;
-import shop.bluebooktle.common.exception.BookAlreadyExistsException;
 import shop.bluebooktle.common.exception.book.BookNotFoundException;
 
 @Service
