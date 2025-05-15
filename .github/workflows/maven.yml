@@ -132,6 +132,7 @@ jobs:
           password: ${{ secrets.SSH_PASSWORD }}
           port: ${{ secrets.SSH_PORT }}
           script: |
+            set -e
             export SPRING_PROFILES_ACTIVE="${{ env.SPRING_PROFILES_ACTIVE }}"
             export CONFIG_SERVER_URI="${{ env.CONFIG_SERVER_URI }}"
             
@@ -144,7 +145,7 @@ jobs:
             chmod +x ~/$S
 
             # 변경된 서비스 리스트를 변수에 담아서
-            CHANGED_SERVICES="{{ needs.detect_changes.outputs.changed }}"
+            CHANGED_SERVICES="${{ needs.detect_changes.outputs.changed }}"
             
             # 순서 보장된 리스트 그대로 for 돌리기
             for M in $CHANGED_SERVICES; do
