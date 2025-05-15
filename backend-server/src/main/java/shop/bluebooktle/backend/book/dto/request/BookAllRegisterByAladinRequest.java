@@ -16,7 +16,7 @@ import shop.bluebooktle.backend.book.entity.BookSaleInfo;
 @Value
 @AllArgsConstructor
 @Builder
-public class BookRegisterByAladinRequest {
+public class BookAllRegisterByAladinRequest {
 	@NotBlank(message = "isbn를 입력해주세요")
 	@Size(min = 13, max = 13, message = "isbn은 13자여야 합니다")
 	String isbn;
