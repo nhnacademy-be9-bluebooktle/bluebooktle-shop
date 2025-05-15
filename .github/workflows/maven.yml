@@ -145,14 +145,21 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           capture_stdout: true
           script: |
-            echo ">>> SSH sees modules: ${{ needs.detect_changes.outputs.changed }}"
-            chmod +x ~/startup.sh
+            BRANCH="${{ github.ref_name }}"
             
-            # 환경변수로 프로파일과 Config URI를 내보냄
+            if [ "$BRANCH" = "master" ]; then
+              STARTUP="prod_startup.sh"
+            else
+              STARTUP="dev_startup.sh"
+            fi
+
+            echo ">>> Using startup script: $STARTUP"
+
+            chmod +x ~/$STARTUP
             export SPRING_PROFILES_ACTIVE="${{ env.SPRING_PROFILES_ACTIVE }}"
             export CONFIG_SERVER_URI="${{ env.CONFIG_SERVER_URI }}"
 
             for MOD in ${{ needs.detect_changes.outputs.changed }}; do
               echo ":arrow_forward: Rolling deploy: $MOD"
-              ~/startup.sh "$MOD"
+              ~/\$STARTUP "$MOD"
             done
