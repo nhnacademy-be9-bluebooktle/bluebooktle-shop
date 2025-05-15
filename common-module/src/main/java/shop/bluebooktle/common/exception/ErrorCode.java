@@ -61,7 +61,7 @@ public enum ErrorCode {
 	PUBLISHER_ALREADY_EXISTS(HttpStatus.CONFLICT, "BP01", "이미 등록된 출판사입니다."),
 	BOOK_PUBLISHER_NOT_FOUND(HttpStatus.NOT_FOUND, "BP02", "도서에 등록된 출판사를 찾을 수 없습니다."),
 	BOOK_PUBLISHER_ALREADY_EXISTS(HttpStatus.CONFLICT, "BP03", "도서에 이미 등록된 출판사입니다."),
-
+	PUBLISHER_DELETE_NOT_AVAILABLE(HttpStatus.BAD_REQUEST, "BP04", "도서에 등록된 출판사로 삭제할 수 없습니다."),
 	// Book - 태그
 	TAG_ALREADY_EXISTS(HttpStatus.CONFLICT, "BT01", "이미 등록된 태그입니다."),
 	TAG_NOT_FOUND(HttpStatus.NOT_FOUND, "BT02", "해당 태그를 찾을 수 없습니다."),

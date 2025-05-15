@@ -38,7 +38,7 @@ public class PublisherServiceImpl implements PublisherService {
 	public void updatePublisher(Long publisherId, PublisherRequest request) {
 		Publisher publisher = publisherRepository.findById(publisherId)
 			.orElseThrow(() -> new PublisherNotFoundException(publisherId));
-
+		// TODO 출판사를 새로 생성하거나, 이름만 수정할지 의논해야 할 듯
 		publisher.setName(request.getName());
 		publisherRepository.save(publisher);
 	}
@@ -64,7 +64,10 @@ public class PublisherServiceImpl implements PublisherService {
 		Publisher publisher = publisherRepository.findById(publisherId)
 			.orElseThrow(() -> new PublisherNotFoundException(publisherId));
 		// 출판사에 등록된 도서 삭제 (도서출판사 연관테이블 삭제)
-		bookPublisherRepository.deleteByPublisher(publisher);
+		// 출판사에 등록된 도서가 있을 경우 삭제 불가
+		if (bookPublisherRepository.existsByPublisher(publisher)) {
+			throw new RuntimeException("출판사 삭제 불가능");
+		}
 		publisherRepository.delete(publisher);
 	}
 }

@@ -30,3 +30,8 @@ logging:
   level:
     shop.bluebooktle.book: DEBUG
     org.hibernate.SQL: DEBUG
+
+api:
+  baseUrl: "http://localhost:9002/api"
+authApi:
+  baseUrl: "http://localhost:9001"
