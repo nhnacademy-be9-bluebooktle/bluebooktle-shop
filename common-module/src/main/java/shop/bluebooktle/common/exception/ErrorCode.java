@@ -41,7 +41,7 @@ public enum ErrorCode {
 	PUBLISHER_NOT_FOUND(HttpStatus.NOT_FOUND, "B003", "출판사를 찾을 수 없습니다."),
 	BOOK_AUTHOR_NOT_FOUND(HttpStatus.NOT_FOUND, "B004", "작가를 찾을 수 없습니다."),
 	CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "B005", "카테고리를 찾을 수 없습니다."),
-	BOOK_TAG_NOT_FOUND(HttpStatus.NOT_FOUND, "B006", "태그를 찾을 수 없습니다."),
+	TAG_NOT_FOUND(HttpStatus.NOT_FOUND, "B006", "태그를 찾을 수 없습니다."),
 	BOOK_ALREADY_LIKED(HttpStatus.CONFLICT, "B007", "이미 좋아요를 누른 도서입니다."),
 	BOOK_NOT_LIKED(HttpStatus.BAD_REQUEST, "B008", "좋아요 상태가 아닌 도서입니다."), // 좋아요 취소 시
 	BOOK_SALE_INFO_NOT_FOUND(HttpStatus.NOT_FOUND, "B009", "도서 판매 정보를 찾을 수 없습니다."),
@@ -64,8 +64,8 @@ public enum ErrorCode {
 	PUBLISHER_DELETE_NOT_AVAILABLE(HttpStatus.BAD_REQUEST, "BP04", "도서에 등록된 출판사로 삭제할 수 없습니다."),
 	// Book - 태그
 	TAG_ALREADY_EXISTS(HttpStatus.CONFLICT, "BT01", "이미 등록된 태그입니다."),
-	TAG_NOT_FOUND(HttpStatus.NOT_FOUND, "BT02", "해당 태그를 찾을 수 없습니다."),
-
+	BOOK_TAG_ALREADY_EXISTS(HttpStatus.CONFLICT, "BT03", "도서에 이미 등록된 태그입니다."),
+	BOOK_TAG_NOT_FOUND(HttpStatus.NOT_FOUND, "BP02", "도서에 등록된 태그를 찾을 수 없습니다."),
 	// Book Order (도서 주문 포장 오류) - G (Gift)
 	G_BOOK_ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "G001", "도서 주문 정보를 찾을 수 없습니다."),
 	G_BOOK_ORDER_UPDATE_FAILED(HttpStatus.BAD_REQUEST, "G002", "도서 주문 정보 수정에 실패했습니다."),

@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.book.dto.request.TagRequest;
 import shop.bluebooktle.backend.book.dto.response.TagInfoResponse;
 import shop.bluebooktle.backend.book.entity.Tag;
+import shop.bluebooktle.backend.book.repository.BookTagRepository;
 import shop.bluebooktle.backend.book.repository.TagRepository;
 import shop.bluebooktle.backend.book.service.TagService;
 import shop.bluebooktle.common.exception.book.TagAlreadyExistsException;
@@ -20,6 +21,7 @@ import shop.bluebooktle.common.exception.book.TagNotFoundException;
 public class TagServiceImpl implements TagService {
 
 	private final TagRepository tagRepository;
+	private final BookTagRepository bookTagRepository;
 
 	@Override
 	public void registerTag(TagRequest request) {
@@ -60,6 +62,9 @@ public class TagServiceImpl implements TagService {
 	public void deleteTag(Long tagId) {
 		Tag tag = tagRepository.findById(tagId)
 			.orElseThrow(() -> new TagNotFoundException(tagId));
+		// 도서태그 관계테이블 삭제
+		bookTagRepository.deleteAllByTag(tag);
+		// 태그 삭제
 		tagRepository.delete(tag);
 	}
 }

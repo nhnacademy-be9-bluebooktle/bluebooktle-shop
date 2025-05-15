@@ -26,7 +26,7 @@ import shop.bluebooktle.common.dto.common.PaginationData;
 public class BookPublisherController {
 	private final BookPublisherService bookPublisherService;
 
-	// 도서에 출판사 등록
+	// 해당 도서에 출판사 등록
 	@PostMapping("/{bookId}")
 	public ResponseEntity<JsendResponse<Void>> addBookPublisher(
 		@PathVariable Long publisherId,
@@ -36,7 +36,7 @@ public class BookPublisherController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(JsendResponse.success());
 	}
 
-	// 해당 도서의 출판사 삭제
+	// 해당 도서에 출판사 삭제
 	@DeleteMapping("/{bookId}")
 	public ResponseEntity<JsendResponse<Void>> deleteBookPublisher(
 		@PathVariable Long publisherId,
