@@ -9,10 +9,6 @@ import shop.bluebooktle.backend.book.dto.response.BookRegisterResponse;
 import shop.bluebooktle.backend.book.dto.response.BookResponse;
 import shop.bluebooktle.backend.book.dto.response.BookUpdateResponse;
 import shop.bluebooktle.backend.book.entity.Book;
-import shop.bluebooktle.backend.book.dto.response.BookResponse;
-import shop.bluebooktle.backend.book.entity.Book;
-import shop.bluebooktle.backend.book.dto.response.BookResponse;
-import shop.bluebooktle.backend.book.entity.Book;
 
 public interface BookService {
 
