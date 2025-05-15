@@ -26,7 +26,44 @@ jobs:
     outputs:
       changed: ${{ steps.list.outputs.changed }}
     steps:
-    # …(생략: 필터링 로직 동일)…
+      - name: Checkout full history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Filter changed paths
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            backend-server:
+              - 'backend-server/**'
+            frontend-server:
+              - 'frontend-server/**'
+            gateway-server:
+              - 'gateway-server/**'
+            eureka-server:
+              - 'eureka-server/**'
+            common-module:
+              - 'common-module/**'
+            auth-server:
+              - 'auth-server/**'
+
+      - name: Generate final changed-services list
+        id: list
+        run: |
+          modules=()
+          [[ "${{ steps.filter.outputs.eureka-server }}"   == "true" ]] && modules+=("eureka-server")
+          [[ "${{ steps.filter.outputs.gateway-server }}"  == "true" ]] && modules+=("gateway-server")
+          [[ "${{ steps.filter.outputs.backend-server }}"  == "true" ]] && modules+=("backend-server")
+          [[ "${{ steps.filter.outputs.frontend-server }}" == "true" ]] && modules+=("frontend-server")
+          [[ "${{ steps.filter.outputs.auth-server }}"     == "true" ]] && modules+=("auth-server")
+          if [[ "${{ steps.filter.outputs.common-module }}" == "true" ]]; then
+            for svc in eureka-server gateway-server backend-server frontend-server auth-server; do
+              [[ ! " ${modules[*]} " =~ " $svc " ]] && modules+=("$svc")
+            done
+          fi
+          echo "changed=${modules[*]}" >> "$GITHUB_OUTPUT"
 
   build:
     needs: detect_changes
@@ -36,8 +73,28 @@ jobs:
     env:
       CONFIG_SERVER_URI: ${{ secrets.CONFIG_SERVER_URI }}
       SPRING_PROFILES_ACTIVE: ${{ github.ref_name == 'master' && 'prod' || 'dev' }}
+
     steps:
-    # …(생략: 빌드 & 업로드 로직 동일)…
+      - uses: actions/checkout@v4
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Clean & Build changed-services
+        run: |
+          MODULE_CSV=$(echo "${{ needs.detect_changes.outputs.changed }}" | sed 's/ /,/g')
+          mvn -B clean package -pl "$MODULE_CSV" -am -DskipTests
+
+      - name: Upload built JARs
+        uses: actions/upload-artifact@v4
+        with:
+          name: jars
+          path: '**/target/*.jar'
+          if-no-files-found: error
 
   deploy:
     needs: [ detect_changes, build ]
@@ -53,7 +110,6 @@ jobs:
         )
       )
     runs-on: ubuntu-latest
-    # 실제 환경 이름(dev/prod)을 environment에 연결
     environment: ${{ github.ref_name == 'master' && 'prod' || 'dev' }}
     env:
       ENVIRONMENT: ${{ github.ref_name == 'master' && 'prod' || 'dev' }}
