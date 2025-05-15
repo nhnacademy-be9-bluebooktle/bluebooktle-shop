@@ -97,10 +97,10 @@
 
         .field-error {
             font-family: var(--font-pixel);
-            color: var(--kitsch-color-3); /* 핫핑크 */
+            color: var(--kitsch-color-3);
             font-size: 0.8rem;
             margin-top: 0.2rem;
-            display: block; /* 이 속성으로 인해 다음 줄로 넘어갑니다 */
+            display: block;
         }
 
     </style>
@@ -151,6 +151,13 @@
                     <input class="input-kitsch pixel-font-kitsch" id="email" name="email"
                            placeholder="예: blue@booktle.com"
                            required type="email" value="test@example.com">
+                </div>
+
+                <div class="form-group-kitsch">
+                    <label class="label-kitsch handwriting-font-kitsch" for="nickname">닉네임:</label>
+                    <input class="input-kitsch pixel-font-kitsch" id="nickname" name="nickname"
+                           placeholder="닉네임을 입력해주세요 (20자 이하)"
+                           required type="text" value="닉네임123">
                 </div>
 
                 <div class="form-group-kitsch">
