@@ -41,21 +41,21 @@ public class JwtUtil {
 		this.secretKey = Keys.hmacShaKeyFor(secretKeyString.getBytes(StandardCharsets.UTF_8));
 	}
 
-	public String createAccessToken(String loginId, Long userId, UserType userType) {
-		return createToken(loginId, userId, userType, accessTokenValiditySeconds * 1000);
+	public String createAccessToken(long userId, String userNickname, UserType userType) {
+		return createToken(userId, userNickname, userType, accessTokenValiditySeconds * 1000);
 	}
 
-	public String createRefreshToken(String loginId, Long userId, UserType userType) {
-		return createToken(loginId, userId, userType, refreshTokenValiditySeconds * 1000);
+	public String createRefreshToken(long userId, String userNickname, UserType userType) {
+		return createToken(userId, userNickname, userType, refreshTokenValiditySeconds * 1000);
 	}
 
-	private String createToken(String loginId, Long userId, UserType userType, long validityInMilliseconds) {
+	private String createToken(long userId, String userNickname, UserType userType, long validityInMilliseconds) {
 		Date now = new Date();
 		Date validity = new Date(now.getTime() + validityInMilliseconds);
 
 		return Jwts.builder()
-			.subject(loginId)
-			.claim("userId", userId)
+			.subject(String.valueOf(userId))
+			.claim("userNickname", userNickname)
 			.claim("userType", userType.name())
 			.issuedAt(now)
 			.expiration(validity)
@@ -87,8 +87,8 @@ public class JwtUtil {
 		return false;
 	}
 
-	public String getLoginIdFromToken(String token) {
-		return getClaims(token).getSubject();
+	public String getUserNicknameFromToken(String token) {
+		return getClaims(token).get("userNickname", String.class);
 	}
 
 	public Long getUserIdFromToken(String token) {
