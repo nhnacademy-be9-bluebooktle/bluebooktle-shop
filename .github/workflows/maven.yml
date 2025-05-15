@@ -133,10 +133,17 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           script: |
             BR=${{ github.ref_name }}
-            [ "$BR" == "master" ] && S=prod_startup.sh || S=dev_startup.sh
+            if [ "$BR" = "master" ]; then
+              S=prod_startup.sh
+            else
+              S=dev_startup.sh
+            fi
+            
             chmod +x ~/$S
+            
             for M in ${{ needs.detect_changes.outputs.changed }}; do
               echo ":arrow_forward: Rolling deploy: $M"
-              ~/$S "$M"
+              bash ~/$S "$M"
             done
+
 
