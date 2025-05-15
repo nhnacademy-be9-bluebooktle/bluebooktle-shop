@@ -1,0 +1,13 @@
+@baseUrl = http://localhost:9009/api/admin
+
+### GET request to example server
+GET https://examples.http-client.intellij.net/get
+    ?generated-in=IntelliJ IDEA
+
+### 전체 배송 정책 조회
+GET {{baseUrl}}/order-status/all
+Accept: application/json
+
+### PENDING 정책 조회
+GET {{baseUrl}}/order-status?name=PENDING
+Accept: application/json

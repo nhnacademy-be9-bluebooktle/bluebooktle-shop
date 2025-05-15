@@ -59,8 +59,8 @@ public class DeliveryRuleServiceImpl implements DeliveryRuleService {
 
 	@Override
 	@Transactional
-	public void deletePolicy(Long id) {
-		DeliveryRule rule = deliveryRuleRepository.findById(id)
+	public void deletePolicy(String name) {
+		DeliveryRule rule = deliveryRuleRepository.findByName(name)
 			.orElseThrow(DeliveryRuleNotFoundException::new);
 
 		// 기본 배송 정책은 삭제 불가

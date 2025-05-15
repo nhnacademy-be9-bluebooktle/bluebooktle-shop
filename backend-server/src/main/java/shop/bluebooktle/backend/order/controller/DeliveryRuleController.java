@@ -6,7 +6,6 @@ import java.util.stream.Collectors;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -52,9 +51,9 @@ public class DeliveryRuleController {
 		return ResponseEntity.ok(JsendResponse.success(rules));
 	}
 
-	@DeleteMapping("/admin/delivery-rules/{id}")
-	public ResponseEntity<JsendResponse<Void>> deleteRule(@PathVariable Long id) {
-		deliveryRuleService.deletePolicy(id);
+	@DeleteMapping("/admin/delivery-rules")
+	public ResponseEntity<JsendResponse<Void>> deleteRule(@RequestParam String name) {
+		deliveryRuleService.deletePolicy(name);
 		return ResponseEntity.ok(JsendResponse.success());
 	}
 

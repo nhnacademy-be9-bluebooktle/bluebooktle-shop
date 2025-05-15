@@ -19,6 +19,7 @@ import shop.bluebooktle.common.exception.ApplicationException;
 import shop.bluebooktle.common.exception.ErrorCode;
 import shop.bluebooktle.common.exception.order.CannotDeleteDefaultPolicyException;
 import shop.bluebooktle.common.exception.order.DeliveryRuleNotFoundException;
+import shop.bluebooktle.common.exception.order.OrderStateNotFoundException;
 
 @Slf4j
 @RestControllerAdvice
@@ -110,6 +111,12 @@ public class GlobalExceptionHandler {
 		return ResponseEntity
 			.status(HttpStatus.BAD_REQUEST)
 			.body(JsendResponse.error(e.getMessage()));
+	}
+
+	@ExceptionHandler(OrderStateNotFoundException.class)
+	protected ResponseEntity<JsendResponse<?>> handleOrderStateNotFoundException(OrderStateNotFoundException ex) {
+		return ResponseEntity.status(HttpStatus.NOT_FOUND)
+			.body(JsendResponse.error(ex.getMessage()));
 	}
 
 }
