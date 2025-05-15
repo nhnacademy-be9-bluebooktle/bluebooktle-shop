@@ -19,6 +19,7 @@ import shop.bluebooktle.backend.book.dto.request.AladinBookItem;
 public class AladinBookResponse {
 	String title;
 	String author;
+	Integer authorId;
 	String description;
 	LocalDateTime publishDate;
 	String isbn;
@@ -43,6 +44,7 @@ public class AladinBookResponse {
 		return AladinBookResponse.builder()
 			.title(item.getTitle())
 			.author(item.getAuthor())
+			.authorId(item.getAuthorId())
 			.description(item.getDescription())
 			.publishDate(LocalDate.parse(item.getPubDate(), DateTimeFormatter.ofPattern("yyyy-MM-dd")).atStartOfDay())
 			.isbn(item.getIsbn13())

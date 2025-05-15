@@ -7,8 +7,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
-import shop.bluebooktle.backend.book.dto.request.BookRegisterByAladinRequest;
-import shop.bluebooktle.backend.book.dto.request.BookRegisterRequest;
+import shop.bluebooktle.backend.book.dto.request.BookAllRegisterByAladinRequest;
+import shop.bluebooktle.backend.book.dto.request.BookAllRegisterRequest;
 import shop.bluebooktle.backend.book.dto.response.AladinBookResponse;
 import shop.bluebooktle.backend.book.entity.Author;
 import shop.bluebooktle.backend.book.entity.Book;
@@ -35,9 +35,11 @@ import shop.bluebooktle.backend.book.repository.ImgRepository;
 import shop.bluebooktle.backend.book.repository.PublisherRepository;
 import shop.bluebooktle.backend.book.repository.TagRepository;
 import shop.bluebooktle.backend.book.service.AladinBookService;
+import shop.bluebooktle.backend.book.repository.TagRepository;
+import shop.bluebooktle.backend.book.service.AladinBookService;
 import shop.bluebooktle.backend.book.service.BookRegisterService;
-import shop.bluebooktle.common.exception.BookAlreadyExistsException;
 import shop.bluebooktle.common.exception.book.AladinBookNotFoundException;
+import shop.bluebooktle.common.exception.book.BookAlreadyExistsException;
 
 @Service
 @RequiredArgsConstructor
@@ -62,7 +64,7 @@ public class BookRegisterServiceImpl implements BookRegisterService {
 	//연관테이블 완성되면 수정필요 일단기능구현만
 	@Transactional
 	@Override
-	public void registerBook(BookRegisterRequest request) {
+	public void registerBook(BookAllRegisterRequest request) {
 		Optional<Book> existBook = bookRepository.findByIsbn(request.getIsbn());
 		if (existBook.isPresent()) {
 			throw new BookAlreadyExistsException();
@@ -82,6 +84,13 @@ public class BookRegisterServiceImpl implements BookRegisterService {
 			.multiply(BigDecimal.valueOf(100));
 
 		//작가, 출판사, 태그, 이미지, 카테고리 - 수정필요
+		// 연관테이블 완성되면 나중에 대략 이런식으로 수정
+		// authorService.saveAuthors(request.getAuthor(), book);
+		// publisherService.savePublisher(request.getPublisher(), book);
+		// categoryService.saveCategories(request.getCategory(), book);
+		// imageService.saveImages(request.getImageUrl(), book, false);
+		// tagService.saveTags(request.getTag(), book);
+
 		for (String authorName : request.getAuthor()) {
 			Author author = authorRepository.findByName(authorName)
 				.orElseGet(() -> authorRepository.save(new Author(authorName)));
@@ -126,10 +135,9 @@ public class BookRegisterServiceImpl implements BookRegisterService {
 	}
 
 	//연관테이블 완성되면 수정필요 일단기능구현만
-	//알라딘으로 도서저장할시 태그 추가해야함. 가져오는정보에 없음
 	@Transactional
 	@Override
-	public void registerBookByAladin(BookRegisterByAladinRequest request) {
+	public void registerBookByAladin(BookAllRegisterByAladinRequest request) {
 		Optional<Book> existBook = bookRepository.findByIsbn(request.getIsbn());
 		if (existBook.isPresent()) {
 			throw new BookAlreadyExistsException();
@@ -166,7 +174,15 @@ public class BookRegisterServiceImpl implements BookRegisterService {
 			.orElseGet(() -> imgRepository.save(new Img(aladin.getImageUrl())));
 		bookImgRepository.save(new BookImg(book, img, true));
 
-		//booksaleinfo 정보 저장
+		if (request.getTag() != null && !request.getTag().isEmpty()) {
+			for (String tagName : request.getTag()) {
+				Tag tag = tagRepository.findByName(tagName).stream()
+					.findFirst()
+					.orElseGet(() -> tagRepository.save(new Tag(tagName)));
+				bookTagRepository.save(new BookTag(tag, book));
+			}
+		}
+
 		BookSaleInfo saleInfo = BookSaleInfo.builder()
 			.book(book)
 			.price(aladin.getPrice())

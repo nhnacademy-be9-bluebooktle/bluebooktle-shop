@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import shop.bluebooktle.backend.book.dto.request.BookRegisterByAladinRequest;
+import shop.bluebooktle.backend.book.dto.request.BookAllRegisterByAladinRequest;
 import shop.bluebooktle.backend.book.dto.response.AladinBookResponse;
 import shop.bluebooktle.backend.book.service.AladinBookService;
 import shop.bluebooktle.backend.book.service.BookRegisterService;
@@ -48,7 +48,7 @@ public class AladinBookController {
 	// 알라딘 api로 도서 등록
 	@PostMapping("/register/aladin")
 	public ResponseEntity<JsendResponse<Void>> registerAladinBook(
-		@Valid @RequestBody BookRegisterByAladinRequest request) {
+		@Valid @RequestBody BookAllRegisterByAladinRequest request) {
 		bookRegisterService.registerBookByAladin(request);
 		return ResponseEntity.status(HttpStatus.CREATED).body(JsendResponse.success());
 	}
