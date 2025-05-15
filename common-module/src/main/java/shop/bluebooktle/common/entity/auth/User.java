@@ -64,6 +64,9 @@ public class User extends BaseEntity {
 	@Column(name = "email", nullable = false, unique = true, length = 50)
 	private String email;
 
+	@Column(name = "nickname", nullable = false, unique = true, length = 20)
+	private String nickname;
+
 	@Column(name = "birth", nullable = false)
 	private String birth;
 
@@ -89,6 +92,7 @@ public class User extends BaseEntity {
 
 	@Builder
 	public User(MembershipLevel membershipLevel, String loginId, String encodedPassword, String name, String email,
+		String nickname,
 		String birth, String phoneNumber, UserType type, UserStatus status,
 		LocalDateTime lastLoginAt) {
 		this.membershipLevel = membershipLevel;
@@ -96,6 +100,7 @@ public class User extends BaseEntity {
 		this.password = encodedPassword;
 		this.name = name;
 		this.email = email;
+		this.nickname = nickname;
 		this.birth = birth;
 		this.phoneNumber = phoneNumber;
 		this.pointBalance = (pointBalance == null) ? BigDecimal.ZERO : pointBalance;

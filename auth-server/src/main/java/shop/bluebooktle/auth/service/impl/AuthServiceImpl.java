@@ -59,6 +59,7 @@ public class AuthServiceImpl implements AuthService {
 			.encodedPassword(passwordEncoder.encode(signupRequest.getPassword()))
 			.name(signupRequest.getName())
 			.email(signupRequest.getEmail())
+			.nickname(signupRequest.getNickname())
 			.phoneNumber(signupRequest.getPhoneNumber())
 			.birth(signupRequest.getBirth())
 			.status(UserStatus.ACTIVE)
