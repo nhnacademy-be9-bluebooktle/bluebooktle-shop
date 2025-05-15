@@ -116,7 +116,7 @@ public class CouponQueryRepositoryImpl implements CouponQueryRepository {
 
 	//유저 별 사용 가능 쿠폰 전체 조회
 	@Override
-	public Page<UserCouponResponse> findAllByAvailableUserCoupon(User user, Pageable pageable) {
+	public Page<UserCouponResponse> findAllByUsableUserCoupon(User user, Pageable pageable) {
 		QUserCoupon userCoupon = QUserCoupon.userCoupon;
 
 		LocalDateTime now = LocalDateTime.now();
@@ -124,6 +124,27 @@ public class CouponQueryRepositoryImpl implements CouponQueryRepository {
 		builder.and(userCoupon.user.eq(user))
 			.and(userCoupon.availableStartAt.loe(now))
 			.and(userCoupon.availableEndAt.goe(now));
+		return findUserCoupon(builder, pageable);
+	}
+
+	// 유저 별 사용 완료 쿠폰 전체 조회
+	@Override
+	public Page<UserCouponResponse> findAllByUsedUserCoupon(User user, Pageable pageable) {
+		QUserCoupon userCoupon = QUserCoupon.userCoupon;
+
+		BooleanBuilder builder = new BooleanBuilder();
+		builder.and(userCoupon.user.eq(user)).and(userCoupon.usedAt.isNotNull());
+		return findUserCoupon(builder, pageable);
+	}
+
+	// 유저 별 (사용 못함 && 기간 만료) 쿠폰 전체 조회
+	@Override
+	public Page<UserCouponResponse> findAllByExpiredUserCoupon(User user, Pageable pageable) {
+		QUserCoupon userCoupon = QUserCoupon.userCoupon;
+
+		LocalDateTime now = LocalDateTime.now();
+		BooleanBuilder builder = new BooleanBuilder();
+		builder.and(userCoupon.user.eq(user)).and(userCoupon.usedAt.isNull()).and(userCoupon.availableEndAt.lt(now));
 		return findUserCoupon(builder, pageable);
 	}
 
