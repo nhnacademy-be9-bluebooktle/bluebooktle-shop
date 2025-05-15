@@ -20,5 +20,5 @@ public interface DeliveryRuleService {
 	List<DeliveryRule> getAll();
 
 	// 정책 삭제
-	void deletePolicy(Long id);
+	void deletePolicy(String name);
 }
