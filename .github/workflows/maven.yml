@@ -63,21 +63,19 @@ jobs:
               [[ ! " ${modules[*]} " =~ " $svc " ]] && modules+=("$svc")
             done
           fi
-          echo "changed=${modules[*]}" >> $GITHUB_OUTPUT
+          echo "changed=${modules[*]}" >> "$GITHUB_OUTPUT"
 
   build:
     needs: detect_changes
     if: needs.detect_changes.outputs.changed != ''
     runs-on: ubuntu-latest
     environment: ${{ github.ref_name == 'master' && 'prod' || 'dev' }}
-
     env:
       CONFIG_SERVER_URI: ${{ secrets.CONFIG_SERVER_URI }}
       SPRING_PROFILES_ACTIVE: ${{ github.ref_name == 'master' && 'prod' || 'dev' }}
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Set up Java 21
         uses: actions/setup-java@v4
@@ -89,7 +87,6 @@ jobs:
       - name: Clean & Build changed-services
         run: |
           MODULE_CSV=$(echo "${{ needs.detect_changes.outputs.changed }}" | sed 's/ /,/g')
-          echo ":arrow_forward: mvn clean package -pl $MODULE_CSV -am"
           mvn -B clean package -pl "$MODULE_CSV" -am -DskipTests
 
       - name: Upload built JARs
@@ -99,18 +96,21 @@ jobs:
           path: '**/target/*.jar'
           if-no-files-found: error
 
-  deploy:
+  deploy_dev:
     needs: [ detect_changes, build ]
-    if: >-
-      ((github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true) || github.event_name == 'push') &&
-      needs.detect_changes.outputs.changed != ''
+    if: |
+      needs.detect_changes.outputs.changed != '' &&
+      (
+        (github.event_name == 'push' && github.ref_name == 'develop') ||
+        (github.event_name == 'pull_request' &&
+         github.event.action == 'opened' &&
+         github.event.pull_request.base.ref == 'develop')
+      )
     runs-on: ubuntu-latest
-    environment: ${{ github.ref_name == 'master' && 'prod' || 'dev' }}
-
-    # ← 여기도 동일하게 ENV 주입
+    environment: dev
     env:
       CONFIG_SERVER_URI: ${{ secrets.CONFIG_SERVER_URI }}
-      SPRING_PROFILES_ACTIVE: ${{ github.ref_name == 'master' && 'prod' || 'dev' }}
+      SPRING_PROFILES_ACTIVE: dev
 
     steps:
       - name: Download JARs
@@ -119,13 +119,17 @@ jobs:
           name: jars
           path: downloaded_jars
 
-      - name: Debug deploy modules
-        run: |
-          echo ">>> Deploy sees modules: '${{ needs.detect_changes.outputs.changed }}'"
-          echo ">>> Using CONFIG_SERVER_URI=${CONFIG_SERVER_URI}"
-          echo ">>> Using SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}"
+      - name: Ensure dev dirs
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_IP }}
+          username: ${{ secrets.SSH_ID }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            mkdir -p ~/app/jars/dev
 
-      - name: Upload JARs to remote
+      - name: Upload JARs to dev
         uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.SSH_IP }}
@@ -133,33 +137,79 @@ jobs:
           password: ${{ secrets.SSH_PASSWORD }}
           port: ${{ secrets.SSH_PORT }}
           source: "downloaded_jars"
-          target: "~/app/jars/"
+          target: "~/app/jars/dev/"
           strip_components: 1
 
-      - name: Rolling deploy for services
+      - name: Rolling deploy on dev
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SSH_IP }}
           username: ${{ secrets.SSH_ID }}
           password: ${{ secrets.SSH_PASSWORD }}
           port: ${{ secrets.SSH_PORT }}
-          capture_stdout: true
           script: |
-            BRANCH="${{ github.ref_name }}"
-            
-            if [ "$BRANCH" = "master" ]; then
-              STARTUP="prod_startup.sh"
-            else
-              STARTUP="dev_startup.sh"
-            fi
-
-            echo ">>> Using startup script: $STARTUP"
-
-            chmod +x ~/$STARTUP
-            export SPRING_PROFILES_ACTIVE="${{ env.SPRING_PROFILES_ACTIVE }}"
+            chmod +x ~/dev_startup.sh
+            export SPRING_PROFILES_ACTIVE="dev"
             export CONFIG_SERVER_URI="${{ env.CONFIG_SERVER_URI }}"
-
             for MOD in ${{ needs.detect_changes.outputs.changed }}; do
-              echo ":arrow_forward: Rolling deploy: $MOD"
-              ~/\$STARTUP "$MOD"
+              echo ":arrow_forward: rolling deploy $MOD (dev)"
+              ~/dev_startup.sh "$MOD"
+            done
+
+  deploy_prod:
+    needs: [ detect_changes, build ]
+    if: |
+      needs.detect_changes.outputs.changed != '' &&
+      github.event_name == 'pull_request' &&
+      github.event.action == 'closed' &&
+      github.event.pull_request.merged == true &&
+      github.event.pull_request.base.ref == 'master'
+    runs-on: ubuntu-latest
+    environment: prod
+    env:
+      CONFIG_SERVER_URI: ${{ secrets.CONFIG_SERVER_URI }}
+      SPRING_PROFILES_ACTIVE: prod
+
+    steps:
+      - name: Download JARs
+        uses: actions/download-artifact@v4
+        with:
+          name: jars
+          path: downloaded_jars
+
+      - name: Ensure prod dirs
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_IP }}
+          username: ${{ secrets.SSH_ID }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            mkdir -p ~/app/jars/prod
+
+      - name: Upload JARs to prod
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.SSH_IP }}
+          username: ${{ secrets.SSH_ID }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          source: "downloaded_jars"
+          target: "~/app/jars/prod/"
+          strip_components: 1
+
+      - name: Rolling deploy on prod
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_IP }}
+          username: ${{ secrets.SSH_ID }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            chmod +x ~/prod_startup.sh
+            export SPRING_PROFILES_ACTIVE="prod"
+            export CONFIG_SERVER_URI="${{ env.CONFIG_SERVER_URI }}"
+            for MOD in ${{ needs.detect_changes.outputs.changed }}; do
+              echo ":arrow_forward: rolling deploy $MOD (prod)"
+              ~/prod_startup.sh "$MOD"
             done
