@@ -14,7 +14,6 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import shop.bluebooktle.common.entity.BaseEntity;
 
 @Entity
@@ -31,12 +30,19 @@ public class Author extends BaseEntity {
 	@Column(name = "author_id")
 	private Long id;
 
-	@Setter
 	@Column(name = "name", nullable = false, length = 50) //공동, 외국인작가 이름 고려해서 수정해서 테스트중 원래 length10
 	private String name;
 
+	@Column(name = "description", nullable = false, columnDefinition = "TEXT")
+	private String description;
+
+	@Column(name = "author_key", nullable = false, columnDefinition = "TEXT", unique = true)
+	private String authorKey;
+
 	@Builder
-	public Author(String name) {
+	public Author(String name, String description, String authorKey) {
 		this.name = name;
+		this.description = description;
+		this.authorKey = authorKey;
 	}
 }
