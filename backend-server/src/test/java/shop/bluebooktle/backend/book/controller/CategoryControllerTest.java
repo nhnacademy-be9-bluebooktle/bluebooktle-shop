@@ -53,9 +53,7 @@ public class CategoryControllerTest {
 		mockMvc.perform(post("/api/categories")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(json))
-			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.status").value("success"))
-			.andExpect(jsonPath("$.data").isEmpty());
+			.andExpect(status().isCreated());
 
 		// verify
 		verify(categoryService, times(1)).registerCategory(any(CategoryRegisterRequest.class));
