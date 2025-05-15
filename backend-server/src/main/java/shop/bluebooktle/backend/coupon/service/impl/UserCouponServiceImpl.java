@@ -42,7 +42,7 @@ public class UserCouponServiceImpl implements UserCouponService {
 
 		List<User> userList = userRepository.findByStatus(UserStatus.ACTIVE);
 
-		List<UserCoupon> userCoupons = userList.stream() //TODO [쿠폰] user type = ACTIVE 확인
+		List<UserCoupon> userCoupons = userList.stream()
 			.map(user -> UserCoupon.builder()
 				.coupon(coupon)
 				.user(user)

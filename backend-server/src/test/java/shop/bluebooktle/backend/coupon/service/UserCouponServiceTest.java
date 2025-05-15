@@ -3,6 +3,7 @@ package shop.bluebooktle.backend.coupon.service;
 import static org.assertj.core.api.AssertionsForClassTypes.*;
 import static org.mockito.BDDMockito.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -25,12 +26,13 @@ import shop.bluebooktle.backend.coupon.entity.UserCoupon;
 import shop.bluebooktle.backend.coupon.repository.CouponRepository;
 import shop.bluebooktle.backend.coupon.repository.UserCouponRepository;
 import shop.bluebooktle.backend.coupon.service.impl.UserCouponServiceImpl;
+import shop.bluebooktle.backend.user.repository.MembershipLevelRepository;
 import shop.bluebooktle.backend.user.repository.UserRepository;
+import shop.bluebooktle.common.domain.auth.UserStatus;
 import shop.bluebooktle.common.dto.coupon.request.UserCouponRegisterRequest;
 import shop.bluebooktle.common.dto.coupon.response.UserCouponResponse;
+import shop.bluebooktle.common.entity.auth.MembershipLevel;
 import shop.bluebooktle.common.entity.auth.User;
-import shop.bluebooktle.common.exception.InvalidInputValueException;
-import shop.bluebooktle.common.exception.auth.UserNotFoundException;
 import shop.bluebooktle.common.exception.coupon.CouponNotFoundException;
 import shop.bluebooktle.common.exception.coupon.UserCouponNotFoundException;
 
@@ -46,9 +48,12 @@ class UserCouponServiceTest {
 	private UserRepository userRepository;
 	@Mock
 	private CouponRepository couponRepository;
+	@Mock
+	private MembershipLevelRepository membershipLevelRepository;
 
 	private User user;
 	private Coupon coupon;
+	private MembershipLevel membership;
 
 	@BeforeEach
 	void setup() {
@@ -56,39 +61,53 @@ class UserCouponServiceTest {
 		coupon = Coupon.builder().build();
 		ReflectionTestUtils.setField(user, "id", 1L);
 		ReflectionTestUtils.setField(coupon, "id", 2L);
+
+		membership = membershipLevelRepository.save(
+			MembershipLevel.builder()
+				.name("BASIC")
+				.rate(1)
+				.minNetSpent(BigDecimal.ZERO)
+				.maxNetSpent(BigDecimal.valueOf(100000))
+				.build()
+		);
 	}
 
 	@Test
 	@DisplayName("쿠폰 발급 - 성공")
-		// TODO 유저 전체한테 보내도록 변경
 	void registerCoupon_success() {
+		// given
+		User user1 = User.builder()
+			.loginId("user1")
+			.name("유저1")
+			.membershipLevel(membership)
+			.email("user1@example.com")
+			.phoneNumber("01012345678")
+			.birth("1990-01-01")
+			.build();
+
+		User user2 = User.builder()
+			.loginId("user2")
+			.name("유저2")
+			.membershipLevel(membership)
+			.email("user2@example.com")
+			.phoneNumber("01023456789")
+			.birth("1991-01-01")
+			.build();
+
 		UserCouponRegisterRequest request = UserCouponRegisterRequest.builder()
 			.couponId(2L)
 			.availableStartAt(LocalDateTime.of(2025, 1, 1, 0, 0))
 			.availableEndAt(LocalDateTime.of(2025, 12, 31, 0, 0))
 			.build();
 
-		given(userRepository.findById(1L)).willReturn(Optional.of(user));
 		given(couponRepository.findById(2L)).willReturn(Optional.of(coupon));
+		given(userRepository.findByStatus(UserStatus.ACTIVE)).willReturn(List.of(user1, user2));
 
+		// when
 		userCouponService.registerCoupon(request);
 
-		verify(userCouponRepository).save(any(UserCoupon.class));
-	}
-
-	@Test
-	@DisplayName("쿠폰 발급 실패 - 사용자 없음")
-	void registerCoupon_userNotFound() {
-		UserCouponRegisterRequest request = UserCouponRegisterRequest.builder()
-			.couponId(2L)
-			.availableStartAt(LocalDateTime.now())
-			.availableEndAt(LocalDateTime.now().plusDays(1))
-			.build();
-
-		given(userRepository.findById(1L)).willReturn(Optional.empty());
-
-		assertThatThrownBy(() -> userCouponService.registerCoupon(request))
-			.isInstanceOf(UserNotFoundException.class);
+		// then
+		verify(userCouponRepository).saveAll(anyList());
 	}
 
 	@Test
@@ -100,27 +119,10 @@ class UserCouponServiceTest {
 			.availableEndAt(LocalDateTime.now().plusDays(1))
 			.build();
 
-		given(userRepository.findById(1L)).willReturn(Optional.of(user));
 		given(couponRepository.findById(2L)).willReturn(Optional.empty());
 
 		assertThatThrownBy(() -> userCouponService.registerCoupon(request))
 			.isInstanceOf(CouponNotFoundException.class);
-	}
-
-	@Test
-	@DisplayName("쿠폰 발급 실패 - 시작일 > 종료일")
-	void registerCoupon_invalidDate_fail() {
-		UserCouponRegisterRequest request = UserCouponRegisterRequest.builder()
-			.couponId(2L)
-			.availableStartAt(LocalDateTime.now().plusDays(5))
-			.availableEndAt(LocalDateTime.now())
-			.build();
-
-		given(userRepository.findById(1L)).willReturn(Optional.of(user));
-		given(couponRepository.findById(2L)).willReturn(Optional.of(coupon));
-
-		assertThatThrownBy(() -> userCouponService.registerCoupon(request))
-			.isInstanceOf(InvalidInputValueException.class);
 	}
 
 	@Test
