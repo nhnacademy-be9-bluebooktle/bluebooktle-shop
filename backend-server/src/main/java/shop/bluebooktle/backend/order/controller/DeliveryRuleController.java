@@ -18,6 +18,7 @@ import shop.bluebooktle.backend.order.dto.request.DeliveryRuleRequest;
 import shop.bluebooktle.backend.order.dto.response.DeliveryRuleResponse;
 import shop.bluebooktle.backend.order.entity.DeliveryRule;
 import shop.bluebooktle.backend.order.service.DeliveryRuleService;
+import shop.bluebooktle.common.dto.common.JsendResponse;
 
 @RestController
 @RequestMapping("/api")
@@ -27,34 +28,34 @@ public class DeliveryRuleController {
 	private final DeliveryRuleService deliveryRuleService;
 
 	@PostMapping("/admin/delivery-rules")
-	public ResponseEntity<?> createDeliveryPolicy(@RequestBody DeliveryRuleRequest request) {
+	public ResponseEntity<JsendResponse<Long>> createDeliveryPolicy(@RequestBody DeliveryRuleRequest request) {
 		DeliveryRule rule = deliveryRuleService.createPolicy(
 			request.name(),
 			request.price(),
 			request.deliveryFee()
 		);
-		return ResponseEntity.ok(rule.getId());
+		return ResponseEntity.ok(JsendResponse.success(rule.getId()));
 	}
 
 	@GetMapping("/admin/delivery-rules")
-	public ResponseEntity<?> getRule(@RequestParam String name) {
+	public ResponseEntity<JsendResponse<DeliveryRuleResponse>> getRule(@RequestParam String name) {
 		DeliveryRule rule = deliveryRuleService.getRule(name);
-		return ResponseEntity.ok(DeliveryRuleResponse.from(rule));
+		return ResponseEntity.ok(JsendResponse.success(DeliveryRuleResponse.from(rule)));
 	}
 
 	// 전체 조회
 	@GetMapping("/admin/delivery-rules/all")
-	public ResponseEntity<?> getAllRules() {
+	public ResponseEntity<JsendResponse<List<DeliveryRuleResponse>>> getAllRules() {
 		List<DeliveryRuleResponse> rules = deliveryRuleService.getAll().stream()
 			.map(DeliveryRuleResponse::from)
 			.collect(Collectors.toList());
-		return ResponseEntity.ok(rules);
+		return ResponseEntity.ok(JsendResponse.success(rules));
 	}
 
 	@DeleteMapping("/admin/delivery-rules/{id}")
-	public ResponseEntity<?> deleteRule(@PathVariable Long id) {
+	public ResponseEntity<JsendResponse<Void>> deleteRule(@PathVariable Long id) {
 		deliveryRuleService.deletePolicy(id);
-		return ResponseEntity.noContent().build();
+		return ResponseEntity.ok(JsendResponse.success());
 	}
 
 }
