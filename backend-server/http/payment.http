@@ -1,0 +1,22 @@
+### PaymentType 전체 조회
+GET localhost:9002/api/payments/types
+
+### PaymentType 삽입
+POST localhost:9002/api/payments/types
+Content-Type: application/json
+
+{
+  "method": "신용카드"
+}
+
+### PaymentType 수정
+PUT localhost:9002/api/payments/types/1
+Content-Type: application/json
+
+{
+  "method": "ㅇㅅㅇ카드"
+}
+
+### PaymentType 삭제
+DELETE localhost:9002/api/payments/types/2
+Content-Type: application/json

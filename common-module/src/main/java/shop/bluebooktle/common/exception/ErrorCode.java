@@ -96,14 +96,15 @@ public enum ErrorCode {
 	PAYMENT_FAILED(HttpStatus.BAD_GATEWAY, "P001", "결제 시스템 오류가 발생했습니다."), // 외부 결제사 오류
 	PAYMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "P002", "결제 정보를 찾을 수 없습니다."),
 	PAYMENT_TYPE_NOT_FOUND(HttpStatus.NOT_FOUND, "P003", "결제 수단을 찾을 수 없습니다."),
-	POINT_INSUFFICIENT_BALANCE(HttpStatus.BAD_REQUEST, "P004", "포인트 잔액이 부족합니다."),
-	POINT_HISTORY_NOT_FOUND(HttpStatus.NOT_FOUND, "P005", "포인트 이력을 찾을 수 없습니다."),
-	POINT_SOURCE_TYPE_NOT_FOUND(HttpStatus.NOT_FOUND, "P006", "포인트 발생/사용 타입을 찾을 수 없습니다."),
-	PAYMENT_INVALID_AMOUNT(HttpStatus.BAD_REQUEST, "P007", "결제 금액이 유효하지 않습니다."),
-	REFUND_NOT_POSSIBLE(HttpStatus.BAD_REQUEST, "P008", "현재 상태에서는 반품/환불이 불가능합니다."),
-	REFUND_ALREADY_PROCESSED(HttpStatus.CONFLICT, "P009", "이미 처리된 반품/환불 요청입니다."),
-	REFUND_INVALID_REASON(HttpStatus.BAD_REQUEST, "P010", "유효하지 않은 반품 사유입니다."),
-	REFUND_NOT_FOUND(HttpStatus.NOT_FOUND, "P011", "환불 정보를 찾을 수 없습니다."),
+	PAYMENT_TYPE_ALREADY_EXISTS(HttpStatus.CONFLICT, "P004", "이미 존재하는 결제수단입니다."),
+	POINT_INSUFFICIENT_BALANCE(HttpStatus.BAD_REQUEST, "P005", "포인트 잔액이 부족합니다."),
+	POINT_HISTORY_NOT_FOUND(HttpStatus.NOT_FOUND, "P006", "포인트 이력을 찾을 수 없습니다."),
+	POINT_SOURCE_TYPE_NOT_FOUND(HttpStatus.NOT_FOUND, "P007", "포인트 발생/사용 타입을 찾을 수 없습니다."),
+	PAYMENT_INVALID_AMOUNT(HttpStatus.BAD_REQUEST, "P008", "결제 금액이 유효하지 않습니다."),
+	REFUND_NOT_POSSIBLE(HttpStatus.BAD_REQUEST, "P009", "현재 상태에서는 반품/환불이 불가능합니다."),
+	REFUND_ALREADY_PROCESSED(HttpStatus.CONFLICT, "P0010", "이미 처리된 반품/환불 요청입니다."),
+	REFUND_INVALID_REASON(HttpStatus.BAD_REQUEST, "P011", "유효하지 않은 반품 사유입니다."),
+	REFUND_NOT_FOUND(HttpStatus.NOT_FOUND, "P012", "환불 정보를 찾을 수 없습니다."),
 
 	// Coupon Errors (쿠폰 오류) - K (Koopon)
 	K_COUPON_NOT_FOUND(HttpStatus.NOT_FOUND, "K001", "쿠폰을 찾을 수 없습니다."),
