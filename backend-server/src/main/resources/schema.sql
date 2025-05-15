@@ -247,21 +247,23 @@ CREATE TABLE `coupon` (
         REFERENCES `coupon_type` (`coupon_type_id`)
 );
 
-CREATE TABLE `users` (
-	`user_id`	bigint	NOT NULL AUTO_INCREMENT,
-	`membership_id`	bigint	NOT NULL,
-	`login_id`	varchar(50)	NOT NULL,
-	`password`	varchar(255)	NOT NULL,
-	`name`	varchar(20)	NOT NULL,
-	`email`	varchar(50)	NOT NULL,
-	`birth`	varchar(8)	NOT NULL,
-	`phone_number`	varchar(11)	NOT NULL,
-	`point_balance`	decimal(10,2)	NOT NULL,
-	`type`	ENUM('USER', 'ADMIN')	NOT NULL	DEFAULT 'USER',
-	`status`	ENUM('ACTIVE', 'DORMANT', 'WITHDRAWN')	NOT NULL	DEFAULT 'ACTIVE'	COMMENT '일반,휴면, 탈퇴',
-	`last_login_at`	timestamp	NULL,
-	`created_at`	timestamp	NOT NULL	DEFAULT CURRENT_TIMESTAMP,
-	`deleted_at`	timestamp	NULL,
+CREATE TABLE `users`
+(
+    `user_id`       bigint                                  NOT NULL AUTO_INCREMENT,
+    `membership_id` bigint                                  NOT NULL,
+    `login_id`      varchar(50)                             NOT NULL,
+    `password`      varchar(255)                            NOT NULL,
+    `name`          varchar(20)                             NOT NULL,
+    `email`         varchar(50)                             NOT NULL,
+    `nickname`      varchar(20)                             NOT NULL,
+    `birth`         varchar(8)                              NOT NULL,
+    `phone_number`  varchar(11)                             NOT NULL,
+    `point_balance` decimal(10, 2)                          NOT NULL,
+    `type`          ENUM ('USER', 'ADMIN')                  NOT NULL DEFAULT 'USER',
+    `status`        ENUM ('ACTIVE', 'DORMANT', 'WITHDRAWN') NOT NULL DEFAULT 'ACTIVE' COMMENT '일반,휴면, 탈퇴',
+    `last_login_at` timestamp                               NULL,
+    `created_at`    timestamp                               NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `deleted_at`    timestamp                               NULL,
 
     CONSTRAINT `PK_USER` PRIMARY KEY (`user_id`),
     CONSTRAINT `FK_user_membership_id_membership_level`

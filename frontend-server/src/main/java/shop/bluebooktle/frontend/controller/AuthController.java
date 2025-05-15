@@ -34,6 +34,8 @@ public class AuthController {
 		if (errorCode != null && !errorCode.isEmpty()) {
 			model.addAttribute("error", "true");
 		}
+		model.addAttribute("globalErrorMessage", "error");
+		model.addAttribute("globalErrorTitle", "title");
 		return "auth/login_form";
 	}
 
