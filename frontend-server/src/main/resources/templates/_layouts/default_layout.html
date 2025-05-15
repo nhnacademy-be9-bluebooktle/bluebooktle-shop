@@ -17,10 +17,12 @@
     <p>Page content goes here</p>
 </div>
 
+<div th:replace="~{_fragments/modal_popup :: successPopup(modalId='globalSuccessModal')}"></div>
+<div th:replace="~{_fragments/modal_popup :: errorPopup(modalId='globalErrorModal')}"></div>
+<div th:replace="~{_fragments/modal_popup :: infoPopup(modalId='globalInfoModal')}"></div>
 <div th:replace="~{_fragments/footer :: footerFragment}"></div>
 
 <script>
-
     function showKitschModal(modalId) {
         const modal = document.getElementById(modalId);
         if (modal) {
@@ -35,6 +37,32 @@
         }
     }
 
+    document.addEventListener('DOMContentLoaded', function () {
+        const modalsToAutoShow = document.querySelectorAll('.modal-overlay-kitsch[data-auto-show="true"]');
+        modalsToAutoShow.forEach(function (modal) {
+            if (modal.id) {
+                showKitschModal(modal.id);
+            }
+        });
+
+        const closeTriggers = document.querySelectorAll('.js-modal-close-trigger');
+        closeTriggers.forEach(function (trigger) {
+            trigger.addEventListener('click', function (event) {
+                const clickedElement = event.currentTarget;
+                const modalIdToHide = clickedElement.getAttribute('data-modal-target');
+
+                if (modalIdToHide) {
+                    if (clickedElement.classList.contains('modal-overlay-kitsch')) {
+                        if (event.target === clickedElement) {
+                            hideKitschModal(modalIdToHide);
+                        }
+                    } else {
+                        hideKitschModal(modalIdToHide);
+                    }
+                }
+            });
+        });
+    });
 </script>
 <th:block layout:fragment="page_scripts"></th:block>
 </body>

@@ -55,7 +55,7 @@ public class SecurityConfig {
 			.formLogin(AbstractHttpConfigurer::disable)
 			.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 			.authorizeHttpRequests(authorize -> authorize
-				.requestMatchers("/auth/**").permitAll()
+				.requestMatchers("/**").permitAll()
 				.requestMatchers(SWAGGER_PATHS).permitAll()
 				.anyRequest().authenticated()
 			);
