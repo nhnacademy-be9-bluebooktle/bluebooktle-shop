@@ -93,9 +93,7 @@ jobs:
     needs: [ detect_changes, build ]
     if: >-
       needs.detect_changes.outputs.changed != '' && (
-        # develop: 모든 이벤트 배포
         github.ref_name == 'develop' ||
-        # master: push 혹은 PR 머지
         (github.ref_name == 'master' && (github.event_name == 'push' ||
          (github.event_name == 'pull_request' &&
           github.event.action == 'closed' &&
