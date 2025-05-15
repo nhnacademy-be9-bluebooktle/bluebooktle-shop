@@ -53,13 +53,13 @@ jobs:
         id: list
         run: |
           modules=()
+          [[ "${{ steps.filter.outputs.eureka-server }}"   == "true" ]] && modules+=("eureka-server")
+          [[ "${{ steps.filter.outputs.gateway-server }}"  == "true" ]] && modules+=("gateway-server")
           [[ "${{ steps.filter.outputs.backend-server }}"  == "true" ]] && modules+=("backend-server")
           [[ "${{ steps.filter.outputs.frontend-server }}" == "true" ]] && modules+=("frontend-server")
-          [[ "${{ steps.filter.outputs.gateway-server }}"  == "true" ]] && modules+=("gateway-server")
-          [[ "${{ steps.filter.outputs.eureka-server }}"   == "true" ]] && modules+=("eureka-server")
           [[ "${{ steps.filter.outputs.auth-server }}"     == "true" ]] && modules+=("auth-server")
           if [[ "${{ steps.filter.outputs.common-module }}" == "true" ]]; then
-            for svc in backend-server frontend-server gateway-server eureka-server auth-server; do
+            for svc in eureka-server gateway-server backend-server frontend-server auth-server; do
               [[ ! " ${modules[*]} " =~ " $svc " ]] && modules+=("$svc")
             done
           fi
