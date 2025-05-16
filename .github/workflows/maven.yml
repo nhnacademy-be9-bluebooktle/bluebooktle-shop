@@ -108,7 +108,6 @@ jobs:
     env:
       CONFIG_SERVER_URI: ${{ secrets.CONFIG_SERVER_URI }}
       SPRING_PROFILES_ACTIVE: ${{ github.ref_name == 'master' && 'prod' || 'dev' }}
-      JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
     steps:
       - uses: actions/download-artifact@v4
         with:
@@ -136,7 +135,6 @@ jobs:
             set -e
             export SPRING_PROFILES_ACTIVE="${{ env.SPRING_PROFILES_ACTIVE }}"
             export CONFIG_SERVER_URI="${{ env.CONFIG_SERVER_URI }}"
-            export CONFIG_SERVER_URI="${{ env.JWT_SECRET_KEY }}"
             BR=${{ github.ref_name }}
             if [ "$BR" = "master" ]; then
               S=prod_startup.sh
