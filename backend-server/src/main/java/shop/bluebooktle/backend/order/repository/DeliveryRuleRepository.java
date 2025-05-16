@@ -9,7 +9,7 @@ import shop.bluebooktle.backend.order.entity.DeliveryRule;
 public interface DeliveryRuleRepository extends JpaRepository<DeliveryRule, Long> {
 
 	// 정책 이름으로 조회
-	Optional<DeliveryRule> findByName(String name);
+	Optional<DeliveryRule> findById(Long id);
 
 	// INSERT INTO delivery_rule (name, price, delivery_fee)
 	// VALUES ('기본 배송 정책', 30000.00, 5000.00);

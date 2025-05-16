@@ -18,6 +18,8 @@ import shop.bluebooktle.backend.order.entity.DeliveryRule;
 import shop.bluebooktle.backend.order.repository.DeliveryRuleRepository;
 import shop.bluebooktle.backend.order.service.impl.DeliveryRuleServiceImpl;
 import shop.bluebooktle.common.exception.order.delivery_rule.CannotDeleteDefaultPolicyException;
+import shop.bluebooktle.common.exception.order.delivery_rule.DefaultDeliveryRuleNotFoundException;
+import shop.bluebooktle.common.exception.order.delivery_rule.DeliveryRuleAlreadyExistsException;
 
 @ExtendWith(MockitoExtension.class)
 class DeliveryRuleServiceTest {
@@ -37,7 +39,7 @@ class DeliveryRuleServiceTest {
 			.deliveryFee(BigDecimal.ZERO)
 			.build();
 
-		given(deliveryRuleRepository.findByName("기본 배송 정책")).willReturn(Optional.of(rule));
+		given(deliveryRuleRepository.findById(1L)).willReturn(Optional.of(rule));
 
 		DeliveryRule result = deliveryRuleService.getDefaultRule();
 
@@ -47,11 +49,10 @@ class DeliveryRuleServiceTest {
 	@Test
 	@DisplayName("기본 배송 정책 조회 - 실패")
 	void getDefaultRule_fail() {
-		given(deliveryRuleRepository.findByName("기본 배송 정책")).willReturn(Optional.empty());
+		given(deliveryRuleRepository.findById(1L)).willReturn(Optional.empty());
 
 		assertThatThrownBy(() -> deliveryRuleService.getDefaultRule())
-			.isInstanceOf(IllegalStateException.class)
-			.hasMessage("기본 배송 정책이 존재하지 않습니다.");
+			.isInstanceOf(DefaultDeliveryRuleNotFoundException.class);
 	}
 
 	@Test
@@ -77,17 +78,17 @@ class DeliveryRuleServiceTest {
 		given(deliveryRuleRepository.existsByName("중복된이름")).willReturn(true);
 
 		assertThatThrownBy(() -> deliveryRuleService.createPolicy("중복된이름", BigDecimal.TEN, BigDecimal.ONE))
-			.isInstanceOf(IllegalArgumentException.class)
-			.hasMessageContaining("이미 존재하는 배송 정책명입니다");
+			.isInstanceOf(DeliveryRuleAlreadyExistsException.class);
 	}
 
 	@Test
 	@DisplayName("배송 정책 삭제 - 성공")
 	void deletePolicy_success() {
+		Long id = 2L;
 		DeliveryRule rule = DeliveryRule.builder().name("삭제 가능 정책").build();
-		given(deliveryRuleRepository.findByName("삭제 가능 정책")).willReturn(Optional.of(rule));
+		given(deliveryRuleRepository.findById(id)).willReturn(Optional.of(rule));
 
-		deliveryRuleService.deletePolicy("삭제 가능 정책");
+		deliveryRuleService.deletePolicy(id);
 
 		verify(deliveryRuleRepository).delete(rule);
 	}
@@ -95,20 +96,22 @@ class DeliveryRuleServiceTest {
 	@Test
 	@DisplayName("기본 배송 정책 삭제 시도 - 실패")
 	void deleteDefaultPolicy_fail() {
+		Long id = 1L;
 		DeliveryRule rule = DeliveryRule.builder().name("기본 배송 정책").build();
-		given(deliveryRuleRepository.findByName("기본 배송 정책")).willReturn(Optional.of(rule));
+		given(deliveryRuleRepository.findById(id)).willReturn(Optional.of(rule));
 
-		assertThatThrownBy(() -> deliveryRuleService.deletePolicy("기본 배송 정책"))
+		assertThatThrownBy(() -> deliveryRuleService.deletePolicy(id))
 			.isInstanceOf(CannotDeleteDefaultPolicyException.class);
 	}
 
 	@Test
 	@DisplayName("배송 정책 단건 조회 - 성공")
 	void getRule_success() {
+		Long id = 3L;
 		DeliveryRule rule = DeliveryRule.builder().name("프리미엄 배송").build();
-		given(deliveryRuleRepository.findByName("프리미엄 배송")).willReturn(Optional.of(rule));
+		given(deliveryRuleRepository.findById(id)).willReturn(Optional.of(rule));
 
-		DeliveryRule result = deliveryRuleService.getRule("프리미엄 배송");
+		DeliveryRule result = deliveryRuleService.getRule(id);
 
 		assertThat(result.getName()).isEqualTo("프리미엄 배송");
 	}
