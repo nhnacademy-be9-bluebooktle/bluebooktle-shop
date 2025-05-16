@@ -23,13 +23,13 @@ import shop.bluebooktle.common.dto.common.JsendResponse;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/book-sale-info")
+@RequestMapping("/api/book-sale-infos")
 public class BookSaleInfoController {
 
 	private final BookSaleInfoService bookSaleInfoService;
 
 	//도서판매정보 등록
-	@PostMapping("/register")
+	@PostMapping
 	public ResponseEntity<JsendResponse<BookSaleInfoRegisterResponse>> registerBookSaleInfo(
 		@Valid @RequestBody BookSaleInfoRegisterRequest request) {
 		BookSaleInfoRegisterResponse response = bookSaleInfoService.save(request);

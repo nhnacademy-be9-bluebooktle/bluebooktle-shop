@@ -40,6 +40,7 @@ import shop.bluebooktle.common.exception.book.AladinBookNotFoundException;
 import shop.bluebooktle.common.exception.book.BookAlreadyExistsException;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class BookRegisterServiceImpl implements BookRegisterService {
 
@@ -60,7 +61,6 @@ public class BookRegisterServiceImpl implements BookRegisterService {
 	private final BookTagRepository bookTagRepository;
 
 	//연관테이블 완성되면 수정필요 일단기능구현만
-	@Transactional
 	@Override
 	public void registerBook(BookAllRegisterRequest request) {
 		Optional<Book> existBook = bookRepository.findByIsbn(request.getIsbn());
@@ -133,7 +133,6 @@ public class BookRegisterServiceImpl implements BookRegisterService {
 	}
 
 	//연관테이블 완성되면 수정필요 일단기능구현만
-	@Transactional
 	@Override
 	public void registerBookByAladin(BookAllRegisterByAladinRequest request) {
 		Optional<Book> existBook = bookRepository.findByIsbn(request.getIsbn());

@@ -27,7 +27,7 @@ import shop.bluebooktle.common.exception.book.BookAlreadyExistsException;
 import shop.bluebooktle.common.exception.book.BookNotFoundException;
 
 @Service
-
+@Transactional
 @RequiredArgsConstructor
 public class BookServiceImpl implements BookService {
 
@@ -39,7 +39,6 @@ public class BookServiceImpl implements BookService {
 	private final BookTagRepository bookTagRepository;
 	private final BookImgRepository bookImgRepository;
 
-	@Transactional
 	@Override
 	public BookRegisterResponse registerBook(BookRegisterRequest request) {
 		if (bookRepository.existsByIsbn(request.getIsbn())) {
@@ -56,8 +55,8 @@ public class BookServiceImpl implements BookService {
 			.build();
 	}
 
-	@Transactional(readOnly = true)
 	@Override
+	@Transactional(readOnly = true)
 	public BookResponse findBookById(Long bookId) {
 		Book book = bookRepository.findById(bookId)
 			.orElseThrow(BookNotFoundException::new);
@@ -70,7 +69,6 @@ public class BookServiceImpl implements BookService {
 			.build();
 	}
 
-	@Transactional
 	@Override
 	public BookUpdateResponse updateBook(Long bookId, BookUpdateRequest request) {
 		Book book = bookRepository.findById(bookId)
@@ -92,7 +90,6 @@ public class BookServiceImpl implements BookService {
 			.build();
 	}
 
-	@Transactional
 	@Override
 	public void deleteBook(Long bookId) {
 		// Book 존재 여부 확인
@@ -106,8 +103,8 @@ public class BookServiceImpl implements BookService {
 	}
 
 	//도서 연관 데이터 한번에 id로조회
-	@Transactional(readOnly = true)
 	@Override
+	@Transactional(readOnly = true)
 	public BookAllResponse findBookAllById(Long id) {
 		Book book = bookRepository.findById(id)
 			.orElseThrow(BookNotFoundException::new);
@@ -135,8 +132,8 @@ public class BookServiceImpl implements BookService {
 	}
 
 	//도서 연관 데이터 한번에 제목으로 조회
-	@Transactional(readOnly = true)
 	@Override
+	@Transactional(readOnly = true)
 	public List<BookAllResponse> getBookAllByTitle(String title) {
 		List<Book> books = bookRepository.findAllByTitle(title);
 
@@ -167,8 +164,8 @@ public class BookServiceImpl implements BookService {
 			.toList();
 	}
 
-	@Transactional(readOnly = true)
 	@Override
+	@Transactional(readOnly = true)
 	public Book getBookById(Long bookId) {
 		return bookRepository.findById(bookId)
 			.orElseThrow(BookNotFoundException::new);

@@ -28,7 +28,7 @@ import shop.bluebooktle.backend.book.service.BookService;
 import shop.bluebooktle.common.dto.common.JsendResponse;
 
 @RestController
-@RequestMapping("/api/book")
+@RequestMapping("/api/books")
 @RequiredArgsConstructor
 public class BookController {
 
@@ -36,7 +36,7 @@ public class BookController {
 	private final BookRegisterService bookRegisterService;
 
 	//도서 정보 등록
-	@PostMapping("/register")
+	@PostMapping
 	public ResponseEntity<JsendResponse<BookRegisterResponse>> registerBook(
 		@Valid @RequestBody BookRegisterRequest request) {
 		BookRegisterResponse response = bookService.registerBook(request);
@@ -44,14 +44,14 @@ public class BookController {
 	}
 
 	//도서 정보 조회
-	@GetMapping("/search/{bookId}")
+	@GetMapping("/{bookId}")
 	public ResponseEntity<JsendResponse<BookResponse>> getBook(@PathVariable Long bookId) {
 		BookResponse bookResponse = bookService.findBookById(bookId);
 		return ResponseEntity.ok(JsendResponse.success(bookResponse));
 	}
 
 	//도서 정보 수정
-	@PutMapping("/update/{bookId}")
+	@PutMapping("/{bookId}")
 	public ResponseEntity<JsendResponse<BookUpdateResponse>> updateBook(
 		@PathVariable Long bookId,
 		@Valid @RequestBody BookUpdateRequest request) {
@@ -61,14 +61,14 @@ public class BookController {
 	}
 
 	//도서 정보 삭제
-	@DeleteMapping("/delete/{bookId}")
+	@DeleteMapping("/{bookId}")
 	public ResponseEntity<JsendResponse<Void>> deleteBook(@PathVariable Long bookId) {
 		bookService.deleteBook(bookId);
 		return ResponseEntity.ok(JsendResponse.success());
 	}
 
 	//해당 도서 관련된 모든 정보(도서,도서 판매정보,작가,출판사,태그,이미지,카테고리)까지 등록
-	@PostMapping("/register/all")
+	@PostMapping("/all")
 	public ResponseEntity<JsendResponse<Void>> registerBookAll(
 		@Valid @RequestBody BookAllRegisterRequest request) {
 		bookRegisterService.registerBook(request);
@@ -76,14 +76,14 @@ public class BookController {
 	}
 
 	//해당 도서 관련된 모든 정보(도서,도서 판매정보,작가,출판사,태그,이미지,카테고리)까지 bookId로 조회
-	@GetMapping("/search/all/{bookId}")
+	@GetMapping("/all/{bookId}")
 	public ResponseEntity<JsendResponse<BookAllResponse>> getBookAll(@PathVariable Long bookId) {
 		BookAllResponse bookAllResponse = bookService.findBookAllById(bookId);
 		return ResponseEntity.ok(JsendResponse.success(bookAllResponse));
 	}
 
 	//해당 도서 관련된 모든 정보(도서,도서 판매정보,작가,출판사,태그,이미지,카테고리)까지 제목으로 조회
-	@GetMapping("/search/all/by-title")
+	@GetMapping("/all/by-title")
 	public ResponseEntity<JsendResponse<List<BookAllResponse>>> getBookAllByTitle(@RequestParam("title") String title) {
 		List<BookAllResponse> bookAllRespons = bookService
 			.getBookAllByTitle(title);

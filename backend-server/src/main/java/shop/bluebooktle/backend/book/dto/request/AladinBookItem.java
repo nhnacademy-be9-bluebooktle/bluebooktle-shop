@@ -10,7 +10,7 @@ import lombok.Getter;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AladinBookItem {
 	private String title;
-	private List<AuthorInfo> authors;
+	private List<String> authors;
 	private String description;
 	private String pubDate;
 	private String isbn13;
@@ -19,12 +19,5 @@ public class AladinBookItem {
 	private String publisher;
 	private String categoryName;
 	private String cover;
-
-	@Getter
-	@JsonIgnoreProperties(ignoreUnknown = true)
-	public static class AuthorInfo {
-		private Integer authorId;
-		private String authorName;
-	}
 
 }

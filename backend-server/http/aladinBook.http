@@ -1,0 +1,66 @@
+@baseUrl = http://localhost:9002/api/aladin/books
+
+#알라딘 관련 아직 수정필요!!
+
+### 알라딘 도서목록 제목으로 검색
+GET {{baseUrl}}/?query=자바
+Accept: application/json
+
+### 알라딘 도서 isbn으로 검색
+GET {{baseUrl}}/select?isbn=9791186560655
+Accept: application/json
+
+### 알라딘 도서 등록
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+  "isbn": "9791186560655",
+  "stock": 999,
+  "isPackable": true,
+  "state": "AVAILABLE",
+  "tag": [
+    "태그"
+  ]
+}
+
+### 알라딘 도서 등록 실패 - 중복isbn
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+  "isbn": "9791193926994",
+  "stock": 999,
+  "isPackable": true,
+  "state": "AVAILABLE",
+  "tag": [
+    "태그"
+  ]
+}
+
+### 알라딘 도서 등록 실패 - 필수필드 stock누락
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+  "isbn": "9791193926994",
+  "isPackable": true,
+  "state": "AVAILABLE",
+  "tag": [
+    "태그"
+  ]
+}
+
+### 알라딘 도서 등록 실패 - isbn글자수 잘못된 형식
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+  "isbn": "97911683407701111111",
+  "stock": "999",
+  "isPackable": true,
+  "state": "AVAILABLE",
+  "tag": [
+    "태그"
+  ]
+}

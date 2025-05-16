@@ -23,6 +23,7 @@ import shop.bluebooktle.common.exception.book.BookSaleInfoAlreadyExistsException
 import shop.bluebooktle.common.exception.book.BookSaleInfoNotFoundException;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class BookSaleInfoServiceImpl implements BookSaleInfoService {
 
@@ -30,7 +31,6 @@ public class BookSaleInfoServiceImpl implements BookSaleInfoService {
 	private final BookSaleInfoRepository bookSaleInfoRepository;
 
 	@Override
-	@Transactional
 	public BookSaleInfoRegisterResponse save(BookSaleInfoRegisterRequest request) {
 		//도서가 있어야 도서 판매정보를 등록할수있음 bookId로 조회
 		Book book = bookRepository.findById(request.getBookId())
@@ -60,7 +60,6 @@ public class BookSaleInfoServiceImpl implements BookSaleInfoService {
 	}
 
 	@Override
-	@Transactional
 	public BookSaleInfoUpdateResponse update(Long id, BookSaleInfoUpdateRequest request) {
 		BookSaleInfo existingEntity = bookSaleInfoRepository.findById(id)
 			.orElseThrow(BookSaleInfoNotFoundException::new);
@@ -82,7 +81,6 @@ public class BookSaleInfoServiceImpl implements BookSaleInfoService {
 	}
 
 	@Override
-	@Transactional
 	public void deleteById(Long id) {
 		if (!bookSaleInfoRepository.existsById(id)) {
 			throw new BookSaleInfoNotFoundException();
