@@ -7,13 +7,6 @@ spring:
     username: sa
     password:
     driver-class-name: org.h2.Driver
-  batch:
-    job:
-      name: ${spring.batch.job.name:}
-  sql:
-    init:
-      mode: always
-      schema-locations: classpath:batch/batch-h2.sql
   jpa:
     hibernate:
       ddl-auto: validate

@@ -15,13 +15,7 @@ public interface UserCouponService {
 	Page<UserCouponResponse> getAllUserCoupons(User user, Pageable pageable);
 
 	// 유저 별 사용 가능 쿠폰 조회
-	Page<UserCouponResponse> getUsableUserCoupons(User user, Pageable pageable);
-
-	// 유저 별 사용 완료 쿠폰 조회
-	Page<UserCouponResponse> getUsedUserCoupons(User user, Pageable pageable);
-
-	// 유저 별 기간 만료 쿠폰 조회
-	Page<UserCouponResponse> getExpiredUserCoupons(User user, Pageable pageable);
+	Page<UserCouponResponse> getAvailableUserCoupons(User user, Pageable pageable);
 
 	// 쿠폰 사용 - used_at = now
 	void useCoupon(Long id);
