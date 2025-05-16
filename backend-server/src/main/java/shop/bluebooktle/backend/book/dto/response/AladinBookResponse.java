@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -18,8 +20,7 @@ import shop.bluebooktle.backend.book.dto.request.AladinBookItem;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AladinBookResponse {
 	String title;
-	String author;
-	Integer authorId;
+	List<AuthorResponse> authors;
 	String description;
 	LocalDateTime publishDate;
 	String isbn;
@@ -41,10 +42,16 @@ public class AladinBookResponse {
 				.divide(price, 0, BigDecimal.ROUND_HALF_UP);
 		}
 
+		List<AuthorResponse> authorList = item.getAuthors().stream()
+			.map(author -> AuthorResponse.builder()
+				.authorId(author.getAuthorId())
+				.authorName(author.getAuthorName())
+				.build())
+			.collect(Collectors.toList());
+
 		return AladinBookResponse.builder()
 			.title(item.getTitle())
-			.author(item.getAuthor())
-			.authorId(item.getAuthorId())
+			.authors(authorList)
 			.description(item.getDescription())
 			.publishDate(LocalDate.parse(item.getPubDate(), DateTimeFormatter.ofPattern("yyyy-MM-dd")).atStartOfDay())
 			.isbn(item.getIsbn13())
@@ -56,4 +63,13 @@ public class AladinBookResponse {
 			.imageUrl(item.getCover())
 			.build();
 	}
+
+	@Getter
+	@Value
+	@Builder
+	public static class AuthorResponse { // 참여 작가 정보를 위한 클래스
+		Integer authorId;
+		String authorName;
+	}
+
 }

@@ -35,8 +35,6 @@ import shop.bluebooktle.backend.book.repository.ImgRepository;
 import shop.bluebooktle.backend.book.repository.PublisherRepository;
 import shop.bluebooktle.backend.book.repository.TagRepository;
 import shop.bluebooktle.backend.book.service.AladinBookService;
-import shop.bluebooktle.backend.book.repository.TagRepository;
-import shop.bluebooktle.backend.book.service.AladinBookService;
 import shop.bluebooktle.backend.book.service.BookRegisterService;
 import shop.bluebooktle.common.exception.book.AladinBookNotFoundException;
 import shop.bluebooktle.common.exception.book.BookAlreadyExistsException;
@@ -157,9 +155,9 @@ public class BookRegisterServiceImpl implements BookRegisterService {
 			.build();
 		bookRepository.save(book);
 
-		Author author = authorRepository.findByName(aladin.getAuthor())
-			.orElseGet(() -> authorRepository.save(new Author(aladin.getAuthor())));
-		bookAuthorRepository.save(new BookAuthor(author, book));
+		// Author author = authorRepository.findByName(aladin.getAuthor())
+		// 	.orElseGet(() -> authorRepository.save(new Author(aladin.getAuthor())));
+		// bookAuthorRepository.save(new BookAuthor(author, book));
 
 		Publisher publisher = publisherRepository.findByName(aladin.getPublisher())
 			.orElseGet(() -> publisherRepository.save(new Publisher(aladin.getPublisher())));
