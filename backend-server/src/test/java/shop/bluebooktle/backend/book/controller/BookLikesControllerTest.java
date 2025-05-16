@@ -13,8 +13,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import shop.bluebooktle.backend.book.dto.response.BookLikesResponse;
 import shop.bluebooktle.backend.book.service.BookLikesService;
 
@@ -24,14 +22,8 @@ public class BookLikesControllerTest {
 	@Autowired
 	private MockMvc mockMvc;
 
-	@Autowired
-	private BookLikesController bookLikesController;
-
 	@MockitoBean
 	private BookLikesService bookLikesService;
-
-	@Autowired
-	private ObjectMapper objectMapper;
 
 	@Test
 	@DisplayName("도서 좋아요 등록 - 성공")
