@@ -36,7 +36,13 @@ import shop.bluebooktle.backend.book.repository.ImgRepository;
 import shop.bluebooktle.backend.book.repository.PublisherRepository;
 import shop.bluebooktle.backend.book.repository.TagRepository;
 import shop.bluebooktle.backend.book.service.AladinBookService;
+import shop.bluebooktle.backend.book.service.BookCategoryService;
+import shop.bluebooktle.backend.book.service.BookPublisherService;
 import shop.bluebooktle.backend.book.service.BookRegisterService;
+import shop.bluebooktle.backend.book.service.BookTagService;
+import shop.bluebooktle.backend.book.service.CategoryService;
+import shop.bluebooktle.backend.book.service.PublisherService;
+import shop.bluebooktle.backend.book.service.TagService;
 import shop.bluebooktle.common.exception.book.AladinBookNotFoundException;
 import shop.bluebooktle.common.exception.book.BookAlreadyExistsException;
 
@@ -61,8 +67,17 @@ public class BookRegisterServiceImpl implements BookRegisterService {
 	private final BookImgRepository bookImgRepository;
 	private final BookTagRepository bookTagRepository;
 
+	private final PublisherService publisherService;
+	private final BookPublisherService bookPublisherService;
+
+	private final CategoryService categoryService;
+	private final TagService tagService;
+	private final BookCategoryService bookCategoryService;
+	private final BookTagService bookTagService;
+	// TODO 작가 서비스 주입
+
 	//연관테이블 완성되면 수정필요 일단기능구현만
-	@Override
+	/*@Override
 	public void registerBook(BookAllRegisterRequest request) {
 		Optional<Book> existBook = bookRepository.findByIsbn(request.getIsbn());
 		if (existBook.isPresent()) {
@@ -102,8 +117,8 @@ public class BookRegisterServiceImpl implements BookRegisterService {
 			bookAuthorRepository.save(new BookAuthor(author, book));
 		}
 
-		Publisher publisher = publisherRepository.findByName(request.getPublisher())
-			.orElseGet(() -> publisherRepository.save(new Publisher(request.getPublisher())));
+		Publisher publisher = publisherRepository.findById(request.getPublisherId())
+			.orElseGet(() -> publisherRepository.save(new Publisher(request.getPublisherId())));
 		bookPublisherRepository.save(new BookPublisher(book, publisher));
 
 		for (String categoryName : request.getCategory()) {
@@ -124,6 +139,66 @@ public class BookRegisterServiceImpl implements BookRegisterService {
 				.findFirst()
 				.orElseGet(() -> tagRepository.save(new Tag(tagName)));
 			bookTagRepository.save(new BookTag(tag, book));
+		}
+
+		BookSaleInfo bookSaleInfo = BookSaleInfo.builder()
+			.book(book)
+			.price(request.getPrice())
+			.salePrice(request.getSalePrice())
+			.stock(request.getStock())
+			.isPackable(request.getIsPackable() != null &&
+				request.getIsPackable())
+			.state(request.getState())
+			.salePercentage(salePercentage)
+			.build();
+		bookSaleInfoRepository.save(bookSaleInfo);
+	}*/
+
+	@Override
+	public void registerBook(BookAllRegisterRequest request) {
+		Optional<Book> existBook = bookRepository.findByIsbn(request.getIsbn());
+		if (existBook.isPresent()) {
+			throw new BookAlreadyExistsException();
+		}
+		Book book = Book.builder()
+			.title(request.getTitle())
+			.isbn(request.getIsbn())
+			.description(request.getDescription())
+			.publishDate(request.getPublishDate() != null ?
+				request.getPublishDate().atStartOfDay() : null)
+			.build();
+		bookRepository.save(book);
+
+		//할인율 계산 따로 뺄것
+		BigDecimal salePercentage = request.getPrice().subtract(request.getSalePrice())
+			.divide(request.getPrice(), 2, BigDecimal.ROUND_HALF_UP)
+			.multiply(BigDecimal.valueOf(100));
+
+		//작가, 이미지 - 수정필요
+
+		for (String authorName : request.getAuthor()) {
+			Author author = authorRepository.findByName(authorName)
+				.orElseGet(() -> authorRepository.save(new Author(authorName)));
+			bookAuthorRepository.save(new BookAuthor(author, book));
+		}
+		bookPublisherService.registerBookPublisher(request.getPublisherId(), book.getId());
+
+		for (Long categoryId : request.getCategoryIdList()) {
+			bookCategoryService.registerBookCategory(categoryId, book.getId());
+		}
+
+		for (String imageUrl : request.getImageUrl()) {
+			Img img = imgRepository.findByImgUrl(imageUrl)
+				.orElseGet(() -> imgRepository.save(new Img(imageUrl)));
+			bookImgRepository.save(new BookImg(book, img, false));
+		}
+
+		for (Long categoryId : request.getCategoryIdList()) {
+			bookCategoryService.registerBookCategory(categoryId, book.getId());
+		}
+
+		for (Long tagId : request.getTagIdList()) {
+			bookTagService.registerBookTag(book.getId(), tagId);
 		}
 
 		BookSaleInfo bookSaleInfo = BookSaleInfo.builder()

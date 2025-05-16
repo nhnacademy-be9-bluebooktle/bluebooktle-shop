@@ -73,6 +73,9 @@ public class CategoryServiceImpl implements CategoryService {
 
 		newCategory.setCategoryPath(categoryPathStr);
 		categoryRepository.save(newCategory);
+
+		parent.addChildCategory(newCategory);
+		categoryRepository.save(parent);
 	}
 
 	@Override

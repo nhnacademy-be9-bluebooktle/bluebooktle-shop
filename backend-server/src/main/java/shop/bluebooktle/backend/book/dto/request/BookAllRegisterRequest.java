@@ -7,6 +7,7 @@ import java.util.List;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -35,11 +36,11 @@ public class BookAllRegisterRequest {
 	@NotEmpty(message = "작가 이름은 최소 1개 이상 필요합니다.")
 	List<@NotBlank(message = "작가 이름은 빈 값일 수 없습니다.") String> author;
 
-	@NotBlank(message = "출판사 이름은 필수 값입니다.")
-	String publisher;
+	@NotNull(message = "출판사를 선택해야합니다.")
+	Long publisherId;
 
 	@NotEmpty(message = "카테고리는 최소 1개 이상 필요합니다.")
-	List<@NotBlank(message = "카테고리 이름은 빈 값일 수 없습니다.") String> category;
+	List<@Positive(message = "카테고리 ID는 양수값이어야 합니다.") Long> categoryIdList;
 
 	List<String> imageUrl;
 
@@ -62,5 +63,7 @@ public class BookAllRegisterRequest {
 
 	@NotNull(message = "태그는 필수 값입니다.")
 	List<String> tag;
+	
+	List<@Positive(message = "태그 ID는 양수값이어야 합니다.") Long> tagIdList;
 
 }
