@@ -62,11 +62,10 @@ public class AuthController {
 	@ExceptionHandler(ApplicationException.class)
 	public String handleApplicationException(ApplicationException ex, RedirectAttributes redirectAttributes) {
 		ErrorCode errorCode = ex.getErrorCode();
-		String errorMessage = ex.getMessage();
 
 		redirectAttributes.addFlashAttribute("error", "true");
 		redirectAttributes.addFlashAttribute("errorCode", errorCode.getCode());
-		redirectAttributes.addFlashAttribute("errorMessage", errorMessage);
+		redirectAttributes.addFlashAttribute("errorMessage", errorCode.getMessage());
 
 		return "redirect:/login";
 	}
@@ -111,9 +110,11 @@ public class AuthController {
 	}
 
 	@PostMapping("/logout")
-	public String handleLogout(HttpServletResponse response) {
+	public String handleLogout(HttpServletResponse response, RedirectAttributes redirectAttributes) {
 		deleteCookie(response, "accessToken");
 		deleteCookie(response, "refreshToken");
+		redirectAttributes.addFlashAttribute("globalSuccessMessage", "로그아웃 되었습니다!");
+		redirectAttributes.addFlashAttribute("globalSuccessTitle", "로그아웃 성공!");
 
 		return "redirect:/";
 	}
