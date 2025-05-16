@@ -17,6 +17,7 @@ import shop.bluebooktle.backend.book.entity.BookSaleInfo;
 import shop.bluebooktle.backend.book.repository.BookRepository;
 import shop.bluebooktle.backend.book.repository.BookSaleInfoRepository;
 import shop.bluebooktle.backend.book.service.BookSaleInfoService;
+import shop.bluebooktle.common.exception.InvalidInputValueException;
 import shop.bluebooktle.common.exception.book.BookNotFoundException;
 import shop.bluebooktle.common.exception.book.BookSaleInfoAlreadyExistsException;
 import shop.bluebooktle.common.exception.book.BookSaleInfoNotFoundException;
@@ -33,10 +34,10 @@ public class BookSaleInfoServiceImpl implements BookSaleInfoService {
 	public BookSaleInfoRegisterResponse save(BookSaleInfoRegisterRequest request) {
 		//도서가 있어야 도서 판매정보를 등록할수있음 bookId로 조회
 		Book book = bookRepository.findById(request.getBookId())
-			.orElseThrow(() -> new BookNotFoundException("도서를 찾을 수 없습니다. ID: " + request.getBookId()));
+			.orElseThrow(BookNotFoundException::new);
 
 		if (bookSaleInfoRepository.findByBook(book).isPresent()) {
-			throw new BookSaleInfoAlreadyExistsException("해당 도서는 이미 판매 정보가 등록되어 있습니다");
+			throw new BookSaleInfoAlreadyExistsException();
 		}
 
 		BigDecimal salePercentage = calculateSalePercentage(request.getPrice(), request.getSalePrice());
@@ -55,17 +56,17 @@ public class BookSaleInfoServiceImpl implements BookSaleInfoService {
 	@Transactional(readOnly = true)
 	public BookSaleInfo findById(Long id) {
 		return bookSaleInfoRepository.findById(id)
-			.orElseThrow(() -> new BookSaleInfoNotFoundException("도서 판매 정보를 찾을 수 없습니다."));
+			.orElseThrow(BookSaleInfoNotFoundException::new);
 	}
 
 	@Override
 	@Transactional
 	public BookSaleInfoUpdateResponse update(Long id, BookSaleInfoUpdateRequest request) {
 		BookSaleInfo existingEntity = bookSaleInfoRepository.findById(id)
-			.orElseThrow(() -> new BookSaleInfoNotFoundException("도서 판매 정보 ID: " + id + "를 찾을 수 없습니다."));
+			.orElseThrow(BookSaleInfoNotFoundException::new);
 
 		Book book = bookRepository.findById(request.getBookId())
-			.orElseThrow(() -> new BookNotFoundException("해당 도서 ID: " + request.getBookId() + "를 찾을 수 없습니다."));
+			.orElseThrow(BookNotFoundException::new);
 
 		BookSaleInfo updatedEntity = request.toEntity(existingEntity.toBuilder()
 			.book(book)
@@ -84,7 +85,7 @@ public class BookSaleInfoServiceImpl implements BookSaleInfoService {
 	@Transactional
 	public void deleteById(Long id) {
 		if (!bookSaleInfoRepository.existsById(id)) {
-			throw new BookSaleInfoNotFoundException("도서 판매 정보를 찾을 수 없습니다.");
+			throw new BookSaleInfoNotFoundException();
 		}
 		bookSaleInfoRepository.deleteById(id);
 	}
@@ -93,7 +94,7 @@ public class BookSaleInfoServiceImpl implements BookSaleInfoService {
 	@Transactional(readOnly = true)
 	public Optional<BookSaleInfo> findByBook(Book book) {
 		if (book == null || book.getId() == null) {
-			throw new BookNotFoundException("도서를 찾을 수 없습니다.");
+			throw new BookNotFoundException();
 		}
 		return bookSaleInfoRepository.findByBook(book);
 	}
@@ -101,7 +102,7 @@ public class BookSaleInfoServiceImpl implements BookSaleInfoService {
 	//할인율 계산
 	private BigDecimal calculateSalePercentage(BigDecimal price, BigDecimal salePrice) {
 		if (price == null || salePrice == null || price.compareTo(BigDecimal.ZERO) <= 0) {
-			throw new IllegalArgumentException("가격과 할인가격은 0보다 커야 합니다.");
+			throw new InvalidInputValueException();
 		}
 
 		return price.subtract(salePrice)
