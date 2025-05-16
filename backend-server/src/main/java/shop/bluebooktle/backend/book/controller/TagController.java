@@ -32,7 +32,6 @@ public class TagController {
 	// 태그 등록
 	@PostMapping
 	public ResponseEntity<JsendResponse<Void>> addTag(@Valid @RequestBody TagRequest request) {
-
 		tagService.registerTag(request);
 		return ResponseEntity.status(HttpStatus.CREATED).body(JsendResponse.success());
 	}

@@ -24,6 +24,7 @@ import shop.bluebooktle.common.exception.book.PublisherNotFoundException;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class BookPublisherServiceImpl implements BookPublisherService {
 
 	private final BookPublisherRepository bookPublisherRepository;
