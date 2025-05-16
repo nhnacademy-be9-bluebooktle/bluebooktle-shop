@@ -104,7 +104,7 @@ public class BookRegisterServiceImpl implements BookRegisterService {
 		for (String categoryName : request.getCategory()) {
 			Category category = Optional.ofNullable(
 				categoryRepository.findByName(categoryName)
-			).orElseGet(() -> categoryRepository.save(new Category(null, categoryName)));
+			).orElseGet(() -> categoryRepository.save(new Category(null, categoryName, "")));
 			bookCategoryRepository.save(new BookCategory(book, category));
 		}
 
@@ -167,7 +167,7 @@ public class BookRegisterServiceImpl implements BookRegisterService {
 
 		Category category = Optional.ofNullable(
 			categoryRepository.findByName(aladin.getCategoryName())
-		).orElseGet(() -> categoryRepository.save(new Category(null, aladin.getCategoryName())));
+		).orElseGet(() -> categoryRepository.save(new Category(null, aladin.getCategoryName(), "")));
 		bookCategoryRepository.save(new BookCategory(book, category));
 
 		Img img = imgRepository.findByImgUrl(aladin.getImageUrl())

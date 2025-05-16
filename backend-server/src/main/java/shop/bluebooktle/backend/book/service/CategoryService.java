@@ -7,12 +7,15 @@ import org.springframework.data.domain.Pageable;
 
 import shop.bluebooktle.backend.book.dto.request.CategoryRegisterRequest;
 import shop.bluebooktle.backend.book.dto.request.CategoryUpdateRequest;
+import shop.bluebooktle.backend.book.dto.request.RootCategoryRegisterRequest;
 import shop.bluebooktle.backend.book.dto.response.CategoryResponse;
 import shop.bluebooktle.backend.book.dto.response.CategoryTreeResponse;
 
 public interface CategoryService {
 
-	void registerCategory(CategoryRegisterRequest request);
+	void registerCategory(Long parentCategoryId, CategoryRegisterRequest request);
+
+	void registerRootCategory(RootCategoryRegisterRequest request);
 
 	void updateCategory(Long categoryId, CategoryUpdateRequest request);
 

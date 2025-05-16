@@ -1,2 +1,46 @@
-@baseUrl = http://localhost:9002/api/categories/books
+@baseUrl = http://localhost:9002/api/categories/{{categoryId}}
+
+@categoryId = 1
+@bookId = 1
+
+### 도서 등록
+POST http://localhost:9002/api/book/register
+Content-Type: application/json
+
+{
+  "title": "제목",
+  "author": [
+    "작가"
+  ],
+  "publisher": "출판사",
+  "tag": [
+    "태그"
+  ],
+  "imageUrl": [
+    "https://image.aladin.co.kr/product/35650/80/coversum/k762036819_1.jpg"
+  ],
+  "category": [
+    "카테고리"
+  ],
+  "isbn": "9791186560655",
+  "description": "테스트 설명",
+  "publishDate": "2025-05-12",
+  "price": 20000,
+  "salePrice": 18000,
+  "stock": 99,
+  "isPackable": true,
+  "state": "AVAILABLE"
+}
+
+### 카테고리 등록
+POST http://localhost:9002/api/categories
+Content-Type: application/json
+
+{
+  "name": "카테고리1",
+  "parentCategoryId": null
+}
+
+
+
 

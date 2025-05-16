@@ -85,6 +85,7 @@ CREATE TABLE `category` (
 	`category_id`	bigint	NOT NULL AUTO_INCREMENT,
 	`parent_category_id`	bigint	NULL,
 	`name`	varchar(50)	NOT NULL,
+    `category_path` text NOT NULL,
 	`created_at`	timestamp	NOT NULL	DEFAULT CURRENT_TIMESTAMP,
 	`deleted_at`	timestamp	NULL,
 

@@ -72,6 +72,28 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 		bookCategoryRepository.delete(bookCategory);
 	}
 
+	// 해당 도서의 카테고리 수정
+	@Override
+	public void updateBookCategoryByBookCategoryId(Long updatedCategoryId, Long bookCategoryId) {
+		BookCategory bookCategory = bookCategoryRepository.findById(bookCategoryId)
+			.orElseThrow(BookCategoryNotFoundException::new);
+		Category updatedCategory = requireCategory(updatedCategoryId);
+		bookCategory.setCategory(updatedCategory);
+	}
+
+	@Override
+	public void updateBookCategory(Long updatedCategoryId, Long categoryId, Long bookId) {
+		Category category = requireCategory(categoryId);
+		Book book = requireBook(bookId);
+		if (!bookCategoryRepository.existsByBookAndCategory(book, category)) {
+			throw new BookCategoryNotFoundException(book.getId(), category.getId());
+		}
+		Category updatedCategory = requireCategory(updatedCategoryId);
+		BookCategory bookCategory = bookCategoryRepository.findByBookAndCategory(book, category)
+			.orElseThrow(BookCategoryNotFoundException::new);
+		bookCategory.setCategory(updatedCategory);
+	}
+
 	@Override
 	@Transactional(readOnly = true)
 	public List<CategoryResponse> getCategoryByBookId(BookInfoRequest request) {
@@ -84,7 +106,7 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 			Category category = bookCategory.getCategory();
 			result.add(new CategoryResponse(category.getId(), category.getName()));
 		}
-
+		//TODO book_category_id 도 반환해야할 듯
 		return result;
 	}
 
