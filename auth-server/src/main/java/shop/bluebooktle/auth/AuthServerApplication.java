@@ -16,6 +16,5 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 public class AuthServerApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(AuthServerApplication.class, args);
-		System.out.println("TEST");
 	}
 }
