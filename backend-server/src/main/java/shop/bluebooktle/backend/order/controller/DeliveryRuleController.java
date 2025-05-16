@@ -1,5 +1,6 @@
 package shop.bluebooktle.backend.order.controller;
 
+import java.net.URI;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,7 +34,10 @@ public class DeliveryRuleController {
 			request.price(),
 			request.deliveryFee()
 		);
-		return ResponseEntity.ok(JsendResponse.success(rule.getId()));
+		URI location = URI.create("/admin/delivery-rules/" + rule.getId());
+		return ResponseEntity
+			.created(location) // 201 Created + Location header
+			.body(JsendResponse.success(rule.getId()));
 	}
 
 	@GetMapping("/admin/delivery-rules")

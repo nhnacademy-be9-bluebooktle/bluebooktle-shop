@@ -48,7 +48,7 @@ class DeliveryRuleControllerTest {
 		mockMvc.perform(post("/api/admin/delivery-rules")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(request)))
-			.andExpect(status().isOk())
+			.andExpect(status().isCreated())
 			.andExpect(jsonPath("$.status").value("success"));
 
 		verify(deliveryRuleService).createPolicy(anyString(), any(), any());
