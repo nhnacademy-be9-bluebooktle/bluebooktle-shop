@@ -139,7 +139,7 @@ jobs:
             if [ "$BR" = "master" ]; then
               S=prod_startup.sh
             else
-              S=dev_startup.sh
+              S=dev_startup_copy.sh
             fi
             chmod +x ~/$S
             CHANGED_SERVICES="${{ needs.detect_changes.outputs.changed }}"

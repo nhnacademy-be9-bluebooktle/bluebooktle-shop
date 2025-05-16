@@ -17,6 +17,12 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+	private static final String[] SWAGGER_PATHS = {
+		"/swagger-ui/**",
+		"/swagger-ui.html",
+		"/v3/api-docs/**",
+		"/swagger-resources/**",
+	};
 
 	@Bean
 	public PasswordEncoder passwordEncoder() {
@@ -48,6 +54,8 @@ public class SecurityConfig {
 			.formLogin(AbstractHttpConfigurer::disable)
 			.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 			.authorizeHttpRequests(authorize -> authorize
+				.requestMatchers(antMatcher("/actuator/**")).permitAll()
+				.requestMatchers(SWAGGER_PATHS).permitAll()
 				.requestMatchers("/auth/**").permitAll()
 				.anyRequest().authenticated()
 			);
