@@ -4,7 +4,7 @@
       xmlns:th="http://www.thymeleaf.org">
 
 <head>
-    <title>회원가입 (Mock)</title>
+    <title>회원가입</title>
     <style>
         .signup-form-container-kitsch {
             max-width: 650px;
@@ -40,6 +40,10 @@
             margin-bottom: 0.2rem;
         }
 
+        .input-kitsch.error-kitsch {
+            border: 2px solid var(--kitsch-color-3);
+        }
+
         .input-description-kitsch {
             font-family: var(--font-pixel);
             font-size: 0.75rem;
@@ -60,7 +64,6 @@
         .address-group-kitsch .small-btn-kitsch {
             white-space: nowrap;
         }
-
 
         .terms-agreement-kitsch {
             margin-top: 2rem;
@@ -97,12 +100,21 @@
 
         .field-error {
             font-family: var(--font-pixel);
-            color: var(--kitsch-color-3); /* 핫핑크 */
+            color: var(--kitsch-color-3);
             font-size: 0.8rem;
             margin-top: 0.2rem;
-            display: block; /* 이 속성으로 인해 다음 줄로 넘어갑니다 */
+            display: block;
         }
 
+        .global-error-message {
+            color: red;
+            background-color: #ffebee;
+            border: 1px solid red;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            text-align: center;
+        }
     </style>
 </head>
 
@@ -110,119 +122,84 @@
 <div layout:fragment="content">
     <div class="container-kitsch">
         <div class="signup-form-container-kitsch">
-            <h2 class="form-title-kitsch display-font-kitsch"><i class="fas fa-ghost"></i> 회원가입 (Mock Data) <i
+            <h2 class="form-title-kitsch display-font-kitsch"><i class="fas fa-ghost"></i> 회원가입 <i
                     class="fas fa-heart"></i></h2>
 
-            <form action="#" method="post">
+            <div th:if="${error}" class="global-error-message">
+                <strong class="error-kitsch pixel-font-kitsch"
+                        th:text="${errorCode != null ? errorCode + ': ' : ''}"></strong>
+                <span th:text="${errorMessage != null ? errorMessage : '알 수 없는 오류가 발생했습니다.'}"></span>
+            </div>
+
+            <form th:action="@{/signup}" method="post" th:object="${signupRequest}">
                 <div class="form-group-kitsch">
-                    <label class="label-kitsch handwriting-font-kitsch e" for="name">이름:</label>
-                    <input class="input-kitsch pixel-font-kitsch error-kitsch" id="name" name="name"
-                           placeholder="실명을 입력해주세요"
-                           required type="text" value="고길동">
-                    <span class="field-error">이름은 필수 항목입니다.</span>
+                    <label class="label-kitsch handwriting-font-kitsch" for="name">이름<span
+                            class="required-star">*</span></label>
+                    <input class="input-kitsch pixel-font-kitsch" id="name" type="text" th:field="*{name}"
+                           placeholder="실명을 입력해주세요" required
+                           th:errorclass="error-kitsch"/>
+                    <span class="field-error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
                 </div>
 
                 <div class="form-group-kitsch">
-                    <label class="label-kitsch handwriting-font-kitsch" for="memberId">아이디:</label>
-                    <input class="input-kitsch pixel-font-kitsch" id="memberId" name="memberId"
-                           placeholder="영문, 숫자 조합 6~12자"
-                           required type="text" value="user123">
-                    <p class="input-description-kitsch">아이디 중복 확인 기능은 JS로 구현 필요</p>
+                    <label class="label-kitsch handwriting-font-kitsch" for="loginId">아이디<span
+                            class="required-star">*</span></label>
+                    <input class="input-kitsch pixel-font-kitsch" id="loginId" type="text" th:field="*{loginId}"
+                           placeholder="영문, 숫자 조합 4~20자" required minlength="4" maxlength="20"
+                           th:errorclass="error-kitsch"/>
+                    <span class="field-error" th:if="${#fields.hasErrors('loginId')}" th:errors="*{loginId}"></span>
                 </div>
 
                 <div class="form-group-kitsch">
-                    <label class="label-kitsch handwriting-font-kitsch" for="password">비밀번호:</label>
-                    <input class="input-kitsch pixel-font-kitsch" id="password" name="password"
-                           placeholder="영문, 숫자, 특수문자 포함 8자 이상"
-                           required type="password" value="password123!">
+                    <label class="label-kitsch handwriting-font-kitsch" for="password">비밀번호<span
+                            class="required-star">*</span></label>
+                    <input class="input-kitsch pixel-font-kitsch" id="password" type="password" th:field="*{password}"
+                           placeholder="8자 이상 입력해주세요" required
+                           th:errorclass="error-kitsch"/>
+                    <span class="field-error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></span>
                 </div>
 
                 <div class="form-group-kitsch">
-                    <label class="label-kitsch handwriting-font-kitsch" for="passwordConfirm">비밀번호 확인:</label>
-                    <input class="input-kitsch pixel-font-kitsch error-kitsch" id="passwordConfirm"
-                           name="passwordConfirm"
-                           placeholder="비밀번호를 다시 입력해주세요" required type="password"
-                           value="password123!">
-                    <span class="field-error">비밀번호가 일치하지 않습니다. </span>
+                    <label class="label-kitsch handwriting-font-kitsch" for="passwordConfirm">비밀번호 확인<span
+                            class="required-star">*</span></label>
+                    <input class="input-kitsch pixel-font-kitsch" id="passwordConfirm" name="passwordConfirm"
+                           type="password" placeholder="비밀번호를 다시 입력해주세요" required/>
                 </div>
 
                 <div class="form-group-kitsch">
-                    <label class="label-kitsch handwriting-font-kitsch" for="email">이메일:</label>
-                    <input class="input-kitsch pixel-font-kitsch" id="email" name="email"
-                           placeholder="예: blue@booktle.com"
-                           required type="email" value="test@example.com">
-                    <p class="input-description-kitsch">이메일 인증 기능은 추후 구현</p>
+                    <label class="label-kitsch handwriting-font-kitsch" for="email">이메일<span
+                            class="required-star">*</span></label>
+                    <input class="input-kitsch pixel-font-kitsch" id="email" type="email" th:field="*{email}"
+                           placeholder="예: blue@booktle.com" required
+                           th:errorclass="error-kitsch"/>
+                    <span class="field-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
                 </div>
 
                 <div class="form-group-kitsch">
-                    <label class="label-kitsch handwriting-font-kitsch" for="phoneNumber">연락처:</label>
-                    <input class="input-kitsch pixel-font-kitsch" id="phoneNumber" name="phoneNumber"
-                           placeholder="'-' 없이 숫자만 입력"
-                           required type="tel" value="01012345678">
+                    <label class="label-kitsch handwriting-font-kitsch" for="nickname">닉네임<span
+                            class="required-star">*</span></label>
+                    <input class="input-kitsch pixel-font-kitsch" id="nickname" type="text" th:field="*{nickname}"
+                           placeholder="닉네임을 입력해주세요 (20자 이하)" required maxlength="20"
+                           th:errorclass="error-kitsch"/>
+                    <span class="field-error" th:if="${#fields.hasErrors('nickname')}" th:errors="*{nickname}"></span>
                 </div>
 
                 <div class="form-group-kitsch">
-                    <label class="label-kitsch handwriting-font-kitsch" for="birthDate">생년월일:</label>
-                    <input class="input-kitsch pixel-font-kitsch" id="birthDate" name="birthDate" required type="date"
-                           value="1990-05-15">
+                    <label class="label-kitsch handwriting-font-kitsch" for="phoneNumber">연락처<span
+                            class="required-star">*</span></label>
+                    <input class="input-kitsch pixel-font-kitsch" id="phoneNumber" type="tel" th:field="*{phoneNumber}"
+                           placeholder="'-' 없이 숫자만 입력 (11자리)" required maxlength="11"
+                           th:errorclass="error-kitsch"/>
+                    <span class="field-error" th:if="${#fields.hasErrors('phoneNumber')}"
+                          th:errors="*{phoneNumber}"></span>
                 </div>
 
                 <div class="form-group-kitsch">
-                    <label class="label-kitsch handwriting-font-kitsch">주소:</label>
-                    <div class="address-group-kitsch" style="margin-bottom: 0.5rem;">
-                        <input class="input-kitsch pixel-font-kitsch" id="postcode" name="postcode" placeholder="우편번호"
-                               readonly type="text" value="12345">
-                        <button class="btn-kitsch secondary-btn-kitsch color1-kitsch retro-shadow-kitsch-small small-btn-kitsch"
-                                onclick="execDaumPostcode()"
-                                type="button">
-                            우편번호 찾기
-                        </button>
-                    </div>
-                    <input class="input-kitsch pixel-font-kitsch" id="address" name="address" placeholder="도로명 주소"
-                           readonly style="margin-bottom: 0.5rem;" type="text" value="경기도 성남시 분당구 대왕판교로">
-                    <input class="input-kitsch pixel-font-kitsch" id="detailAddress" name="detailAddress"
-                           placeholder="상세주소 입력"
-                           type="text" value="645번길 NHN 플레이뮤지엄">
-                </div>
-
-
-                <div class="terms-agreement-kitsch">
-                    <div class="checkbox-kitsch">
-                        <label>
-                            <input id="agreeAll" name="agreeAll" onchange="checkAllAgreements(this.checked)"
-                                   type="checkbox">
-                            <span class="checkbox-custom-kitsch"></span>
-                            <span style="margin-left: 0.5em; font-weight: bold;">모든 약관에 동의합니다.</span>
-                        </label>
-                    </div>
-                    <hr style="border: 1px dashed var(--kitsch-color-4); margin: 1rem 0;">
-                    <div class="checkbox-kitsch">
-                        <label>
-                            <input checked class="agreement-checkbox" id="termsOfService" name="termsOfService"
-                                   required type="checkbox" value="true">
-                            <span class="checkbox-custom-kitsch"></span>
-                            <span style="margin-left: 0.5em;">[필수] <a class="terms-link-kitsch" target="_blank"
-                                                                      th:href="@{/legal/terms}">이용약관</a>에 동의합니다.</span>
-                        </label>
-                        <span class="field-error" style="margin-left: 25px;">이용약관 동의는 필수입니다.</span>
-                    </div>
-                    <div class="checkbox-kitsch">
-                        <label>
-                            <input class="agreement-checkbox" id="privacyPolicy" name="privacyPolicy" required
-                                   type="checkbox" value="true"> <span class="checkbox-custom-kitsch"></span>
-                            <span style="margin-left: 0.5em;">[필수]
-                                <a class="terms-link-kitsch" target="_blank"
-                                   th:href="@{/legal/privacy}">개인정보 수집 및 이용</a>에 동의합니다.</span>
-                        </label>
-                    </div>
-                    <div class="checkbox-kitsch">
-                        <label>
-                            <input checked class="agreement-checkbox" id="marketingOptIn" name="marketingOptIn"
-                                   type="checkbox" value="true">
-                            <span class="checkbox-custom-kitsch"></span>
-                            <span style="margin-left: 0.5em;">[선택] 마케팅 정보 수신에 동의합니다. (이메일, SMS)</span>
-                        </label>
-                    </div>
+                    <label class="label-kitsch handwriting-font-kitsch" for="birth">생년월일<span
+                            class="required-star">*</span></label>
+                    <input class="input-kitsch pixel-font-kitsch" id="birth" type="text" th:field="*{birth}"
+                           placeholder="생년월일 8자리 (예: 19900515)" required maxlength="8" th:errorclass="error-kitsch"/>
+                    <span class="field-error" th:if="${#fields.hasErrors('birth')}" th:errors="*{birth}"></span>
                 </div>
 
                 <button class="btn-kitsch primary-btn-kitsch retro-shadow-kitsch" style="width: 100%; margin-top: 2rem;"
@@ -235,30 +212,7 @@
 </div>
 
 <th:block layout:fragment="page_scripts">
-    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
     <script>
-        function execDaumPostcode() {
-            new daum.Postcode({
-                oncomplete: function (data) {
-                    var addr = '';
-                    if (data.userSelectedType === 'R') {
-                        addr = data.roadAddress;
-                    } else {
-                        addr = data.jibunAddress;
-                    }
-                    document.getElementById('postcode').value = data.zonecode;
-                    document.getElementById("address").value = addr;
-                    document.getElementById("detailAddress").focus();
-                }
-            }).open();
-        }
-
-        function checkAllAgreements(isAllChecked) {
-            document.querySelectorAll('.agreement-checkbox').forEach(function (checkbox) {
-                checkbox.checked = isAllChecked;
-            });
-        }
-
         document.querySelectorAll('.agreement-checkbox').forEach(function (checkbox) {
             checkbox.addEventListener('change', function () {
                 let allRequiredChecked = true;
@@ -267,23 +221,10 @@
                         allRequiredChecked = false;
                     }
                 });
-                // 모든 '필수' 항목이 체크되었는지 여부만으로 '모두 동의'를 결정
                 document.getElementById('agreeAll').checked = allRequiredChecked;
-
-                // 만약 선택 항목까지 모두 동의해야 '모두 동의'가 체크되도록 하려면 아래 로직 사용
-                /*
-                let allAgreementsChecked = true;
-                 document.querySelectorAll('.agreement-checkbox').forEach(function(cb) {
-                    if (!cb.checked) {
-                        allAgreementsChecked = false;
-                    }
-                });
-                document.getElementById('agreeAll').checked = allAgreementsChecked;
-                */
             });
         });
 
-        // 페이지 로드 시 초기 '모두 동의' 상태 설정
         window.addEventListener('DOMContentLoaded', (event) => {
             let allRequiredCheckedInitially = true;
             document.querySelectorAll('.agreement-checkbox[required]').forEach(function (reqCheckbox) {
@@ -291,12 +232,22 @@
                     allRequiredCheckedInitially = false;
                 }
             });
-            document.getElementById('agreeAll').checked = allRequiredCheckedInitially;
+            // document.getElementById('agreeAll').checked = allRequiredCheckedInitially;
 
-            // Mock 데이터로 인해 privacyPolicy가 체크 안된 상태이므로, 모두 동의는 초기에 체크 해제되어야 함.
-            // 만약 privacyPolicy도 checked라면 이 코드는 true로 설정함.
+            const passwordInput = document.getElementById('password');
+            const passwordConfirmInput = document.getElementById('passwordConfirm');
+            const form = document.querySelector('form[th\\:action="@{/signup}"]');
+
+            if (form && passwordInput && passwordConfirmInput) {
+                form.addEventListener('submit', function (event) {
+                    if (passwordInput.value !== passwordConfirmInput.value) {
+                        alert('비밀번호와 비밀번호 확인이 일치하지 않습니다.');
+                        passwordConfirmInput.focus();
+                        event.preventDefault();
+                    }
+                });
+            }
         });
-
     </script>
 </th:block>
 

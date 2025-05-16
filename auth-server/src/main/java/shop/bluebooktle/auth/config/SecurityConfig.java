@@ -17,6 +17,7 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
 	private static final String[] SWAGGER_PATHS = {
 		"/swagger-ui/**",
 		"/swagger-ui.html",
