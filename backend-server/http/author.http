@@ -3,7 +3,10 @@ POST http://localhost:9012/api/authors
 Content-Type: application/json
 
 {
-  "name": "홍길동"
+  "name": "문소연",
+  "authorKey": "문소연_authorKey",
+  "description": "문소연_description"
+
 }
 
 ### 특정 작가 조회
@@ -14,7 +17,9 @@ PUT http://localhost:9012/api/authors/1
 Content-Type: application/json
 
 {
-  "name": "김영희"
+  "name": "곰소연",
+  "authorKey": "곰소연_authorKey",
+  "description": "곰소연_description"
 }
 
 ### 작가 삭제

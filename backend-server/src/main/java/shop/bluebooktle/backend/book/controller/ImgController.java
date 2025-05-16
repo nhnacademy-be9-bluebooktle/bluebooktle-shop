@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.book.dto.request.img.ImgRegisterRequest;
 import shop.bluebooktle.backend.book.dto.request.img.ImgUpdateRequest;
@@ -25,7 +26,7 @@ public class ImgController {
 	// 이미지 생성
 	@PostMapping
 	public JsendResponse<Void> registerImg(
-		@RequestBody ImgRegisterRequest imgRegisterRequest
+		@Valid @RequestBody ImgRegisterRequest imgRegisterRequest
 	) {
 		imgService.registerImg(imgRegisterRequest);
 		return JsendResponse.success();
@@ -44,7 +45,7 @@ public class ImgController {
 	@PutMapping("/{id}")
 	public JsendResponse<Void> updateImg(
 		@PathVariable Long id,
-		@RequestBody ImgUpdateRequest imgUpdateRequest
+		@Valid @RequestBody ImgUpdateRequest imgUpdateRequest
 	) {
 		imgService.updateImg(id, imgUpdateRequest);
 		return JsendResponse.success();
