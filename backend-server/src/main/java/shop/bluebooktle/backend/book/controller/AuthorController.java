@@ -1,5 +1,7 @@
 package shop.bluebooktle.backend.book.controller;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -9,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.book.dto.request.author.AuthorRegisterRequest;
 import shop.bluebooktle.backend.book.dto.request.author.AuthorUpdateRequest;
@@ -20,42 +23,43 @@ import shop.bluebooktle.common.dto.common.JsendResponse;
 @RequestMapping("/api/authors")
 @RequiredArgsConstructor
 public class AuthorController {
+
 	private final AuthorService authorService;
 
 	// 작가 생성
 	@PostMapping
-	public JsendResponse<Void> registerAuthor(
-		@RequestBody AuthorRegisterRequest authorRegisterRequest
+	public ResponseEntity<JsendResponse<Void>> registerAuthor(
+		@Valid @RequestBody AuthorRegisterRequest authorRegisterRequest
 	) {
 		authorService.registerAuthor(authorRegisterRequest);
-		return JsendResponse.success();
+		return ResponseEntity.status(HttpStatus.CREATED).body(JsendResponse.success());
 	}
 
 	// 작가 조회
 	@GetMapping("/{id}")
-	public JsendResponse<AuthorResponse> getAuthor(
+	public ResponseEntity<JsendResponse<AuthorResponse>> getAuthor(
 		@PathVariable Long id
 	) {
 		AuthorResponse authorResponse = authorService.getAuthor(id);
-		return JsendResponse.success(authorResponse);
+		return ResponseEntity.ok(JsendResponse.success(authorResponse));
 	}
 
 	// 작가 수정
 	@PutMapping("/{id}")
-	public JsendResponse<Void> updateAuthor(
+	public ResponseEntity<JsendResponse<Void>> updateAuthor(
 		@PathVariable Long id,
-		@RequestBody AuthorUpdateRequest authorUpdateRequest
+		@Valid @RequestBody AuthorUpdateRequest authorUpdateRequest
 	) {
 		authorService.updateAuthor(id, authorUpdateRequest);
-		return JsendResponse.success();
+		return ResponseEntity.ok(JsendResponse.success());
 	}
 
 	// 작가 삭제
 	@DeleteMapping("/{id}")
-	public JsendResponse<Void> deleteAuthor(
+	public ResponseEntity<JsendResponse<Void>> deleteAuthor(
 		@PathVariable Long id
 	) {
 		authorService.deleteAuthor(id);
-		return JsendResponse.success();
+		return ResponseEntity.ok(JsendResponse.success());
 	}
 }

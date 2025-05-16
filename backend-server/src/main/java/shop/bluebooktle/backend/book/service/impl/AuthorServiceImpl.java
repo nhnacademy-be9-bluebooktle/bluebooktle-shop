@@ -23,60 +23,88 @@ public class AuthorServiceImpl implements AuthorService {
 	@Transactional
 	@Override
 	public void registerAuthor(AuthorRegisterRequest authorRegisterRequest) {
-		if (authorRegisterRequest.getName() == null || authorRegisterRequest.getName().trim().isEmpty()) {
-			throw new AuthorNameEmptyException();
-		}
-		if (!authorRepository.findByName(authorRegisterRequest.getName()).isEmpty()) {
-			throw new AuthorAlreadyExistsException(authorRegisterRequest.getName());
+
+		String name = authorRegisterRequest.getName();
+		String description = authorRegisterRequest.getDescription();
+		String authorKey = authorRegisterRequest.getAuthorKey();
+
+		if (name == null || description == null || authorKey == null) {
+			throw new RuntimeException(); // TODO #1
 		}
 
-		Author author = Author.builder().name(authorRegisterRequest.getName()).build();
+		if (name.trim().isEmpty() || description.trim().isEmpty() || authorKey.trim().isEmpty()) {
+			throw new RuntimeException(); // TODO #2
+		}
+
+		Author author = Author.builder()
+			.name(authorRegisterRequest.getName())
+			.description(authorRegisterRequest.getDescription())
+			.authorKey(authorRegisterRequest.getAuthorKey())
+			.build();
 
 		authorRepository.save(author);
 	}
 
-	@Transactional(readOnly = true)
+	@Transactional
 	@Override
 	public AuthorResponse getAuthor(Long authorId) {
+
 		if (authorId == null) {
-			throw new AuthorIdNullException();
+			throw new RuntimeException(); // TODO #3
 		}
 
-		Author author = authorRepository.findById(authorId).orElseThrow(() -> new IllegalArgumentException("Author not found"));
+		Author author = authorRepository.findById(authorId).orElseThrow(() -> new RuntimeException()); // TODO #4
 
-		AuthorResponse authorResponse = AuthorResponse.builder()
+		return AuthorResponse.builder()
 			.id(author.getId())
 			.name(author.getName())
+			.description(author.getDescription())
+			.authorKey(author.getAuthorKey())
+			.createdAt(author.getCreatedAt())
 			.build();
-
-		return authorResponse;
 	}
 
 	@Transactional
 	@Override
 	public void updateAuthor(Long authorId, AuthorUpdateRequest authorUpdateRequest) {
+
+		String name = authorUpdateRequest.getName();
+		String description = authorUpdateRequest.getDescription();
+		String authorKey = authorUpdateRequest.getAuthorKey();
+
 		if (authorId == null) {
-			throw new AuthorIdNullException();
-		}
-		if (authorUpdateRequest.getName() == null || authorUpdateRequest.getName().trim().isEmpty()) {
-			throw new AuthorNameEmptyException();
+			throw new RuntimeException(); // TODO #5
 		}
 
-		Author author = authorRepository.findById(authorId).orElseThrow(() -> new IllegalArgumentException("Author not found"));
+		if ((name == null || name.trim().isEmpty()) &&
+			(description == null || description.trim().isEmpty()) &&
+			(authorKey == null || authorKey.trim().isEmpty())) {
+			throw new RuntimeException(); // TODO #6
+		}
 
-		author.setName(authorUpdateRequest.getName());
+		Author author = authorRepository.findById(authorId).orElseThrow(() -> new RuntimeException()); // TODO #7
+
+		if (name != null) {
+			author.setName(name);
+		}
+		if (description != null) {
+			author.setDescription(description);
+		}
+		if (authorKey != null) {
+			author.setAuthorKey(authorKey);
+		}
 
 		authorRepository.save(author);
+
 	}
 
 	@Transactional
 	@Override
 	public void deleteAuthor(Long authorId) {
 		if (authorId == null) {
-			throw new AuthorIdNullException();
+			throw new RuntimeException(); // TODO #8
 		}
-		// Author author = authorRepository.findById(authorId).orElseThrow(() -> new IllegalArgumentException("Author not found"));
-		// authorRepository.delete(author);
-		authorRepository.deleteById(authorId);
+		Author author = authorRepository.findById(authorId).orElseThrow(() -> new RuntimeException()); // TODO #9
+		authorRepository.delete(author);
 	}
 }
