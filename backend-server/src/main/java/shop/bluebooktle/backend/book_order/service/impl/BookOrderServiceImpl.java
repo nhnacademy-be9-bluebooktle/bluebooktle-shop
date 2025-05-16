@@ -11,7 +11,7 @@ import shop.bluebooktle.backend.book_order.repository.BookOrderRepository;
 import shop.bluebooktle.backend.book_order.service.BookOrderService;
 import shop.bluebooktle.backend.order.entity.Order;
 import shop.bluebooktle.backend.order.repository.OrderRepository;
-import shop.bluebooktle.common.dto.book_order.request.BookOrderRequest;
+import shop.bluebooktle.common.dto.book_order.request.BookOrderRegisterRequest;
 import shop.bluebooktle.common.dto.book_order.request.BookOrderUpdateRequest;
 import shop.bluebooktle.common.dto.book_order.response.BookOrderResponse;
 import shop.bluebooktle.common.exception.book.BookNotFoundException;
@@ -28,7 +28,7 @@ public class BookOrderServiceImpl implements BookOrderService {
 
 	/** 도서 주문 생성 */
 	@Override
-	public BookOrderResponse createBookOrder(BookOrderRequest request) {
+	public BookOrderResponse createBookOrder(BookOrderRegisterRequest request) {
 		Order order = orderRepository.findById(request.getOrderId())
 			.orElseThrow(OrderNotFoundException::new);
 		Book book = bookRepository.findById(request.getBookId())
@@ -69,8 +69,8 @@ public class BookOrderServiceImpl implements BookOrderService {
 
 	/** 도서 주문 수정 */
 	@Override
-	public BookOrderResponse updateBookOrder(BookOrderUpdateRequest request) {
-		BookOrder order = bookOrderRepository.findByIdAndDeletedAtIsNull(request.getBookOrderId())
+	public BookOrderResponse updateBookOrder(Long bookOrderId, BookOrderUpdateRequest request) {
+		BookOrder order = bookOrderRepository.findByIdAndDeletedAtIsNull(bookOrderId)
 			.orElseThrow(BookOrderNotFoundException::new);
 
 		order.setQuantity(request.getQuantity());

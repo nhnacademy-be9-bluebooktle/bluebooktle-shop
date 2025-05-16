@@ -79,6 +79,7 @@ public enum ErrorCode {
 	G_PACKAGING_QUANTITY_EXCEEDS_BOOK_ORDER(HttpStatus.BAD_REQUEST, "G009", "포장 수량은 도서 주문 수량을 초과할 수 없습니다."),
 	G_ORDER_PACKAGING_DELETE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "G010", "포장 정보 삭제 중 오류가 발생했습니다."),
 	G_ORDER_PACKAGING_OPTION_NOT_FOUND(HttpStatus.NOT_FOUND, "G011", "주문 포장 옵션을 찾을 수 없습니다."),
+	G_PACKAGING_ALREADY_EXISTS(HttpStatus.CONFLICT, "G012", "동일한 이름과 가격의 포장 옵션이 이미 존재합니다."),
 
 	// Cart Errors (장바구니 오류) - T (TeaCart)
 	CART_NOT_FOUND(HttpStatus.NOT_FOUND, "T001", "장바구니를 찾을 수 없습니다."), // 예외적인 경우
