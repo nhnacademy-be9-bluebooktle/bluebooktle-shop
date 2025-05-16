@@ -15,10 +15,10 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -38,7 +38,7 @@ import shop.bluebooktle.common.entity.BaseEntity;
 public class Refund extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "return_id")
+	@Column(name = "refund_id")
 	private Long id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -49,18 +49,29 @@ public class Refund extends BaseEntity {
 	private LocalDateTime date;
 
 	@Column(name = "reason", nullable = false)
+	@Enumerated(EnumType.STRING)
 	private RefundReason reason;
 
 	//TODO @Lob이 mysql에서 TEXT type인지 확인
-	@Lob
-	@Column(name = "reason_detail", nullable = false)
+	@Column(name = "reason_detail", columnDefinition = "TEXT", nullable = false)
 	private String reasonDetail;
 
-	@Enumerated(EnumType.STRING)
 	@Column(name = "status", nullable = false)
+	@Enumerated(EnumType.STRING)
 	private RefundStatus status;
 
 	@Column(name = "price", nullable = false, precision = 10, scale = 2)
 	private BigDecimal price;
+
+	@Builder
+	public Refund(Order order, LocalDateTime date, RefundReason reason, String reasonDetail,
+		RefundStatus status, BigDecimal price) {
+		this.order = order;
+		this.date = date;
+		this.reason = reason;
+		this.reasonDetail = reasonDetail;
+		this.status = status;
+		this.price = price;
+	}
 
 }

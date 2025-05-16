@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<footer class="site-footer-kitsch" th:fragment="footerFragment">
+    <div class="container-kitsch footer-content-kitsch">
+        <div class="footer-logo-area-kitsch">
+            <a class="logo-link-kitsch" th:href="@{/}">
+                <h2 class="logo-main-kitsch display-font-kitsch">Blue<span class="logo-alt-color-kitsch">Book</span>tle
+                </h2>
+            </a>
+            <p class="handwriting-font-kitsch">즐거운 책 읽기, 키치한 스타일로!</p>
+        </div>
+        <div class="footer-links-kitsch">
+            <a th:href="@{/legal/terms}">이용약관</a>
+            <a th:href="@{/legal/privacy}">개인정보처리방침</a>
+            <a th:href="@{/support/faq}">고객센터</a>
+        </div>
+        <div class="footer-social-kitsch">
+            <a href="#" target="_blank" title="Instagram"><i class="fab fa-instagram"></i></a>
+            <a href="#" target="_blank" title="Twitter"><i class="fab fa-twitter"></i></a>
+            <a href="#" target="_blank" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+        </div>
+        <div class="footer-copyright-kitsch pixel-font-kitsch">
+            &copy; <span th:text="${#dates.year(#dates.createNow())}">2024</span> Bluebooktle. All Rights Reserved.
+        </div>
+    </div>
+</footer>
+</body>
+</html>

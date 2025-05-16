@@ -12,12 +12,15 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import shop.bluebooktle.common.entity.BaseEntity;
 
 @Getter
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "packaging_option")
@@ -36,4 +39,10 @@ public class PackagingOption extends BaseEntity {
 
 	@Column(name = "price", nullable = false, precision = 10, scale = 2)
 	private BigDecimal price;
+
+	@Builder
+	public PackagingOption(String name, BigDecimal price) {
+		this.name = name;
+		this.price = price;
+	}
 }

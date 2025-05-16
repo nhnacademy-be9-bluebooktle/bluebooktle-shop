@@ -1,5 +1,6 @@
 package shop.bluebooktle.backend.book.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -9,6 +10,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,12 +21,13 @@ import lombok.ToString;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString(exclude = {"book, publisher"})
-@EqualsAndHashCode(of = "bookPublisherId", callSuper = false)
+@EqualsAndHashCode(of = "id", callSuper = false)
 public class BookPublisher {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long bookPublisherId;
+	@Column(name = "book_publisher_id")
+	private Long id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "book_id", nullable = false)
@@ -34,6 +37,7 @@ public class BookPublisher {
 	@JoinColumn(name = "publisher_id", nullable = false)
 	private Publisher publisher;
 
+	@Builder
 	public BookPublisher(Book book, Publisher publisher) {
 		this.book = book;
 		this.publisher = publisher;

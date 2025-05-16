@@ -14,11 +14,12 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import shop.bluebooktle.backend.user.entity.User;
+import shop.bluebooktle.common.entity.auth.User;
 
 @Entity
 @Table(name = "payment_point_history")
@@ -46,4 +47,10 @@ public class PaymentPointHistory {
 	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id", nullable = false, unique = true)
 	private User user;
+
+	@Builder
+	public PaymentPointHistory(Payment payment, User user) {
+		this.payment = payment;
+		this.user = user;
+	}
 }

@@ -3,7 +3,6 @@ package shop.bluebooktle.backend.book.entity;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
@@ -13,7 +12,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import shop.bluebooktle.backend.user.entity.User;
+import shop.bluebooktle.common.entity.auth.User;
 
 @Entity
 @Table(name = "book_likes")
@@ -38,6 +37,6 @@ public class BookLikes {
 	public BookLikes(Book book, User user) {
 		this.book = book;
 		this.user = user;
-		this.id = new BookLikesId(book.getBookId(), user.getUserId());
+		this.id = new BookLikesId(book.getId(), user.getId());
 	}
 }

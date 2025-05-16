@@ -16,17 +16,21 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import shop.bluebooktle.common.entity.BaseEntity;
 
 @Entity
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder(toBuilder = true)
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "book_sale_info")
-@EqualsAndHashCode(of = {"bookSaleInfoId"}, callSuper = false)
+@EqualsAndHashCode(of = "id", callSuper = false)
 @SQLDelete(sql = "UPDATE book_sale_info SET deleted_at = CURRENT_TIMESTAMP WHERE book_sale_info_id = ?")
 @SQLRestriction("deleted_at IS NULL")
 public class BookSaleInfo extends BaseEntity {
@@ -52,23 +56,24 @@ public class BookSaleInfo extends BaseEntity {
 	@Column(name = "is_packable")
 	private boolean isPackable;
 
+	@Setter
 	@Column(name = "sale_percentage", nullable = false, precision = 10, scale = 2)
 	private BigDecimal salePercentage;
 
+	@Builder.Default
 	@Column(name = "state")
 	@Enumerated(EnumType.STRING)
 	private State state = State.AVAILABLE;
 
-	@Column(name = "view_count", nullable = false, columnDefinition = "BIGINT DEFALUT 0")
-	private Long viewCount;
+	@Builder.Default
+	@Column(name = "view_count", nullable = false, columnDefinition = "BIGINT DEFAULT 0")
+	private Long viewCount = 0L;
 
-	@Column(name = "search_count", nullable = false, columnDefinition = "BIGINT DEFALUT 0")
-	private Long searchCount;
+	@Builder.Default
+	@Column(name = "search_count", nullable = false, columnDefinition = "BIGINT DEFAULT 0")
+	private Long searchCount = 0L;
 
 	public enum State {
-		AVAILABLE,
-		LOW_STOCK,
-		SALE_ENDED,
-		DELETED
+		AVAILABLE, LOW_STOCK, SALE_ENDED, DELETED
 	}
 }

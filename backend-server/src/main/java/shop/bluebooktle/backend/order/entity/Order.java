@@ -1,9 +1,11 @@
 package shop.bluebooktle.backend.order.entity;
 
 import java.math.BigDecimal;
+import java.sql.Types;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
@@ -17,19 +19,20 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import shop.bluebooktle.backend.user.entity.User;
+import shop.bluebooktle.common.entity.auth.User;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "order")
+@Table(name = "orders")
 @EqualsAndHashCode(of = "id", callSuper = false)
 @ToString(exclude = {"orderState", "deliveryRule"})
-@SQLDelete(sql = "UPDATE order SET deleted_at = CURRENT_TIMESTAMP WHERE order_id = ?")
+@SQLDelete(sql = "UPDATE orders SET deleted_at = CURRENT_TIMESTAMP WHERE order_id = ?")
 @SQLRestriction("deleted_at IS NULL")
 public class Order {
 
@@ -89,6 +92,33 @@ public class Order {
 	@Column(name = "deleted_at")
 	private LocalDateTime deletedAt;
 
-	@Column(name = "order_key")
+	@Column(name = "order_key", length = 36)
+	@JdbcTypeCode(Types.VARCHAR)
 	private UUID orderKey;
+
+	@Builder
+	public Order(OrderState orderState, DeliveryRule deliveryRule, User user, LocalDateTime orderDate,
+		LocalDateTime requestedDeliveryDate, LocalDateTime shippedAt, BigDecimal deliveryFee, String ordererName,
+		String ordererPhoneNumber, String receiverName, String receiverPhoneNumber, String address,
+		String detailAddress, String postalCode, String trackingNumber) {
+		this.orderState = orderState;
+		this.deliveryRule = deliveryRule;
+		this.user = user;
+		this.orderDate = orderDate;
+		this.requestedDeliveryDate = requestedDeliveryDate;
+		this.shippedAt = shippedAt;
+		this.deliveryFee = deliveryFee;
+		this.ordererName = ordererName;
+		this.ordererPhoneNumber = ordererPhoneNumber;
+		this.receiverName = receiverName;
+		this.receiverPhoneNumber = receiverPhoneNumber;
+		this.address = address;
+		this.detailAddress = detailAddress;
+		this.postalCode = postalCode;
+		this.trackingNumber = trackingNumber;
+	}
+
+	public void changeOrderState(OrderState newState) {
+		this.orderState = newState;
+	}
 }

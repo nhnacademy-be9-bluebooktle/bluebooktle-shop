@@ -1,0 +1,78 @@
+### 쿠폰 정책 등록 - 1 (주문 관련 쿠폰)
+POST localhost:9002/api/admin/coupon-type
+Content-Type: application/json
+
+{
+  "name": "10,000원 이상 구매 시 1,000원 할인",
+  "target": "ORDER",
+  "minimumPayment": 10000,
+  "discountPrice": 1000,
+  "discountPercent": null,
+  "maximumDiscountPrice": null
+}
+
+### 쿠폰 정책 조회 (주문 관련 쿠폰)
+GET localhost:9002/api/admin/coupon-type
+
+### 쿠폰 등록 - 1 (주문 관련 쿠폰)
+POST localhost:9002/api/admin/coupons
+Content-Type: application/json
+
+{
+  "couponTypeId": 1,
+  "name": "Welcome 쿠폰",
+  "bookId": null,
+  "categoryId": null
+}
+
+
+### 쿠폰 조회 - 1 (주문 관련 쿠폰)
+GET localhost:9002/api/admin/coupons
+
+### 쿠폰 수정 - 1 (주문 관련 쿠폰)
+PATCH localhost:9002/api/admin/coupon/1
+Content-Type: application/json
+
+{
+  "name": "변경된 쿠폰 이름",
+  "bookId": null,
+  "categoryId": null
+}
+
+### 쿠폰 삭제 - 1 (주문 관련 쿠폰)
+DELETE localhost:9002/api/admin/coupon/1
+
+
+### 쿠폰 정책 등록 - 2 (특정 도서 관련 쿠폰)
+POST localhost:9002/api/admin/coupon-type
+Content-Type: application/json
+
+{
+  "name": "20,000원 이상 구매시 20% 할인 (최대 5,000원)",
+  "target": "BOOK",
+  "minimumPayment": 20000,
+  "discountPrice": null,
+  "discountPercent": 20,
+  "maximumDiscountPrice": 5000
+}
+
+### 특정 도서 쿠폰 등록
+POST localhost:9002/api/admin/coupons
+Content-Type: application/json
+
+{
+  "couponTypeId": 2,
+  "name": "'IT 척척박사' 전용 쿠폰",
+  "bookId": 101,
+  "categoryId": null
+}
+
+### 특정 도서 쿠폰 수정 - 도서만 변경
+PATCH localhost:9002/api/admin/coupon/10
+Content-Type: application/json
+
+{
+  "name": "'IT 척척박사' 전용 쿠폰",
+  "bookId": 102,
+  "categoryId": null
+}

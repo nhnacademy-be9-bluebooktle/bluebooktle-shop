@@ -13,13 +13,16 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 import shop.bluebooktle.common.entity.BaseEntity;
 
 @Getter
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "order_packaging")
@@ -45,4 +48,10 @@ public class OrderPackaging extends BaseEntity {
 	@Column(name = "quantity", nullable = false)
 	private Integer quantity;
 
+	@Builder
+	public OrderPackaging(PackagingOption packagingOption, BookOrder bookOrder, Integer quantity) {
+		this.packagingOption = packagingOption;
+		this.bookOrder = bookOrder;
+		this.quantity = quantity;
+	}
 }

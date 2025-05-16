@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html layout:decorate="~{_layouts/default_layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>메인 페이지</title>
+    <style>
+        .hero-section-main {
+            background-color: var(--kitsch-color-4);
+            color: var(--kitsch-text-light);
+            padding: 3rem 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            border-bottom: 4px solid var(--kitsch-text-dark);
+        }
+
+        .search-bar-main {
+            margin: 2rem 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .search-bar-main .input-kitsch {
+            max-width: 400px;
+            font-size: 1.1rem;
+            /* 검색창 플레이스홀더에 픽셀 폰트 적용 (CSS에서 처리하는 것이 더 좋음) */
+            /* font-family: var(--font-pixel); */
+        }
+
+        .search-bar-main .input-kitsch::placeholder { /* 플레이스홀더 폰트 적용 */
+            font-family: var(--font-pixel);
+            color: var(--kitsch-text-dark);
+            opacity: 0.7;
+        }
+
+        .search-bar-main .btn-kitsch {
+            font-size: 1.1rem;
+        }
+
+        /* 추가: 도서 저자명에 픽셀 폰트 적용하는 클래스 */
+        .book-author-pixel {
+            font-family: var(--font-pixel);
+            font-size: 0.9rem; /* 기존 author보다 약간 크게 */
+            color: var(--kitsch-color-5); /* 다른 색상으로 강조 */
+        }
+    </style>
+</head>
+<body>
+<div layout:fragment="content">
+    <main class="site-main-kitsch">
+
+        <section class="category-zone-kitsch section-padding-kitsch">
+            <div class="hero-bg-pattern-kitsch"></div>
+            <div class="container-kitsch">
+                <div class="category-flex-kitsch">
+                    <a class="category-bubble-kitsch pixel-font-kitsch retro-shadow-kitsch-small color1-kitsch"
+                       href="/categories/1">
+                        <i class="fas fa-quidditch"></i> 문학
+                    </a>
+                    <a class="category-bubble-kitsch pixel-font-kitsch retro-shadow-kitsch-small color2-kitsch"
+                       href="/categories/2">
+                        <i class="fas fa-ghost"></i> 픽셀 아트
+                    </a>
+                    <a class="category-bubble-kitsch pixel-font-kitsch retro-shadow-kitsch-small color4-kitsch"
+                       href="/categories/3">
+                        <i class="fas fa-gamepad"></i> 레트로 게임
+                    </a>
+                    <a class="category-bubble-kitsch pixel-font-kitsch retro-shadow-kitsch-small color5-kitsch"
+                       href="/categories/4">
+                        <i class="fas fa-palette"></i> 컬러풀 디자인
+                    </a>
+                    <a class="category-bubble-kitsch pixel-font-kitsch retro-shadow-kitsch-small color1-kitsch"
+                       href="/categories/5">
+                        <i class="fas fa-cut"></i> DIY & 공예
+                    </a>
+                    <a class="category-bubble-kitsch pixel-font-kitsch retro-shadow-kitsch-small color2-kitsch"
+                       href="/categories/6">
+                        <i class="fas fa-hat-wizard"></i> 판타지 소설
+                    </a>
+                </div>
+            </div>
+        </section>
+
+
+        <section class="section-padding-kitsch">
+            <div class="container-kitsch">
+                <div class="section-header-kitsch">
+                    <h2 class="section-title-kitsch display-font-kitsch">추천 도서 <i
+                            class="fas fa-star highlight-pink-kitsch"></i></h2>
+                    <p class="pixel-font-kitsch"
+                       style="margin-top: 0.5rem; font-size: 1.1em; color: var(--kitsch-color-1);">매일매일 새로운 도서
+                        업데이트!</p>
+                </div>
+                <div class="book-grid-kitsch featured-grid-kitsch">
+                    <div class="book-item-kitsch">
+                        <a class="book-link-kitsch" href="/books/1">
+                            <div class="book-cover-wrap-kitsch">
+                                <img alt="도서 표지" class="book-cover-kitsch"
+                                     src="https://picsum.photos/255/484?random=101">
+
+                                <div class="book-hover-overlay-kitsch">
+                                    <i class="fas fa-search-plus"></i>
+                                    <p class="pixel-font-kitsch">상세 보기</p>
+                                </div>
+                                <span class="sticker-new-kitsch pixel-font-kitsch">NEW</span>
+                            </div>
+                            <div class="book-info-kitsch">
+                                <h3 class="book-title-kitsch pixel-font-kitsch"
+                                    style="font-size: 1.2rem; color: var(--kitsch-color-4);">코딩 대모험</h3>
+                                <p class="book-author-kitsch book-author-pixel">글쓴이: 나코딩</p>
+                                <p class="book-price-kitsch pixel-font-kitsch">25,000원 <span
+                                        class="original-price-kitsch pixel-font-kitsch" style="font-size: 0.8em;">28,000원</span>
+                                </p>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="book-item-kitsch tilt-right-kitsch">
+                        <a class="book-link-kitsch" href="/books/2">
+                            <div class="book-cover-wrap-kitsch">
+                                <img alt="도서 표지" class="book-cover-kitsch"
+                                     src="https://picsum.photos/255/484?random=102">
+                                <div class="book-hover-overlay-kitsch">
+                                    <i class="fas fa-search-plus"></i>
+                                    <p class="pixel-font-kitsch">상세 보기</p>
+                                </div>
+                                <span class="sticker-hot-kitsch display-font-kitsch">HOT</span>
+                            </div>
+                            <div class="book-info-kitsch">
+                                <h3 class="book-title-kitsch pixel-font-kitsch"
+                                    style="font-size: 1.2rem; color: var(--kitsch-color-4);">레트로 픽셀 아트북</h3>
+                                <p class="book-author-kitsch book-author-pixel">만든이: 박도트</p>
+                                <p class="book-price-kitsch pixel-font-kitsch highlight-pink-kitsch">18,000원</p>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="book-item-kitsch">
+                        <a class="book-link-kitsch" href="/books/3">
+                            <div class="book-cover-wrap-kitsch">
+                                <img alt="도서 표지" class="book-cover-kitsch"
+                                     src="https://picsum.photos/255/484?random=103">
+                                <div class="book-hover-overlay-kitsch">
+                                    <i class="fas fa-search-plus"></i>
+                                    <p class="pixel-font-kitsch">상세 보기</p>
+                                </div>
+                            </div>
+                            <div class="book-info-kitsch">
+                                <h3 class="book-title-kitsch pixel-font-kitsch"
+                                    style="font-size: 1.2em; color: var(--kitsch-color-4);">알록달록 웹디자인</h3>
+                                <p class="book-author-kitsch">김컬러 그림</p>
+                                <p class="book-price-kitsch pixel-font-kitsch">32,000원</p>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="book-item-kitsch tilt-left-kitsch">
+                        <a class="book-link-kitsch" href="/books/4">
+                            <div class="book-cover-wrap-kitsch">
+                                <img alt="도서 표지" class="book-cover-kitsch"
+                                     src="https://picsum.photos/255/484?random=104">
+                                <div class="book-hover-overlay-kitsch">
+                                    <i class="fas fa-search-plus"></i>
+                                    <p class="pixel-font-kitsch">상세 보기</p>
+                                </div>
+                            </div>
+                            <div class="book-info-kitsch">
+                                <h3 class="book-title-kitsch pixel-font-kitsch"
+                                    style="font-size: 1.2rem; color: var(--kitsch-color-4);">나만의 작은 정원 만들기</h3>
+                                <p class="book-author-kitsch">이가든 글/사진</p>
+                                <p class="book-price-kitsch pixel-font-kitsch highlight-cyan-kitsch">21,500원 <span
+                                        class="original-price-kitsch pixel-font-kitsch" style="font-size: 0.8em;">23,000원</span>
+                                </p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="hero-section-main">
+            <div class="hero-bg-pattern-kitsch"></div>
+            <div class="container-kitsch hero-content-kitsch">
+                <h2 class="hero-title-kitsch display-font-kitsch">오늘의 <span class="highlight-pink-kitsch">도서</span>
+                    발견!</h2>
+                <p class="hero-subtitle-kitsch pixel-font-kitsch" style="font-size: 1.3em; line-height: 1.5;">지금 바로
+                    Bluebooktle에서 특별하고 재미난 책들을 만나보세요!</p>
+                <form action="/books" class="search-bar-main" method="get">
+                    <input class="input-kitsch retro-shadow-kitsch-small" name="query" placeholder="어떤 책을 찾으세요?"
+                           type="text">
+                    <button class="btn-kitsch primary-btn-kitsch retro-shadow-kitsch" type="submit"><i
+                            class="fas fa-search"></i> 검색
+                    </button>
+                </form>
+            </div>
+        </section>
+
+
+    </main>
+</div>
+
+<th:block layout:fragment="page_scripts">
+    <script>
+        // console.log("메인 페이지 스크립트 로드됨");
+    </script>
+</th:block>
+</body>
+</html>

@@ -1,0 +1,119 @@
+@baseUrl = http://localhost:9002/api/categories
+
+@category1 = 1
+@category1_1 = 2
+@category1_2 = 5
+
+### 카테고리 트리 구조 조회
+GET {{baseUrl}}/tree
+Accept: application/json
+
+### 최상위 카테고리 등록 1
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+  "rootCategoryName": "카테고리1",
+  "childCategoryName": "카테고리1_1"
+}
+
+### 최상위 카테고리 등록 실패 (중복된 카테고리명)
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+  "rootCategoryName": "카테고리1",
+  "childCategoryName": "최상위 카테고리명 중복"
+}
+
+### 최상위 카테고리 등록 2
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+  "rootCategoryName": "카테고리2",
+  "childCategoryName": "카테고리2_1"
+}
+
+### 카테고리1의 하위 카테고리 등록 실패 (형제 카테고리의 이름과 중복)
+POST {{baseUrl}}/{{category1}}
+Content-Type: application/json
+
+{
+  "name": "카테고리1_1"
+}
+
+### 카테고리1의 하위 카테고리 등록 성공
+POST {{baseUrl}}/{{category1}}
+Content-Type: application/json
+
+{
+  "name": "카테고리1_2"
+}
+
+
+### 카테고리1의 하위 카테고리 등록
+POST {{baseUrl}}/{{category1}}
+Content-Type: application/json
+
+{
+  "name": "카테고리1_3"
+}
+
+### 카테고리1의 하위 카테고리 등록
+POST {{baseUrl}}/{{category1}}
+Content-Type: application/json
+
+{
+  "name": "카테고리1_4"
+}
+
+### 카테고리1_1의 하위 카테고리 등록
+POST {{baseUrl}}/{{category1_1}}
+Content-Type: application/json
+
+{
+  "name": "카테고리1_1_1"
+}
+
+### 카테고리1_2의 하위 카테고리 등록
+POST {{baseUrl}}/{{category1_2}}
+Content-Type: application/json
+
+{
+  "name": "카테고리1_2_1"
+}
+
+### 카테고리1_1의 하위 카테고리 등록
+POST {{baseUrl}}/8
+Content-Type: application/json
+
+{
+  "name": "카테고리1_1_1_1"
+}
+
+
+### 카테고리명 수정
+PUT {{baseUrl}}/2
+Content-Type: application/json
+
+{
+  "id": 2,
+  "name": "카테고리1_1 수정본"
+}
+
+### 카테고리 삭제 실패 -> 최상위 카테고리 삭제 불가
+DELETE {{baseUrl}}/1
+
+### 카테고리 삭제 실패 -> 상위 카테고리가 최상위면서 2단계 카테고리가 1개일 경우 삭제 불가능
+DELETE {{baseUrl}}/4
+
+### 중간 카테고리 삭제
+DELETE {{baseUrl}}/5
+
+### 최하위 카테고리 삭제 성공
+DELETE {{baseUrl}}/8
+
+
+
+

@@ -1,5 +1,5 @@
 server:
-  port: 9002
+  port: 9012
 
 spring:
   datasource:
@@ -9,29 +9,35 @@ spring:
     driver-class-name: org.h2.Driver
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: validate
     show-sql: true
     properties:
       hibernate:
         format_sql: true
-        globally_quoted_identifiers: true
         use_sql_comments: true
         highlight_sql: true
         auto_quote_keyword: true
-    database-platform: org.hibernate.dialect.H2Dialect
+    #    database-platform: org.hibernate.dialect.H2Dialect
+    database-platform: org.hibernate.dialect.MySQL8Dialect
   h2:
     console:
       enabled: true
       path: /h2-console
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      database: 0
 #  elasticsearch:
 #    uris: http://localhost:9200
 #  rabbitmq:
 #    host: localhost
 
-# 로컬에서는 Eureka 클라이언트 비활성화
+
 eureka:
   client:
-    enabled: false
+    service-url:
+      defaultZone: "http://${EUREKA_ID}:${EUREKA_PASSWORD}@localhost:9761/eureka"
 
 
 logging:

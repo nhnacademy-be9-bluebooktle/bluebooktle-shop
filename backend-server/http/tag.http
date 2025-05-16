@@ -1,0 +1,64 @@
+@baseUrl = http://localhost:9002/api/tags
+
+### 태그 등록 성공 - 1
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+  "name": "태그테스트1"
+}
+
+### 태그 등록 실패 (중복된 태그명)
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+  "name": "태그테스트1"
+}
+
+### 태그 등록 성공 - 2
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+  "name": "태그테스트2"
+}
+
+### 태그 등록 성공 - 3
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+  "name": "태그테스트3"
+}
+
+
+### 태그 등록 성공 - 4
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+  "name": "태그테스트4"
+}
+
+### 태그명 수정
+PUT {{baseUrl}}/1
+Content-Type: application/json
+
+{
+  "name": "태그테스트1-수정"
+}
+
+### 태그 id 1 삭제
+DELETE {{baseUrl}}/1
+
+### 태그 존재하지 않는 id 삭제
+DELETE {{baseUrl}}/12345
+
+### 태그 조회
+GET {{baseUrl}}
+Accept: application/json
+
+### 태그 조회
+GET {{baseUrl}}?page=0&size=2
+Accept: application/json

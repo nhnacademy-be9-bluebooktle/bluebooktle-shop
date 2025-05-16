@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<div th:fragment="successPopup(modalId)"
+     th:with="effectiveModalId=${modalId ?: 'globalSuccessModal'}"
+     th:if="${globalSuccessMessage != null && !globalSuccessMessage.isEmpty()}"
+     class="modal-overlay-kitsch js-modal-close-trigger" th:id="${effectiveModalId}"
+     th:attr="data-auto-show='true', data-modal-target=${effectiveModalId}">
+    <div class="modal-content-kitsch info-modal-kitsch success-modal-content" onclick="event.stopPropagation();">
+        <button type="button" class="modal-close-btn-kitsch js-modal-close-trigger"
+                th:attr="data-modal-target=${effectiveModalId}"><i class="fas fa-times"></i>
+        </button>
+
+        <div class="modal-icon-kitsch">
+            <i class="fas fa-check-circle success-icon-kitsch"></i>
+        </div>
+        <h2 class="modal-title-kitsch display-font-kitsch"
+            th:text="${globalSuccessTitle} ?: '성공!'">성공!</h2>
+        <p class="modal-message-kitsch handwriting-font-kitsch"
+           th:utext="${globalSuccessMessage}">성공 메시지가 여기에 표시됩니다.</p>
+        <div class="modal-actions-kitsch">
+            <button type="button"
+                    class="btn-kitsch primary-btn-kitsch modal-confirm-btn-kitsch retro-shadow-kitsch-small js-modal-close-trigger"
+                    th:attr="data-modal-target=${effectiveModalId}"> 확인
+            </button>
+        </div>
+    </div>
+</div>
+
+
+<div th:fragment="errorPopup(modalId)"
+     th:with="effectiveModalId=${modalId ?: 'globalErrorModal'}"
+     th:if="${globalErrorMessage != null && !globalErrorMessage.isEmpty()}"
+     class="modal-overlay-kitsch js-modal-close-trigger" th:id="${effectiveModalId}"
+     th:attr="data-auto-show='true', data-modal-target=${effectiveModalId}">
+    <div class="modal-content-kitsch info-modal-kitsch error-modal-content" onclick="event.stopPropagation();">
+        <button type="button" class="modal-close-btn-kitsch js-modal-close-trigger"
+                th:attr="data-modal-target=${effectiveModalId}">
+            <i class="fas fa-times"></i>
+        </button>
+        <div class="modal-icon-kitsch">
+            <i class="fas fa-times-circle error-icon-kitsch"></i>
+        </div>
+        <h2 class="modal-title-kitsch display-font-kitsch"
+            th:text="${globalErrorTitle} ?: '오류 발생!'">오류 발생!</h2>
+        <p class="modal-message-kitsch handwriting-font-kitsch"
+           th:utext="${globalErrorMessage}">오류 메시지가 여기에 표시됩니다.</p>
+        <div class="modal-actions-kitsch">
+            <button type="button"
+                    class="btn-kitsch primary-btn-kitsch modal-confirm-btn-kitsch retro-shadow-kitsch-small js-modal-close-trigger"
+                    th:attr="data-modal-target=${effectiveModalId}">
+                확인
+            </button>
+        </div>
+    </div>
+</div>
+
+
+<div th:fragment="infoPopup(modalId)"
+     th:with="effectiveModalId=${modalId ?: 'globalInfoModal'}"
+     th:if="${globalInfoMessage != null && !globalInfoMessage.isEmpty()}"
+     class="modal-overlay-kitsch js-modal-close-trigger" th:id="${effectiveModalId}"
+     th:attr="data-auto-show='true', data-modal-target=${effectiveModalId}">
+    <div class="modal-content-kitsch info-modal-kitsch" onclick="event.stopPropagation();">
+        <button type="button" class="modal-close-btn-kitsch js-modal-close-trigger"
+                th:attr="data-modal-target=${effectiveModalId}">
+            <i class="fas fa-times"></i>
+        </button>
+
+        <div class="modal-icon-kitsch">
+            <i class="fas fa-info-circle"></i>
+        </div>
+        <h2 class="modal-title-kitsch display-font-kitsch"
+            th:text="${globalInfoTitle} ?: '알림'">알림</h2>
+        <p class="modal-message-kitsch handwriting-font-kitsch"
+           th:utext="${globalInfoMessage}">알림 메시지가 여기에 표시됩니다.</p>
+        <div class="modal-actions-kitsch">
+            <button type="button"
+                    class="btn-kitsch primary-btn-kitsch modal-confirm-btn-kitsch retro-shadow-kitsch-small js-modal-close-trigger"
+                    th:attr="data-modal-target=${effectiveModalId}">
+                확인
+            </button>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<aside class="mypage-sidebar-kitsch" th:fragment="mypageSidebarFragment(activeMenu)">
+    <h2 class="sidebar-title-kitsch pixel-font-kitsch">나의 활동</h2>
+    <ul class="sidebar-menu-kitsch">
+        <li>
+            <a th:classappend="${activeMenu == 'profile' ? 'active' : ''}" th:href="@{/mypage/profile}">
+                <i class="fas fa-id-card"></i> 내 정보 관리
+            </a>
+        </li>
+        <li>
+            <a th:classappend="${activeMenu == 'orders' ? 'active' : ''}" th:href="@{/mypage/orders}">
+                <i class="fas fa-box-open"></i> 주문 내역
+            </a>
+        </li>
+        <li>
+            <a th:classappend="${activeMenu == 'addresses' ? 'active' : ''}" th:href="@{/mypage/addresses}">
+                <i class="fas fa-map-marked-alt"></i> 주소 관리
+            </a>
+        </li>
+        <li>
+            <a th:classappend="${activeMenu == 'points' ? 'active' : ''}" th:href="@{/mypage/points}">
+                <i class="fas fa-coins"></i> 포인트 내역
+            </a>
+        </li>
+        <li>
+            <a th:classappend="${activeMenu == 'coupons' ? 'active' : ''}" th:href="@{/mypage/coupons}">
+                <i class="fas fa-tags"></i> 나의 쿠폰함
+            </a>
+        </li>
+        <li>
+            <a th:classappend="${activeMenu == 'reviews' ? 'active' : ''}" th:href="@{/mypage/reviews}">
+                <i class="fas fa-comment-dots"></i> 내가 쓴 리뷰
+            </a>
+        </li>
+        <li>
+            <a th:classappend="${activeMenu == 'likes' ? 'active' : ''}" th:href="@{/mypage/likes}">
+                <i class="fas fa-heart"></i> 좋아요 목록
+            </a>
+        </li>
+    </ul>
+</aside>
+
+</body>
+</html>

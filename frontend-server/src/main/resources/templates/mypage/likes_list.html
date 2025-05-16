@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html layout:decorate="~{_layouts/default_layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>마이페이지 - 찜 목록</title>
+    <style>
+        /* styles.css 에 정의된 마이페이지 공통 스타일을 사용합니다. */
+        /* 아래는 "찜 목록" 페이지에만 필요한 특화 스타일입니다. */
+
+        /* 페이지별 헤더 (mypage_reviews_kitsch.html 과 유사하게) */
+        .mypage-page-specific-header-kitsch {
+            background-color: var(--kitsch-color-3); /* 핫핑크 */
+            color: var(--kitsch-text-light);
+            padding: 2rem;
+            text-align: center;
+            border: 5px groove var(--kitsch-color-1); /* 버건디 */
+            border-radius: 25px 10px 25px 10px;
+            margin-bottom: 2.5rem;
+            box-shadow: 0px 5px 0px var(--kitsch-text-dark);
+        }
+
+        .mypage-page-specific-header-kitsch .page-main-title-kitsch {
+            font-size: 2.6rem;
+            color: var(--kitsch-bg-main);
+            text-shadow: 2px 2px 0 var(--kitsch-text-dark);
+        }
+
+        .wishlist-controls-kitsch {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding: 0.8rem;
+            background-color: var(--kitsch-bg-alt);
+            border: 2px dashed var(--kitsch-color-2); /* 머스타드 */
+            border-radius: 5px;
+        }
+
+        .wishlist-controls-kitsch .selection-info-kitsch {
+            font-family: var(--font-pixel);
+            font-size: 0.9rem;
+            color: var(--kitsch-text-dark);
+        }
+
+        .wishlist-controls-kitsch .action-buttons-group-kitsch .btn-kitsch {
+            margin-left: 0.5rem;
+        }
+
+        .wishlist-grid-kitsch {
+            display: grid;
+            /* === 한 줄에 항상 3개의 아이템을 표시하고, 각 아이템이 부모 너비의 1/3을 차지하도록 설정 === */
+            grid-template-columns: repeat(3, 1fr); /* 3개의 동일한 너비의 열 생성 */
+            gap: 1.5rem; /* 아이템 간의 간격 */
+            /* justify-content는 더 이상 크게 의미가 없을 수 있으나, 필요시 유지 또는 제거 */
+        }
+
+        .wishlist-item-kitsch {
+            background-color: var(--kitsch-bg-main);
+            border: 3px solid var(--kitsch-text-dark);
+            border-radius: 8px;
+            padding: 1rem;
+            position: relative;
+            box-shadow: 2px 2px 0 var(--kitsch-color-4);
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex; /* 내부 요소 정렬을 위해 flex 사용 */
+            flex-direction: column; /* 아이템들을 세로로 쌓음 */
+            /* === 크기 고정을 위한 높이 설정 (예시) === */
+            /* min-height: 450px; */ /* 카드의 최소 높이를 지정하여 들쭉날쭉한 것을 방지. 실제 콘텐츠 양에 따라 조절 */
+            /* 또는 내부 요소들의 높이를 합산하여 결정되도록 하고, 제목 등 가변적인 부분만 제어 */
+        }
+
+        .wishlist-item-kitsch:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 4px 4px 0 var(--kitsch-color-5);
+        }
+
+        .wishlist-item-checkbox-kitsch { /* 기존 스타일 유지 */
+        }
+
+        .wishlist-item-kitsch .book-cover-wrap-kitsch {
+            position: relative;
+            border: 2px solid var(--kitsch-text-dark);
+            background-color: var(--kitsch-color-1);
+            margin-top: 0.8rem;
+            margin-bottom: 0.8rem;
+            /* === 이미지 영역 크기 고정 === */
+            width: 100%; /* 부모 너비에 맞춤 */
+            aspect-ratio: 200 / 300; /* 가로:세로 비율 유지 (예: 2:3) */
+            overflow: hidden; /* 이미지가 영역을 벗어나지 않도록 */
+        }
+
+        .wishlist-item-kitsch .book-cover-kitsch {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* 이미지가 비율을 유지하며 영역을 채움 */
+        }
+
+        .wishlist-item-kitsch .book-info-kitsch {
+            text-align: center;
+            margin-bottom: 0.8rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between; /* 제목/저자와 가격을 위아래로 분산 */
+        }
+
+        .wishlist-item-kitsch .book-title-kitsch {
+            font-size: 1.15rem; /* 폰트 크기 약간 조정 */
+            color: var(--kitsch-color-5);
+            margin-bottom: 0.2em;
+            line-height: 1.3;
+            /* === 제목 여러 줄 처리 (예: 최대 2줄) === */
+            display: -webkit-box;
+            -webkit-line-clamp: 2; /* 보여줄 줄 수 */
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            min-height: calc(1.3em * 1.3 * 2); /* 대략적인 2줄 높이 확보 (line-height * font-size * 줄 수) */
+            /* 실제 값은 폰트와 line-height에 따라 조정 */
+        }
+
+        .wishlist-item-kitsch .book-author-kitsch {
+            font-size: 0.8rem;
+            color: var(--kitsch-text-dark);
+            margin-bottom: 0.4em;
+            /* === 저자도 길어질 경우 처리 === */
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%; /* 부모 너비 초과 방지 */
+        }
+
+        .wishlist-item-kitsch .book-price-kitsch {
+            font-size: 1rem;
+            color: var(--kitsch-color-3);
+            margin-top: 0.5rem; /* 저자명과의 간격 */
+        }
+
+        .wishlist-item-actions-kitsch {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            margin-top: auto; /* 버튼들을 카드 하단에 위치시키도록 (부모가 flex column일 때) */
+        }
+
+        .wishlist-item-actions-kitsch .btn-kitsch {
+            font-size: 0.8rem; /* 버튼 크기 작게 */
+            padding: 0.6em 0.8em;
+        }
+
+        .no-wishlist-items-kitsch {
+            text-align: center;
+            padding: 3rem 1rem;
+            font-family: var(--font-pixel);
+            font-size: 1.3rem;
+            color: var(--kitsch-color-5);
+            background-color: var(--kitsch-bg-alt);
+            border: 2px dashed var(--kitsch-color-2);
+            border-radius: 5px;
+        }
+
+        .no-wishlist-items-kitsch i {
+            font-size: 3rem;
+            display: block;
+            margin-bottom: 1rem;
+            color: var(--kitsch-color-4);
+        }
+
+        @media (max-width: 768px) {
+            .wishlist-controls-kitsch {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0.8rem;
+            }
+
+            .wishlist-controls-kitsch .action-buttons-group-kitsch {
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .wishlist-controls-kitsch .action-buttons-group-kitsch .btn-kitsch {
+                margin-left: 0;
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 520px) {
+            .wishlist-grid-kitsch {
+                grid-template-columns: 1fr; /* 아주 작은 화면에서는 한 줄로 */
+            }
+        }
+    </style>
+</head>
+
+<body>
+<div layout:fragment="content">
+    <div class="container-kitsch section-padding-kitsch">
+
+        <div class="mypage-page-specific-header-kitsch">
+            <h1 class="page-main-title-kitsch display-font-kitsch"><i class="fas fa-heartbeat"></i> 나의 찜 목록 <i
+                    class="fas fa-grin-hearts"></i></h1>
+        </div>
+
+        <div class="mypage-layout-kitsch">
+            <div th:replace="~{_fragments/mypage_sidebar :: mypageSidebarFragment(activeMenu='likes')}"></div>
+
+            <main class="mypage-content-kitsch">
+                <div class="wishlist-controls-kitsch">
+                    <div class="selection-info-kitsch">
+                        <label class="checkbox-kitsch">
+                            <input id="selectAllWishlistItems" onchange="toggleSelectAllWishlist(this.checked)"
+                                   type="checkbox">
+                            <span class="checkbox-custom-kitsch"></span>
+                            <span style="margin-left:0.5em;">전체선택 (<span id="selectedWishlistCount">0</span> / <span
+                                    id="totalWishlistCount">3</span>개)</span>
+                        </label>
+                    </div>
+                    <div class="action-buttons-group-kitsch">
+                        <button class="btn-kitsch secondary-btn-kitsch color1-kitsch small-btn-kitsch retro-shadow-kitsch-small"
+                                onclick="addSelectedToCart()">
+                            <i class="fas fa-cart-plus"></i> 선택 장바구니 담기
+                        </button>
+                        <button class="btn-kitsch secondary-btn-kitsch color3-kitsch small-btn-kitsch retro-shadow-kitsch-small"
+                                onclick="removeSelectedFromWishlist()">
+                            <i class="fas fa-trash-alt"></i> 선택삭제
+                        </button>
+                    </div>
+                </div>
+
+                <div class="wishlist-grid-kitsch" id="wishlistGrid">
+                    <div class="wishlist-item-kitsch" data-item-id="wish001">
+                        <div class="wishlist-item-checkbox-kitsch">
+                            <label class="checkbox-kitsch">
+                                <input class="wishlist-item-select" onchange="updateSelectedWishlistCount()"
+                                       type="checkbox">
+                                <span class="checkbox-custom-kitsch"></span>
+                            </label>
+                        </div>
+                        <a th:href="@{/books/101}">
+                            <div class="book-cover-wrap-kitsch">
+                                <img alt="코딩 대모험" class="book-cover-kitsch"
+                                     src="https://picsum.photos/200/300?random=101">
+                            </div>
+                            <div class="book-info-kitsch">
+                                <h3 class="book-title-kitsch display-font-kitsch">코딩 대모험</h3>
+                                <p class="book-author-kitsch handwriting-font-kitsch">저자: 고냥이 개발자</p>
+                                <div class="book-price-kitsch">25,200원</div>
+                            </div>
+                        </a>
+                        <div class="wishlist-item-actions-kitsch">
+                            <button class="btn-kitsch primary-btn-kitsch retro-shadow-kitsch-small"
+                                    onclick="alert('Mock: [코딩 대모험] 장바구니 담기')">
+                                <i class="fas fa-shopping-basket"></i> 장바구니
+                            </button>
+                            <button class="btn-kitsch secondary-btn-kitsch color5-kitsch retro-shadow-kitsch-small"
+                                    onclick="removeWishlistItem('wish001')">
+                                <i class="fas fa-heart-broken"></i> 찜 해제
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="wishlist-item-kitsch" data-item-id="wish002">
+                        <div class="wishlist-item-checkbox-kitsch">
+                            <label class="checkbox-kitsch">
+                                <input class="wishlist-item-select" onchange="updateSelectedWishlistCount()"
+                                       type="checkbox">
+                                <span class="checkbox-custom-kitsch"></span>
+                            </label>
+                        </div>
+                        <a th:href="@{/books/104}">
+                            <div class="book-cover-wrap-kitsch">
+                                <img alt="글리치 아트 코딩" class="book-cover-kitsch"
+                                     src="https://picsum.photos/200/300?random=104">
+                            </div>
+                            <div class="book-info-kitsch">
+                                <h3 class="book-title-kitsch display-font-kitsch">글리치 아트 코딩</h3>
+                                <p class="book-author-kitsch handwriting-font-kitsch">노이즈 마스터</p>
+                                <div class="book-price-kitsch">22,000원</div>
+                            </div>
+                        </a>
+                        <div class="wishlist-item-actions-kitsch">
+                            <button class="btn-kitsch primary-btn-kitsch retro-shadow-kitsch-small"
+                                    onclick="alert('Mock: [글리치 아트 코딩] 장바구니 담기')">
+                                <i class="fas fa-shopping-basket"></i> 장바구니
+                            </button>
+                            <button class="btn-kitsch secondary-btn-kitsch color5-kitsch retro-shadow-kitsch-small"
+                                    onclick="removeWishlistItem('wish002')">
+                                <i class="fas fa-heart-broken"></i> 찜 해제
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="wishlist-item-kitsch" data-item-id="wish003">
+                        <div class="wishlist-item-checkbox-kitsch">
+                            <label class="checkbox-kitsch">
+                                <input class="wishlist-item-select" onchange="updateSelectedWishlistCount()"
+                                       type="checkbox">
+                                <span class="checkbox-custom-kitsch"></span>
+                            </label>
+                        </div>
+                        <a th:href="@{/books/105}">
+                            <div class="book-cover-wrap-kitsch">
+                                <img alt="게임보이 개발 비급" class="book-cover-kitsch"
+                                     src="https://picsum.photos/200/300?random=105">
+                            </div>
+                            <div class="book-info-kitsch">
+                                <h3 class="book-title-kitsch display-font-kitsch">게임보이 개발 비급</h3>
+                                <p class="book-author-kitsch handwriting-font-kitsch">레트로 장인</p>
+                                <div class="book-price-kitsch">33,300원</div>
+                            </div>
+                        </a>
+                        <div class="wishlist-item-actions-kitsch">
+                            <button class="btn-kitsch primary-btn-kitsch retro-shadow-kitsch-small"
+                                    onclick="alert('Mock: [게임보이 개발 비급] 장바구니 담기')">
+                                <i class="fas fa-shopping-basket"></i> 장바구니
+                            </button>
+                            <button class="btn-kitsch secondary-btn-kitsch color5-kitsch retro-shadow-kitsch-small"
+                                    onclick="removeWishlistItem('wish003')">
+                                <i class="fas fa-heart-broken"></i> 찜 해제
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="no-wishlist-items-kitsch" id="noWishlistItemsMessage" style="display:none;">
+                        <i class="fas fa-heart-crack"></i>
+                        <p>아직 찜한 상품이 없네요!</p>
+                        <p class="handwriting-font-kitsch" style="font-size:1.1rem; margin-top:0.5rem;">마음에 드는 책에 하트를
+                            눌러보세요!</p>
+                    </div>
+                </div>
+
+                <nav aria-label="Page navigation" class="pagination-kitsch" style="margin-top: 2.5rem;">
+                    <a class="page-btn-kitsch prev-kitsch retro-shadow-kitsch-small disabled" href="#"><i
+                            class="fas fa-angle-left"></i> 이전</a>
+                    <a class="page-btn-kitsch num-kitsch active-kitsch retro-shadow-kitsch-small" href="#">1</a>
+                    <a class="page-btn-kitsch next-kitsch retro-shadow-kitsch-small" href="#">다음 <i
+                            class="fas fa-angle-right"></i></a>
+                </nav>
+            </main>
+        </div>
+    </div>
+</div>
+
+<th:block layout:fragment="page_scripts">
+    <script>
+        // 현재 URL 기준으로 활성 메뉴 표시
+        document.addEventListener('DOMContentLoaded', function () {
+            const currentPath = window.location.pathname;
+            const sidebarLinks = document.querySelectorAll('.mypage-sidebar-kitsch .sidebar-menu-kitsch li a');
+            sidebarLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === currentPath) {
+                    link.classList.add('active');
+                }
+            });
+            updateTotalWishlistCount(); // 초기 전체 개수 업데이트
+            updateSelectedWishlistCount(); // 초기 선택 개수 업데이트
+            toggleNoWishlistMessage(); // 찜 목록 유무에 따른 메시지 표시
+        });
+
+        function updateTotalWishlistCount() {
+            const totalCountEl = document.getElementById('totalWishlistCount');
+            if (totalCountEl) {
+                totalCountEl.textContent = document.querySelectorAll('.wishlist-item-kitsch').length;
+            }
+        }
+
+        function updateSelectedWishlistCount() {
+            const selectedCountEl = document.getElementById('selectedWishlistCount');
+            if (selectedCountEl) {
+                selectedCountEl.textContent = document.querySelectorAll('.wishlist-item-select:checked').length;
+            }
+        }
+
+        function toggleSelectAllWishlist(isChecked) {
+            document.querySelectorAll('.wishlist-item-select').forEach(checkbox => {
+                checkbox.checked = isChecked;
+            });
+            updateSelectedWishlistCount();
+        }
+
+        function addSelectedToCart() {
+            const selectedItems = document.querySelectorAll('.wishlist-item-select:checked');
+            if (selectedItems.length === 0) {
+                alert("장바구니에 담을 상품을 선택해주세요. (Mock)");
+                return;
+            }
+            alert(`${selectedItems.length}개 상품을 장바구니에 담았습니다. (Mock - 실제 동작 없음)`);
+        }
+
+        function removeSelectedFromWishlist() {
+            const selectedItems = document.querySelectorAll('.wishlist-item-select:checked');
+            if (selectedItems.length === 0) {
+                alert("삭제할 상품을 선택해주세요. (Mock)");
+                return;
+            }
+            if (confirm(`${selectedItems.length}개 상품을 찜 목록에서 삭제하시겠습니까? (Mock)`)) {
+                selectedItems.forEach(checkbox => {
+                    checkbox.closest('.wishlist-item-kitsch').remove();
+                });
+                alert("선택한 상품들이 찜 목록에서 삭제되었습니다. (Mock - 화면만 변경)");
+                updateTotalWishlistCount();
+                updateSelectedWishlistCount();
+                toggleNoWishlistMessage();
+            }
+        }
+
+        function removeWishlistItem(itemId) {
+            if (confirm("이 상품을 찜 목록에서 삭제하시겠습니까? (Mock)")) {
+                const itemToRemove = document.querySelector(`.wishlist-item-kitsch[data-item-id="${itemId}"]`);
+                if (itemToRemove) {
+                    itemToRemove.remove();
+                    alert("상품이 찜 목록에서 삭제되었습니다. (Mock - 화면만 변경)");
+                    updateTotalWishlistCount();
+                    updateSelectedWishlistCount();
+                    toggleNoWishlistMessage();
+                }
+            }
+        }
+
+        function toggleNoWishlistMessage() {
+            const wishlistGrid = document.getElementById('wishlistGrid');
+            const noItemsMsg = document.getElementById('noWishlistItemsMessage');
+            const pagination = document.querySelector('.pagination-kitsch');
+            const wishlistItems = wishlistGrid.querySelectorAll('.wishlist-item-kitsch');
+
+            if (wishlistItems.length === 0 && noItemsMsg) {
+                noItemsMsg.style.display = 'block';
+                if (pagination) pagination.style.display = 'none';
+            } else if (noItemsMsg) {
+                noItemsMsg.style.display = 'none';
+                if (pagination) pagination.style.display = 'flex';
+            }
+        }
+    </script>
+</th:block>
+</body>
+</html>

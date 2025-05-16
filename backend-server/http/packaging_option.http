@@ -1,0 +1,9 @@
+@baseUrl = http://localhost:9002/api/options
+
+## 포장 옵션 등록
+POST /api/options HTTP/1.1
+Content-Type: application/json
+{
+    "name": "기본 포장지",
+    "price": 1500
+}

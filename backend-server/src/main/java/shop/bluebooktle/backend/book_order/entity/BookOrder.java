@@ -15,9 +15,11 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 import shop.bluebooktle.backend.book.entity.Book;
 import shop.bluebooktle.backend.order.entity.Order;
@@ -27,6 +29,7 @@ import shop.bluebooktle.common.entity.BaseEntity;
 @Table(name = "book_order")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
+@Setter
 @EqualsAndHashCode(of = "id", callSuper = false)
 @ToString(exclude = {"order", "book"})
 @SQLDelete(sql = "UPDATE book_order SET deleted_at = CURRENT_TIMESTAMP WHERE book_order_id = ?")
@@ -51,5 +54,13 @@ public class BookOrder extends BaseEntity {
 
 	@Column(name = "price", precision = 10, scale = 2, nullable = false)
 	private BigDecimal price;
+
+	@Builder
+	public BookOrder(Order order, Book book, Integer quantity, BigDecimal price) {
+		this.order = order;
+		this.book = book;
+		this.quantity = quantity;
+		this.price = price;
+	}
 
 }
