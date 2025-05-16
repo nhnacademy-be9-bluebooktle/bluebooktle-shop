@@ -4,8 +4,10 @@ import org.hibernate.validator.constraints.Length;
 
 import jakarta.validation.constraints.NotBlank;
 
-public record CategoryRegisterRequest(
+public record RootCategoryRegisterRequest(
 	@NotBlank @Length(max = 50)
-	String name
+	String rootCategoryName,
+	@NotBlank @Length(max = 50)
+	String childCategoryName
 ) {
 }

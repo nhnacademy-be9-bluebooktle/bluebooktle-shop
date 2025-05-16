@@ -1,0 +1,68 @@
+@baseUrl = http://localhost:9002/api/categories/{{categoryId}}
+@categoryUrl = http://localhost:9002/api/categories
+
+@categoryId = 1
+@bookId = 1
+
+@category1 = 1
+@category1_1 = 2
+
+### 도서 등록
+POST http://localhost:9002/api/book/register
+Content-Type: application/json
+
+{
+  "title": "제목",
+  "author": [
+    "작가"
+  ],
+  "publisher": "출판사",
+  "tag": [
+    "태그"
+  ],
+  "imageUrl": [
+    "https://image.aladin.co.kr/product/35650/80/coversum/k762036819_1.jpg"
+  ],
+  "category": [
+    "카테고리"
+  ],
+  "isbn": "9791186560655",
+  "description": "테스트 설명",
+  "publishDate": "2025-05-12",
+  "price": 20000,
+  "salePrice": 18000,
+  "stock": 99,
+  "isPackable": true,
+  "state": "AVAILABLE"
+}
+
+
+### 최상위 카테고리 등록 1
+POST {{categoryUrl}}
+Content-Type: application/json
+
+{
+  "rootCategoryName": "카테고리1",
+  "childCategoryName": "카테고리1_1"
+}
+
+### 카테고리1의 하위 카테고리 등록 성공
+POST {{categoryUrl}}/{{category1}}
+Content-Type: application/json
+
+{
+  "name": "카테고리1_2"
+}
+
+### 카테고리1_1의 하위 카테고리 등록
+POST {{categoryUrl}}/{{category1_1}}
+Content-Type: application/json
+
+{
+  "name": "카테고리1_1_1"
+}
+
+
+
+
+

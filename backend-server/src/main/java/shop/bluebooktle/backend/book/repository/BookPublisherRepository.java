@@ -3,9 +3,11 @@ package shop.bluebooktle.backend.book.repository;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.transaction.annotation.Transactional;
 
 import shop.bluebooktle.backend.book.entity.Book;
 import shop.bluebooktle.backend.book.entity.BookPublisher;
@@ -13,16 +15,20 @@ import shop.bluebooktle.backend.book.entity.Publisher;
 
 public interface BookPublisherRepository extends JpaRepository<BookPublisher, Long> {
 
-	// 특정 출판사의 모든 도서들 조회
-	@Query("SELECT bp.book FROM BookPublisher bp WHERE bp.publisher = :publisher")
-	List<Book> findBooksByPublisher(@Param("publisher") Publisher publisher);
+	List<BookPublisher> findByBook(Book book);
 
-	// 특정 도서의 모든 출판사들 조회
-	@Query("SELECT bp.publisher FROM BookPublisher bp WHERE bp.book = :book")
-	List<Publisher> findPublishersByBook(@Param("book") Book book);
+	List<BookPublisher> findByPublisher(Publisher publisher);
 
 	// 특정 출판사의 특정 도서 존재 유무 조회
 	boolean existsByBookAndPublisher(Book book, Publisher publisher);
 
+	@Modifying
+	@Transactional
+	void deleteByPublisher(Publisher publisher);
+
+	Page<BookPublisher> findAllByPublisher(Publisher publisher, Pageable pageable);
+
 	Optional<BookPublisher> findByBookId(Long bookId);
+
+	boolean existsByPublisher(Publisher publisher);
 }

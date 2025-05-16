@@ -6,7 +6,6 @@ import java.util.List;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -43,13 +42,23 @@ public class Category extends BaseEntity {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "parent_category_id")
+	@Setter
 	private Category parentCategory;
 
 	@Setter
 	@Column(name = "name", nullable = false, length = 50)
 	private String name;
 
-	@OneToMany(mappedBy = "parentCategory", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+	@Column(name = "category_path", nullable = false)
+	@Setter
+	private String categoryPath;
+
+	@OneToMany(
+		mappedBy = "parentCategory",
+		/*cascade = CascadeType.ALL,
+		orphanRemoval = true,*/
+		fetch = FetchType.LAZY
+	)
 	private List<Category> childCategories = new ArrayList<>();
 
 	public void addChildCategory(Category child) {
@@ -57,9 +66,16 @@ public class Category extends BaseEntity {
 		this.childCategories.add(child);
 	}
 
+	public Category(Category parentCategory, String name, String categoryPath) {
+		this.parentCategory = parentCategory;
+		this.name = name;
+		this.categoryPath = categoryPath;
+	}
+
 	@Builder
 	public Category(Category parentCategory, String name) {
 		this.parentCategory = parentCategory;
 		this.name = name;
+		this.categoryPath = "default";
 	}
 }

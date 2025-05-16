@@ -85,7 +85,7 @@ Content-Type: application/json
     "카테고리1",
     "카테고리2"
   ],
-  "isbn": "1234567890123",
+  "isbn": "9791186560655",
   "description": "테스트 설명",
   "publishDate": "2025-05-12",
   "price": 20000,

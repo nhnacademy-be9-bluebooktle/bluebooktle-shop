@@ -14,6 +14,7 @@ import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 
 @Entity
@@ -41,6 +42,7 @@ public class BookCategory {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "category_id", nullable = false)
+	@Setter
 	private Category category;
 
 	public BookCategory(Book book, Category category) {

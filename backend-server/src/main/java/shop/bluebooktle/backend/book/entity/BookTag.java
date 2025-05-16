@@ -10,6 +10,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -36,6 +37,7 @@ public class BookTag {
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Book book;
 
+	@Builder
 	public BookTag(Tag tag, Book book) {
 		this.tag = tag;
 		this.book = book;
