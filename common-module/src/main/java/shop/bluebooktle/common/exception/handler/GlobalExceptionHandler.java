@@ -17,8 +17,6 @@ import lombok.extern.slf4j.Slf4j;
 import shop.bluebooktle.common.dto.common.JsendResponse;
 import shop.bluebooktle.common.exception.ApplicationException;
 import shop.bluebooktle.common.exception.ErrorCode;
-import shop.bluebooktle.common.exception.order.CannotDeleteDefaultPolicyException;
-import shop.bluebooktle.common.exception.order.DeliveryRuleNotFoundException;
 
 @Slf4j
 @RestControllerAdvice
@@ -96,20 +94,6 @@ public class GlobalExceptionHandler {
 			errorCode.getCode(), httpStatus, ex);
 
 		return new ResponseEntity<>(response, httpStatus);
-	}
-
-	@ExceptionHandler(CannotDeleteDefaultPolicyException.class)
-	public ResponseEntity<JsendResponse<Void>> handleCannotDeleteDefault(CannotDeleteDefaultPolicyException e) {
-		return ResponseEntity
-			.status(HttpStatus.BAD_REQUEST)
-			.body(JsendResponse.error(e.getMessage()));
-	}
-
-	@ExceptionHandler(DeliveryRuleNotFoundException.class)
-	public ResponseEntity<JsendResponse<Void>> handleCannotNotFound(DeliveryRuleNotFoundException e) {
-		return ResponseEntity
-			.status(HttpStatus.BAD_REQUEST)
-			.body(JsendResponse.error(e.getMessage()));
 	}
 
 }

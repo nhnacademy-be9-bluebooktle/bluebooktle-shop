@@ -16,5 +16,4 @@ public interface OrderService {
 
 	Order getOrderByOrderKey(UUID orderKey);
 
-	void updateOrderStatus(Long orderId, OrderStatus newStatus);
 }
