@@ -17,7 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import shop.bluebooktle.backend.order.entity.DeliveryRule;
 import shop.bluebooktle.backend.order.repository.DeliveryRuleRepository;
 import shop.bluebooktle.backend.order.service.impl.DeliveryRuleServiceImpl;
-import shop.bluebooktle.common.exception.order.CannotDeleteDefaultPolicyException;
+import shop.bluebooktle.common.exception.order.delivery_rule.CannotDeleteDefaultPolicyException;
 
 @ExtendWith(MockitoExtension.class)
 class DeliveryRuleServiceTest {
