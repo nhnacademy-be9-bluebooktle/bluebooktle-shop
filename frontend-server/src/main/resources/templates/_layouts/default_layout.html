@@ -17,9 +17,9 @@
     <p>Page content goes here</p>
 </div>
 
-<div th:replace="~{_fragments/modal_popup :: successPopup(modalId='globalSuccessModal')}"></div>
-<div th:replace="~{_fragments/modal_popup :: errorPopup(modalId='globalErrorModal')}"></div>
-<div th:replace="~{_fragments/modal_popup :: infoPopup(modalId='globalInfoModal')}"></div>
+<div th:replace="~{_fragments/popup_modal :: successPopup(modalId='globalSuccessModal')}"></div>
+<div th:replace="~{_fragments/popup_modal :: errorPopup(modalId='globalErrorModal')}"></div>
+<div th:replace="~{_fragments/popup_modal :: infoPopup(modalId='globalInfoModal')}"></div>
 <div th:replace="~{_fragments/footer :: footerFragment}"></div>
 
 <script>
