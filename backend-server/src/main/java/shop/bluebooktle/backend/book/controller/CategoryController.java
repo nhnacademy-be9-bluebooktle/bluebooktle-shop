@@ -21,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import shop.bluebooktle.backend.book.dto.request.CategoryRegisterRequest;
 import shop.bluebooktle.backend.book.dto.request.CategoryUpdateRequest;
+import shop.bluebooktle.backend.book.dto.request.RootCategoryRegisterRequest;
 import shop.bluebooktle.backend.book.dto.response.CategoryResponse;
 import shop.bluebooktle.backend.book.dto.response.CategoryTreeResponse;
 import shop.bluebooktle.backend.book.service.CategoryService;
@@ -59,10 +60,21 @@ public class CategoryController {
 		return ResponseEntity.ok(JsendResponse.success(tree));
 	}
 
-	// 카테고리 등록
+	// 최상위 카테고리 등록
 	@PostMapping
-	public ResponseEntity<JsendResponse<Void>> addCategory(@Valid @RequestBody CategoryRegisterRequest request) {
-		categoryService.registerCategory(request);
+	public ResponseEntity<JsendResponse<Void>> addRootCategory(
+		@Valid @RequestBody RootCategoryRegisterRequest request) {
+		categoryService.registerRootCategory(request);
+		return ResponseEntity.status(HttpStatus.CREATED).body(JsendResponse.success());
+	}
+
+	// 카테고리 등록
+	@PostMapping("/{parentCategoryId}")
+	public ResponseEntity<JsendResponse<Void>> addCategory(
+		@PathVariable Long parentCategoryId,
+		@Valid @RequestBody CategoryRegisterRequest request
+	) {
+		categoryService.registerCategory(parentCategoryId, request);
 		return ResponseEntity.status(HttpStatus.CREATED).body(JsendResponse.success());
 	}
 

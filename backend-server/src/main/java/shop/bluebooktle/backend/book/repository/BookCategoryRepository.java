@@ -1,6 +1,7 @@
 package shop.bluebooktle.backend.book.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,6 +14,8 @@ import shop.bluebooktle.backend.book.entity.BookCategory;
 import shop.bluebooktle.backend.book.entity.Category;
 
 public interface BookCategoryRepository extends JpaRepository<BookCategory, Long> {
+
+	Optional<BookCategory> findByBookAndCategory(Book book, Category category);
 
 	// 특정 책에 연결된 모든 카테고리 조회
 	List<BookCategory> findByBook(Book book);

@@ -45,20 +45,18 @@ public class CategoryControllerTest {
 	@DisplayName("카테고리 등록 성공")
 	void registerCategorySuccess() throws Exception {
 		// given
-		CategoryRegisterRequest req = new CategoryRegisterRequest("테스트", null);
+		CategoryRegisterRequest req = new CategoryRegisterRequest("테스트");
 		String json = objectMapper.writeValueAsString(req);
-		doNothing().when(categoryService).registerCategory(any());
+		doNothing().when(categoryService).registerCategory(any(), any());
 
 		// when / then
-		mockMvc.perform(post("/api/categories")
+		mockMvc.perform(post("/api/categories/1")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(json))
-			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.status").value("success"))
-			.andExpect(jsonPath("$.data").isEmpty());
+			.andExpect(status().isCreated());
 
 		// verify
-		verify(categoryService, times(1)).registerCategory(any(CategoryRegisterRequest.class));
+		verify(categoryService, times(1)).registerCategory(anyLong(), any(CategoryRegisterRequest.class));
 	}
 
 }

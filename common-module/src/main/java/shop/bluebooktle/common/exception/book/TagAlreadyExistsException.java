@@ -10,7 +10,7 @@ public class TagAlreadyExistsException extends ApplicationException {
 	}
 
 	public TagAlreadyExistsException(String message) {
-		super(ErrorCode.TAG_ALREADY_EXISTS, message);
+		super(ErrorCode.TAG_ALREADY_EXISTS, ErrorCode.TAG_ALREADY_EXISTS.getMessage() + message);
 	}
 
 	public TagAlreadyExistsException(Throwable cause) {

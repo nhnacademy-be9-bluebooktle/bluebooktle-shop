@@ -9,19 +9,22 @@ import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.book.dto.request.PublisherRequest;
 import shop.bluebooktle.backend.book.dto.response.PublisherInfoResponse;
 import shop.bluebooktle.backend.book.entity.Publisher;
+import shop.bluebooktle.backend.book.repository.BookPublisherRepository;
 import shop.bluebooktle.backend.book.repository.PublisherRepository;
 import shop.bluebooktle.backend.book.service.PublisherService;
 import shop.bluebooktle.common.exception.book.PublisherAlreadyExistsException;
+import shop.bluebooktle.common.exception.book.PublisherCannotDeleteException;
 import shop.bluebooktle.common.exception.book.PublisherNotFoundException;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class PublisherServiceImpl implements PublisherService {
 
 	private final PublisherRepository publisherRepository;
+	private final BookPublisherRepository bookPublisherRepository;
 
 	@Override
-	@Transactional
 	public void registerPublisher(PublisherRequest request) {
 		if (publisherRepository.existsByName(request.getName())) {
 			throw new PublisherAlreadyExistsException("출판사명 : " + request.getName());
@@ -33,11 +36,9 @@ public class PublisherServiceImpl implements PublisherService {
 	}
 
 	@Override
-	@Transactional
 	public void updatePublisher(Long publisherId, PublisherRequest request) {
 		Publisher publisher = publisherRepository.findById(publisherId)
 			.orElseThrow(() -> new PublisherNotFoundException(publisherId));
-
 		publisher.setName(request.getName());
 		publisherRepository.save(publisher);
 	}
@@ -59,11 +60,13 @@ public class PublisherServiceImpl implements PublisherService {
 	}
 
 	@Override
-	@Transactional
 	public void deletePublisher(Long publisherId) {
 		Publisher publisher = publisherRepository.findById(publisherId)
 			.orElseThrow(() -> new PublisherNotFoundException(publisherId));
-
+		// 출판사에 등록된 도서가 있을 경우 삭제 불가
+		if (bookPublisherRepository.existsByPublisher(publisher)) {
+			throw new PublisherCannotDeleteException();
+		}
 		publisherRepository.delete(publisher);
 	}
 }
