@@ -1,7 +1,11 @@
 @baseUrl = http://localhost:9002/api/categories/{{categoryId}}
+@categoryUrl = http://localhost:9002/api/categories
 
 @categoryId = 1
 @bookId = 1
+
+@category1 = 1
+@category1_1 = 2
 
 ### 도서 등록
 POST http://localhost:9002/api/book/register
@@ -32,14 +36,32 @@ Content-Type: application/json
   "state": "AVAILABLE"
 }
 
-### 카테고리 등록
-POST http://localhost:9002/api/categories
+
+### 최상위 카테고리 등록 1
+POST {{categoryUrl}}
 Content-Type: application/json
 
 {
-  "name": "카테고리1",
-  "parentCategoryId": null
+  "rootCategoryName": "카테고리1",
+  "childCategoryName": "카테고리1_1"
 }
+
+### 카테고리1의 하위 카테고리 등록 성공
+POST {{categoryUrl}}/{{category1}}
+Content-Type: application/json
+
+{
+  "name": "카테고리1_2"
+}
+
+### 카테고리1_1의 하위 카테고리 등록
+POST {{categoryUrl}}/{{category1_1}}
+Content-Type: application/json
+
+{
+  "name": "카테고리1_1_1"
+}
+
 
 
 
