@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -18,8 +19,7 @@ import shop.bluebooktle.backend.book.dto.request.AladinBookItem;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AladinBookResponse {
 	String title;
-	String author;
-	Integer authorId;
+	List<String> authors;
 	String description;
 	LocalDateTime publishDate;
 	String isbn;
@@ -43,8 +43,7 @@ public class AladinBookResponse {
 
 		return AladinBookResponse.builder()
 			.title(item.getTitle())
-			.author(item.getAuthor())
-			.authorId(item.getAuthorId())
+			.authors(item.getAuthors())
 			.description(item.getDescription())
 			.publishDate(LocalDate.parse(item.getPubDate(), DateTimeFormatter.ofPattern("yyyy-MM-dd")).atStartOfDay())
 			.isbn(item.getIsbn13())
@@ -55,5 +54,6 @@ public class AladinBookResponse {
 			.categoryName(item.getCategoryName())
 			.imageUrl(item.getCover())
 			.build();
+
 	}
 }

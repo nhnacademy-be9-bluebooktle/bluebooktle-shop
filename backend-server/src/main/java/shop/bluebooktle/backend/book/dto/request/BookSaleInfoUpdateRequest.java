@@ -2,6 +2,7 @@ package shop.bluebooktle.backend.book.dto.request;
 
 import java.math.BigDecimal;
 
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.AllArgsConstructor;
@@ -15,6 +16,9 @@ import shop.bluebooktle.backend.book.entity.BookSaleInfo;
 @Builder
 @AllArgsConstructor
 public class BookSaleInfoUpdateRequest {
+	@NotNull(message = "도서 ID는 필수 값입니다.")
+	@Positive(message = "도서 ID는 양수여야 합니다.")
+	Long bookId;
 
 	@Positive(message = "가격은 0보다 커야합니다.")
 	BigDecimal price;
@@ -31,16 +35,16 @@ public class BookSaleInfoUpdateRequest {
 
 	public BookSaleInfo toEntity(BookSaleInfo existingEntity) {
 		return BookSaleInfo.builder()
-			.id(existingEntity.getId()) // 기존 ID 유지
-			.book(existingEntity.getBook()) // 기존 Book 정보 유지
-			.price(this.price != null ? this.price : existingEntity.getPrice()) // 요청 데이터가 null이면 기존 데이터 유지
+			.id(existingEntity.getId())
+			.book(existingEntity.getBook())
+			.price(this.price != null ? this.price : existingEntity.getPrice())
 			.salePrice(this.salePrice != null ? this.salePrice : existingEntity.getSalePrice())
 			.stock(this.stock != null ? this.stock : existingEntity.getStock())
 			.isPackable(this.isPackable != null ? this.isPackable : existingEntity.isPackable())
-			.salePercentage(existingEntity.getSalePercentage()) // 할인율은 변경하지 않음
-			.state(this.state != null ? this.state : existingEntity.getState()) // 상태 업데이트 또는 기존 상태 유지
-			.viewCount(existingEntity.getViewCount()) // 조회 수는 기존 값을 유지
-			.searchCount(existingEntity.getSearchCount()) // 검색 수 그대로 유지
+			.salePercentage(existingEntity.getSalePercentage())
+			.state(this.state != null ? this.state : existingEntity.getState())
+			.viewCount(existingEntity.getViewCount())
+			.searchCount(existingEntity.getSearchCount())
 			.build();
 	}
 }
