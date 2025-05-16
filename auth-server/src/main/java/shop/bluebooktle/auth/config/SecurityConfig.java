@@ -58,7 +58,6 @@ public class SecurityConfig {
 				.requestMatchers(antMatcher("/actuator/**")).permitAll()
 				.requestMatchers(SWAGGER_PATHS).permitAll()
 				.requestMatchers("/auth/**").permitAll()
-				.requestMatchers(SWAGGER_PATHS).permitAll()
 				.anyRequest().authenticated()
 			);
 		return http.build();
