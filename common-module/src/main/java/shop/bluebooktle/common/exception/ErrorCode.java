@@ -91,6 +91,7 @@ public enum ErrorCode {
 	ORDER_PACKAGING_OPTION_NOT_FOUND(HttpStatus.NOT_FOUND, "O005", "포장 옵션을 찾을 수 없습니다."),
 	ORDER_DELIVERY_RULE_NOT_FOUND(HttpStatus.NOT_FOUND, "O006", "배송 정책을 찾을 수 없습니다."),
 	ORDER_INVALID_ORDER_KEY(HttpStatus.UNAUTHORIZED, "O007", "유효하지 않은 주문 확인 정보입니다."), // 비회원 주문 확인
+	ORDER_STATE_NOT_FOUND(HttpStatus.NOT_FOUND, "O008", "해당 주문상태가 존재하지 않습니다."),
 
 	// Payment & Point Errors (결제/포인트 오류) - P
 	PAYMENT_FAILED(HttpStatus.BAD_GATEWAY, "P001", "결제 시스템 오류가 발생했습니다."), // 외부 결제사 오류
@@ -130,7 +131,11 @@ public enum ErrorCode {
 	SEARCH_INVALID_SORT_CRITERIA(HttpStatus.BAD_REQUEST, "R008", "유효하지 않은 검색 정렬 기준입니다."),
 	SEARCH_INVALID_WEIGHT_CONFIG(HttpStatus.INTERNAL_SERVER_ERROR, "R009", "검색 가중치 설정이 올바르지 않습니다."),
 
-	;
+	// Delivery Errors (배송 오류) - D
+	DELIVERY_RULE_CANNOT_DELETE_DEFAULT(HttpStatus.METHOD_NOT_ALLOWED, "D001", "기본 배송 정책은 삭제할 수 없습니다."),
+	DELIVERY_RULE_NOT_FOUND(HttpStatus.NOT_FOUND, "D002", "해당 배송정책이 없습니다."),
+	DEFAULT_DELIVERY_RULE_NOT_FOUND(HttpStatus.NOT_FOUND, "D003", "기본 배송 정책이 없습니다."),
+	DELIVERY_RULE_ALREADY_EXISTS(HttpStatus.CONFLICT, "D004", "해당 이름의 배송정책이 존재합니다.");
 
 	private final HttpStatus status; // HTTP 상태 코드
 	private final String code;       // 고유 오류 코드 (클라이언트 사용)

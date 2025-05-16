@@ -15,7 +15,7 @@ import shop.bluebooktle.backend.order.dto.response.OrderStateResponse;
 import shop.bluebooktle.backend.order.service.OrderStateService;
 import shop.bluebooktle.common.domain.OrderStatus;
 import shop.bluebooktle.common.dto.common.JsendResponse;
-import shop.bluebooktle.common.exception.order.OrderStateNotFoundException;
+import shop.bluebooktle.common.exception.order.order_state.OrderStateNotFoundException;
 
 @RestController
 @RequestMapping("/api")
