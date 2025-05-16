@@ -47,6 +47,7 @@ public enum ErrorCode {
 	BOOK_SALE_INFO_NOT_FOUND(HttpStatus.NOT_FOUND, "B009", "도서 판매 정보를 찾을 수 없습니다."),
 	BOOK_STATE_NOT_AVAILABLE(HttpStatus.BAD_REQUEST, "B010", "현재 구매할 수 없는 도서입니다."), // 재고 부족, 판매 종료 등
 	BOOK_ALREADY_EXISTS_EXCEPTION(HttpStatus.CONFLICT, "B011", "이미 등록된 도서입니다."),
+	BOOK_SALE_INFO_ALREADY_EXISTS(HttpStatus.CONFLICT, "B012", "이미 등록된 도서 판매 정보입니다."),
 
 	// Book - 카테고리
 	BOOK_CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "BC01", "도서에 등록된 카테고리를 찾을 수 없습니다."),

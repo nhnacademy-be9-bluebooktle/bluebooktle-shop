@@ -1,191 +1,26 @@
-@baseUrl = http://localhost:9002/api/admin/books
-
-### 알라딘 도서목록 제목으로 검색
-GET {{baseUrl}}/search?query=자바
-Accept: application/json
-
-### 알라딘 도서 isbn으로 검색
-GET {{baseUrl}}/select?isbn=9791186560655
-Accept: application/json
-
-### 알라딘 도서 등록
-POST {{baseUrl}}/register/aladin
+### 도서 테이블 직접등록
+POST http://localhost:9002/api/books
 Content-Type: application/json
 
 {
-  "isbn": "9791186560655",
-  "stock": 999,
-  "isPackable": true,
-  "state": "AVAILABLE",
-  "tag": [
-    "태그"
-  ]
-}
-
-### 알라딘 도서 등록 실패 - 중복isbn
-POST {{baseUrl}}/register/aladin
-Content-Type: application/json
-
-{
-  "isbn": "9791193926994",
-  "stock": 999,
-  "isPackable": true,
-  "state": "AVAILABLE",
-  "tag": [
-    "태그"
-  ]
-}
-
-### 알라딘 도서 등록 실패 - 필수필드 stock누락
-POST {{baseUrl}}/register/aladin
-Content-Type: application/json
-
-{
-  "isbn": "9791193926994",
-  "isPackable": true,
-  "state": "AVAILABLE",
-  "tag": [
-    "태그"
-  ]
-}
-
-### 알라딘 도서 등록 실패 - isbn글자수 잘못된 형식
-POST {{baseUrl}}/register/aladin
-Content-Type: application/json
-
-{
-  "isbn": "97911683407701111111",
-  "stock": "999",
-  "isPackable": true,
-  "state": "AVAILABLE",
-  "tag": [
-    "태그"
-  ]
-}
-
-### 도서 직접 등록
-POST http://localhost:9002/api/book/register/all
-Content-Type: application/json
-
-{
-  "title": "자바 개발",
-  "author": [
-    "작가1",
-    "작가2"
-  ],
-  "publisher": "출판사",
-  "tag": [
-    "태그1",
-    "태그2"
-  ],
-  "imageUrl": [
-    "https://image.aladin.co.kr/product/35650/80/coversum/k762036819_1.jpg"
-  ],
-  "category": [
-    "카테고리1",
-    "카테고리2"
-  ],
-  "isbn": "9791186560655",
+  "title": "테스트 제목",
   "description": "테스트 설명",
-  "publishDate": "2025-05-12",
-  "price": 20000,
-  "salePrice": 18000,
-  "stock": 99,
-  "isPackable": true,
-  "state": "AVAILABLE"
+  "isbn": "1234567890125",
+  "publishDate": "2025-05-15"
 }
 
-### 도서 직접 등록 실패 - 중복isbn
-POST http://localhost:9002/api/book/register/all
+### 도서 테이블 조회
+GET http://localhost:9002/api/books/1
+Content-Type: application/json
+
+### 도서 테이블 수정
+PUT http://localhost:9002/api/books/1
 Content-Type: application/json
 
 {
-  "title": "제목",
-  "author": [
-    "작가"
-  ],
-  "publisher": "출판사",
-  "tag": [
-    "태그"
-  ],
-  "imageUrl": [
-    "https://image.aladin.co.kr/product/35650/80/coversum/k762036819_1.jpg"
-  ],
-  "category": [
-    "카테고리"
-  ],
-  "isbn": "1234567890123",
-  "description": "테스트 설명",
-  "publishDate": "2025-05-12",
-  "price": 20000,
-  "salePrice": 18000,
-  "stock": 99,
-  "isPackable": true,
-  "state": "AVAILABLE"
+  "title": "테스트 제목 수정",
+  "description": "테스트 설명 수정"
 }
 
-### 도서 직접 등록 실패 - 필수필드 title 누락
-POST http://localhost:9002/api/book/register/all
-Content-Type: application/json
-
-{
-  "author": [
-    "작가"
-  ],
-  "publisher": "출판사",
-  "tag": [
-    "태그"
-  ],
-  "imageUrl": [
-    "https://image.aladin.co.kr/product/35650/80/coversum/k762036819_1.jpg"
-  ],
-  "category": [
-    "카테고리"
-  ],
-  "isbn": "1234567890123",
-  "description": "테스트 설명",
-  "publishDate": "2025-05-12",
-  "price": 20000,
-  "salePrice": 18000,
-  "stock": 99,
-  "isPackable": true,
-  "state": "AVAILABLE"
-}
-
-### 도서 직접 등록 실패 - isbn글자수 잘못된 형식
-POST http://localhost:9002/api/book/register/all
-Content-Type: application/json
-
-{
-  "title": "제목",
-  "author": [
-    "작가"
-  ],
-  "publisher": "출판사",
-  "tag": [
-    "태그"
-  ],
-  "imageUrl": [
-    "https://image.aladin.co.kr/product/35650/80/coversum/k762036819_1.jpg"
-  ],
-  "category": [
-    "카테고리"
-  ],
-  "isbn": "1234567890123456",
-  "description": "테스트 설명",
-  "publishDate": "2025-05-12",
-  "price": 20000,
-  "salePrice": 18000,
-  "stock": 99,
-  "isPackable": true,
-  "state": "AVAILABLE"
-}
-
-### 도서 조회 - book id로
-GET http://localhost:9002/api/book/search/all/1
-Content-Type: application/json
-
-### 모든 도서 조회 - 제목으로
-GET http://localhost:9002/api/book/search/all/by-title?title=자바
-Content-Type: application/json
-
+### 도서 테이블 삭제
+DELETE http://localhost:9002/api/books/1

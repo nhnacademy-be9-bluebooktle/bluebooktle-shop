@@ -27,7 +27,7 @@ import shop.bluebooktle.common.exception.book.BookAlreadyExistsException;
 import shop.bluebooktle.common.exception.book.BookNotFoundException;
 
 @Service
-
+@Transactional
 @RequiredArgsConstructor
 public class BookServiceImpl implements BookService {
 
@@ -39,11 +39,10 @@ public class BookServiceImpl implements BookService {
 	private final BookTagRepository bookTagRepository;
 	private final BookImgRepository bookImgRepository;
 
-	@Transactional
 	@Override
 	public BookRegisterResponse registerBook(BookRegisterRequest request) {
 		if (bookRepository.existsByIsbn(request.getIsbn())) {
-			throw new BookAlreadyExistsException("이미 도서가 존재합니다 ISBN: " + request.getIsbn());
+			throw new BookAlreadyExistsException();
 		}
 		Book book = toEntity(request);
 		bookRepository.save(book);
@@ -56,11 +55,11 @@ public class BookServiceImpl implements BookService {
 			.build();
 	}
 
-	@Transactional(readOnly = true)
 	@Override
+	@Transactional(readOnly = true)
 	public BookResponse findBookById(Long bookId) {
 		Book book = bookRepository.findById(bookId)
-			.orElseThrow(() -> new BookNotFoundException("도서를 찾을 수 없습니다 ID: " + bookId));
+			.orElseThrow(BookNotFoundException::new);
 
 		return BookResponse.builder()
 			.title(book.getTitle())
@@ -70,11 +69,10 @@ public class BookServiceImpl implements BookService {
 			.build();
 	}
 
-	@Transactional
 	@Override
 	public BookUpdateResponse updateBook(Long bookId, BookUpdateRequest request) {
 		Book book = bookRepository.findById(bookId)
-			.orElseThrow(() -> new BookNotFoundException("도서를 찾을 수 없습니다 ID: " + bookId));
+			.orElseThrow(BookNotFoundException::new);
 
 		Book updatedBook = Book.builder()
 			.id(book.getId()) // ID는 기존 데이터 유지
@@ -92,22 +90,24 @@ public class BookServiceImpl implements BookService {
 			.build();
 	}
 
-	@Transactional
 	@Override
 	public void deleteBook(Long bookId) {
-		if (!bookRepository.existsById(bookId)) {
-			throw new BookNotFoundException("삭제할 책이 존재하지 않습니다. ID: " + bookId);
-		}
-		bookRepository.deleteById(bookId);
+		// Book 존재 여부 확인
+		Book book = bookRepository.findById(bookId)
+			.orElseThrow(BookNotFoundException::new);
 
+		// book 삭제시 관련 BookSaleInfo 함께 삭제
+		bookSaleInfoRepository.findByBook(book).ifPresent(bookSaleInfoRepository::delete);
+
+		bookRepository.delete(book);
 	}
 
 	//도서 연관 데이터 한번에 id로조회
-	@Transactional(readOnly = true)
 	@Override
+	@Transactional(readOnly = true)
 	public BookAllResponse findBookAllById(Long id) {
 		Book book = bookRepository.findById(id)
-			.orElseThrow(() -> new BookNotFoundException("해당 도서를 찾을 수 없습니다. ID: " + id));
+			.orElseThrow(BookNotFoundException::new);
 		BookSaleInfo saleInfo = getBookSaleInfoByBookId(book.getId());
 
 		return BookAllResponse.builder()
@@ -132,8 +132,8 @@ public class BookServiceImpl implements BookService {
 	}
 
 	//도서 연관 데이터 한번에 제목으로 조회
-	@Transactional(readOnly = true)
 	@Override
+	@Transactional(readOnly = true)
 	public List<BookAllResponse> getBookAllByTitle(String title) {
 		List<Book> books = bookRepository.findAllByTitle(title);
 
@@ -164,11 +164,11 @@ public class BookServiceImpl implements BookService {
 			.toList();
 	}
 
-	@Transactional(readOnly = true)
 	@Override
+	@Transactional(readOnly = true)
 	public Book getBookById(Long bookId) {
 		return bookRepository.findById(bookId)
-			.orElseThrow(() -> new BookNotFoundException("해당 ID를 가진 책을 찾을 수 없습니다: " + bookId));
+			.orElseThrow(BookNotFoundException::new);
 	}
 
 	private List<String> getAuthorsByBookId(Long bookId) {
@@ -210,7 +210,7 @@ public class BookServiceImpl implements BookService {
 
 	private BookSaleInfo getBookSaleInfoByBookId(Long bookId) {
 		return bookSaleInfoRepository.findByBookId(bookId)
-			.orElseThrow(() -> new BookNotFoundException("도서 판매정보가 필요합니다. ID: " + bookId));
+			.orElseThrow(BookNotFoundException::new);
 	}
 
 	@Override
