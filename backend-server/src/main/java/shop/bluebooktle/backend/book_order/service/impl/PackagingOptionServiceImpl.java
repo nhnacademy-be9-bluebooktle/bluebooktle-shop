@@ -1,10 +1,6 @@
 package shop.bluebooktle.backend.book_order.service.impl;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +23,9 @@ public class PackagingOptionServiceImpl implements PackagingOptionService {
 	/** 포장 옵션 등록 */
 	@Override
 	public PackagingOptionResponse createPackagingOption(PackagingOptionRequest request) {
+		if (packagingOptionRepository.existsByName(request.getName())) {
+			throw new PackagingOptionNotFoundException(); // 이미 등록된 포장 옵션 이름이라면 에러 발생
+		}
 		PackagingOption option = PackagingOption.builder()
 			.name(request.getName())
 			.price(request.getPrice())
@@ -43,15 +42,12 @@ public class PackagingOptionServiceImpl implements PackagingOptionService {
 	/** 포장 옵션 전체 조회 */
 	@Override
 	public Page<PackagingOptionResponse> getPackagingOption(Pageable pageable) {
-		List<PackagingOption> options = packagingOptionRepository.findAllByDeletedAtIsNull();
-		List<PackagingOptionResponse> responses = options.stream()
-			.map(o -> PackagingOptionResponse.builder()
-				.packagingOptionId(o.getId())
-				.name(o.getName())
-				.price(o.getPrice())
-				.build())
-			.collect(Collectors.toList());
-		return new PageImpl<>(responses, pageable, responses.size());
+		Page<PackagingOption> page = packagingOptionRepository.findAllByDeletedAtIsNull(pageable);
+		return page.map(o -> PackagingOptionResponse.builder()
+			.packagingOptionId(o.getId())
+			.name(o.getName())
+			.price(o.getPrice())
+			.build());
 	}
 
 	/** 포장 옵션 수정 */

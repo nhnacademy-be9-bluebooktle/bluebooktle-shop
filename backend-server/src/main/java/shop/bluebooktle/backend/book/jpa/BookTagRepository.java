@@ -1,4 +1,4 @@
-package shop.bluebooktle.backend.book.repository;
+package shop.bluebooktle.backend.book.jpa;
 
 import java.util.List;
 
