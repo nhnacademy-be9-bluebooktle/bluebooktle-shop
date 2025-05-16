@@ -9,8 +9,8 @@ import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.book.dto.response.BookLikesResponse;
 import shop.bluebooktle.backend.book.entity.Book;
 import shop.bluebooktle.backend.book.entity.BookLikes;
-import shop.bluebooktle.backend.book.repository.BookLikesRepository;
-import shop.bluebooktle.backend.book.repository.BookRepository;
+import shop.bluebooktle.backend.book.jpa.BookLikesRepository;
+import shop.bluebooktle.backend.book.jpa.BookRepository;
 import shop.bluebooktle.backend.book.service.BookLikesService;
 import shop.bluebooktle.backend.user.repository.UserRepository;
 import shop.bluebooktle.common.entity.auth.User;
@@ -80,11 +80,13 @@ public class BookLikesServiceImpl implements BookLikesService {
 	@Transactional(readOnly = true)
 	public List<BookLikesResponse> getBooksLikedByUser(Long userId) {
 		List<BookLikes> likedBooks = bookLikesRepository.findAllByUser_Id(userId);
-		return likedBooks.stream().map(bl -> BookLikesResponse.builder()
+		return likedBooks.stream()
+			.map(bl -> BookLikesResponse.builder()
 				.bookId(bl.getBook().getId())
 				.isLiked(true)
 				.countLikes((int)bookLikesRepository.countByBook_Id(bl.getBook().getId()))
 				.build())
+			.filter(BookLikesResponse::isLiked) // 좋아요 누른 도서만 조회
 			.toList();
 	}
 }

@@ -5,7 +5,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.book.entity.Book;
-import shop.bluebooktle.backend.book.repository.BookRepository;
+import shop.bluebooktle.backend.book.jpa.BookRepository;
 import shop.bluebooktle.backend.book_order.entity.BookOrder;
 import shop.bluebooktle.backend.book_order.repository.BookOrderRepository;
 import shop.bluebooktle.backend.book_order.service.BookOrderService;

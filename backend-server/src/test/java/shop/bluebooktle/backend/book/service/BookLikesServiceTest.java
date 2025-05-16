@@ -1,50 +1,66 @@
 package shop.bluebooktle.backend.book.service;
 
+import static org.mockito.BDDMockito.*;
+
+import java.util.Optional;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import lombok.extern.slf4j.Slf4j;
+import shop.bluebooktle.backend.book.entity.Book;
+import shop.bluebooktle.backend.book.entity.BookLikes;
+import shop.bluebooktle.backend.book.jpa.BookLikesRepository;
+import shop.bluebooktle.backend.book.jpa.BookRepository;
+import shop.bluebooktle.backend.book.service.impl.BookLikesServiceImpl;
+import shop.bluebooktle.backend.user.repository.UserRepository;
+import shop.bluebooktle.common.entity.auth.User;
+
+@ExtendWith(MockitoExtension.class)
+@Slf4j
 public class BookLikesServiceTest {
-	//
-	// @InjectMocks
-	// private BookLikesServiceImpl bookLikesService;
-	//
-	// @Mock
-	// private BookLikesRepository bookLikesRepository;
-	//
-	// @Mock
-	// private BookRepository bookRepository;
-	//
-	// @Mock
-	// private UserRepository userRepository;
-	//
-	// private Book book;
-	// private User user;
-	//
-	// /** 사전 설정 */
-	// @BeforeEach
-	// void setUp() throws Exception {
-	// 	MockitoAnnotations.initMocks(this); // Mockito 어노테이션 초기화
-	// 	book = mock(Book.class); // Book 객체를 mock 으로 생성
-	// 	user = mock(User.class); // User 객체를 mock 으로 생성
-	// 	when(book.getId()).thenReturn(1L); // ID 값 설정
-	// 	when(user.getId()).thenReturn(1L);
-	// }
-	//
-	// @Test
-	// @DisplayName("도서 좋아요 성공")
-	// void likeBookTest() {
-	// 	// // given - 좋아요 요청 생성 및 레포지토리 반환 값 설정
-	// 	// BookLikesRequest request = BookLikesRequest.builder()
-	// 	// 	.bookId(1L)
-	// 	// 	.userId(1L)
-	// 	// 	.build();
-	// 	// when(bookLikesRepository.existsByUser_IdAndBook_Id(1L, 1L)).thenReturn(false);
-	// 	// when(bookRepository.findById(1L)).thenReturn(Optional.of(book));
-	// 	// when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-	// 	//
-	// 	// // when - 좋아요 요청 실행
-	// 	// bookLikesService.like(request);
-	// 	//
-	// 	// // then - 좋아요 요청 메서드 실행 확인
-	// 	// verify(bookLikesRepository).save(any(BookLikes.class));
-	// }
+
+	@InjectMocks
+	private BookLikesServiceImpl bookLikesService;
+
+	@Mock
+	private BookLikesRepository bookLikesRepository;
+
+	@Mock
+	private BookRepository bookRepository;
+
+	@Mock
+	private UserRepository userRepository;
+
+	@Test
+	@DisplayName("도서 좋아요 성공")
+	void like_success() {
+		// given - 좋아요 요청 생성 및 레포지토리 반환 값 설정
+		given(bookLikesRepository.existsByUser_IdAndBook_Id(1L, 1L)).willReturn(false);
+
+		Book book = mock(Book.class);
+		given(book.getId()).willReturn(1L);
+		given(bookRepository.findById(1L)).willReturn(Optional.of(book));
+
+		User user = mock(User.class);
+		given(user.getId()).willReturn(1L);
+		given(userRepository.findById(1L)).willReturn(Optional.of(user));
+
+		// when - 좋아요 요청 실행
+		bookLikesService.like(1L, 1L);
+
+		// then - 좋아요 요청 메서드 실행 확인
+		verify(bookLikesRepository).save(argThat(bl -> {
+			bl.getBook().getId().equals(1L);
+			bl.getUser().getId().equals(1L);
+			return true;
+		}));
+	}
+
 	//
 	// @Test
 	// @DisplayName("좋아요 중복 예외 발생")
@@ -96,23 +112,27 @@ public class BookLikesServiceTest {
 	// 	assertThrows(UserNotFoundException.class, () -> bookLikesService.like(request));
 	// }
 	//
-	// @Test
-	// @DisplayName("도서 좋아요 취소 성공")
-	// void unlikeBookTest() {
-	// 	// given - 좋아요 요청 엔티티가 미리 있도록 설정
-	// 	BookLikesRequest request = BookLikesRequest.builder()
-	// 		.bookId(1L)
-	// 		.userId(1L)
-	// 		.build();
-	// 	BookLikes like = mock(BookLikes.class);
-	// 	when(bookLikesRepository.findByUser_IdAndBook_Id(1L, 1L)).thenReturn(like);
-	//
-	// 	// when - 좋아요 요청 실행
-	// 	bookLikesService.unlike(request);
-	//
-	// 	// then - 좋아요 요청 메서드 실행 확인
-	// 	verify(bookLikesRepository).delete(like);
-	// }
+	@Test
+	@DisplayName("도서 좋아요 삭제 - 성공")
+	void unlike_success() {
+		// given - 좋아요 요청 엔티티가 미리 있도록 설정
+		Book book = mock(Book.class);
+		when(book.getId()).thenReturn(1L);
+		User user = mock(User.class);
+		when(user.getId()).thenReturn(1L);
+
+		BookLikes like = new BookLikes(book, user);
+		given(bookLikesRepository.findByUser_IdAndBook_Id(1L, 1L)).willReturn(like);
+
+		// when - 좋아요 요청 실행
+		bookLikesService.unlike(1L, 1L);
+
+		// then - 좋아요 요청 메서드 실행 확인
+		verify(bookLikesRepository).delete(argThat(bl ->
+			bl.getBook().getId().equals(1L) &&
+				bl.getUser().getId().equals(1L)
+		));
+	}
 	//
 	// @Test
 	// @DisplayName("좋아요 여부 확인")

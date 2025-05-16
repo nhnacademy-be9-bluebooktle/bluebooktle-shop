@@ -1,7 +1,7 @@
-package shop.bluebooktle.backend.book.repository;
+package shop.bluebooktle.backend.book.jpa;
 
-import java.util.Optional;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
