@@ -20,11 +20,5 @@ public interface CouponQueryRepository {
 	Page<UserCouponResponse> findAllByUserCoupon(User user, Pageable pageable);
 
 	// 유저 별 사용 가능 쿠폰 전체 조회
-	Page<UserCouponResponse> findAllByUsableUserCoupon(User user, Pageable pageable);
-
-	// 유저 별 사용 완료 쿠폰 조회
-	Page<UserCouponResponse> findAllByUsedUserCoupon(User user, Pageable pageable);
-
-	// 유저 별 기간 만료 쿠폰 조회
-	Page<UserCouponResponse> findAllByExpiredUserCoupon(User user, Pageable pageable);
+	Page<UserCouponResponse> findAllByAvailableUserCoupon(User user, Pageable pageable);
 }
