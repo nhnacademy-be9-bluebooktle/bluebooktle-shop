@@ -61,11 +61,25 @@ public class UserCouponServiceImpl implements UserCouponService {
 		return userCouponRepository.findAllByUserCoupon(user, pageable);
 	}
 
-	// 유저 별 사용 가능 쿠폰 조회 - 결제용
+	// 유저 별 사용 가능 쿠폰 조회
 	@Override
 	@Transactional(readOnly = true)
-	public Page<UserCouponResponse> getAvailableUserCoupons(User user, Pageable pageable) {
-		return userCouponRepository.findAllByAvailableUserCoupon(user, pageable);
+	public Page<UserCouponResponse> getUsableUserCoupons(User user, Pageable pageable) {
+		return userCouponRepository.findAllByUsableUserCoupon(user, pageable);
+	}
+
+	// 유저 별 사용 완료 쿠폰 조회
+	@Override
+	@Transactional(readOnly = true)
+	public Page<UserCouponResponse> getUsedUserCoupons(User user, Pageable pageable) {
+		return userCouponRepository.findAllByUsedUserCoupon(user, pageable);
+	}
+
+	// 유저 별 (기간 만료 && 사용 못함) 쿠폰 조회
+	@Override
+	@Transactional(readOnly = true)
+	public Page<UserCouponResponse> getExpiredUserCoupons(User user, Pageable pageable) {
+		return userCouponRepository.findAllByExpiredUserCoupon(user, pageable);
 	}
 
 	// 쿠폰 사용
