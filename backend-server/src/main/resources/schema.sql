@@ -275,6 +275,7 @@ CREATE TABLE `users`
     `password`      varchar(255)                            NOT NULL,
     `name`          varchar(20)                             NOT NULL,
     `email`         varchar(50)                             NOT NULL,
+    `nickname`      varchar(20)                             NOT NULL,
     `birth`         varchar(8)                              NOT NULL,
     `phone_number`  varchar(11)                             NOT NULL,
     `point_balance` decimal(10, 2)                          NOT NULL,
