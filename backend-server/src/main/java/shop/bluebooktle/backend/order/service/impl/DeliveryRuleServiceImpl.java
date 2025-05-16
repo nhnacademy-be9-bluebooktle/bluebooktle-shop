@@ -21,12 +21,12 @@ public class DeliveryRuleServiceImpl implements DeliveryRuleService {
 
 	private final DeliveryRuleRepository deliveryRuleRepository;
 
-	private static final String DEFAULT_RULE_NAME = "기본 배송 정책";
+	private static final Long DEFAULT_RULE_ID = 1L;
 
 	@Override
 	@Transactional(readOnly = true)
 	public DeliveryRule getDefaultRule() {
-		return deliveryRuleRepository.findByName(DEFAULT_RULE_NAME)
+		return deliveryRuleRepository.findById(DEFAULT_RULE_ID)
 			.orElseThrow(DefaultDeliveryRuleNotFoundException::new);
 	}
 
@@ -48,8 +48,8 @@ public class DeliveryRuleServiceImpl implements DeliveryRuleService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public DeliveryRule getRule(String name) {
-		return deliveryRuleRepository.findByName(name)
+	public DeliveryRule getRule(Long id) {
+		return deliveryRuleRepository.findById(id)
 			.orElseThrow(DeliveryRuleNotFoundException::new);
 	}
 
@@ -61,8 +61,8 @@ public class DeliveryRuleServiceImpl implements DeliveryRuleService {
 
 	@Override
 	@Transactional
-	public void deletePolicy(String name) {
-		DeliveryRule rule = deliveryRuleRepository.findByName(name)
+	public void deletePolicy(Long id) {
+		DeliveryRule rule = deliveryRuleRepository.findById(id)
 			.orElseThrow(DeliveryRuleNotFoundException::new);
 
 		// 기본 배송 정책은 삭제 불가

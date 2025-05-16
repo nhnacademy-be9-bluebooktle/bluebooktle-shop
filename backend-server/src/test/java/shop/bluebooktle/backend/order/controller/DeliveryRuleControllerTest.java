@@ -57,20 +57,21 @@ class DeliveryRuleControllerTest {
 	@Test
 	@DisplayName("단일 배송 정책 조회 - 성공")
 	void getRule_success() throws Exception {
+		Long id = 1L;
 		DeliveryRule rule = DeliveryRule.builder()
 			.name("기본 배송")
 			.price(new BigDecimal("30000"))
 			.deliveryFee(new BigDecimal("3000"))
 			.build();
 
-		given(deliveryRuleService.getRule(eq("기본 배송"))).willReturn(rule);
+		given(deliveryRuleService.getRule(id)).willReturn(rule);
 
-		mockMvc.perform(get("/api/admin/delivery-rules")
-				.param("name", "기본 배송"))
+		mockMvc.perform(get("/api/admin/delivery-rules/{id}", id))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.status").value("success"));
+			.andExpect(jsonPath("$.status").value("success"))
+			.andExpect(jsonPath("$.data.name").value("기본 배송"));
 
-		verify(deliveryRuleService).getRule("기본 배송");
+		verify(deliveryRuleService).getRule(id);
 	}
 
 	@Test
@@ -97,11 +98,11 @@ class DeliveryRuleControllerTest {
 	@Test
 	@DisplayName("배송 정책 삭제 - 성공")
 	void deleteRule_success() throws Exception {
-		mockMvc.perform(delete("/api/admin/delivery-rules")
-				.param("name", "기본 배송"))
+		Long id = 1L;
+		mockMvc.perform(delete("/api/admin/delivery-rules/{id}", id))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.status").value("success"));
 
-		verify(deliveryRuleService).deletePolicy("기본 배송");
+		verify(deliveryRuleService).deletePolicy(id);
 	}
 }
