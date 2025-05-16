@@ -1,5 +1,7 @@
 package shop.bluebooktle.backend.book.dto.request;
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import lombok.Getter;
@@ -8,8 +10,7 @@ import lombok.Getter;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AladinBookItem {
 	private String title;
-	private String author;
-	private Integer authorId;
+	private List<String> authors;
 	private String description;
 	private String pubDate;
 	private String isbn13;

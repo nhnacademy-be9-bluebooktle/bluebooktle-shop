@@ -35,13 +35,12 @@ import shop.bluebooktle.backend.book.repository.ImgRepository;
 import shop.bluebooktle.backend.book.repository.PublisherRepository;
 import shop.bluebooktle.backend.book.repository.TagRepository;
 import shop.bluebooktle.backend.book.service.AladinBookService;
-import shop.bluebooktle.backend.book.repository.TagRepository;
-import shop.bluebooktle.backend.book.service.AladinBookService;
 import shop.bluebooktle.backend.book.service.BookRegisterService;
 import shop.bluebooktle.common.exception.book.AladinBookNotFoundException;
 import shop.bluebooktle.common.exception.book.BookAlreadyExistsException;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class BookRegisterServiceImpl implements BookRegisterService {
 
@@ -62,7 +61,6 @@ public class BookRegisterServiceImpl implements BookRegisterService {
 	private final BookTagRepository bookTagRepository;
 
 	//연관테이블 완성되면 수정필요 일단기능구현만
-	@Transactional
 	@Override
 	public void registerBook(BookAllRegisterRequest request) {
 		Optional<Book> existBook = bookRepository.findByIsbn(request.getIsbn());
@@ -135,7 +133,6 @@ public class BookRegisterServiceImpl implements BookRegisterService {
 	}
 
 	//연관테이블 완성되면 수정필요 일단기능구현만
-	@Transactional
 	@Override
 	public void registerBookByAladin(BookAllRegisterByAladinRequest request) {
 		Optional<Book> existBook = bookRepository.findByIsbn(request.getIsbn());
@@ -157,9 +154,9 @@ public class BookRegisterServiceImpl implements BookRegisterService {
 			.build();
 		bookRepository.save(book);
 
-		Author author = authorRepository.findByName(aladin.getAuthor())
-			.orElseGet(() -> authorRepository.save(new Author(aladin.getAuthor())));
-		bookAuthorRepository.save(new BookAuthor(author, book));
+		// Author author = authorRepository.findByName(aladin.getAuthor())
+		// 	.orElseGet(() -> authorRepository.save(new Author(aladin.getAuthor())));
+		// bookAuthorRepository.save(new BookAuthor(author, book));
 
 		Publisher publisher = publisherRepository.findByName(aladin.getPublisher())
 			.orElseGet(() -> publisherRepository.save(new Publisher(aladin.getPublisher())));
