@@ -85,7 +85,6 @@ CREATE TABLE `category` (
 	`category_id`	bigint	NOT NULL AUTO_INCREMENT,
 	`parent_category_id`	bigint	NULL,
 	`name`	varchar(50)	NOT NULL,
-    `category_path` text NOT NULL,
 	`created_at`	timestamp	NOT NULL	DEFAULT CURRENT_TIMESTAMP,
 	`deleted_at`	timestamp	NULL,
 
@@ -408,25 +407,26 @@ CREATE TABLE `cart` (
         REFERENCES `users` (`user_id`)
 );
 
-CREATE TABLE `orders` (
-	`order_id`	bigint	NOT NULL AUTO_INCREMENT,
-	`order_state_id`	bigint	NOT NULL,
-	`delivery_rule_id`	bigint	NOT NULL,
-	`user_id`	bigint	NULL,
-	`order_date`	timestamp	NOT NULL,
-	`requested_delivery_date`	timestamp	NOT NULL	DEFAULT CURRENT_TIMESTAMP,
-	`shipped_at`	timestamp	NULL,
-	`delivery_fee`	decimal(10,2)	NOT NULL,
-	`orderer_name`	varchar(20)	NOT NULL,
-	`orderer_phone_number`	varchar(11)	NOT NULL,
-	`receiver_name`	varchar(20)	NOT NULL,
-	`receiver_phone_number`	varchar(11)	NOT NULL,
-	`address`	varchar(255)	NOT NULL,
-	`detail_address`	varchar(255)	NOT NULL,
-	`postal_code`	varchar(5)	NOT NULL,
-	`tracking_number`	varchar(14)	NOT NULL,
-	`deleted_at`	timestamp	NULL,
-	`order_key`	varchar(36)	NULL	COMMENT '비회원이 주문을 확인하기 위해 사용하는 비밀번호입니다.',
+CREATE TABLE `orders`
+(
+    `order_id`                bigint         NOT NULL AUTO_INCREMENT,
+    `order_state_id`          bigint         NOT NULL,
+    `delivery_rule_id`        bigint         NOT NULL,
+    `user_id`                 bigint         NULL,
+    `order_date`              timestamp      NOT NULL,
+    `requested_delivery_date` timestamp      NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `shipped_at`              timestamp      NULL,
+    `delivery_fee`            decimal(10, 2) NOT NULL,
+    `orderer_name`            varchar(20)    NOT NULL,
+    `orderer_phone_number`    varchar(11)    NOT NULL,
+    `receiver_name`           varchar(20)    NOT NULL,
+    `receiver_phone_number`   varchar(11)    NOT NULL,
+    `address`                 varchar(255)   NOT NULL,
+    `detail_address`          varchar(255)   NOT NULL,
+    `postal_code`             varchar(5)     NOT NULL,
+    `tracking_number`         varchar(14)    NOT NULL,
+    `deleted_at`              timestamp      NULL,
+    `order_key`               varchar(36)    NULL COMMENT '비회원이 주문을 확인하기 위해 사용하는 비밀번호입니다.',
 
     CONSTRAINT `PK_ORDERS`  PRIMARY KEY (`order_id`),
     CONSTRAINT `FK_order_order_state_id_order_state`
