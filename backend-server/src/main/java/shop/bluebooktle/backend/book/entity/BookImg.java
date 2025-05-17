@@ -10,6 +10,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -39,6 +40,7 @@ public class BookImg {
 	@Column(name = "is_thumbnail", nullable = false)
 	private boolean isThumbnail;
 
+	@Builder
 	public BookImg(Book book, Img img, boolean isThumbnail) {
 		this.book = book;
 		this.img = img;

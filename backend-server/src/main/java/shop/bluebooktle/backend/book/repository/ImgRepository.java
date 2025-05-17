@@ -1,9 +1,13 @@
 package shop.bluebooktle.backend.book.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
+import shop.bluebooktle.backend.book.entity.Book;
 import shop.bluebooktle.backend.book.entity.Img;
 
 public interface ImgRepository extends JpaRepository<Img, Long> {
@@ -15,4 +19,5 @@ public interface ImgRepository extends JpaRepository<Img, Long> {
 	boolean existsByImgUrl(String imgUrl);
 
 	Optional<Img> findByImgUrl(String imgUrl);
+
 }
