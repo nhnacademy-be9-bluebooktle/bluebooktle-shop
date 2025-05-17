@@ -14,6 +14,8 @@ public interface AuthorRepository extends JpaRepository<Author, Long> {
 	// 작가 전체 이름으로 조회 (정확하게 일치하는 이름)
 	Optional<Author> findByName(String name);
 
+	boolean existsByName(String name);
+
 	// 작가 이름 부분 일치 조회
 	List<Author> findByNameContaining(String name);
 
@@ -34,4 +36,5 @@ public interface AuthorRepository extends JpaRepository<Author, Long> {
 
 	// 삭제되지 않은 작가 이름 부분 일치 조회
 	List<Author> findByNameContainingAndDeletedAtIsNull(String name);
+
 }

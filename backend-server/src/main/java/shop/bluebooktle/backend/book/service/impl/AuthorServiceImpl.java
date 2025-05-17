@@ -11,8 +11,10 @@ import shop.bluebooktle.backend.book.entity.Author;
 import shop.bluebooktle.backend.book.repository.AuthorRepository;
 import shop.bluebooktle.backend.book.service.AuthorService;
 import shop.bluebooktle.common.exception.book.AuthorAlreadyExistsException;
+import shop.bluebooktle.common.exception.book.AuthorFieldNullException;
 import shop.bluebooktle.common.exception.book.AuthorIdNullException;
-import shop.bluebooktle.common.exception.book.AuthorNameEmptyException;
+import shop.bluebooktle.common.exception.book.AuthorNotFoundException;
+import shop.bluebooktle.common.exception.book.AuthorUpdateFieldMissingException;
 
 @Service
 @RequiredArgsConstructor
@@ -29,11 +31,15 @@ public class AuthorServiceImpl implements AuthorService {
 		String authorKey = authorRegisterRequest.getAuthorKey();
 
 		if (name == null || description == null || authorKey == null) {
-			throw new RuntimeException(); // TODO #1
+			throw new AuthorFieldNullException();
 		}
 
 		if (name.trim().isEmpty() || description.trim().isEmpty() || authorKey.trim().isEmpty()) {
-			throw new RuntimeException(); // TODO #2
+			throw new AuthorFieldNullException();
+		}
+
+		if (authorRepository.existsByName(name)) {
+			throw new AuthorAlreadyExistsException(name);
 		}
 
 		Author author = Author.builder()
@@ -50,10 +56,10 @@ public class AuthorServiceImpl implements AuthorService {
 	public AuthorResponse getAuthor(Long authorId) {
 
 		if (authorId == null) {
-			throw new RuntimeException(); // TODO #3
+			throw new AuthorIdNullException();
 		}
 
-		Author author = authorRepository.findById(authorId).orElseThrow(() -> new RuntimeException()); // TODO #4
+		Author author = authorRepository.findById(authorId).orElseThrow(() -> new AuthorNotFoundException(authorId));
 
 		return AuthorResponse.builder()
 			.id(author.getId())
@@ -73,16 +79,16 @@ public class AuthorServiceImpl implements AuthorService {
 		String authorKey = authorUpdateRequest.getAuthorKey();
 
 		if (authorId == null) {
-			throw new RuntimeException(); // TODO #5
+			throw new AuthorIdNullException();
 		}
 
 		if ((name == null || name.trim().isEmpty()) &&
 			(description == null || description.trim().isEmpty()) &&
 			(authorKey == null || authorKey.trim().isEmpty())) {
-			throw new RuntimeException(); // TODO #6
+			throw new AuthorUpdateFieldMissingException();
 		}
 
-		Author author = authorRepository.findById(authorId).orElseThrow(() -> new RuntimeException()); // TODO #7
+		Author author = authorRepository.findById(authorId).orElseThrow(() -> new AuthorNotFoundException(authorId));
 
 		if (name != null) {
 			author.setName(name);
@@ -102,9 +108,9 @@ public class AuthorServiceImpl implements AuthorService {
 	@Override
 	public void deleteAuthor(Long authorId) {
 		if (authorId == null) {
-			throw new RuntimeException(); // TODO #8
+			throw new AuthorIdNullException();
 		}
-		Author author = authorRepository.findById(authorId).orElseThrow(() -> new RuntimeException()); // TODO #9
+		Author author = authorRepository.findById(authorId).orElseThrow(() -> new AuthorNotFoundException(authorId));
 		authorRepository.delete(author);
 	}
 }

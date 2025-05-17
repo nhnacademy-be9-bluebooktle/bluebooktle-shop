@@ -17,6 +17,12 @@ import shop.bluebooktle.backend.book.repository.AuthorRepository;
 import shop.bluebooktle.backend.book.repository.BookAuthorRepository;
 import shop.bluebooktle.backend.book.repository.BookRepository;
 import shop.bluebooktle.backend.book.service.BookAuthorService;
+import shop.bluebooktle.common.exception.book.AuthorIdNullException;
+import shop.bluebooktle.common.exception.book.AuthorNotFoundException;
+import shop.bluebooktle.common.exception.book.BookAuthorAlreadyExistsException;
+import shop.bluebooktle.common.exception.book.BookAuthorNotFoundException;
+import shop.bluebooktle.common.exception.book.BookIdNullException;
+import shop.bluebooktle.common.exception.book.BookNotFoundException;
 
 @Service
 @RequiredArgsConstructor
@@ -29,44 +35,45 @@ public class BookAuthorServiceImpl implements BookAuthorService {
 	@Transactional
 	@Override
 	public void registerBookAuthor(Long bookId, Long authorId) {
-
-		if (bookId == null || authorId == null) {
-			throw new RuntimeException(); // TODO #1
+		if (bookId == null) {
+			throw new BookIdNullException();
+		}
+		if (authorId == null) {
+			throw new AuthorIdNullException();
 		}
 
-		Author author = authorRepository.findById(authorId).orElseThrow(() -> new RuntimeException()); // TODO #2
-		Book book = bookRepository.findById(bookId).orElseThrow(() -> new RuntimeException()); // TODO #3
+		Author author = authorRepository.findById(authorId)
+			.orElseThrow(() -> new AuthorNotFoundException(authorId));
+		Book book = bookRepository.findById(bookId)
+			.orElseThrow(() -> new BookNotFoundException());
 
 		if (bookAuthorRepository.existsByBookAndAuthor(book, author)) {
-			throw new RuntimeException(); // TODO #4
+			throw new BookAuthorAlreadyExistsException(bookId, authorId);
 		}
-		BookAuthor bookAuthor = BookAuthor.builder()
+
+		BookAuthor ba = BookAuthor.builder()
 			.book(book)
 			.author(author)
 			.build();
-
-		bookAuthorRepository.save(bookAuthor);
+		bookAuthorRepository.save(ba);
 	}
 
 	@Transactional(readOnly = true)
 	@Override
 	public List<AuthorResponse> getAuthorByBookId(Long bookId) {
-
 		if (bookId == null) {
-			throw new RuntimeException(); // TODO #5
+			throw new BookIdNullException();
 		}
+		Book book = bookRepository.findById(bookId)
+			.orElseThrow(() -> new BookNotFoundException());
 
-		Book book = bookRepository.findById(bookId).orElseThrow(() -> new RuntimeException()); // TODO #6
-
-		List<Author> authors = bookAuthorRepository.findAuthorsByBook(book);
-
-		return authors.stream()
-			.map(author -> AuthorResponse.builder()
-				.id(author.getId())
-				.name(author.getName())
-				.description(author.getDescription())
-				.authorKey(author.getAuthorKey())
-				.createdAt(author.getCreatedAt())
+		return bookAuthorRepository.findAuthorsByBook(book).stream()
+			.map(a -> AuthorResponse.builder()
+				.id(a.getId())
+				.name(a.getName())
+				.description(a.getDescription())
+				.authorKey(a.getAuthorKey())
+				.createdAt(a.getCreatedAt())
 				.build())
 			.toList();
 	}
@@ -75,32 +82,34 @@ public class BookAuthorServiceImpl implements BookAuthorService {
 	@Override
 	public List<BookInfoResponse> getBookByAuthorId(Long authorId) {
 		if (authorId == null) {
-			throw new RuntimeException(); // TODO #7
+			throw new AuthorIdNullException();
 		}
+		Author author = authorRepository.findById(authorId)
+			.orElseThrow(() -> new AuthorNotFoundException(authorId));
 
-		Author author = authorRepository.findById(authorId).orElseThrow(() -> new RuntimeException()); // TODO #8
-
-		List<Book> books = bookAuthorRepository.findBooksByAuthor(author);
-
-		return books.stream()
-			.map(book -> new BookInfoResponse(book.getId()))
+		return bookAuthorRepository.findBooksByAuthor(author).stream()
+			.map(b -> new BookInfoResponse(b.getId()))
 			.toList();
 	}
 
 	@Transactional
 	@Override
 	public void deleteBookAuthor(Long bookId, Long authorId) {
-
-		if (bookId == null || authorId == null) {
-			throw new RuntimeException(); // TODO #9
+		if (bookId == null) {
+			throw new BookIdNullException();
+		}
+		if (authorId == null) {
+			throw new AuthorIdNullException();
 		}
 
-		Author author = authorRepository.findById(authorId).orElseThrow(() -> new RuntimeException()); // TODO #10
-		Book book = bookRepository.findById(bookId).orElseThrow(() -> new RuntimeException()); // TODO #11
+		Author author = authorRepository.findById(authorId)
+			.orElseThrow(() -> new AuthorNotFoundException(authorId));
+		Book book = bookRepository.findById(bookId)
+			.orElseThrow(() -> new BookNotFoundException());
 
-		BookAuthor bookAuthor = bookAuthorRepository.findByBookAndAuthor(book, author)
-			.orElseThrow(() -> new RuntimeException()); // TODO #12
+		BookAuthor ba = bookAuthorRepository.findByBookAndAuthor(book, author)
+			.orElseThrow(() -> new BookAuthorNotFoundException(bookId, authorId));
 
-		bookAuthorRepository.delete(bookAuthor);
+		bookAuthorRepository.delete(ba);
 	}
 }

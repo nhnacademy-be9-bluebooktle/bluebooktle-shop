@@ -19,6 +19,12 @@ import shop.bluebooktle.backend.book.repository.BookImgRepository;
 import shop.bluebooktle.backend.book.repository.BookRepository;
 import shop.bluebooktle.backend.book.repository.ImgRepository;
 import shop.bluebooktle.backend.book.service.BookImgService;
+import shop.bluebooktle.common.exception.book.BookIdNullException;
+import shop.bluebooktle.common.exception.book.BookImgAlreadyExistsException;
+import shop.bluebooktle.common.exception.book.BookImgNotFoundException;
+import shop.bluebooktle.common.exception.book.BookNotFoundException;
+import shop.bluebooktle.common.exception.book.ImgIdNullException;
+import shop.bluebooktle.common.exception.book.ImgNotFoundException;
 
 // 수정 필요
 
@@ -35,14 +41,19 @@ public class BookImgServiceImpl implements BookImgService {
 	public void registerBookImg(Long bookId, BookImgRegisterRequest bookImgRegisterRequest) {
 
 		if (bookId == null) {
-			throw new RuntimeException(); // TODO #1
+			throw new BookIdNullException();
 		}
 
-		Img img = imgRepository.findById(bookImgRegisterRequest.getImgId()).orElseThrow(() -> new RuntimeException()); // TODO #2
-		Book book = bookRepository.findById(bookId).orElseThrow(() -> new RuntimeException()); // TODO #3
+		Long imgId = bookImgRegisterRequest.getImgId();
+		if (imgId == null) {
+			throw new ImgIdNullException();
+		}
+
+		Img img = imgRepository.findById(bookImgRegisterRequest.getImgId()).orElseThrow(() -> new ImgNotFoundException());
+		Book book = bookRepository.findById(bookId).orElseThrow(() -> new BookNotFoundException());
 
 		if (bookImgRepository.existsByBookAndImg(book, img)) {
-			throw new RuntimeException(); // TODO #4
+			throw new BookImgAlreadyExistsException(bookId, imgId);
 		}
 		BookImg bookImg = BookImg.builder()
 			.book(book)
@@ -58,10 +69,10 @@ public class BookImgServiceImpl implements BookImgService {
 	@Override
 	public List<ImgResponse> getImgByBookId(Long bookId) {
 		if (bookId == null) {
-			throw new RuntimeException(); // TODO #5
+			throw new BookIdNullException();
 		}
 
-		Book book = bookRepository.findById(bookId).orElseThrow(() -> new RuntimeException()); // TODO #6
+		Book book = bookRepository.findById(bookId).orElseThrow(() -> new BookNotFoundException());
 
 		List<Img> images = bookImgRepository.findImagesByBook(book);
 
@@ -79,10 +90,10 @@ public class BookImgServiceImpl implements BookImgService {
 	@Override
 	public List<BookInfoResponse> getBookByImgId(Long imgId) {
 		if (imgId == null) {
-			throw new RuntimeException(); // TODO #7
+			throw new ImgIdNullException();
 		}
 
-		Img img = imgRepository.findById(imgId).orElseThrow(() -> new RuntimeException()); // TODO #8
+		Img img = imgRepository.findById(imgId).orElseThrow(() -> new ImgNotFoundException());
 
 		List<Book> books = bookImgRepository.findBooksByImg(img);
 		return books.stream()
@@ -115,13 +126,15 @@ public class BookImgServiceImpl implements BookImgService {
 	@Transactional
 	@Override
 	public void deleteBookImg(Long bookId, Long imgId) {
-		if (bookId == null || imgId == null) {
-			throw new RuntimeException(); // TODO
+		if (bookId == null) {
+			throw new BookIdNullException();
+		}
+		if (imgId == null) {
+			throw new ImgIdNullException();
 		}
 
-		BookImg relation = bookImgRepository
-			.findByBookIdAndImgId(bookId, imgId)
-			.orElseThrow(RuntimeException::new); // TODO
+		BookImg relation = bookImgRepository.findByBookIdAndImgId(bookId, imgId)
+			.orElseThrow(() -> new BookImgNotFoundException(bookId, imgId));
 
 		bookImgRepository.delete(relation);
 	}
