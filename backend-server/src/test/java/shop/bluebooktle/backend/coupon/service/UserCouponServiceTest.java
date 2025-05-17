@@ -81,6 +81,7 @@ class UserCouponServiceTest {
 			.name("유저1")
 			.membershipLevel(membership)
 			.email("user1@example.com")
+			.nickname("유저1")
 			.phoneNumber("01012345678")
 			.birth("1990-01-01")
 			.build();
@@ -89,6 +90,7 @@ class UserCouponServiceTest {
 			.loginId("user2")
 			.name("유저2")
 			.membershipLevel(membership)
+			.nickname("유저2")
 			.email("user2@example.com")
 			.phoneNumber("01023456789")
 			.birth("1991-01-01")
