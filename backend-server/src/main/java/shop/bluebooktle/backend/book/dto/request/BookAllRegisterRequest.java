@@ -33,17 +33,6 @@ public class BookAllRegisterRequest {
 
 	LocalDate publishDate;
 
-	@NotEmpty(message = "작가 이름은 최소 1개 이상 필요합니다.")
-	List<@NotBlank(message = "작가 이름은 빈 값일 수 없습니다.") String> author;
-
-	@NotNull(message = "출판사를 선택해야합니다.")
-	Long publisherId;
-
-	@NotEmpty(message = "카테고리는 최소 1개 이상 필요합니다.")
-	List<@Positive(message = "카테고리 ID는 양수값이어야 합니다.") Long> categoryIdList;
-
-	List<String> imageUrl;
-
 	@NotNull(message = "판매 가격은 필수 값입니다.")
 	BigDecimal price;
 
@@ -61,9 +50,21 @@ public class BookAllRegisterRequest {
 	@NotNull(message = "판매상태는 필수 값입니다.")
 	BookSaleInfo.State state;
 
-	@NotNull(message = "태그는 필수 값입니다.")
-	List<String> tag;
-	
+	@NotEmpty(message = "작가는 최소 1개 이상 필요합니다.")
+	List<@NotBlank(message = "작가 ID는 양수값이어야 합니다.") Long> authorIdList;
+
+	@NotEmpty(message = "출판사는 최소 1개 이상 필요합니다.")
+	List<@NotBlank(message = "출판사 ID는 양수값이어야 합니다.") Long> publisherIdList;
+
+	@NotEmpty(message = "카테고리는 최소 1개 이상 필요합니다.")
+	List<@Positive(message = "카테고리 ID는 양수값이어야 합니다.") Long> categoryIdList;
+
 	List<@Positive(message = "태그 ID는 양수값이어야 합니다.") Long> tagIdList;
+
+	// TODO 이미지 썸네일을 여러개할 것인지
+	List<String> imageUrl;
+
+	// TODO 도서 상세 이미지
+	String imageDetailUrl;
 
 }
