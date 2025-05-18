@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BlueBooktle 관리자 페이지 (더미 데이터 미리보기)</title>
+    <style>
+        :root {
+            --primary-color: #1e90ff;
+            --background-color: #ffffff;
+            --sidebar-bg: #f2f8ff;
+            --sidebar-hover: #dceeff;
+            --text-color: #2c3e50;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            height: 100vh;
+            color: var(--text-color);
+            background-color: var(--background-color);
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            width: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .container {
+            display: flex;
+            width: 100%;
+            margin-top: 60px;
+        }
+
+        nav {
+            width: 220px;
+            background-color: var(--sidebar-bg);
+            height: calc(100vh - 60px);
+            padding-top: 1rem;
+            box-shadow: 1px 0 4px rgba(0, 0, 0, 0.05);
+        }
+
+        nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        nav ul li {
+            padding: 1rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        nav ul li:hover {
+            background-color: var(--sidebar-hover);
+        }
+
+        main {
+            flex: 1;
+            padding: 2rem;
+            background-color: var(--background-color);
+        }
+
+        main h2 {
+            color: var(--primary-color);
+        }
+
+        form {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            max-width: 800px;
+            margin-top: 1rem;
+        }
+
+        form label {
+            display: block;
+            margin-top: 1rem;
+            font-weight: 600;
+        }
+
+        form input, form textarea {
+            width: 100%;
+            padding: 0.6rem;
+            margin-top: 0.5rem;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+
+        .action-btn {
+            margin-left: 0.5rem;
+            padding: 0.6rem 1.2rem;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .action-btn:hover {
+            background-color: #1c7ed6;
+        }
+
+        .flex-row {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80%;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        .result-item {
+            padding: 0.5rem;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+        }
+
+        .result-item:hover {
+            background: var(--sidebar-hover);
+        }
+
+        .category-list {
+            list-style: none;
+            padding-left: 1rem;
+        }
+
+        .category-list li {
+            margin: 4px 0;
+        }
+
+        .leaf {
+            cursor: pointer;
+            color: var(--primary-color);
+        }
+
+        .leaf:hover {
+            text-decoration: underline;
+        }
+
+        .pagination {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            justify-content: flex-end;
+        }
+
+        .pagination button {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+<header>관리자 ID: admin001 | <strong>모달 더미 데이터 시연</strong></header>
+<div class="container">
+    <nav>
+        <ul>
+            <li>도서</li>
+            <li>작가</li>
+            <li>출판사</li>
+            <li>카테고리</li>
+            <li>태그</li>
+        </ul>
+    </nav>
+    <main>
+        <h2>도서 등록 (더미 시연)</h2>
+        <form id="bookForm">
+            <label>제목</label><input type="text" placeholder="샘플 제목">
+            <label>책 설명</label><textarea rows="3">샘플 설명입니다.</textarea>
+            <label>ISBN</label><input type="text" placeholder="0000000000000">
+            <label>출판일자</label><input type="date">
+            <label>작가</label>
+            <div class="flex-row"><input id="authorName" readonly placeholder="작가 선택" style="flex:1;">
+                <button type="button" class="action-btn" id="openAuthorModal">검색</button>
+            </div>
+            <label>출판사</label>
+            <div class="flex-row"><input id="publisherName" readonly placeholder="출판사 선택" style="flex:1;">
+                <button type="button" class="action-btn" id="openPublisherModal">검색</button>
+            </div>
+            <label>카테고리</label>
+            <div class="flex-row"><input id="categoryName" readonly placeholder="카테고리 선택" style="flex:1;">
+                <button type="button" class="action-btn" id="openCategoryModal">선택</button>
+            </div>
+            <label>태그</label>
+            <div class="flex-row"><input id="tagNames" readonly placeholder="태그 선택" style="flex:1;">
+                <button type="button" class="action-btn" id="openTagModal">돋보기</button>
+            </div>
+            <button type="submit" class="action-btn">등록</button>
+        </form>
+        <!-- 모달들 -->
+        <div class="modal" id="authorModal">
+            <div class="modal-content">
+                <span class="close-btn" id="closeAuthorModal">&times;</span>
+                <h3>작가 검색 (더미)</h3>
+                <input type="text" id="authorSearchInput" placeholder="*자동 검색*">
+                <button class="action-btn" id="authorSearchBtn">검색</button>
+                <div id="authorResults"></div>
+            </div>
+        </div>
+        <div class="modal" id="publisherModal">
+            <div class="modal-content">
+                <span class="close-btn" id="closePublisherModal">&times;</span>
+                <h3>출판사 검색 (더미)</h3>
+                <input type="text" id="publisherSearchInput" placeholder="예: '문학'">
+                <button class="action-btn" id="publisherSearchBtn">검색</button>
+                <div id="publisherResults"></div>
+            </div>
+        </div>
+        <div class="modal" id="categoryModal">
+            <div class="modal-content">
+                <span class="close-btn" id="closeCategoryModal">&times;</span>
+                <h3>카테고리 선택 (더미)</h3>
+                <ul id="categoryTree" class="category-list"></ul>
+            </div>
+        </div>
+        <div class="modal" id="tagModal">
+            <div class="modal-content">
+                <span class="close-btn" id="closeTagModal">&times;</span>
+                <h3>태그 목록 (더미)</h3>
+                <div id="tagResults"></div>
+                <div class="pagination">
+                    <button id="prevPage">이전</button>
+                    <button id="nextPage">다음</button>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+<script>
+    // 더미 데이터 정의
+    const dummyAuthors = [
+        {id: 1, name: '홍길동', description: '대표 저자'},
+        {id: 2, name: '김영희', description: '소설가'},
+        {id: 3, name: '이철수', description: '에세이스트'}
+    ];
+    const dummyPublishers = [
+        {id: 1, name: '푸른책들'},
+        {id: 2, name: '열린문'},
+        {id: 3, name: '문학동네'}
+    ];
+    const dummyCategories = [
+        {
+            id: 1,
+            name: '대분류1',
+            children: [{id: 2, name: '중분류1-1', children: [{id: 3, name: '소분류1-1-1', children: []}]}, {
+                id: 4,
+                name: '중분류1-2',
+                children: []
+            }]
+        },
+        {id: 5, name: '대분류2', children: [{id: 6, name: '중분류2-1', children: []}]}
+    ];
+    const dummyTagsPages = [
+        Array.from({length: 10}, (_, i) => ({id: i + 1, name: `태그${i + 1}`})),
+        Array.from({length: 5}, (_, i) => ({id: 11 + i, name: `태그${11 + i}`}))
+    ];
+
+    function toggleModal(id, open) {
+        document.getElementById(id).style.display = open ? 'flex' : 'none';
+    }
+
+    ['Author', 'Publisher', 'Category', 'Tag'].forEach(type => {
+        const low = type.toLowerCase();
+        document.getElementById(`open${type}Modal`).onclick = () => {
+            toggleModal(`${low}Modal`, true);
+            if (type === 'Author') {
+                authorSearch();
+            }
+            if (type === 'Category') {
+                renderCategories();
+            }
+            if (type === 'Tag') {
+                loadTags();
+            }
+        };
+        document.getElementById(`close${type}Modal`).onclick = () => toggleModal(`${low}Modal`, false);
+    });
+
+    function authorSearch() {
+        const cont = document.getElementById('authorResults');
+        cont.innerHTML = '';
+        dummyAuthors.forEach(a => {
+            const d = document.createElement('div');
+            d.className = 'result-item';
+            d.textContent = `${a.name} - ${a.description}`;
+            d.onclick = () => {
+                document.getElementById('authorName').value = a.name;
+                toggleModal('authorModal', false);
+            };
+            cont.appendChild(d);
+        });
+    }
+
+    document.getElementById('authorSearchBtn').onclick = authorSearch;
+    document.getElementById('publisherSearchBtn').onclick = () => {
+        const cont = document.getElementById('publisherResults');
+        cont.innerHTML = '';
+        dummyPublishers.forEach(p => {
+            const d = document.createElement('div');
+            d.className = 'result-item';
+            d.textContent = p.name;
+            d.onclick = () => {
+                document.getElementById('publisherName').value = p.name;
+                toggleModal('publisherModal', false);
+            };
+            cont.appendChild(d);
+        });
+    };
+
+    function renderCategories() {
+        const tree = document.getElementById('categoryTree');
+        tree.innerHTML = '';
+
+        function build(nodes, el) {
+            nodes.forEach(n => {
+                const li = document.createElement('li');
+                li.textContent = n.name;
+                if (n.children.length) {
+                    const ul = document.createElement('ul');
+                    ul.className = 'category-list';
+                    build(n.children, ul);
+                    li.appendChild(ul);
+                } else {
+                    li.className = 'leaf';
+                    li.onclick = () => {
+                        document.getElementById('categoryName').value = n.name;
+                        toggleModal('categoryModal', false);
+                    };
+                }
+                el.appendChild(li);
+            });
+        }
+
+        build(dummyCategories, tree);
+    }
+
+    let tp = 0;
+
+    function loadTags() {
+        const page = dummyTagsPages[tp] || [];
+        const cont = document.getElementById('tagResults');
+        cont.innerHTML = '';
+        page.forEach(t => {
+            const d = document.createElement('div');
+            d.className = 'result-item';
+            d.textContent = t.name;
+            d.onclick = () => {
+                const cur = document.getElementById('tagNames');
+                cur.value = cur.value ? cur.value + ',' + t.name : t.name;
+                toggleModal('tagModal', false);
+            };
+            cont.appendChild(d);
+        });
+    }
+
+    document.getElementById('prevPage').onclick = () => {
+        if (tp > 0) tp--;
+        loadTags();
+    };
+    document.getElementById('nextPage').onclick = () => {
+        if (tp < dummyTagsPages.length - 1) tp++;
+        loadTags();
+    };
+    // 페이지 로드 시 자동으로 작가 모달을 열고 시연
+    window.addEventListener('DOMContentLoaded', () => {
+        toggleModal('authorModal', true);
+        authorSearch();
+    });
+</script>
+</body>
+</html>
