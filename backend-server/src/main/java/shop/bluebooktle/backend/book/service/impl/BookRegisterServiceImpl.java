@@ -77,7 +77,7 @@ public class BookRegisterServiceImpl implements BookRegisterService {
 	// TODO 작가 서비스 주입
 
 	//연관테이블 완성되면 수정필요 일단기능구현만
-	@Override
+	/*@Override
 	public void registerBook(BookAllRegisterRequest request) {
 		Optional<Book> existBook = bookRepository.findByIsbn(request.getIsbn());
 		if (existBook.isPresent()) {
