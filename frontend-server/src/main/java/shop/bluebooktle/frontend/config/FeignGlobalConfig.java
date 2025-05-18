@@ -22,6 +22,11 @@ public class FeignGlobalConfig {
 	}
 
 	@Bean
+	public FeignBearerTokenInterceptor feignBearerTokenInterceptor() {
+		return new FeignBearerTokenInterceptor();
+	}
+
+	@Bean
 	public ErrorDecoder globalFeignErrorDecoder(ObjectMapper objectMapper) {
 		return new GlobalFeignErrorDecoder(objectMapper);
 	}
