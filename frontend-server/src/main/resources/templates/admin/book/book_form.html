@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html layout:decorate="~{_layouts/admin_layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${pageTitle} ?: '도서 폼'"></title>
+    <style>
+        .form-section {
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .form-section h3 {
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+            color: var(--admin-color-primary);
+        }
+    </style>
+</head>
+<body>
+<div layout:fragment="admin_content">
+    <div class="admin-page-header">
+        <h1 class="admin-page-title">
+            <i class="fas fa-book-medical"></i>
+            <th:block th:text="${pageTitle}"></th:block>
+        </h1>
+    </div>
+
+    <div class="admin-panel">
+        <div class="admin-panel__body">
+            <div th:if="${globalErrorMessage}" class="alert alert-danger admin-alert">
+                <strong th:text="${globalErrorMessage}"></strong>
+            </div>
+
+            <form th:action="@{/admin/books/save}" th:object="${book}" method="post" enctype="multipart/form-data">
+                <input type="hidden" th:field="*{id}"/>
+                <input type="hidden" th:field="*{deletedAt}"/>
+
+                <div class="form-section">
+                    <h3><i class="fas fa-info-circle"></i> 기본 정보</h3>
+                    <div class="row">
+                        <div class="col-md-8 admin-form-group">
+                            <label for="title" class="admin-form-label">도서 제목 <span class="text-danger">*</span></label>
+                            <input type="text" id="title" th:field="*{title}" class="admin-form-control"
+                                   th:errorclass="is-invalid">
+                            <div th:if="${#fields.hasErrors('title')}" th:errors="*{title}"
+                                 class="invalid-feedback"></div>
+                        </div>
+                        <div class="col-md-4 admin-form-group">
+                            <label for="isbn" class="admin-form-label">ISBN <span class="text-danger">*</span></label>
+                            <input type="text" id="isbn" th:field="*{isbn}" class="admin-form-control"
+                                   th:errorclass="is-invalid" placeholder="13자리 숫자">
+                            <div th:if="${#fields.hasErrors('isbn')}" th:errors="*{isbn}"
+                                 class="invalid-feedback"></div>
+                        </div>
+                    </div>
+                    <div class="admin-form-group">
+                        <label for="bookIndex" class="admin-form-label">목차</label>
+                        <textarea id="bookIndex" th:field="*{bookIndex}" class="admin-form-control" rows="5"></textarea>
+                    </div>
+                    <div class="admin-form-group">
+                        <label for="description" class="admin-form-label">상세 설명 <span
+                                class="text-danger">*</span></label>
+                        <textarea id="description" th:field="*{description}" class="admin-form-control" rows="10"
+                                  placeholder="WYSIWYG 에디터 적용 예정"></textarea>
+                        <div th:if="${#fields.hasErrors('description')}" th:errors="*{description}"
+                             class="invalid-feedback"></div>
+                    </div>
+                    <div class="admin-form-group">
+                        <label for="publishDate" class="admin-form-label">출판일</label>
+                        <input type="date" id="publishDate" th:field="*{publishDate}" class="admin-form-control">
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3><i class="fas fa-dollar-sign"></i> 판매 정보</h3>
+                    <div class="row">
+                        <div class="col-md-4 admin-form-group">
+                            <label for="regularPrice" class="admin-form-label">정가 <span
+                                    class="text-danger">*</span></label>
+                            <input type="number" id="regularPrice" th:field="*{regularPrice}" class="admin-form-control"
+                                   th:errorclass="is-invalid">
+                            <div th:if="${#fields.hasErrors('regularPrice')}" th:errors="*{regularPrice}"
+                                 class="invalid-feedback"></div>
+                        </div>
+                        <div class="col-md-4 admin-form-group">
+                            <label for="salePrice" class="admin-form-label">판매가 <span
+                                    class="text-danger">*</span></label>
+                            <input type="number" id="salePrice" th:field="*{salePrice}" class="admin-form-control"
+                                   th:errorclass="is-invalid">
+                            <div th:if="${#fields.hasErrors('salePrice')}" th:errors="*{salePrice}"
+                                 class="invalid-feedback"></div>
+                        </div>
+                        <div class="col-md-4 admin-form-group">
+                            <label for="stock" class="admin-form-label">재고 수량 <span class="text-danger">*</span></label>
+                            <input type="number" id="stock" th:field="*{stock}" class="admin-form-control"
+                                   th:errorclass="is-invalid">
+                            <div th:if="${#fields.hasErrors('stock')}" th:errors="*{stock}"
+                                 class="invalid-feedback"></div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 admin-form-group">
+                            <label for="saleState" class="admin-form-label">판매 상태 <span
+                                    class="text-danger">*</span></label>
+                            <select id="saleState" th:field="*{saleState}" class="admin-form-control">
+                                <option th:each="stateOpt : ${saleStateOptions}" th:value="${stateOpt}"
+                                        th:text="${stateOpt}"></option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 admin-form-group">
+                            <label class="admin-form-label">포장 가능 여부</label>
+                            <div>
+                                <input type="checkbox" id="isPackable" th:field="*{isPackable}"
+                                       class="admin-form-check-input">
+                                <label for="isPackable" class="admin-form-check-label">포장 가능</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3><i class="fas fa-project-diagram"></i> 연관 정보</h3>
+                    <div class="admin-form-group">
+                        <label class="admin-form-label">카테고리 (다중 선택 가능)</label>
+                        <select th:field="*{categoryIds}" class="admin-form-control" multiple="multiple" size="5">
+                            <option th:each="cat : ${allCategories}" th:value="${cat.id}"
+                                    th:text="${cat.name}"></option>
+                        </select>
+                        <small>Ctrl 또는 Shift 키를 사용하여 여러 개 선택</small>
+                    </div>
+                    <div class="admin-form-group">
+                        <label class="admin-form-label">작가 (다중 선택 가능)</label>
+                        <select th:field="*{authorIds}" class="admin-form-control" multiple="multiple" size="3">
+                            <option th:each="auth : ${allAuthors}" th:value="${auth.id}"
+                                    th:text="${auth.name}"></option>
+                        </select>
+                        <input type="text" th:field="*{newAuthorName}" placeholder="새 작가 이름 (선택 시)"
+                               class="admin-form-control mt-2">
+                    </div>
+                    <div class="admin-form-group">
+                        <label class="admin-form-label">출판사</label>
+                        <select th:field="*{publisherId}" class="admin-form-control">
+                            <option value="">-- 출판사 선택 --</option>
+                            <option th:each="pub : ${allPublishers}" th:value="${pub.id}"
+                                    th:text="${pub.name}"></option>
+                        </select>
+                        <input type="text" th:field="*{newPublisherName}" placeholder="새 출판사 이름 (선택 시)"
+                               class="admin-form-control mt-2">
+                    </div>
+                    <div class="admin-form-group">
+                        <label for="tagsInput" class="admin-form-label">태그 (쉼표로 구분)</label>
+                        <input type="text" id="tagsInput" th:field="*{tagsInput}" class="admin-form-control"
+                               placeholder="예: 스프링, Java, 웹">
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3><i class="fas fa-images"></i> 이미지 관리</h3>
+                    <p class="text-muted">이미지 업로드 기능은 추후 구현 예정입니다.</p>
+                </div>
+
+
+                <div class="admin-form-actions mt-4 text-end">
+                    <a th:href="@{/admin/books}" class="admin-btn admin-btn--default" style="margin-right: 8px;">취소</a>
+                    <button type="submit" class="admin-btn admin-btn--primary">
+                        <i class="fas fa-save"></i>
+                        <th:block th:text="*{id == null} ? '도서 등록' : '도서 수정'"></th:block>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<th:block layout:fragment="page_scripts">
+    <script>
+        // document.addEventListener('DOMContentLoaded', function() {
+        //     // 예: new Fancytree.FancyTree("#categoryTree", { source: { url: "/api/admin/categories/tree" }});
+        //     // $('#tagsInput').tagify();
+        // });
+    </script>
+</th:block>
+
+</body>
+</html>

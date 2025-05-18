@@ -1,0 +1,840 @@
+/* ==========================================================================
+   Admin Global Styles
+   ========================================================================== */
+
+:root {
+    /* Colors - 심플하고 명확한 색상 사용 */
+    --admin-color-primary: #007bff; /* 주요 액션, 링크 */
+    --admin-color-secondary: #6c757d; /* 보조적인 요소 */
+    --admin-color-success: #28a745; /* 성공 상태 */
+    --admin-color-danger: #dc3545; /* 위험, 삭제 */
+    --admin-color-warning: #ffc107; /* 경고 */
+    --admin-color-info: #17a2b8; /* 정보 */
+
+    --admin-text-color: #212529; /* 본문 텍스트 */
+    --admin-text-muted: #6c757d; /* 부가 정보, placeholder */
+    --admin-bg-light: #f8f9fa; /* 밝은 배경 (페이지 전체, 카드 등) */
+    --admin-bg-dark: #343a40; /* 어두운 배경 (사이드바, 헤더 등) */
+    --admin-border-color: #dee2e6; /* 테두리, 구분선 */
+    --admin-focus-ring-color: rgba(0, 123, 255, 0.25); /* 포커스 시 아웃라인 */
+
+    /* Typography - 가독성 좋은 시스템 폰트 우선 */
+    --admin-font-family-base: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    --admin-font-size-base: 1rem; /* 16px (기본) */
+    --admin-font-size-sm: 0.875rem; /* 14px */
+    --admin-font-size-lg: 1.125rem; /* 18px */
+    --admin-line-height-base: 1.5;
+
+    /* Spacing - 일관된 간격 단위 사용 (8px 기반 추천) */
+    --admin-spacing-unit: 0.5rem; /* 8px */
+    --admin-spacing-xs: calc(var(--admin-spacing-unit) * 0.5); /* 4px */
+    --admin-spacing-sm: var(--admin-spacing-unit); /* 8px */
+    --admin-spacing-md: calc(var(--admin-spacing-unit) * 2); /* 16px */
+    --admin-spacing-lg: calc(var(--admin-spacing-unit) * 3); /* 24px */
+    --admin-spacing-xl: calc(var(--admin-spacing-unit) * 4); /* 32px */
+
+    /* Borders */
+    --admin-border-width: 1px;
+    --admin-border-radius: 0.25rem; /* 4px */
+    --admin-border-radius-sm: 0.2rem; /* 3.2px */
+    --admin-border-radius-lg: 0.3rem; /* 4.8px */
+
+    /* Layout */
+    --admin-header-height: 60px;
+    --admin-sidebar-width: 240px;
+    --admin-content-max-width: 1200px; /* 필요한 경우 콘텐츠 최대 너비 제한 */
+
+    /* Z-index */
+    --admin-zindex-sidebar: 1030;
+    --admin-zindex-header: 1040;
+    --admin-zindex-modal: 1050;
+
+    /* Kitsch Theme Specific (필요시 추가 정의) */
+    /* --font-family-display-kitsch: 'Your Display Font', sans-serif; */ /* 예시: 디스플레이 폰트 정의 */
+    /* --font-family-handwriting-kitsch: 'Your Handwriting Font', cursive; */ /* 예시: 손글씨 폰트 정의 */
+
+    /* 미리 계산된 어두운 색상 (SASS/LESS 사용 불가 시) */
+    --admin-color-primary-darken-10: #0056b3;
+    --admin-color-secondary-darken-10: #545b62;
+}
+
+/* Basic Reset & Defaults */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+body.admin-body { /* admin_layout.html의 body에 class="admin-body" 추가 */
+    margin: 0;
+    font-family: var(--admin-font-family-base);
+    font-size: var(--admin-font-size-base);
+    font-weight: 400;
+    line-height: var(--admin-line-height-base);
+    color: var(--admin-text-color);
+    background-color: var(--admin-bg-light);
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    padding-top: var(--admin-header-height); /* 헤더 높이만큼 body 상단 패딩 */
+}
+
+a {
+    color: var(--admin-color-primary);
+    text-decoration: none;
+}
+
+a:hover {
+    /* color: darken(var(--admin-color-primary), 10%); 순수 CSS에서는 직접 색상 지정 필요 */
+    color: var(--admin-color-primary-darken-10);
+    text-decoration: underline;
+}
+
+img, svg {
+    vertical-align: middle;
+}
+
+/* ==========================================================================
+   Layout: Header, Sidebar, Content
+   ========================================================================== */
+
+.admin-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--admin-header-height);
+    background-color: var(--admin-bg-dark);
+    color: var(--admin-bg-light);
+    padding: 0 var(--admin-spacing-md);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: var(--admin-zindex-header);
+    border-bottom: var(--admin-border-width) solid var(--admin-border-color);
+}
+
+.admin-header__logo {
+    font-size: var(--admin-font-size-lg);
+    font-weight: 700;
+    color: #fff; /* 로고는 흰색 고정 또는 변수 사용 */
+    text-decoration: none;
+}
+
+.admin-header__logo:hover {
+    color: #fff;
+    text-decoration: none;
+}
+
+.admin-header__user-actions {
+    display: flex;
+    align-items: center;
+}
+
+.admin-header__user-info {
+    margin-right: var(--admin-spacing-md);
+    font-size: var(--admin-font-size-sm);
+}
+
+.admin-header__logout-btn { /* button 요소에 직접 적용 */
+    font-size: var(--admin-font-size-sm);
+    color: var(--admin-bg-light);
+    background-color: transparent;
+    border: 1px solid var(--admin-bg-light);
+    padding: var(--admin-spacing-xs) var(--admin-spacing-sm);
+    border-radius: var(--admin-border-radius);
+    cursor: pointer;
+}
+
+.admin-header__logout-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.admin-main-container {
+    display: flex;
+}
+
+.admin-sidebar {
+    width: var(--admin-sidebar-width);
+    height: calc(100vh - var(--admin-header-height)); /* 헤더 제외한 화면 높이 */
+    position: fixed;
+    left: 0;
+    /* top: var(--admin-header-height);  body에 padding-top을 줬으므로 top은 0 */
+    background-color: #fff; /* 사이드바는 밝은 배경 */
+    border-right: var(--admin-border-width) solid var(--admin-border-color);
+    padding: var(--admin-spacing-md) 0;
+    overflow-y: auto;
+    z-index: var(--admin-zindex-sidebar);
+}
+
+.admin-sidebar__nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.admin-sidebar__nav-item a {
+    display: block;
+    padding: var(--admin-spacing-sm) var(--admin-spacing-md);
+    color: var(--admin-text-color);
+    text-decoration: none;
+    font-size: var(--admin-font-size-sm);
+}
+
+.admin-sidebar__nav-item a:hover,
+.admin-sidebar__nav-item a.active { /* JavaScript로 .active 클래스 관리 */
+    background-color: var(--admin-bg-light);
+    color: var(--admin-color-primary);
+    border-left: 3px solid var(--admin-color-primary); /* 활성 메뉴 표시 */
+    padding-left: calc(var(--admin-spacing-md) - 3px);
+}
+
+.admin-sidebar__nav-item a i { /* FontAwesome 등 아이콘 사용 시 */
+    margin-right: var(--admin-spacing-sm);
+    width: 16px; /* 아이콘 너비 고정으로 정렬 */
+    text-align: center;
+}
+
+.admin-sidebar__nav-submenu {
+    list-style: none;
+    padding-left: var(--admin-spacing-md); /* 들여쓰기 */
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.2s ease-out;
+}
+
+.admin-sidebar__nav-item.open > .admin-sidebar__nav-submenu { /* 부모 .admin-sidebar__nav-item에 .open 클래스 추가 시 */
+    max-height: 1000px; /* 충분한 높이 */
+}
+
+.admin-sidebar__nav-submenu a {
+    padding-left: calc(var(--admin-spacing-md) + var(--admin-spacing-sm)); /* 추가 들여쓰기 */
+    font-size: calc(var(--admin-font-size-sm) * 0.95);
+}
+
+.admin-sidebar__nav-item .submenu-toggle-icon { /* 펼침/닫힘 아이콘 */
+    float: right;
+    transition: transform 0.2s ease-out;
+}
+
+.admin-sidebar__nav-item.open > a > .submenu-toggle-icon {
+    transform: rotate(90deg);
+}
+
+
+.admin-content-area {
+    flex-grow: 1;
+    margin-left: var(--admin-sidebar-width);
+    padding: var(--admin-spacing-lg);
+    background-color: var(--admin-bg-light); /* 페이지 전체 배경과 동일하게 하거나, 콘텐츠 영역만 다른 색으로 구분 가능 */
+}
+
+/* 필요한 경우 콘텐츠 영역의 최대 너비 제한 */
+.admin-content-area__inner {
+    max-width: var(--admin-content-max-width);
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
+.admin-footer {
+    margin-left: var(--admin-sidebar-width); /* 사이드바 너비만큼 밀어줌 */
+    padding: var(--admin-spacing-md) var(--admin-spacing-lg);
+    background-color: #fff;
+    border-top: var(--admin-border-width) solid var(--admin-border-color);
+    text-align: center;
+    font-size: var(--admin-font-size-sm);
+    color: var(--admin-text-muted);
+}
+
+/* ==========================================================================
+   Common UI Elements: Titles, Panels, Forms, Buttons, Tables, Modals
+   ========================================================================== */
+
+/* Page Title */
+.admin-page-header {
+    margin-bottom: var(--admin-spacing-lg);
+    padding-bottom: var(--admin-spacing-md);
+    border-bottom: var(--admin-border-width) solid var(--admin-border-color);
+}
+
+.admin-page-title {
+    font-size: 1.75rem; /* 약 28px */
+    font-weight: 500;
+    margin: 0;
+}
+
+/* Panels / Cards */
+.admin-panel {
+    background-color: #fff;
+    border: var(--admin-border-width) solid var(--admin-border-color);
+    border-radius: var(--admin-border-radius);
+    margin-bottom: var(--admin-spacing-lg);
+}
+
+.admin-panel__header {
+    padding: var(--admin-spacing-md) var(--admin-spacing-lg);
+    border-bottom: var(--admin-border-width) solid var(--admin-border-color);
+    font-size: var(--admin-font-size-lg);
+    font-weight: 500;
+}
+
+.admin-panel__body {
+    padding: var(--admin-spacing-lg);
+}
+
+.admin-panel__footer {
+    padding: var(--admin-spacing-md) var(--admin-spacing-lg);
+    border-top: var(--admin-border-width) solid var(--admin-border-color);
+    background-color: var(--admin-bg-light);
+}
+
+/* Forms */
+.admin-form-group {
+    margin-bottom: var(--admin-spacing-md);
+}
+
+.admin-form-label {
+    display: block;
+    margin-bottom: var(--admin-spacing-xs);
+    font-weight: 600;
+    font-size: var(--admin-font-size-sm);
+}
+
+.admin-form-control {
+    display: block;
+    width: 100%;
+    padding: var(--admin-spacing-sm) var(--admin-spacing-md);
+    font-size: var(--admin-font-size-base);
+    font-weight: 400;
+    line-height: var(--admin-line-height-base);
+    color: var(--admin-text-color);
+    background-color: #fff;
+    background-clip: padding-box;
+    border: var(--admin-border-width) solid var(--admin-border-color);
+    border-radius: var(--admin-border-radius);
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.admin-form-control:focus {
+    border-color: var(--admin-color-primary);
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem var(--admin-focus-ring-color);
+}
+
+.admin-form-control::placeholder {
+    color: var(--admin-text-muted);
+    opacity: 1;
+}
+
+.admin-form-control:disabled,
+.admin-form-control[readonly] {
+    background-color: var(--admin-bg-light);
+    opacity: 1;
+}
+
+.admin-form-text { /* 도움말 텍스트 */
+    display: block;
+    margin-top: var(--admin-spacing-xs);
+    font-size: var(--admin-font-size-sm);
+    color: var(--admin-text-muted);
+}
+
+/* Input with button (e.g., search) */
+.admin-input-group {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap; /* For validation messages */
+    align-items: stretch;
+    width: 100%;
+}
+
+.admin-input-group > .admin-form-control {
+    position: relative;
+    flex: 1 1 auto;
+    width: 1%; /* Prevent collapsing when alone */
+    min-width: 0; /* Allow a narrower item to wrap */
+}
+
+.admin-input-group > .admin-form-control:not(:last-child) {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.admin-input-group > .admin-btn {
+    position: relative;
+    z-index: 2; /* Place buttons over input borders */
+}
+
+.admin-input-group > .admin-btn:not(:first-child) {
+    margin-left: -1px; /* Overlap borders */
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+
+/* Buttons */
+.admin-btn {
+    display: inline-block;
+    font-weight: 400;
+    line-height: var(--admin-line-height-base);
+    color: var(--admin-text-color);
+    text-align: center;
+    vertical-align: middle;
+    cursor: pointer;
+    user-select: none;
+    background-color: transparent;
+    border: var(--admin-border-width) solid transparent;
+    padding: var(--admin-spacing-sm) var(--admin-spacing-md);
+    font-size: var(--admin-font-size-base);
+    border-radius: var(--admin-border-radius);
+    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.admin-btn:focus {
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem var(--admin-focus-ring-color);
+}
+
+.admin-btn:disabled {
+    opacity: 0.65;
+    pointer-events: none;
+}
+
+.admin-btn--primary {
+    color: #fff;
+    background-color: var(--admin-color-primary);
+    border-color: var(--admin-color-primary);
+}
+
+.admin-btn--primary:hover {
+    /* background-color: darken(var(--admin-color-primary), 10%); */
+    /* border-color: darken(var(--admin-color-primary), 10%); */
+    background-color: var(--admin-color-primary-darken-10);
+    border-color: var(--admin-color-primary-darken-10);
+    color: #fff;
+    text-decoration: none;
+}
+
+.admin-btn--secondary {
+    color: #fff;
+    background-color: var(--admin-color-secondary);
+    border-color: var(--admin-color-secondary);
+}
+
+.admin-btn--secondary:hover {
+    /* background-color: darken(var(--admin-color-secondary), 10%); */
+    /* border-color: darken(var(--admin-color-secondary), 10%); */
+    background-color: var(--admin-color-secondary-darken-10);
+    border-color: var(--admin-color-secondary-darken-10);
+    color: #fff;
+    text-decoration: none;
+}
+
+.admin-btn--success {
+    color: #fff;
+    background-color: var(--admin-color-success);
+    border-color: var(--admin-color-success);
+}
+
+.admin-btn--danger {
+    color: #fff;
+    background-color: var(--admin-color-danger);
+    border-color: var(--admin-color-danger);
+}
+
+.admin-btn--warning {
+    color: var(--admin-text-color);
+    background-color: var(--admin-color-warning);
+    border-color: var(--admin-color-warning);
+}
+
+.admin-btn--info {
+    color: #fff;
+    background-color: var(--admin-color-info);
+    border-color: var(--admin-color-info);
+}
+
+.admin-btn--outline-primary {
+    color: var(--admin-color-primary);
+    border-color: var(--admin-color-primary);
+}
+
+.admin-btn--outline-primary:hover {
+    color: #fff;
+    background-color: var(--admin-color-primary);
+}
+
+/* Button sizes */
+.admin-btn--sm {
+    padding: var(--admin-spacing-xs) var(--admin-spacing-sm);
+    font-size: var(--admin-font-size-sm);
+    border-radius: var(--admin-border-radius-sm);
+}
+
+.admin-btn--lg {
+    padding: var(--admin-spacing-md) var(--admin-spacing-lg);
+    font-size: var(--admin-font-size-lg);
+    border-radius: var(--admin-border-radius-lg);
+}
+
+/* Tables */
+.table-responsive {
+    display: block; /* 테이블을 블록 요소처럼 만들어 너비와 오버플로우를 제어할 수 있게 함 */
+    width: 100%; /* 부모 요소의 전체 너비를 차지하도록 함 */
+    overflow-x: auto; /* 내용이 .table-responsive 요소의 너비를 초과할 경우 가로 스크롤바를 생성 */
+    -webkit-overflow-scrolling: touch; /* iOS에서 관성 스크롤 효과를 부드럽게 함 (선택 사항) */
+}
+
+.admin-table {
+    width: 100%; /* 기본적으로는 .table-responsive 내부에서 100%를 차지하려 함 */
+    /* 하지만, 테이블 내용(th, td의 콘텐츠와 패딩 등)의 실제 너비가
+       .table-responsive의 너비보다 크면, .table-responsive에서 스크롤이 발생함.
+       테이블의 width를 100%로 설정하면, .table-responsive가 스크롤을 관리하기 용이해짐. */
+    margin-bottom: 1rem; /* 테이블 하단 여백 */
+    color: var(--admin-text-color); /* admin_styles.css 에서 정의한 텍스트 색상 변수 사용 */
+    border-collapse: collapse; /* 테이블 테두리 겹침 처리 */
+}
+
+.admin-table th,
+.admin-table td {
+    padding: var(--admin-spacing-md); /* admin_styles.css 에서 정의한 간격 변수 사용 (예: 0.75rem) */
+    vertical-align: top; /* 셀 내용 상단 정렬 */
+    border-top: var(--admin-border-width) solid var(--admin-border-color); /* admin_styles.css 변수 사용 */
+
+}
+
+.admin-table thead th {
+    vertical-align: bottom;
+    border-bottom: calc(var(--admin-border-width) * 2) solid var(--admin-border-color);
+    text-align: left; /* 기본 왼쪽 정렬, 필요시 center 등으로 변경 */
+    font-weight: 600;
+}
+
+.admin-table tbody + tbody {
+    border-top: calc(var(--admin-border-width) * 2) solid var(--admin-border-color);
+}
+
+.admin-table--striped tbody tr:nth-of-type(odd) { /* 줄무늬 테이블 */
+    background-color: rgba(0, 0, 0, 0.03);
+}
+
+.admin-table--hover tbody tr:hover { /* 마우스 오버 효과 */
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.admin-table--bordered {
+    border: var(--admin-border-width) solid var(--admin-border-color);
+}
+
+.admin-table--bordered th,
+.admin-table--bordered td {
+    border: var(--admin-border-width) solid var(--admin-border-color);
+}
+
+/* Modals (기존 popup_modal.html 구조를 기반으로 스타일 단순화) */
+.admin-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: none; /* 기본 숨김, JS로 .active 추가 시 flex로 변경 */
+    align-items: center;
+    justify-content: center;
+    z-index: var(--admin-zindex-modal);
+}
+
+.admin-modal-overlay.active {
+    display: flex;
+}
+
+.admin-modal-content {
+    background-color: #fff;
+    padding: var(--admin-spacing-lg);
+    border-radius: var(--admin-border-radius);
+    min-width: 300px;
+    max-width: 600px;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    position: relative;
+}
+
+.admin-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: var(--admin-spacing-md);
+    margin-bottom: var(--admin-spacing-md);
+    border-bottom: var(--admin-border-width) solid var(--admin-border-color);
+}
+
+.admin-modal-title {
+    font-size: var(--admin-font-size-lg);
+    font-weight: 500;
+    margin: 0;
+}
+
+.admin-modal-close-btn { /* FontAwesome 아이콘 사용 가정 */
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0;
+    color: var(--admin-text-muted);
+}
+
+.admin-modal-close-btn:hover {
+    color: var(--admin-text-color);
+}
+
+.admin-modal-body {
+    margin-bottom: var(--admin-spacing-md);
+}
+
+.admin-modal-footer {
+    text-align: right; /* 버튼 오른쪽 정렬 */
+}
+
+.admin-modal-footer .admin-btn + .admin-btn {
+    margin-left: var(--admin-spacing-sm);
+}
+
+/* Kitsch Popup Modals */
+.modal-overlay-kitsch {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* 반투명 배경 */
+    display: none; /* JS로 data-auto-show="true" 또는 .active 클래스로 제어 */
+    align-items: center;
+    justify-content: center;
+    z-index: var(--admin-zindex-modal); /* 기존 모달과 동일한 z-index 사용 */
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+/* HTML에서 th:if 조건 만족하고 data-auto-show='true' 이거나 .active 클래스가 JS로 추가될 때 보이도록 */
+.modal-overlay-kitsch.active,
+.modal-overlay-kitsch[data-auto-show='true']:not([style*="display: none"]) { /* Thymeleaf th:if와 data-auto-show를 고려 */
+    display: flex;
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-content-kitsch {
+    background-color: #fff;
+    padding: var(--admin-spacing-lg);
+    border-radius: var(--admin-border-radius);
+    min-width: 320px; /* 최소 너비 */
+    max-width: 500px; /* 최대 너비 */
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    position: relative;
+    text-align: center; /* 내부 요소들 가운데 정렬 */
+    border: var(--admin-border-width) solid var(--admin-border-color);
+}
+
+.modal-close-btn-kitsch {
+    position: absolute;
+    top: var(--admin-spacing-md);
+    right: var(--admin-spacing-md);
+    background: none;
+    border: none;
+    font-size: 1.25rem; /* 20px */
+    cursor: pointer;
+    padding: 0;
+    color: var(--admin-text-muted);
+    line-height: 1;
+}
+
+.modal-close-btn-kitsch:hover {
+    color: var(--admin-text-color);
+}
+
+.modal-icon-kitsch {
+    font-size: 3rem; /* 아이콘 크기 키움 */
+    margin-bottom: var(--admin-spacing-md);
+}
+
+.modal-icon-kitsch .fas { /* FontAwesome 아이콘 */
+    display: block;
+}
+
+.success-modal-content .modal-icon-kitsch .fas,
+.success-icon-kitsch { /* .success-icon-kitsch 클래스 명시 */
+    color: var(--admin-color-success);
+}
+
+.error-modal-content .modal-icon-kitsch .fas,
+.error-icon-kitsch { /* .error-icon-kitsch 클래스 명시 */
+    color: var(--admin-color-danger);
+}
+
+.info-modal-kitsch .modal-icon-kitsch .fas { /* .info-modal-kitsch 내부 아이콘 */
+    color: var(--admin-color-info);
+}
+
+
+.modal-title-kitsch {
+    font-size: var(--admin-font-size-lg); /* 기존 admin title과 유사한 크기 */
+    font-weight: 600; /* 약간 더 강조 */
+    margin-top: 0;
+    margin-bottom: var(--admin-spacing-sm);
+    color: var(--admin-text-color);
+}
+
+.modal-message-kitsch {
+    font-size: var(--admin-font-size-base);
+    color: var(--admin-text-muted);
+    margin-bottom: var(--admin-spacing-lg);
+    line-height: var(--admin-line-height-base);
+}
+
+/* Kitsch 폰트 클래스 - 실제 폰트 파일이 연결되어야 함 */
+.display-font-kitsch {
+    /* font-family: var(--font-family-display-kitsch); */ /* 실제 디스플레이 폰트 지정 */
+}
+
+.handwriting-font-kitsch {
+    /* font-family: var(--font-family-handwriting-kitsch); */ /* 실제 손글씨 폰트 지정 */
+}
+
+.modal-actions-kitsch {
+    margin-top: var(--admin-spacing-md);
+}
+
+/* Kitsch 버튼 스타일 - admin 버튼 스타일을 기반으로 함 */
+.btn-kitsch {
+    display: inline-block;
+    font-weight: 400;
+    line-height: var(--admin-line-height-base);
+    color: var(--admin-text-color);
+    text-align: center;
+    vertical-align: middle;
+    cursor: pointer;
+    user-select: none;
+    background-color: transparent;
+    border: var(--admin-border-width) solid transparent;
+    padding: var(--admin-spacing-sm) var(--admin-spacing-md);
+    font-size: var(--admin-font-size-base);
+    border-radius: var(--admin-border-radius);
+    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.btn-kitsch:focus {
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem var(--admin-focus-ring-color);
+}
+
+.btn-kitsch.primary-btn-kitsch { /* .admin-btn--primary 스타일 적용 */
+    color: #fff;
+    background-color: var(--admin-color-primary);
+    border-color: var(--admin-color-primary);
+}
+
+.btn-kitsch.primary-btn-kitsch:hover {
+    background-color: var(--admin-color-primary-darken-10);
+    border-color: var(--admin-color-primary-darken-10);
+    color: #fff;
+}
+
+/* Kitsch 레트로 그림자 (필요시 구체적인 스타일 추가) */
+.retro-shadow-kitsch-small {
+    /* box-shadow: 2px 2px 0px rgba(0,0,0,0.1); */ /* 예시 그림자 */
+}
+
+
+/* Utility Classes */
+.admin-text-center {
+    text-align: center !important;
+}
+
+.admin-text-right {
+    text-align: right !important;
+}
+
+.admin-mb-0 {
+    margin-bottom: 0 !important;
+}
+
+.admin-mt-auto {
+    margin-top: auto !important;
+}
+
+
+/* 페이지네이션 */
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 2rem;
+    padding: 1rem 0;
+}
+
+.pagination {
+    display: flex;
+    list-style: none;
+    padding-left: 0;
+    border-radius: .25rem;
+}
+
+.pagination .page-item {
+    margin: 0 2px;
+}
+
+.pagination .page-link {
+    position: relative;
+    display: block;
+    padding: .5rem .75rem;
+    margin-left: -1px;
+    line-height: 1.25;
+    color: var(--admin-color-primary); /* admin_styles.css 변수 사용 */
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+    text-decoration: none;
+}
+
+.pagination .page-link:hover {
+    z-index: 2;
+    color: var(--admin-color-primary);
+    text-decoration: none;
+    background-color: #e9ecef;
+    border-color: #dee2e6;
+}
+
+.pagination .page-item.active .page-link {
+    z-index: 3;
+    color: #fff;
+    background-color: var(--admin-color-primary);
+    border-color: var(--admin-color-primary);
+}
+
+.pagination .page-item.disabled .page-link {
+    color: #6c757d;
+    pointer-events: none;
+    cursor: auto;
+    background-color: #fff;
+    border-color: #dee2e6;
+}
+
+
+/* FontAwesome 아이콘 기본 스타일 (필요시) */
+.fas, .far, .fal, .fad, .fab {
+    line-height: 1; /* 아이콘이 텍스트와 어긋나지 않도록 */
+}
+
+/* 순수 CSS용 darken/lighten 함수 (단순화 버전) */
+/* 실제 프로젝트에서는 SASS/LESS 사용 또는 고정 색상값 사용 권장 */
+/* 이 부분은 예시이며, 모든 색상에 대해 완벽하게 동작하지 않을 수 있습니다. */
+/*
+:root {
+    --admin-color-primary-darken-10: #0056b3;  <-- 상단 :root로 이동하여 중복 제거
+    --admin-color-secondary-darken-10: #545b62; <-- 상단 :root로 이동하여 중복 제거
+}
+.admin-btn--primary:hover {
+    background-color: var(--admin-color-primary-darken-10);
+    border-color: var(--admin-color-primary-darken-10);
+}
+*/

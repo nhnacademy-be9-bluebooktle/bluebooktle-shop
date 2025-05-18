@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html layout:decorate="~{_layouts/admin_layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${pageTitle} ?: '회원 정보 수정'"></title>
+</head>
+<body>
+<div layout:fragment="admin_content">
+    <div class="admin-page-header">
+        <h1 class="admin-page-title">
+            <i class="fas fa-user-edit"></i>
+            <th:block th:text="${pageTitle}">회원 정보 수정</th:block>
+        </h1>
+        <div class="admin-page-actions">
+            <a th:href="@{/admin/members/{id}(id=${memberForm?.userId != null ? memberForm.userId : ''})}"
+               class="admin-btn admin-btn--default" th:if="${memberForm?.userId != null}">
+                <i class="fas fa-eye"></i> 상세 보기
+            </a>
+            <a th:href="@{/admin/members}" class="admin-btn admin-btn--default">
+                <i class="fas fa-list"></i> 목록으로
+            </a>
+        </div>
+    </div>
+
+    <div th:if="${globalErrorMessage}" class="alert alert-danger" th:text="${globalErrorMessage}"></div>
+    <div th:if="${globalSuccessMessage}" class="alert alert-success" th:text="${globalSuccessMessage}"></div>
+
+
+    <div class="admin-panel">
+        <div class="admin-panel__body">
+            <form th:action="@{/admin/members/{id}/edit(id=${memberForm.userId})}" th:object="${memberForm}"
+                  method="post">
+                <input type="hidden" th:field="*{userId}"/>
+
+                <div class="admin-form-group row">
+                    <label for="loginId" class="col-sm-2 col-form-label admin-form-label">로그인 ID</label>
+                    <div class="col-sm-10">
+                        <input type="text" id="loginId" th:field="*{loginId}" class="admin-form-control"
+                               readonly/>
+                    </div>
+                </div>
+
+                <div class="admin-form-group row">
+                    <label for="name" class="col-sm-2 col-form-label admin-form-label">이름 <span
+                            class="text-danger">*</span></label>
+                    <div class="col-sm-10">
+                        <input type="text" id="name" th:field="*{name}" class="admin-form-control"
+                               th:errorclass="is-invalid" placeholder="회원 이름">
+                        <div th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="invalid-feedback"></div>
+                    </div>
+                </div>
+
+                <div class="admin-form-group row">
+                    <label for="nickname" class="col-sm-2 col-form-label admin-form-label">닉네임 <span
+                            class="text-danger">*</span></label>
+                    <div class="col-sm-10">
+                        <input type="text" id="nickname" th:field="*{nickname}" class="admin-form-control"
+                               th:errorclass="is-invalid" placeholder="닉네임">
+                        <div th:if="${#fields.hasErrors('nickname')}" th:errors="*{nickname}"
+                             class="invalid-feedback"></div>
+                    </div>
+                </div>
+
+                <div class="admin-form-group row">
+                    <label for="email" class="col-sm-2 col-form-label admin-form-label">이메일 <span
+                            class="text-danger">*</span></label>
+                    <div class="col-sm-10">
+                        <input type="email" id="email" th:field="*{email}" class="admin-form-control"
+                               th:errorclass="is-invalid" placeholder="example@email.com">
+                        <div th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="invalid-feedback"></div>
+                    </div>
+                </div>
+
+                <div class="admin-form-group row">
+                    <label for="phoneNumber" class="col-sm-2 col-form-label admin-form-label">전화번호 <span
+                            class="text-danger">*</span></label>
+                    <div class="col-sm-10">
+                        <input type="text" id="phoneNumber" th:field="*{phoneNumber}" class="admin-form-control"
+                               th:errorclass="is-invalid" placeholder="'-' 없이 숫자만 입력">
+                        <div th:if="${#fields.hasErrors('phoneNumber')}" th:errors="*{phoneNumber}"
+                             class="invalid-feedback"></div>
+                    </div>
+                </div>
+
+                <div class="admin-form-group row">
+                    <label for="birthDate" class="col-sm-2 col-form-label admin-form-label">생년월일</label>
+                    <div class="col-sm-10">
+                        <input type="text" id="birthDate" th:field="*{birthDate}" class="admin-form-control"
+                               th:errorclass="is-invalid" placeholder="YYYYMMDD (예: 19900101)">
+                        <div th:if="${#fields.hasErrors('birthDate')}" th:errors="*{birthDate}"
+                             class="invalid-feedback"></div>
+                    </div>
+                </div>
+
+                <hr class="my-4">
+
+                <div class="admin-form-group row">
+                    <label for="userType" class="col-sm-2 col-form-label admin-form-label">회원 유형</label>
+                    <div class="col-sm-10">
+                        <select id="userType" th:field="*{userType}" class="admin-form-control"
+                                th:errorclass="is-invalid">
+                            <option value="">-- 선택 --</option>
+                            <option th:each="typeOpt : ${userTypeOptions}" th:value="${typeOpt}"
+                                    th:text="${typeOpt}"></option>
+                        </select>
+                        <div th:if="${#fields.hasErrors('userType')}" th:errors="*{userType}"
+                             class="invalid-feedback"></div>
+                    </div>
+                </div>
+
+                <div class="admin-form-group row">
+                    <label for="userStatus" class="col-sm-2 col-form-label admin-form-label">회원 상태</label>
+                    <div class="col-sm-10">
+                        <select id="userStatus" th:field="*{userStatus}" class="admin-form-control"
+                                th:errorclass="is-invalid">
+                            <option value="">-- 선택 --</option>
+                            <option th:each="statusOpt : ${userStatusOptions}" th:value="${statusOpt}"
+                                    th:text="${statusOpt}"></option>
+                        </select>
+                        <div th:if="${#fields.hasErrors('userStatus')}" th:errors="*{userStatus}"
+                             class="invalid-feedback"></div>
+                    </div>
+                </div>
+
+                <div class="admin-form-group row">
+                    <label for="membershipId" class="col-sm-2 col-form-label admin-form-label">회원 등급</label>
+                    <div class="col-sm-10">
+                        <select id="membershipId" th:field="*{membershipId}" class="admin-form-control"
+                                th:errorclass="is-invalid">
+                            <option value="">-- 등급 선택 --</option>
+                            <option th:each="level : ${membershipLevels}"
+                                    th:value="${level.id}"
+                                    th:text="${level.name}"
+                                    th:selected="${memberForm.membershipId == level.id}">
+                            </option>
+                        </select>
+                        <div th:if="${#fields.hasErrors('membershipId')}" th:errors="*{membershipId}"
+                             class="invalid-feedback"></div>
+                    </div>
+                </div>
+
+                <div class="admin-form-actions mt-4" style="text-align: right;">
+                    <a th:href="@{/admin/members/{id}(id=${memberForm.userId})}" class="admin-btn admin-btn--default"
+                       style="margin-right: 8px;">취소</a>
+                    <button type="submit" class="admin-btn admin-btn--primary">
+                        <i class="fas fa-save"></i> 저장하기
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>
