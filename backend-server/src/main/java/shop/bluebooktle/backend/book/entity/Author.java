@@ -40,7 +40,7 @@ public class Author extends BaseEntity {
 	private String description;
 
 	@Setter
-	@Column(name = "author_key", nullable = false, columnDefinition = "TEXT", unique = true)
+	@Column(name = "author_key", nullable = false, columnDefinition = "TEXT")
 	private String authorKey;
 
 	@Builder
