@@ -2,6 +2,7 @@ package shop.bluebooktle.backend.book.service.impl;
 
 import java.math.BigDecimal;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -91,7 +92,13 @@ public class BookRegisterServiceImpl implements BookRegisterService {
 
 		for (String authorName : request.getAuthor()) {
 			Author author = authorRepository.findByName(authorName)
-				.orElseGet(() -> authorRepository.save(new Author(authorName)));
+				.orElseGet(() -> authorRepository.save(
+					Author.builder()
+						.name(authorName)
+						.description("설명 없음")
+						.authorKey(UUID.randomUUID().toString())
+						.build()
+				));
 			bookAuthorRepository.save(new BookAuthor(author, book));
 		}
 

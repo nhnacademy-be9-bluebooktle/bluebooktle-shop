@@ -12,6 +12,8 @@ CREATE TABLE `author`
 (
     `author_id`  bigint      NOT NULL AUTO_INCREMENT,
     `name`       varchar(50) NOT NULL,
+    `description`	text	NOT NULL,
+    `author_key` varchar(50) NOT NULL DEFAULT 'a_null' COMMENT 'Unique',
     `created_at` timestamp   NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `deleted_at` timestamp   NULL,
 
