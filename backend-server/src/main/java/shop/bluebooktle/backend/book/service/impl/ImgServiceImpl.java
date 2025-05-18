@@ -16,12 +16,12 @@ import shop.bluebooktle.common.exception.book.ImgNotFoundException;
 import shop.bluebooktle.common.exception.book.ImgUrlEmptyException;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class ImgServiceImpl implements ImgService {
 
 	private final ImgRepository imgRepository;
 
-	@Transactional
 	@Override
 	public void registerImg(ImgRegisterRequest imgRegisterRequest) {
 		if (imgRegisterRequest.getImgUrl() == null || imgRegisterRequest.getImgUrl().trim().isEmpty()) {
@@ -54,7 +54,6 @@ public class ImgServiceImpl implements ImgService {
 		return imgResponse;
 	}
 
-	@Transactional
 	@Override
 	public void updateImg(Long imgId, ImgUpdateRequest imgUpdateRequest) {
 		if (imgId == null) {
@@ -71,7 +70,6 @@ public class ImgServiceImpl implements ImgService {
 		imgRepository.save(img);
 	}
 
-	@Transactional
 	@Override
 	public void deleteImg(Long imgId) {
 		if (imgId == null) {

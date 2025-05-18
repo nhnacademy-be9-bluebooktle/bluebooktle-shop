@@ -25,6 +25,7 @@ import shop.bluebooktle.common.exception.book.BookIdNullException;
 import shop.bluebooktle.common.exception.book.BookNotFoundException;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class BookAuthorServiceImpl implements BookAuthorService {
 
@@ -32,7 +33,6 @@ public class BookAuthorServiceImpl implements BookAuthorService {
 	private final AuthorRepository authorRepository;
 	private final BookAuthorRepository bookAuthorRepository;
 
-	@Transactional
 	@Override
 	public void registerBookAuthor(Long bookId, Long authorId) {
 		if (bookId == null) {
@@ -92,7 +92,6 @@ public class BookAuthorServiceImpl implements BookAuthorService {
 			.toList();
 	}
 
-	@Transactional
 	@Override
 	public void deleteBookAuthor(Long bookId, Long authorId) {
 		if (bookId == null) {

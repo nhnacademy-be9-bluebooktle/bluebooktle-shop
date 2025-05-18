@@ -29,6 +29,7 @@ import shop.bluebooktle.common.exception.book.ImgNotFoundException;
 // 수정 필요
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class BookImgServiceImpl implements BookImgService {
 
@@ -36,7 +37,6 @@ public class BookImgServiceImpl implements BookImgService {
 	private final ImgRepository imgRepository;
 	private final BookImgRepository bookImgRepository;
 
-	@Transactional
 	@Override
 	public void registerBookImg(Long bookId, BookImgRegisterRequest bookImgRegisterRequest) {
 
@@ -123,7 +123,6 @@ public class BookImgServiceImpl implements BookImgService {
 			);
 	}
 
-	@Transactional
 	@Override
 	public void deleteBookImg(Long bookId, Long imgId) {
 		if (bookId == null) {

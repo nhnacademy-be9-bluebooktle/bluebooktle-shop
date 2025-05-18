@@ -17,12 +17,12 @@ import shop.bluebooktle.common.exception.book.AuthorNotFoundException;
 import shop.bluebooktle.common.exception.book.AuthorUpdateFieldMissingException;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class AuthorServiceImpl implements AuthorService {
 
 	private final AuthorRepository authorRepository;
 
-	@Transactional
 	@Override
 	public void registerAuthor(AuthorRegisterRequest authorRegisterRequest) {
 
@@ -57,7 +57,6 @@ public class AuthorServiceImpl implements AuthorService {
 		authorRepository.save(authorSaved);
 	}
 
-	@Transactional
 	@Override
 	public AuthorResponse getAuthor(Long authorId) {
 
@@ -76,7 +75,6 @@ public class AuthorServiceImpl implements AuthorService {
 			.build();
 	}
 
-	@Transactional
 	@Override
 	public void updateAuthor(Long authorId, AuthorUpdateRequest authorUpdateRequest) {
 
@@ -105,7 +103,6 @@ public class AuthorServiceImpl implements AuthorService {
 
 	}
 
-	@Transactional
 	@Override
 	public void deleteAuthor(Long authorId) {
 		if (authorId == null) {
