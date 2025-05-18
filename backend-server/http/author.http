@@ -4,7 +4,6 @@ Content-Type: application/json
 
 {
   "name": "문소연",
-  "authorKey": "문소연_authorKey",
   "description": "문소연_description"
 
 }
@@ -18,7 +17,6 @@ Content-Type: application/json
 
 {
   "name": "곰소연",
-  "authorKey": "곰소연_authorKey",
   "description": "곰소연_description"
 }
 

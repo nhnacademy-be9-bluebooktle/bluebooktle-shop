@@ -12,12 +12,11 @@ import lombok.extern.jackson.Jacksonized;
 @Jacksonized
 public class AuthorRegisterRequest {
 
-	@NotBlank @Length(max = 50)
+	@NotBlank
+	@Length(max = 50)
 	String name;
 
 	@NotBlank
 	String description;
 
-	@NotBlank
-	String authorKey;
 }

@@ -19,6 +19,4 @@ public class AuthorUpdateRequest {
 	@NotBlank
 	String description;
 
-	@NotBlank
-	String authorKey;
 }

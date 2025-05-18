@@ -28,13 +28,12 @@ public class AuthorServiceImpl implements AuthorService {
 
 		String name = authorRegisterRequest.getName();
 		String description = authorRegisterRequest.getDescription();
-		String authorKey = authorRegisterRequest.getAuthorKey();
 
-		if (name == null || description == null || authorKey == null) {
+		if (name == null || description == null) {
 			throw new AuthorFieldNullException();
 		}
 
-		if (name.trim().isEmpty() || description.trim().isEmpty() || authorKey.trim().isEmpty()) {
+		if (name.trim().isEmpty() || description.trim().isEmpty()) {
 			throw new AuthorFieldNullException();
 		}
 
@@ -45,10 +44,17 @@ public class AuthorServiceImpl implements AuthorService {
 		Author author = Author.builder()
 			.name(authorRegisterRequest.getName())
 			.description(authorRegisterRequest.getDescription())
-			.authorKey(authorRegisterRequest.getAuthorKey())
 			.build();
 
-		authorRepository.save(author);
+		if (author.getAuthorKey() == null) {
+			author.setAuthorKey("a_null");
+		}
+
+		Author authorSaved = authorRepository.save(author);
+
+		String key = "a" + authorSaved.getId();
+		authorSaved.setAuthorKey(key);
+		authorRepository.save(authorSaved);
 	}
 
 	@Transactional
@@ -76,15 +82,13 @@ public class AuthorServiceImpl implements AuthorService {
 
 		String name = authorUpdateRequest.getName();
 		String description = authorUpdateRequest.getDescription();
-		String authorKey = authorUpdateRequest.getAuthorKey();
 
 		if (authorId == null) {
 			throw new AuthorIdNullException();
 		}
 
 		if ((name == null || name.trim().isEmpty()) &&
-			(description == null || description.trim().isEmpty()) &&
-			(authorKey == null || authorKey.trim().isEmpty())) {
+			(description == null || description.trim().isEmpty())) {
 			throw new AuthorUpdateFieldMissingException();
 		}
 
@@ -95,9 +99,6 @@ public class AuthorServiceImpl implements AuthorService {
 		}
 		if (description != null) {
 			author.setDescription(description);
-		}
-		if (authorKey != null) {
-			author.setAuthorKey(authorKey);
 		}
 
 		authorRepository.save(author);
