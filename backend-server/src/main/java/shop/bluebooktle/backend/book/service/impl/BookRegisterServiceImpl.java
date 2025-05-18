@@ -74,6 +74,64 @@ public class BookRegisterServiceImpl implements BookRegisterService {
 	private final TagService tagService;
 	private final BookCategoryService bookCategoryService;
 	private final BookTagService bookTagService;
+	private final BookImgService bookImgService;
+	private final BookAuthorService bookAuthorService;
+
+	@Override
+	public void registerBook(BookAllRegisterRequest request) {
+		Optional<Book> existBook = bookRepository.findByIsbn(request.getIsbn());
+		if (existBook.isPresent()) {
+			throw new BookAlreadyExistsException();
+		}
+		Book book = Book.builder()
+			.title(request.getTitle())
+			.isbn(request.getIsbn())
+			.description(request.getDescription())
+			.publishDate(request.getPublishDate() != null ?
+				request.getPublishDate().atStartOfDay() : null)
+			.build();
+		bookRepository.save(book);
+
+		//할인율 계산 따로 뺄것
+		BigDecimal salePercentage = request.getPrice().subtract(request.getSalePrice())
+			.divide(request.getPrice(), 2, BigDecimal.ROUND_HALF_UP)
+			.multiply(BigDecimal.valueOf(100));
+
+		//작가, 이미지 - 수정필요
+
+		// TODO 작가 ID로 받아와서 도서작가 테이블에 등록되도록 변경
+		for (Long authorId : request.getAuthorIdList()) {
+			bookAuthorService.registerBookAuthor(book.getId(), authorId);
+		}
+
+		for (Long publisherId : request.getAuthorIdList()) {
+			bookPublisherService.registerBookPublisher(book.getId(), publisherId);
+		}
+
+		for (Long categoryId : request.getCategoryIdList()) {
+			bookCategoryService.registerBookCategory(book.getId(), categoryId);
+		}
+
+		for (Long tagId : request.getTagIdList()) {
+			bookTagService.registerBookTag(book.getId(), tagId);
+		}
+
+		// TODO 이미지를 url을 받아와서 저장되도록(이미지 테이블에 저장 및 도서이미지에 저장)
+		//  -> 도서 썸네일 사진(개수가 많은가? 정렬되어서 들어오도록 구현 필요) 및 도서 상세 이미지
+		for (String imageUrl : request.getImageUrl()) {
+			Img img = imgRepository.findByImgUrl(imageUrl)
+				.orElseGet(() -> imgRepository.save(new Img(imageUrl)));
+			bookImgRepository.save(new BookImg(book, img, false));
+		}
+
+		for (Long categoryId : request.getCategoryIdList()) {
+			bookCategoryService.registerBookCategory(categoryId, book.getId());
+		}
+
+		for (Long tagId : request.getTagIdList()) {
+			bookTagService.registerBookTag(book.getId(), tagId);
+		}
+
 	// TODO 작가 서비스 주입
 
 	//연관테이블 완성되면 수정필요 일단기능구현만
