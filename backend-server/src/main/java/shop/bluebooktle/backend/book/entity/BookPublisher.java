@@ -30,12 +30,12 @@ public class BookPublisher {
 	private Long id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "book_id", nullable = false)
-	private Book book;
-
-	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "publisher_id", nullable = false)
 	private Publisher publisher;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "book_id", nullable = false)
+	private Book book;
 
 	@Builder
 	public BookPublisher(Book book, Publisher publisher) {

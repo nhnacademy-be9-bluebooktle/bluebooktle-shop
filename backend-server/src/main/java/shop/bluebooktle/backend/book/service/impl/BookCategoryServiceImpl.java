@@ -59,16 +59,14 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 		Book book = requireBook(bookId);
 		Category category = requireCategory(categoryId);
 
-		if (!bookCategoryRepository.existsByBookAndCategory(book, category)) {
-			throw new BookCategoryNotFoundException(book.getId(), category.getId());
-		}
+		BookCategory bookCategory = bookCategoryRepository.findByBookAndCategory(book, category)
+			.orElseThrow(() -> new BookCategoryNotFoundException(bookId, categoryId));
 
 		long count = bookCategoryRepository.countByBook(book);
 		if (count <= 1) {
 			throw new BookCategoryRequiredException(book.getId());
 		}
 
-		BookCategory bookCategory = new BookCategory(book, category);
 		bookCategoryRepository.delete(bookCategory);
 	}
 

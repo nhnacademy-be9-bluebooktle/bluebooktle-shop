@@ -176,17 +176,21 @@ public class BookRegisterServiceImpl implements BookRegisterService {
 
 		//작가, 이미지 - 수정필요
 
+		// TODO 작가 ID로 받아와서 도서작가 테이블에 등록되도록 변경
 		for (String authorName : request.getAuthor()) {
 			Author author = authorRepository.findByName(authorName)
 				.orElseGet(() -> authorRepository.save(new Author(authorName)));
 			bookAuthorRepository.save(new BookAuthor(author, book));
 		}
+
 		bookPublisherService.registerBookPublisher(request.getPublisherId(), book.getId());
 
 		for (Long categoryId : request.getCategoryIdList()) {
 			bookCategoryService.registerBookCategory(categoryId, book.getId());
 		}
 
+		// TODO 이미지를 url을 받아와서 저장되도록(이미지 테이블에 저장 및 도서이미지에 저장)
+		//  -> 도서 썸네일 사진(개수가 많은가? 정렬되어서 들어오도록 구현 필요) 및 도서 상세 이미지
 		for (String imageUrl : request.getImageUrl()) {
 			Img img = imgRepository.findByImgUrl(imageUrl)
 				.orElseGet(() -> imgRepository.save(new Img(imageUrl)));

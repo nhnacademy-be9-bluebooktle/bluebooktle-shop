@@ -1,6 +1,7 @@
 package shop.bluebooktle.backend.book.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,4 +27,6 @@ public interface BookTagRepository extends JpaRepository<BookTag, Long> {
 	List<BookTag> tag(Tag tag);
 
 	void deleteAllByTag(Tag tag);
+
+	Optional<BookTag> findByBookAndTag(Book book, Tag tag);
 }
