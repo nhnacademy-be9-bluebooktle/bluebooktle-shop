@@ -1,0 +1,9 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<footer class="admin-footer" th:fragment="adminFooterFragment">
+    <p>&copy; <span th:text="${#dates.year(#dates.createNow())}">2025</span> BlueBooktle. All Rights Reserved. (Admin
+        Panel)</p>
+</footer>
+</body>
+</html>

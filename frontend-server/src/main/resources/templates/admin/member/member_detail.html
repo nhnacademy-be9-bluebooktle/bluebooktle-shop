@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html layout:decorate="~{_layouts/admin_layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${pageTitle} ?: '회원 상세 정보'"></title>
+    <style>
+        .detail-label {
+            font-weight: bold;
+            color: #555;
+            min-width: 120px;
+            display: inline-block;
+        }
+
+        .detail-value {
+            color: #333;
+        }
+
+        .detail-section {
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .detail-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .detail-section h5 {
+            color: var(--admin-color-primary);
+            margin-bottom: 15px;
+            padding-bottom: 5px;
+            border-bottom: 2px solid var(--admin-color-primary);
+            display: inline-block;
+        }
+
+        .related-info-table th {
+            background-color: #f8f9fa;
+        }
+    </style>
+</head>
+<body>
+<div layout:fragment="admin_content">
+    <div class="admin-page-header">
+        <h1 class="admin-page-title">
+            <i class="fas fa-user-circle"></i>
+            <th:block th:text="${pageTitle}">회원 상세 정보</th:block>
+        </h1>
+        <div class="admin-page-actions">
+            <a th:href="@{/admin/members}" class="admin-btn admin-btn--default">
+                <i class="fas fa-list"></i> 목록으로
+            </a>
+            <a th:href="@{/admin/members/{id}/edit(id=${member.userId})}" class="admin-btn admin-btn--primary"
+               th:if="${member != null}">
+                <i class="fas fa-edit"></i> 정보 수정
+            </a>
+        </div>
+    </div>
+
+    <div th:if="${globalErrorMessage}" class="alert alert-danger" th:text="${globalErrorMessage}"></div>
+    <div th:if="${globalSuccessMessage}" class="alert alert-success" th:text="${globalSuccessMessage}"></div>
+
+    <div class="admin-panel" th:if="${member != null}">
+        <div class="admin-panel__body">
+            <div class="detail-section">
+                <h5><i class="fas fa-id-card"></i> 기본 정보</h5>
+                <p><span class="detail-label">회원 ID:</span> <span class="detail-value"
+                                                                  th:text="${member.userId}">123</span></p>
+                <p><span class="detail-label">로그인 ID:</span> <span class="detail-value" th:text="${member.loginId}">user01</span>
+                </p>
+                <p><span class="detail-label">이름:</span> <span class="detail-value" th:text="${member.name}">김회원</span>
+                </p>
+                <p><span class="detail-label">닉네임:</span> <span class="detail-value"
+                                                                th:text="${member.nickname}">별명하나</span></p>
+                <p><span class="detail-label">이메일:</span> <span class="detail-value" th:text="${member.email}">user01@example.com</span>
+                </p>
+                <p><span class="detail-label">전화번호:</span> <span class="detail-value" th:text="${member.phoneNumber}">010-1234-5678</span>
+                </p>
+                <p><span class="detail-label">생년월일:</span> <span class="detail-value"
+                                                                 th:text="${member.birthDate} ? ${#strings.length(member.birthDate) == 8 ? #strings.substring(member.birthDate,0,4) + '-' + #strings.substring(member.birthDate,4,6) + '-' + #strings.substring(member.birthDate,6,8) : member.birthDate} : '-'">1990-01-01</span>
+                </p>
+            </div>
+
+            <div class="detail-section">
+                <h5><i class="fas fa-user-cog"></i> 계정 정보</h5>
+                <p><span class="detail-label">회원 유형:</span>
+                    <span class="detail-value" th:switch="${member.userType}">
+                        <span th:case="'USER'" class="badge bg-info">일반회원</span>
+                        <span th:case="'ADMIN'" class="badge bg-danger">관리자</span>
+                        <span th:case="*" th:text="${member.userType}"></span>
+                    </span>
+                </p>
+                <p><span class="detail-label">회원 상태:</span>
+                    <span class="detail-value" th:switch="${member.userStatus}">
+                        <span th:case="'ACTIVE'" class="badge bg-success">활성</span>
+                        <span th:case="'DORMANT'" class="badge bg-warning text-dark">휴면</span>
+                        <span th:case="'WITHDRAWN'" class="badge bg-secondary">탈퇴</span>
+                        <span th:case="*" th:text="${member.userStatus}"></span>
+                    </span>
+                </p>
+                <p><span class="detail-label">회원 등급:</span> <span class="detail-value badge bg-primary"
+                                                                  th:text="${member.membershipName} ?: '-'">BRONZE</span>
+                </p>
+                <p><span class="detail-label">포인트 잔액:</span> <span class="detail-value"
+                                                                   th:text="${#numbers.formatDecimal(member.pointBalance, 0, 'COMMA', 2, 'POINT')} + ' P'">1,500.00 P</span>
+                </p>
+                <p><span class="detail-label">가입일:</span> <span class="detail-value"
+                                                                th:text="${member.createdAt != null ? #temporals.format(member.createdAt, 'yyyy-MM-dd HH:mm:ss') : '-'}">2023-01-15 10:00:00</span>
+                </p>
+                <p><span class="detail-label">최근 로그인:</span> <span class="detail-value"
+                                                                   th:text="${member.lastLoginAt != null ? #temporals.format(member.lastLoginAt, 'yyyy-MM-dd HH:mm:ss') : '기록 없음'}">2025-05-18 14:30:00</span>
+                </p>
+                <p th:if="${member.deletedAt != null}"><span class="detail-label" style="color:red;">탈퇴/삭제일:</span>
+                    <span class="detail-value" th:text="${#temporals.format(member.deletedAt, 'yyyy-MM-dd HH:mm:ss')}"
+                          style="color:red;"></span></p>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<th:block layout:fragment="page_scripts">
+</th:block>
+</body>
+</html>

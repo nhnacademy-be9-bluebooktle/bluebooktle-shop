@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html layout:decorate="~{_layouts/admin_layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${pageTitle} ?: '배송 정책 관리'"></title>
+    <th:block layout:fragment="page_css">
+        <style>
+            .status-active {
+                color: green;
+                font-weight: bold;
+            }
+
+            .status-inactive {
+                color: red;
+            }
+        </style>
+    </th:block>
+</head>
+<body>
+<div layout:fragment="admin_content">
+    <div class="admin-page-header">
+        <h1 class="admin-page-title">
+            <i class="fas fa-truck-loading"></i>
+            <th:block th:text="${pageTitle} ?: '배송 정책 관리'"></th:block>
+        </h1>
+        <div>
+            <a th:href="@{/admin/delivery/settings/new}" class="admin-btn admin-btn--primary">
+                <i class="fas fa-plus"></i> 새 배송 정책 추가
+            </a>
+        </div>
+    </div>
+
+    <div class="admin-panel">
+        <div class="admin-panel__header">
+            <h2 class="admin-panel__title"><i class="fas fa-list-ul"></i> 배송 정책 목록</h2>
+        </div>
+        <div class="admin-panel__body">
+            <table class="admin-table">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>규칙명/설명</th>
+                    <th>배송비</th>
+                    <th>무료배송 조건 (금액)</th>
+                    <th>적용 지역</th>
+                    <th>우선순위</th>
+                    <th>상태</th>
+                    <th>관리</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:if="${#lists.isEmpty(deliveryRules)}">
+                    <td colspan="8" style="text-align:center;">등록된 배송 정책이 없습니다.</td>
+                </tr>
+                <tr th:each="rule : ${deliveryRules}">
+                    <td th:text="${rule.id}">1</td>
+                    <td>
+                        <strong th:text="${rule.ruleName}">기본 배송비</strong><br>
+                        <small th:if="${rule.description}" th:text="${rule.description}" style="color: #555;"></small>
+                    </td>
+                    <td th:text="${rule.baseShippingFee != null ? (#numbers.formatInteger(rule.baseShippingFee, 0, 'COMMA') + '원') : '-'}">
+                        3,000원
+                    </td>
+                    <td th:text="${rule.freeShippingThreshold != null ? (#numbers.formatInteger(rule.freeShippingThreshold, 0, 'COMMA') + '원 이상') : '-'}">
+                        50,000원 이상
+                    </td>
+                    <td th:text="${rule.regionType}">ALL</td>
+                    <td th:text="${rule.priority ?: '-'}">10</td>
+                    <td>
+                        <span th:text="${rule.isActive ? '활성' : '비활성'}"
+                              th:classappend="${rule.isActive ? 'status-active' : 'status-inactive'}">활성</span>
+                    </td>
+                    <td>
+                        <a th:href="@{/admin/delivery/settings/{id}/edit(id=${rule.id})}"
+                           class="admin-btn admin-btn--sm admin-btn--info" title="수정">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <form th:action="@{/admin/delivery/settings/{id}/delete(id=${rule.id})}" method="post"
+                              style="display:inline;"
+                              onsubmit="return confirm('정말로 이 배송 정책을 삭제하시겠습니까?');">
+                            <button type="submit" class="admin-btn admin-btn--sm admin-btn--danger" title="삭제">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<th:block layout:fragment="page_scripts">
+</th:block>
+</body>
+</html>

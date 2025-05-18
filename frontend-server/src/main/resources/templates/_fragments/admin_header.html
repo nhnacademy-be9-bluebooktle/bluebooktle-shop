@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<header class="admin-header" th:fragment="adminHeaderFragment">
+    <a th:href="@{/admin/dashboard}" class="admin-header__logo">BlueBooktle Admin</a>
+
+    <div class="admin-header__user-actions">
+        <span class="admin-header__user-info" th:if="${userNickname}" th:text="|${userNickname}님 (관리자)|">관리자님</span>
+        <span class="admin-header__user-info" th:unless="${userNickname}">관리자</span>
+
+        <form th:action="@{/logout}" method="post" style="display: inline;">
+            <button type="submit" class="admin-header__logout-btn">
+                <i class="fas fa-sign-out-alt"></i> 로그아웃
+            </button>
+        </form>
+    </div>
+</header>
+</body>
+</html>

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html layout:decorate="~{_layouts/admin_layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${pageTitle} ?: '포인트 정책 설정'"></title>
+    <th:block layout:fragment="page_css">
+        <style>
+            .policy-section {
+                margin-bottom: 30px;
+            }
+
+            .policy-section legend {
+                font-size: 1.2em;
+                margin-bottom: 15px;
+                padding-bottom: 5px;
+                border-bottom: 1px solid #eee;
+            }
+
+            .policy-item {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                gap: 15px;
+                padding: 10px;
+                border: 1px solid #f0f0f0;
+                margin-bottom: 10px;
+                border-radius: 4px;
+            }
+
+            .policy-item .item-label {
+                font-weight: bold;
+                min-width: 150px;
+            }
+
+            .policy-item .admin-form-group {
+                margin-bottom: 0;
+                flex-grow: 1;
+            }
+
+            .policy-item .admin-form-control-sm {
+                width: 100px;
+                display: inline-block;
+                margin-right: 5px;
+            }
+
+            .policy-item .admin-form-check-input {
+                margin-right: 5px;
+            }
+        </style>
+    </th:block>
+</head>
+<body>
+<div layout:fragment="admin_content">
+    <div class="admin-page-header">
+        <h1 class="admin-page-title">
+            <i class="fas fa-coins"></i>
+            <th:block th:text="${pageTitle} ?: '포인트 정책 설정'"></th:block>
+        </h1>
+    </div>
+
+    <div class="admin-panel">
+        <div class="admin-panel__body">
+            <form th:action="@{/admin/points/settings}" th:object="${pointSettings}" method="post" class="admin-form">
+
+                <fieldset class="policy-section">
+                    <legend>포인트 적립 규칙</legend>
+                    <div th:each="rule, iterStat : *{earningRules}" class="policy-item">
+                        <input type="hidden" th:name="|earningRules[${iterStat.index}].sourceTypeKey|"
+                               th:value="${rule.sourceTypeKey}"/>
+                        <input type="hidden" th:name="|earningRules[${iterStat.index}].sourceTypeName|"
+                               th:value="${rule.sourceTypeName}"/>
+
+                        <span class="item-label" th:text="${rule.sourceTypeName}">회원가입 시</span>
+
+                        <div class="admin-form-group" style="flex-basis: 100px; flex-grow:0;">
+                            <input type="checkbox" th:id="'earningActive_' + ${iterStat.index}"
+                                   th:name="|earningRules[${iterStat.index}].isActive|" th:checked="${rule.isActive}"
+                                   class="admin-form-check-input">
+                            <label th:for="'earningActive_' + ${iterStat.index}"
+                                   class="admin-form-check-label">활성화</label>
+                        </div>
+
+                        <div class="admin-form-group" style="flex-basis: 200px; flex-grow:0;">
+                            <select th:id="'earningType_' + ${iterStat.index}"
+                                    th:name="|earningRules[${iterStat.index}].earningType|"
+                                    class="admin-form-control admin-form-control-sm">
+                                <option th:each="opt : ${earningTypeOptions}" th:value="${opt.value}"
+                                        th:text="${opt.text}" th:selected="${opt.value == rule.earningType}">타입
+                                </option>
+                            </select>
+                        </div>
+                        <div class="admin-form-group">
+                            <input type="number" th:id="'earningValue_' + ${iterStat.index}"
+                                   th:name="|earningRules[${iterStat.index}].earningValue|"
+                                   th:value="${rule.earningValue}" class="admin-form-control admin-form-control-sm"
+                                   step="any" placeholder="값">
+                        </div>
+                    </div>
+                    <div th:if="${#fields.hasErrors('earningRules')}" th:errors="*{earningRules}"
+                         class="invalid-feedback admin-form-text" style="display:block;"></div>
+                </fieldset>
+
+                <fieldset class="policy-section">
+                    <legend>회원 등급별 구매 시 추가 적립률</legend>
+                    <div th:each="rate, iterStat : *{membershipRates}" class="policy-item">
+                        <input type="hidden" th:name="|membershipRates[${iterStat.index}].membershipLevelId|"
+                               th:value="${rate.membershipLevelId}"/>
+                        <input type="hidden" th:name="|membershipRates[${iterStat.index}].membershipLevelName|"
+                               th:value="${rate.membershipLevelName}"/>
+
+                        <span class="item-label" th:text="${rate.membershipLevelName}">BRONZE</span>
+
+                        <div class="admin-form-group" style="flex-basis: 100px; flex-grow:0;">
+                            <input type="checkbox" th:id="'membershipActive_' + ${iterStat.index}"
+                                   th:name="|membershipRates[${iterStat.index}].isActive|" th:checked="${rate.isActive}"
+                                   class="admin-form-check-input">
+                            <label th:for="'membershipActive_' + ${iterStat.index}"
+                                   class="admin-form-check-label">활성화</label>
+                        </div>
+
+                        <div class="admin-form-group">
+                            <input type="number" th:id="'additionalRate_' + ${iterStat.index}"
+                                   th:name="|membershipRates[${iterStat.index}].additionalPurchaseRate|"
+                                   th:value="${rate.additionalPurchaseRate}"
+                                   class="admin-form-control admin-form-control-sm" step="0.1" placeholder="추가 적립률">
+                            <span style="margin-left: 5px;">%</span>
+                        </div>
+                    </div>
+                    <div th:if="${#fields.hasErrors('membershipRates')}" th:errors="*{membershipRates}"
+                         class="invalid-feedback admin-form-text" style="display:block;"></div>
+                </fieldset>
+
+                <div class="admin-form-actions" style="margin-top: 20px; text-align: center;">
+                    <button type="submit" class="admin-btn admin-btn--primary admin-btn--lg">
+                        <i class="fas fa-save"></i> 포인트 정책 저장
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+</body>
+</html>

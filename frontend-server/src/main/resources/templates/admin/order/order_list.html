@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html layout:decorate="~{_layouts/admin_layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${pageTitle} ?: '주문 목록 관리'"></title>
+    <th:block layout:fragment="page_css">
+        <style>
+            .search-filters {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 15px;
+                margin-bottom: 20px;
+            }
+
+            .search-filters .admin-form-group {
+                flex: 1 1 200px; /* 너비 조절 */
+                margin-bottom: 0;
+            }
+
+            .search-filters .admin-form-group-full {
+                flex: 1 1 100%;
+            }
+
+            .search-filters .admin-btn {
+                align-self: flex-end;
+            }
+
+            .date-range-inputs {
+                display: flex;
+                gap: 10px;
+            }
+
+            .pagination-container { /* commonPagination 프래그먼트의 스타일과 충돌하지 않도록 주의 */
+                margin-top: 20px;
+                text-align: center;
+                /* 기존 admin-pagination 스타일이 있다면, commonPagination의 스타일로 대체될 것임 */
+            }
+
+            /* commonPagination 프래그먼트의 .pagination, .page-item, .page-link 등의 스타일이 필요합니다. */
+            /* 예시: Bootstrap 스타일과 유사하게 (실제 admin_styles.css에 맞게 조정 필요) */
+            .pagination {
+                display: inline-flex;
+                padding-left: 0;
+                list-style: none;
+                border-radius: .25rem;
+            }
+
+            .page-item {
+            }
+
+            .page-item.disabled .page-link {
+                color: #6c757d;
+                pointer-events: none;
+                background-color: #fff;
+                border-color: #dee2e6;
+            }
+
+            .page-item.active .page-link {
+                z-index: 3;
+                color: #fff;
+                background-color: #007bff;
+                border-color: #007bff;
+            }
+
+            .page-link {
+                position: relative;
+                display: block;
+                padding: .5rem .75rem;
+                margin-left: -1px;
+                line-height: 1.25;
+                color: #007bff;
+                background-color: #fff;
+                border: 1px solid #dee2e6;
+            }
+
+            .page-link:hover {
+                z-index: 2;
+                color: #0056b3;
+                text-decoration: none;
+                background-color: #e9ecef;
+                border-color: #dee2e6;
+            }
+
+        </style>
+    </th:block>
+</head>
+<body>
+<div layout:fragment="admin_content">
+    <div class="admin-page-header">
+        <h1 class="admin-page-title">
+            <i class="fas fa-shopping-cart"></i>
+            <th:block th:text="${pageTitle} ?: '주문 목록 관리'"></th:block>
+        </h1>
+    </div>
+
+    <div class="admin-panel">
+        <div class="admin-panel__header">
+            <h2 class="admin-panel__title">
+                <i class="fas fa-search"></i> 주문 검색 및 필터
+            </h2>
+        </div>
+        <div class="admin-panel__body">
+            <form th:action="@{/admin/orders}" method="get" th:object="${searchCriteria}" class="admin-form">
+                <div class="search-filters">
+                    <div class="admin-form-group">
+                        <label for="searchKeywordType" class="admin-form-label">검색 조건</label>
+                        <select id="searchKeywordType" th:field="*{searchKeywordType}" class="admin-form-control">
+                            <option value="">- 전체 -</option>
+                            <option th:each="type : ${searchKeywordTypes}" th:value="${type.key}"
+                                    th:text="${type.value}">검색 타입
+                            </option>
+                        </select>
+                    </div>
+                    <div class="admin-form-group">
+                        <label for="searchKeywordInput" class="admin-form-label">검색어</label> <input type="text"
+                                                                                                    id="searchKeywordInput"
+                                                                                                    th:field="*{searchKeyword}"
+                                                                                                    class="admin-form-control"
+                                                                                                    placeholder="검색어를 입력하세요">
+                    </div>
+                    <div class="admin-form-group">
+                        <label for="orderStatusFilter" class="admin-form-label">주문 상태</label>
+                        <select id="orderStatusFilter" th:field="*{orderStatusFilter}" class="admin-form-control">
+                            <option th:each="status : ${orderStatusOptions}" th:value="${status == '전체' ? '' : status}"
+                                    th:text="${status}">상태
+                            </option>
+                        </select>
+                    </div>
+                    <div class="admin-form-group">
+                        <label for="paymentMethodFilter" class="admin-form-label">결제 수단</label>
+                        <select id="paymentMethodFilter" th:field="*{paymentMethodFilter}" class="admin-form-control">
+                            <option th:each="method : ${paymentMethodOptions}"
+                                    th:value="${method == '전체' ? '' : method}" th:text="${method}">결제수단
+                            </option>
+                        </select>
+                    </div>
+                    <div class="admin-form-group admin-form-group-full">
+                        <label class="admin-form-label">주문 기간</label>
+                        <div class="date-range-inputs">
+                            <input type="date" id="startDate" th:field="*{startDate}" class="admin-form-control">
+                            <span>~</span>
+                            <input type="date" id="endDate" th:field="*{endDate}" class="admin-form-control">
+                        </div>
+                    </div>
+                </div>
+                <div class="admin-form-actions" style="text-align: right; margin-top: 10px;">
+                    <button type="submit" class="admin-btn admin-btn--primary">
+                        <i class="fas fa-search"></i> 검색
+                    </button>
+                    <a th:href="@{/admin/orders}" class="admin-btn admin-btn--default">
+                        <i class="fas fa-undo"></i> 초기화
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="admin-panel" style="margin-top: 20px;">
+        <div class="admin-panel__header">
+            <h2 class="admin-panel__title">
+                <i class="fas fa-list-ul"></i> 주문 목록
+            </h2>
+        </div>
+        <div class="admin-panel__body">
+            <table class="admin-table">
+                <thead>
+                <tr>
+                    <th>주문번호</th>
+                    <th>주문일</th>
+                    <th>주문자명 (ID)</th>
+                    <th>수령인명</th>
+                    <th>총 결제액</th>
+                    <th>주문 상태</th>
+                    <th>결제 수단</th>
+                    <th>관리</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:if="${#lists.isEmpty(orders)}">
+                    <td colspan="8" style="text-align:center;">조회된 주문이 없습니다.</td>
+                </tr>
+                <tr th:each="order : ${orders}">
+                    <td th:text="${order.orderNumber}">ORD20250517001</td>
+                    <td th:text="${#temporals.format(order.orderDate, 'yyyy-MM-dd HH:mm')}">2025-05-17 10:00</td>
+                    <td>
+                        <th:block th:text="${order.ordererName}">김주문</th:block>
+                        <th:block th:if="${order.ordererId != null}" th:text="' (' + ${order.ordererId} + ')'">
+                            (member01)
+                        </th:block>
+                    </td>
+                    <td th:text="${order.recipientName}">박수령</td>
+                    <td th:text="${#numbers.formatInteger(order.totalAmount, 0, 'COMMA') + '원'}">55,000원</td>
+                    <td>
+                        <span th:text="${order.orderStatus}"
+                              th:classappend="${order.orderStatus == '결제완료' ? 'status-paid' : (order.orderStatus == '배송준비중' ? 'status-preparing' : (order.orderStatus == '배송완료' ? 'status-delivered' : 'status-default'))}">
+                              결제완료
+                        </span>
+                    </td>
+                    <td th:text="${order.paymentMethod}">신용카드</td>
+                    <td>
+                        <a th:href="@{/admin/orders/{id}(id=${order.orderId})}"
+                           class="admin-btn admin-btn--sm admin-btn--info">
+                            <i class="fas fa-eye"></i> 상세
+                        </a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div th:if="${totalPages != null and totalPages > 0}" class="admin-panel__footer pagination-container">
+            <th:block th:replace="~{_fragments/admin_pagination :: commonPagination(
+                        currentPage=${currentPage + 1}, totalPages=${totalPages},
+                        baseUrl=${baseUrlWithParams},
+                        searchKeyword=${searchKeyword}
+                        )}"></th:block>
+        </div>
+
+    </div>
+</div>
+
+<th:block layout:fragment="page_scripts">
+</th:block>
+</body>
+</html>
