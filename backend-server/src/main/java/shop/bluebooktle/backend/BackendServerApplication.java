@@ -12,7 +12,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 @EnableFeignClients
 @EntityScan(basePackages = {
 	"shop.bluebooktle.backend",
-	"shop.bluebooktle.common.entity"
+	"shop.bluebooktle.common.entity",
 })
 public class BackendServerApplication {
 	public static void main(String[] args) {

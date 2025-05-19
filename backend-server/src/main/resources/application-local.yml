@@ -39,3 +39,14 @@ eureka:
     service-url:
       defaultZone: "http://${EUREKA_ID}:${EUREKA_PASSWORD}@localhost:9761/eureka"
 
+jwt:
+  secret: ${JWT_SECRET_KEY_LOCAL}
+  access-token-validity-seconds: 1800
+  refresh-token-validity-seconds: 3600
+
+logging:
+  level:
+    shop.bluebooktle: DEBUG
+    org.hibernate.SQL: info
+    org.hibernate.orm.jdbc.bind: trace
+    org.springframework.transaction.interceptor: trace
