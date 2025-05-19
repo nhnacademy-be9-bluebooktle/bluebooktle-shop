@@ -1,4 +1,4 @@
-package shop.bluebooktle.auth.util;
+package shop.bluebooktle.common.util;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
