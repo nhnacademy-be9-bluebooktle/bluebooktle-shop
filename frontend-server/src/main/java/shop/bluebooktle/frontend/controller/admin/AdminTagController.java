@@ -3,7 +3,11 @@ package shop.bluebooktle.frontend.controller.admin;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -21,12 +25,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
+import shop.bluebooktle.backend.book.dto.response.TagInfoResponse;
 
 @Slf4j
 @Controller
 @RequestMapping("/admin/tags")
 @RequiredArgsConstructor
 public class AdminTagController {
+	private final
 
 	@Getter
 	@Setter
@@ -47,14 +53,21 @@ public class AdminTagController {
 			this.createdAt = createdAt;
 			this.deletedAt = deletedAt;
 		}
-		// Lombok 사용 시 getter/setter 자동 생성
 	}
 
+	/** 태그 목록 조회 */
 	@GetMapping
 	public String listTags(Model model, HttpServletRequest request,
 		@RequestParam(value = "page", defaultValue = "1") int page,
 		@RequestParam(value = "size", defaultValue = "10") int size,
 		@RequestParam(value = "searchKeyword", required = false) String searchKeyword) {
+		Pageable pageable = PageRequest.of(page - 1, size);
+		Page<TagInfoResponse> tagPage = tagService.getTags(pageable);
+
+		List<TagInfoResponse> filteredTags = tagPage.getContent().stream()
+			.filter(t -> searchKeyword == null || t.getName().contains(searchKeyword))
+			.collect(Collectors.toList());
+
 		log.info("어드민 태그 목록 페이지 요청. URI: {}", request.getRequestURI());
 		model.addAttribute("pageTitle", "태그 관리");
 		model.addAttribute("currentURI", request.getRequestURI());
