@@ -3,8 +3,8 @@ POST http://localhost:9012/api/authors
 Content-Type: application/json
 
 {
-  "name": "문소연",
-  "description": "문소연_description"
+  "name": "홍길동",
+  "description": "홍길동_description"
 
 }
 
@@ -16,8 +16,8 @@ PATCH http://localhost:9012/api/authors/1
 Content-Type: application/json
 
 {
-  "name": "곰소연 (수정)",
-  "description": "곰소연_description (수정)"
+  "name": "홍길동 (수정)",
+  "description": "홍길동_description (수정)"
 }
 
 ### 작가 수정_2
@@ -25,8 +25,8 @@ PATCH http://localhost:9012/api/authors/1
 Content-Type: application/json
 
 {
-  "name": "문소연",
-  "description": "곰소연_description (수정)"
+  "name": "홍길동",
+  "description": "홍길동_description (수정)"
 }
 
 ### 작가 삭제

@@ -35,20 +35,14 @@ public class BookAuthorServiceImpl implements BookAuthorService {
 
 	@Override
 	public void registerBookAuthor(Long bookId, Long authorId) {
-		if (bookId == null) {
-			throw new BookIdNullException();
-		}
-		if (authorId == null) {
-			throw new AuthorIdNullException();
-		}
 
 		Author author = authorRepository.findById(authorId)
-			.orElseThrow(() -> new AuthorNotFoundException(authorId));
+			.orElseThrow(() -> new AuthorNotFoundException(authorId)); // #TODO
 		Book book = bookRepository.findById(bookId)
-			.orElseThrow(() -> new BookNotFoundException());
+			.orElseThrow(() -> new BookNotFoundException()); // #TODO
 
 		if (bookAuthorRepository.existsByBookAndAuthor(book, author)) {
-			throw new BookAuthorAlreadyExistsException(bookId, authorId);
+			throw new BookAuthorAlreadyExistsException(bookId, authorId); // #TODO
 		}
 
 		BookAuthor ba = BookAuthor.builder()
@@ -61,19 +55,17 @@ public class BookAuthorServiceImpl implements BookAuthorService {
 	@Transactional(readOnly = true)
 	@Override
 	public List<AuthorResponse> getAuthorByBookId(Long bookId) {
-		if (bookId == null) {
-			throw new BookIdNullException();
-		}
+
 		Book book = bookRepository.findById(bookId)
-			.orElseThrow(() -> new BookNotFoundException());
+			.orElseThrow(() -> new BookNotFoundException()); // #TODO
 
 		return bookAuthorRepository.findAuthorsByBook(book).stream()
-			.map(a -> AuthorResponse.builder()
-				.id(a.getId())
-				.name(a.getName())
-				.description(a.getDescription())
-				.authorKey(a.getAuthorKey())
-				.createdAt(a.getCreatedAt())
+			.map(author -> AuthorResponse.builder()
+				.id(author.getId())
+				.name(author.getName())
+				.description(author.getDescription())
+				.authorKey(author.getAuthorKey())
+				.createdAt(author.getCreatedAt())
 				.build())
 			.toList();
 	}
@@ -81,11 +73,9 @@ public class BookAuthorServiceImpl implements BookAuthorService {
 	@Transactional(readOnly = true)
 	@Override
 	public List<BookInfoResponse> getBookByAuthorId(Long authorId) {
-		if (authorId == null) {
-			throw new AuthorIdNullException();
-		}
+
 		Author author = authorRepository.findById(authorId)
-			.orElseThrow(() -> new AuthorNotFoundException(authorId));
+			.orElseThrow(() -> new AuthorNotFoundException(authorId)); // #TODO
 
 		return bookAuthorRepository.findBooksByAuthor(author).stream()
 			.map(b -> new BookInfoResponse(b.getId()))
@@ -94,20 +84,14 @@ public class BookAuthorServiceImpl implements BookAuthorService {
 
 	@Override
 	public void deleteBookAuthor(Long bookId, Long authorId) {
-		if (bookId == null) {
-			throw new BookIdNullException();
-		}
-		if (authorId == null) {
-			throw new AuthorIdNullException();
-		}
 
 		Author author = authorRepository.findById(authorId)
-			.orElseThrow(() -> new AuthorNotFoundException(authorId));
+			.orElseThrow(() -> new AuthorNotFoundException(authorId)); // #TODO
 		Book book = bookRepository.findById(bookId)
-			.orElseThrow(() -> new BookNotFoundException());
+			.orElseThrow(() -> new BookNotFoundException()); // #TODO
 
 		BookAuthor ba = bookAuthorRepository.findByBookAndAuthor(book, author)
-			.orElseThrow(() -> new BookAuthorNotFoundException(bookId, authorId));
+			.orElseThrow(() -> new BookAuthorNotFoundException(bookId, authorId)); // #TODO
 
 		bookAuthorRepository.delete(ba);
 	}
