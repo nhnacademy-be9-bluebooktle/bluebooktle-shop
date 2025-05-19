@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html layout:decorate="~{_layouts/admin_layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${pageTitle} ?: '카테고리 관리'"></title>
+    <style>
+        /* depth 관련 스타일 제거 */
+        .category-item .category-name {
+            font-weight: bold;
+        }
+
+        .category-actions a, .category-actions button {
+            margin-left: var(--admin-spacing-sm);
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+<div layout:fragment="admin_content">
+    <div class="admin-page-header">
+        <h1 class="admin-page-title">
+            <i class="fas fa-sitemap"></i>
+            <th:block th:text="${pageTitle} ?: '카테고리 관리'"></th:block>
+        </h1>
+        <div class="admin-page-actions">
+            <a th:href="@{/admin/categories/new}" class="admin-btn admin-btn--primary">
+                <i class="fas fa-plus"></i> 새 카테고리 등록
+            </a>
+        </div>
+    </div>
+
+    <div class="admin-panel">
+        <div class="admin-panel__body">
+            <form th:action="@{/admin/categories}" method="get" class="admin-form-inline">
+                <div class="admin-form-group">
+                    <input type="text" name="searchKeyword" th:value="${searchKeyword}" placeholder="카테고리명 검색"
+                           class="admin-form-control" style="width: auto; display: inline-block; margin-right: 8px;">
+                    <button type="submit" class="admin-btn admin-btn--secondary"><i class="fas fa-search"></i> 검색
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="admin-panel">
+        <div class="admin-panel__header">
+            카테고리 목록
+        </div>
+        <div class="admin-panel__body table-responsive">
+            <table class="admin-table admin-table--striped admin-table--hover">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>카테고리명</th>
+                    <th>부모 카테고리명</th>
+                    <th>경로</th>
+                    <th>상태</th>
+                    <th>관리</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="cat : ${categories}" th:if="${cat != null}">
+                    <td th:text="${cat.id}">1</td>
+                    <td>
+                        <span class="category-item" th:text="${cat.name}">카테고리 이름</span>
+                    </td>
+                    <td th:text="${cat.parentName} ?: '-'">-</td>
+                    <td th:text="${cat.categoryPath}">/path/to/category</td>
+                    <td th:text="${cat.isActive()} ? '활성' : '비활성'">상태</td>
+                    <td class="category-actions">
+                        <a th:href="@{/admin/categories/{id}/edit(id=${cat.id})}"
+                           class="admin-btn admin-btn--sm admin-btn--outline-primary" title="수정">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <form th:if="${cat.isActive()}" th:action="@{/admin/categories/{id}/delete(id=${cat.id})}"
+                              method="post" style="display: inline;"
+                              onsubmit="return confirm('정말로 이 카테고리를 비활성화 하시겠습니까?');">
+                            <button type="submit" class="admin-btn admin-btn--sm admin-btn--danger" title="비활성화">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
+                        <form th:unless="${cat.isActive()}" th:action="@{/admin/categories/{id}/activate(id=${cat.id})}"
+                              method="post" style="display: inline;">
+                            <button type="submit" class="admin-btn admin-btn--sm admin-btn--success" title="활성화">
+                                <i class="fas fa-check-circle"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                <tr th:if="${categories == null or #lists.isEmpty(categories)}">
+                    <td colspan="6" class="text-center">등록된 카테고리가 없습니다.</td>
+                </tr>
+                </tbody>
+            </table>
+            <div th:if="${totalPages != null and totalPages > 0}" class="pagination-container">
+                <th:block th:replace="~{_fragments/admin_pagination :: commonPagination(
+                            currentPage=${currentPage+ 1}, totalPages=${totalPages},
+                            baseUrl=${baseUrlWithParams},
+                            searchKeyword=${searchKeyword} )}"></th:block>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

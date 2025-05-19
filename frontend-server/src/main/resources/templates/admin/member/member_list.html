@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html layout:decorate="~{_layouts/admin_layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${pageTitle} ?: '회원 관리'"></title>
+    <style>
+        /* 기존 페이지네이션 관련 <style> 내용은 삭제합니다. 공통 CSS에서 관리됩니다. */
+
+        /* 테이블 컬럼 너비 (이 부분은 유지하거나 필요에 따라 조정) */
+        .admin-table .col-member-id {
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .admin-table .col-member-loginid {
+            min-width: 120px;
+        }
+
+        .admin-table .col-member-name {
+            min-width: 100px;
+        }
+
+        .admin-table .col-member-nickname {
+            min-width: 110px;
+        }
+
+        .admin-table .col-member-email {
+            min-width: 220px;
+        }
+
+        .admin-table .col-member-type {
+            min-width: 70px;
+            text-align: center;
+        }
+
+        .admin-table .col-member-status {
+            min-width: 70px;
+            text-align: center;
+        }
+
+        .admin-table .col-member-membership {
+            min-width: 90px;
+        }
+
+        .admin-table .col-member-points {
+            min-width: 100px;
+            text-align: right;
+        }
+
+        .admin-table .col-member-createdat {
+            min-width: 110px;
+            white-space: nowrap;
+        }
+
+        .admin-table .col-member-lastlogin {
+            min-width: 150px;
+            white-space: nowrap;
+        }
+
+        .admin-table .col-member-actions {
+            min-width: 80px;
+            text-align: center;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body>
+<div layout:fragment="admin_content">
+    <div class="admin-page-header">
+        <h1 class="admin-page-title">
+            <i class="fas fa-users"></i>
+            <th:block th:text="${pageTitle} ?: '회원 관리'"></th:block>
+        </h1>
+    </div>
+
+    <div class="admin-panel filter-form">
+        <div class="admin-panel__body">
+            <form th:action="@{/admin/members}" method="get" class="row gx-2 gy-2 align-items-center">
+                <div class="col-auto">
+                    <select name="searchField" class="admin-form-control">
+                        <option value="loginId" th:selected="${searchField == 'loginId'}">아이디</option>
+                        <option value="name" th:selected="${searchField == 'name'}">이름</option>
+                        <option value="nickname" th:selected="${searchField == 'nickname'}">닉네임</option>
+                        <option value="email" th:selected="${searchField == 'email'}">이메일</option>
+                    </select>
+                </div>
+                <div class="col-auto">
+                    <input type="text" name="searchKeyword" th:value="${searchKeyword}" placeholder="검색어 입력"
+                           class="admin-form-control">
+                </div>
+                <div class="col-auto">
+                    <select name="userTypeFilter" class="admin-form-control">
+                        <option value="">-- 회원 유형 --</option>
+                        <option th:each="typeOpt : ${userTypeOptions}" th:value="${typeOpt}" th:text="${typeOpt}"
+                                th:selected="${userTypeFilter == typeOpt}"></option>
+                    </select>
+                </div>
+                <div class="col-auto">
+                    <select name="userStatusFilter" class="admin-form-control">
+                        <option value="">-- 회원 상태 --</option>
+                        <option th:each="statusOpt : ${userStatusOptions}" th:value="${statusOpt}"
+                                th:text="${statusOpt}" th:selected="${userStatusFilter == statusOpt}"></option>
+                    </select>
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="admin-btn admin-btn--secondary"><i class="fas fa-search"></i> 검색
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="admin-panel">
+        <div class="admin-panel__header">
+            회원 목록
+        </div>
+        <div class="admin-panel__body table-responsive">
+            <table class="admin-table admin-table--striped admin-table--hover">
+                <thead>
+                <tr>
+                    <th class="col-member-id">ID</th>
+                    <th class="col-member-loginid">아이디</th>
+                    <th class="col-member-name">이름</th>
+                    <th class="col-member-nickname">닉네임</th>
+                    <th class="col-member-email">이메일</th>
+                    <th class="col-member-type">유형</th>
+                    <th class="col-member-status">상태</th>
+                    <th class="col-member-membership">등급</th>
+                    <th class="col-member-points">포인트</th>
+                    <th class="col-member-createdat">가입일</th>
+                    <th class="col-member-lastlogin">최근 로그인</th>
+                    <th class="col-member-actions">작업</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="member : ${members}">
+                    <td class="col-member-id" th:text="${member.userId}">1</td>
+                    <td class="col-member-loginid">
+                        <a th:href="@{/admin/members/{id}(id=${member.userId})}" th:text="${member.loginId}"
+                           style="font-weight: bold;">user01</a>
+                    </td>
+                    <td class="col-member-name" th:text="${member.name}">김회원</td>
+                    <td class="col-member-nickname" th:text="${member.nickname}">별명하나</td>
+                    <td class="col-member-email" th:text="${member.email}">user01@example.com</td>
+                    <td class="col-member-type" th:text="${member.userType}">USER</td>
+                    <td class="col-member-status">
+                        <span th:switch="${member.userStatus}">
+                            <span th:case="'ACTIVE'" class="badge bg-success" style="color:white;">활성</span>
+                            <span th:case="'DORMANT'" class="badge bg-warning text-dark">휴면</span>
+                            <span th:case="'WITHDRAWN'" class="badge bg-secondary" style="color:white;">탈퇴</span>
+                            <span th:case="*" th:text="${member.userStatus}"
+                                  class="badge bg-light text-dark"></span>
+                        </span>
+                    </td>
+                    <td class="col-member-membership" th:text="${member.membershipName} ?: '-'">BRONZE</td>
+                    <td class="col-member-points"
+                        th:text="${#numbers.formatDecimal(member.pointBalance, 0, 'COMMA', 0, 'POINT')}">1,500
+                    </td>
+                    <td class="col-member-createdat" th:text="${#temporals.format(member.createdAt, 'yyyy-MM-dd')}">
+                        2023-03-19
+                    </td>
+                    <td class="col-member-lastlogin"
+                        th:text="${member.lastLoginAt != null ? #temporals.format(member.lastLoginAt, 'yyyy-MM-dd HH:mm') : '-'}">
+                        2025-05-18 20:00
+                    </td>
+                    <td class="col-member-actions category-actions">
+                        <a th:href="@{/admin/members/{id}/edit(id=${member.userId})}"
+                           class="admin-btn admin-btn--sm admin-btn--outline-primary" title="정보 수정">
+                            <i class="fas fa-user-edit"></i>
+                        </a>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(members)}">
+                    <td colspan="12" class="text-center">조회된 회원이 없습니다.</td>
+                </tr>
+                </tbody>
+            </table>
+
+            <div th:if="${totalPages > 0}" class="pagination-container">
+                <th:block th:replace="~{_fragments/admin_pagination :: commonPagination(
+                            currentPage=${currentPage + 1}, totalPages=${totalPages},
+                            baseUrl=${baseUrlWithParams},
+                            searchKeyword=null )}"></th:block>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
