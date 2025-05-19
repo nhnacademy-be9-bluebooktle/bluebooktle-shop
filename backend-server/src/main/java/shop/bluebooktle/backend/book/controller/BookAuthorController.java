@@ -14,17 +14,18 @@ import org.springframework.web.bind.annotation.RestController;
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.book.dto.request.BookUpdateRequest;
 import shop.bluebooktle.backend.book.dto.response.BookInfoResponse;
+import shop.bluebooktle.backend.book.dto.response.author.AuthorResponse;
 import shop.bluebooktle.backend.book.service.BookAuthorService;
 import shop.bluebooktle.common.dto.common.JsendResponse;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/authors/{authorId}/books")
 public class BookAuthorController {
+
 	private final BookAuthorService bookAuthorService;
 
 	// 도서에 작가 등록
-	@PostMapping("/{bookId}")
+	@PostMapping("/api/authors/{authorId}/books/{bookId}")
 	public ResponseEntity<JsendResponse<Void>> addBookAuthor(
 		@PathVariable Long authorId,
 		@PathVariable Long bookId
@@ -33,22 +34,31 @@ public class BookAuthorController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(JsendResponse.success());
 	}
 
+	// 작가의 모든 도서
+	@GetMapping("/api/authors/{authorId}/books")
+	public ResponseEntity<JsendResponse<List<BookInfoResponse>>> getBooksByAuthor(
+		@PathVariable Long authorId
+	) {
+		List<BookInfoResponse> bookInfoResponses = bookAuthorService.getBookByAuthorId(authorId);
+		return ResponseEntity.ok(JsendResponse.success(bookInfoResponses));
+	}
+
+	// 도서의 모든 작가
+	@GetMapping("/api/books/{bookId}/authors")
+	public ResponseEntity<JsendResponse<List<AuthorResponse>>> getAuthorsByBook(
+		@PathVariable Long bookId
+	) {
+		List<AuthorResponse> authorResponses = bookAuthorService.getAuthorByBookId(bookId);
+		return ResponseEntity.ok(JsendResponse.success(authorResponses));
+	}
+
 	// 도서에 작가 삭제
-	@DeleteMapping("/{bookId}")
+	@DeleteMapping("/api/authors/{authorId}/books/{bookId}")
 	public ResponseEntity<JsendResponse<Void>> deleteBookAuthor(
 		@PathVariable Long authorId,
 		@PathVariable Long bookId
 	) {
 		bookAuthorService.deleteBookAuthor(authorId, bookId);
 		return ResponseEntity.ok(JsendResponse.success());
-	}
-
-	// 작가의 모든 도서
-	@GetMapping
-	public ResponseEntity<JsendResponse<List<BookInfoResponse>>> getBookAuthors(
-		@PathVariable Long authorId
-	) {
-		List<BookInfoResponse> response = bookAuthorService.getBookByAuthorId(authorId);
-		return ResponseEntity.ok(JsendResponse.success(response));
 	}
 }

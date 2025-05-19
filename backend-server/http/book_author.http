@@ -1,0 +1,14 @@
+### 도서에 작가 등록
+POST http://localhost:9012/api/authors/1/books/1
+Content-Type: application/json
+
+### 작가의 모든 도서
+GET http://localhost:9012/api/authors/1/books
+Content-Type: application/json
+
+### 도서의 모든 작가
+GET http://localhost:9012/api/books/1/authors
+Content-Type: application/json
+
+### 도서에 작가 삭제
+DELETE http://localhost:9012/api/authors/1/books/1
