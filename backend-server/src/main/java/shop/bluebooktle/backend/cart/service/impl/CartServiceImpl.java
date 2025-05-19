@@ -3,14 +3,12 @@ package shop.bluebooktle.backend.cart.service.impl;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.book.entity.Book;
 import shop.bluebooktle.backend.book.repository.BookRepository;
-import shop.bluebooktle.backend.cart.dto.request.CartItemRequest;
 import shop.bluebooktle.backend.cart.dto.response.CartItemResponse;
 import shop.bluebooktle.backend.cart.entity.Cart;
 import shop.bluebooktle.backend.cart.entity.CartBook;
@@ -31,9 +29,6 @@ public class CartServiceImpl implements CartService {
 	private final CartBookRepository cartBookRepository;
 	private final BookRepository bookRepository;
 	private final GuestCartRepository guestCartRepository;
-
-	private final RedisTemplate<String, CartItemRequest> redisTemplate;
-	private static final String GUEST_KEY_PREFIX = "guest:";
 
 	// ----------------- 회원용 -----------------
 
