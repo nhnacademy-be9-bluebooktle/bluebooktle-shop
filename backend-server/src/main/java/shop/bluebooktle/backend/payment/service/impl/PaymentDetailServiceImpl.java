@@ -7,9 +7,11 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.payment.dto.request.PaymentDetailRequest;
 import shop.bluebooktle.backend.payment.dto.response.PaymentDetailResponse;
+import shop.bluebooktle.backend.payment.entity.Payment;
 import shop.bluebooktle.backend.payment.entity.PaymentDetail;
 import shop.bluebooktle.backend.payment.entity.PaymentType;
 import shop.bluebooktle.backend.payment.repository.PaymentDetailRepository;
+import shop.bluebooktle.backend.payment.repository.PaymentRepository;
 import shop.bluebooktle.backend.payment.repository.PaymentTypeRepository;
 import shop.bluebooktle.backend.payment.service.PaymentDetailService;
 import shop.bluebooktle.common.exception.payment.PaymentDetailNotFoundException;
@@ -20,6 +22,7 @@ import shop.bluebooktle.common.exception.payment.PaymentTypeNotFoundException;
 @Transactional(readOnly = true)
 public class PaymentDetailServiceImpl implements PaymentDetailService {
 
+	private final PaymentRepository paymentRepository;
 	private final PaymentDetailRepository detailRepo;
 	private final PaymentTypeRepository typeRepo;
 
@@ -28,7 +31,11 @@ public class PaymentDetailServiceImpl implements PaymentDetailService {
 	public void create(PaymentDetailRequest req) {
 		PaymentType type = typeRepo.findById(req.paymentTypeId())
 			.orElseThrow(() -> new PaymentTypeNotFoundException());
-		detailRepo.save(req.toEntity(type));
+
+		// TODO Payment 에러 처리하기
+		Payment payment = paymentRepository.findById(req.paymentId())
+			.orElseThrow(() -> new PaymentDetailNotFoundException());
+		detailRepo.save(req.toEntity(payment, type));
 	}
 
 	@Override

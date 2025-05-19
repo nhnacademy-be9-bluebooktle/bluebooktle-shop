@@ -1,18 +1,30 @@
 package shop.bluebooktle.backend.payment.dto.request;
 
+import java.time.LocalDateTime;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import shop.bluebooktle.backend.payment.entity.Payment;
 import shop.bluebooktle.backend.payment.entity.PaymentDetail;
 import shop.bluebooktle.backend.payment.entity.PaymentType;
+import shop.bluebooktle.common.domain.payment.PaymentStatus;
 
 public record PaymentDetailRequest(
+	@NotNull Long paymentId,
 	@NotNull Long paymentTypeId,
-	@NotBlank String key
+	@NotBlank String paymentKey,
+	@NotNull PaymentStatus paymentStatus,
+	@NotNull LocalDateTime requestedAt,
+	@NotNull LocalDateTime approvedAt
 ) {
-	public PaymentDetail toEntity(PaymentType paymentType) {
+	public PaymentDetail toEntity(Payment payment, PaymentType paymentType) {
 		return PaymentDetail.builder()
+			.payment(payment)
 			.paymentType(paymentType)
-			.key(key)
+			.paymentKey(paymentKey)
+			.paymentStatus(paymentStatus)
+			.requestedAt(requestedAt)
+			.approvedAt(approvedAt)
 			.build();
 	}
 }

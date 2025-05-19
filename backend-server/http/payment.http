@@ -28,7 +28,7 @@ Content-Type: application/json
 
 {
   "paymentTypeId": 1,
-  "key": "exampleKey2"
+  "paymentKey": "exampleKey2"
 }
 
 

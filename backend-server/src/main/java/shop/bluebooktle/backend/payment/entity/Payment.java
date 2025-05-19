@@ -13,7 +13,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -29,7 +28,7 @@ import shop.bluebooktle.common.entity.BaseEntity;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(of = "id", callSuper = false)
-@ToString(exclude = {"order", "paymentDetail"})
+@ToString(exclude = {"order"})
 @SQLDelete(sql = "UPDATE payment SET deleted_at = CURRENT_TIMESTAMP WHERE payment_id = ?")
 @SQLRestriction("deleted_at IS NULL")
 public class Payment extends BaseEntity {
@@ -43,17 +42,20 @@ public class Payment extends BaseEntity {
 	@JoinColumn(name = "order_id", nullable = false)
 	private Order order;
 
-	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "payment_detail_id", nullable = false, unique = true)
-	private PaymentDetail paymentDetail;
+	@Column(name = "original_price", nullable = false, precision = 10, scale = 2)
+	private BigDecimal originalPrice;
 
-	@Column(name = "price", nullable = false, precision = 10, scale = 2)
-	private BigDecimal price;
+	@Column(name = "point_amount", precision = 10, scale = 2)
+	private BigDecimal pointAmount;
+
+	@Column(name = "final_price", nullable = false, precision = 10, scale = 2)
+	private BigDecimal finalPrice;
 
 	@Builder
-	public Payment(Order order, PaymentDetail paymentDetail, BigDecimal price) {
+	public Payment(Order order, BigDecimal originalPrice, BigDecimal pointAmount, BigDecimal finalPrice) {
 		this.order = order;
-		this.paymentDetail = paymentDetail;
-		this.price = price;
+		this.originalPrice = originalPrice;
+		this.pointAmount = pointAmount;
+		this.finalPrice = finalPrice;
 	}
 }
