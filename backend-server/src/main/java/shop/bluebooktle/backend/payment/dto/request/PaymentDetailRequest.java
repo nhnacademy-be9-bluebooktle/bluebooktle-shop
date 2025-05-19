@@ -1,7 +1,5 @@
 package shop.bluebooktle.backend.payment.dto.request;
 
-import java.time.LocalDateTime;
-
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import shop.bluebooktle.backend.payment.entity.Payment;
@@ -13,9 +11,7 @@ public record PaymentDetailRequest(
 	@NotNull Long paymentId,
 	@NotNull Long paymentTypeId,
 	@NotBlank String paymentKey,
-	@NotNull PaymentStatus paymentStatus,
-	@NotNull LocalDateTime requestedAt,
-	@NotNull LocalDateTime approvedAt
+	@NotNull PaymentStatus paymentStatus
 ) {
 	public PaymentDetail toEntity(Payment payment, PaymentType paymentType) {
 		return PaymentDetail.builder()
@@ -23,8 +19,6 @@ public record PaymentDetailRequest(
 			.paymentType(paymentType)
 			.paymentKey(paymentKey)
 			.paymentStatus(paymentStatus)
-			.requestedAt(requestedAt)
-			.approvedAt(approvedAt)
 			.build();
 	}
 }

@@ -1,7 +1,5 @@
 package shop.bluebooktle.backend.payment.dto.response;
 
-import java.time.LocalDateTime;
-
 import jakarta.validation.constraints.NotNull;
 import shop.bluebooktle.backend.payment.entity.PaymentDetail;
 import shop.bluebooktle.common.domain.payment.PaymentStatus;
@@ -10,18 +8,14 @@ public record PaymentDetailResponse(
 	@NotNull Long id,
 	@NotNull Long paymentTypeId,
 	String paymentKey,
-	@NotNull PaymentStatus paymentStatus,
-	LocalDateTime requestAt,
-	LocalDateTime approvedAt
+	@NotNull PaymentStatus paymentStatus
 ) {
 	public static PaymentDetailResponse fromEntity(PaymentDetail e) {
 		return new PaymentDetailResponse(
 			e.getId(),
 			e.getPaymentType().getId(),
 			e.getPaymentKey(),
-			e.getPaymentStatus(),
-			e.getRequestedAt(),
-			e.getApprovedAt()
+			e.getPaymentStatus()
 		);
 	}
 }

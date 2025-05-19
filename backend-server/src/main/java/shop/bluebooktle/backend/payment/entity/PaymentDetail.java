@@ -1,7 +1,5 @@
 package shop.bluebooktle.backend.payment.entity;
 
-import java.time.LocalDateTime;
-
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
@@ -56,21 +54,11 @@ public class PaymentDetail extends BaseEntity {
 	@Enumerated(EnumType.STRING)
 	private PaymentStatus paymentStatus;
 
-	@Column(name = "requested_at", nullable = false)
-	private LocalDateTime requestedAt;
-
-	@Column(name = "approved_at")
-	private LocalDateTime approvedAt;
-
 	@Builder
-	public PaymentDetail(Payment payment, PaymentType paymentType, String paymentKey, PaymentStatus paymentStatus,
-		LocalDateTime requestedAt,
-		LocalDateTime approvedAt) {
+	public PaymentDetail(Payment payment, PaymentType paymentType, String paymentKey, PaymentStatus paymentStatus) {
 		this.payment = payment;
 		this.paymentType = paymentType;
 		this.paymentKey = paymentKey;
 		this.paymentStatus = paymentStatus;
-		this.requestedAt = requestedAt;
-		this.approvedAt = approvedAt;
 	}
 }
