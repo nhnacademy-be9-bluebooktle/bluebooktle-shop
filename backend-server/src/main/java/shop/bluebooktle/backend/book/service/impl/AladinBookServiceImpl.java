@@ -9,20 +9,24 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import shop.bluebooktle.backend.book.dto.response.AladinApiResponse;
 import shop.bluebooktle.backend.book.dto.response.AladinBookResponse;
 import shop.bluebooktle.backend.book.service.AladinBookService;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AladinBookServiceImpl implements AladinBookService {
 
 	private final RestTemplate restTemplate = new RestTemplate();
 
-	private final String TTB_KEY = "ttbehfk11131717001";
+	private final String TTB_KEY = "ttbsua64581504003";
 	private final String BASE_URL = "http://www.aladin.co.kr/ttb/api/ItemSearch.aspx";
+	// private final String PRODUCT_READ = "http://www.aladin.co.kr/ttb/api/ItemLookUp.aspx";
 
 	//알라딘 도서 조회
+	@Override
 	public List<AladinBookResponse> searchBooks(String query) {
 		String url = UriComponentsBuilder
 			.fromHttpUrl(BASE_URL)
@@ -45,8 +49,38 @@ public class AladinBookServiceImpl implements AladinBookService {
 
 	}
 
+	@Override
 	public AladinBookResponse getBookByIsbn(String isbn) {
 		List<AladinBookResponse> books = searchBooks(isbn);
 		return books.getFirst();
 	}
+
+
+
+
+	/*@Override
+	public AladinBookItemBySearch searchBookByIsbn(String isbn) {
+		String url = UriComponentsBuilder
+			.fromHttpUrl(PRODUCT_READ)
+			.queryParam("ttbkey", TTB_KEY)
+			.queryParam("itemIdType", "ISBN13")
+			.queryParam("itemId", isbn)
+			.queryParam("output", "js")
+			.queryParam("Version", "20131101")
+			.queryParam("Cover", "Big")
+			.queryParam("OptResult", "authors")
+			.build()
+			.toUriString();
+
+		log.info("{}", url);
+		ResponseEntity<AladinItemLookupResponse> response = restTemplate.getForEntity(url,
+			AladinItemLookupResponse.class);
+		List<AladinBookItemBySearch> items = response.getBody().getItem();
+
+		if (items == null || items.isEmpty()) {
+			throw new AladinBookNotFoundException("도서를 찾을 수 없습니다.");
+		}
+
+		return items.get(0);
+	}*/
 }

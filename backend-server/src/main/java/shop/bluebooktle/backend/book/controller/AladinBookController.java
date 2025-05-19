@@ -29,11 +29,18 @@ public class AladinBookController {
 	private final BookRegisterService bookRegisterService;
 
 	// 알라딘 API 도서 검색
+	// TODO Pagenation 구현
 	@GetMapping
 	public ResponseEntity<JsendResponse<List<AladinBookResponse>>> searchBooks(@RequestParam String query) {
 		List<AladinBookResponse> result = aladinBookService.searchBooks(query);
 		return ResponseEntity.ok(JsendResponse.success(result));
 	}
+
+	/*@GetMapping("/isbn/{isbn}")
+	public ResponseEntity<JsendResponse<AladinBookItemBySearch>> searchBookByIsbn(@PathVariable String isbn) {
+		AladinBookItemBySearch result = aladinBookService.searchBookByIsbn(isbn);
+		return ResponseEntity.ok(JsendResponse.success(result));
+	}*/
 
 	// isbn으로 도서정보 가져오기
 	@GetMapping("/select")
