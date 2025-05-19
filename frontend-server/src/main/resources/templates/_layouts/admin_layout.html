@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title layout:title-pattern="$LAYOUT_TITLE - $CONTENT_TITLE">어드민 페이지</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+          integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
+          crossorigin="anonymous" referrerpolicy="no-referrer"/>
+
+    <link rel="stylesheet" th:href="@{/css/admin_styles.css}">
+
+    <th:block layout:fragment="page_css"></th:block>
+</head>
+<body class="admin-body">
+
+<div th:replace="~{_fragments/admin_header :: adminHeaderFragment}"></div>
+
+<div class="admin-main-container">
+    <div th:replace="~{_fragments/admin_sidebar :: adminSidebarFragment}"></div>
+
+    <main class="admin-content-area">
+        <div class="admin-content-area__inner">
+            <div layout:fragment="admin_content">
+                <p>어드민 페이지 콘텐츠가 여기에 표시됩니다.</p>
+            </div>
+        </div>
+    </main>
+</div>
+
+<div th:replace="~{_fragments/admin_footer :: adminFooterFragment}"></div>
+
+<div th:replace="~{_fragments/popup_modal :: successPopup(modalId='globalAdminSuccessModal')}"></div>
+<div th:replace="~{_fragments/popup_modal :: errorPopup(modalId='globalAdminErrorModal')}"></div>
+<div th:replace="~{_fragments/popup_modal :: infoPopup(modalId='globalAdminInfoModal')}"></div>
+
+
+<script>
+    // 전역 어드민 스크립트 (예: 사이드바 토글, 모달 공통 로직 등)
+    document.addEventListener('DOMContentLoaded', function () {
+        // 사이드바 메뉴 토글 기능
+        const submenuToggles = document.querySelectorAll('.admin-sidebar__nav-item.has-submenu > a');
+        submenuToggles.forEach(toggle => {
+            toggle.addEventListener('click', function (event) {
+                // a 태그 기본 동작(링크 이동) 막기 (실제 링크가 '#' 등이면 필요)
+                if (this.getAttribute('href') === '#') {
+                    event.preventDefault();
+                }
+                const parentItem = this.parentElement;
+                parentItem.classList.toggle('open');
+            });
+        });
+
+        // 기존 Modal 관련 스크립트 (default_layout.html 및 popup_modal.html 참조)
+        // admin_styles.css에서 정의한 .admin-modal-overlay 및 .active 클래스 사용하도록 수정
+        window.showAdminModal = function (modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                // modal.classList.add('active'); // 기존 kitsch 스타일
+                modal.classList.add('admin-modal-overlay'); // 새 CSS 클래스
+                modal.classList.add('active');
+                modal.style.display = 'flex'; // CSS에서 .active로 처리하도록 수정
+            }
+        };
+
+        window.hideAdminModal = function (modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                // modal.classList.remove('active'); // 기존 kitsch 스타일
+                modal.classList.remove('active');
+                modal.style.display = 'none'; // CSS에서 .active로 처리하도록 수정
+            }
+        };
+
+        // 자동 표시 모달 처리
+        const modalsToAutoShow = document.querySelectorAll('.admin-modal-overlay[data-auto-show="true"], .modal-overlay-kitsch[data-auto-show="true"]'); // 기존 클래스도 호환
+        modalsToAutoShow.forEach(function (modal) {
+            if (modal.id) {
+                showAdminModal(modal.id);
+            }
+        });
+
+        // 모달 닫기 트리거
+        const closeTriggers = document.querySelectorAll('.js-modal-close-trigger, .admin-modal-close-btn'); // 기존 및 신규 닫기 버튼
+        closeTriggers.forEach(function (trigger) {
+            trigger.addEventListener('click', function (event) {
+                const clickedElement = event.currentTarget;
+                // data-modal-target 속성 또는 가장 가까운 modal-overlay ID 찾기
+                let modalIdToHide = clickedElement.getAttribute('data-modal-target');
+                if (!modalIdToHide) {
+                    const modalOverlay = clickedElement.closest('.admin-modal-overlay, .modal-overlay-kitsch');
+                    if (modalOverlay) {
+                        modalIdToHide = modalOverlay.id;
+                    }
+                }
+
+                if (modalIdToHide) {
+                    // 모달 오버레이 클릭 시 닫기 (콘텐츠 영역 제외)
+                    if (clickedElement.classList.contains('admin-modal-overlay') || clickedElement.classList.contains('modal-overlay-kitsch')) {
+                        if (event.target === clickedElement) { // 오버레이 직접 클릭
+                            hideAdminModal(modalIdToHide);
+                        }
+                    } else { // 닫기 버튼 클릭
+                        hideAdminModal(modalIdToHide);
+                    }
+                }
+            });
+        });
+    });
+</script>
+
+<th:block layout:fragment="page_scripts"></th:block>
+</body>
+</html>

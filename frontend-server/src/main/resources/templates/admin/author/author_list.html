@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html layout:decorate="~{_layouts/admin_layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${pageTitle} ?: '작가 관리'"></title>
+</head>
+<body>
+<div layout:fragment="admin_content">
+    <div class="admin-page-header">
+        <h1 class="admin-page-title">
+            <i class="fas fa-feather-alt"></i>
+            <th:block th:text="${pageTitle} ?: '작가 관리'"></th:block>
+        </h1>
+        <div class="admin-page-actions">
+            <a th:href="@{/admin/authors/new}" class="admin-btn admin-btn--primary">
+                <i class="fas fa-plus"></i> 새 작가 등록
+            </a>
+        </div>
+    </div>
+
+    <div class="admin-panel">
+        <div class="admin-panel__body">
+            <form th:action="@{/admin/authors}" method="get" class="admin-form-inline">
+                <div class="admin-form-group">
+                    <input type="text" name="searchKeyword" th:value="${searchKeyword}" placeholder="작가명 또는 설명 검색"
+                           class="admin-form-control" style="width: auto; display: inline-block; margin-right: 8px;">
+                    <button type="submit" class="admin-btn admin-btn--secondary"><i class="fas fa-search"></i> 검색
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="admin-panel">
+        <div class="admin-panel__header">
+            작가 목록
+        </div>
+        <div class="admin-panel__body table-responsive">
+            <table class="admin-table admin-table--striped admin-table--hover">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>작가명</th>
+                    <th>작가 설명 (일부)</th>
+                    <th>작가 KEY</th>
+                    <th>등록일</th>
+                    <th>작업</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="author : ${authors}">
+                    <td th:text="${author.id}">1</td>
+                    <td th:text="${author.name}">김스프링</td>
+                    <td th:text="${#strings.abbreviate(author.description, 50)}">스프링 부트 전문가...</td>
+                    <td th:text="${author.authorKey}">KSPRING001</td>
+                    <td th:text="${#temporals.format(author.createdAt, 'yyyy-MM-dd HH:mm')}">2025-05-09 10:00</td>
+                    <td class="category-actions">
+                        <a th:href="@{/admin/authors/{id}/edit(id=${author.id})}"
+                           class="admin-btn admin-btn--sm admin-btn--outline-primary" title="수정">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <form th:action="@{/admin/authors/{id}/delete(id=${author.id})}" method="post"
+                              style="display: inline;" onsubmit="return confirm('이 작가를 삭제(비활성) 처리하시겠습니까?');">
+                            <button type="submit" class="admin-btn admin-btn--sm admin-btn--danger" title="삭제">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(authors)}">
+                    <td colspan="7" class="text-center">등록된 작가가 없습니다.</td>
+                </tr>
+                </tbody>
+            </table>
+
+            <div th:if="${totalPages > 0}" class="pagination-container">
+                <th:block th:replace="~{_fragments/admin_pagination :: commonPagination(
+                            currentPage=${currentPage + 1}, totalPages=${totalPages},
+                            baseUrl=${baseUrlWithParams},
+                            searchKeyword=null )}"></th:block>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

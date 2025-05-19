@@ -31,24 +31,9 @@ public class GlobalUserInfoAdvice {
 
 		if (StringUtils.hasText(accessToken)) {
 			Map<String, Object> claims = JwtPayloadUtil.getPayloadClaims(accessToken);
-
-			if (!claims.isEmpty()) {
-				String userId = JwtPayloadUtil.getClaim(claims, CLAIM_USER_ID, String.class);
-
-				if (StringUtils.hasText(userId)) {
-					isLoggedIn = true;
-					userNickname = JwtPayloadUtil.getClaim(claims, CLAIM_USER_NICKNAME, String.class);
-					userType = JwtPayloadUtil.getClaim(claims, CLAIM_USER_TYPE, String.class);
-					logger.debug("User identified. UserID: '{}', Nickname: '{}', Type: '{}'", userId, userNickname,
-						userType);
-				} else {
-					logger.warn("User identifier claim ('{}') not found in token payload.", CLAIM_USER_ID);
-				}
-			} else {
-				logger.warn(
-					"Failed to parse claims from access token or claims map is empty for token starting with: [{}...]",
-					accessToken.substring(0, Math.min(accessToken.length(), 10)));
-			}
+			isLoggedIn = true;
+			userNickname = JwtPayloadUtil.getClaim(claims, CLAIM_USER_NICKNAME, String.class);
+			userType = JwtPayloadUtil.getClaim(claims, CLAIM_USER_TYPE, String.class);
 		}
 
 		model.addAttribute("isLoggedIn", isLoggedIn);

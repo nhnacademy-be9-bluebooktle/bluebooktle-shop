@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html layout:decorate="~{_layouts/admin_layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${pageTitle} ?: '태그 관리'"></title>
+</head>
+<body>
+<div layout:fragment="admin_content">
+    <div class="admin-page-header">
+        <h1 class="admin-page-title">
+            <i class="fas fa-tags"></i>
+            <th:block th:text="${pageTitle} ?: '태그 관리'"></th:block>
+        </h1>
+        <div class="admin-page-actions">
+            <a th:href="@{/admin/tags/new}" class="admin-btn admin-btn--primary">
+                <i class="fas fa-plus"></i> 새 태그 등록
+            </a>
+        </div>
+    </div>
+
+    <div class="admin-panel">
+        <div class="admin-panel__body">
+            <form th:action="@{/admin/tags}" method="get" class="admin-form-inline">
+                <div class="admin-form-group">
+                    <input type="text" name="searchKeyword" th:value="${searchKeyword}" placeholder="태그명 검색"
+                           class="admin-form-control" style="width: auto; display: inline-block; margin-right: 8px;">
+                    <button type="submit" class="admin-btn admin-btn--secondary"><i class="fas fa-search"></i> 검색
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="admin-panel">
+        <div class="admin-panel__header">
+            태그 목록
+        </div>
+        <div class="admin-panel__body table-responsive">
+            <table class="admin-table admin-table--striped admin-table--hover">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>태그명</th>
+                    <th>등록일</th>
+                    <th>상태</th>
+                    <th>작업</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="tag : ${tags}">
+                    <td th:text="${tag.id}">1</td>
+                    <td th:text="${tag.name}">스프링부트</td>
+                    <td th:text="${#temporals.format(tag.createdAt, 'yyyy-MM-dd HH:mm')}">2025-05-14 10:00</td>
+                    <td>
+                        <span th:if="${tag.deletedAt == null}" class="badge badge-success"
+                              style="color: green;">활성</span>
+                        <span th:unless="${tag.deletedAt == null}" class="badge badge-danger"
+                              style="color: red;">비활성</span>
+                    </td>
+                    <td class="category-actions">
+                        <a th:href="@{/admin/tags/{id}/edit(id=${tag.id})}"
+                           class="admin-btn admin-btn--sm admin-btn--outline-primary" title="수정">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <form th:if="${tag.deletedAt == null}" th:action="@{/admin/tags/{id}/delete(id=${tag.id})}"
+                              method="post" style="display: inline;" onsubmit="return confirm('이 태그를 비활성화 하시겠습니까?');">
+                            <button type="submit" class="admin-btn admin-btn--sm admin-btn--danger" title="비활성화">
+                                <i class="fas fa-toggle-off"></i>
+                            </button>
+                        </form>
+                        <form th:unless="${tag.deletedAt == null}"
+                              th:action="@{/admin/tags/{id}/activate(id=${tag.id})}" method="post"
+                              style="display: inline;" onsubmit="return confirm('이 태그를 다시 활성화 하시겠습니까?');">
+                            <button type="submit" class="admin-btn admin-btn--sm admin-btn--success" title="활성화">
+                                <i class="fas fa-toggle-on"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(tags)}">
+                    <td colspan="5" class="text-center">등록된 태그가 없습니다.</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>

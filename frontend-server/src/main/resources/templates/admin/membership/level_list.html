@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html layout:decorate="~{_layouts/admin_layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${pageTitle} ?: '회원 등급 정책 관리'"></title>
+    <th:block layout:fragment="page_css">
+        <style>
+            .status-active {
+                color: green;
+                font-weight: bold;
+            }
+
+            .status-inactive {
+                color: red;
+            }
+
+            .level-icon-preview {
+                max-width: 32px;
+                max-height: 32px;
+                vertical-align: middle;
+                margin-right: 5px;
+            }
+        </style>
+    </th:block>
+</head>
+<body>
+<div layout:fragment="admin_content">
+    <div class="admin-page-header">
+        <h1 class="admin-page-title">
+            <i class="fas fa-layer-group"></i>
+            <th:block th:text="${pageTitle} ?: '회원 등급 정책 관리'"></th:block>
+        </h1>
+        <div>
+            <a th:href="@{/admin/membership/levels/new}" class="admin-btn admin-btn--primary">
+                <i class="fas fa-plus"></i> 새 회원 등급 추가
+            </a>
+        </div>
+    </div>
+
+    <div class="admin-panel">
+        <div class="admin-panel__header">
+            <h2 class="admin-panel__title"><i class="fas fa-list-ul"></i> 회원 등급 목록</h2>
+        </div>
+        <div class="admin-panel__body">
+            <table class="admin-table">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>아이콘</th>
+                    <th>등급명</th>
+                    <th>등급 조건 (순수 지출액)</th>
+                    <th>추가 적립률</th>
+                    <th>설명</th>
+                    <th>상태</th>
+                    <th>관리</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:if="${#lists.isEmpty(membershipLevels)}">
+                    <td colspan="8" style="text-align:center;">등록된 회원 등급이 없습니다.</td>
+                </tr>
+                <tr th:each="level : ${membershipLevels}">
+                    <td th:text="${level.id}">1</td>
+                    <td>
+                        <img th:if="${level.iconUrl != null && !level.iconUrl.isEmpty()}"
+                             th:src="${level.iconUrl}" alt="등급 아이콘" class="level-icon-preview">
+                        <span th:unless="${level.iconUrl != null && !level.iconUrl.isEmpty()}">-</span>
+                    </td>
+                    <td th:text="${level.levelName}">BRONZE</td>
+                    <td>
+                        <th:block th:text="${#numbers.formatInteger(level.minNetSpent, 0, 'COMMA') + '원'}"></th:block>
+                        <th:block th:if="${level.maxNetSpent != null}"
+                                  th:text="' ~ ' + ${#numbers.formatInteger(level.maxNetSpent, 0, 'COMMA')} + '원'"></th:block>
+                        <th:block th:if="${level.maxNetSpent == null}" th:text="' 이상'"></th:block>
+                    </td>
+                    <td th:text="${#numbers.formatDecimal(level.pointRate, 1, 1) + '%'}">0.5%</td>
+                    <td th:text="${level.description ?: '-'}">기본 등급</td>
+                    <td>
+                        <span th:text="${level.isActive ? '활성' : '비활성'}"
+                              th:classappend="${level.isActive ? 'status-active' : 'status-inactive'}">활성</span>
+                    </td>
+                    <td>
+                        <a th:href="@{/admin/membership/levels/{id}/edit(id=${level.id})}"
+                           class="admin-btn admin-btn--sm admin-btn--info" title="수정">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <form th:action="@{/admin/membership/levels/{id}/delete(id=${level.id})}" method="post"
+                              style="display:inline;"
+                              onsubmit="return confirm('정말로 이 회원 등급을 삭제하시겠습니까? 이 등급에 속한 회원이 있을 경우 서비스에 영향이 있을 수 있습니다.');">
+                            <button type="submit" class="admin-btn admin-btn--sm admin-btn--danger" title="삭제">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<th:block layout:fragment="page_scripts">
+</th:block>
+</body>
+</html>
