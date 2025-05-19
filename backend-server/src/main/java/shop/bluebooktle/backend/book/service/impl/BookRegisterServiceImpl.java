@@ -39,9 +39,6 @@ import shop.bluebooktle.backend.book.service.BookImgService;
 import shop.bluebooktle.backend.book.service.BookPublisherService;
 import shop.bluebooktle.backend.book.service.BookRegisterService;
 import shop.bluebooktle.backend.book.service.BookTagService;
-import shop.bluebooktle.backend.book.service.CategoryService;
-import shop.bluebooktle.backend.book.service.PublisherService;
-import shop.bluebooktle.backend.book.service.TagService;
 import shop.bluebooktle.common.exception.book.AladinBookNotFoundException;
 import shop.bluebooktle.common.exception.book.BookAlreadyExistsException;
 
@@ -66,11 +63,7 @@ public class BookRegisterServiceImpl implements BookRegisterService {
 	private final BookImgRepository bookImgRepository;
 	private final BookTagRepository bookTagRepository;
 
-	private final PublisherService publisherService;
 	private final BookPublisherService bookPublisherService;
-
-	private final CategoryService categoryService;
-	private final TagService tagService;
 	private final BookCategoryService bookCategoryService;
 	private final BookTagService bookTagService;
 	private final BookImgService bookImgService;
