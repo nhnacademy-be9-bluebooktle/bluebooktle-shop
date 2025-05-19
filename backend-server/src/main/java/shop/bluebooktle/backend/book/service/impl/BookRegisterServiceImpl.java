@@ -2,7 +2,6 @@ package shop.bluebooktle.backend.book.service.impl;
 
 import java.math.BigDecimal;
 import java.util.Optional;
-import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,9 +10,7 @@ import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.book.dto.request.BookAllRegisterByAladinRequest;
 import shop.bluebooktle.backend.book.dto.request.BookAllRegisterRequest;
 import shop.bluebooktle.backend.book.dto.response.AladinBookResponse;
-import shop.bluebooktle.backend.book.entity.Author;
 import shop.bluebooktle.backend.book.entity.Book;
-import shop.bluebooktle.backend.book.entity.BookAuthor;
 import shop.bluebooktle.backend.book.entity.BookCategory;
 import shop.bluebooktle.backend.book.entity.BookImg;
 import shop.bluebooktle.backend.book.entity.BookPublisher;
@@ -36,7 +33,9 @@ import shop.bluebooktle.backend.book.repository.ImgRepository;
 import shop.bluebooktle.backend.book.repository.PublisherRepository;
 import shop.bluebooktle.backend.book.repository.TagRepository;
 import shop.bluebooktle.backend.book.service.AladinBookService;
+import shop.bluebooktle.backend.book.service.BookAuthorService;
 import shop.bluebooktle.backend.book.service.BookCategoryService;
+import shop.bluebooktle.backend.book.service.BookImgService;
 import shop.bluebooktle.backend.book.service.BookPublisherService;
 import shop.bluebooktle.backend.book.service.BookRegisterService;
 import shop.bluebooktle.backend.book.service.BookTagService;

@@ -1,4 +1,6 @@
-@baseUrl = http://localhost:9002/api/aladin/books
+@port = 9012
+
+@baseUrl = http://localhost:{{port}}/api/aladin/books
 
 #알라딘 관련 아직 수정필요!!
 

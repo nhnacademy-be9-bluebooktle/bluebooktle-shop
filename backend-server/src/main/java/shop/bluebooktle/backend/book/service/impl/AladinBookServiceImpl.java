@@ -33,6 +33,7 @@ public class AladinBookServiceImpl implements AladinBookService {
 			.queryParam("SearchTarget", "Book")
 			.queryParam("output", "js")
 			.queryParam("Version", "20131101")
+			.queryParam("Cover", "Big")
 			.build()
 			.toUriString();
 
