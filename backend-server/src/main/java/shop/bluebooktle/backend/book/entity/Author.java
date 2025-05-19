@@ -32,20 +32,11 @@ public class Author extends BaseEntity {
 	private Long id;
 
 	@Setter
-	@Column(name = "name", nullable = false, length = 50) //공동, 외국인작가 이름 고려해서 수정해서 테스트중 원래 length10
+	@Column(name = "name", nullable = false, unique = true, length = 50) //공동, 외국인작가 이름 고려해서 수정해서 테스트중 원래 length10
 	private String name;
 
-	@Setter
-	@Column(name = "description", nullable = false, columnDefinition = "TEXT")
-	private String description;
-
-	@Setter
-	@Column(name = "author_key", nullable = false, length = 50)
-	private String authorKey;
-
 	@Builder
-	public Author(String name, String description) {
+	public Author(String name) {
 		this.name = name;
-		this.description = description;
 	}
 }

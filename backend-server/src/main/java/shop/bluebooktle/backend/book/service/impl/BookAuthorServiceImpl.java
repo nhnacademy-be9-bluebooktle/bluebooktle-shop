@@ -63,8 +63,6 @@ public class BookAuthorServiceImpl implements BookAuthorService {
 			.map(author -> AuthorResponse.builder()
 				.id(author.getId())
 				.name(author.getName())
-				.description(author.getDescription())
-				.authorKey(author.getAuthorKey())
 				.createdAt(author.getCreatedAt())
 				.build())
 			.toList();

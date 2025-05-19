@@ -12,9 +12,8 @@ import lombok.extern.jackson.Jacksonized;
 @Jacksonized
 public class AuthorUpdateRequest {
 
+	@NotBlank
 	@Length(max = 50)
 	String name;
-
-	String description;
 
 }

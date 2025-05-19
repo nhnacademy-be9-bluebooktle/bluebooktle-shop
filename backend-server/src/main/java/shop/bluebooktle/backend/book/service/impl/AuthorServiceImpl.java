@@ -27,30 +27,25 @@ public class AuthorServiceImpl implements AuthorService {
 	public void registerAuthor(AuthorRegisterRequest authorRegisterRequest) {
 
 		String name = authorRegisterRequest.getName();
-		String description = authorRegisterRequest.getDescription();
 
-		if (name == null || description == null) {
+		if (name == null) {
 			throw new AuthorFieldNullException();
 		}
 
-		if (name.trim().isEmpty() || description.trim().isEmpty()) {
+		if (name.trim().isEmpty()) {
 			throw new AuthorFieldNullException();
+		}
+
+		if (authorRepository.existsByName(name)) {
+			throw new AuthorAlreadyExistsException(name);
 		}
 
 		Author author = Author.builder()
 			.name(authorRegisterRequest.getName())
-			.description(authorRegisterRequest.getDescription())
 			.build();
 
-		if (author.getAuthorKey() == null) {
-			author.setAuthorKey("null");
-		}
+		authorRepository.save(author);
 
-		Author authorSaved = authorRepository.save(author);
-
-		String key = "a" + authorSaved.getId();
-		authorSaved.setAuthorKey(key);
-		authorRepository.save(authorSaved);
 	}
 
 	@Transactional(readOnly = true)
@@ -62,8 +57,6 @@ public class AuthorServiceImpl implements AuthorService {
 		return AuthorResponse.builder()
 			.id(author.getId())
 			.name(author.getName())
-			.description(author.getDescription())
-			.authorKey(author.getAuthorKey())
 			.createdAt(author.getCreatedAt())
 			.build();
 	}
@@ -72,21 +65,14 @@ public class AuthorServiceImpl implements AuthorService {
 	public void updateAuthor(Long authorId, AuthorUpdateRequest authorUpdateRequest) {
 
 		String name = authorUpdateRequest.getName();
-		String description = authorUpdateRequest.getDescription();
 
-		if ((name == null || name.trim().isEmpty()) &&
-			(description == null || description.trim().isEmpty())) {
+		if ((name == null || name.trim().isEmpty())) {
 			throw new AuthorUpdateFieldMissingException(); // #TODO
 		}
 
 		Author author = authorRepository.findById(authorId).orElseThrow(() -> new AuthorNotFoundException(authorId));
 
-		if (name != null) {
-			author.setName(name);
-		}
-		if (description != null) {
-			author.setDescription(description);
-		}
+		author.setName(name);
 
 		authorRepository.save(author);
 
