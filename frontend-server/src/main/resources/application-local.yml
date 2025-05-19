@@ -36,3 +36,4 @@ logging:
   level:
     shop.bluebooktle.book: DEBUG
     org.hibernate.SQL: DEBUG
+    shop.bluebooktle.frontend.repository: DEBUG

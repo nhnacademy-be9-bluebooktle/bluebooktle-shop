@@ -91,10 +91,12 @@ public class User extends BaseEntity {
 	private List<Address> addresses = new ArrayList<>();
 
 	@Builder
-	public User(MembershipLevel membershipLevel, String loginId, String encodedPassword, String name, String email,
+	public User(Long id, MembershipLevel membershipLevel, String loginId, String encodedPassword, String name,
+		String email,
 		String nickname,
 		String birth, String phoneNumber, UserType type, UserStatus status,
 		LocalDateTime lastLoginAt) {
+		this.id = id;
 		this.membershipLevel = membershipLevel;
 		this.loginId = loginId;
 		this.password = encodedPassword;

@@ -19,6 +19,7 @@ import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SecurityException;
 import jakarta.annotation.PostConstruct;
 import shop.bluebooktle.common.domain.auth.UserType;
+import shop.bluebooktle.common.exception.auth.InvalidTokenException;
 
 @Component
 public class JwtUtil {
@@ -92,7 +93,16 @@ public class JwtUtil {
 	}
 
 	public Long getUserIdFromToken(String token) {
-		return getClaims(token).get("userId", Long.class);
+		String subject = getClaims(token).getSubject();
+		if (subject != null) {
+			try {
+				return Long.valueOf(subject);
+			} catch (NumberFormatException e) {
+				throw new InvalidTokenException("토큰의 subject에서 userId를 파싱할 수 없습니다.", e);
+			}
+		}
+		throw new InvalidTokenException("토큰에서 userId (subject)를 찾을 수 없습니다.");
+
 	}
 
 	public UserType getUserTypeFromToken(String token) {
