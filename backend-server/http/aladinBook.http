@@ -62,10 +62,6 @@ Content-Type: application/json
 GET {{baseUrl}}/?query=자바
 Accept: application/json
 
-### 알라딘 ISBN으로 도서 정보 조회
-GET {{baseUrl}}/isbn/9791163036227
-Accept: application/json
-
 ### 알라딘 도서 isbn으로 검색
 GET {{baseUrl}}/select?isbn=9791186560655
 Accept: application/json
