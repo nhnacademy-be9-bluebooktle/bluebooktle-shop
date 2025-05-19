@@ -27,13 +27,12 @@ public class AuthorServiceImpl implements AuthorService {
 	public void registerAuthor(AuthorRegisterRequest authorRegisterRequest) {
 
 		String name = authorRegisterRequest.getName();
-		String description = authorRegisterRequest.getDescription();
 
-		if (name == null || description == null) {
+		if (name == null) {
 			throw new AuthorFieldNullException();
 		}
 
-		if (name.trim().isEmpty() || description.trim().isEmpty()) {
+		if (name.trim().isEmpty()) {
 			throw new AuthorFieldNullException();
 		}
 
@@ -43,34 +42,21 @@ public class AuthorServiceImpl implements AuthorService {
 
 		Author author = Author.builder()
 			.name(authorRegisterRequest.getName())
-			.description(authorRegisterRequest.getDescription())
 			.build();
 
-		if (author.getAuthorKey() == null) {
-			author.setAuthorKey("a_null");
-		}
+		authorRepository.save(author);
 
-		Author authorSaved = authorRepository.save(author);
-
-		String key = "a" + authorSaved.getId();
-		authorSaved.setAuthorKey(key);
-		authorRepository.save(authorSaved);
 	}
 
+	@Transactional(readOnly = true)
 	@Override
 	public AuthorResponse getAuthor(Long authorId) {
 
-		if (authorId == null) {
-			throw new AuthorIdNullException();
-		}
-
-		Author author = authorRepository.findById(authorId).orElseThrow(() -> new AuthorNotFoundException(authorId));
+		Author author = authorRepository.findById(authorId).orElseThrow(() -> new AuthorNotFoundException(authorId)); // #TODO
 
 		return AuthorResponse.builder()
 			.id(author.getId())
 			.name(author.getName())
-			.description(author.getDescription())
-			.authorKey(author.getAuthorKey())
 			.createdAt(author.getCreatedAt())
 			.build();
 	}
@@ -79,25 +65,14 @@ public class AuthorServiceImpl implements AuthorService {
 	public void updateAuthor(Long authorId, AuthorUpdateRequest authorUpdateRequest) {
 
 		String name = authorUpdateRequest.getName();
-		String description = authorUpdateRequest.getDescription();
 
-		if (authorId == null) {
-			throw new AuthorIdNullException();
-		}
-
-		if ((name == null || name.trim().isEmpty()) &&
-			(description == null || description.trim().isEmpty())) {
-			throw new AuthorUpdateFieldMissingException();
+		if ((name == null || name.trim().isEmpty())) {
+			throw new AuthorUpdateFieldMissingException(); // #TODO
 		}
 
 		Author author = authorRepository.findById(authorId).orElseThrow(() -> new AuthorNotFoundException(authorId));
 
-		if (name != null) {
-			author.setName(name);
-		}
-		if (description != null) {
-			author.setDescription(description);
-		}
+		author.setName(name);
 
 		authorRepository.save(author);
 
@@ -105,9 +80,7 @@ public class AuthorServiceImpl implements AuthorService {
 
 	@Override
 	public void deleteAuthor(Long authorId) {
-		if (authorId == null) {
-			throw new AuthorIdNullException();
-		}
+
 		Author author = authorRepository.findById(authorId).orElseThrow(() -> new AuthorNotFoundException(authorId));
 		authorRepository.delete(author);
 	}

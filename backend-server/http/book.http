@@ -1,5 +1,5 @@
 ### 도서 테이블 직접등록
-POST http://localhost:9002/api/books
+POST http://localhost:9012/api/books
 Content-Type: application/json
 
 {
@@ -10,11 +10,11 @@ Content-Type: application/json
 }
 
 ### 도서 테이블 조회
-GET http://localhost:9002/api/books/1
+GET http://localhost:9012/api/books/1
 Content-Type: application/json
 
 ### 도서 테이블 수정
-PUT http://localhost:9002/api/books/1
+PUT http://localhost:9012/api/books/1
 Content-Type: application/json
 
 {
@@ -23,4 +23,4 @@ Content-Type: application/json
 }
 
 ### 도서 테이블 삭제
-DELETE http://localhost:9002/api/books/1
+DELETE http://localhost:9012/api/books/1

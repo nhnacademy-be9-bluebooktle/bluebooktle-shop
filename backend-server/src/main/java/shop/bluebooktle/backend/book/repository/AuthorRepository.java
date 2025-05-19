@@ -11,8 +11,8 @@ import shop.bluebooktle.backend.book.entity.Author;
 @Repository
 public interface AuthorRepository extends JpaRepository<Author, Long> {
 
-	// 작가 전체 이름으로 조회 (정확하게 일치하는 이름)
-	Optional<Author> findByName(String name);
+	// (작가 이름으로) 작가 조회
+	List <Author> findByName(String name);
 
 	boolean existsByName(String name);
 

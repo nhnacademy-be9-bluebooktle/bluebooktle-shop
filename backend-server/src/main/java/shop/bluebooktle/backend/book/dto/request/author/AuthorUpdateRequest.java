@@ -16,7 +16,4 @@ public class AuthorUpdateRequest {
 	@Length(max = 50)
 	String name;
 
-	@NotBlank
-	String description;
-
 }

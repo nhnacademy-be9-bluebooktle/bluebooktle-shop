@@ -4,9 +4,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -36,30 +36,30 @@ public class AuthorController {
 	}
 
 	// 작가 조회
-	@GetMapping("/{id}")
+	@GetMapping("/{authorId}")
 	public ResponseEntity<JsendResponse<AuthorResponse>> getAuthor(
-		@PathVariable Long id
+		@PathVariable Long authorId
 	) {
-		AuthorResponse authorResponse = authorService.getAuthor(id);
+		AuthorResponse authorResponse = authorService.getAuthor(authorId);
 		return ResponseEntity.ok(JsendResponse.success(authorResponse));
 	}
 
 	// 작가 수정
-	@PutMapping("/{id}")
+	@PatchMapping("/{authorId}")
 	public ResponseEntity<JsendResponse<Void>> updateAuthor(
-		@PathVariable Long id,
+		@PathVariable Long authorId,
 		@Valid @RequestBody AuthorUpdateRequest authorUpdateRequest
 	) {
-		authorService.updateAuthor(id, authorUpdateRequest);
+		authorService.updateAuthor(authorId, authorUpdateRequest);
 		return ResponseEntity.ok(JsendResponse.success());
 	}
 
 	// 작가 삭제
-	@DeleteMapping("/{id}")
+	@DeleteMapping("/{authorId}")
 	public ResponseEntity<JsendResponse<Void>> deleteAuthor(
-		@PathVariable Long id
+		@PathVariable Long authorId
 	) {
-		authorService.deleteAuthor(id);
+		authorService.deleteAuthor(authorId);
 		return ResponseEntity.ok(JsendResponse.success());
 	}
 }
