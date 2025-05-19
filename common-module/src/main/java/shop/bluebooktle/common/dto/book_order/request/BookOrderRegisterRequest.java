@@ -13,11 +13,7 @@ import lombok.Value;
 @Value
 @Getter
 @Builder
-public class BookOrderRequest {
-	@NotNull(message = "도서 주문 ID는 필수값입니다.")
-	@Positive(message = "도서 주문 ID는 양수여야 합니다.")
-	Long bookOrderId;
-
+public class BookOrderRegisterRequest {
 	@NotNull(message = "도서 ID는 필수값입니다.")
 	@Positive(message = "도서 ID는 양수여야 합니다.")
 	Long bookId;

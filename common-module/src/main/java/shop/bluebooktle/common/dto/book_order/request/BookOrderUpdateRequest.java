@@ -16,10 +16,6 @@ import lombok.Value;
 public class BookOrderUpdateRequest {
 	@NotNull(message = "도서 ID는 필수값입니다.")
 	@Positive(message = "도서 ID는 양수여야 합니다.")
-	Long bookOrderId;
-
-	@NotNull(message = "도서 ID는 필수값입니다.")
-	@Positive(message = "도서 ID는 양수여야 합니다.")
 	Long bookId;
 
 	@NotNull(message = "도서 ID는 필수값입니다.")

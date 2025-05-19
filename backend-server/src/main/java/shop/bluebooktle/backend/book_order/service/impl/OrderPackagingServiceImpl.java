@@ -11,7 +11,7 @@ import shop.bluebooktle.backend.book_order.repository.BookOrderRepository;
 import shop.bluebooktle.backend.book_order.repository.OrderPackagingRepository;
 import shop.bluebooktle.backend.book_order.repository.PackagingOptionRepository;
 import shop.bluebooktle.backend.book_order.service.OrderPackagingService;
-import shop.bluebooktle.common.dto.book_order.request.OrderPackagingRequest;
+import shop.bluebooktle.common.dto.book_order.request.OrderPackagingRegisterRequest;
 import shop.bluebooktle.common.dto.book_order.request.OrderPackagingUpdateRequest;
 import shop.bluebooktle.common.dto.book_order.response.OrderPackagingResponse;
 import shop.bluebooktle.common.exception.book_order.BookOrderNotFoundException;
@@ -29,8 +29,8 @@ public class OrderPackagingServiceImpl implements OrderPackagingService {
 
 	/** 도서 주문에 포장 옵션 추가 */
 	@Override
-	public OrderPackagingResponse addOrderPackaging(OrderPackagingRequest request) {
-		BookOrder bookOrder = bookOrderRepository.findById(request.getBookOrderId())
+	public OrderPackagingResponse addOrderPackaging(Long bookOrderId, OrderPackagingRegisterRequest request) {
+		BookOrder bookOrder = bookOrderRepository.findById(bookOrderId)
 			.orElseThrow(BookOrderNotFoundException::new);
 		PackagingOption option = packagingOptionRepository.findById(request.getPackagingOptionId())
 			.orElseThrow(PackagingOptionNotFoundException::new);
