@@ -15,6 +15,7 @@ import shop.bluebooktle.backend.payment.repository.PaymentRepository;
 import shop.bluebooktle.backend.payment.repository.PaymentTypeRepository;
 import shop.bluebooktle.backend.payment.service.PaymentDetailService;
 import shop.bluebooktle.common.exception.payment.PaymentDetailNotFoundException;
+import shop.bluebooktle.common.exception.payment.PaymentNotFoundException;
 import shop.bluebooktle.common.exception.payment.PaymentTypeNotFoundException;
 
 @Service
@@ -31,10 +32,9 @@ public class PaymentDetailServiceImpl implements PaymentDetailService {
 	public void create(PaymentDetailRequest req) {
 		PaymentType type = typeRepo.findById(req.paymentTypeId())
 			.orElseThrow(() -> new PaymentTypeNotFoundException());
-
-		// TODO Payment 에러 처리하기
+		
 		Payment payment = paymentRepository.findById(req.paymentId())
-			.orElseThrow(() -> new PaymentDetailNotFoundException());
+			.orElseThrow(() -> new PaymentNotFoundException());
 		detailRepo.save(req.toEntity(payment, type));
 	}
 

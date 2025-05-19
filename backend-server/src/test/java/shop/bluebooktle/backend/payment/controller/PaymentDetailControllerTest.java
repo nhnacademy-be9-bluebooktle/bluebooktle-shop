@@ -53,16 +53,6 @@ class PaymentDetailControllerTest {
 	}
 
 	@Test
-	@DisplayName("결제 상세 삭제 - 성공")
-	void deletePaymentDetail_success() throws Exception {
-		mockMvc.perform(delete("/api/payments/details/{id}", 42L))
-			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.status").value("success"));
-
-		then(service).should().delete(42L);
-	}
-
-	@Test
 	@DisplayName("결제 상세 조회 - 성공")
 	void getPaymentDetail_success() throws Exception {
 		// given: 서비스가 반환할 더미 응답

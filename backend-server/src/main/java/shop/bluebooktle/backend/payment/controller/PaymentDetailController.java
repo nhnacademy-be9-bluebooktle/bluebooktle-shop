@@ -2,7 +2,6 @@ package shop.bluebooktle.backend.payment.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,21 +26,14 @@ public class PaymentDetailController {
 
 	private final PaymentDetailService service;
 
-	@Operation(summary = "결제 상세 생성")
+	@Operation(summary = "결제 상세 생성", description = "결제 상세를 생성합니다.")
 	@PostMapping
 	public ResponseEntity<JsendResponse<Void>> create(@RequestBody @Valid PaymentDetailRequest req) {
 		service.create(req);
 		return ResponseEntity.status(HttpStatus.CREATED).body(JsendResponse.success());
 	}
 
-	@Operation(summary = "결제 상세 삭제")
-	@DeleteMapping("/{id}")
-	public ResponseEntity<JsendResponse<Void>> delete(@PathVariable Long id) {
-		service.delete(id);
-		return ResponseEntity.ok(JsendResponse.success());
-	}
-
-	@Operation(summary = "결제 상세 조회")
+	@Operation(summary = "결제 상세 조회", description = "결제 상세를 조회합니다.")
 	@GetMapping("/{id}")
 	public ResponseEntity<JsendResponse<PaymentDetailResponse>> get(@PathVariable Long id) {
 		PaymentDetailResponse dto = service.get(id);

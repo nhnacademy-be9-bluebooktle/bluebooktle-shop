@@ -31,6 +31,7 @@ import shop.bluebooktle.common.entity.BaseEntity;
 @ToString(exclude = {"order"})
 @SQLDelete(sql = "UPDATE payment SET deleted_at = CURRENT_TIMESTAMP WHERE payment_id = ?")
 @SQLRestriction("deleted_at IS NULL")
+
 public class Payment extends BaseEntity {
 
 	@Id
@@ -42,20 +43,20 @@ public class Payment extends BaseEntity {
 	@JoinColumn(name = "order_id", nullable = false)
 	private Order order;
 
-	@Column(name = "original_price", nullable = false, precision = 10, scale = 2)
-	private BigDecimal originalPrice;
+	@Column(name = "original_amount", nullable = false, precision = 10, scale = 2)
+	private BigDecimal originalAmount;
 
 	@Column(name = "point_amount", precision = 10, scale = 2)
 	private BigDecimal pointAmount;
 
-	@Column(name = "final_price", nullable = false, precision = 10, scale = 2)
-	private BigDecimal finalPrice;
+	@Column(name = "final_amount", nullable = false, precision = 10, scale = 2)
+	private BigDecimal finalAmount;
 
 	@Builder
-	public Payment(Order order, BigDecimal originalPrice, BigDecimal pointAmount, BigDecimal finalPrice) {
+	public Payment(Order order, BigDecimal originalAmount, BigDecimal pointAmount, BigDecimal finalAmount) {
 		this.order = order;
-		this.originalPrice = originalPrice;
+		this.originalAmount = originalAmount;
 		this.pointAmount = pointAmount;
-		this.finalPrice = finalPrice;
+		this.finalAmount = finalAmount;
 	}
 }

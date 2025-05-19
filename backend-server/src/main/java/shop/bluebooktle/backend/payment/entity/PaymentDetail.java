@@ -8,11 +8,10 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
@@ -30,17 +29,17 @@ import shop.bluebooktle.common.entity.BaseEntity;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(of = "id", callSuper = false)
 @ToString(exclude = {"payment,paymentType"})
-@SQLDelete(sql = "UPDATE payment_detail SET deleted_at = CURRENT_TIMESTAMP WHERE payment_detail_id = ?")
+@SQLDelete(sql = "UPDATE payment_detail SET deleted_at = CURRENT_TIMESTAMP WHERE payment_id = ?")
 @SQLRestriction("deleted_at IS NULL")
 public class PaymentDetail extends BaseEntity {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "payment_detail_id")
+	@Column(name = "payment_id")
 	private Long id;
 
+	@MapsId
 	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "payment_id", nullable = false, unique = true)
+	@JoinColumn(name = "payment_id")
 	private Payment payment;
 
 	@ManyToOne(fetch = FetchType.LAZY)
