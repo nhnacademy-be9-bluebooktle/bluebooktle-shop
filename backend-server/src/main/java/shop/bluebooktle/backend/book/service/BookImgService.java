@@ -13,6 +13,9 @@ public interface BookImgService {
 	// 도서 이미지 등록
 	void registerBookImg(Long bookId, BookImgRegisterRequest bookImgRegisterRequest);
 
+	// 도서 이미지 등록
+	void registerBookImg(Long bookId, String imageUrl);
+
 	// 특정 도서의 모든 이미지 목록 조회
 	List<ImgResponse> getImgByBookId(Long bookId);
 

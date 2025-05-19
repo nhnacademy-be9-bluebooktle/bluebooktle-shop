@@ -1,8 +1,8 @@
 @portNum = 9012
 
 @baseUrl = http://localhost:{{portNum}}/api
-
 @bookUrl = http://localhost:{{portNum}}/api/books
+
 @book1 = 1
 @book2 = 2
 

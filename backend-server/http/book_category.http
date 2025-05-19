@@ -1,8 +1,8 @@
-@portNum = 9012
+@port = 9012
 
-@baseUrl = http://localhost:{{portNum}}/api
-@bookUrl = http://localhost:{{portNum}}/api/books
-@categoryUrl = http://localhost:{{portNum}}/api/categories
+@baseUrl = http://localhost:{{port}}/api
+@bookUrl = http://localhost:{{port}}/api/books
+@categoryUrl = http://localhost:{{port}}/api/categories
 
 @category1 = 1
 @category1_1 = 2

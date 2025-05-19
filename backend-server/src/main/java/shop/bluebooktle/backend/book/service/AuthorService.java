@@ -18,4 +18,7 @@ public interface AuthorService {
 	// (작가 아이디로) 작가 삭제
 	void deleteAuthor(Long authorId);
 
+	// 작가 이름으로 작가 조회 및 저장 로직
+	AuthorResponse registerAuthorByName(String authorName);
+
 }

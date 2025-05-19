@@ -1,15 +1,65 @@
 @port = 9012
-
 @baseUrl = http://localhost:{{port}}/api/aladin/books
+@tagUrl = http://localhost:{{port}}/api/tags
+@categoryUrl = http://localhost:{{port}}/api/categories
 
-#알라딘 관련 아직 수정필요!!
+@category1 = 1
+@category1_1 = 2
+@category1_2 = 3
+@category1_1_1 = 4
+
+### 태그 등록 성공 - 1
+POST {{tagUrl}}
+Content-Type: application/json
+
+{
+  "name": "태그테스트1"
+}
+
+### 태그 등록 성공 - 2
+POST {{tagUrl}}
+Content-Type: application/json
+
+{
+  "name": "태그테스트2"
+}
+
+### 태그 등록 성공 - 3
+POST {{tagUrl}}
+Content-Type: application/json
+
+{
+  "name": "태그테스트3"
+}
+
+### 최상위 카테고리 등록 1
+POST {{categoryUrl}}
+Content-Type: application/json
+
+{
+  "rootCategoryName": "카테고리1",
+  "childCategoryName": "카테고리1_1"
+}
+
+### 카테고리1의 하위 카테고리 등록 성공
+POST {{categoryUrl}}/{{category1}}
+Content-Type: application/json
+
+{
+  "name": "카테고리1_2"
+}
+
+### 카테고리1_1의 하위 카테고리 등록
+POST {{categoryUrl}}/{{category1_1}}
+Content-Type: application/json
+
+{
+  "name": "카테고리1_1_1"
+}
+
 
 ### 알라딘 도서목록 제목으로 검색
 GET {{baseUrl}}/?query=자바
-Accept: application/json
-
-### 알라딘 ISBN으로 도서 정보 조회
-GET {{baseUrl}}/isbn/9791163036227
 Accept: application/json
 
 ### 알라딘 도서 isbn으로 검색
@@ -25,8 +75,12 @@ Content-Type: application/json
   "stock": 999,
   "isPackable": true,
   "state": "AVAILABLE",
-  "tag": [
-    "태그"
+  "categoryIdList": [
+    2,
+    3
+  ],
+  "tagIdList": [
+    1
   ]
 }
 
@@ -35,12 +89,14 @@ POST {{baseUrl}}
 Content-Type: application/json
 
 {
-  "isbn": "9791193926994",
+  "isbn": "9791186560655",
   "stock": 999,
   "isPackable": true,
   "state": "AVAILABLE",
-  "tag": [
-    "태그"
+  "categoryIdList": [
+    4
+  ],
+  "tagIdList": [
   ]
 }
 
@@ -52,8 +108,10 @@ Content-Type: application/json
   "isbn": "9791193926994",
   "isPackable": true,
   "state": "AVAILABLE",
-  "tag": [
-    "태그"
+  "categoryIdList": [
+    4
+  ],
+  "tagIdList": [
   ]
 }
 
@@ -66,7 +124,23 @@ Content-Type: application/json
   "stock": "999",
   "isPackable": true,
   "state": "AVAILABLE",
-  "tag": [
-    "태그"
+  "categoryIdList": [
+    4
+  ],
+  "tagIdList": [
+  ]
+}
+
+### 알라딘 도서 등록 실패 - 필수필드 categoryIdList 누락
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+  "isbn": "9791193926994",
+  "isPackable": true,
+  "state": "AVAILABLE",
+  "categoryIdList": [
+  ],
+  "tagIdList": [
   ]
 }

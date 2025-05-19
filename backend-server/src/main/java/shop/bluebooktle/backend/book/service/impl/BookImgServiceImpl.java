@@ -71,6 +71,19 @@ public class BookImgServiceImpl implements BookImgService {
 		bookImgRepository.save(bookImg);
 	}
 
+	@Override
+	public void registerBookImg(Long bookId, String imageUrl) {
+		Book book = bookRepository.findById(bookId).orElseThrow(BookNotFoundException::new);
+		Img img = imgRepository.save(Img.builder().imgUrl(imageUrl).build());
+
+		BookImg bookImg = BookImg.builder()
+			.book(book)
+			.img(img)
+			.isThumbnail(true)
+			.build();
+		bookImgRepository.save(bookImg);
+	}
+
 	@Transactional(readOnly = true)
 	@Override
 	public List<ImgResponse> getImgByBookId(Long bookId) {

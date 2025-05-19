@@ -12,7 +12,6 @@ import shop.bluebooktle.backend.book.repository.AuthorRepository;
 import shop.bluebooktle.backend.book.service.AuthorService;
 import shop.bluebooktle.common.exception.book.AuthorAlreadyExistsException;
 import shop.bluebooktle.common.exception.book.AuthorFieldNullException;
-import shop.bluebooktle.common.exception.book.AuthorIdNullException;
 import shop.bluebooktle.common.exception.book.AuthorNotFoundException;
 import shop.bluebooktle.common.exception.book.AuthorUpdateFieldMissingException;
 
@@ -52,7 +51,8 @@ public class AuthorServiceImpl implements AuthorService {
 	@Override
 	public AuthorResponse getAuthor(Long authorId) {
 
-		Author author = authorRepository.findById(authorId).orElseThrow(() -> new AuthorNotFoundException(authorId)); // #TODO
+		Author author = authorRepository.findById(authorId)
+			.orElseThrow(() -> new AuthorNotFoundException(authorId)); // #TODO
 
 		return AuthorResponse.builder()
 			.id(author.getId())
@@ -83,5 +83,21 @@ public class AuthorServiceImpl implements AuthorService {
 
 		Author author = authorRepository.findById(authorId).orElseThrow(() -> new AuthorNotFoundException(authorId));
 		authorRepository.delete(author);
+	}
+
+	@Override
+	public AuthorResponse registerAuthorByName(String authorName) {
+		Author author = authorRepository.findByName(authorName)
+			.orElseGet(() -> authorRepository.save(
+				Author.builder()
+					.name(authorName)
+					.build()
+			));
+
+		return AuthorResponse.builder()
+			.id(author.getId())
+			.name(author.getName())
+			.createdAt(author.getCreatedAt())
+			.build();
 	}
 }
