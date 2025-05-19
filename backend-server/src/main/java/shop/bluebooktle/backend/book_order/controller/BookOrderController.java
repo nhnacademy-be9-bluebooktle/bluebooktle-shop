@@ -15,9 +15,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.book_order.service.BookOrderService;
 import shop.bluebooktle.backend.book_order.service.OrderPackagingService;
-import shop.bluebooktle.common.dto.book_order.request.BookOrderRequest;
+import shop.bluebooktle.common.dto.book_order.request.BookOrderRegisterRequest;
 import shop.bluebooktle.common.dto.book_order.request.BookOrderUpdateRequest;
-import shop.bluebooktle.common.dto.book_order.request.OrderPackagingRequest;
+import shop.bluebooktle.common.dto.book_order.request.OrderPackagingRegisterRequest;
 import shop.bluebooktle.common.dto.book_order.request.OrderPackagingUpdateRequest;
 import shop.bluebooktle.common.dto.book_order.response.BookOrderResponse;
 import shop.bluebooktle.common.dto.book_order.response.OrderPackagingResponse;
@@ -33,7 +33,7 @@ public class BookOrderController {
 	/** 도서 주문 등록 */
 	@PostMapping
 	public ResponseEntity<JsendResponse<BookOrderResponse>> createBookOrder(
-		@Valid @RequestBody BookOrderRequest request) {
+		@Valid @RequestBody BookOrderRegisterRequest request) {
 		return ResponseEntity.status(HttpStatus.CREATED)
 			.body(JsendResponse.success(bookOrderService.createBookOrder(request)));
 	}
@@ -48,8 +48,9 @@ public class BookOrderController {
 	/** 도서 주문 수정 */
 	@PutMapping("/{bookOrderId}")
 	public ResponseEntity<JsendResponse<BookOrderResponse>> updateBookOrder(
-		@RequestBody @Valid BookOrderUpdateRequest request) {
-		return ResponseEntity.ok(JsendResponse.success(bookOrderService.updateBookOrder(request)));
+		@RequestBody @Valid BookOrderUpdateRequest request,
+		@PathVariable Long bookOrderId) {
+		return ResponseEntity.ok(JsendResponse.success(bookOrderService.updateBookOrder(bookOrderId, request)));
 	}
 
 	/** 도서 주문 삭제 */
@@ -63,9 +64,10 @@ public class BookOrderController {
 	/** 포장 추가 */
 	@PostMapping("/{bookOrderId}/packaging")
 	public ResponseEntity<JsendResponse<OrderPackagingResponse>> addPackaging(
-		@RequestBody @Valid OrderPackagingRequest request) {
+		@PathVariable Long bookOrderId,
+		@RequestBody @Valid OrderPackagingRegisterRequest request) {
 		return ResponseEntity.status(HttpStatus.CREATED)
-			.body(JsendResponse.success(orderPackagingService.addOrderPackaging(request)));
+			.body(JsendResponse.success(orderPackagingService.addOrderPackaging(bookOrderId, request)));
 	}
 
 	/** 포장 단건 조회 */

@@ -20,6 +20,7 @@ import shop.bluebooktle.common.exception.book.BookNotFoundException;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class BookLikesServiceImpl implements BookLikesService {
 	private final BookLikesRepository bookLikesRepository;
 	private final BookRepository bookRepository;
@@ -27,7 +28,6 @@ public class BookLikesServiceImpl implements BookLikesService {
 
 	/** 사용자가 도서 좋아요 누르기 */
 	@Override
-	@Transactional
 	public void like(Long bookId, Long userId) {
 		if (bookLikesRepository.existsByUser_IdAndBook_Id(userId, bookId)) {
 			throw new BookLikesAlreadyChecked();
@@ -40,7 +40,6 @@ public class BookLikesServiceImpl implements BookLikesService {
 	}
 
 	/** 사용자가 누른 도서 좋아요 취소 */
-	@Transactional
 	@Override
 	public void unlike(Long bookId, Long userId) {
 		BookLikes bookLikes = bookLikesRepository.findByUser_IdAndBook_Id(userId, bookId);
@@ -80,11 +79,13 @@ public class BookLikesServiceImpl implements BookLikesService {
 	@Transactional(readOnly = true)
 	public List<BookLikesResponse> getBooksLikedByUser(Long userId) {
 		List<BookLikes> likedBooks = bookLikesRepository.findAllByUser_Id(userId);
-		return likedBooks.stream().map(bl -> BookLikesResponse.builder()
+		return likedBooks.stream()
+			.map(bl -> BookLikesResponse.builder()
 				.bookId(bl.getBook().getId())
 				.isLiked(true)
 				.countLikes((int)bookLikesRepository.countByBook_Id(bl.getBook().getId()))
 				.build())
+			.filter(BookLikesResponse::isLiked) // 좋아요 누른 도서만 조회
 			.toList();
 	}
 }
