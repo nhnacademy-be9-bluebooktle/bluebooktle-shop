@@ -1,0 +1,83 @@
+@portNum = 9012
+
+@baseUrl = http://localhost:{{portNum}}/api
+
+@bookUrl = http://localhost:{{portNum}}/api/books
+@book1 = 1
+@book2 = 2
+
+@tagUrl = http://localhost:{{portNum}}/api/tags
+@tag_test_1 = 1
+@tag_test_2 = 2
+@tag_test_3 = 3
+
+### 도서 등록1
+POST {{bookUrl}}
+Content-Type: application/json
+
+{
+  "title": "아낌없이 주는 나무",
+  "description": "아낌없이 주는 나무 설명",
+  "isbn": "9780060256654",
+  "publishDate": "2025-05-15"
+}
+
+### 도서 등록2
+POST {{bookUrl}}
+Content-Type: application/json
+
+{
+  "title": "소년은 온다",
+  "description": "소년은 온다 설명",
+  "isbn": "9788936434120",
+  "publishDate": "2025-05-15"
+}
+
+
+### 태그 등록 성공 - 1
+POST {{tagUrl}}
+Content-Type: application/json
+
+{
+  "name": "태그테스트1"
+}
+
+### 태그 등록 성공 - 2
+POST {{tagUrl}}
+Content-Type: application/json
+
+{
+  "name": "태그테스트2"
+}
+
+### 태그 등록 성공 - 3
+POST {{tagUrl}}
+Content-Type: application/json
+
+{
+  "name": "태그테스트3"
+}
+
+### 태그테스트1에 도서 등록 성공
+POST {{baseUrl}}/tags/{{tag_test_1}}/books/{{book1}}
+
+### 태그테스트1에 도서 등록 실패 (이미 등록된 태그)
+POST {{baseUrl}}/tags/{{tag_test_1}}/books/{{book1}}
+
+### 태그테스트1에 도서 등록 성공
+POST {{baseUrl}}/tags/{{tag_test_1}}/books/{{book2}}
+
+### 태그테스트3에 도서 등록 성공
+POST {{baseUrl}}/tags/{{tag_test_3}}/books/{{book1}}
+
+### 태그테스트1에 등록된 도서 목록 반환
+GET {{baseUrl}}/tags/{{tag_test_1}}/books
+
+### 도서에 해당 태그(태그테스트1) 삭제
+DELETE {{baseUrl}}/tags/{{tag_test_1}}/books/{{book1}}
+
+### 도서에 해당 태그(태그테스트3) 삭제
+DELETE {{baseUrl}}/tags/{{tag_test_3}}/books/{{book1}}
+
+### 태그테스트1(id = 1) 삭제 (해당 태그(태그테스트1)에 등록된 도서도 관계테이블(도서태그)에서 연쇄적으로 삭제)
+DELETE {{tagUrl}}/{{tag_test_1}}

@@ -22,6 +22,6 @@ public class TagNotFoundException extends ApplicationException {
 	}
 
 	public TagNotFoundException(Long tagId) {
-		this("Publisher with id " + tagId + " not found");
+		this("Tag with id " + tagId + " not found");
 	}
 }

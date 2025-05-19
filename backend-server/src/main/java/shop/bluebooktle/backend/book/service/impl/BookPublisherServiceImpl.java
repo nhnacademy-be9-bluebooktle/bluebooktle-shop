@@ -50,13 +50,10 @@ public class BookPublisherServiceImpl implements BookPublisherService {
 	public void deleteBookPublisher(Long bookId, Long publisherId) {
 		Book book = findBookOrThrow(bookId);
 		Publisher publisher = findPublisherOrThrow(publisherId);
-		if (!bookPublisherRepository.existsByBookAndPublisher(book, publisher)) {
-			throw new BookPublisherNotFoundException(bookId, publisherId);
-		}
-		BookPublisher bookPublisher = BookPublisher.builder()
-			.book(book)
-			.publisher(publisher)
-			.build();
+
+		BookPublisher bookPublisher = bookPublisherRepository.findByBookAndPublisher(book, publisher)
+			.orElseThrow(() -> new BookPublisherNotFoundException(bookId, publisherId));
+		
 		bookPublisherRepository.delete(bookPublisher);
 	}
 

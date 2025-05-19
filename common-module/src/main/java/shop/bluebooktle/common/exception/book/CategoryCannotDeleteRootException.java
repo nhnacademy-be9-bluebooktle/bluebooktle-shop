@@ -6,18 +6,18 @@ import shop.bluebooktle.common.exception.ErrorCode;
 public class CategoryCannotDeleteRootException extends ApplicationException {
 
 	public CategoryCannotDeleteRootException() {
-		super(ErrorCode.CATEGORY_DELETE_ROOT_CATEGORY);
+		super(ErrorCode.CATEGORY_DELETE_NOT_ALLOWED);
 	}
 
 	public CategoryCannotDeleteRootException(String message) {
-		super(ErrorCode.CATEGORY_DELETE_ROOT_CATEGORY, message);
+		super(ErrorCode.CATEGORY_DELETE_NOT_ALLOWED, ErrorCode.CATEGORY_DELETE_NOT_ALLOWED.getMessage() + message);
 	}
 
 	public CategoryCannotDeleteRootException(Throwable cause) {
-		super(ErrorCode.CATEGORY_DELETE_ROOT_CATEGORY, cause);
+		super(ErrorCode.CATEGORY_DELETE_NOT_ALLOWED, cause);
 	}
 
 	public CategoryCannotDeleteRootException(String message, Throwable cause) {
-		super(ErrorCode.CATEGORY_DELETE_ROOT_CATEGORY, message, cause);
+		super(ErrorCode.CATEGORY_DELETE_NOT_ALLOWED, message, cause);
 	}
 }
