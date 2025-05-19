@@ -14,5 +14,8 @@ public class BookImgRegisterRequest {
 	long imgId;
 
 	@NotBlank
+	String imgUrl;
+
+	@NotBlank
 	boolean isThumbnail;
 }

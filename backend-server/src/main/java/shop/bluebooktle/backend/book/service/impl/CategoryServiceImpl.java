@@ -17,6 +17,7 @@ import shop.bluebooktle.backend.book.dto.request.CategoryUpdateRequest;
 import shop.bluebooktle.backend.book.dto.request.RootCategoryRegisterRequest;
 import shop.bluebooktle.backend.book.dto.response.CategoryResponse;
 import shop.bluebooktle.backend.book.dto.response.CategoryTreeResponse;
+import shop.bluebooktle.backend.book.entity.BookCategory;
 import shop.bluebooktle.backend.book.entity.Category;
 import shop.bluebooktle.backend.book.repository.BookCategoryRepository;
 import shop.bluebooktle.backend.book.repository.CategoryRepository;
@@ -73,6 +74,9 @@ public class CategoryServiceImpl implements CategoryService {
 
 		newCategory.setCategoryPath(categoryPathStr);
 		categoryRepository.save(newCategory);
+
+		parent.addChildCategory(newCategory);
+		categoryRepository.save(parent);
 	}
 
 	@Override
@@ -116,27 +120,37 @@ public class CategoryServiceImpl implements CategoryService {
 		categoryRepository.save(category);
 	}
 
-	// TODO 삭제 로직 다시 손보기 예외처리는 잘 됨, 삭제 해야할 것이 삭제가 안 됨
 	@Override
 	public void deleteCategory(Long categoryId) {
 		log.info("삭제 요청 : categoryId: {}", categoryId);
 		Category category = categoryRepository.findById(categoryId)
 			.orElseThrow(() -> new CategoryNotFoundException(categoryId));
 
+		// TODO 카테고리에 도서 등록시 삭제 불가(하위 카테고리 포함)
+		if (bookCategoryRepository.existsByCategory(category)) {
+			throw new CategoryCannotDeleteRootException("(도서가 등록된 카테고리 삭제 불가)");
+		}
+		// 하위 모든 카테고리 수집
+		List<Category> descendants = getAllDescendantCategories(category);
+		for (Category descendant : descendants) {
+			if (bookCategoryRepository.existsByCategory(descendant)) {
+				throw new CategoryCannotDeleteRootException("(도서가 등록된 하위 카테고리 존재시 삭제 불가");
+			}
+		}
+
 		// 최상위 카테고리는 삭제 불가
 		if (isRootCategory(categoryId)) {
-			throw new CategoryCannotDeleteRootException();
+			throw new CategoryCannotDeleteRootException("(최상위 카테고리 삭제 불가)");
 		}
 		// 상위 카테고리가 최상위 카테고리이면서 2단계 카테고리가 1개일 경우 삭제 불가능
 		if (isRootCategory(category.getParentCategory().getId())) {
 			Category rootCategory = categoryRepository.findById(category.getParentCategory().getId())
 				.orElseThrow(() -> new CategoryNotFoundException(category.getParentCategory().getId())); // 최상위 카테고리
 			if (rootCategory.getChildCategories().size() == 1) {
-				throw new CategoryCannotDeleteException();
+				throw new CategoryCannotDeleteException("(카테고리는 최소 2단계 카테고리 유지)");
 			}
 		}
-		// 하위 모든 카테고리 수집
-		List<Category> descendants = getAllDescendantCategories(category);
+
 		// 연관된 BookCategory 삭제
 		bookCategoryRepository.deleteByCategoryIn(descendants); // 손자 카테고리까지 삭제
 		// 하위 모든 카테고리 삭제
@@ -145,6 +159,11 @@ public class CategoryServiceImpl implements CategoryService {
 			log.info("자식 카테고리명 : {}", childCategory.getName());
 			categoryRepository.delete(childCategory);
 		}
+		List<BookCategory> categoryLinks = bookCategoryRepository.findByCategory(category);
+		List<BookCategory> toUpdate = categoryLinks.stream()
+			.filter(bc -> bookCategoryRepository.countByBook(bc.getBook()) == 1)
+			.peek(bc -> bc.setCategory(category.getParentCategory()))  // 상위 카테고리로 교체
+			.toList();
 
 		// 현재 카테고리의 BookCategory 관계 삭제
 		bookCategoryRepository.deleteByCategory(category);

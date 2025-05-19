@@ -55,8 +55,6 @@ public class Category extends BaseEntity {
 
 	@OneToMany(
 		mappedBy = "parentCategory",
-		/*cascade = CascadeType.ALL,
-		orphanRemoval = true,*/
 		fetch = FetchType.LAZY
 	)
 	private List<Category> childCategories = new ArrayList<>();

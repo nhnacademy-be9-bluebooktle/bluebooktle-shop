@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.book.dto.request.BookImgRegisterRequest;
+import shop.bluebooktle.backend.book.dto.request.img.ImgRegisterRequest;
 import shop.bluebooktle.backend.book.dto.response.BookImgResponse;
 import shop.bluebooktle.backend.book.dto.response.BookInfoResponse;
 import shop.bluebooktle.backend.book.dto.response.img.ImgResponse;
@@ -19,6 +20,7 @@ import shop.bluebooktle.backend.book.repository.BookImgRepository;
 import shop.bluebooktle.backend.book.repository.BookRepository;
 import shop.bluebooktle.backend.book.repository.ImgRepository;
 import shop.bluebooktle.backend.book.service.BookImgService;
+import shop.bluebooktle.backend.book.service.ImgService;
 import shop.bluebooktle.common.exception.book.BookIdNullException;
 import shop.bluebooktle.common.exception.book.BookImgAlreadyExistsException;
 import shop.bluebooktle.common.exception.book.BookImgNotFoundException;
@@ -36,20 +38,25 @@ public class BookImgServiceImpl implements BookImgService {
 	private final BookRepository bookRepository;
 	private final ImgRepository imgRepository;
 	private final BookImgRepository bookImgRepository;
+	private final ImgService imgService;
 
 	@Override
 	public void registerBookImg(Long bookId, BookImgRegisterRequest bookImgRegisterRequest) {
-
 		if (bookId == null) {
 			throw new BookIdNullException();
 		}
+		imgService.registerImg(ImgRegisterRequest
+			.builder()
+			.imgUrl(bookImgRegisterRequest.getImgUrl())
+			.build());
 
 		Long imgId = bookImgRegisterRequest.getImgId();
 		if (imgId == null) {
 			throw new ImgIdNullException();
 		}
 
-		Img img = imgRepository.findById(bookImgRegisterRequest.getImgId()).orElseThrow(() -> new ImgNotFoundException());
+		Img img = imgRepository.findById(bookImgRegisterRequest.getImgId())
+			.orElseThrow(() -> new ImgNotFoundException());
 		Book book = bookRepository.findById(bookId).orElseThrow(() -> new BookNotFoundException());
 
 		if (bookImgRepository.existsByBookAndImg(book, img)) {
@@ -63,7 +70,6 @@ public class BookImgServiceImpl implements BookImgService {
 
 		bookImgRepository.save(bookImg);
 	}
-
 
 	@Transactional(readOnly = true)
 	@Override

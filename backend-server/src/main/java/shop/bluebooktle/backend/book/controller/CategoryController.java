@@ -100,7 +100,6 @@ public class CategoryController {
 	) {
 
 		categoryService.updateCategory(categoryId, request);
-		// TODO 업데이트면 return ResponseEntity.noContent().build(); 이렇게 해야할지.. 응답코드 : 204
 		return ResponseEntity.ok(JsendResponse.success());
 	}
 

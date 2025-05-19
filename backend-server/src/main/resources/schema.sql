@@ -202,8 +202,8 @@ CREATE TABLE `book_sale_info`
 CREATE TABLE `book_publisher`
 (
     `book_publisher_id` bigint NOT NULL AUTO_INCREMENT,
-    `book_id`           bigint NOT NULL,
     `publisher_id`      bigint NOT NULL,
+    `book_id`           bigint NOT NULL,
 
     CONSTRAINT `PK_BOOK_PUBLISHER` PRIMARY KEY (`book_publisher_id`),
     CONSTRAINT `FK_book_publisher_book_id_book`
@@ -297,8 +297,8 @@ CREATE TABLE `users`
 CREATE TABLE `book_category`
 (
     `book_category_id` bigint NOT NULL AUTO_INCREMENT,
-    `book_id`          bigint NOT NULL,
     `category_id`      bigint NOT NULL,
+    `book_id`          bigint NOT NULL,
 
     CONSTRAINT `PK_BOOK_CATEGORY` PRIMARY KEY (`book_category_id`),
     UNIQUE KEY `UK_book_category_book_category` (`book_id`, `category_id`),
