@@ -281,246 +281,292 @@
                     class="fas fa-gem"></i></h1>
         </div>
 
-        <form action="/order/process" id="checkoutForm" method="post">
-            <div class="checkout-container-kitsch">
-                <div class="checkout-main-panel-kitsch">
-                    <section class="checkout-section-kitsch">
-                        <h3 class="section-title-kitsch"><i class="fas fa-shopping-basket"></i> 주문 상품 확인</h3>
-                        <div id="orderedItemsList">
-                            <div class="ordered-item-kitsch" data-item-id="101" data-item-price="25200"
-                                 data-item-quantity="1">
-                                <img alt="코딩 대모험" src="https://picsum.photos/70/105?random=101">
-                                <div class="ordered-item-details-kitsch">
-                                    <a class="item-title-kitsch" href="#">코딩 대모험</a>
-                                    <p class="item-quantity-price-kitsch">수량: <span class="item-qty">1</span>개 / 가격:
-                                        <span class="item-price-per-unit">25,200</span>원</p>
-                                    <div class="item-packaging-kitsch">
-                                        <label class="label-kitsch" for="packaging-101">포장 선택:</label>
-                                        <select class="select-kitsch item-packaging-select" id="packaging-101"
-                                                name="itemPackaging[101]">
-                                            <option data-packaging-cost="0" value="none">포장 안함</option>
-                                            <option data-packaging-cost="2000" selected value="shiny">✨반짝이 포장
-                                                (+2,000원)
-                                            </option>
-                                            <option data-packaging-cost="1500" value="retro_dot">👾레트로 도트 포장 (+1,500원)
-                                            </option>
-                                        </select>
-                                    </div>
-                                    <div class="item-coupon-apply-kitsch">
-                                        <label class="label-kitsch" for="item-coupon-101">개별쿠폰:</label>
-                                        <select class="select-kitsch item-coupon-select" id="item-coupon-101"
-                                                name="itemCoupon[101]">
-                                            <option data-discount="0" value="">쿠폰 미적용</option>
-                                            <option data-discount="1000" data-discount-type="amount"
-                                                    value="ITEM_1000_OFF">키치코딩 1,000원 할인
-                                            </option>
-                                            <option data-discount="5" data-discount-type="percent"
-                                                    value="ITEM_5_PERCENT">키치코딩 5% 할인
-                                            </option>
-                                        </select>
-                                        <div class="item-coupon-applied-info"></div>
-                                    </div>
+        <!--        <form action="/order/process" id="checkoutForm" method="post">-->
+        <div class="checkout-container-kitsch">
+            <div class="checkout-main-panel-kitsch">
+                <section class="checkout-section-kitsch">
+                    <h3 class="section-title-kitsch"><i class="fas fa-shopping-basket"></i> 주문 상품 확인</h3>
+                    <div id="orderedItemsList">
+                        <div class="ordered-item-kitsch" data-item-id="101" data-item-price="25200"
+                             data-item-quantity="1">
+                            <img alt="코딩 대모험" src="https://picsum.photos/70/105?random=101">
+                            <div class="ordered-item-details-kitsch">
+                                <a class="item-title-kitsch" href="#">코딩 대모험</a>
+                                <p class="item-quantity-price-kitsch">수량: <span class="item-qty">1</span>개 / 가격:
+                                    <span class="item-price-per-unit">25,200</span>원</p>
+                                <div class="item-packaging-kitsch">
+                                    <label class="label-kitsch" for="packaging-101">포장 선택:</label>
+                                    <select class="select-kitsch item-packaging-select" id="packaging-101"
+                                            name="itemPackaging[101]">
+                                        <option data-packaging-cost="0" value="none">포장 안함</option>
+                                        <option data-packaging-cost="2000" selected value="shiny">✨반짝이 포장
+                                            (+2,000원)
+                                        </option>
+                                        <option data-packaging-cost="1500" value="retro_dot">👾레트로 도트 포장 (+1,500원)
+                                        </option>
+                                    </select>
                                 </div>
-                            </div>
-                            <div class="ordered-item-kitsch" data-item-id="102" data-item-price="31500"
-                                 data-item-quantity="2">
-                                <img alt="픽셀 아트로 배우는 알고리즘" src="https://picsum.photos/70/105?random=102">
-                                <div class="ordered-item-details-kitsch">
-                                    <a class="item-title-kitsch" href="#">픽셀 아트로 배우는 알고리즘</a>
-                                    <p class="item-quantity-price-kitsch">수량: <span class="item-qty">2</span>개 / 가격:
-                                        <span class="item-price-per-unit">31,500</span>원</p>
-                                    <div class="item-packaging-kitsch">
-                                        <label class="label-kitsch" for="packaging-102">포장 선택:</label>
-                                        <select class="select-kitsch item-packaging-select" id="packaging-102"
-                                                name="itemPackaging[102]">
-                                            <option data-packaging-cost="0" selected value="none">포장 안함</option>
-                                            <option data-packaging-cost="2000" value="shiny">✨반짝이 포장 (+2,000원)</option>
-                                        </select>
-                                    </div>
-                                    <div class="item-coupon-apply-kitsch">
-                                        <label class="label-kitsch" for="item-coupon-102">개별쿠폰:</label>
-                                        <select class="select-kitsch item-coupon-select" id="item-coupon-102"
-                                                name="itemCoupon[102]">
-                                            <option data-discount="0" value="">쿠폰 미적용</option>
-                                            <option data-discount="3000" data-discount-type="amount"
-                                                    selected value="PIXEL_ART_ONLY">픽셀아트 전용 3,000원 할인
-                                            </option>
-                                        </select>
-                                        <div class="item-coupon-applied-info"></div>
-                                    </div>
+                                <div class="item-coupon-apply-kitsch">
+                                    <label class="label-kitsch" for="item-coupon-101">개별쿠폰:</label>
+                                    <select class="select-kitsch item-coupon-select" id="item-coupon-101"
+                                            name="itemCoupon[101]">
+                                        <option data-discount="0" value="">쿠폰 미적용</option>
+                                        <option data-discount="1000" data-discount-type="amount"
+                                                value="ITEM_1000_OFF">키치코딩 1,000원 할인
+                                        </option>
+                                        <option data-discount="5" data-discount-type="percent"
+                                                value="ITEM_5_PERCENT">키치코딩 5% 할인
+                                        </option>
+                                    </select>
+                                    <div class="item-coupon-applied-info"></div>
                                 </div>
                             </div>
                         </div>
-                    </section>
-
-                    <section class="checkout-section-kitsch">
-                        <h3 class="section-title-kitsch"><i class="fas fa-user-circle"></i> 주문자 정보</h3>
-                        <div class="form-group-kitsch">
-                            <label class="label-kitsch" for="ordererName">이름:</label>
-                            <input class="input-kitsch pixel-font-kitsch" id="ordererName" name="ordererName"
-                                   required type="text" value="겜돌이_77">
-                        </div>
-                        <div class="form-group-kitsch">
-                            <label class="label-kitsch" for="ordererEmail">이메일:</label>
-                            <input class="input-kitsch pixel-font-kitsch" id="ordererEmail" name="ordererEmail"
-                                   required type="email" value="gamer77@bluebooktle.com">
-                        </div>
-                        <div class="form-group-kitsch">
-                            <label class="label-kitsch" for="ordererPhone">연락처:</label>
-                            <input class="input-kitsch pixel-font-kitsch" id="ordererPhone" name="ordererPhone"
-                                   required type="tel" value="010-1234-5678">
-                        </div>
-                    </section>
-
-                    <section class="checkout-section-kitsch">
-                        <h3 class="section-title-kitsch"><i class="fas fa-truck-loading"></i> 배송지 정보</h3>
-                        <div class="form-group-kitsch">
-                            <label class="label-kitsch">배송지 선택:</label>
-                            <select class="select-kitsch" id="shippingAddressOption" name="shippingAddressOption"
-                                    onchange="toggleNewAddressForm(this.value)">
-                                <option selected value="default">기본 배송지 (우리집)</option>
-                                <option value="saved_1">등록된 주소 1 (회사)</option>
-                                <option value="new">새로 입력</option>
-                            </select>
-                        </div>
-                        <div class="input-description-kitsch" id="savedAddressInfo"
-                             style="border:1px dashed var(--kitsch-color-2); padding:0.5rem; margin-bottom:1rem; border-radius:3px;">
-                            <p><strong>받는 분:</strong> 겜돌이_77</p>
-                            <p><strong>연락처:</strong> 010-1234-5678</p>
-                            <p><strong>주소:</strong> (12345) 서울특별시 키치구 레트로길 88, 101동 1988호</p>
-                        </div>
-                        <div id="newAddressForm" style="display:none;">
-                            <div class="form-group-kitsch">
-                                <label class="label-kitsch" for="recipientName">받는 분:</label>
-                                <input class="input-kitsch pixel-font-kitsch" id="recipientName" name="recipientName"
-                                       type="text">
-                            </div>
-                            <div class="form-group-kitsch">
-                                <label class="label-kitsch" for="recipientPhone">연락처:</label>
-                                <input class="input-kitsch pixel-font-kitsch" id="recipientPhone" name="recipientPhone"
-                                       type="tel">
-                            </div>
-                            <div class="form-group-kitsch">
-                                <label class="label-kitsch">주소:</label>
-                                <div class="address-group-kitsch" style="margin-bottom: 0.5rem;">
-                                    <input class="input-kitsch pixel-font-kitsch" id="shippingPostcode"
-                                           name="shippingPostcode"
-                                           placeholder="우편번호" readonly type="text">
-                                    <button class="btn-kitsch secondary-btn-kitsch color1-kitsch retro-shadow-kitsch-small small-btn-kitsch"
-                                            onclick="execDaumPostcode('shippingPostcode', 'shippingAddress')"
-                                            type="button">
-                                        우편번호 찾기
-                                    </button>
+                        <div class="ordered-item-kitsch" data-item-id="102" data-item-price="31500"
+                             data-item-quantity="2">
+                            <img alt="픽셀 아트로 배우는 알고리즘" src="https://picsum.photos/70/105?random=102">
+                            <div class="ordered-item-details-kitsch">
+                                <a class="item-title-kitsch" href="#">픽셀 아트로 배우는 알고리즘</a>
+                                <p class="item-quantity-price-kitsch">수량: <span class="item-qty">2</span>개 / 가격:
+                                    <span class="item-price-per-unit">31,500</span>원</p>
+                                <div class="item-packaging-kitsch">
+                                    <label class="label-kitsch" for="packaging-102">포장 선택:</label>
+                                    <select class="select-kitsch item-packaging-select" id="packaging-102"
+                                            name="itemPackaging[102]">
+                                        <option data-packaging-cost="0" selected value="none">포장 안함</option>
+                                        <option data-packaging-cost="2000" value="shiny">✨반짝이 포장 (+2,000원)</option>
+                                    </select>
                                 </div>
-                                <input class="input-kitsch pixel-font-kitsch" id="shippingAddress"
-                                       name="shippingAddress"
-                                       placeholder="도로명 주소" readonly style="margin-bottom: 0.5rem;"
-                                       type="text">
-                                <input class="input-kitsch pixel-font-kitsch" id="shippingDetailAddress"
-                                       name="shippingDetailAddress"
-                                       placeholder="상세주소 입력" type="text">
+                                <div class="item-coupon-apply-kitsch">
+                                    <label class="label-kitsch" for="item-coupon-102">개별쿠폰:</label>
+                                    <select class="select-kitsch item-coupon-select" id="item-coupon-102"
+                                            name="itemCoupon[102]">
+                                        <option data-discount="0" value="">쿠폰 미적용</option>
+                                        <option data-discount="3000" data-discount-type="amount"
+                                                selected value="PIXEL_ART_ONLY">픽셀아트 전용 3,000원 할인
+                                        </option>
+                                    </select>
+                                    <div class="item-coupon-applied-info"></div>
+                                </div>
                             </div>
                         </div>
-                        <div class="form-group-kitsch">
-                            <label class="label-kitsch" for="deliveryMessage">배송 요청사항:</label>
-                            <textarea class="textarea-kitsch handwriting-font-kitsch" id="deliveryMessage"
-                                      name="deliveryMessage" placeholder="예: 문 앞에 놓아주세요. 부재 시 연락주세요."
-                                      rows="3"></textarea>
-                        </div>
-                        <div class="form-group-kitsch">
-                            <label class="label-kitsch" for="deliveryDate">배송 희망일 (선택):</label>
-                            <input class="input-kitsch pixel-font-kitsch" id="deliveryDate" name="deliveryDate"
-                                   type="date">
-                        </div>
-                    </section>
-                </div>
+                    </div>
+                </section>
 
-                <div class="checkout-sidebar-panel-kitsch">
-                    <section class="checkout-section-kitsch payment-summary-kitsch">
-                        <h3 class="summary-title-kitsch"><i class="fas fa-money-check-alt"></i> 최종 결제 금액</h3>
-                        <div class="summary-row-kitsch">
-                            <span class="label">총 상품 금액:</span>
-                            <span class="value" id="summaryTotalProductPrice">88,200원</span>
-                        </div>
-                        <div class="summary-row-kitsch">
-                            <span class="label">총 포장비:</span>
-                            <span class="value" id="summaryPackagingFee">2,000원</span>
-                        </div>
-                        <div class="summary-row-kitsch">
-                            <span class="label">개별 상품 할인:</span>
-                            <span class="value discount" id="summaryItemCouponDiscount">- 4,000원</span>
-                        </div>
-                        <div class="form-group-kitsch" style="margin-top:1rem;">
-                            <label class="label-kitsch" for="orderCoupon" style="font-size:1em;">주문 전체 쿠폰:</label>
-                            <select class="select-kitsch" id="orderCoupon" name="orderCouponId">
-                                <option data-discount="0" value="">쿠폰 선택 안함</option>
-                                <option data-discount="5000" data-discount-type="amount" value="ORDER_WELCOME_5000">
-                                    WELCOME! 5,000원 할인
-                                </option>
-                                <option data-discount="10" data-discount-type="percent" value="ORDER_VIP_10_PERCENT">VIP
-                                    전용 10% 할인
-                                </option>
-                            </select>
+                <section class="checkout-section-kitsch">
+                    <h3 class="section-title-kitsch"><i class="fas fa-user-circle"></i> 주문자 정보</h3>
+                    <div class="form-group-kitsch">
+                        <label class="label-kitsch" for="ordererName">이름:</label>
+                        <input class="input-kitsch pixel-font-kitsch" id="ordererName" name="ordererName"
+                               required type="text" value="겜돌이_77">
+                    </div>
+                    <div class="form-group-kitsch">
+                        <label class="label-kitsch" for="ordererEmail">이메일:</label>
+                        <input class="input-kitsch pixel-font-kitsch" id="ordererEmail" name="ordererEmail"
+                               required type="email" value="gamer77@bluebooktle.com">
+                    </div>
+                    <div class="form-group-kitsch">
+                        <label class="label-kitsch" for="ordererPhone">연락처:</label>
+                        <input class="input-kitsch pixel-font-kitsch" id="ordererPhone" name="ordererPhone"
+                               required type="tel" value="010-1234-5678">
+                    </div>
+                </section>
+
+                <section class="checkout-section-kitsch">
+                    <h3 class="section-title-kitsch"><i class="fas fa-truck-loading"></i> 배송지 정보</h3>
+                    <div class="form-group-kitsch">
+                        <label class="label-kitsch">배송지 선택:</label>
+                        <select class="select-kitsch" id="shippingAddressOption" name="shippingAddressOption"
+                                onchange="toggleNewAddressForm(this.value)">
+                            <option selected value="default">기본 배송지 (우리집)</option>
+                            <option value="saved_1">등록된 주소 1 (회사)</option>
+                            <option value="new">새로 입력</option>
+                        </select>
+                    </div>
+                    <div class="input-description-kitsch" id="savedAddressInfo"
+                         style="border:1px dashed var(--kitsch-color-2); padding:0.5rem; margin-bottom:1rem; border-radius:3px;">
+                        <p><strong>받는 분:</strong> 겜돌이_77</p>
+                        <p><strong>연락처:</strong> 010-1234-5678</p>
+                        <p><strong>주소:</strong> (12345) 서울특별시 키치구 레트로길 88, 101동 1988호</p>
+                    </div>
+                    <div id="newAddressForm" style="display:none;">
+                        <div class="form-group-kitsch">
+                            <label class="label-kitsch" for="recipientName">받는 분:</label>
+                            <input class="input-kitsch pixel-font-kitsch" id="recipientName" name="recipientName"
+                                   type="text">
                         </div>
                         <div class="form-group-kitsch">
-                            <label class="label-kitsch" for="pointsToUse" style="font-size:1em;">포인트 사용 (보유: 3,500
-                                P):</label>
-                            <div style="display:flex; gap:0.5rem;">
-                                <input class="input-kitsch pixel-font-kitsch" data-available-points="3500"
-                                       id="pointsToUse"
-                                       max="3500" name="pointsToUse" placeholder="사용할 포인트"
-                                       type="number" value="1000">
-                                <button class="btn-kitsch secondary-btn-kitsch color2-kitsch small-btn-kitsch retro-shadow-kitsch-small"
-                                        onclick="applyMaxPoints()"
-                                        style="min-width: fit-content;"
-                                        type="button">전액 사용
+                            <label class="label-kitsch" for="recipientPhone">연락처:</label>
+                            <input class="input-kitsch pixel-font-kitsch" id="recipientPhone" name="recipientPhone"
+                                   type="tel">
+                        </div>
+                        <div class="form-group-kitsch">
+                            <label class="label-kitsch">주소:</label>
+                            <div class="address-group-kitsch" style="margin-bottom: 0.5rem;">
+                                <input class="input-kitsch pixel-font-kitsch" id="shippingPostcode"
+                                       name="shippingPostcode"
+                                       placeholder="우편번호" readonly type="text">
+                                <button class="btn-kitsch secondary-btn-kitsch color1-kitsch retro-shadow-kitsch-small small-btn-kitsch"
+                                        onclick="execDaumPostcode('shippingPostcode', 'shippingAddress')"
+                                        type="button">
+                                    우편번호 찾기
                                 </button>
                             </div>
+                            <input class="input-kitsch pixel-font-kitsch" id="shippingAddress"
+                                   name="shippingAddress"
+                                   placeholder="도로명 주소" readonly style="margin-bottom: 0.5rem;"
+                                   type="text">
+                            <input class="input-kitsch pixel-font-kitsch" id="shippingDetailAddress"
+                                   name="shippingDetailAddress"
+                                   placeholder="상세주소 입력" type="text">
                         </div>
-                        <div class="summary-row-kitsch">
-                            <span class="label">주문 전체 할인:</span>
-                            <span class="value discount" id="summaryOrderCouponDiscount">- 5,000원</span>
-                        </div>
-                        <div class="summary-row-kitsch">
-                            <span class="label">포인트 할인:</span>
-                            <span class="value discount" id="summaryPointDiscount">- 1,000원</span>
-                        </div>
-                        <div class="summary-row-kitsch">
-                            <span class="label">배송비:</span>
-                            <span class="value" id="summaryDeliveryFee">0원</span>
-                        </div>
-                        <div class="total-summary-kitsch">
-                            <div class="summary-row-kitsch">
-                                <span class="label">최종 결제금액:</span>
-                                <span class="value" id="summaryFinalTotalPrice">80,200원</span>
-                            </div>
-                        </div>
-                    </section>
-
-                    <section class="checkout-section-kitsch payment-methods-kitsch">
-                        <h3 class="section-title-kitsch" style="background-color: var(--kitsch-color-4);"><i
-                                class="fas fa-credit-card"></i> 결제 수단 선택</h3>
-                        <div class="payment-option-kitsch selected-payment"
-                             onclick="selectPaymentMethod(this, 'toss_payments')">
-                            <i class="fas fa-shield-alt"></i> <span class="pixel-font-kitsch">토스페이먼츠 (카드/간편결제)</span>
-                        </div>
-                        <div class="payment-option-kitsch" onclick="selectPaymentMethod(this, 'bank_transfer')">
-                            <i class="fas fa-university"></i> <span class="pixel-font-kitsch">무통장 입금</span>
-                        </div>
-                        <div id="payment-widget" style="margin-top:1rem;"></div>
-                    </section>
-                    <button class="btn-kitsch primary-btn-kitsch checkout-submit-btn-kitsch retro-shadow-kitsch"
-                            type="submit">
-                        <i class="fas fa-check-circle"></i> 80,200원 결제하기
-                    </button>
-                </div>
+                    </div>
+                    <div class="form-group-kitsch">
+                        <label class="label-kitsch" for="deliveryMessage">배송 요청사항:</label>
+                        <textarea class="textarea-kitsch handwriting-font-kitsch" id="deliveryMessage"
+                                  name="deliveryMessage" placeholder="예: 문 앞에 놓아주세요. 부재 시 연락주세요."
+                                  rows="3"></textarea>
+                    </div>
+                    <div class="form-group-kitsch">
+                        <label class="label-kitsch" for="deliveryDate">배송 희망일 (선택):</label>
+                        <input class="input-kitsch pixel-font-kitsch" id="deliveryDate" name="deliveryDate"
+                               type="date">
+                    </div>
+                </section>
             </div>
-        </form>
+
+            <div class="checkout-sidebar-panel-kitsch">
+                <section class="checkout-section-kitsch payment-summary-kitsch">
+                    <h3 class="summary-title-kitsch"><i class="fas fa-money-check-alt"></i> 최종 결제 금액</h3>
+                    <div class="summary-row-kitsch">
+                        <span class="label">총 상품 금액:</span>
+                        <span class="value" id="summaryTotalProductPrice">88,200원</span>
+                    </div>
+                    <div class="summary-row-kitsch">
+                        <span class="label">총 포장비:</span>
+                        <span class="value" id="summaryPackagingFee">2,000원</span>
+                    </div>
+                    <div class="summary-row-kitsch">
+                        <span class="label">개별 상품 할인:</span>
+                        <span class="value discount" id="summaryItemCouponDiscount">- 4,000원</span>
+                    </div>
+                    <div class="form-group-kitsch" style="margin-top:1rem;">
+                        <label class="label-kitsch" for="orderCoupon" style="font-size:1em;">주문 전체 쿠폰:</label>
+                        <select class="select-kitsch" id="orderCoupon" name="orderCouponId">
+                            <option data-discount="0" value="">쿠폰 선택 안함</option>
+                            <option data-discount="5000" data-discount-type="amount" value="ORDER_WELCOME_5000">
+                                WELCOME! 5,000원 할인
+                            </option>
+                            <option data-discount="10" data-discount-type="percent" value="ORDER_VIP_10_PERCENT">VIP
+                                전용 10% 할인
+                            </option>
+                        </select>
+                    </div>
+                    <div class="form-group-kitsch">
+                        <label class="label-kitsch" for="pointsToUse" style="font-size:1em;">포인트 사용 (보유: 3,500
+                            P):</label>
+                        <div style="display:flex; gap:0.5rem;">
+                            <input class="input-kitsch pixel-font-kitsch" data-available-points="3500"
+                                   id="pointsToUse"
+                                   max="3500" name="pointsToUse" placeholder="사용할 포인트"
+                                   type="number" value="1000">
+                            <button class="btn-kitsch secondary-btn-kitsch color2-kitsch small-btn-kitsch retro-shadow-kitsch-small"
+                                    onclick="applyMaxPoints()"
+                                    style="min-width: fit-content;"
+                                    type="button">전액 사용
+                            </button>
+                        </div>
+                    </div>
+                    <div class="summary-row-kitsch">
+                        <span class="label">주문 전체 할인:</span>
+                        <span class="value discount" id="summaryOrderCouponDiscount">- 5,000원</span>
+                    </div>
+                    <div class="summary-row-kitsch">
+                        <span class="label">포인트 할인:</span>
+                        <span class="value discount" id="summaryPointDiscount">- 1,000원</span>
+                    </div>
+                    <div class="summary-row-kitsch">
+                        <span class="label">배송비:</span>
+                        <span class="value" id="summaryDeliveryFee">0원</span>
+                    </div>
+                    <div class="total-summary-kitsch">
+                        <div class="summary-row-kitsch">
+                            <span class="label">최종 결제금액:</span>
+                            <span class="value" id="summaryFinalTotalPrice">80,200원</span>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="checkout-section-kitsch payment-methods-kitsch">
+                    <h3 class="section-title-kitsch" style="background-color: var(--kitsch-color-4);"><i
+                            class="fas fa-credit-card"></i> 결제 수단 선택</h3>
+                    <div class="payment-option-kitsch selected-payment"
+                         onclick="selectPaymentMethod(this, 'toss_payments')">
+                        <i class="fas fa-shield-alt"></i> <span class="pixel-font-kitsch">토스페이먼츠 (카드/간편결제)</span>
+                    </div>
+                    <div class="payment-option-kitsch" onclick="selectPaymentMethod(this, 'bank_transfer')">
+                        <i class="fas fa-university"></i> <span class="pixel-font-kitsch">무통장 입금</span>
+                    </div>
+                    <div id="payment-widget" style="margin-top:1rem;"></div>
+                </section>
+                <button id="payment-button"
+                        class="btn-kitsch primary-btn-kitsch checkout-submit-btn-kitsch retro-shadow-kitsch"
+                        type="button">
+                    <i class="fas fa-check-circle"></i> <span th:text="${amount} + '원 결제하기'">80,200원 결제하기</span>
+                </button>
+            </div>
+        </div>
+        <!--        </form>-->
     </div>
 </div>
 
 <th:block layout:fragment="page_scripts">
     <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    <script src="https://js.tosspayments.com/v1/payment"></script>
+    <script th:inline="javascript">
+        const clientKey = /*[[${clientKey}]]*/ '';
+        const orderId = /*[[${orderId}]]*/ '';
+        const orderName = /*[[${orderName}]]*/ '';
+        const successUrl = /*[[${successUrl}]]*/ '';
+        const failUrl = /*[[${failUrl}]]*/ '';
+        const customerEmail = /*[[${customerEmail}]]*/ '';
+        const customerName = /*[[${customerName}]]*/ '';
+        const amount = /*[[${amount}]]*/ 0;
+
+        const tossPayments = TossPayments(clientKey);
+
+        function selectPaymentMethod(el, method) {
+
+            document.querySelectorAll('.payment-option-kitsch')
+                .forEach(x => x.classList.remove('selected-payment'));
+            el.classList.add('selected-payment');
+
+            const btn = document.getElementById('payment-button');
+
+            if (method === 'toss_payments') {
+                btn.onclick = function (evt) {
+                    evt.preventDefault();
+                    tossPayments.requestPayment('TOSSPAY', {
+                        amount: amount,
+                        currency: 'KRW',
+                        orderId: orderId,
+                        orderName: orderName,
+                        customerName: customerEmail,
+                        customerEmail: customerName,
+                        successUrl: window.location.origin + successUrl,
+                        failUrl: window.location.origin + failUrl
+                    });
+                };
+            } else if (method === 'bank_transfer') {
+                btn.onclick = function (evt) {
+                    evt.preventDefault();
+                    // 무통장 입금 선택 시 처리 로직
+                    // 예: form.submit() 이나 안내 모달 띄우기
+                    alert('무통장 입금 선택됨. 서버로 주문 정보 보내세요.');
+                };
+            }
+        }
+    </script>
     <script>
         const MOCK_AVAILABLE_POINTS = 3500;
         const MOCK_DELIVERY_THRESHOLD = 30000;
@@ -654,11 +700,6 @@
             updateCheckoutSummary();
         }
 
-        function selectPaymentMethod(element, method) {
-            document.querySelectorAll('.payment-option-kitsch').forEach(el => el.classList.remove('selected-payment'));
-            element.classList.add('selected-payment');
-            console.log("Selected payment method (Mock):", method);
-        }
 
         document.addEventListener('DOMContentLoaded', function () {
             document.querySelectorAll('.item-packaging-select, .item-coupon-select, #orderCoupon, #pointsToUse').forEach(el => {
