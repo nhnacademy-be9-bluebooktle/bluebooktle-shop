@@ -54,6 +54,10 @@ public class CartBook extends BaseEntity {
 		this.quantity = quantity;
 	}
 
+	public static CartBook of(Book book, Cart cart, int quantity) {
+		return new CartBook(book, cart, quantity);
+	}
+
 	public void increaseQuantity(int amount) {
 		this.quantity += amount;
 	}
