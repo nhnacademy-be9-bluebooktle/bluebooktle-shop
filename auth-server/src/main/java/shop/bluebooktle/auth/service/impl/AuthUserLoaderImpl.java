@@ -20,7 +20,7 @@ public class AuthUserLoaderImpl implements AuthUserLoader {
 		User user = userRepository.findById(userId)
 			.orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없습니다 (ID: " + userId + ")"));
 		UserDto userDto = UserDto.builder()
-			.id(user.getId())
+			.id(1L)
 			.loginId(user.getLoginId())
 			.nickname(user.getNickname())
 			.type(user.getType())

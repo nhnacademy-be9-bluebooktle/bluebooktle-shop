@@ -20,7 +20,7 @@ import shop.bluebooktle.common.dto.auth.request.SignupRequest;
 import shop.bluebooktle.common.dto.auth.response.TokenResponse;
 import shop.bluebooktle.common.exception.ApplicationException;
 import shop.bluebooktle.common.exception.ErrorCode;
-import shop.bluebooktle.frontend.service.AuthService;
+import shop.bluebooktle.frontend.service.impl.AuthServiceImpl;
 
 @Slf4j
 @Controller
@@ -28,7 +28,7 @@ import shop.bluebooktle.frontend.service.AuthService;
 @RequiredArgsConstructor
 public class AuthController {
 
-	private final AuthService authService;
+	private final AuthServiceImpl authService;
 
 	@GetMapping("/login")
 	public String loginForm(Model model,
@@ -103,7 +103,7 @@ public class AuthController {
 			return "redirect:/signup";
 		} catch (Exception e) {
 			redirectAttributes.addFlashAttribute("error", "true");
-			redirectAttributes.addFlashAttribute("errorMessage", "알 수 없는 오류로 회원가입에 실패했습니다. 잠시 후 다시 시도해주세요.");
+			redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
 			redirectAttributes.addFlashAttribute("signupRequest", signupRequest);
 			return "redirect:/signup";
 		}
