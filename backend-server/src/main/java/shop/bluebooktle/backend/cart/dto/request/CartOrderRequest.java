@@ -1,4 +1,4 @@
-package shop.bluebooktle.backend.cart.dto;
+package shop.bluebooktle.backend.cart.dto.request;
 
 import java.util.List;
 
