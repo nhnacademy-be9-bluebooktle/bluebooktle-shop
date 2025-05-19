@@ -40,13 +40,12 @@ public class Author extends BaseEntity {
 	private String description;
 
 	@Setter
-	@Column(name = "author_key", nullable = false, columnDefinition = "TEXT")
+	@Column(name = "author_key", nullable = false, length = 50)
 	private String authorKey;
 
 	@Builder
-	public Author(String name, String description, String authorKey) {
+	public Author(String name, String description) {
 		this.name = name;
 		this.description = description;
-		this.authorKey = authorKey;
 	}
 }

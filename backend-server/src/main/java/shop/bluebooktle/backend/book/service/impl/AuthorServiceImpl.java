@@ -37,17 +37,13 @@ public class AuthorServiceImpl implements AuthorService {
 			throw new AuthorFieldNullException();
 		}
 
-		if (authorRepository.existsByName(name)) {
-			throw new AuthorAlreadyExistsException(name);
-		}
-
 		Author author = Author.builder()
 			.name(authorRegisterRequest.getName())
 			.description(authorRegisterRequest.getDescription())
 			.build();
 
 		if (author.getAuthorKey() == null) {
-			author.setAuthorKey("a_null");
+			author.setAuthorKey("null");
 		}
 
 		Author authorSaved = authorRepository.save(author);
@@ -57,14 +53,11 @@ public class AuthorServiceImpl implements AuthorService {
 		authorRepository.save(authorSaved);
 	}
 
+	@Transactional(readOnly = true)
 	@Override
 	public AuthorResponse getAuthor(Long authorId) {
 
-		if (authorId == null) {
-			throw new AuthorIdNullException();
-		}
-
-		Author author = authorRepository.findById(authorId).orElseThrow(() -> new AuthorNotFoundException(authorId));
+		Author author = authorRepository.findById(authorId).orElseThrow(() -> new AuthorNotFoundException(authorId)); // #TODO
 
 		return AuthorResponse.builder()
 			.id(author.getId())
@@ -81,13 +74,9 @@ public class AuthorServiceImpl implements AuthorService {
 		String name = authorUpdateRequest.getName();
 		String description = authorUpdateRequest.getDescription();
 
-		if (authorId == null) {
-			throw new AuthorIdNullException();
-		}
-
 		if ((name == null || name.trim().isEmpty()) &&
 			(description == null || description.trim().isEmpty())) {
-			throw new AuthorUpdateFieldMissingException();
+			throw new AuthorUpdateFieldMissingException(); // #TODO
 		}
 
 		Author author = authorRepository.findById(authorId).orElseThrow(() -> new AuthorNotFoundException(authorId));
@@ -105,9 +94,7 @@ public class AuthorServiceImpl implements AuthorService {
 
 	@Override
 	public void deleteAuthor(Long authorId) {
-		if (authorId == null) {
-			throw new AuthorIdNullException();
-		}
+
 		Author author = authorRepository.findById(authorId).orElseThrow(() -> new AuthorNotFoundException(authorId));
 		authorRepository.delete(author);
 	}
