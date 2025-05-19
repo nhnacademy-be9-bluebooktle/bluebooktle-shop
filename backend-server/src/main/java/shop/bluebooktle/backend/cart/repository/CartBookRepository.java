@@ -23,9 +23,6 @@ public interface CartBookRepository extends JpaRepository<CartBook, Long> {
 	// 개별 삭제
 	void delete(CartBook cartBook);
 
-	// 일괄 삭제 TODO 기본 jpa 와 충돌
-	// void deleteAll(List<CartBook> cartBooks);
-
 	// 저장 (수량 증가 등)
 	CartBook save(CartBook cartBook);
 }
