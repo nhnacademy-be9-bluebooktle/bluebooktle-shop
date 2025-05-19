@@ -1,9 +1,9 @@
 package shop.bluebooktle.backend.order.service.impl;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +24,7 @@ public class OrderServiceImpl implements OrderService {
 	private final OrderStateRepository orderStateRepository;
 
 	@Override
-	public List<Order> getUserOrders(User user, OrderStatus status, LocalDateTime start, LocalDateTime end,
+	public Page<Order> getUserOrders(User user, OrderStatus status, LocalDateTime start, LocalDateTime end,
 		Pageable pageable) {
 		if (status == null && start != null && end != null) {
 			return orderRepository.findByUserAndOrderDateBetween(user, start, end, pageable);
@@ -40,7 +40,7 @@ public class OrderServiceImpl implements OrderService {
 	@Override
 	public Order getOrderByOrderKey(UUID orderKey) {
 		return orderRepository.findByOrderKey(orderKey)
-			.orElseThrow(() -> new OrderNotFoundException("주문을 찾을 수 없습니다."));
+			.orElseThrow(() -> new OrderNotFoundException());
 	}
-	
+
 }

@@ -25,6 +25,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import shop.bluebooktle.common.entity.auth.User;
+import shop.bluebooktle.common.exception.InvalidInputValueException;
 
 @Entity
 @Getter
@@ -119,6 +120,9 @@ public class Order {
 	}
 
 	public void changeOrderState(OrderState newState) {
+		if (newState == null) {
+			throw new InvalidInputValueException("주문 상태는 null일 수 없습니다.");
+		}
 		this.orderState = newState;
 	}
 }
