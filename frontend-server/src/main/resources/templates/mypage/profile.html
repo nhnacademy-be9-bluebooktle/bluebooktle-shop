@@ -5,7 +5,6 @@
 <head>
     <title>마이페이지 - 내 정보 관리</title>
     <style>
-        /* 기존 스타일 유지 */
         .profile-info-grid-kitsch {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -27,11 +26,6 @@
             border-radius: 3px;
         }
 
-        /* .success-message-kitsch 및 .error-message-kitsch 스타일은 모달에서 자체적으로 처리하므로 제거하거나,
-           모달 외부의 다른 메시지에 필요하다면 유지할 수 있습니다. 여기서는 모달만 사용하므로 주석 처리 또는 제거합니다.
-        .success-message-kitsch { ... }
-        .error-message-kitsch { ... }
-        */
     </style>
 </head>
 
@@ -167,21 +161,15 @@
 </div>
 <th:block layout:fragment="page_scripts">
     <script>
-        // JavaScript는 이전과 동일하게 유지하거나, 필요에 따라 수정합니다.
-        // 모달 자동 표시는 popup_modal.html의 data-auto-show와 관련 JS에 의해 처리됩니다.
-
         document.getElementById('passwordChangeForm')?.addEventListener('submit', function (e) {
             e.preventDefault();
             const newPassword = document.getElementById('newPassword').value;
             const confirmNewPassword = document.getElementById('confirmNewPassword').value;
             if (newPassword !== confirmNewPassword) {
-                // 이 부분도 모달로 변경하고 싶다면, 별도의 JS 함수를 호출하여
-                // globalErrorMessage 등을 설정하고 모달을 직접 트리거해야 합니다.
-                // 여기서는 일단 alert 유지
                 alert('새 비밀번호와 확인 비밀번호가 일치하지 않습니다. (Mock)');
                 return false;
             }
-            alert('비밀번호가 성공적으로 변경되었습니다! (Mock)'); // 실제로는 AJAX 등으로 처리 후 모달 표시
+            alert('비밀번호가 성공적으로 변경되었습니다! (Mock)');
             this.reset();
         });
 
@@ -199,18 +187,13 @@
                 if (profileLink) profileLink.classList.add('active');
             }
 
-            // 자동 표시 모달 로직 (popup_modal.html의 data-auto-show='true'를 위한 지원)
-            // 이 로직은 공통 JS에 있을 가능성이 높습니다. 없다면 추가 필요.
-            // 예시:
+
             document.querySelectorAll('.modal-overlay-kitsch[data-auto-show="true"]').forEach(modal => {
-                // th:if 조건에 의해 이미 렌더링 된 모달만 해당됩니다.
-                // 즉, globalSuccessMessage 등이 있어서 실제로 DOM에 존재하는 모달만 표시됩니다.
-                if (modal.style.display !== 'flex') { // 중복 표시 방지 (필요시)
+                if (modal.style.display !== 'flex') {
                     modal.style.display = 'flex';
                 }
             });
 
-            // 모든 js-modal-close-trigger 요소에 이벤트 리스너 추가
             document.querySelectorAll('.js-modal-close-trigger').forEach(trigger => {
                 trigger.addEventListener('click', function () {
                     const targetModalId = this.getAttribute('data-modal-target');
@@ -227,21 +210,16 @@
 
 <th:block layout:fragment="page_scripts">
     <script>
-        // JavaScript는 이전과 동일하게 유지하거나, 필요에 따라 수정합니다.
-        // 모달 자동 표시는 popup_modal.html의 data-auto-show와 관련 JS에 의해 처리됩니다.
 
         document.getElementById('passwordChangeForm')?.addEventListener('submit', function (e) {
             e.preventDefault();
             const newPassword = document.getElementById('newPassword').value;
             const confirmNewPassword = document.getElementById('confirmNewPassword').value;
             if (newPassword !== confirmNewPassword) {
-                // 이 부분도 모달로 변경하고 싶다면, 별도의 JS 함수를 호출하여
-                // globalErrorMessage 등을 설정하고 모달을 직접 트리거해야 합니다.
-                // 여기서는 일단 alert 유지
                 alert('새 비밀번호와 확인 비밀번호가 일치하지 않습니다. (Mock)');
                 return false;
             }
-            alert('비밀번호가 성공적으로 변경되었습니다! (Mock)'); // 실제로는 AJAX 등으로 처리 후 모달 표시
+            alert('비밀번호가 성공적으로 변경되었습니다! (Mock)');
             this.reset();
         });
 
@@ -259,18 +237,12 @@
                 if (profileLink) profileLink.classList.add('active');
             }
 
-            // 자동 표시 모달 로직 (popup_modal.html의 data-auto-show='true'를 위한 지원)
-            // 이 로직은 공통 JS에 있을 가능성이 높습니다. 없다면 추가 필요.
-            // 예시:
             document.querySelectorAll('.modal-overlay-kitsch[data-auto-show="true"]').forEach(modal => {
-                // th:if 조건에 의해 이미 렌더링 된 모달만 해당됩니다.
-                // 즉, globalSuccessMessage 등이 있어서 실제로 DOM에 존재하는 모달만 표시됩니다.
-                if (modal.style.display !== 'flex') { // 중복 표시 방지 (필요시)
+                if (modal.style.display !== 'flex') {
                     modal.style.display = 'flex';
                 }
             });
 
-            // 모든 js-modal-close-trigger 요소에 이벤트 리스너 추가
             document.querySelectorAll('.js-modal-close-trigger').forEach(trigger => {
                 trigger.addEventListener('click', function () {
                     const targetModalId = this.getAttribute('data-modal-target');
