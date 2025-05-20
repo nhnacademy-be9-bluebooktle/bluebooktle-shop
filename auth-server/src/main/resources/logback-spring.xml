@@ -22,7 +22,7 @@
             </encoder>
         </appender>
 
-        <logger name="shop.bluebooktle.frontend" level="INFO">
+        <logger name="shop.bluebooktle.auth" level="INFO">
             <appender-ref ref="systemLogAppender"/>
         </logger>
 
@@ -54,7 +54,7 @@
             </encoder>
         </appender>
 
-        <logger name="shop.bluebooktle.frontend" level="DEBUG">
+        <logger name="shop.bluebooktle.auth" level="DEBUG">
             <appender-ref ref="systemLogAppender"/>
         </logger>
 
@@ -70,7 +70,7 @@
             </encoder>
         </appender>
 
-        <logger name="shop.bluebooktle.frontend" level="DEBUG">
+        <logger name="shop.bluebooktle.auth" level="DEBUG">
             <appender-ref ref="STDOUT"/>
         </logger>
 
