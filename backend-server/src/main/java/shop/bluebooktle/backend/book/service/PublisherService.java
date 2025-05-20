@@ -23,4 +23,6 @@ public interface PublisherService {
 	// 출판사 삭제
 	void deletePublisher(Long publisherId);
 
+	PublisherInfoResponse registerPublisherByName(String publisherName);
+
 }

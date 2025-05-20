@@ -1,7 +1,7 @@
 package shop.bluebooktle.backend.book.repository;
 
-import java.util.Optional;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -12,7 +12,7 @@ import shop.bluebooktle.backend.book.entity.Author;
 public interface AuthorRepository extends JpaRepository<Author, Long> {
 
 	// (작가 이름으로) 작가 조회
-	List <Author> findByName(String name);
+	Optional<Author> findByName(String name);
 
 	boolean existsByName(String name);
 

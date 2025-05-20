@@ -36,11 +36,19 @@ public class BookController {
 	private final BookRegisterService bookRegisterService;
 
 	//도서 정보 등록
-	@PostMapping
+	@PostMapping("/only-book-table")
 	public ResponseEntity<JsendResponse<BookRegisterResponse>> registerBook(
 		@Valid @RequestBody BookRegisterRequest request) {
 		BookRegisterResponse response = bookService.registerBook(request);
 		return ResponseEntity.status(HttpStatus.CREATED).body(JsendResponse.success(response));
+	}
+
+	//도서 등록
+	@PostMapping
+	public ResponseEntity<JsendResponse<Void>> registerBook(
+		@Valid @RequestBody BookAllRegisterRequest request) {
+		bookRegisterService.registerBook(request);
+		return ResponseEntity.status(HttpStatus.CREATED).body(JsendResponse.success());
 	}
 
 	//도서 정보 조회
@@ -65,14 +73,6 @@ public class BookController {
 	public ResponseEntity<JsendResponse<Void>> deleteBook(@PathVariable Long bookId) {
 		bookService.deleteBook(bookId);
 		return ResponseEntity.ok(JsendResponse.success());
-	}
-
-	//해당 도서 관련된 모든 정보(도서,도서 판매정보,작가,출판사,태그,이미지,카테고리)까지 등록
-	@PostMapping("/all")
-	public ResponseEntity<JsendResponse<Void>> registerBookAll(
-		@Valid @RequestBody BookAllRegisterRequest request) {
-		bookRegisterService.registerBook(request);
-		return ResponseEntity.status(HttpStatus.CREATED).body(JsendResponse.success());
 	}
 
 	//해당 도서 관련된 모든 정보(도서,도서 판매정보,작가,출판사,태그,이미지,카테고리)까지 bookId로 조회

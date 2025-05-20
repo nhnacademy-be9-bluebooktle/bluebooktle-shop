@@ -69,4 +69,15 @@ public class PublisherServiceImpl implements PublisherService {
 		}
 		publisherRepository.delete(publisher);
 	}
+
+	@Override
+	public PublisherInfoResponse registerPublisherByName(String publisherName) {
+		Publisher publisher = publisherRepository.findByName(publisherName)
+			.orElseGet(() -> publisherRepository.save(
+				Publisher.builder()
+					.name(publisherName)
+					.build()
+			));
+		return new PublisherInfoResponse(publisher.getId(), publisher.getName());
+	}
 }

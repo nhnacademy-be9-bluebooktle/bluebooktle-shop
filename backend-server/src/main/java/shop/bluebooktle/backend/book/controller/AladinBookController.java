@@ -29,6 +29,7 @@ public class AladinBookController {
 	private final BookRegisterService bookRegisterService;
 
 	// 알라딘 API 도서 검색
+	// TODO Pagenation 구현
 	@GetMapping
 	public ResponseEntity<JsendResponse<List<AladinBookResponse>>> searchBooks(@RequestParam String query) {
 		List<AladinBookResponse> result = aladinBookService.searchBooks(query);

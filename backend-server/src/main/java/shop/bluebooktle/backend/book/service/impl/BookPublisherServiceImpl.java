@@ -47,13 +47,20 @@ public class BookPublisherServiceImpl implements BookPublisherService {
 	}
 
 	@Override
+	public void registerBookPublisher(Long bookId, List<Long> publisherIdList) {
+		for (Long publisherId : publisherIdList) {
+			registerBookPublisher(bookId, publisherId);
+		}
+	}
+
+	@Override
 	public void deleteBookPublisher(Long bookId, Long publisherId) {
 		Book book = findBookOrThrow(bookId);
 		Publisher publisher = findPublisherOrThrow(publisherId);
 
 		BookPublisher bookPublisher = bookPublisherRepository.findByBookAndPublisher(book, publisher)
 			.orElseThrow(() -> new BookPublisherNotFoundException(bookId, publisherId));
-		
+
 		bookPublisherRepository.delete(bookPublisher);
 	}
 
