@@ -13,9 +13,9 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 @EnableFeignClients
 @EntityScan(basePackages = {
 	"shop.bluebooktle.backend",
-	"shop.bluebooktle.common.entity",
+	"shop.bluebooktle.common.entity"
 })
-@EnableAspectJAutoProxy(proxyTargetClass = true)
+@EnableAspectJAutoProxy()
 public class BackendServerApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(BackendServerApplication.class, args);

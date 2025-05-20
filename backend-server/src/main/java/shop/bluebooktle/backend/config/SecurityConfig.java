@@ -1,4 +1,3 @@
-// src/main/java/shop/bluebooktle/backend/config/SecurityConfig.java
 package shop.bluebooktle.backend.config;
 
 import org.springframework.context.annotation.Bean;
@@ -28,7 +27,7 @@ public class SecurityConfig {
 			.authorizeHttpRequests(authz -> authz
 				.anyRequest().authenticated()
 			);
-		
+
 		http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
 		return http.build();
