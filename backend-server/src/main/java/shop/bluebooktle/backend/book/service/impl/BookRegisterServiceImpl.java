@@ -1,6 +1,8 @@
 package shop.bluebooktle.backend.book.service.impl;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -10,30 +12,21 @@ import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.book.dto.request.BookAllRegisterByAladinRequest;
 import shop.bluebooktle.backend.book.dto.request.BookAllRegisterRequest;
 import shop.bluebooktle.backend.book.dto.response.AladinBookResponse;
+import shop.bluebooktle.backend.book.dto.response.PublisherInfoResponse;
+import shop.bluebooktle.backend.book.dto.response.author.AuthorResponse;
 import shop.bluebooktle.backend.book.entity.Book;
-import shop.bluebooktle.backend.book.entity.BookCategory;
-import shop.bluebooktle.backend.book.entity.BookImg;
-import shop.bluebooktle.backend.book.entity.BookPublisher;
 import shop.bluebooktle.backend.book.entity.BookSaleInfo;
-import shop.bluebooktle.backend.book.entity.BookTag;
-import shop.bluebooktle.backend.book.entity.Category;
-import shop.bluebooktle.backend.book.entity.Img;
-import shop.bluebooktle.backend.book.entity.Publisher;
-import shop.bluebooktle.backend.book.entity.Tag;
-import shop.bluebooktle.backend.book.repository.AuthorRepository;
-import shop.bluebooktle.backend.book.repository.BookAuthorRepository;
-import shop.bluebooktle.backend.book.repository.BookCategoryRepository;
-import shop.bluebooktle.backend.book.repository.BookImgRepository;
-import shop.bluebooktle.backend.book.repository.BookPublisherRepository;
 import shop.bluebooktle.backend.book.repository.BookRepository;
 import shop.bluebooktle.backend.book.repository.BookSaleInfoRepository;
-import shop.bluebooktle.backend.book.repository.BookTagRepository;
-import shop.bluebooktle.backend.book.repository.CategoryRepository;
-import shop.bluebooktle.backend.book.repository.ImgRepository;
-import shop.bluebooktle.backend.book.repository.PublisherRepository;
-import shop.bluebooktle.backend.book.repository.TagRepository;
 import shop.bluebooktle.backend.book.service.AladinBookService;
+import shop.bluebooktle.backend.book.service.AuthorService;
+import shop.bluebooktle.backend.book.service.BookAuthorService;
+import shop.bluebooktle.backend.book.service.BookCategoryService;
+import shop.bluebooktle.backend.book.service.BookImgService;
+import shop.bluebooktle.backend.book.service.BookPublisherService;
 import shop.bluebooktle.backend.book.service.BookRegisterService;
+import shop.bluebooktle.backend.book.service.BookTagService;
+import shop.bluebooktle.backend.book.service.PublisherService;
 import shop.bluebooktle.common.exception.book.AladinBookNotFoundException;
 import shop.bluebooktle.common.exception.book.BookAlreadyExistsException;
 
@@ -46,19 +39,14 @@ public class BookRegisterServiceImpl implements BookRegisterService {
 	private final BookSaleInfoRepository bookSaleInfoRepository;
 	private final AladinBookService aladinBookService;
 
-	private final AuthorRepository authorRepository;
-	private final PublisherRepository publisherRepository;
-	private final CategoryRepository categoryRepository;
-	private final ImgRepository imgRepository;
-	private final TagRepository tagRepository;
+	private final BookPublisherService bookPublisherService;
+	private final BookCategoryService bookCategoryService;
+	private final BookTagService bookTagService;
+	private final BookImgService bookImgService;
+	private final BookAuthorService bookAuthorService;
+	private final AuthorService authorService;
+	private final PublisherService publisherService;
 
-	private final BookAuthorRepository bookAuthorRepository;
-	private final BookPublisherRepository bookPublisherRepository;
-	private final BookCategoryRepository bookCategoryRepository;
-	private final BookImgRepository bookImgRepository;
-	private final BookTagRepository bookTagRepository;
-
-	//연관테이블 완성되면 수정필요 일단기능구현만
 	@Override
 	public void registerBook(BookAllRegisterRequest request) {
 		Optional<Book> existBook = bookRepository.findByIsbn(request.getIsbn());
@@ -79,25 +67,17 @@ public class BookRegisterServiceImpl implements BookRegisterService {
 			.divide(request.getPrice(), 2, BigDecimal.ROUND_HALF_UP)
 			.multiply(BigDecimal.valueOf(100));
 
-		//작가, 출판사, 태그, 이미지, 카테고리 - 수정필요
-		// 연관테이블 완성되면 나중에 대략 이런식으로 수정
-		// authorService.saveAuthors(request.getAuthor(), book);
-		// publisherService.savePublisher(request.getPublisher(), book);
-		// categoryService.saveCategories(request.getCategory(), book);
-		// imageService.saveImages(request.getImageUrl(), book, false);
-		// tagService.saveTags(request.getTag(), book);
+		bookAuthorService.registerBookAuthor(book.getId(), request.getAuthorIdList());
 
-		// for (String authorName : request.getAuthor()) {
-		// 	Author author = authorRepository.findByName(authorName)
-		// 		.orElseGet(() -> authorRepository.save(
-		// 			Author.builder()
-		// 				.name(authorName)
-		// 				.description("설명 없음")
-		// 				.authorKey(UUID.randomUUID().toString())
-		// 				.build()
-		// 		));
-		// 	bookAuthorRepository.save(new BookAuthor(author, book));
-		// }
+		bookPublisherService.registerBookPublisher(book.getId(), request.getAuthorIdList());
+
+		bookCategoryService.registerBookCategory(book.getId(), request.getCategoryIdList());
+
+		bookTagService.registerBookTag(book.getId(), request.getTagIdList());
+
+		// TODO 일단 이미지를 url을 받아와서 저장되도록(이미지 테이블에 저장 및 도서이미지에 저장)
+		// TODO 이미지 파일 이미지 서버(MINIO)에 저장 로직 구현
+		bookImgService.registerBookImg(book.getId(), request.getThumbnailUrl());
 
 		BookSaleInfo bookSaleInfo = BookSaleInfo.builder()
 			.book(book)
@@ -112,63 +92,64 @@ public class BookRegisterServiceImpl implements BookRegisterService {
 		bookSaleInfoRepository.save(bookSaleInfo);
 	}
 
-	//연관테이블 완성되면 수정필요 일단기능구현만
 	@Override
 	public void registerBookByAladin(BookAllRegisterByAladinRequest request) {
-		Optional<Book> existBook = bookRepository.findByIsbn(request.getIsbn());
-		if (existBook.isPresent()) {
+		// 이미 등록된 도서인 경우(중복 isbn 처리)
+		if (bookRepository.existsByIsbn(request.getIsbn())) {
 			throw new BookAlreadyExistsException();
 		}
-
-		AladinBookResponse aladin = aladinBookService.getBookByIsbn(request.getIsbn());
-		if (aladin == null) {
+		AladinBookResponse aladinBook = aladinBookService.getBookByIsbn(request.getIsbn());
+		if (aladinBook == null) {
 			throw new AladinBookNotFoundException("알라딘 API에서 해당 ISBN의 도서를 찾을 수 없습니다.");
 		}
 
 		//book 정보 저장
 		Book book = Book.builder()
-			.title(aladin.getTitle())
-			.description(aladin.getDescription())
-			.isbn(aladin.getIsbn())
-			.publishDate(aladin.getPublishDate().toLocalDate().atStartOfDay())
+			.title(aladinBook.getTitle())
+			.description(aladinBook.getDescription())
+			.isbn(aladinBook.getIsbn())
+			.publishDate(aladinBook.getPublishDate().toLocalDate().atStartOfDay())
 			.build();
 		bookRepository.save(book);
 
-		// Author author = authorRepository.findByName(aladin.getAuthor())
-		// 	.orElseGet(() -> authorRepository.save(new Author(aladin.getAuthor())));
-		// bookAuthorRepository.save(new BookAuthor(author, book));
+		List<String> authorsName = parseAuthors(aladinBook.getAuthor());
+		for (String authorName : authorsName) {
+			// 도서에 작가 등록 (작가 없으면 작가 테이블에 등록)
+			AuthorResponse author = authorService.registerAuthorByName(authorName);
+			bookAuthorService.registerBookAuthor(book.getId(), author.getId());
+		}
+		// 도서에 출판사 등록 (출판사 없으면 출판사 테이블에 등록)
+		PublisherInfoResponse publisher = publisherService.registerPublisherByName(aladinBook.getPublisher());
+		bookPublisherService.registerBookPublisher(book.getId(), publisher.getId());
 
-		Publisher publisher = publisherRepository.findByName(aladin.getPublisher())
-			.orElseGet(() -> publisherRepository.save(new Publisher(aladin.getPublisher())));
-		bookPublisherRepository.save(new BookPublisher(book, publisher));
+		// TODO 이미지 파일 이미지 서버(MINIO)에 저장 로직 구현
+		bookImgService.registerBookImg(book.getId(), aladinBook.getImageUrl());
 
-		Category category = Optional.ofNullable(
-			categoryRepository.findByName(aladin.getCategoryName())
-		).orElseGet(() -> categoryRepository.save(new Category(null, aladin.getCategoryName(), "")));
-		bookCategoryRepository.save(new BookCategory(book, category));
+		for (Long categoryId : request.getCategoryIdList()) {
+			bookCategoryService.registerBookCategory(book.getId(), categoryId);
+		}
 
-		Img img = imgRepository.findByImgUrl(aladin.getImageUrl())
-			.orElseGet(() -> imgRepository.save(new Img(aladin.getImageUrl())));
-		bookImgRepository.save(new BookImg(book, img, true));
-
-		if (request.getTag() != null && !request.getTag().isEmpty()) {
-			for (String tagName : request.getTag()) {
-				Tag tag = tagRepository.findByName(tagName).stream()
-					.findFirst()
-					.orElseGet(() -> tagRepository.save(new Tag(tagName)));
-				bookTagRepository.save(new BookTag(tag, book));
-			}
+		for (Long tagId : request.getTagIdList()) {
+			bookTagService.registerBookTag(book.getId(), tagId);
 		}
 
 		BookSaleInfo saleInfo = BookSaleInfo.builder()
 			.book(book)
-			.price(aladin.getPrice())
-			.salePrice(aladin.getSalePrice())
-			.salePercentage(aladin.getSalePercentage())
+			.price(aladinBook.getPrice())
+			.salePrice(aladinBook.getSalePrice())
+			.salePercentage(aladinBook.getSalePercentage())
 			.stock(request.getStock())
 			.isPackable(request.getIsPackable())
 			.state(request.getState())
 			.build();
 		bookSaleInfoRepository.save(saleInfo);
+	}
+
+	private List<String> parseAuthors(String author) {
+		int index = author.indexOf("(지은이)");
+		String authorsStr = author.substring(0, index);
+		return Arrays.stream(authorsStr.split(","))
+			.map(String::trim)
+			.toList();
 	}
 }

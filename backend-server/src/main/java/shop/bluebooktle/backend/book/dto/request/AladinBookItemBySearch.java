@@ -1,14 +1,19 @@
 package shop.bluebooktle.backend.book.dto.request;
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import lombok.Getter;
+import shop.bluebooktle.backend.book.dto.response.AladinAuthorResponse;
 
 @Getter
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class AladinBookItem {
+public class AladinBookItemBySearch {
 	private String title;
 	private String author;
+	private Long authorId;
+	private List<AladinAuthorResponse> authors;
 	private String description;
 	private String pubDate;
 	private String isbn13;

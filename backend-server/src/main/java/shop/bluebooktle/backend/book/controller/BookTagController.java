@@ -30,7 +30,7 @@ public class BookTagController {
 		@PathVariable Long tagId,
 		@PathVariable Long bookId
 	) {
-		bookTagService.registerBookTag(tagId, bookId);
+		bookTagService.registerBookTag(bookId, tagId);
 		return ResponseEntity.status(HttpStatus.CREATED).body(JsendResponse.success());
 	}
 

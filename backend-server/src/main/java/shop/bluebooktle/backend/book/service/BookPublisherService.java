@@ -13,6 +13,8 @@ public interface BookPublisherService {
 	// 도서 출판사 등록
 	void registerBookPublisher(Long bookId, Long publisherId);
 
+	void registerBookPublisher(Long bookId, List<Long> publisherIdList);
+
 	// 도서 출판사 삭제
 	void deleteBookPublisher(Long bookId, Long publisherId);
 
