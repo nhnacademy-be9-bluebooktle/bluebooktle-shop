@@ -147,12 +147,12 @@ class UserCouponServiceTest {
 		Pageable pageable = PageRequest.of(0, 10);
 		Page<UserCouponResponse> page = new PageImpl<>(List.of());
 
-		given(userCouponRepository.findAllByAvailableUserCoupon(user, pageable)).willReturn(page);
+		given(userCouponRepository.findAllByUsableUserCoupon(user, pageable)).willReturn(page);
 
-		Page<UserCouponResponse> result = userCouponService.getAvailableUserCoupons(user, pageable);
+		Page<UserCouponResponse> result = userCouponService.getUsableUserCoupons(user, pageable);
 
 		assertThat(result.getContent()).isInstanceOf(List.class);
-		verify(userCouponRepository).findAllByAvailableUserCoupon(user, pageable);
+		verify(userCouponRepository).findAllByUsableUserCoupon(user, pageable);
 	}
 
 	@Test
