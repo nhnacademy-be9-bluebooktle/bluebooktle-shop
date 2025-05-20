@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import jakarta.validation.Valid;
 import shop.bluebooktle.common.dto.payment.reponse.TossConfirmResponse;
 import shop.bluebooktle.common.dto.payment.request.TossConfirmRequest;
 import shop.bluebooktle.frontend.service.TossPaymentsService;
@@ -20,13 +22,12 @@ import shop.bluebooktle.frontend.service.TossPaymentsService;
 public class OrderController {
 
 	private final TossPaymentsService tossPaymentsService;
+	@Value("${toss.client-key}")
+	private String clientKey;
 
 	public OrderController(TossPaymentsService tossPaymentsService) {
 		this.tossPaymentsService = tossPaymentsService;
 	}
-
-	@Value("${toss.client-key}")
-	private String clientKey;
 
 	@GetMapping("/checkout")
 	public ModelAndView checkoutPage() {
@@ -56,8 +57,12 @@ public class OrderController {
 	}
 
 	@GetMapping("/complete")
-	public String orderCompletePage(@ModelAttribute("orderData") TossConfirmResponse data) {
-		
+	public String orderCompletePage(@Valid @ModelAttribute("orderData") TossConfirmResponse data,
+		BindingResult bindingResult) {
+		if (bindingResult.hasErrors()) {
+			return "order/fail";
+		}
+
 		return "order/complete";
 	}
 
