@@ -31,8 +31,3 @@ toss:
     url: https://api.tosspayments.com/v1
   secret-key: test_sk_LlDJaYngroXzQGEQlMlv8ezGdRpX
   client-key: test_ck_0RnYX2w532oJMLLx9JBPVNeyqApQ
-
-logging:
-  level:
-    shop.bluebooktle.book: DEBUG
-    org.hibernate.SQL: DEBUG

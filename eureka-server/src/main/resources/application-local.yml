@@ -11,8 +11,3 @@ eureka:
     serviceUrl:
       defaultZone: http://blue:blueBooktle12@localhost:9761/eureka/
 
-logging:
-  level:
-    com.netflix.eureka: OFF
-    com.netflix.discovery: OFF
-    shop.bluebooktle.eureka: DEBUG
