@@ -92,7 +92,7 @@ public class CouponServiceImpl implements CouponService {
 
 		// dirty checking 방식
 		coupon.update(request.getName());
-
+		// TODO [쿠폰] save로 변경
 		if (couponType.getTarget() == CouponTypeTarget.BOOK) {
 			updateCouponTarget(coupon, request);
 		}

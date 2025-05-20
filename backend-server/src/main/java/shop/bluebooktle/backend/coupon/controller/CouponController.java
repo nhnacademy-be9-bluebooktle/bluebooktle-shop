@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.coupon.service.CouponService;
@@ -25,18 +27,21 @@ import shop.bluebooktle.common.dto.coupon.response.CouponResponse;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping
+@RequestMapping("/api/admin/coupon")
+@Tag(name = "쿠폰 API", description = "관리자 쿠폰 CRUD API")
 public class CouponController {
 
 	private final CouponService couponService;
 
-	@PostMapping("/api/admin/coupons")
+	@Operation(summary = "쿠폰 등록", description = "새로운 쿠폰을 등록합니다.")
+	@PostMapping
 	public ResponseEntity<JsendResponse<Void>> registerCoupon(@Valid @RequestBody CouponRegisterRequest request) {
 		couponService.registerCoupon(request);
 		return ResponseEntity.status(HttpStatus.CREATED).body(JsendResponse.success());
 	}
 
-	@GetMapping("/api/admin/coupons")
+	@Operation(summary = "쿠폰 조회", description = "등록된 쿠폰을 조회합니다.")
+	@GetMapping
 	public ResponseEntity<JsendResponse<PaginationData<CouponResponse>>> getAllCoupons(
 		@PageableDefault(size = 10, sort = "id") Pageable pageable) {
 		Page<CouponResponse> couponPage = couponService.getAllCoupons(pageable);
@@ -44,14 +49,16 @@ public class CouponController {
 		return ResponseEntity.ok(JsendResponse.success(paginationData));
 	}
 
-	@PatchMapping("/api/admin/coupon/{id}")
+	@Operation(summary = "쿠폰 수정", description = "등록된 쿠폰을 수정합니다.")
+	@PatchMapping("/{id}")
 	public ResponseEntity<JsendResponse<Void>> updateCoupon(@PathVariable Long id,
 		@Valid @RequestBody CouponUpdateRequest request) {
 		couponService.updateCoupon(id, request);
 		return ResponseEntity.ok(JsendResponse.success());
 	}
 
-	@DeleteMapping("/api/admin/coupon/{id}")
+	@Operation(summary = "쿠폰 삭제", description = "등록된 쿠폰을 삭제합니다.")
+	@DeleteMapping("/{id}")
 	public ResponseEntity<JsendResponse<Void>> deleteCoupon(@PathVariable Long id) {
 		couponService.deleteCoupon(id);
 		return ResponseEntity.ok(JsendResponse.success());

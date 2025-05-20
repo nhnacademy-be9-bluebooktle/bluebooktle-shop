@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.coupon.service.CouponTypeService;
@@ -22,11 +24,12 @@ import shop.bluebooktle.common.dto.coupon.response.CouponTypeResponse;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/admin/coupon-type")
+@Tag(name = "쿠폰 정책 API", description = "관리자 쿠폰 정책 CRUD 관련 API")
 public class CouponTypeController {
 
 	private final CouponTypeService couponTypeService;
 
-	//쿠폰 정책 등록
+	@Operation(summary = "쿠폰 정책 등록", description = "새로운 쿠폰 정책을 등록합니다.")
 	@PostMapping
 	public ResponseEntity<JsendResponse<Void>> registerCouponType(
 		@RequestBody @Valid CouponTypeRegisterRequest request) {
@@ -34,7 +37,7 @@ public class CouponTypeController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(JsendResponse.success());
 	}
 
-	// 쿠폰 정책 전체 조회
+	@Operation(summary = "쿠폰 정책 조회", description = "등록된 쿠폰 정책을 조회합니다.")
 	@GetMapping
 	public ResponseEntity<JsendResponse<PaginationData<CouponTypeResponse>>> findAllCouponTypeList(
 		@PageableDefault(size = 10, sort = "id") Pageable pageable) {

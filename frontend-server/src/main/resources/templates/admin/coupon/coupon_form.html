@@ -3,122 +3,28 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title th:text="${pageTitle} ?: '쿠폰 정책 폼'"></title>
+    <meta charset="UTF-8"/>
+    <title>쿠폰 등록</title>
     <th:block layout:fragment="page_css">
         <style>
-            .form-section {
-                margin-bottom: 25px;
-                padding-bottom: 15px;
-                border-bottom: 1px solid #eee;
-            }
-
-            .form-section:last-child {
-                border-bottom: none;
-            }
-
-            .form-subsection {
-                margin-left: 20px;
-                margin-top: 15px;
-            }
-
-            .target-specific-options {
-                margin-top: 10px;
+            .selectable-item {
+                border: 1px solid #ccc;
                 padding: 10px;
-                border: 1px dashed #ddd;
-            }
-
-            /* 선택된 아이템 표시 스타일 */
-            .selected-items-container {
-                border: 1px solid #ced4da;
-                padding: 10px;
-                min-height: 40px;
-                border-radius: .25rem;
-                margin-top: 10px;
-            }
-
-            .selected-item {
-                display: inline-flex;
-                align-items: center;
-                background-color: #007bff;
-                color: white;
-                padding: 5px 10px;
-                margin: 2px;
-                border-radius: 3px;
-                font-size: 0.9em;
-            }
-
-            .selected-item .remove-item {
-                margin-left: 8px;
-                color: #ffc107;
-                cursor: pointer;
-                font-weight: bold;
-            }
-
-            .selected-item .remove-item:hover {
-                color: #fff;
-            }
-
-            /* 모달 스타일 (admin_styles.css 에 이미 유사한 스타일이 있을 수 있음) */
-            .admin-modal {
-                display: none; /* Hidden by default */
-                position: fixed; /* Stay in place */
-                z-index: 1050; /* Sit on top */
-                left: 0;
-                top: 0;
-                width: 100%; /* Full width */
-                height: 100%; /* Full height */
-                overflow: auto; /* Enable scroll if needed */
-                background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
-            }
-
-            .admin-modal-content {
-                background-color: #fefefe;
-                margin: 10% auto; /* 10% from the top and centered */
-                padding: 20px;
-                border: 1px solid #888;
-                width: 80%; /* Could be more or less, depending on screen size */
-                max-width: 600px;
+                margin-bottom: 5px;
                 border-radius: 5px;
-                position: relative;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
             }
 
-            .admin-modal-close-btn {
-                color: #aaa;
-                float: right;
-                font-size: 28px;
-                font-weight: bold;
-                position: absolute;
-                top: 10px;
-                right: 20px;
+            .selectable-item.selected {
+                background-color: #e6f7ff;
+                border-color: #1890ff;
             }
 
-            .admin-modal-close-btn:hover,
-            .admin-modal-close-btn:focus {
-                color: black;
-                text-decoration: none;
-                cursor: pointer;
-            }
-
-            .search-results-list {
-                list-style-type: none;
-                padding: 0;
-                max-height: 200px;
-                overflow-y: auto;
-                border: 1px solid #ddd;
-            }
-
-            .search-results-list li {
-                padding: 8px;
-                border-bottom: 1px solid #eee;
-                cursor: pointer;
-            }
-
-            .search-results-list li:hover {
-                background-color: #f0f0f0;
-            }
-
-            .search-results-list li:last-child {
-                border-bottom: none;
+            .admin-form-group h4 {
+                margin-top: 15px;
+                margin-bottom: 10px;
             }
         </style>
     </th:block>
@@ -127,471 +33,119 @@
 <div layout:fragment="admin_content">
     <div class="admin-page-header">
         <h1 class="admin-page-title">
-            <i class="fas fa-tag"></i>
-            <th:block th:text="${pageTitle}"></th:block>
+            <i class="fas fa-plus-circle"></i> 쿠폰 등록
         </h1>
     </div>
 
     <div class="admin-panel">
         <div class="admin-panel__body">
-            <form th:action="@{/admin/coupons/save}" th:object="${coupon}" method="post" class="admin-form">
-                <input type="hidden" th:field="*{id}"/>
-
+            <form th:action="@{/admin/coupon}" th:object="${coupon}" method="post" class="admin-form">
+                <!-- 쿠폰 이름 -->
                 <fieldset class="form-section">
                     <legend class="admin-form-legend">기본 정보</legend>
                     <div class="admin-form-group">
-                        <label for="name" class="admin-form-label">쿠폰명 <span class="text-danger">*</span></label>
+                        <label for="name" class="admin-form-label">쿠폰 이름 <span class="text-danger">*</span></label>
                         <input type="text" id="name" th:field="*{name}" class="admin-form-control"
-                               placeholder="예: 여름맞이 특별 할인 쿠폰" required>
+                               placeholder="예: 5월 IT 특별 쿠폰">
                         <div th:if="${#fields.hasErrors('name')}" th:errors="*{name}"
                              class="invalid-feedback admin-form-text"></div>
                     </div>
-                    <div class="admin-form-group">
-                        <label for="couponCode" class="admin-form-label">쿠폰 코드 <span
-                                class="text-danger">*</span></label>
-                        <input type="text" id="couponCode" th:field="*{couponCode}" class="admin-form-control"
-                               placeholder="예: SUMMER2025 (미입력 시 자동 생성)">
-                        <small class="admin-form-text">미입력 시 시스템에서 자동으로 생성될 수 있습니다 (서버 로직에 따라 다름).</small>
-                        <div th:if="${#fields.hasErrors('couponCode')}" th:errors="*{couponCode}"
-                             class="invalid-feedback admin-form-text"></div>
-                    </div>
 
+                    <!-- 쿠폰 정책 선택 -->
                     <div class="admin-form-group">
-                        <label for="couponTypeId" class="admin-form-label">쿠폰 타입 <span
-                                class="text-danger">*</span></label>
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <select id="couponTypeId" th:field="*{couponTypeId}" class="admin-form-control" required
-                                    style="flex-grow: 1;">
-                                <option value="">-- 쿠폰 타입 선택 --</option>
-                                <option th:each="type : ${couponTypes}" th:value="${type.value}" th:text="${type.text}"
-                                        th:selected="${type.value == coupon.couponTypeId?.toString()}">타입명
-                                </option>
-                            </select>
-                            <button type="button" id="addNewCouponTypeBtn"
-                                    class="admin-btn admin-btn--sm admin-btn--secondary">
-                                <i class="fas fa-plus"></i> 새 타입 추가
+                        <label class="admin-form-label">쿠폰 정책 <span class="text-danger">*</span></label>
+                        <div th:each="type : ${couponTypes}" class="selectable-item"
+                             th:classappend="${coupon.couponTypeId == type.id} ? 'selected'">
+                            <span th:text="${type.name}">정책 이름</span>
+                            <button type="button" class="admin-btn admin-btn--sm admin-btn--secondary"
+                                    th:attr="data-id=${type.id}, data-target=${type.target}"
+                                    onclick="selectCouponType(this)">선택하기
                             </button>
                         </div>
+                        <input type="hidden" th:field="*{couponTypeId}"/>
                         <div th:if="${#fields.hasErrors('couponTypeId')}" th:errors="*{couponTypeId}"
                              class="invalid-feedback admin-form-text"></div>
                     </div>
-
-                    <div class="admin-form-group">
-                        <label for="description" class="admin-form-label">쿠폰 설명</label>
-                        <textarea id="description" th:field="*{description}" class="admin-form-control" rows="3"
-                                  placeholder="쿠폰에 대한 상세 설명을 입력하세요."></textarea>
-                    </div>
                 </fieldset>
 
-                <fieldset class="form-section">
-                    <legend class="admin-form-legend">할인 정보</legend>
-                    <div class="admin-form-group">
-                        <label class="admin-form-label">할인 방식 <span class="text-danger">*</span></label>
-                        <div>
-                            <input type="radio" th:field="*{discountType}" id="discountTypeAmount" value="AMOUNT"
-                                   class="admin-form-check-input" required>
-                            <label for="discountTypeAmount" class="admin-form-check-label" style="margin-right: 15px;">정액
-                                할인</label>
-
-                            <input type="radio" th:field="*{discountType}" id="discountTypePercentage"
-                                   value="PERCENTAGE" class="admin-form-check-input" required>
-                            <label for="discountTypePercentage" class="admin-form-check-label">정률 할인</label>
-                        </div>
-                        <div th:if="${#fields.hasErrors('discountType')}" th:errors="*{discountType}"
-                             class="invalid-feedback admin-form-text"></div>
-                    </div>
-
-                    <div class="admin-form-group">
-                        <label for="discountValue" id="discountValueLabel" class="admin-form-label">할인 값 <span
-                                class="text-danger">*</span></label>
-                        <input type="number" id="discountValue" th:field="*{discountValue}" class="admin-form-control"
-                               placeholder="할인액(원) 또는 할인율(%)" step="any" required>
-                        <div th:if="${#fields.hasErrors('discountValue')}" th:errors="*{discountValue}"
-                             class="invalid-feedback admin-form-text"></div>
-                    </div>
-
-                    <div class="form-subsection" id="maxDiscountSection" style="display:none;">
-                        <div class="admin-form-group">
-                            <label for="maxDiscountAmount" class="admin-form-label">최대 할인 금액 (원)</label>
-                            <input type="number" id="maxDiscountAmount" th:field="*{maxDiscountAmount}"
-                                   class="admin-form-control" placeholder="정률 할인 시 최대 할인 금액 (선택)">
-                            <small class="admin-form-text">비워두면 제한 없음.</small>
-                        </div>
-                    </div>
-
-                    <div class="admin-form-group" style="margin-top:15px;">
-                        <label for="minPurchaseAmount" class="admin-form-label">최소 구매 금액 (원)</label>
-                        <input type="number" id="minPurchaseAmount" th:field="*{minPurchaseAmount}"
-                               class="admin-form-control" placeholder="예: 30000 (0 또는 미입력 시 제한 없음)">
-                        <small class="admin-form-text">이 금액 이상 구매 시 쿠폰 적용 가능.</small>
-                    </div>
-                </fieldset>
-
-                <fieldset class="form-section">
-                    <legend class="admin-form-legend">적용 대상</legend>
-                    <div class="admin-form-group">
-                        <label class="admin-form-label">적용 범위 <span class="text-danger">*</span></label>
-                        <div>
-                            <input type="radio" th:field="*{targetType}" id="targetTypeAll" value="ALL_ORDERS"
-                                   class="admin-form-check-input" required>
-                            <label for="targetTypeAll" class="admin-form-check-label" style="margin-right:15px;">전체
-                                주문</label>
-
-                            <input type="radio" th:field="*{targetType}" id="targetTypeBooks" value="SPECIFIC_BOOKS"
-                                   class="admin-form-check-input" required>
-                            <label for="targetTypeBooks" class="admin-form-check-label" style="margin-right:15px;">특정
-                                도서</label>
-
-                            <input type="radio" th:field="*{targetType}" id="targetTypeCategories"
-                                   value="SPECIFIC_CATEGORIES" class="admin-form-check-input" required>
-                            <label for="targetTypeCategories" class="admin-form-check-label">특정 카테고리</label>
-                        </div>
-                        <div th:if="${#fields.hasErrors('targetType')}" th:errors="*{targetType}"
-                             class="invalid-feedback admin-form-text"></div>
-                    </div>
-
-                    <div id="targetBooksOptions" class="target-specific-options">
-                        <label class="admin-form-label">적용 도서</label>
-                        <button type="button" id="addTargetBookBtn"
-                                class="admin-btn admin-btn--sm admin-btn--secondary">
-                            <i class="fas fa-plus"></i> 도서 검색/추가
+                <!-- 도서 선택 -->
+                <div class="admin-form-group" id="bookSection" style="display: none;">
+                    <h4>도서 선택</h4>
+                    <div th:each="book : ${books}" class="selectable-item"
+                         th:classappend="${coupon.bookId == book.id} ? 'selected'">
+                        <span th:text="${book.name}">도서명</span>
+                        <button type="button" class="admin-btn admin-btn--sm admin-btn--info"
+                                th:attr="data-id=${book.id}" onclick="selectBook(this)">선택
                         </button>
-                        <div id="selectedBooksContainer" class="selected-items-container">
-                            <span class="selected-item" th:each="bookId : *{targetBookIds}" th:attr="data-id=${bookId}"
-                                  th:data-name="${#lists.contains(coupon.targetBookIds, bookId) ? coupon.targetBookNames[#lists.indexOf(coupon.targetBookIds, bookId)] : '알 수 없는 도서'}">
-                                <th:block
-                                        th:text="${#lists.contains(coupon.targetBookIds, bookId) ? coupon.targetBookNames[#lists.indexOf(coupon.targetBookIds, bookId)] : 'ID: '+bookId}"></th:block>
-                                <span class="remove-item" title="삭제">&times;</span>
-                            </span>
-                        </div>
-                        <th:block th:each="bookId, iterStat : *{targetBookIds}">
-                            <input type="hidden" th:name="|targetBookIds[${iterStat.index}]|" th:value="${bookId}"/>
-                        </th:block>
                     </div>
+                    <input type="hidden" th:field="*{bookId}"/>
+                </div>
 
-                    <div id="targetCategoriesOptions" class="target-specific-options">
-                        <label class="admin-form-label">적용 카테고리</label>
-                        <button type="button" id="addTargetCategoryBtn"
-                                class="admin-btn admin-btn--sm admin-btn--secondary">
-                            <i class="fas fa-plus"></i> 카테고리 검색/추가
+                <!-- 카테고리 선택 -->
+                <div class="admin-form-group" id="categorySection" style="display: none;">
+                    <h4>카테고리 선택</h4>
+                    <div th:each="category : ${categories}" class="selectable-item"
+                         th:classappend="${coupon.categoryId == category.id} ? 'selected'">
+                        <span th:text="${category.name}">카테고리명</span>
+                        <button type="button" class="admin-btn admin-btn--sm admin-btn--info"
+                                th:attr="data-id=${category.id}" onclick="selectCategory(this)">선택
                         </button>
-                        <div id="selectedCategoriesContainer" class="selected-items-container">
-                             <span class="selected-item" th:each="catId : *{targetCategoryIds}"
-                                   th:attr="data-id=${catId}"
-                                   th:data-name="${#lists.contains(coupon.targetCategoryIds, catId) ? coupon.targetCategoryNames[#lists.indexOf(coupon.targetCategoryIds, catId)] : '알 수 없는 카테고리'}">
-                                 <th:block
-                                         th:text="${#lists.contains(coupon.targetCategoryIds, catId) ? coupon.targetCategoryNames[#lists.indexOf(coupon.targetCategoryIds, catId)] : 'ID: '+catId}"></th:block>
-                                <span class="remove-item" title="삭제">&times;</span>
-                            </span>
-                        </div>
-                        <th:block th:each="catId, iterStat : *{targetCategoryIds}">
-                            <input type="hidden" th:name="|targetCategoryIds[${iterStat.index}]|" th:value="${catId}"/>
-                        </th:block>
                     </div>
-                </fieldset>
+                    <input type="hidden" th:field="*{categoryId}"/>
+                </div>
 
-                <fieldset class="form-section">
-                    <legend class="admin-form-legend">유효 기간</legend>
-                    <div class="admin-form-group">
-                        <label for="validFrom" class="admin-form-label">정책 유효 시작일시</label>
-                        <input type="datetime-local" id="validFrom" th:field="*{validFrom}" class="admin-form-control">
-                    </div>
-                    <div class="admin-form-group">
-                        <label for="validTo" class="admin-form-label">정책 유효 종료일시</label>
-                        <input type="datetime-local" id="validTo" th:field="*{validTo}" class="admin-form-control">
-                    </div>
-                    <div class="admin-form-group">
-                        <label for="issuanceValidDays" class="admin-form-label">발급 후 유효 일수</label>
-                        <input type="number" id="issuanceValidDays" th:field="*{issuanceValidDays}"
-                               class="admin-form-control" placeholder="예: 30 (일)">
-                        <small class="admin-form-text">이 값을 설정하면, 쿠폰 발급 시점으로부터 해당 일수만큼 유효합니다.</small>
-                    </div>
-                </fieldset>
-
-                <fieldset class="form-section">
-                    <legend class="admin-form-legend">기타 설정</legend>
-                    <div class="admin-form-group">
-                        <input type="checkbox" id="isActive" th:field="*{isActive}" class="admin-form-check-input">
-                        <label for="isActive" class="admin-form-check-label">쿠폰 정책 활성화</label>
-                    </div>
-                </fieldset>
-
-                <div class="admin-form-actions" style="margin-top: 20px; text-align: right;">
-                    <a th:href="@{/admin/coupons}" class="admin-btn admin-btn--default"
-                       style="margin-right: 8px;">취소</a>
-                    <button type="submit" class="admin-btn admin-btn--primary">
-                        <i class="fas fa-save"></i>
-                        <th:block th:text="*{id == null} ? '쿠폰 정책 등록' : '쿠폰 정책 수정'"></th:block>
-                    </button>
+                <!-- 저장 버튼 -->
+                <div class="admin-form-actions" style="text-align: right; margin-top: 20px;">
+                    <a th:href="@{/admin/coupon}" class="admin-btn admin-btn--default"
+                       style="margin-right:10px;">취소</a>
+                    <button type="submit" class="admin-btn admin-btn--primary"><i class="fas fa-save"></i> 저장</button>
                 </div>
             </form>
         </div>
     </div>
-
-    <div id="couponTypeModal" class="admin-modal">
-        <div class="admin-modal-content">
-            <span class="admin-modal-close-btn" onclick="closeModal('couponTypeModal')">&times;</span>
-            <h3>새 쿠폰 타입 추가</h3>
-            <form id="newCouponTypeForm" class="admin-form">
-                <div class="admin-form-group">
-                    <label for="newCouponTypeName" class="admin-form-label">타입명 <span
-                            class="text-danger">*</span></label>
-                    <input type="text" id="newCouponTypeName" name="name" class="admin-form-control" required>
-                </div>
-                <div class="admin-form-actions" style="text-align: right;">
-                    <button type="button" class="admin-btn admin-btn--default" onclick="closeModal('couponTypeModal')">
-                        취소
-                    </button>
-                    <button type="button" id="saveNewCouponTypeBtn" class="admin-btn admin-btn--primary">저장</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <div id="itemSearchModal" class="admin-modal">
-        <div class="admin-modal-content">
-            <span class="admin-modal-close-btn" onclick="closeModal('itemSearchModal')">&times;</span>
-            <h3 id="itemSearchModalTitle">항목 검색</h3>
-            <div class="admin-form-group">
-                <input type="text" id="itemSearchKeyword" class="admin-form-control" placeholder="검색어를 입력하세요...">
-                <button type="button" id="itemSearchBtn" class="admin-btn admin-btn--sm admin-btn--info"
-                        style="margin-top:5px;">검색
-                </button>
-            </div>
-            <ul id="itemSearchResults" class="search-results-list">
-            </ul>
-            <div class="admin-form-actions" style="text-align: right;">
-                <button type="button" class="admin-btn admin-btn--default" onclick="closeModal('itemSearchModal')">닫기
-                </button>
-            </div>
-        </div>
-    </div>
-
 </div>
 
 <th:block layout:fragment="page_scripts">
     <script th:inline="javascript">
         /*<![CDATA[*/
-        document.addEventListener('DOMContentLoaded', function () {
-            // Discount Type Toggle
-            const discountTypeRadios = document.querySelectorAll('input[name="discountType"]');
-            const discountValueLabel = document.getElementById('discountValueLabel');
-            const discountValueInput = document.getElementById('discountValue'); // 공용 할인 값 입력 필드
-            const maxDiscountSection = document.getElementById('maxDiscountSection');
+        function selectCouponType(button) {
+            const selectedId = button.dataset.id;
+            const target = button.dataset.target;
 
-            function toggleDiscountFields() {
-                const selectedType = document.querySelector('input[name="discountType"]:checked');
-                if (selectedType) {
-                    if (selectedType.value === 'AMOUNT') {
-                        discountValueLabel.textContent = '할인 금액 (원) *';
-                        discountValueInput.placeholder = '예: 5000';
-                        discountValueInput.step = '1'; // 정수 입력
-                        maxDiscountSection.style.display = 'none';
-                    } else if (selectedType.value === 'PERCENTAGE') {
-                        discountValueLabel.textContent = '할인율 (%) *';
-                        discountValueInput.placeholder = '예: 10';
-                        discountValueInput.step = '0.1'; // 소수점 입력 가능
-                        maxDiscountSection.style.display = 'block';
-                    }
-                } else { // 아무것도 선택되지 않은 초기 상태 등
-                    discountValueLabel.textContent = '할인 값 *';
-                    discountValueInput.placeholder = '할인액(원) 또는 할인율(%)';
-                    maxDiscountSection.style.display = 'none';
-                }
+            document.querySelector("input[name='couponTypeId']").value = selectedId;
+
+            // UI 갱신
+            document.querySelectorAll(".selectable-item").forEach(item => item.classList.remove("selected"));
+            button.closest(".selectable-item").classList.add("selected");
+
+            // BOOK이면 도서/카테고리 보여주기
+            if (target === 'BOOK') {
+                document.getElementById("bookSection").style.display = 'block';
+                document.getElementById("categorySection").style.display = 'block';
+            } else {
+                document.getElementById("bookSection").style.display = 'none';
+                document.getElementById("categorySection").style.display = 'none';
+                document.querySelector("input[name='bookId']").value = '';
+                document.querySelector("input[name='categoryId']").value = '';
             }
+        }
 
-            discountTypeRadios.forEach(radio => radio.addEventListener('change', toggleDiscountFields));
-            toggleDiscountFields(); // Initial setup
+        function selectBook(button) {
+            const id = button.dataset.id;
+            document.querySelector("input[name='bookId']").value = id;
 
-            // Target Type Toggle
-            const targetTypeRadios = document.querySelectorAll('input[name="targetType"]');
-            const booksOptions = document.getElementById('targetBooksOptions');
-            const categoriesOptions = document.getElementById('targetCategoriesOptions');
+            document.querySelectorAll("#bookSection .selectable-item").forEach(item => item.classList.remove("selected"));
+            button.closest(".selectable-item").classList.add("selected");
+        }
 
-            function toggleTargetOptions() {
-                const selectedType = document.querySelector('input[name="targetType"]:checked');
-                if (selectedType) {
-                    booksOptions.style.display = (selectedType.value === 'SPECIFIC_BOOKS') ? 'block' : 'none';
-                    categoriesOptions.style.display = (selectedType.value === 'SPECIFIC_CATEGORIES') ? 'block' : 'none';
-                } else {
-                    booksOptions.style.display = 'none';
-                    categoriesOptions.style.display = 'none';
-                }
-            }
+        function selectCategory(button) {
+            const id = button.dataset.id;
+            document.querySelector("input[name='categoryId']").value = id;
 
-            targetTypeRadios.forEach(radio => radio.addEventListener('change', toggleTargetOptions));
-            toggleTargetOptions(); // Initial setup
+            document.querySelectorAll("#categorySection .selectable-item").forEach(item => item.classList.remove("selected"));
+            button.closest(".selectable-item").classList.add("selected");
+        }
 
-
-            // --- Modal Logic ---
-            window.openModal = function (modalId) {
-                document.getElementById(modalId).style.display = 'block';
-            }
-            window.closeModal = function (modalId) {
-                document.getElementById(modalId).style.display = 'none';
-                // 모달 내용 초기화 (선택적)
-                if (modalId === 'itemSearchModal') {
-                    document.getElementById('itemSearchKeyword').value = '';
-                    document.getElementById('itemSearchResults').innerHTML = '';
-                }
-            }
-
-            // Coupon Type Modal
-            document.getElementById('addNewCouponTypeBtn').addEventListener('click', function () {
-                openModal('couponTypeModal');
-            });
-            document.getElementById('saveNewCouponTypeBtn').addEventListener('click', function () {
-                const newTypeName = document.getElementById('newCouponTypeName').value.trim();
-                if (!newTypeName) {
-                    alert('타입명을 입력해주세요.');
-                    return;
-                }
-                // TODO: AJAX로 서버에 새 쿠폰 타입 저장 요청
-                // 성공 시:
-                // 1. couponTypeId 드롭다운에 새 옵션 추가
-                // 2. 새로 추가된 옵션 선택
-                // 3. 모달 닫기
-                console.log('새 쿠폰 타입 저장 시도:', newTypeName);
-                // 예시: fetch('/admin/api/coupon-types/add', { method: 'POST', body: JSON.stringify({name: newTypeName}), headers: {'Content-Type': 'application/json'} })
-                //   .then(response => response.json())
-                //   .then(data => {
-                //     if(data.success) {
-                //        const select = document.getElementById('couponTypeId');
-                //        const newOption = new Option(data.couponType.name, data.couponType.id, false, true);
-                //        select.add(newOption);
-                //        select.value = data.couponType.id; // 새로 추가된 것 선택
-                //        closeModal('couponTypeModal');
-                //        document.getElementById('newCouponTypeName').value = ''; // 입력 필드 초기화
-                //     } else { alert('쿠폰 타입 추가 실패: ' + data.message); }
-                //   })
-                //   .catch(error => { console.error('Error:', error); alert('오류 발생'); });
-                alert('쿠폰 타입 추가 기능은 백엔드 연동이 필요합니다.'); // 임시 알림
-                closeModal('couponTypeModal'); // 임시로 바로 닫기
-            });
-
-
-            // Item Search Modal (Book/Category)
-            let currentSearchType = ''; // 'book' or 'category'
-
-            document.getElementById('addTargetBookBtn').addEventListener('click', function () {
-                currentSearchType = 'book';
-                document.getElementById('itemSearchModalTitle').textContent = '적용 도서 검색/추가';
-                openModal('itemSearchModal');
-            });
-            document.getElementById('addTargetCategoryBtn').addEventListener('click', function () {
-                currentSearchType = 'category';
-                document.getElementById('itemSearchModalTitle').textContent = '적용 카테고리 검색/추가';
-                openModal('itemSearchModal');
-            });
-
-            document.getElementById('itemSearchBtn').addEventListener('click', function () {
-                const keyword = document.getElementById('itemSearchKeyword').value.trim();
-                if (!keyword) {
-                    alert('검색어를 입력하세요.');
-                    return;
-                }
-                // TODO: AJAX로 서버에 도서 또는 카테고리 검색 요청 (currentSearchType에 따라 다른 API 호출)
-                console.log(currentSearchType + ' 검색:', keyword);
-                // 예시: let searchUrl = currentSearchType === 'book' ? '/admin/api/books/search?query=' : '/admin/api/categories/search?query=';
-                // fetch(searchUrl + encodeURIComponent(keyword))
-                //   .then(response => response.json())
-                //   .then(data => {
-                //     const resultsList = document.getElementById('itemSearchResults');
-                //     resultsList.innerHTML = ''; // 기존 결과 지우기
-                //     if (data && data.length > 0) {
-                //       data.forEach(item => {
-                //         const li = document.createElement('li');
-                //         li.textContent = item.name; // item.title 등 실제 필드명 사용
-                //         li.dataset.id = item.id;
-                //         li.dataset.name = item.name;
-                //         li.addEventListener('click', function() { addSelectedItem(item.id, item.name, currentSearchType); });
-                //         resultsList.appendChild(li);
-                //       });
-                //     } else { resultsList.innerHTML = '<li>검색 결과가 없습니다.</li>'; }
-                //   })
-                //   .catch(error => { console.error('Error:', error); resultsList.innerHTML = '<li>검색 중 오류 발생</li>'; });
-
-                // 임시 검색 결과
-                const resultsList = document.getElementById('itemSearchResults');
-                resultsList.innerHTML = '';
-                if (currentSearchType === 'book') {
-                    resultsList.innerHTML += '<li data-id="101" data-name="[임시] 자바의 정석" onclick="addSelectedItem(101, \'[임시] 자바의 정석\', \'book\')">[임시] 자바의 정석 (ID:101)</li>';
-                    resultsList.innerHTML += '<li data-id="102" data-name="[임시] 스프링 부트 따라하기" onclick="addSelectedItem(102, \'[임시] 스프링 부트 따라하기\', \'book\')">[임시] 스프링 부트 따라하기 (ID:102)</li>';
-                } else {
-                    resultsList.innerHTML += '<li data-id="1" data-name="[임시] 국내소설" onclick="addSelectedItem(1, \'[임시] 국내소설\', \'category\')">[임시] 국내소설 (ID:1)</li>';
-                    resultsList.innerHTML += '<li data-id="5" data-name="[임시] IT/컴퓨터" onclick="addSelectedItem(5, \'[임시] IT/컴퓨터\', \'category\')">[임시] IT/컴퓨터 (ID:5)</li>';
-                }
-            });
-
-            window.addSelectedItem = function (id, name, type) {
-                const containerId = (type === 'book') ? 'selectedBooksContainer' : 'selectedCategoriesContainer';
-                const hiddenInputListName = (type === 'book') ? 'targetBookIds' : 'targetCategoryIds';
-                const container = document.getElementById(containerId);
-
-                // 중복 추가 방지
-                if (container.querySelector(`.selected-item[data-id="${id}"]`)) {
-                    alert('이미 추가된 항목입니다.');
-                    return;
-                }
-
-                const itemSpan = document.createElement('span');
-                itemSpan.className = 'selected-item';
-                itemSpan.dataset.id = id;
-                itemSpan.dataset.name = name; // 이름도 저장 (나중에 hidden input 업데이트 시 활용)
-                itemSpan.textContent = name;
-
-                const removeSpan = document.createElement('span');
-                removeSpan.className = 'remove-item';
-                removeSpan.innerHTML = '&times;';
-                removeSpan.title = '삭제';
-                removeSpan.onclick = function () {
-                    removeSelectedItem(this.parentElement, type);
-                };
-
-                itemSpan.appendChild(removeSpan);
-                container.appendChild(itemSpan);
-
-                updateHiddenInputs(containerId, hiddenInputListName);
-                closeModal('itemSearchModal'); // 아이템 추가 후 모달 닫기
-            }
-
-            window.removeSelectedItem = function (itemElement, type) {
-                const containerId = (type === 'book') ? 'selectedBooksContainer' : 'selectedCategoriesContainer';
-                const hiddenInputListName = (type === 'book') ? 'targetBookIds' : 'targetCategoryIds';
-                itemElement.remove();
-                updateHiddenInputs(containerId, hiddenInputListName);
-            }
-
-            // 선택된 아이템 삭제 이벤트 리스너 초기 바인딩
-            document.querySelectorAll('.selected-item .remove-item').forEach(btn => {
-                btn.addEventListener('click', function () {
-                    const itemElement = this.parentElement;
-                    const container = itemElement.parentElement;
-                    let type = '';
-                    if (container.id === 'selectedBooksContainer') type = 'book';
-                    else if (container.id === 'selectedCategoriesContainer') type = 'category';
-
-                    if (type) removeSelectedItem(itemElement, type);
-                });
-            });
-
-
-            function updateHiddenInputs(containerId, hiddenInputListName) {
-                const form = document.querySelector('form.admin-form');
-                // 기존 hidden input 모두 제거
-                form.querySelectorAll(`input[name^="${hiddenInputListName}["]`).forEach(input => input.remove());
-
-                const container = document.getElementById(containerId);
-                const items = container.querySelectorAll('.selected-item');
-                items.forEach((item, index) => {
-                    const hiddenInput = document.createElement('input');
-                    hiddenInput.type = 'hidden';
-                    hiddenInput.name = `${hiddenInputListName}[${index}]`;
-                    hiddenInput.value = item.dataset.id;
-                    form.appendChild(hiddenInput);
-                });
-            }
-        });
         /*]]>*/
     </script>
 </th:block>
