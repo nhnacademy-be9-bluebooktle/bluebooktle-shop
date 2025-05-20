@@ -35,7 +35,7 @@ public class AladinAdaptor {
 		if (response.getBody() == null) {
 			throw new AladinBookNotFoundException(query);
 		}
-		
+
 		return response.getBody();
 	}
 

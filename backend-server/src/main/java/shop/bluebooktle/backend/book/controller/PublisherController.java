@@ -17,9 +17,9 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import shop.bluebooktle.backend.book.dto.request.PublisherRequest;
-import shop.bluebooktle.backend.book.dto.response.PublisherInfoResponse;
 import shop.bluebooktle.backend.book.service.PublisherService;
+import shop.bluebooktle.common.dto.book.request.PublisherRequest;
+import shop.bluebooktle.common.dto.book.response.PublisherInfoResponse;
 import shop.bluebooktle.common.dto.common.JsendResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
 

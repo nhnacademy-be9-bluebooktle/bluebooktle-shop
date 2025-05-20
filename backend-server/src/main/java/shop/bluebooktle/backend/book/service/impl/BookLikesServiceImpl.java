@@ -6,13 +6,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
-import shop.bluebooktle.backend.book.dto.response.BookLikesResponse;
 import shop.bluebooktle.backend.book.entity.Book;
 import shop.bluebooktle.backend.book.entity.BookLikes;
 import shop.bluebooktle.backend.book.repository.BookLikesRepository;
 import shop.bluebooktle.backend.book.repository.BookRepository;
 import shop.bluebooktle.backend.book.service.BookLikesService;
 import shop.bluebooktle.backend.user.repository.UserRepository;
+import shop.bluebooktle.common.dto.book.response.BookLikesResponse;
 import shop.bluebooktle.common.entity.auth.User;
 import shop.bluebooktle.common.exception.auth.UserNotFoundException;
 import shop.bluebooktle.common.exception.book.BookLikesAlreadyChecked;

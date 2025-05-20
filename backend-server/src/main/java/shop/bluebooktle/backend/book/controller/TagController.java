@@ -16,9 +16,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import shop.bluebooktle.backend.book.dto.request.TagRequest;
-import shop.bluebooktle.backend.book.dto.response.TagInfoResponse;
 import shop.bluebooktle.backend.book.service.TagService;
+import shop.bluebooktle.common.dto.book.request.TagRequest;
+import shop.bluebooktle.common.dto.book.response.TagInfoResponse;
 import shop.bluebooktle.common.dto.common.JsendResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
 

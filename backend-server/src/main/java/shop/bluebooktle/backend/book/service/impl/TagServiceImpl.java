@@ -6,12 +6,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
-import shop.bluebooktle.backend.book.dto.request.TagRequest;
-import shop.bluebooktle.backend.book.dto.response.TagInfoResponse;
 import shop.bluebooktle.backend.book.entity.Tag;
 import shop.bluebooktle.backend.book.repository.BookTagRepository;
 import shop.bluebooktle.backend.book.repository.TagRepository;
 import shop.bluebooktle.backend.book.service.TagService;
+import shop.bluebooktle.common.dto.book.request.TagRequest;
+import shop.bluebooktle.common.dto.book.response.TagInfoResponse;
 import shop.bluebooktle.common.exception.book.TagAlreadyExistsException;
 import shop.bluebooktle.common.exception.book.TagNotFoundException;
 

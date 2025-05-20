@@ -5,9 +5,9 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import shop.bluebooktle.backend.book.dto.request.BookInfoRequest;
-import shop.bluebooktle.backend.book.dto.response.BookInfoResponse;
-import shop.bluebooktle.backend.book.dto.response.CategoryResponse;
+import shop.bluebooktle.common.dto.book.request.BookInfoRequest;
+import shop.bluebooktle.common.dto.book.response.BookInfoResponse;
+import shop.bluebooktle.common.dto.book.response.CategoryResponse;
 
 public interface BookCategoryService {
 

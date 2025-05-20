@@ -5,8 +5,8 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import shop.bluebooktle.backend.book.dto.response.BookInfoResponse;
-import shop.bluebooktle.backend.book.dto.response.PublisherInfoResponse;
+import shop.bluebooktle.common.dto.book.response.BookInfoResponse;
+import shop.bluebooktle.common.dto.book.response.PublisherInfoResponse;
 
 public interface BookPublisherService {
 
