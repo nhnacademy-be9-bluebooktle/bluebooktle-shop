@@ -50,13 +50,11 @@ public class UserController {
 	}
 
 	@Operation(summary = "내 유저 정보 수정", description = "내 유저 정보를 수정합니다.")
-	// @Auth(type = UserType.USER)
+	@Auth(type = UserType.USER)
 	@PutMapping("/{id}")
 	public ResponseEntity<JsendResponse<Void>> updateUser(
 		@PathVariable Long id,
-		@RequestBody UserUpdateRequest userUpdateRequest,
-		@Parameter(hidden = true)
-		@AuthenticationPrincipal UserPrincipal userPrincipal
+		@RequestBody UserUpdateRequest userUpdateRequest
 	) {
 
 		try {
