@@ -1,7 +1,7 @@
 package shop.bluebooktle.backend.book.service;
 
-import shop.bluebooktle.backend.book.dto.request.BookAllRegisterByAladinRequest;
-import shop.bluebooktle.backend.book.dto.request.BookAllRegisterRequest;
+import shop.bluebooktle.common.dto.book.request.BookAllRegisterByAladinRequest;
+import shop.bluebooktle.common.dto.book.request.BookAllRegisterRequest;
 
 public interface BookRegisterService {
 	//책 모든정보 직접등록

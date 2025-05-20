@@ -1,8 +1,8 @@
 package shop.bluebooktle.backend.book.service;
 
-import shop.bluebooktle.backend.book.dto.request.author.AuthorRegisterRequest;
-import shop.bluebooktle.backend.book.dto.request.author.AuthorUpdateRequest;
-import shop.bluebooktle.backend.book.dto.response.author.AuthorResponse;
+import shop.bluebooktle.common.dto.book.request.author.AuthorRegisterRequest;
+import shop.bluebooktle.common.dto.book.request.author.AuthorUpdateRequest;
+import shop.bluebooktle.common.dto.book.response.author.AuthorResponse;
 
 public interface AuthorService {
 

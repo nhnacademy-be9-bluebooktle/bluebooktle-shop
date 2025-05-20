@@ -2,8 +2,8 @@ package shop.bluebooktle.backend.book.service;
 
 import java.util.List;
 
-import shop.bluebooktle.backend.book.dto.response.BookInfoResponse;
-import shop.bluebooktle.backend.book.dto.response.author.AuthorResponse;
+import shop.bluebooktle.common.dto.book.response.BookInfoResponse;
+import shop.bluebooktle.common.dto.book.response.author.AuthorResponse;
 
 public interface BookAuthorService {
 

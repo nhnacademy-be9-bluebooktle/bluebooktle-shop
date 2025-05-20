@@ -16,15 +16,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import shop.bluebooktle.backend.book.dto.request.BookAllRegisterRequest;
-import shop.bluebooktle.backend.book.dto.request.BookRegisterRequest;
-import shop.bluebooktle.backend.book.dto.request.BookUpdateRequest;
-import shop.bluebooktle.backend.book.dto.response.BookAllResponse;
-import shop.bluebooktle.backend.book.dto.response.BookRegisterResponse;
-import shop.bluebooktle.backend.book.dto.response.BookResponse;
-import shop.bluebooktle.backend.book.dto.response.BookUpdateResponse;
 import shop.bluebooktle.backend.book.service.BookRegisterService;
 import shop.bluebooktle.backend.book.service.BookService;
+import shop.bluebooktle.common.dto.book.request.BookAllRegisterRequest;
+import shop.bluebooktle.common.dto.book.request.BookRegisterRequest;
+import shop.bluebooktle.common.dto.book.request.BookUpdateRequest;
+import shop.bluebooktle.common.dto.book.response.BookAllResponse;
+import shop.bluebooktle.common.dto.book.response.BookRegisterResponse;
+import shop.bluebooktle.common.dto.book.response.BookResponse;
+import shop.bluebooktle.common.dto.book.response.BookUpdateResponse;
 import shop.bluebooktle.common.dto.common.JsendResponse;
 
 @RestController

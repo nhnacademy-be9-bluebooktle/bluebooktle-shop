@@ -3,8 +3,8 @@ package shop.bluebooktle.backend.book.service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import shop.bluebooktle.backend.book.dto.request.TagRequest;
-import shop.bluebooktle.backend.book.dto.response.TagInfoResponse;
+import shop.bluebooktle.common.dto.book.request.TagRequest;
+import shop.bluebooktle.common.dto.book.response.TagInfoResponse;
 
 public interface TagService {
 

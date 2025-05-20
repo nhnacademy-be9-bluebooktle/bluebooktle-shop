@@ -13,8 +13,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import shop.bluebooktle.backend.book.dto.response.BookLikesResponse;
 import shop.bluebooktle.backend.book.service.BookLikesService;
+import shop.bluebooktle.common.dto.book.response.BookLikesResponse;
 
 @WebMvcTest(BookLikesController.class)
 public class BookLikesControllerTest {

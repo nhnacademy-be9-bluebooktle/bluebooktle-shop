@@ -6,12 +6,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
-import shop.bluebooktle.backend.book.dto.request.PublisherRequest;
-import shop.bluebooktle.backend.book.dto.response.PublisherInfoResponse;
 import shop.bluebooktle.backend.book.entity.Publisher;
 import shop.bluebooktle.backend.book.repository.BookPublisherRepository;
 import shop.bluebooktle.backend.book.repository.PublisherRepository;
 import shop.bluebooktle.backend.book.service.PublisherService;
+import shop.bluebooktle.common.dto.book.request.PublisherRequest;
+import shop.bluebooktle.common.dto.book.response.PublisherInfoResponse;
 import shop.bluebooktle.common.exception.book.PublisherAlreadyExistsException;
 import shop.bluebooktle.common.exception.book.PublisherCannotDeleteException;
 import shop.bluebooktle.common.exception.book.PublisherNotFoundException;

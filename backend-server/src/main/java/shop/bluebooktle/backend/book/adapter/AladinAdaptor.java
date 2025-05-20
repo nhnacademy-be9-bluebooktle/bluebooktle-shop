@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import shop.bluebooktle.backend.book.dto.response.AladinApiResponse;
+import shop.bluebooktle.common.dto.book.response.AladinApiResponse;
 import shop.bluebooktle.common.exception.book.AladinBookNotFoundException;
 
 @Component
@@ -35,7 +35,7 @@ public class AladinAdaptor {
 		if (response.getBody() == null) {
 			throw new AladinBookNotFoundException(query);
 		}
-		
+
 		return response.getBody();
 	}
 

@@ -14,13 +14,13 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import lombok.extern.slf4j.Slf4j;
-import shop.bluebooktle.backend.book.dto.response.BookLikesResponse;
 import shop.bluebooktle.backend.book.entity.Book;
 import shop.bluebooktle.backend.book.entity.BookLikes;
 import shop.bluebooktle.backend.book.repository.BookLikesRepository;
 import shop.bluebooktle.backend.book.repository.BookRepository;
 import shop.bluebooktle.backend.book.service.impl.BookLikesServiceImpl;
 import shop.bluebooktle.backend.user.repository.UserRepository;
+import shop.bluebooktle.common.dto.book.response.BookLikesResponse;
 import shop.bluebooktle.common.entity.auth.User;
 import shop.bluebooktle.common.exception.auth.UserNotFoundException;
 import shop.bluebooktle.common.exception.book.BookLikesAlreadyChecked;

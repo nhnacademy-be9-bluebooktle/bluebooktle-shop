@@ -9,11 +9,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
-import shop.bluebooktle.backend.book.dto.request.BookAllRegisterByAladinRequest;
-import shop.bluebooktle.backend.book.dto.request.BookAllRegisterRequest;
-import shop.bluebooktle.backend.book.dto.response.AladinBookResponse;
-import shop.bluebooktle.backend.book.dto.response.PublisherInfoResponse;
-import shop.bluebooktle.backend.book.dto.response.author.AuthorResponse;
 import shop.bluebooktle.backend.book.entity.Book;
 import shop.bluebooktle.backend.book.entity.BookSaleInfo;
 import shop.bluebooktle.backend.book.repository.BookRepository;
@@ -27,6 +22,11 @@ import shop.bluebooktle.backend.book.service.BookPublisherService;
 import shop.bluebooktle.backend.book.service.BookRegisterService;
 import shop.bluebooktle.backend.book.service.BookTagService;
 import shop.bluebooktle.backend.book.service.PublisherService;
+import shop.bluebooktle.common.dto.book.request.BookAllRegisterByAladinRequest;
+import shop.bluebooktle.common.dto.book.request.BookAllRegisterRequest;
+import shop.bluebooktle.common.dto.book.response.AladinBookResponse;
+import shop.bluebooktle.common.dto.book.response.PublisherInfoResponse;
+import shop.bluebooktle.common.dto.book.response.author.AuthorResponse;
 import shop.bluebooktle.common.exception.book.AladinBookNotFoundException;
 import shop.bluebooktle.common.exception.book.BookAlreadyExistsException;
 

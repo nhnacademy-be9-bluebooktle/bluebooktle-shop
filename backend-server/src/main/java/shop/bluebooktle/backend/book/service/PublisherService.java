@@ -3,8 +3,8 @@ package shop.bluebooktle.backend.book.service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import shop.bluebooktle.backend.book.dto.request.PublisherRequest;
-import shop.bluebooktle.backend.book.dto.response.PublisherInfoResponse;
+import shop.bluebooktle.common.dto.book.request.PublisherRequest;
+import shop.bluebooktle.common.dto.book.response.PublisherInfoResponse;
 
 public interface PublisherService {
 

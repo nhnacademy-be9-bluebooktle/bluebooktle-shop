@@ -8,8 +8,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
-import shop.bluebooktle.backend.book.dto.request.BookSaleInfoRegisterRequest;
-import shop.bluebooktle.backend.book.dto.request.BookSaleInfoUpdateRequest;
 import shop.bluebooktle.backend.book.dto.response.BookSaleInfoRegisterResponse;
 import shop.bluebooktle.backend.book.dto.response.BookSaleInfoUpdateResponse;
 import shop.bluebooktle.backend.book.entity.Book;
@@ -17,6 +15,8 @@ import shop.bluebooktle.backend.book.entity.BookSaleInfo;
 import shop.bluebooktle.backend.book.repository.BookRepository;
 import shop.bluebooktle.backend.book.repository.BookSaleInfoRepository;
 import shop.bluebooktle.backend.book.service.BookSaleInfoService;
+import shop.bluebooktle.common.dto.book.request.BookSaleInfoRegisterRequest;
+import shop.bluebooktle.common.dto.book.request.BookSaleInfoUpdateRequest;
 import shop.bluebooktle.common.exception.InvalidInputValueException;
 import shop.bluebooktle.common.exception.book.BookNotFoundException;
 import shop.bluebooktle.common.exception.book.BookSaleInfoAlreadyExistsException;

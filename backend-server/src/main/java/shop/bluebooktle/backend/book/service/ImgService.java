@@ -1,8 +1,8 @@
 package shop.bluebooktle.backend.book.service;
 
-import shop.bluebooktle.backend.book.dto.request.img.ImgRegisterRequest;
-import shop.bluebooktle.backend.book.dto.request.img.ImgUpdateRequest;
-import shop.bluebooktle.backend.book.dto.response.img.ImgResponse;
+import shop.bluebooktle.common.dto.book.request.img.ImgRegisterRequest;
+import shop.bluebooktle.common.dto.book.request.img.ImgUpdateRequest;
+import shop.bluebooktle.common.dto.book.response.img.ImgResponse;
 
 public interface ImgService {
 

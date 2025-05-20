@@ -19,8 +19,8 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import shop.bluebooktle.backend.book.dto.request.CategoryRegisterRequest;
 import shop.bluebooktle.backend.book.service.CategoryService;
+import shop.bluebooktle.common.dto.book.request.CategoryRegisterRequest;
 
 @WebMvcTest(controllers = CategoryController.class,
 	excludeAutoConfiguration = {
