@@ -36,12 +36,6 @@ public class AladinBookController {
 		return ResponseEntity.ok(JsendResponse.success(result));
 	}
 
-	/*@GetMapping("/isbn/{isbn}")
-	public ResponseEntity<JsendResponse<AladinBookItemBySearch>> searchBookByIsbn(@PathVariable String isbn) {
-		AladinBookItemBySearch result = aladinBookService.searchBookByIsbn(isbn);
-		return ResponseEntity.ok(JsendResponse.success(result));
-	}*/
-
 	// isbn으로 도서정보 가져오기
 	@GetMapping("/select")
 	public ResponseEntity<JsendResponse<AladinBookResponse>> selectBook(@RequestParam String isbn) {
