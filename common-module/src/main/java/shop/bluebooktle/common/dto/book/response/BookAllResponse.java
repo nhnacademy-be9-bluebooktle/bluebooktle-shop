@@ -33,5 +33,3 @@ public class BookAllResponse {
 	Long viewCount;
 	Long searchCount;
 }
-
-
