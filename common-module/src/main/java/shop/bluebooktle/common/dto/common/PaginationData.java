@@ -16,6 +16,10 @@ public class PaginationData<T> {
 		this.pagination = new PaginationInfo(page);
 	}
 
+	public long getTotalElements() {
+		return pagination.totalElements;
+	}
+
 	@Getter
 	private static class PaginationInfo {
 		private final int totalPages;

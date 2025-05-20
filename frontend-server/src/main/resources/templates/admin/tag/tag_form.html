@@ -16,11 +16,13 @@
 
     <div class="admin-panel">
         <div class="admin-panel__body">
+            <!-- 에러 메세지 표시 -->
             <div th:if="${globalErrorMessage}" class="alert alert-danger admin-alert"
                  style="background-color: #f8d7da; color: #721c24; padding: .75rem 1.25rem; margin-bottom: 1rem; border: 1px solid transparent; border-radius: .25rem;">
                 <strong th:text="${globalErrorMessage}"></strong>
             </div>
 
+            <!-- 태그 등록/수정 폼 -->
             <form th:action="@{/admin/tags/save}" th:object="${tag}" method="post">
                 <input type="hidden" th:field="*{id}"/>
                 <input type="hidden" th:field="*{deletedAt}"/>

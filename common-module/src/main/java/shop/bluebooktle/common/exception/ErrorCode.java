@@ -69,6 +69,11 @@ public enum ErrorCode {
 	TAG_ALREADY_EXISTS(HttpStatus.CONFLICT, "BT01", "이미 등록된 태그입니다."),
 	BOOK_TAG_ALREADY_EXISTS(HttpStatus.CONFLICT, "BT03", "도서에 이미 등록된 태그입니다."),
 	BOOK_TAG_NOT_FOUND(HttpStatus.NOT_FOUND, "BP02", "도서에 등록된 태그를 찾을 수 없습니다."),
+	TAG_LIST_FETCH_ERROR(HttpStatus.BAD_GATEWAY, "BT04", "태그 목록 조회 중 오류가 발생했습니다."),
+	TAG_CREATE_FAILED(HttpStatus.BAD_GATEWAY, "BT05", "태그 등록에 실패했습니다."),
+	TAG_UPDATE_FAILED(HttpStatus.BAD_GATEWAY, "BT06", "태그 수정에 실패했습니다."),
+	TAG_DELETE_FAILED(HttpStatus.BAD_GATEWAY, "BT07", "태그 삭제에 실패했습니다."),
+
 	// Book Order (도서 주문 포장 오류) - G (Gift)
 	G_BOOK_ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "G001", "도서 주문 정보를 찾을 수 없습니다."),
 	G_BOOK_ORDER_UPDATE_FAILED(HttpStatus.BAD_REQUEST, "G002", "도서 주문 정보 수정에 실패했습니다."),
