@@ -19,9 +19,9 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import shop.bluebooktle.backend.book.dto.request.PublisherRequest;
-import shop.bluebooktle.backend.book.dto.response.PublisherInfoResponse;
 import shop.bluebooktle.backend.book.service.PublisherService;
+import shop.bluebooktle.common.dto.book.request.PublisherRequest;
+import shop.bluebooktle.common.dto.book.response.PublisherInfoResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
 
 @WebMvcTest(PublisherController.class)
