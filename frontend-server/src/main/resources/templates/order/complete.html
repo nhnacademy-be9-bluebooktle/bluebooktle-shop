@@ -130,7 +130,7 @@
             <h1 class="completion-title-kitsch">주문 완료!</h1>
             <p class="completion-message-kitsch">
                 겜돌이_77님의 주문이 성공적으로 완료되었습니다! <br>
-                주문번호는 <strong class="pixel-font-kitsch">BKTTL-19880515-007</strong> 입니다. <br>
+                주문번호는 <strong th:text="${orderData.orderId}">[orderId]</strong> 입니다. <br>
                 키치한 상품들이 곧 용사님을 찾아갈 거예요!
             </p>
 
@@ -138,7 +138,9 @@
                 <h4><i class="fas fa-receipt"></i> 주문 요약</h4>
                 <div class="summary-item-kitsch">
                     <span class="label">결제 금액:</span>
-                    <span class="value" style="color:var(--kitsch-color-3); font-size:1.1rem;">84,200원</span>
+                    <span class="value" style="color:var(--kitsch-color-3); font-size:1.1rem;">
+                        <strong th:text="${orderData.totalAmount()}"></strong>
+                    </span>
                 </div>
                 <div class="summary-item-kitsch">
                     <span class="label">결제 수단:</span>
