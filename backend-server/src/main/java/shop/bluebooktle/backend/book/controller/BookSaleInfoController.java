@@ -13,12 +13,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import shop.bluebooktle.backend.book.dto.request.BookSaleInfoRegisterRequest;
+import shop.bluebooktle.backend.book.dto.request.BookSaleInfoUpdateRequest;
 import shop.bluebooktle.backend.book.dto.response.BookSaleInfoRegisterResponse;
 import shop.bluebooktle.backend.book.dto.response.BookSaleInfoUpdateResponse;
 import shop.bluebooktle.backend.book.entity.BookSaleInfo;
 import shop.bluebooktle.backend.book.service.BookSaleInfoService;
-import shop.bluebooktle.common.dto.book.request.BookSaleInfoRegisterRequest;
-import shop.bluebooktle.common.dto.book.request.BookSaleInfoUpdateRequest;
 import shop.bluebooktle.common.dto.common.JsendResponse;
 
 @RestController

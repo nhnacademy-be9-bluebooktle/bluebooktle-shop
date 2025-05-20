@@ -86,7 +86,7 @@ public class BookRegisterServiceImpl implements BookRegisterService {
 			.stock(request.getStock())
 			.isPackable(request.getIsPackable() != null &&
 				request.getIsPackable())
-			.state(request.getState())
+			.state(toStateOrThrow(request.getState()))
 			.salePercentage(salePercentage)
 			.build();
 		bookSaleInfoRepository.save(bookSaleInfo);
@@ -140,7 +140,7 @@ public class BookRegisterServiceImpl implements BookRegisterService {
 			.salePercentage(aladinBook.getSalePercentage())
 			.stock(request.getStock())
 			.isPackable(request.getIsPackable())
-			.state(request.getState())
+			.state(toStateOrThrow(request.getState()))
 			.build();
 		bookSaleInfoRepository.save(saleInfo);
 	}
@@ -151,5 +151,16 @@ public class BookRegisterServiceImpl implements BookRegisterService {
 		return Arrays.stream(authorsStr.split(","))
 			.map(String::trim)
 			.toList();
+	}
+
+	public BookSaleInfo.State toStateOrThrow(String stateStr) {
+		if (stateStr == null) {
+			throw new IllegalArgumentException("State 값이 null입니다.");
+		}
+		try {
+			return BookSaleInfo.State.valueOf(stateStr);
+		} catch (IllegalArgumentException e) {
+			throw new IllegalArgumentException("유효하지 않은 상태 값입니다: " + stateStr);
+		}
 	}
 }

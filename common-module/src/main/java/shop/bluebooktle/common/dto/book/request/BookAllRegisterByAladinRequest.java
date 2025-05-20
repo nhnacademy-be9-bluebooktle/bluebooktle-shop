@@ -12,7 +12,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Value;
-import shop.bluebooktle.backend.book.entity.BookSaleInfo;
 
 @Getter
 @Value
@@ -29,8 +28,8 @@ public class BookAllRegisterByAladinRequest {
 
 	Boolean isPackable;
 
-	@NotNull(message = "판매 상태를 입력해주세요.")
-	BookSaleInfo.State state;
+	@NotBlank(message = "판매 상태를 입력해주세요.")
+	String state;
 
 	@NotEmpty(message = "카테고리는 최소 1개 이상 필요합니다.")
 	List<@Positive(message = "카테고리 ID는 양수값이어야 합니다.") Long> categoryIdList;

@@ -1,4 +1,4 @@
-package shop.bluebooktle.common.dto.book.response;
+package shop.bluebooktle.backend.book.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
