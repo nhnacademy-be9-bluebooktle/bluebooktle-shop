@@ -5,8 +5,8 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import shop.bluebooktle.common.dto.payment.reponse.TossConfirmResponse;
 import shop.bluebooktle.common.dto.payment.request.TossConfirmRequest;
+import shop.bluebooktle.common.dto.payment.response.TossConfirmResponse;
 import shop.bluebooktle.frontend.config.TossFeignConfig;
 
 @FeignClient(

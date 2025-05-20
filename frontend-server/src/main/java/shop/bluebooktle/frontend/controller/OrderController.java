@@ -13,8 +13,8 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.validation.Valid;
-import shop.bluebooktle.common.dto.payment.reponse.TossConfirmResponse;
 import shop.bluebooktle.common.dto.payment.request.TossConfirmRequest;
+import shop.bluebooktle.common.dto.payment.response.TossConfirmResponse;
 import shop.bluebooktle.frontend.service.TossPaymentsService;
 
 @Controller

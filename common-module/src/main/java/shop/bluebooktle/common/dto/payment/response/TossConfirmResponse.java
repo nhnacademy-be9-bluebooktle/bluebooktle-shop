@@ -1,4 +1,4 @@
-package shop.bluebooktle.common.dto.payment.reponse;
+package shop.bluebooktle.common.dto.payment.response;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

@@ -2,8 +2,8 @@ package shop.bluebooktle.frontend.service;
 
 import org.springframework.stereotype.Service;
 
-import shop.bluebooktle.common.dto.payment.reponse.TossConfirmResponse;
 import shop.bluebooktle.common.dto.payment.request.TossConfirmRequest;
+import shop.bluebooktle.common.dto.payment.response.TossConfirmResponse;
 import shop.bluebooktle.frontend.repository.TossPaymentsRepository;
 
 @Service
