@@ -35,6 +35,9 @@ public class AdminTagController {
 		@RequestParam(value = "searchKeyword", required = false) String searchKeyword) {
 		Page<TagDto> tagPage = adminTagService.getTags(page - 1, size, searchKeyword);
 
+		log.info("어드민 태그 목록 페이지 요청. URI: {}", request.getRequestURI());
+		model.addAttribute("pageTitle", "태그 관리");
+		model.addAttribute("currentURI", request.getRequestURI());
 		model.addAttribute("tags", tagPage.getContent()); // 태그 리스트
 		model.addAttribute("currentPage", page); // 현재 페이지 번호
 		model.addAttribute("totalPages", tagPage.getTotalPages()); // 전체 페이지 수
@@ -104,7 +107,7 @@ public class AdminTagController {
 			redirectAttributes.addFlashAttribute("globalSuccessMessage",
 				"태그 '" + tagDto.getName() + "'가 성공적으로 " + action + "되었습니다.");
 		} catch (Exception e) {
-			log.error("태그 저장 중 오류 발생", e);
+			log.error("태그 저장 중 오류 발생 ", e);
 			redirectAttributes.addFlashAttribute("globalErrorMessage", "태그 저장 중 오류가 발생했습니다: " + e.getMessage());
 			redirectAttributes.addFlashAttribute("tag", tagDto);
 			if (tagDto.getId() != null) {

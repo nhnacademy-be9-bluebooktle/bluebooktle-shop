@@ -4,9 +4,15 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class PaginationData<T> {
 	private List<T> content;
 	private PaginationInfo pagination;
@@ -21,15 +27,18 @@ public class PaginationData<T> {
 	}
 
 	@Getter
+	@Setter
+	@NoArgsConstructor
+	@AllArgsConstructor
 	private static class PaginationInfo {
-		private final int totalPages;
-		private final long totalElements;
-		private final int currentPage;
-		private final int pageSize;
-		private final boolean isFirst;
-		private final boolean isLast;
-		private final boolean hasNext;
-		private final boolean hasPrevious;
+		private int totalPages;
+		private long totalElements;
+		private int currentPage;
+		private int pageSize;
+		private boolean isFirst;
+		private boolean isLast;
+		private boolean hasNext;
+		private boolean hasPrevious;
 
 		public PaginationInfo(Page<?> page) {
 			this.totalPages = page.getTotalPages();
