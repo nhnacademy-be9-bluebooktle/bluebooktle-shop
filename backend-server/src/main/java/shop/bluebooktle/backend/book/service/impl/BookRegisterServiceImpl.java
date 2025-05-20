@@ -66,7 +66,7 @@ public class BookRegisterServiceImpl implements BookRegisterService {
 		BigDecimal salePercentage = request.getPrice().subtract(request.getSalePrice())
 			.divide(request.getPrice(), 2, BigDecimal.ROUND_HALF_UP)
 			.multiply(BigDecimal.valueOf(100));
-		
+
 		bookAuthorService.registerBookAuthor(book.getId(), request.getAuthorIdList());
 
 		bookPublisherService.registerBookPublisher(book.getId(), request.getAuthorIdList());
@@ -114,6 +114,7 @@ public class BookRegisterServiceImpl implements BookRegisterService {
 
 		List<String> authorsName = parseAuthors(aladinBook.getAuthor());
 		for (String authorName : authorsName) {
+			// 도서에 작가 등록 (작가 없으면 작가 테이블에 등록)
 			AuthorResponse author = authorService.registerAuthorByName(authorName);
 			bookAuthorService.registerBookAuthor(book.getId(), author.getId());
 		}
