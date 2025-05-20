@@ -3,10 +3,10 @@ package shop.bluebooktle.backend.book.service;
 import java.util.List;
 import java.util.Optional;
 
-import shop.bluebooktle.backend.book.dto.request.BookImgRegisterRequest;
-import shop.bluebooktle.backend.book.dto.response.BookImgResponse;
-import shop.bluebooktle.backend.book.dto.response.BookInfoResponse;
-import shop.bluebooktle.backend.book.dto.response.img.ImgResponse;
+import shop.bluebooktle.common.dto.book.request.BookImgRegisterRequest;
+import shop.bluebooktle.common.dto.book.response.BookImgResponse;
+import shop.bluebooktle.common.dto.book.response.BookInfoResponse;
+import shop.bluebooktle.common.dto.book.response.img.ImgResponse;
 
 public interface BookImgService {
 

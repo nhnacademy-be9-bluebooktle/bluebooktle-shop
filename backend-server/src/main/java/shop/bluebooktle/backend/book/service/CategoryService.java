@@ -5,11 +5,11 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import shop.bluebooktle.backend.book.dto.request.CategoryRegisterRequest;
-import shop.bluebooktle.backend.book.dto.request.CategoryUpdateRequest;
-import shop.bluebooktle.backend.book.dto.request.RootCategoryRegisterRequest;
-import shop.bluebooktle.backend.book.dto.response.CategoryResponse;
-import shop.bluebooktle.backend.book.dto.response.CategoryTreeResponse;
+import shop.bluebooktle.common.dto.book.request.CategoryRegisterRequest;
+import shop.bluebooktle.common.dto.book.request.CategoryUpdateRequest;
+import shop.bluebooktle.common.dto.book.request.RootCategoryRegisterRequest;
+import shop.bluebooktle.common.dto.book.response.CategoryResponse;
+import shop.bluebooktle.common.dto.book.response.CategoryTreeResponse;
 
 public interface CategoryService {
 

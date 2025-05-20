@@ -9,11 +9,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
-import shop.bluebooktle.backend.book.dto.request.BookAllRegisterByAladinRequest;
-import shop.bluebooktle.backend.book.dto.request.BookAllRegisterRequest;
-import shop.bluebooktle.backend.book.dto.response.AladinBookResponse;
-import shop.bluebooktle.backend.book.dto.response.PublisherInfoResponse;
-import shop.bluebooktle.backend.book.dto.response.author.AuthorResponse;
 import shop.bluebooktle.backend.book.entity.Book;
 import shop.bluebooktle.backend.book.entity.BookSaleInfo;
 import shop.bluebooktle.backend.book.repository.BookRepository;
@@ -27,6 +22,11 @@ import shop.bluebooktle.backend.book.service.BookPublisherService;
 import shop.bluebooktle.backend.book.service.BookRegisterService;
 import shop.bluebooktle.backend.book.service.BookTagService;
 import shop.bluebooktle.backend.book.service.PublisherService;
+import shop.bluebooktle.common.dto.book.request.BookAllRegisterByAladinRequest;
+import shop.bluebooktle.common.dto.book.request.BookAllRegisterRequest;
+import shop.bluebooktle.common.dto.book.response.AladinBookResponse;
+import shop.bluebooktle.common.dto.book.response.PublisherInfoResponse;
+import shop.bluebooktle.common.dto.book.response.author.AuthorResponse;
 import shop.bluebooktle.common.exception.book.AladinBookNotFoundException;
 import shop.bluebooktle.common.exception.book.BookAlreadyExistsException;
 
@@ -86,7 +86,7 @@ public class BookRegisterServiceImpl implements BookRegisterService {
 			.stock(request.getStock())
 			.isPackable(request.getIsPackable() != null &&
 				request.getIsPackable())
-			.state(request.getState())
+			.state(toStateOrThrow(request.getState()))
 			.salePercentage(salePercentage)
 			.build();
 		bookSaleInfoRepository.save(bookSaleInfo);
@@ -140,7 +140,7 @@ public class BookRegisterServiceImpl implements BookRegisterService {
 			.salePercentage(aladinBook.getSalePercentage())
 			.stock(request.getStock())
 			.isPackable(request.getIsPackable())
-			.state(request.getState())
+			.state(toStateOrThrow(request.getState()))
 			.build();
 		bookSaleInfoRepository.save(saleInfo);
 	}
@@ -151,5 +151,16 @@ public class BookRegisterServiceImpl implements BookRegisterService {
 		return Arrays.stream(authorsStr.split(","))
 			.map(String::trim)
 			.toList();
+	}
+
+	public BookSaleInfo.State toStateOrThrow(String stateStr) {
+		if (stateStr == null) {
+			throw new IllegalArgumentException("State 값이 null입니다.");
+		}
+		try {
+			return BookSaleInfo.State.valueOf(stateStr);
+		} catch (IllegalArgumentException e) {
+			throw new IllegalArgumentException("유효하지 않은 상태 값입니다: " + stateStr);
+		}
 	}
 }

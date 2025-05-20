@@ -9,8 +9,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import shop.bluebooktle.backend.book.adapter.AladinAdaptor;
 import shop.bluebooktle.backend.book.dto.response.AladinApiResponse;
-import shop.bluebooktle.backend.book.dto.response.AladinBookResponse;
 import shop.bluebooktle.backend.book.service.AladinBookService;
+import shop.bluebooktle.common.dto.book.response.AladinBookResponse;
 
 @Service
 @RequiredArgsConstructor
@@ -23,7 +23,7 @@ public class AladinBookServiceImpl implements AladinBookService {
 	@Override
 	public List<AladinBookResponse> searchBooks(String query) {
 		AladinApiResponse response = aladinAdaptor.searchBooks(query);
-		
+
 		return response.getItem().stream()
 			.map(AladinBookResponse::from)
 			.collect(Collectors.toList());

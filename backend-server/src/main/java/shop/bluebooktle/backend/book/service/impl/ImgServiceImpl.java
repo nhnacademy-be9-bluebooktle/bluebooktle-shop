@@ -4,12 +4,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
-import shop.bluebooktle.backend.book.dto.request.img.ImgRegisterRequest;
-import shop.bluebooktle.backend.book.dto.request.img.ImgUpdateRequest;
-import shop.bluebooktle.backend.book.dto.response.img.ImgResponse;
 import shop.bluebooktle.backend.book.entity.Img;
 import shop.bluebooktle.backend.book.repository.ImgRepository;
 import shop.bluebooktle.backend.book.service.ImgService;
+import shop.bluebooktle.common.dto.book.request.img.ImgRegisterRequest;
+import shop.bluebooktle.common.dto.book.request.img.ImgUpdateRequest;
+import shop.bluebooktle.common.dto.book.response.img.ImgResponse;
 import shop.bluebooktle.common.exception.book.ImgAlreadyExistsException;
 import shop.bluebooktle.common.exception.book.ImgIdNullException;
 import shop.bluebooktle.common.exception.book.ImgNotFoundException;

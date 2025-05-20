@@ -19,12 +19,12 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import shop.bluebooktle.backend.book.dto.request.CategoryRegisterRequest;
-import shop.bluebooktle.backend.book.dto.request.CategoryUpdateRequest;
-import shop.bluebooktle.backend.book.dto.request.RootCategoryRegisterRequest;
-import shop.bluebooktle.backend.book.dto.response.CategoryResponse;
-import shop.bluebooktle.backend.book.dto.response.CategoryTreeResponse;
 import shop.bluebooktle.backend.book.service.CategoryService;
+import shop.bluebooktle.common.dto.book.request.CategoryRegisterRequest;
+import shop.bluebooktle.common.dto.book.request.CategoryUpdateRequest;
+import shop.bluebooktle.common.dto.book.request.RootCategoryRegisterRequest;
+import shop.bluebooktle.common.dto.book.response.CategoryResponse;
+import shop.bluebooktle.common.dto.book.response.CategoryTreeResponse;
 import shop.bluebooktle.common.dto.common.JsendResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
 
