@@ -1,0 +1,82 @@
+package shop.bluebooktle.frontend.service.impl;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
+import lombok.RequiredArgsConstructor;
+import shop.bluebooktle.backend.book.dto.request.TagRequest;
+import shop.bluebooktle.backend.book.dto.response.TagInfoResponse;
+import shop.bluebooktle.common.dto.common.JsendResponse;
+import shop.bluebooktle.common.dto.common.PaginationData;
+import shop.bluebooktle.common.exception.book.TagCreateException;
+import shop.bluebooktle.common.exception.book.TagDeleteException;
+import shop.bluebooktle.common.exception.book.TagListFetchException;
+import shop.bluebooktle.common.exception.book.TagNotFoundException;
+import shop.bluebooktle.common.exception.book.TagUpdateException;
+import shop.bluebooktle.frontend.dto.TagDto;
+import shop.bluebooktle.frontend.repository.TagRepository;
+import shop.bluebooktle.frontend.service.AdminTagService;
+
+@Service
+@RequiredArgsConstructor
+public class AdminTagServiceImpl implements AdminTagService {
+	private final TagRepository tagRepository;
+
+	@Override
+	public Page<TagDto> getTags(int page, int size, String searchKeyword) {
+		Pageable pageable = PageRequest.of(page, size); // 페이징 정보를 Spring Data Pageable 객체로 변환해 주는 작업
+		JsendResponse<PaginationData<TagInfoResponse>> response = tagRepository.getTags(page + 1, size);
+		if (!"success".equalsIgnoreCase(response.status())) { // JSend 상태가 success 가 아니면 태그 목록 조회 예외를 던짐
+			throw new TagListFetchException();
+		}
+		// Feign 으로 받은 JSend 형태의 페이징 응답 -> Spring Data Page<T> 객체로 변환해 주는 작업
+		PaginationData<TagInfoResponse> data = response.data(); // 페이징된 태그 목록과 객체 꺼냄
+		List<TagDto> filtered = data.getContent().stream()
+			.filter(tag -> searchKeyword == null || tag.getName().contains(searchKeyword))
+			.map(tag -> new TagDto(tag.getId(), tag.getName(), null, null))
+			.collect(Collectors.toList());
+
+		return new PageImpl<>(filtered, pageable,
+			data.getTotalElements()); // 뷰에서 페이징 정보(총 페이지, 현재 페이지, 아이템 리스트) 사용 가능하게 반환
+	}
+
+	@Override
+	public TagDto getTag(Long id) {
+		JsendResponse<TagInfoResponse> response = tagRepository.getTag(id);
+		if (!"success".equalsIgnoreCase(response.status())) {
+			throw new TagNotFoundException();
+		}
+		TagInfoResponse tag = response.data();
+		return new TagDto(tag.getId(), tag.getName(), null, null);
+	}
+
+	@Override
+	public void createTag(TagRequest request) {
+		JsendResponse<Void> response = tagRepository.createTag(request);
+		if (!"success".equalsIgnoreCase(response.status())) { // JSend 상태가 success 가 아니면 예외를 던짐
+			throw new TagCreateException();
+		}
+	}
+
+	@Override
+	public void updateTag(Long id, TagRequest request) {
+		JsendResponse<Void> response = tagRepository.updateTag(id, request);
+		if (!"success".equalsIgnoreCase(response.status())) { // JSend 상태가 success 가 아니면 예외를 던짐
+			throw new TagUpdateException();
+		}
+	}
+
+	@Override
+	public void deleteTag(Long id) {
+		JsendResponse<Void> response = tagRepository.deleteTag(id);
+		if (!"success".equalsIgnoreCase(response.status())) { // JSend 상태가 success 가 아니면 예외를 던짐
+			throw new TagDeleteException();
+		}
+	}
+}
