@@ -31,14 +31,20 @@ public class AdminTagServiceImpl implements AdminTagService {
 	@Override
 	public Page<TagDto> getTags(int page, int size, String searchKeyword) {
 		Pageable pageable = PageRequest.of(page, size); // 페이징 정보를 Spring Data Pageable 객체로 변환해 주는 작업
+
+		String keyword = null; // 빈 문자열은 null로 간주
+		if (searchKeyword != null && !searchKeyword.isBlank()) {
+			keyword = searchKeyword;
+		}
+
 		JsendResponse<PaginationData<TagInfoResponse>> response = tagRepository.getTags(page + 1, size);
+
 		if (!"success".equalsIgnoreCase(response.status())) { // JSend 상태가 success 가 아니면 태그 목록 조회 예외를 던짐
 			throw new TagListFetchException();
 		}
 		// Feign 으로 받은 JSend 형태의 페이징 응답 -> Spring Data Page<T> 객체로 변환해 주는 작업
 		PaginationData<TagInfoResponse> data = response.data(); // 페이징된 태그 목록과 객체 꺼냄
 		List<TagDto> filtered = data.getContent().stream()
-			.filter(tag -> searchKeyword == null || tag.getName().contains(searchKeyword))
 			.map(tag -> new TagDto(tag.getId(), tag.getName(), null, null))
 			.collect(Collectors.toList());
 
