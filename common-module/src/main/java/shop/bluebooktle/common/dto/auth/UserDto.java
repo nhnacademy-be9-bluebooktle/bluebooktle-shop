@@ -1,8 +1,5 @@
 package shop.bluebooktle.common.dto.auth;
 
-import java.io.Serial;
-import java.io.Serializable;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,10 +13,7 @@ import shop.bluebooktle.common.domain.auth.UserType;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UserDto implements Serializable {
-	@Serial
-	private static final long serialVersionUID = 1L;
-
+public class UserDto {
 	private Long id;
 	private String loginId;
 	private String nickname;
