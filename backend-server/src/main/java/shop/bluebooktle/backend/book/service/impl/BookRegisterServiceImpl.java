@@ -2,7 +2,6 @@ package shop.bluebooktle.backend.book.service.impl;
 
 import java.math.BigDecimal;
 import java.util.Optional;
-import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,9 +10,7 @@ import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.book.dto.request.BookAllRegisterByAladinRequest;
 import shop.bluebooktle.backend.book.dto.request.BookAllRegisterRequest;
 import shop.bluebooktle.backend.book.dto.response.AladinBookResponse;
-import shop.bluebooktle.backend.book.entity.Author;
 import shop.bluebooktle.backend.book.entity.Book;
-import shop.bluebooktle.backend.book.entity.BookAuthor;
 import shop.bluebooktle.backend.book.entity.BookCategory;
 import shop.bluebooktle.backend.book.entity.BookImg;
 import shop.bluebooktle.backend.book.entity.BookPublisher;
@@ -101,30 +98,6 @@ public class BookRegisterServiceImpl implements BookRegisterService {
 		// 		));
 		// 	bookAuthorRepository.save(new BookAuthor(author, book));
 		// }
-
-		Publisher publisher = publisherRepository.findByName(request.getPublisher())
-			.orElseGet(() -> publisherRepository.save(new Publisher(request.getPublisher())));
-		bookPublisherRepository.save(new BookPublisher(book, publisher));
-
-		for (String categoryName : request.getCategory()) {
-			Category category = Optional.ofNullable(
-				categoryRepository.findByName(categoryName)
-			).orElseGet(() -> categoryRepository.save(new Category(null, categoryName, "")));
-			bookCategoryRepository.save(new BookCategory(book, category));
-		}
-
-		for (String imageUrl : request.getImageUrl()) {
-			Img img = imgRepository.findByImgUrl(imageUrl)
-				.orElseGet(() -> imgRepository.save(new Img(imageUrl)));
-			bookImgRepository.save(new BookImg(book, img, false));
-		}
-
-		for (String tagName : request.getTag()) {
-			Tag tag = tagRepository.findByName(tagName).stream()
-				.findFirst()
-				.orElseGet(() -> tagRepository.save(new Tag(tagName)));
-			bookTagRepository.save(new BookTag(tag, book));
-		}
 
 		BookSaleInfo bookSaleInfo = BookSaleInfo.builder()
 			.book(book)
