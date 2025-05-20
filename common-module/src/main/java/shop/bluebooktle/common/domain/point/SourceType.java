@@ -4,7 +4,6 @@ import lombok.Getter;
 
 @Getter
 public enum SourceType {
-	LOGIN_EARN("로그인 적립"),
 	ORDER_EARN("주문 적립"),
 	REVIEW_EARN("리뷰 적립"),
 	REGISTER_EARN("회원가입 적립"),
