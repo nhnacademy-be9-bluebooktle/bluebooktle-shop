@@ -509,8 +509,8 @@
                     </div>
                     <div id="payment-widget" style="margin-top:1rem;"></div>
                 </section>
-                <button id="payment-button"
-                        class="btn-kitsch primary-btn-kitsch checkout-submit-btn-kitsch retro-shadow-kitsch"
+                <button class="btn-kitsch primary-btn-kitsch checkout-submit-btn-kitsch retro-shadow-kitsch"
+                        id="payment-button"
                         type="button">
                     <i class="fas fa-check-circle"></i> <span th:text="${amount} + '원 결제하기'">80,200원 결제하기</span>
                 </button>
@@ -551,8 +551,8 @@
                         currency: 'KRW',
                         orderId: orderId,
                         orderName: orderName,
-                        customerName: customerEmail,
-                        customerEmail: customerName,
+                        customerName: customerName,
+                        customerEmail: customerEmail,
                         successUrl: window.location.origin + successUrl,
                         failUrl: window.location.origin + failUrl
                     });

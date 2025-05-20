@@ -11,7 +11,7 @@ import shop.bluebooktle.frontend.config.TossFeignConfig;
 
 @FeignClient(
 	name = "tossPaymentsClient",
-	url = "${toss.api.url}",
+	url = "https://api.tosspayments.com/v1",
 	configuration = TossFeignConfig.class
 )
 public interface TossPaymentsRepository {
