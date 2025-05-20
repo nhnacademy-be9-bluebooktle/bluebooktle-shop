@@ -1,4 +1,4 @@
-package shop.bluebooktle.common.dto.book.request;
+package shop.bluebooktle.backend.book.dto.request;
 
 import java.math.BigDecimal;
 

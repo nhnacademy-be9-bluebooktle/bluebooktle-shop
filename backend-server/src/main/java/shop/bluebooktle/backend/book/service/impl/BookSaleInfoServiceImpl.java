@@ -1,6 +1,7 @@
 package shop.bluebooktle.backend.book.service.impl;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ import shop.bluebooktle.common.dto.book.response.BookSaleInfoRegisterResponse;
 import shop.bluebooktle.common.dto.book.response.BookSaleInfoResponse;
 import shop.bluebooktle.common.dto.book.response.BookSaleInfoUpdateResponse;
 import shop.bluebooktle.common.exception.book.BookNotFoundException;
+import shop.bluebooktle.common.exception.book.BookSaleInfoAlreadyExistsException;
 import shop.bluebooktle.common.exception.book.BookSaleInfoNotFoundException;
 
 @Service
@@ -31,6 +33,7 @@ public class BookSaleInfoServiceImpl implements BookSaleInfoService {
 
 	@Override
 	public BookSaleInfoRegisterResponse save(BookSaleInfoRegisterRequest request) {
+		//도서가 있어야 도서 판매정보를 등록할수있음 bookId로 조회
 		Book book = bookRepository.findById(request.getBookId())
 			.orElseThrow(BookNotFoundException::new);
 
