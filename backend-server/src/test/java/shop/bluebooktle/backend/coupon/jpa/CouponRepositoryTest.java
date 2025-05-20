@@ -110,6 +110,7 @@ class CouponRepositoryTest { //custom Repository Test 진행
 				.loginId("test123")
 				.encodedPassword("password123")
 				.name("테스트 유저")
+				.nickname("유저 닉네임")
 				.email("test@example.com")
 				.birth("2025-01-01")
 				.phoneNumber("01012345678")

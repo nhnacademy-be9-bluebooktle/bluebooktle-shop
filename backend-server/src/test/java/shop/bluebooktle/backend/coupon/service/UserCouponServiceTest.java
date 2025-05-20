@@ -81,6 +81,7 @@ class UserCouponServiceTest {
 			.name("유저1")
 			.membershipLevel(membership)
 			.email("user1@example.com")
+			.nickname("유저1")
 			.phoneNumber("01012345678")
 			.birth("1990-01-01")
 			.build();
@@ -89,6 +90,7 @@ class UserCouponServiceTest {
 			.loginId("user2")
 			.name("유저2")
 			.membershipLevel(membership)
+			.nickname("유저2")
 			.email("user2@example.com")
 			.phoneNumber("01023456789")
 			.birth("1991-01-01")
@@ -145,12 +147,12 @@ class UserCouponServiceTest {
 		Pageable pageable = PageRequest.of(0, 10);
 		Page<UserCouponResponse> page = new PageImpl<>(List.of());
 
-		given(userCouponRepository.findAllByAvailableUserCoupon(user, pageable)).willReturn(page);
+		given(userCouponRepository.findAllByUsableUserCoupon(user, pageable)).willReturn(page);
 
-		Page<UserCouponResponse> result = userCouponService.getAvailableUserCoupons(user, pageable);
+		Page<UserCouponResponse> result = userCouponService.getUsableUserCoupons(user, pageable);
 
 		assertThat(result.getContent()).isInstanceOf(List.class);
-		verify(userCouponRepository).findAllByAvailableUserCoupon(user, pageable);
+		verify(userCouponRepository).findAllByUsableUserCoupon(user, pageable);
 	}
 
 	@Test
