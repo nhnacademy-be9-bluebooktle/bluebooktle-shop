@@ -66,25 +66,14 @@ public class BookRegisterServiceImpl implements BookRegisterService {
 		BigDecimal salePercentage = request.getPrice().subtract(request.getSalePrice())
 			.divide(request.getPrice(), 2, BigDecimal.ROUND_HALF_UP)
 			.multiply(BigDecimal.valueOf(100));
+		
+		bookAuthorService.registerBookAuthor(book.getId(), request.getAuthorIdList());
 
-		//작가, 이미지 - 수정필요
+		bookPublisherService.registerBookPublisher(book.getId(), request.getAuthorIdList());
 
-		// TODO 작가 ID로 받아와서 도서작가 테이블에 등록되도록 변경
-		for (Long authorId : request.getAuthorIdList()) {
-			bookAuthorService.registerBookAuthor(book.getId(), authorId);
-		}
+		bookCategoryService.registerBookCategory(book.getId(), request.getCategoryIdList());
 
-		for (Long publisherId : request.getAuthorIdList()) {
-			bookPublisherService.registerBookPublisher(book.getId(), publisherId);
-		}
-
-		for (Long categoryId : request.getCategoryIdList()) {
-			bookCategoryService.registerBookCategory(book.getId(), categoryId);
-		}
-
-		for (Long tagId : request.getTagIdList()) {
-			bookTagService.registerBookTag(book.getId(), tagId);
-		}
+		bookTagService.registerBookTag(book.getId(), request.getTagIdList());
 
 		// TODO 일단 이미지를 url을 받아와서 저장되도록(이미지 테이블에 저장 및 도서이미지에 저장)
 		// TODO 이미지 파일 이미지 서버(MINIO)에 저장 로직 구현

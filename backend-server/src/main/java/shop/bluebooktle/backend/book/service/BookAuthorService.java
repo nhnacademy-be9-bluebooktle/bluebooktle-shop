@@ -10,6 +10,8 @@ public interface BookAuthorService {
 	// 도서 작가 등록
 	void registerBookAuthor(Long bookId, Long authorId);
 
+	void registerBookAuthor(Long bookId, List<Long> authorIdList);
+
 	// 특정 도서의 모든 작가 목록 조회
 	List<AuthorResponse> getAuthorByBookId(Long bookId);
 

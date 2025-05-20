@@ -32,9 +32,9 @@ public class BookTagServiceImpl implements BookTagService {
 	private final TagRepository tagRepository;
 
 	@Override
-	public void registerBookTag(Long tagId, Long bookId) {
-		Tag tag = findTagOrThrow(tagId);
+	public void registerBookTag(Long bookId, Long tagId) {
 		Book book = findBookOrThrow(bookId);
+		Tag tag = findTagOrThrow(tagId);
 
 		if (bookTagRepository.existsByBookAndTag(book, tag)) {
 			throw new BookTagAlreadyExistsException(bookId, tagId);
@@ -47,10 +47,17 @@ public class BookTagServiceImpl implements BookTagService {
 	}
 
 	@Override
+	public void registerBookTag(Long bookId, List<Long> tagIdList) {
+		for (Long tagId : tagIdList) {
+			registerBookTag(bookId, tagId);
+		}
+	}
+
+	@Override
 	public void deleteBookTag(Long tagId, Long bookId) {
 		Tag tag = findTagOrThrow(tagId);
 		Book book = findBookOrThrow(bookId);
-		
+
 		BookTag bookTag = bookTagRepository.findByBookAndTag(book, tag)
 			.orElseThrow(() -> new BookTagNotFoundException(bookId, tagId));
 		bookTagRepository.delete(bookTag);

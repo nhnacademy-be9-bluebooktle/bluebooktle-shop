@@ -55,6 +55,13 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 	}
 
 	@Override
+	public void registerBookCategory(Long bookId, List<Long> categoryIdList) {
+		for (Long categoryId : categoryIdList) {
+			registerBookCategory(bookId, categoryId);
+		}
+	}
+
+	@Override
 	public void deleteBookCategory(Long bookId, Long categoryId) {
 		Book book = requireBook(bookId);
 		Category category = requireCategory(categoryId);

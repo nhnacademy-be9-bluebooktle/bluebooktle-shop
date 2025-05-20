@@ -1,9 +1,7 @@
 package shop.bluebooktle.backend.book.service.impl;
 
 import java.util.List;
-import java.util.Optional;
 
-import org.hibernate.query.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,11 +15,9 @@ import shop.bluebooktle.backend.book.repository.AuthorRepository;
 import shop.bluebooktle.backend.book.repository.BookAuthorRepository;
 import shop.bluebooktle.backend.book.repository.BookRepository;
 import shop.bluebooktle.backend.book.service.BookAuthorService;
-import shop.bluebooktle.common.exception.book.AuthorIdNullException;
 import shop.bluebooktle.common.exception.book.AuthorNotFoundException;
 import shop.bluebooktle.common.exception.book.BookAuthorAlreadyExistsException;
 import shop.bluebooktle.common.exception.book.BookAuthorNotFoundException;
-import shop.bluebooktle.common.exception.book.BookIdNullException;
 import shop.bluebooktle.common.exception.book.BookNotFoundException;
 
 @Service
@@ -50,6 +46,13 @@ public class BookAuthorServiceImpl implements BookAuthorService {
 			.author(author)
 			.build();
 		bookAuthorRepository.save(ba);
+	}
+
+	@Override
+	public void registerBookAuthor(Long bookId, List<Long> authorIdList) {
+		for (Long authorId : authorIdList) {
+			registerBookAuthor(bookId, authorId);
+		}
 	}
 
 	@Transactional(readOnly = true)

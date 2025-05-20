@@ -14,6 +14,8 @@ public interface BookCategoryService {
 	// 도서 카테고리 등록 -> 도서당 최대 10개 카테고리 가짐
 	void registerBookCategory(Long bookId, Long categoryId);
 
+	void registerBookCategory(Long bookId, List<Long> categoryIdList);
+
 	// 도서 카테고리 삭제
 	void deleteBookCategory(Long bookId, Long categoryId);
 

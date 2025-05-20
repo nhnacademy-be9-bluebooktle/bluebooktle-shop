@@ -51,10 +51,10 @@ public class BookAllRegisterRequest {
 	BookSaleInfo.State state;
 
 	@NotEmpty(message = "작가는 최소 1개 이상 필요합니다.")
-	List<@NotBlank(message = "작가 ID는 양수값이어야 합니다.") Long> authorIdList;
+	List<@Positive(message = "작가 ID는 양수값이어야 합니다.") Long> authorIdList;
 
 	@NotEmpty(message = "출판사는 최소 1개 이상 필요합니다.")
-	List<@NotBlank(message = "출판사 ID는 양수값이어야 합니다.") Long> publisherIdList;
+	List<@Positive(message = "출판사 ID는 양수값이어야 합니다.") Long> publisherIdList;
 
 	@NotEmpty(message = "카테고리는 최소 1개 이상 필요합니다.")
 	List<@Positive(message = "카테고리 ID는 양수값이어야 합니다.") Long> categoryIdList;
