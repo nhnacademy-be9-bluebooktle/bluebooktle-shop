@@ -41,10 +41,3 @@ jwt:
   secret: ${JWT_SECRET_KEY_LOCAL}
   access-token-validity-seconds: 1800
   refresh-token-validity-seconds: 3600
-
-logging:
-  level:
-    shop.bluebooktle.auth: DEBUG
-    org.hibernate.SQL: DEBUG
-    org.springframework.security: DEBUG
-    com.zaxxer.hikari: DEBUG

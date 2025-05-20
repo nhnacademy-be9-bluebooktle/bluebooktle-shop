@@ -115,7 +115,7 @@ public class AuthController {
 		deleteCookie(response, "refreshToken");
 		redirectAttributes.addFlashAttribute("globalSuccessMessage", "로그아웃 되었습니다!");
 		redirectAttributes.addFlashAttribute("globalSuccessTitle", "로그아웃 성공!");
-
+		log.info("로그아웃 성공");
 		return "redirect:/";
 	}
 
