@@ -23,7 +23,6 @@ public class AladinBookServiceImpl implements AladinBookService {
 
 	private final String TTB_KEY = "ttbsua64581504003";
 	private final String BASE_URL = "http://www.aladin.co.kr/ttb/api/ItemSearch.aspx";
-	// private final String PRODUCT_READ = "http://www.aladin.co.kr/ttb/api/ItemLookUp.aspx";
 
 	//알라딘 도서 조회
 	@Override
@@ -54,33 +53,4 @@ public class AladinBookServiceImpl implements AladinBookService {
 		List<AladinBookResponse> books = searchBooks(isbn);
 		return books.getFirst();
 	}
-
-
-
-
-	/*@Override
-	public AladinBookItemBySearch searchBookByIsbn(String isbn) {
-		String url = UriComponentsBuilder
-			.fromHttpUrl(PRODUCT_READ)
-			.queryParam("ttbkey", TTB_KEY)
-			.queryParam("itemIdType", "ISBN13")
-			.queryParam("itemId", isbn)
-			.queryParam("output", "js")
-			.queryParam("Version", "20131101")
-			.queryParam("Cover", "Big")
-			.queryParam("OptResult", "authors")
-			.build()
-			.toUriString();
-
-		log.info("{}", url);
-		ResponseEntity<AladinItemLookupResponse> response = restTemplate.getForEntity(url,
-			AladinItemLookupResponse.class);
-		List<AladinBookItemBySearch> items = response.getBody().getItem();
-
-		if (items == null || items.isEmpty()) {
-			throw new AladinBookNotFoundException("도서를 찾을 수 없습니다.");
-		}
-
-		return items.get(0);
-	}*/
 }
