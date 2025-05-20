@@ -4,7 +4,7 @@
         <springProperty name="PORT" source="server.port"/>
         <springProperty name="PROFILE" source="spring.profiles.active"/>
 
-        <property name="LOG_FOLDER" value="logs/${PROFILE}"/>
+        <property name="LOG_FOLDER" value="logs/${PROFILE}/server"/>
 
         <property name="LOG_FILE" value="${LOG_FOLDER}/${APP_NAME}-${PORT}.log"/>
 
@@ -36,7 +36,7 @@
         <springProperty name="PORT" source="server.port"/>
         <springProperty name="PROFILE" source="spring.profiles.active"/>
 
-        <property name="LOG_FOLDER" value="logs/${PROFILE}"/>
+        <property name="LOG_FOLDER" value="logs/${PROFILE}/server"/>
 
         <property name="LOG_FILE" value="${LOG_FOLDER}/${APP_NAME}-${PORT}.log"/>
 
