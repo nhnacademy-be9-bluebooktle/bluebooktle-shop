@@ -10,6 +10,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -20,7 +21,9 @@ import shop.bluebooktle.common.entity.BaseEntity;
 @Entity
 @Table(name = "tag")
 @Getter
+@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 @EqualsAndHashCode(of = "id", callSuper = false)
 @SQLDelete(sql = "UPDATE tag SET deleted_at = CURRENT_TIMESTAMP WHERE tag_id = ?")
 @SQLRestriction("deleted_at IS NULL")
@@ -35,7 +38,6 @@ public class Tag extends BaseEntity {
 	@Setter
 	private String name;
 
-	@Builder
 	public Tag(String name) {
 		this.name = name;
 	}

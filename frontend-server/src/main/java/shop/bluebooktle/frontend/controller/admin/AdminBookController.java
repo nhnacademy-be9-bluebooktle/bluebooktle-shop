@@ -252,7 +252,8 @@ public class AdminBookController {
 		// 생성자: CategoryDto(Long id, String name, Long parentId, String categoryPath, LocalDateTime createdAt, LocalDateTime deletedAt)
 		model.addAttribute("allCategories", Arrays.asList(
 			new AdminCategoryController.CategoryDto(1L, "국내도서", null, "/1", LocalDateTime.now().minusDays(10), null),
-			new AdminCategoryController.CategoryDto(2L, "소설", 1L, "/1/2", LocalDateTime.now().minusDays(9), null)
+			new AdminCategoryController.CategoryDto(2L, "소설", 1L, "/1/2", LocalDateTime.now().minusDays(9), null),
+			new AdminCategoryController.CategoryDto(3L, "해외도서", null, "/1", LocalDateTime.now().minusDays(8), null)
 			// depth, parentName, isActive는 CategoryDto 내부 로직 또는 flattenCategories에서 처리됨 (AdminCategoryController 참고)
 		));
 
