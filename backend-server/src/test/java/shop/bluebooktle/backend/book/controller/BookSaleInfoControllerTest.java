@@ -17,13 +17,15 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import shop.bluebooktle.backend.book.dto.request.BookSaleInfoRegisterRequest;
-import shop.bluebooktle.backend.book.dto.request.BookSaleInfoUpdateRequest;
-import shop.bluebooktle.backend.book.dto.response.BookSaleInfoRegisterResponse;
-import shop.bluebooktle.backend.book.dto.response.BookSaleInfoUpdateResponse;
 import shop.bluebooktle.backend.book.entity.Book;
 import shop.bluebooktle.backend.book.entity.BookSaleInfo;
 import shop.bluebooktle.backend.book.service.BookSaleInfoService;
+import shop.bluebooktle.common.dto.book.BookSaleInfoState;
+import shop.bluebooktle.common.dto.book.request.BookSaleInfoRegisterRequest;
+import shop.bluebooktle.common.dto.book.request.BookSaleInfoUpdateRequest;
+import shop.bluebooktle.common.dto.book.response.BookSaleInfoRegisterResponse;
+import shop.bluebooktle.common.dto.book.response.BookSaleInfoResponse;
+import shop.bluebooktle.common.dto.book.response.BookSaleInfoUpdateResponse;
 
 @WebMvcTest(BookSaleInfoController.class)
 class BookSaleInfoControllerTest {
@@ -47,7 +49,7 @@ class BookSaleInfoControllerTest {
 			.salePrice(BigDecimal.valueOf(18000))
 			.stock(50)
 			.isPackable(true)
-			.state(BookSaleInfo.State.AVAILABLE)
+			.bookSaleInfoState(BookSaleInfoState.AVAILABLE)
 			.build();
 
 		BookSaleInfoRegisterResponse response = BookSaleInfoRegisterResponse.builder()
@@ -80,7 +82,10 @@ class BookSaleInfoControllerTest {
 		// Given
 		Long id = 1L;
 
-		Book book = new Book();
+		Book book = Book.builder()
+			.id(1L)
+			.title("Test Book")
+			.build();
 
 		BookSaleInfo bookSaleInfo = BookSaleInfo.builder()
 			.id(id)
@@ -90,20 +95,38 @@ class BookSaleInfoControllerTest {
 			.salePercentage(BigDecimal.valueOf(10))
 			.stock(50)
 			.isPackable(true)
-			.state(BookSaleInfo.State.AVAILABLE)
+			.bookSaleInfoState(BookSaleInfoState.AVAILABLE)
 			.build();
 
-		BookSaleInfoUpdateResponse response = BookSaleInfoUpdateResponse.fromEntity(bookSaleInfo);
+		// BookSaleInfoResponse 객체 생성
+		BookSaleInfoResponse response = BookSaleInfoResponse.builder()
+			.id(bookSaleInfo.getId())
+			.title(bookSaleInfo.getBook().getTitle())
+			.price(bookSaleInfo.getPrice())
+			.salePrice(bookSaleInfo.getSalePrice())
+			.salePercentage(bookSaleInfo.getSalePercentage())
+			.stock(bookSaleInfo.getStock())
+			.isPackable(bookSaleInfo.isPackable())
+			.state(bookSaleInfo.getBookSaleInfoState().name())
+			.build();
 
+		// Mock 설정
 		Mockito.when(bookSaleInfoService.findById(eq(id)))
-			.thenReturn(bookSaleInfo);
+			.thenReturn(response);
 
 		// When & Then
 		mockMvc.perform(get("/api/book-sale-infos/{id}", id)
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.status").value("success"))
-			.andExpect(jsonPath("$.data.id").value(1L));
+			.andExpect(jsonPath("$.data.id").value(response.getId()))
+			.andExpect(jsonPath("$.data.title").value(response.getTitle()))
+			.andExpect(jsonPath("$.data.price").value(response.getPrice().intValue())) // BigDecimal 값을 단순 숫자로 매칭
+			.andExpect(jsonPath("$.data.salePrice").value(response.getSalePrice().intValue()))
+			.andExpect(jsonPath("$.data.salePercentage").value(response.getSalePercentage().intValue()))
+			.andExpect(jsonPath("$.data.stock").value(response.getStock()))
+			.andExpect(jsonPath("$.data.isPackable").value(response.getIsPackable()))
+			.andExpect(jsonPath("$.data.state").value(response.getState()));
 	}
 
 	@Test
@@ -118,7 +141,7 @@ class BookSaleInfoControllerTest {
 			.salePrice(BigDecimal.valueOf(20000))
 			.stock(40)
 			.isPackable(false)
-			.state(BookSaleInfo.State.AVAILABLE)
+			.bookSaleInfoState(BookSaleInfoState.AVAILABLE)
 			.build();
 
 		BookSaleInfoUpdateResponse response = BookSaleInfoUpdateResponse.builder()
@@ -129,7 +152,7 @@ class BookSaleInfoControllerTest {
 			.salePercentage(BigDecimal.valueOf(9.1))
 			.stock(40)
 			.isPackable(false)
-			.state("UNAVAILABLE")
+			.state("AVAILABLE")
 			.build();
 
 		Mockito.when(bookSaleInfoService.update(eq(id), any(BookSaleInfoUpdateRequest.class)))

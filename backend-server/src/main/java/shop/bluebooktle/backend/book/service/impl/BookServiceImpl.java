@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
-import shop.bluebooktle.backend.book.dto.response.BookAllResponse;
 import shop.bluebooktle.backend.book.entity.Book;
 import shop.bluebooktle.backend.book.entity.BookSaleInfo;
 import shop.bluebooktle.backend.book.repository.BookAuthorRepository;
@@ -20,6 +19,7 @@ import shop.bluebooktle.backend.book.repository.BookTagRepository;
 import shop.bluebooktle.backend.book.service.BookService;
 import shop.bluebooktle.common.dto.book.request.BookRegisterRequest;
 import shop.bluebooktle.common.dto.book.request.BookUpdateRequest;
+import shop.bluebooktle.common.dto.book.response.BookAllResponse;
 import shop.bluebooktle.common.dto.book.response.BookRegisterResponse;
 import shop.bluebooktle.common.dto.book.response.BookResponse;
 import shop.bluebooktle.common.dto.book.response.BookUpdateResponse;
@@ -125,7 +125,7 @@ public class BookServiceImpl implements BookService {
 			.publisher(getPublisherByBookId(book.getId()))           // 출판사 이름
 			.categories(getCategoriesByBookId(book.getId()))         // 카테고리 리스트
 			.tags(getTagsByBookId(book.getId()))                     // 태그 리스트
-			.state(saleInfo.getState())
+			.bookSaleInfoState(saleInfo.getBookSaleInfoState())
 			.viewCount(saleInfo.getViewCount())                      // 조회수
 			.searchCount(saleInfo.getSearchCount())                  // 검색수
 			.build();
@@ -156,7 +156,7 @@ public class BookServiceImpl implements BookService {
 					.publisher(getPublisherByBookId(book.getId()))           // 출판사 이름
 					.categories(getCategoriesByBookId(book.getId()))         // 카테고리 리스트
 					.tags(getTagsByBookId(book.getId()))                     // 태그 리스트
-					.state(saleInfo.getState())
+					.bookSaleInfoState(saleInfo.getBookSaleInfoState())
 					.viewCount(saleInfo.getViewCount())                      // 조회수
 					.searchCount(saleInfo.getSearchCount())                  // 검색수
 					.build();

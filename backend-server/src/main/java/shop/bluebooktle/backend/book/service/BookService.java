@@ -2,10 +2,10 @@ package shop.bluebooktle.backend.book.service;
 
 import java.util.List;
 
-import shop.bluebooktle.backend.book.dto.response.BookAllResponse;
 import shop.bluebooktle.backend.book.entity.Book;
 import shop.bluebooktle.common.dto.book.request.BookRegisterRequest;
 import shop.bluebooktle.common.dto.book.request.BookUpdateRequest;
+import shop.bluebooktle.common.dto.book.response.BookAllResponse;
 import shop.bluebooktle.common.dto.book.response.BookRegisterResponse;
 import shop.bluebooktle.common.dto.book.response.BookResponse;
 import shop.bluebooktle.common.dto.book.response.BookUpdateResponse;
