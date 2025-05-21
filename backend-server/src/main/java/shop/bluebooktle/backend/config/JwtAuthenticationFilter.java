@@ -49,16 +49,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 				} else {
 					log.info("JwtAuthenticationFilter: 사용자 ID '{}'에 해당하는 사용자를 찾을 수 없습니다. URI: {}", userId,
 						request.getRequestURI());
-					SecurityContextHolder.clearContext();
 				}
 			} else {
 				if (StringUtils.hasText(jwt)) {
 					log.info("JwtAuthenticationFilter: 유효하지 않은 JWT 토큰입니다. URI: {}", request.getRequestURI());
 				}
-				SecurityContextHolder.clearContext();
 			}
+		} catch (io.jsonwebtoken.ExpiredJwtException e) {
+			log.info("JwtAuthenticationFilter: 만료된 JWT 토큰입니다. URI: {}", request.getRequestURI());
+			SecurityContextHolder.clearContext();
+		} catch (io.jsonwebtoken.MalformedJwtException | io.jsonwebtoken.security.SignatureException |
+				 io.jsonwebtoken.UnsupportedJwtException | IllegalArgumentException e) {
+			log.info("JwtAuthenticationFilter: 유효하지 않은 형식의 JWT 토큰입니다. {} - URI: {}", e.getMessage(),
+				request.getRequestURI());
+			SecurityContextHolder.clearContext();
 		} catch (Exception e) {
-			log.info("JwtAuthenticationFilter: JWT 인증 필터 처리 중 오류 발생: {}", e.getMessage(), e);
+			log.error("JwtAuthenticationFilter: JWT 인증 필터 처리 중 예측하지 못한 오류 발생: {}", e.getMessage(), e);
 			SecurityContextHolder.clearContext();
 		}
 

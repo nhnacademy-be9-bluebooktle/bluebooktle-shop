@@ -46,17 +46,17 @@ public class ProfileController {
 	@GetMapping("")
 	public String userProfilePage(Model model, RedirectAttributes redirectAttributes) {
 		try {
-			UserResponse user = userService.getMe();
-			model.addAttribute("user", user);
+			UserResponse userResponse = userService.getMe();
+			model.addAttribute("user", userResponse);
 
 			if (!model.containsAttribute("UserUpdateRequest")) {
-				UserUpdateRequest dto = new UserUpdateRequest();
-				if (user != null) {
-					dto.setNickname(user.getNickname());
-					dto.setPhoneNumber(user.getPhoneNumber());
-					dto.setBirthDate(convertToDisplayFormat(user.getBirth()));
+				UserUpdateRequest userUpdateRequest = new UserUpdateRequest();
+				if (userResponse != null) {
+					userUpdateRequest.setNickname(userResponse.getNickname());
+					userUpdateRequest.setPhoneNumber(userResponse.getPhoneNumber());
+					userUpdateRequest.setBirthDate(convertToDisplayFormat(userResponse.getBirth()));
 				}
-				model.addAttribute("UserUpdateRequest", dto);
+				model.addAttribute("UserUpdateRequest", userUpdateRequest);
 			}
 		} catch (ApplicationException e) {
 			redirectAttributes.addFlashAttribute("globalErrorMessage", e.getErrorCode().getMessage());
@@ -68,7 +68,7 @@ public class ProfileController {
 
 	@PostMapping("/{id}")
 	public String updateUserProfile(@PathVariable Long id,
-		@Valid @ModelAttribute("UserUpdateRequest") UserUpdateRequest userUpdateRequest, // 모델 객체 이름 명시
+		@Valid @ModelAttribute("UserUpdateRequest") UserUpdateRequest userUpdateRequest,
 		BindingResult bindingResult,
 		RedirectAttributes redirectAttributes) {
 
