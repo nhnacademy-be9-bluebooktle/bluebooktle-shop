@@ -18,13 +18,13 @@ import shop.bluebooktle.common.exception.book.TagDeleteException;
 import shop.bluebooktle.common.exception.book.TagListFetchException;
 import shop.bluebooktle.common.exception.book.TagNotFoundException;
 import shop.bluebooktle.common.exception.book.TagUpdateException;
-import shop.bluebooktle.frontend.repository.TagRepository;
+import shop.bluebooktle.frontend.repository.AdminTagRepository;
 import shop.bluebooktle.frontend.service.AdminTagService;
 
 @Service
 @RequiredArgsConstructor
 public class AdminTagServiceImpl implements AdminTagService {
-	private final TagRepository tagRepository;
+	private final AdminTagRepository tagRepository;
 
 	@Override
 	public Page<TagInfoResponse> getTags(int page, int size, String searchKeyword) {
