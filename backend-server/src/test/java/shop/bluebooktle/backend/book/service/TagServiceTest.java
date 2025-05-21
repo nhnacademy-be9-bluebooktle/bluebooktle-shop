@@ -130,7 +130,8 @@ public class TagServiceTest {
 		Tag tag2 = new Tag(2L, "Tag 2");
 		List<Tag> tagList = Arrays.asList(tag1, tag2);
 		Page<Tag> tagPage = new PageImpl<>(tagList, pageable, tagList.size());
-		when(tagRepository.findAll(pageable)).thenReturn(tagPage);
+
+		when(tagRepository.findAllByDeletedAtIsNull(pageable)).thenReturn(tagPage);
 
 		// When: getTags 메서드 호출
 		Page<TagInfoResponse> responsePage = tagService.getTags(pageable);
