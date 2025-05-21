@@ -34,6 +34,7 @@ public enum ErrorCode {
 	AUTH_ADDRESS_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "A013", "주소는 최대 10개까지 등록할 수 있습니다."),
 	AUTH_INVALID_ADDRESS(HttpStatus.BAD_REQUEST, "A014", "유효하지 않은 주소 정보입니다."),
 	AUTH_MEMBERSHIP_LEVEL_NOT_FOUND(HttpStatus.NOT_FOUND, "A015", "회원 등급 정보를 찾을 수 없습니다."),
+	AUTH_INVALID_USER_ID(HttpStatus.BAD_REQUEST, "A016", "유효하지 않은 계정 ID입니다."),
 
 	// Book Errors (도서 관련 오류) - B
 	BOOK_NOT_FOUND(HttpStatus.NOT_FOUND, "B001", "도서를 찾을 수 없습니다."),

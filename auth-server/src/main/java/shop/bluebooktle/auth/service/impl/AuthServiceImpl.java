@@ -11,7 +11,6 @@ import shop.bluebooktle.auth.repository.MembershipLevelRepository;
 import shop.bluebooktle.auth.repository.UserRepository;
 import shop.bluebooktle.auth.service.AuthService;
 import shop.bluebooktle.auth.service.RefreshTokenService;
-import shop.bluebooktle.auth.util.JwtUtil;
 import shop.bluebooktle.common.domain.auth.UserStatus;
 import shop.bluebooktle.common.domain.auth.UserType;
 import shop.bluebooktle.common.dto.auth.request.LoginRequest;
@@ -27,6 +26,7 @@ import shop.bluebooktle.common.exception.auth.InvalidRefreshTokenException;
 import shop.bluebooktle.common.exception.auth.LoginIdAlreadyExistsException;
 import shop.bluebooktle.common.exception.auth.UserNotFoundException;
 import shop.bluebooktle.common.exception.auth.WithdrawnAccountException;
+import shop.bluebooktle.common.util.JwtUtil;
 
 @Service
 @RequiredArgsConstructor

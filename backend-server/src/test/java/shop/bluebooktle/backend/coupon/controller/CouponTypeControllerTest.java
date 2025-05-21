@@ -1,6 +1,7 @@
 package shop.bluebooktle.backend.coupon.controller;
 
 import static org.mockito.BDDMockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -16,6 +17,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -24,7 +26,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import shop.bluebooktle.backend.coupon.service.CouponTypeService;
 import shop.bluebooktle.common.domain.CouponTypeTarget;
+import shop.bluebooktle.common.dto.coupon.request.CouponTypeRegisterRequest;
 import shop.bluebooktle.common.dto.coupon.response.CouponTypeResponse;
+import shop.bluebooktle.common.service.AuthUserLoader;
+import shop.bluebooktle.common.util.JwtUtil;
 
 @WebMvcTest(controllers = CouponTypeController.class)
 class CouponTypeControllerTest {
@@ -38,25 +43,31 @@ class CouponTypeControllerTest {
 	@Autowired
 	private ObjectMapper objectMapper;
 
-	// @Test
-	// @DisplayName("쿠폰 정책 등록 - 성공")
-	// @WithMockUser
-	// void registerCouponType_success() throws Exception {
-	// 	CouponTypeRegisterRequest request = CouponTypeRegisterRequest.builder()
-	// 		.name("도서 10% 할인")
-	// 		.target(CouponTypeTarget.BOOK)
-	// 		.minimumPayment(new BigDecimal("10000"))
-	// 		.discountPercent(10)
-	// 		.build();
-	//
-	// 	mockMvc.perform(post("/api/admin/coupon-type")
-	// 			.contentType(MediaType.APPLICATION_JSON)
-	// 			.content(objectMapper.writeValueAsString(request)))
-	// 		.andExpect(status().isCreated())
-	// 		.andExpect(jsonPath("$.status").value("success"));
-	//
-	// 	verify(couponTypeService).registerCouponType(any());
-	// }
+	@MockitoBean
+	private JwtUtil jwtUtil;
+
+	@MockitoBean
+	private AuthUserLoader authUserLoader;
+
+	@Test
+	@DisplayName("쿠폰 정책 등록 - 성공")
+	@WithMockUser
+	void registerCouponType_success() throws Exception {
+		CouponTypeRegisterRequest request = CouponTypeRegisterRequest.builder()
+			.name("도서 10% 할인")
+			.target(CouponTypeTarget.BOOK)
+			.minimumPayment(new BigDecimal("10000"))
+			.discountPercent(10)
+			.build();
+
+		mockMvc.perform(post("/api/admin/coupon-type")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request)).with(csrf()))
+			.andExpect(status().isCreated())
+			.andExpect(jsonPath("$.status").value("success"));
+
+		verify(couponTypeService).registerCouponType(any());
+	}
 
 	@Test
 	@DisplayName("쿠폰 정책 전체 조회 - 성공")

@@ -1,6 +1,7 @@
 package shop.bluebooktle.backend.book.controller;
 
 import static org.mockito.ArgumentMatchers.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -12,6 +13,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -26,6 +28,8 @@ import shop.bluebooktle.common.dto.book.request.BookSaleInfoUpdateRequest;
 import shop.bluebooktle.common.dto.book.response.BookSaleInfoRegisterResponse;
 import shop.bluebooktle.common.dto.book.response.BookSaleInfoResponse;
 import shop.bluebooktle.common.dto.book.response.BookSaleInfoUpdateResponse;
+import shop.bluebooktle.common.service.AuthUserLoader;
+import shop.bluebooktle.common.util.JwtUtil;
 
 @WebMvcTest(BookSaleInfoController.class)
 class BookSaleInfoControllerTest {
@@ -39,8 +43,15 @@ class BookSaleInfoControllerTest {
 	@MockitoBean
 	private BookSaleInfoService bookSaleInfoService;
 
+	@MockitoBean
+	private JwtUtil jwtUtil;
+
+	@MockitoBean
+	private AuthUserLoader authUserLoader;
+
 	@Test
 	@DisplayName("도서 판매정보 등록 성공")
+	@WithMockUser
 	void registerBookSaleInfo_Success() throws Exception {
 		// Given
 		BookSaleInfoRegisterRequest request = BookSaleInfoRegisterRequest.builder()
@@ -69,7 +80,7 @@ class BookSaleInfoControllerTest {
 		// When & Then
 		mockMvc.perform(post("/api/book-sale-infos")
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(request)))
+				.content(objectMapper.writeValueAsString(request)).with(csrf()))
 			.andExpect(status().isCreated())
 			.andExpect(jsonPath("$.status").value("success"))
 			.andExpect(jsonPath("$.data.id").value(1L))
@@ -78,6 +89,7 @@ class BookSaleInfoControllerTest {
 
 	@Test
 	@DisplayName("도서 판매정보 조회 성공")
+	@WithMockUser
 	void getBookSaleInfoById_Success() throws Exception {
 		// Given
 		Long id = 1L;
@@ -131,6 +143,7 @@ class BookSaleInfoControllerTest {
 
 	@Test
 	@DisplayName("도서 판매정보 수정 성공")
+	@WithMockUser
 	void updateBookSaleInfo_Success() throws Exception {
 		// Given
 		Long id = 1L;
@@ -161,7 +174,7 @@ class BookSaleInfoControllerTest {
 		// When & Then
 		mockMvc.perform(put("/api/book-sale-infos/{id}", id)
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(request)))
+				.content(objectMapper.writeValueAsString(request)).with(csrf()))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.status").value("success"))
 			.andExpect(jsonPath("$.data.title").value("Updated Book"));
@@ -169,6 +182,7 @@ class BookSaleInfoControllerTest {
 
 	@Test
 	@DisplayName("도서 판매정보 삭제 성공")
+	@WithMockUser
 	void deleteBookSaleInfo_Success() throws Exception {
 		// Given
 		Long id = 1L;
@@ -177,7 +191,7 @@ class BookSaleInfoControllerTest {
 
 		// When & Then
 		mockMvc.perform(delete("/api/book-sale-infos/{id}", id)
-				.contentType(MediaType.APPLICATION_JSON))
+				.contentType(MediaType.APPLICATION_JSON).with(csrf()))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.status").value("success"));
 	}

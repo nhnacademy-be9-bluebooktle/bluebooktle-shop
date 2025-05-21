@@ -2,6 +2,7 @@ package shop.bluebooktle.backend.book.controller;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -19,6 +20,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -30,6 +32,8 @@ import shop.bluebooktle.common.dto.book.request.CategoryUpdateRequest;
 import shop.bluebooktle.common.dto.book.request.RootCategoryRegisterRequest;
 import shop.bluebooktle.common.dto.book.response.CategoryResponse;
 import shop.bluebooktle.common.dto.book.response.CategoryTreeResponse;
+import shop.bluebooktle.common.service.AuthUserLoader;
+import shop.bluebooktle.common.util.JwtUtil;
 
 @WebMvcTest(controllers = CategoryController.class,
 	excludeAutoConfiguration = {
@@ -50,8 +54,15 @@ public class CategoryControllerTest {
 	@MockitoBean
 	private CategoryService categoryService;
 
+	@MockitoBean
+	private JwtUtil jwtUtil;
+
+	@MockitoBean
+	private AuthUserLoader authUserLoader;
+
 	@Test
 	@DisplayName("모든 카테고리 페이징 조회 성공")
+	@WithMockUser
 	void getCategoriesWithPaginationSuccess() throws Exception {
 		// given
 		List<CategoryResponse> categories = List.of(
@@ -65,7 +76,7 @@ public class CategoryControllerTest {
 		mockMvc.perform(get("/api/categories")
 				.param("page", "0")
 				.param("size", "10")
-				.accept(MediaType.APPLICATION_JSON))
+				.accept(MediaType.APPLICATION_JSON).with(csrf()))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.status").value("success"))
 			.andExpect(jsonPath("$.data.content.length()").value(categories.size()))
@@ -77,6 +88,7 @@ public class CategoryControllerTest {
 
 	@Test
 	@DisplayName("최상위 카테고리 트리 조회 성공")
+	@WithMockUser
 	void getCategoryTreeSuccess() throws Exception {
 		// given
 		List<CategoryTreeResponse> categoryTree = List.of(
@@ -88,7 +100,7 @@ public class CategoryControllerTest {
 
 		// when & then
 		mockMvc.perform(get("/api/categories/tree")
-				.accept(MediaType.APPLICATION_JSON))
+				.accept(MediaType.APPLICATION_JSON).with(csrf()))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.status").value("success"))
 			.andExpect(jsonPath("$.data.length()").value(categoryTree.size()))
@@ -101,6 +113,7 @@ public class CategoryControllerTest {
 
 	@Test
 	@DisplayName("특정 카테고리 트리 조회 성공")
+	@WithMockUser
 	void getCategoryTreeByIdSuccess() throws Exception {
 		// given
 		Long categoryId = 1L;
@@ -113,7 +126,7 @@ public class CategoryControllerTest {
 
 		// when & then
 		mockMvc.perform(get("/api/categories/{categoryId}/tree", categoryId)
-				.accept(MediaType.APPLICATION_JSON))
+				.accept(MediaType.APPLICATION_JSON).with(csrf()))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.status").value("success"))
 			.andExpect(jsonPath("$.data.id").value(categoryTree.id()))
@@ -131,6 +144,7 @@ public class CategoryControllerTest {
 
 	@Test
 	@DisplayName("최상위 카테고리 등록 성공")
+	@WithMockUser
 	void registerRootCategorySuccess() throws Exception {
 		// given
 		RootCategoryRegisterRequest request = new RootCategoryRegisterRequest("New Root Category", "New Description");
@@ -141,7 +155,7 @@ public class CategoryControllerTest {
 		// when & then
 		mockMvc.perform(post("/api/categories")
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(content))
+				.content(content).with(csrf()))
 			.andExpect(status().isCreated());
 
 		verify(categoryService, times(1)).registerRootCategory(any(RootCategoryRegisterRequest.class));
@@ -149,6 +163,7 @@ public class CategoryControllerTest {
 
 	@Test
 	@DisplayName("특정 상위 카테고리에 하위 카테고리 추가 성공")
+	@WithMockUser
 	void addCategorySuccess() throws Exception {
 		// given
 		Long parentCategoryId = 1L;
@@ -160,7 +175,7 @@ public class CategoryControllerTest {
 		// when & then
 		mockMvc.perform(post("/api/categories/{parentCategoryId}", parentCategoryId)
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(content))
+				.content(content).with(csrf()))
 			.andExpect(status().isCreated());
 
 		verify(categoryService, times(1))
@@ -169,6 +184,7 @@ public class CategoryControllerTest {
 
 	@Test
 	@DisplayName("특정 카테고리 조회 성공")
+	@WithMockUser
 	void getCategorySuccess() throws Exception {
 		// given
 		Long categoryId = 1L;
@@ -178,7 +194,7 @@ public class CategoryControllerTest {
 
 		// when & then
 		mockMvc.perform(get("/api/categories/{categoryId}", categoryId)
-				.accept(MediaType.APPLICATION_JSON))
+				.accept(MediaType.APPLICATION_JSON).with(csrf()))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.status").value("success"))
 			.andExpect(jsonPath("$.data.categoryId").value(response.categoryId()))
@@ -189,6 +205,7 @@ public class CategoryControllerTest {
 
 	@Test
 	@DisplayName("카테고리 삭제 성공")
+	@WithMockUser
 	void deleteCategorySuccess() throws Exception {
 		// given
 		Long categoryId = 1L;
@@ -196,7 +213,7 @@ public class CategoryControllerTest {
 		doNothing().when(categoryService).deleteCategory(categoryId);
 
 		// when & then
-		mockMvc.perform(delete("/api/categories/{categoryId}", categoryId))
+		mockMvc.perform(delete("/api/categories/{categoryId}", categoryId).with(csrf()))
 			.andExpect(status().isOk());
 
 		verify(categoryService, times(1)).deleteCategory(categoryId);
@@ -204,6 +221,7 @@ public class CategoryControllerTest {
 
 	@Test
 	@DisplayName("카테고리명 수정 성공")
+	@WithMockUser
 	void updateCategorySuccess() throws Exception {
 		// given
 		Long categoryId = 1L;
@@ -215,7 +233,7 @@ public class CategoryControllerTest {
 		// when & then
 		mockMvc.perform(put("/api/categories/{categoryId}", categoryId)
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(content))
+				.content(content).with(csrf()))
 			.andExpect(status().isOk());
 
 		verify(categoryService, times(1)).updateCategory(eq(categoryId), any(CategoryUpdateRequest.class));
@@ -223,6 +241,7 @@ public class CategoryControllerTest {
 
 	@Test
 	@DisplayName("특정 상위 카테고리의 하위 카테고리 목록 조회 성공")
+	@WithMockUser
 	void getSubcategoriesSuccess() throws Exception {
 		// given
 		Long parentCategoryId = 1L;
@@ -236,7 +255,7 @@ public class CategoryControllerTest {
 
 		// when & then
 		mockMvc.perform(get("/api/categories/{parentCategoryId}/subcategories", parentCategoryId)
-				.accept(MediaType.APPLICATION_JSON))
+				.accept(MediaType.APPLICATION_JSON).with(csrf()))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.status").value("success"))
 			.andExpect(jsonPath("$.data.length()").value(subcategories.size()))
@@ -248,6 +267,7 @@ public class CategoryControllerTest {
 
 	@Test
 	@DisplayName("특정 하위 카테고리가 포함된 상위 카테고리 목록 조회 성공")
+	@WithMockUser
 	void getParentCategoriesSuccess() throws Exception {
 		// given
 		Long childCategoryId = 1L;
@@ -261,7 +281,7 @@ public class CategoryControllerTest {
 
 		// when & then
 		mockMvc.perform(get("/api/categories/{categoryId}/parentcategories", childCategoryId)
-				.accept(MediaType.APPLICATION_JSON))
+				.accept(MediaType.APPLICATION_JSON).with(csrf()))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.status").value("success"))
 			.andExpect(jsonPath("$.data.length()").value(parentCategories.size()))

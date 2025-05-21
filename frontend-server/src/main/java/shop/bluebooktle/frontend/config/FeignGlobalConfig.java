@@ -3,27 +3,32 @@ package shop.bluebooktle.frontend.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import feign.Logger;
+import feign.codec.Decoder;
 import feign.codec.ErrorDecoder;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 @Configuration
 public class FeignGlobalConfig {
 
+	private final ObjectMapper feignObjectMapperInstance;
+
 	@Bean
-	public ObjectMapper feignObjectMapper() {
-		ObjectMapper objectMapper = new ObjectMapper();
-		objectMapper.registerModule(new JavaTimeModule());
-		objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-		return objectMapper;
+	public FeignBearerTokenInterceptor feignBearerTokenInterceptor() {
+		return new FeignBearerTokenInterceptor();
 	}
 
 	@Bean
-	public ErrorDecoder globalFeignErrorDecoder(ObjectMapper objectMapper) {
-		return new GlobalFeignErrorDecoder(objectMapper);
+	public Decoder feignDecoder() {
+		return new JsendDecoder(this.feignObjectMapperInstance);
+	}
+
+	@Bean
+	public ErrorDecoder globalFeignErrorDecoder() {
+		return new GlobalFeignErrorDecoder(this.feignObjectMapperInstance);
 	}
 
 	@Bean
