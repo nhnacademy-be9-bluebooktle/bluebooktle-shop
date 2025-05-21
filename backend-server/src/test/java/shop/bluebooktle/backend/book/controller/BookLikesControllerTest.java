@@ -17,7 +17,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import shop.bluebooktle.backend.book.service.BookLikesService;
 import shop.bluebooktle.common.dto.book.response.BookLikesResponse;
-import shop.bluebooktle.common.service.AuthUserLoader;
+import shop.bluebooktle.common.security.AuthUserLoader;
 import shop.bluebooktle.common.util.JwtUtil;
 
 @WebMvcTest(BookLikesController.class)

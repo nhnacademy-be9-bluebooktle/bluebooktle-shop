@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.auth.repository.MembershipLevelRepository;
 import shop.bluebooktle.auth.repository.UserRepository;
+import shop.bluebooktle.auth.service.AccessTokenService;
 import shop.bluebooktle.auth.service.AuthService;
 import shop.bluebooktle.auth.service.RefreshTokenService;
 import shop.bluebooktle.common.domain.auth.UserStatus;
@@ -38,6 +39,7 @@ public class AuthServiceImpl implements AuthService {
 	private final PasswordEncoder passwordEncoder;
 	private final JwtUtil jwtUtil;
 	private final RefreshTokenService refreshTokenService;
+	private final AccessTokenService accessTokenService;
 
 	@Override
 	@Transactional
@@ -109,6 +111,13 @@ public class AuthServiceImpl implements AuthService {
 	}
 
 	@Override
+	public void logout(String accessToken) {
+		Long userId = jwtUtil.getUserIdFromToken(accessToken);
+		refreshTokenService.deleteByUserId(userId);
+		accessTokenService.addTokenToBlacklist(accessToken);
+	}
+
+	@Override
 	public TokenResponse refreshToken(TokenRefreshRequest tokenRefreshRequest) {
 		String refreshToken = tokenRefreshRequest.getRefreshToken();
 
@@ -127,6 +136,10 @@ public class AuthServiceImpl implements AuthService {
 			throw new DormantAccountException("휴면 계정입니다. 로그인이 필요합니다.");
 		} else if (user.getStatus() == UserStatus.WITHDRAWN) {
 			throw new WithdrawnAccountException("탈퇴된 계정입니다.");
+		}
+		String redisRefreshToken = refreshTokenService.findByUserId(userId);
+		if (!redisRefreshToken.equals(refreshToken)) {
+			throw new InvalidRefreshTokenException();
 		}
 
 		String newAccessToken = jwtUtil.createAccessToken(userId, userNickname, userType);

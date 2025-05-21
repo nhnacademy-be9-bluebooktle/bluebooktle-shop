@@ -19,7 +19,6 @@ public class AuthServiceImpl implements shop.bluebooktle.frontend.service.AuthSe
 	@Override
 	public void signup(SignupRequest signupRequest) {
 		authRepository.signup(signupRequest);
-
 	}
 
 	@Override

@@ -14,14 +14,14 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.user.service.UserService;
-import shop.bluebooktle.common.annotation.Auth;
 import shop.bluebooktle.common.domain.auth.UserType;
 import shop.bluebooktle.common.dto.common.JsendResponse;
 import shop.bluebooktle.common.dto.user.request.UserUpdateRequest;
 import shop.bluebooktle.common.dto.user.response.UserResponse;
 import shop.bluebooktle.common.exception.auth.InvalidTokenException;
 import shop.bluebooktle.common.exception.auth.UserNotFoundException;
-import shop.bluebooktle.common.principal.UserPrincipal;
+import shop.bluebooktle.common.security.Auth;
+import shop.bluebooktle.common.security.UserPrincipal;
 
 @RestController
 @RequestMapping("/api/users")

@@ -20,7 +20,7 @@ import shop.bluebooktle.backend.order.dto.response.OrderStateResponse;
 import shop.bluebooktle.backend.order.entity.OrderState;
 import shop.bluebooktle.backend.order.service.OrderStateService;
 import shop.bluebooktle.common.domain.OrderStatus;
-import shop.bluebooktle.common.service.AuthUserLoader;
+import shop.bluebooktle.common.security.AuthUserLoader;
 import shop.bluebooktle.common.util.JwtUtil;
 
 @WebMvcTest(controllers = OrderStateController.class)
