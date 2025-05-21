@@ -1,6 +1,7 @@
 package shop.bluebooktle.backend.book.controller;
 
 import static org.mockito.Mockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -14,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -23,6 +25,8 @@ import shop.bluebooktle.backend.book.service.TagService;
 import shop.bluebooktle.common.dto.book.request.TagRequest;
 import shop.bluebooktle.common.dto.book.response.TagInfoResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
+import shop.bluebooktle.common.service.AuthUserLoader;
+import shop.bluebooktle.common.util.JwtUtil;
 
 @WebMvcTest(TagController.class)
 class TagControllerTest {
@@ -36,14 +40,21 @@ class TagControllerTest {
 	@Autowired
 	private ObjectMapper objectMapper;
 
+	@MockitoBean
+	private JwtUtil jwtUtil;
+
+	@MockitoBean
+	private AuthUserLoader authUserLoader;
+
 	@Test
 	@DisplayName("태그 등록 성공")
+	@WithMockUser
 	void testAddTag() throws Exception {
 		TagRequest request = new TagRequest("New Tag");
 
 		mockMvc.perform(post("/api/tags")
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(request)))
+				.content(objectMapper.writeValueAsString(request)).with(csrf()))
 			.andExpect(status().isCreated())
 			.andExpect(jsonPath("$.status").value("success"));
 
@@ -52,13 +63,14 @@ class TagControllerTest {
 
 	@Test
 	@DisplayName("태그 수정 성공")
+	@WithMockUser
 	void testUpdateTag() throws Exception {
 		Long tagId = 1L;
 		TagRequest request = new TagRequest("Updated Tag");
 
 		mockMvc.perform(put("/api/tags/{tagId}", tagId)
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(request)))
+				.content(objectMapper.writeValueAsString(request)).with(csrf()))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.status").value("success"));
 
@@ -67,10 +79,11 @@ class TagControllerTest {
 
 	@Test
 	@DisplayName("태그 삭제 성공")
+	@WithMockUser
 	void testDeleteTag() throws Exception {
 		Long tagId = 1L;
 
-		mockMvc.perform(delete("/api/tags/{tagId}", tagId))
+		mockMvc.perform(delete("/api/tags/{tagId}", tagId).with(csrf()))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.status").value("success"));
 
@@ -79,6 +92,7 @@ class TagControllerTest {
 
 	@Test
 	@DisplayName("태그 조회 성공")
+	@WithMockUser
 	void testGetTag() throws Exception {
 		Long tagId = 1L;
 		TagInfoResponse response = new TagInfoResponse(tagId, "Tag Name");
@@ -95,6 +109,7 @@ class TagControllerTest {
 
 	@Test
 	@DisplayName("태그 목록 조회 성공")
+	@WithMockUser
 	void testGetTags() throws Exception {
 		TagInfoResponse tag1 = new TagInfoResponse(1L, "Tag 1");
 		TagInfoResponse tag2 = new TagInfoResponse(2L, "Tag 2");

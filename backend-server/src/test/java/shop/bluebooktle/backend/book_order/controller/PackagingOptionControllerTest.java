@@ -1,6 +1,7 @@
 package shop.bluebooktle.backend.book_order.controller;
 
 import static org.mockito.BDDMockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -14,6 +15,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -21,7 +23,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import shop.bluebooktle.backend.book_order.service.PackagingOptionService;
+import shop.bluebooktle.common.dto.book_order.request.PackagingOptionRequest;
 import shop.bluebooktle.common.dto.book_order.response.PackagingOptionResponse;
+import shop.bluebooktle.common.service.AuthUserLoader;
+import shop.bluebooktle.common.util.JwtUtil;
 
 @WebMvcTest(PackagingOptionController.class)
 class PackagingOptionControllerTest {
@@ -35,30 +40,36 @@ class PackagingOptionControllerTest {
 	@MockitoBean
 	private PackagingOptionService packagingOptionService;
 
-	// @Test
-	// @DisplayName("포장 옵션 등록 - 성공")
-	// @WithMockUser
-	// void createPackagingOption_success() throws Exception {
-	// 	PackagingOptionRequest request = PackagingOptionRequest.builder()
-	// 		.name("기본 포장지")
-	// 		.price(BigDecimal.valueOf(1500))
-	// 		.build();
-	//
-	// 	PackagingOptionResponse response = PackagingOptionResponse.builder()
-	// 		.packagingOptionId(1L)
-	// 		.name("기본 포장지")
-	// 		.price(BigDecimal.valueOf(1500))
-	// 		.build();
-	//
-	// 	given(packagingOptionService.createPackagingOption(request)).willReturn(response);
-	//
-	// 	mockMvc.perform(post("/api/options")
-	// 			.contentType(MediaType.APPLICATION_JSON)
-	// 			.content(objectMapper.writeValueAsString(request)))
-	// 		.andExpect(status().isCreated())
-	// 		.andExpect(jsonPath("$.status").value("success"))
-	// 		.andExpect(jsonPath("$.data.name").value("기본 포장지"));
-	// }
+	@MockitoBean
+	private JwtUtil jwtUtil;
+
+	@MockitoBean
+	private AuthUserLoader authUserLoader;
+
+	@Test
+	@DisplayName("포장 옵션 등록 - 성공")
+	@WithMockUser
+	void createPackagingOption_success() throws Exception {
+		PackagingOptionRequest request = PackagingOptionRequest.builder()
+			.name("기본 포장지")
+			.price(BigDecimal.valueOf(1500))
+			.build();
+
+		PackagingOptionResponse response = PackagingOptionResponse.builder()
+			.packagingOptionId(1L)
+			.name("기본 포장지")
+			.price(BigDecimal.valueOf(1500))
+			.build();
+
+		given(packagingOptionService.createPackagingOption(request)).willReturn(response);
+
+		mockMvc.perform(post("/api/options")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request)).with(csrf()))
+			.andExpect(status().isCreated())
+			.andExpect(jsonPath("$.status").value("success"))
+			.andExpect(jsonPath("$.data.name").value("기본 포장지"));
+	}
 
 	@Test
 	@DisplayName("포장 옵션 전체 조회 - 성공")

@@ -20,6 +20,8 @@ import shop.bluebooktle.backend.order.dto.response.OrderStateResponse;
 import shop.bluebooktle.backend.order.entity.OrderState;
 import shop.bluebooktle.backend.order.service.OrderStateService;
 import shop.bluebooktle.common.domain.OrderStatus;
+import shop.bluebooktle.common.service.AuthUserLoader;
+import shop.bluebooktle.common.util.JwtUtil;
 
 @WebMvcTest(controllers = OrderStateController.class)
 class OrderStateControllerTest {
@@ -29,6 +31,12 @@ class OrderStateControllerTest {
 
 	@MockitoBean
 	private OrderStateService orderStateService;
+
+	@MockitoBean
+	private JwtUtil jwtUtil;
+
+	@MockitoBean
+	private AuthUserLoader authUserLoader;
 
 	@Test
 	@DisplayName("주문 상태 전체 조회 - 성공")
