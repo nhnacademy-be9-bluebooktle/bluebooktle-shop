@@ -1,6 +1,7 @@
 package shop.bluebooktle.backend.book.controller;
 
 import static org.mockito.BDDMockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -16,6 +17,8 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import shop.bluebooktle.backend.book.service.BookLikesService;
 import shop.bluebooktle.common.dto.book.response.BookLikesResponse;
+import shop.bluebooktle.common.service.AuthUserLoader;
+import shop.bluebooktle.common.util.JwtUtil;
 
 @WebMvcTest(BookLikesController.class)
 public class BookLikesControllerTest {
@@ -26,25 +29,31 @@ public class BookLikesControllerTest {
 	@MockitoBean
 	private BookLikesService bookLikesService;
 
-	// @Test
-	// @DisplayName("도서 좋아요 등록 - 성공")
-	// @WithMockUser
-	// void registerLikeBook_success() throws Exception {
-	// 	mockMvc.perform(post("/api/books/1/likes")
-	// 			.param("userId", "1"))
-	// 		.andExpect(status().isCreated())
-	// 		.andExpect(jsonPath("$.status").value("success"));
-	// }
+	@MockitoBean
+	private JwtUtil jwtUtil;
 
-	// @Test
-	// @DisplayName("도서 좋아요 취소 - 성공")
-	// @WithMockUser
-	// void unlikeBook_success() throws Exception {
-	// 	mockMvc.perform(delete("/api/books/1/likes")
-	// 			.param("userId", "1"))
-	// 		.andExpect(status().isOk())
-	// 		.andExpect(jsonPath("$.status").value("success"));
-	// }
+	@MockitoBean
+	private AuthUserLoader authUserLoader;
+
+	@Test
+	@DisplayName("도서 좋아요 등록 - 성공")
+	@WithMockUser
+	void registerLikeBook_success() throws Exception {
+		mockMvc.perform(post("/api/books/1/likes")
+				.param("userId", "1").with(csrf()))
+			.andExpect(status().isCreated())
+			.andExpect(jsonPath("$.status").value("success"));
+	}
+
+	@Test
+	@DisplayName("도서 좋아요 취소 - 성공")
+	@WithMockUser
+	void unlikeBook_success() throws Exception {
+		mockMvc.perform(delete("/api/books/1/likes")
+				.param("userId", "1").with(csrf()))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.status").value("success"));
+	}
 
 	@Test
 	@DisplayName("좋아요 상태 조회 - 성공")

@@ -1,6 +1,7 @@
 package shop.bluebooktle.backend.book.controller;
 
 import static org.mockito.Mockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -14,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -23,6 +25,8 @@ import shop.bluebooktle.backend.book.service.PublisherService;
 import shop.bluebooktle.common.dto.book.request.PublisherRequest;
 import shop.bluebooktle.common.dto.book.response.PublisherInfoResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
+import shop.bluebooktle.common.service.AuthUserLoader;
+import shop.bluebooktle.common.util.JwtUtil;
 
 @WebMvcTest(PublisherController.class)
 class PublisherControllerTest {
@@ -36,14 +40,22 @@ class PublisherControllerTest {
 	@MockitoBean
 	private PublisherService publisherService;
 
+	@MockitoBean
+	private JwtUtil jwtUtil;
+
+	@MockitoBean
+	private AuthUserLoader authUserLoader;
+
 	@Test
 	@DisplayName("출판사 등록 성공")
+	@WithMockUser
 	void testAddPublisher() throws Exception {
 		PublisherRequest request = PublisherRequest.builder()
 			.name("New Publisher")
 			.build();
 
 		mockMvc.perform(post("/api/publishers")
+				.with(csrf())
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(request)))
 			.andExpect(status().isCreated())
@@ -54,6 +66,7 @@ class PublisherControllerTest {
 
 	@Test
 	@DisplayName("출판사 수정 성공")
+	@WithMockUser
 	void testUpdatePublisher() throws Exception {
 		Long publisherId = 1L;
 		PublisherRequest request = PublisherRequest.builder()
@@ -61,6 +74,7 @@ class PublisherControllerTest {
 			.build();
 
 		mockMvc.perform(put("/api/publishers/{publisherId}", publisherId)
+				.with(csrf())
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(request)))
 			.andExpect(status().isOk())
@@ -71,10 +85,11 @@ class PublisherControllerTest {
 
 	@Test
 	@DisplayName("출판사 삭제 성공")
+	@WithMockUser
 	void testDeletePublisher() throws Exception {
 		Long publisherId = 1L;
 
-		mockMvc.perform(delete("/api/publishers/{publisherId}", publisherId))
+		mockMvc.perform(delete("/api/publishers/{publisherId}", publisherId).with(csrf()))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.status").value("success"));
 
@@ -83,6 +98,7 @@ class PublisherControllerTest {
 
 	@Test
 	@DisplayName("출판사 조회 성공")
+	@WithMockUser
 	void testGetPublisher() throws Exception {
 		Long publisherId = 1L;
 		PublisherInfoResponse response = PublisherInfoResponse.builder()
@@ -103,6 +119,7 @@ class PublisherControllerTest {
 
 	@Test
 	@DisplayName("출판사 목록 조회 성공")
+	@WithMockUser
 	void testGetPublishers() throws Exception {
 		PublisherInfoResponse publisher1 = PublisherInfoResponse.builder()
 			.id(1L)

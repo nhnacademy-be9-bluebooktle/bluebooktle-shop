@@ -15,7 +15,6 @@
             margin-bottom: 0.5rem;
         }
 
-
         .password-change-note-kitsch {
             font-family: var(--font-pixel);
             font-size: 0.8rem;
@@ -26,6 +25,7 @@
             border: 1px dashed var(--kitsch-color-4);
             border-radius: 3px;
         }
+
     </style>
 </head>
 
@@ -36,9 +36,12 @@
         <div class="mypage-header-kitsch">
             <h1 class="page-main-title-kitsch display-font-kitsch"><i class="fas fa-user-cog"></i> 마이페이지 <i
                     class="fas fa-star"></i></h1>
-            <div class="mypage-user-summary-kitsch">
-                <span>회원등급: <strong class="highlight-yellow-kitsch">골드</strong></span> |
-                <span>포인트: <strong class="highlight-yellow-kitsch">3,500 P</strong></span> |
+            <div class="mypage-user-summary-kitsch" th:if="${user != null}">
+                <span>회원등급: <strong class="highlight-yellow-kitsch"
+                                    th:text="${user.membershipLevelName ?: '정보 없음'}">골드</strong></span> |
+                <span>포인트: <strong class="highlight-yellow-kitsch"
+                                   th:text="${user.pointBalance != null ? user.pointBalance + ' P' : '0 P'}">3,500 P</strong></span>
+                |
                 <span>사용가능 쿠폰: <strong class="highlight-yellow-kitsch">5 장</strong></span>
             </div>
         </div>
@@ -46,40 +49,69 @@
         <div class="mypage-layout-kitsch">
             <div th:replace="~{_fragments/mypage_sidebar :: mypageSidebarFragment(activeMenu='profile')}"></div>
 
-
             <main class="mypage-content-kitsch">
                 <section class="mypage-section-kitsch" id="profileInfoSection">
                     <h3 class="section-title-kitsch"><i class="fas fa-user-edit"></i> 기본 정보 수정</h3>
-                    <form action="/mypage/profile/update" id="profileForm" method="post">
+
+                    <form th:if="${user != null && user.id != null}"
+                          th:action="@{/mypage/profile/{id}(id=${user.id})}" id="profileForm" method="post"
+                          th:object="${UserUpdateRequest}">
+
                         <div class="profile-info-grid-kitsch">
                             <div class="form-group-kitsch">
                                 <label class="label-kitsch handwriting-font-kitsch" for="profileName">이름:</label>
                                 <input class="input-kitsch pixel-font-kitsch" id="profileName" name="name" readonly
-                                       type="text" value="겜돌이_77">
+                                       type="text" th:value="${user.name}">
                             </div>
                             <div class="form-group-kitsch">
                                 <label class="label-kitsch handwriting-font-kitsch" for="profileMemberId">아이디:</label>
-                                <input class="input-kitsch pixel-font-kitsch" id="profileMemberId" name="memberId"
-                                       readonly type="text" value="gamer77">
+                                <input class="input-kitsch pixel-font-kitsch" id="profileMemberId" name="loginId"
+                                       readonly type="text" th:value="${user.loginId}">
                             </div>
                             <div class="form-group-kitsch">
                                 <label class="label-kitsch handwriting-font-kitsch" for="profileEmail">이메일:</label>
-                                <input class="input-kitsch pixel-font-kitsch" id="profileEmail" name="email"
-                                       required type="email" value="gamer77@bluebooktle.com">
+                                <input class="input-kitsch pixel-font-kitsch" id="profileEmail"
+                                       th:value="${user.email}"
+                                       readonly type="email">
                             </div>
+                            <div class="form-group-kitsch">
+                                <label class="label-kitsch handwriting-font-kitsch" for="profileNickname">닉네임:</label>
+                                <input class="input-kitsch pixel-font-kitsch" id="profileNickname"
+                                       th:field="*{nickname}" type="text" required maxlength="20"
+                                       th:classappend="${#fields.hasErrors('nickname')} ? 'is-invalid-kitsch' : ''">
+                                <div th:if="${#fields.hasErrors('nickname')}"
+                                     class="error-message-kitsch pixel-font-kitsch">
+                                    <p th:each="err : ${#fields.errors('nickname')}" th:text="${err}"></p>
+                                </div>
+                            </div>
+
                             <div class="form-group-kitsch">
                                 <label class="label-kitsch handwriting-font-kitsch" for="profilePhone">연락처:</label>
-                                <input class="input-kitsch pixel-font-kitsch" id="profilePhone" name="phoneNumber"
-                                       required type="tel" value="010-1234-5678">
+                                <input class="input-kitsch pixel-font-kitsch" id="profilePhone"
+                                       th:field="*{phoneNumber}" required type="tel" maxlength="11"
+                                       th:classappend="${#fields.hasErrors('phoneNumber')} ? 'is-invalid-kitsch' : ''">
+                                <div th:if="${#fields.hasErrors('phoneNumber')}"
+                                     class="error-message-kitsch pixel-font-kitsch">
+                                    <p th:each="err : ${#fields.errors('phoneNumber')}" th:text="${err}"></p>
+                                </div>
                             </div>
+
+
                             <div class="form-group-kitsch">
                                 <label class="label-kitsch handwriting-font-kitsch" for="profileBirthDate">생년월일:</label>
-                                <input class="input-kitsch pixel-font-kitsch" id="profileBirthDate" name="birthDate"
-                                       type="date" value="1988-05-15">
+                                <input class="input-kitsch pixel-font-kitsch" id="profileBirthDate"
+                                       th:field="*{birthDate}" type="date"
+                                       th:classappend="${#fields.hasErrors('birthDate')} ? 'is-invalid-kitsch' : ''">
+                                <div th:if="${#fields.hasErrors('birthDate')}"
+                                     class="error-message-kitsch pixel-font-kitsch">
+                                    <p th:each="err : ${#fields.errors('birthDate')}" th:text="${err}"></p>
+                                </div>
                             </div>
+
                             <div class="form-group-kitsch">
                                 <label class="label-kitsch handwriting-font-kitsch">가입일:</label>
-                                <input class="input-kitsch pixel-font-kitsch" readonly type="text" value="2023-01-15">
+                                <input class="input-kitsch pixel-font-kitsch" readonly type="text"
+                                       th:value="${user.lastLoginAt != null ? #temporals.format(user.lastLoginAt, 'yyyy-MM-dd') : ''}">
                             </div>
                         </div>
                         <div class="mypage-actions-kitsch">
@@ -124,14 +156,60 @@
             </main>
         </div>
     </div>
+
+
 </div>
+<th:block layout:fragment="page_scripts">
+    <script>
+        document.getElementById('passwordChangeForm')?.addEventListener('submit', function (e) {
+            e.preventDefault();
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmNewPassword = document.getElementById('confirmNewPassword').value;
+            if (newPassword !== confirmNewPassword) {
+                alert('새 비밀번호와 확인 비밀번호가 일치하지 않습니다. (Mock)');
+                return false;
+            }
+            alert('비밀번호가 성공적으로 변경되었습니다! (Mock)');
+            this.reset();
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const currentPath = window.location.pathname;
+            const sidebarLinks = document.querySelectorAll('.mypage-sidebar-kitsch .sidebar-menu-kitsch li a');
+            sidebarLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === currentPath) {
+                    link.classList.add('active');
+                }
+            });
+            if (currentPath === '/mypage' || currentPath === '/mypage/') {
+                const profileLink = document.querySelector('.mypage-sidebar-kitsch .sidebar-menu-kitsch li a[href$="/mypage/profile"]');
+                if (profileLink) profileLink.classList.add('active');
+            }
+
+
+            document.querySelectorAll('.modal-overlay-kitsch[data-auto-show="true"]').forEach(modal => {
+                if (modal.style.display !== 'flex') {
+                    modal.style.display = 'flex';
+                }
+            });
+
+            document.querySelectorAll('.js-modal-close-trigger').forEach(trigger => {
+                trigger.addEventListener('click', function () {
+                    const targetModalId = this.getAttribute('data-modal-target');
+                    const modalToClose = document.getElementById(targetModalId);
+                    if (modalToClose) {
+                        modalToClose.style.display = 'none';
+                    }
+                });
+            });
+        });
+    </script>
+</th:block>
+
 
 <th:block layout:fragment="page_scripts">
     <script>
-        document.getElementById('profileForm')?.addEventListener('submit', function (e) {
-            e.preventDefault();
-            alert('프로필 정보가 저장되었습니다! (Mock)');
-        });
 
         document.getElementById('passwordChangeForm')?.addEventListener('submit', function (e) {
             e.preventDefault();
@@ -149,7 +227,7 @@
             const currentPath = window.location.pathname;
             const sidebarLinks = document.querySelectorAll('.mypage-sidebar-kitsch .sidebar-menu-kitsch li a');
             sidebarLinks.forEach(link => {
-                link.classList.remove('active'); // 일단 모두 비활성화
+                link.classList.remove('active');
                 if (link.getAttribute('href') === currentPath) {
                     link.classList.add('active');
                 }
@@ -158,6 +236,22 @@
                 const profileLink = document.querySelector('.mypage-sidebar-kitsch .sidebar-menu-kitsch li a[href$="/mypage/profile"]');
                 if (profileLink) profileLink.classList.add('active');
             }
+
+            document.querySelectorAll('.modal-overlay-kitsch[data-auto-show="true"]').forEach(modal => {
+                if (modal.style.display !== 'flex') {
+                    modal.style.display = 'flex';
+                }
+            });
+
+            document.querySelectorAll('.js-modal-close-trigger').forEach(trigger => {
+                trigger.addEventListener('click', function () {
+                    const targetModalId = this.getAttribute('data-modal-target');
+                    const modalToClose = document.getElementById(targetModalId);
+                    if (modalToClose) {
+                        modalToClose.style.display = 'none';
+                    }
+                });
+            });
         });
     </script>
 </th:block>

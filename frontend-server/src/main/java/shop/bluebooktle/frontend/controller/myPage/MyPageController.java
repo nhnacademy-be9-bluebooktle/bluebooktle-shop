@@ -1,4 +1,4 @@
-package shop.bluebooktle.frontend.controller;
+package shop.bluebooktle.frontend.controller.myPage;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,12 +13,7 @@ public class MyPageController {
 	public String myPageDefault() {
 		return "redirect:/mypage/profile";
 	}
-
-	@GetMapping("/profile")
-	public String userProfilePage() {
-		return "mypage/profile";
-	}
-
+	
 	@GetMapping("/orders")
 	public String userOrdersPage() {
 		return "mypage/order_list";
