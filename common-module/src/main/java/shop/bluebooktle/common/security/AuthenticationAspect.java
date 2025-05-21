@@ -1,4 +1,4 @@
-package shop.bluebooktle.common.security;
+package shop.bluebooktle.common.aop;
 
 import java.lang.reflect.Method;
 
