@@ -39,6 +39,11 @@ public class TagServiceImpl implements TagService {
 	public void updateTag(Long tagId, TagRequest request) {
 		Tag tag = tagRepository.findById(tagId)
 			.orElseThrow(() -> new TagNotFoundException(tagId));
+
+		if (tagRepository.existsByName(request.getName())) {
+			throw new TagAlreadyExistsException("태그명 : " + request.getName());
+		}
+
 		tag.setName(request.getName());
 		tagRepository.save(tag);
 	}
