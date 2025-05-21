@@ -1,10 +1,11 @@
 ### Auth Server API Tests
 
-@baseUrl = http://localhost:9001/auth
+@baseUrl = http://localhost:9011/auth
 
 # 변수 설정 (필요에 따라 수정)
 @validLoginId = testuser123
 @validPassword = password123!
+@validNickname = 테스트닉네임
 @validName = 테스트사용자
 @validEmail = testuser@example.com
 @validBirth = 19900101
@@ -18,6 +19,7 @@ Content-Type: application/json
 {
   "loginId": "{{validLoginId}}",
   "password": "{{validPassword}}",
+   "nickname": "{{validNickname}}",
   "name": "{{validName}}",
   "email": "{{validEmail}}",
   "birth": "{{validBirth}}",

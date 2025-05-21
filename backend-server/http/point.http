@@ -1,3 +1,6 @@
+### @name Common
+@token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwidXNlck5pY2tuYW1lIjoi7YWM7Iqk7Yq464uJ64Sk7J6EIiwidXNlclR5cGUiOiJVU0VSIiwiaWF0IjoxNzQ3ODMxNjM1LCJleHAiOjE3NDc4MzM0MzV9.r2Nx0VBXVwK_zmf9YopD--TySQnkIVd6DfXYZ07xbZE
+
 ### 포인트 발생 유형 생성
 POST http://localhost:9012/api/points/source
 Content-Type: application/json
