@@ -25,9 +25,12 @@
             <!-- 태그 등록/수정 폼 -->
             <form th:action="@{/admin/tags/save}" th:object="${tag}" method="post">
                 <input type="hidden" th:field="*{id}"/>
-                <input type="hidden" th:field="*{deletedAt}"/>
-                <input type="hidden" th:field="*{createdAt}"/>
-
+                <div class="admin-form-group" th:if="*{id != null}">
+                    <label for="createdAt" class="admin-form-label">등록일</label>
+                    <input type="text" id="createdAt"
+                           th:value="${#temporals.format(tag.createdAt, 'yyyy-MM-dd HH:mm')}"
+                           class="admin-form-control" readonly>
+                </div>
                 <div class="admin-form-group">
                     <label for="name" class="admin-form-label">태그 이름 <span style="color:red;">*</span></label>
                     <input type="text" id="name" th:field="*{name}" class="admin-form-control"

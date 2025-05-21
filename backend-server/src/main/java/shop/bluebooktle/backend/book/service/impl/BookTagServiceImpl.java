@@ -71,7 +71,8 @@ public class BookTagServiceImpl implements BookTagService {
 		return bookTagsByBook.stream()
 			.map(t -> new TagInfoResponse(
 				t.getTag().getId(),
-				t.getTag().getName()))
+				t.getTag().getName(),
+				t.getTag().getCreatedAt()))
 			.toList();
 	}
 
