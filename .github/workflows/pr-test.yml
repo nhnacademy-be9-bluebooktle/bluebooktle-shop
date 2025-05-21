@@ -25,33 +25,29 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
-      # 3. mvnw 권한 부여
-      - name: Grant execute permission for mvnw
-        run: chmod +x mvnw
-
-      # 4. 전체 빌드·테스트·집계 리포트 생성
+      # 3. 전체 빌드·테스트·집계 리포트 생성
       - name: Build, Test & Generate Coverage
-        run: ./mvnw -B clean verify
+        run: mvn -B clean verify
 
-      # 5. 단위 테스트 결과 게시
+      # 4. 단위 테스트 결과 게시
       - name: Publish Unit Test Results
         if: success()
         uses: EnricoMi/publish-unit-test-result-action@v2
         with:
           files: "**/target/surefire-reports/**/*.xml"
 
-      # 6. jacoco.exec 위치 디버그
+      # 5. jacoco.exec 위치 디버그
       - name: Debug jacoco.exec locations
         run: |
           echo "---- Found exec files ----"
           find . -name jacoco.exec -ls
           echo "--------------------------"
 
-      # 7. 집계된 JaCoCo XML 확인
+      # 6. 집계된 JaCoCo XML 확인
       - name: Check JaCoCo Aggregate XML
         if: success()
         run: |
-          REPORT_PATH="${{ github.workspace }}/_coverage-report/target/site/jacoco-aggregate/jacoco.xml"
+          REPORT_PATH="${{ github.workspace }}/coverage-report/target/site/jacoco-aggregate/jacoco.xml"
           echo "Looking for ${REPORT_PATH}"
           if [[ -f "$REPORT_PATH" ]]; then
             echo "File exists, head 20 lines:"
@@ -65,12 +61,12 @@ jobs:
             exit 1
           fi
 
-      # 8. PR 코멘트에 커버리지 리포트 게시
+      # 7. PR 코멘트에 커버리지 리포트 게시
       - name: Publish JaCoCo Coverage Report
         uses: madrapps/jacoco-report@v1.6.1
         if: always()
         with:
-          paths: ${{ github.workspace }}/_coverage-report/target/site/jacoco-aggregate/jacoco.xml
+          paths: ${{ github.workspace }}/coverage-report/target/site/jacoco-aggregate/jacoco.xml
           token: ${{ secrets.GITHUB_TOKEN }}
           min-coverage-overall: 40
           min-coverage-changed-files: 60
