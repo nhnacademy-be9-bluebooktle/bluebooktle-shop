@@ -82,38 +82,6 @@
             </div>
         </div>
     </div>
-
-    <!--    &lt;!&ndash; (테이블 닫는 태그 직후) &ndash;&gt;-->
-    <!--    <div class="admin-pagination" style="margin-top: 1rem;">-->
-    <!--        <ul class="pagination justify-content-center">-->
-    <!--            &lt;!&ndash; 이전 버튼 &ndash;&gt;-->
-    <!--            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">-->
-    <!--                <a class="page-link"-->
-    <!--                   th:href="@{/admin/tags(page=${currentPage - 1}, size=${size}, searchKeyword=${searchKeyword})}"-->
-    <!--                   aria-label="Previous">-->
-    <!--                    &laquo;-->
-    <!--                </a>-->
-    <!--            </li>-->
-
-    <!--            &lt;!&ndash; 페이지 번호 &ndash;&gt;-->
-    <!--            <li class="page-item"-->
-    <!--                th:each="i : ${#numbers.sequence(0, totalPages - 1)}"-->
-    <!--                th:classappend="${i == currentPage} ? 'active'">-->
-    <!--                <a class="page-link"-->
-    <!--                   th:text="${i + 1}"-->
-    <!--                   th:href="@{/admin/tags(page=${i}, size=${size}, searchKeyword=${searchKeyword})}">1</a>-->
-    <!--            </li>-->
-
-    <!--            &lt;!&ndash; 다음 버튼 &ndash;&gt;-->
-    <!--            <li class="page-item" th:classappend="${currentPage + 1 >= totalPages} ? 'disabled'">-->
-    <!--                <a class="page-link"-->
-    <!--                   th:href="@{/admin/tags(page=${currentPage + 1}, size=${size}, searchKeyword=${searchKeyword})}"-->
-    <!--                   aria-label="Next">-->
-    <!--                    &raquo;-->
-    <!--                </a>-->
-    <!--            </li>-->
-    <!--        </ul>-->
-    <!--    </div>-->
 </div>
 </body>
 </html>
