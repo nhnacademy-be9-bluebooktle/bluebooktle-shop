@@ -1,4 +1,4 @@
-package shop.bluebooktle.backend.book.dto.response;
+package shop.bluebooktle.common.dto.book.response;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -8,7 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Value;
-import shop.bluebooktle.backend.book.entity.BookSaleInfo;
+import shop.bluebooktle.common.dto.book.BookSaleInfoState;
 
 @Getter
 @Builder
@@ -29,7 +29,9 @@ public class BookAllResponse {
 	String publisher;
 	List<String> categories;
 	List<String> tags;
-	BookSaleInfo.State state;
+	BookSaleInfoState bookSaleInfoState;
 	Long viewCount;
 	Long searchCount;
 }
+
+

@@ -1,4 +1,4 @@
-package shop.bluebooktle.backend.book.dto.request;
+package shop.bluebooktle.common.dto.book.request;
 
 import java.math.BigDecimal;
 
@@ -9,15 +9,13 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Value;
-import shop.bluebooktle.backend.book.entity.Book;
-import shop.bluebooktle.backend.book.entity.BookSaleInfo;
+import shop.bluebooktle.common.dto.book.BookSaleInfoState;
 
 @Getter
 @Value
 @Builder
 @AllArgsConstructor
-public class BookSaleInfoRegisterRequest {
-	//도서가 있어야 도서 판매정보를 등록할수있음 bookId입력받아 조회
+public class BookSaleInfoUpdateRequest {
 	@NotNull(message = "도서 ID는 필수 값입니다.")
 	@Positive(message = "도서 ID는 양수여야 합니다.")
 	Long bookId;
@@ -33,17 +31,7 @@ public class BookSaleInfoRegisterRequest {
 
 	Boolean isPackable;
 
-	BookSaleInfo.State state;
+	@Builder.Default
+	BookSaleInfoState bookSaleInfoState = BookSaleInfoState.AVAILABLE;
 
-	public BookSaleInfo toEntity(Book book) {
-		return BookSaleInfo.builder()
-			.book(book)
-			.price(this.price)
-			.salePrice(this.salePrice)
-			.stock(this.stock)
-			.isPackable(this.isPackable != null ? this.isPackable : false)
-			.salePercentage(BigDecimal.ZERO)
-			.state(this.state != null ? this.state : BookSaleInfo.State.AVAILABLE)
-			.build();
-	}
 }

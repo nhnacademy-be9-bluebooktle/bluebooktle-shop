@@ -1,5 +1,5 @@
 ### 도서 직접등록 - 도서가 있어야 도서 판매정보를 등록할수있음
-POST http://localhost:9002/api/books
+POST http://localhost:9012/api/books/only-book-table
 Content-Type: application/json
 
 {
@@ -10,7 +10,7 @@ Content-Type: application/json
 }
 
 ### 도서 판매정보 등록  - 도서가 있어야 도서 판매정보를 등록할수있음
-POST http://localhost:9002/api/book-sale-infos
+POST http://localhost:9012/api/book-sale-infos
 Content-Type: application/json
 
 {
@@ -23,11 +23,11 @@ Content-Type: application/json
 }
 
 ### 도서 판매정보 조회
-GET http://localhost:9002/api/book-sale-infos/1
+GET http://localhost:9012/api/book-sale-infos/1
 Content-Type: application/json
 
 ### 도서 판매정보 수정
-PUT http://localhost:9002/api/book-sale-infos/1
+PUT http://localhost:9012/api/book-sale-infos/1
 Content-Type: application/json
 
 {
@@ -40,5 +40,5 @@ Content-Type: application/json
 }
 
 ### 도서 판매정보 삭제
-DELETE http://localhost:9002/api/book-sale-infos/1
+DELETE http://localhost:9012/api/book-sale-infos/1
 Content-Type: application/json
