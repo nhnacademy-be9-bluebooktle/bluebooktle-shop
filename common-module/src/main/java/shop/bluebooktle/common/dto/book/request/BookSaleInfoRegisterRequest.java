@@ -9,7 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Value;
-import shop.bluebooktle.common.dto.book.emuns.State;
+import shop.bluebooktle.common.dto.book.BookSaleInfoState;
 
 @Getter
 @Value
@@ -33,6 +33,6 @@ public class BookSaleInfoRegisterRequest {
 	Boolean isPackable;
 
 	@Builder.Default
-	State state = State.AVAILABLE;
+	BookSaleInfoState bookSaleInfoState = BookSaleInfoState.AVAILABLE;
 
 }

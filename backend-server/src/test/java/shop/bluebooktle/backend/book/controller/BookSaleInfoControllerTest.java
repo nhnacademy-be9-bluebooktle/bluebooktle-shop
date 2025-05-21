@@ -20,7 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import shop.bluebooktle.backend.book.entity.Book;
 import shop.bluebooktle.backend.book.entity.BookSaleInfo;
 import shop.bluebooktle.backend.book.service.BookSaleInfoService;
-import shop.bluebooktle.common.dto.book.emuns.State;
+import shop.bluebooktle.common.dto.book.BookSaleInfoState;
 import shop.bluebooktle.common.dto.book.request.BookSaleInfoRegisterRequest;
 import shop.bluebooktle.common.dto.book.request.BookSaleInfoUpdateRequest;
 import shop.bluebooktle.common.dto.book.response.BookSaleInfoRegisterResponse;
@@ -49,7 +49,7 @@ class BookSaleInfoControllerTest {
 			.salePrice(BigDecimal.valueOf(18000))
 			.stock(50)
 			.isPackable(true)
-			.state(State.AVAILABLE)
+			.bookSaleInfoState(BookSaleInfoState.AVAILABLE)
 			.build();
 
 		BookSaleInfoRegisterResponse response = BookSaleInfoRegisterResponse.builder()
@@ -95,7 +95,7 @@ class BookSaleInfoControllerTest {
 			.salePercentage(BigDecimal.valueOf(10))
 			.stock(50)
 			.isPackable(true)
-			.state(State.AVAILABLE)
+			.bookSaleInfoState(BookSaleInfoState.AVAILABLE)
 			.build();
 
 		// BookSaleInfoResponse 객체 생성
@@ -107,7 +107,7 @@ class BookSaleInfoControllerTest {
 			.salePercentage(bookSaleInfo.getSalePercentage())
 			.stock(bookSaleInfo.getStock())
 			.isPackable(bookSaleInfo.isPackable())
-			.state(bookSaleInfo.getState().name())
+			.state(bookSaleInfo.getBookSaleInfoState().name())
 			.build();
 
 		// Mock 설정
@@ -141,7 +141,7 @@ class BookSaleInfoControllerTest {
 			.salePrice(BigDecimal.valueOf(20000))
 			.stock(40)
 			.isPackable(false)
-			.state(State.AVAILABLE)
+			.bookSaleInfoState(BookSaleInfoState.AVAILABLE)
 			.build();
 
 		BookSaleInfoUpdateResponse response = BookSaleInfoUpdateResponse.builder()

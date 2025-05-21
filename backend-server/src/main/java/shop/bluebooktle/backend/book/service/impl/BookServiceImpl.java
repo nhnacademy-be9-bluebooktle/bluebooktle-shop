@@ -125,7 +125,7 @@ public class BookServiceImpl implements BookService {
 			.publisher(getPublisherByBookId(book.getId()))           // 출판사 이름
 			.categories(getCategoriesByBookId(book.getId()))         // 카테고리 리스트
 			.tags(getTagsByBookId(book.getId()))                     // 태그 리스트
-			.state(saleInfo.getState())
+			.bookSaleInfoState(saleInfo.getBookSaleInfoState())
 			.viewCount(saleInfo.getViewCount())                      // 조회수
 			.searchCount(saleInfo.getSearchCount())                  // 검색수
 			.build();
@@ -156,7 +156,7 @@ public class BookServiceImpl implements BookService {
 					.publisher(getPublisherByBookId(book.getId()))           // 출판사 이름
 					.categories(getCategoriesByBookId(book.getId()))         // 카테고리 리스트
 					.tags(getTagsByBookId(book.getId()))                     // 태그 리스트
-					.state(saleInfo.getState())
+					.bookSaleInfoState(saleInfo.getBookSaleInfoState())
 					.viewCount(saleInfo.getViewCount())                      // 조회수
 					.searchCount(saleInfo.getSearchCount())                  // 검색수
 					.build();

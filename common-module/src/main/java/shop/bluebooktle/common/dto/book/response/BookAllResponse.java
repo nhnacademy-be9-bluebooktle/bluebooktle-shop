@@ -8,7 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Value;
-import shop.bluebooktle.common.dto.book.emuns.State;
+import shop.bluebooktle.common.dto.book.BookSaleInfoState;
 
 @Getter
 @Builder
@@ -29,7 +29,7 @@ public class BookAllResponse {
 	String publisher;
 	List<String> categories;
 	List<String> tags;
-	State state;
+	BookSaleInfoState bookSaleInfoState;
 	Long viewCount;
 	Long searchCount;
 }

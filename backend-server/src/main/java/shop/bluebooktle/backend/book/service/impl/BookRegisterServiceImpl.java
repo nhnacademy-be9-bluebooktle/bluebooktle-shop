@@ -22,7 +22,7 @@ import shop.bluebooktle.backend.book.service.BookPublisherService;
 import shop.bluebooktle.backend.book.service.BookRegisterService;
 import shop.bluebooktle.backend.book.service.BookTagService;
 import shop.bluebooktle.backend.book.service.PublisherService;
-import shop.bluebooktle.common.dto.book.emuns.State;
+import shop.bluebooktle.common.dto.book.BookSaleInfoState;
 import shop.bluebooktle.common.dto.book.request.BookAllRegisterByAladinRequest;
 import shop.bluebooktle.common.dto.book.request.BookAllRegisterRequest;
 import shop.bluebooktle.common.dto.book.response.AladinBookResponse;
@@ -87,7 +87,7 @@ public class BookRegisterServiceImpl implements BookRegisterService {
 			.stock(request.getStock())
 			.isPackable(request.getIsPackable() != null &&
 				request.getIsPackable())
-			.state(toStateOrThrow(request.getState()))
+			.bookSaleInfoState(toStateOrThrow(request.getState()))
 			.salePercentage(salePercentage)
 			.build();
 		bookSaleInfoRepository.save(bookSaleInfo);
@@ -141,7 +141,7 @@ public class BookRegisterServiceImpl implements BookRegisterService {
 			.salePercentage(aladinBook.getSalePercentage())
 			.stock(request.getStock())
 			.isPackable(request.getIsPackable())
-			.state(toStateOrThrow(request.getState()))
+			.bookSaleInfoState(toStateOrThrow(request.getState()))
 			.build();
 		bookSaleInfoRepository.save(saleInfo);
 	}
@@ -154,12 +154,12 @@ public class BookRegisterServiceImpl implements BookRegisterService {
 			.toList();
 	}
 
-	public State toStateOrThrow(String stateStr) {
+	public BookSaleInfoState toStateOrThrow(String stateStr) {
 		if (stateStr == null) {
 			throw new IllegalArgumentException("State 값이 null입니다.");
 		}
 		try {
-			return State.valueOf(stateStr);
+			return BookSaleInfoState.valueOf(stateStr);
 		} catch (IllegalArgumentException e) {
 			throw new IllegalArgumentException("유효하지 않은 상태 값입니다: " + stateStr);
 		}
