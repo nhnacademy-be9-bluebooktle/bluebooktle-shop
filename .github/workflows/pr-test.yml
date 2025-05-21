@@ -13,16 +13,19 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      # 1. Checkout
+      # 1. 코드 체크아웃
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          # SonarQube PR 분석 시 전체 히스토리 필요
+          fetch-depth: 0
 
       - name: Set up Redis
         uses: supercharge/redis-github-action@1.7.0
         with:
           redis-version: 'latest'
 
-      # 2. JDK 21 & Maven 캐시
+      # 2. JDK 21 설정 및 Maven 캐시
       - name: Set up JDK 21 and Maven Cache
         uses: actions/setup-java@v4
         with:
@@ -30,46 +33,26 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
-      # 3. 전체 빌드·테스트·집계 리포트 생성
-      - name: Build, Test & Generate Coverage
-        run: mvn -B clean verify
+      # 3. 빌드, 테스트, 커버리지 생성 및 SonarQube 분석
+      - name: Build, Test, Generate Coverage & Analyze with SonarQube
+        run: |
+          mvn -B clean verify sonar:sonar \
+            -Dsonar.projectKey=bluebooktle \
+            -Dsonar.projectName='bluebooktle' \
+            -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
+            -Dsonar.token=${{ secrets.SONAR_TOKEN }} 
 
       # 4. 단위 테스트 결과 게시
       - name: Publish Unit Test Results
-        if: success()
+        if: success() # 또는 always() - SonarQube 분석 실패와 관계없이 게시하고 싶다면
         uses: EnricoMi/publish-unit-test-result-action@v2
         with:
           files: "**/target/surefire-reports/**/*.xml"
 
-      # 5. jacoco.exec 위치 디버그
-      - name: Debug jacoco.exec locations
-        run: |
-          echo "---- Found exec files ----"
-          find . -name jacoco.exec -ls
-          echo "--------------------------"
-
-      # 6. 집계된 JaCoCo XML 확인
-      - name: Check JaCoCo Aggregate XML
-        if: success()
-        run: |
-          REPORT_PATH="${{ github.workspace }}/coverage-report/target/site/jacoco-aggregate/jacoco.xml"
-          echo "Looking for ${REPORT_PATH}"
-          if [[ -f "$REPORT_PATH" ]]; then
-            echo "File exists, head 20 lines:"
-            head -n 20 "$REPORT_PATH"
-            echo "Coverage counters >0:"
-            grep '<counter ' "$REPORT_PATH" | grep 'covered="[1-9]' || echo "No coverage >0 found"
-          else
-            echo "ERROR: Aggregated report not found!"
-            echo "Workspace files:"
-            ls -R .
-            exit 1
-          fi
-
-      # 7. PR 코멘트에 커버리지 리포트 게시
+      # 5. PR 코멘트에 커버리지 리포트 게시
       - name: Publish JaCoCo Coverage Report
         uses: madrapps/jacoco-report@v1.6.1
-        if: always()
+        if: always() # SonarQube 분석이 실패하더라도 커버리지 리포트는 게시
         with:
           paths: ${{ github.workspace }}/coverage-report/target/site/jacoco-aggregate/jacoco.xml
           token: ${{ secrets.GITHUB_TOKEN }}
