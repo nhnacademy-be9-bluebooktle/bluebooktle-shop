@@ -25,6 +25,17 @@
         <maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version>
         <jjwt.version>0.12.5</jjwt.version>
     </properties>
+
+    <modules>
+        <module>common-module</module>
+        <module>eureka-server</module>
+        <module>gateway-server</module>
+        <module>backend-server</module>
+        <module>frontend-server</module>
+        <module>auth-server</module>
+        <module>coverage-report</module>
+    </modules>
+
     <dependencies>
         <dependency>
             <groupId>jakarta.persistence</groupId>
@@ -37,15 +48,6 @@
         </dependency>
     </dependencies>
 
-    <modules>
-        <module>common-module</module>
-        <module>eureka-server</module>
-        <module>gateway-server</module>
-        <module>backend-server</module>
-        <module>frontend-server</module>
-        <module>coverage-report</module>
-        <module>auth-server</module>
-    </modules>
 
     <dependencyManagement>
         <dependencies>
@@ -104,32 +106,33 @@
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-maven-plugin</artifactId>
                 </plugin>
-
                 <plugin>
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
                     <version>${jacoco.version}</version>
                     <executions>
                         <execution>
-                            <id>prepare-agent</id>
+                            <id>default-prepare-agent</id>
                             <goals>
                                 <goal>prepare-agent</goal>
                             </goals>
                         </execution>
                         <execution>
-                            <id>report</id>
-                            <phase>test</phase>
+                            <id>default-report</id>
+                            <phase>prepare-package</phase>
                             <goals>
                                 <goal>report</goal>
                             </goals>
                         </execution>
                     </executions>
                 </plugin>
-
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>${maven-surefire-plugin.version}</version>
+                    <configuration>
+                        <argLine>${argLine}</argLine>
+                    </configuration>
                 </plugin>
 
             </plugins>
@@ -146,10 +149,6 @@
                         <arg>-parameters</arg>
                     </compilerArgs>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
             </plugin>
         </plugins>
     </build>
