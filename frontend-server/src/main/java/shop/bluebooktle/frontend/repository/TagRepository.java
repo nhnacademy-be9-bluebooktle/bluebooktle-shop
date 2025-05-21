@@ -9,19 +9,21 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import shop.bluebooktle.backend.book.dto.request.TagRequest;
-import shop.bluebooktle.backend.book.dto.response.TagInfoResponse;
+import shop.bluebooktle.common.dto.book.request.TagRequest;
+import shop.bluebooktle.common.dto.book.response.TagInfoResponse;
 import shop.bluebooktle.common.dto.common.JsendResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
+import shop.bluebooktle.frontend.config.FeignGlobalConfig;
 
 /** 백엔드의 /api/tags REST 엔드포인트를 호출하는 HTTP 클라이언트 */
-@FeignClient(name = "backend-server", contextId = "tagRepository", url = "http://localhost:9012", path = "/api/tags")
+@FeignClient(name = "backend-server", contextId = "tagRepository", path = "/api/tags", configuration = FeignGlobalConfig.class)
 public interface TagRepository {
 	// 태그 전체 조회
 	@GetMapping
 	JsendResponse<PaginationData<TagInfoResponse>> getTags(
 		@RequestParam("page") int page,    // 페이지 번호
-		@RequestParam("size") int size    // 페이지 당 아이템 수
+		@RequestParam("size") int size,    // 페이지 당 아이템 수
+		@RequestParam(value = "searchKeyword", required = false) String searchKeyword // 검색 키워드 (옵션)
 	);
 
 	// 단일 태그 조회

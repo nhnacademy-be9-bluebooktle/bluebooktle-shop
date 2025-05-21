@@ -43,20 +43,24 @@
                     <th>ID</th>
                     <th>태그명</th>
                     <th>등록일</th>
-                    <th>상태</th>
-                    <th>작업</th>
+                    <th>수정</th>
+                    <th>삭제</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr th:each="tag : ${tags}">
                     <td th:text="${tag.id}">1</td>
                     <td th:text="${tag.name}">스프링부트</td>
-                    <td th:text="${#temporals.format(tag.createdAt, 'yyyy-MM-dd HH:mm')}">2025-05-14 10:00</td>
+                    <td th:text="${tag.createdAt != null ? #temporals.format(tag.createdAt, 'yyyy-MM-dd HH:mm') : '-'}">
+                        2025-05-14 10:00
+                    </td>
                     <td class="category-actions">
                         <a th:href="@{/admin/tags/{id}/edit(id=${tag.id})}"
                            class="admin-btn admin-btn--sm admin-btn--outline-primary" title="수정">
                             <i class="fas fa-edit"></i>
                         </a>
+                    </td>
+                    <td>
                         <form th:action="@{/admin/tags/{id}/delete(id=${tag.id})}" method="post"
                               style="display: inline;" onsubmit="return confirm('정말 삭제하시겠습니까?');">
                             <button type="submit" class="admin-btn admin-btn--sm admin-btn--danger" title="삭제">
@@ -70,8 +74,46 @@
                 </tr>
                 </tbody>
             </table>
+            <div th:if="${totalPages != null and totalPages > 0}" class="pagination-container">
+                <th:block th:replace="~{_fragments/admin_pagination :: commonPagination(
+                            currentPage=${currentPage+ 1}, totalPages=${totalPages},
+                            baseUrl=${baseUrlWithParams},
+                            searchKeyword=${searchKeyword} )}"></th:block>
+            </div>
         </div>
     </div>
+
+    <!--    &lt;!&ndash; (테이블 닫는 태그 직후) &ndash;&gt;-->
+    <!--    <div class="admin-pagination" style="margin-top: 1rem;">-->
+    <!--        <ul class="pagination justify-content-center">-->
+    <!--            &lt;!&ndash; 이전 버튼 &ndash;&gt;-->
+    <!--            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">-->
+    <!--                <a class="page-link"-->
+    <!--                   th:href="@{/admin/tags(page=${currentPage - 1}, size=${size}, searchKeyword=${searchKeyword})}"-->
+    <!--                   aria-label="Previous">-->
+    <!--                    &laquo;-->
+    <!--                </a>-->
+    <!--            </li>-->
+
+    <!--            &lt;!&ndash; 페이지 번호 &ndash;&gt;-->
+    <!--            <li class="page-item"-->
+    <!--                th:each="i : ${#numbers.sequence(0, totalPages - 1)}"-->
+    <!--                th:classappend="${i == currentPage} ? 'active'">-->
+    <!--                <a class="page-link"-->
+    <!--                   th:text="${i + 1}"-->
+    <!--                   th:href="@{/admin/tags(page=${i}, size=${size}, searchKeyword=${searchKeyword})}">1</a>-->
+    <!--            </li>-->
+
+    <!--            &lt;!&ndash; 다음 버튼 &ndash;&gt;-->
+    <!--            <li class="page-item" th:classappend="${currentPage + 1 >= totalPages} ? 'disabled'">-->
+    <!--                <a class="page-link"-->
+    <!--                   th:href="@{/admin/tags(page=${currentPage + 1}, size=${size}, searchKeyword=${searchKeyword})}"-->
+    <!--                   aria-label="Next">-->
+    <!--                    &raquo;-->
+    <!--                </a>-->
+    <!--            </li>-->
+    <!--        </ul>-->
+    <!--    </div>-->
 </div>
 </body>
 </html>

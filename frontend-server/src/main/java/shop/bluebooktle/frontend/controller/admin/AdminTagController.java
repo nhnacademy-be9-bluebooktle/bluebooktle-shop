@@ -1,5 +1,7 @@
 package shop.bluebooktle.frontend.controller.admin;
 
+import java.time.LocalDateTime;
+
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,8 +17,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import shop.bluebooktle.backend.book.dto.request.TagRequest;
-import shop.bluebooktle.frontend.dto.TagDto;
+import shop.bluebooktle.common.dto.book.request.TagRequest;
+import shop.bluebooktle.common.dto.book.response.TagInfoResponse;
 import shop.bluebooktle.frontend.service.AdminTagService;
 
 @Slf4j
@@ -30,10 +32,10 @@ public class AdminTagController {
 	/** 태그 목록 조회 */
 	@GetMapping
 	public String listTags(Model model, HttpServletRequest request,
-		@RequestParam(value = "page", defaultValue = "1") int page,
+		@RequestParam(value = "page", defaultValue = "0") int page,
 		@RequestParam(value = "size", defaultValue = "10") int size,
 		@RequestParam(value = "searchKeyword", required = false) String searchKeyword) {
-		Page<TagDto> tagPage = adminTagService.getTags(page - 1, size, searchKeyword);
+		Page<TagInfoResponse> tagPage = adminTagService.getTags(page, size, searchKeyword);
 
 		log.info("어드민 태그 목록 페이지 요청. URI: {}", request.getRequestURI());
 		model.addAttribute("pageTitle", "태그 관리");
@@ -42,6 +44,7 @@ public class AdminTagController {
 		model.addAttribute("currentPage", page); // 현재 페이지 번호
 		model.addAttribute("totalPages", tagPage.getTotalPages()); // 전체 페이지 수
 		model.addAttribute("searchKeyword", searchKeyword); // 검색 키워드
+		model.addAttribute("size", size);
 
 		return "admin/tag/tag_list";
 	}
@@ -54,31 +57,31 @@ public class AdminTagController {
 		log.info("어드민 태그 폼 페이지 요청. URI: {}, tagId: {}", request.getRequestURI(), tagId);
 		model.addAttribute("currentURI", request.getRequestURI());
 
-		TagDto tagDto;
 		String pageTitle;
+		TagInfoResponse tag;
 
 		if (tagId != null) {
-			tagDto = adminTagService.getTag(tagId); // 수정 시 기존 데이터 조회
+			tag = adminTagService.getTag(tagId); // 수정 시 기존 데이터 조회
 			pageTitle = "태그 수정 (ID: " + tagId + ")";
 		} else {
 			pageTitle = "새 태그 등록";
-			tagDto = new TagDto(); // 신규 등록용 폼
+			tag = new TagInfoResponse(null, "", LocalDateTime.now()); // 새로운 데이터 생성
 		}
 		model.addAttribute("pageTitle", pageTitle);
-		model.addAttribute("tag", tagDto);
+		model.addAttribute("tag", tag);
 
 		return "admin/tag/tag_form";
 	}
 
 	/** 태그 저장 */
 	@PostMapping("/save")
-	public String saveTag(@ModelAttribute("tag") TagDto tagDto,
+	public String saveTag(@ModelAttribute("tag") TagInfoResponse tag,
 		BindingResult bindingResult,
 		RedirectAttributes redirectAttributes) {
-		log.info("태그 저장 요청: {}", tagDto);
+		log.info("태그 저장 요청: {}", tag);
 
 		// 기본 유효성 검사
-		if (tagDto.getName() == null || tagDto.getName().trim().isEmpty()) {
+		if (tag.getName() == null || tag.getName().trim().isEmpty()) {
 			bindingResult.rejectValue("name", "NotEmpty", "태그 이름은 필수입니다.");
 		}
 
@@ -86,10 +89,10 @@ public class AdminTagController {
 		if (bindingResult.hasErrors()) {
 			log.warn("태그 저장 폼 유효성 검증 에러: {}", bindingResult.getAllErrors());
 			redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.tag", bindingResult);
-			redirectAttributes.addFlashAttribute("tag", tagDto);
+			redirectAttributes.addFlashAttribute("tag", tag);
 			redirectAttributes.addFlashAttribute("globalErrorMessage", "입력값을 확인해주세요.");
-			if (tagDto.getId() != null) {
-				return "redirect:/admin/tags/" + tagDto.getId() + "/edit";
+			if (tag.getId() != null) {
+				return "redirect:/admin/tags/" + tag.getId() + "/edit";
 			} else {
 				return "redirect:/admin/tags/new";
 			}
@@ -97,21 +100,21 @@ public class AdminTagController {
 
 		try {
 			// 실제 서비스 로직 호출 (DB에 저장/수정)
-			if (tagDto.getId() == null) {
-				adminTagService.createTag(new TagRequest(tagDto.getName()));
+			if (tag.getId() == null) {
+				adminTagService.createTag(new TagRequest(tag.getName()));
 			} else {
-				adminTagService.updateTag(tagDto.getId(), new TagRequest(tagDto.getName())); // name 만 수정
+				adminTagService.updateTag(tag.getId(), new TagRequest(tag.getName())); // name 만 수정
 			}
-			String action = (tagDto.getId() == null) ? "등록" : "수정";
-			log.info("태그 {} 처리 (임시): Name={}, DeletedAt={}", action, tagDto.getName(), tagDto.getDeletedAt());
+			String action = (tag.getId() == null) ? "등록" : "수정";
+			log.info("태그 {} 처리 (임시): Name={}, DeletedAt={}", action, tag.getName());
 			redirectAttributes.addFlashAttribute("globalSuccessMessage",
-				"태그 '" + tagDto.getName() + "'가 성공적으로 " + action + "되었습니다.");
+				"태그 '" + tag.getName() + "'가 성공적으로 " + action + "되었습니다.");
 		} catch (Exception e) {
 			log.error("태그 저장 중 오류 발생 ", e);
 			redirectAttributes.addFlashAttribute("globalErrorMessage", "태그 저장 중 오류가 발생했습니다: " + e.getMessage());
-			redirectAttributes.addFlashAttribute("tag", tagDto);
-			if (tagDto.getId() != null) {
-				return "redirect:/admin/tags/" + tagDto.getId() + "/edit";
+			redirectAttributes.addFlashAttribute("tag", tag);
+			if (tag.getId() != null) {
+				return "redirect:/admin/tags/" + tag.getId() + "/edit";
 			} else {
 				return "redirect:/admin/tags/new";
 			}
