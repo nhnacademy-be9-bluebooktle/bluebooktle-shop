@@ -17,6 +17,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Set up Redis
+        uses: supercharge/redis-github-action@1.7.0
+        with:
+          redis-version: 'latest'
+
       # 2. JDK 21 & Maven 캐시
       - name: Set up JDK 21 and Maven Cache
         uses: actions/setup-java@v4
