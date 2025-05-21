@@ -22,6 +22,7 @@ import shop.bluebooktle.backend.book.service.BookPublisherService;
 import shop.bluebooktle.backend.book.service.BookRegisterService;
 import shop.bluebooktle.backend.book.service.BookTagService;
 import shop.bluebooktle.backend.book.service.PublisherService;
+import shop.bluebooktle.common.dto.book.emuns.State;
 import shop.bluebooktle.common.dto.book.request.BookAllRegisterByAladinRequest;
 import shop.bluebooktle.common.dto.book.request.BookAllRegisterRequest;
 import shop.bluebooktle.common.dto.book.response.AladinBookResponse;
@@ -153,12 +154,12 @@ public class BookRegisterServiceImpl implements BookRegisterService {
 			.toList();
 	}
 
-	public BookSaleInfo.State toStateOrThrow(String stateStr) {
+	public State toStateOrThrow(String stateStr) {
 		if (stateStr == null) {
 			throw new IllegalArgumentException("State 값이 null입니다.");
 		}
 		try {
-			return BookSaleInfo.State.valueOf(stateStr);
+			return State.valueOf(stateStr);
 		} catch (IllegalArgumentException e) {
 			throw new IllegalArgumentException("유효하지 않은 상태 값입니다: " + stateStr);
 		}

@@ -3,6 +3,7 @@ package shop.bluebooktle.backend.book.service;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyLong;
 
 import java.math.BigDecimal;
 import java.util.Optional;
@@ -14,20 +15,23 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import shop.bluebooktle.backend.book.dto.request.BookSaleInfoRegisterRequest;
-import shop.bluebooktle.backend.book.dto.request.BookSaleInfoUpdateRequest;
-import shop.bluebooktle.backend.book.dto.response.BookSaleInfoRegisterResponse;
-import shop.bluebooktle.backend.book.dto.response.BookSaleInfoUpdateResponse;
 import shop.bluebooktle.backend.book.entity.Book;
 import shop.bluebooktle.backend.book.entity.BookSaleInfo;
 import shop.bluebooktle.backend.book.repository.BookRepository;
 import shop.bluebooktle.backend.book.repository.BookSaleInfoRepository;
 import shop.bluebooktle.backend.book.service.impl.BookSaleInfoServiceImpl;
-import shop.bluebooktle.common.exception.book.BookSaleInfoAlreadyExistsException;
+import shop.bluebooktle.common.dto.book.request.BookSaleInfoRegisterRequest;
+import shop.bluebooktle.common.dto.book.request.BookSaleInfoUpdateRequest;
+import shop.bluebooktle.common.dto.book.response.BookSaleInfoRegisterResponse;
+import shop.bluebooktle.common.dto.book.response.BookSaleInfoUpdateResponse;
+import shop.bluebooktle.common.exception.book.BookNotFoundException;
 import shop.bluebooktle.common.exception.book.BookSaleInfoNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 class BookSaleInfoServiceTest {
+
+	@InjectMocks
+	private BookSaleInfoServiceImpl bookSaleInfoService;
 
 	@Mock
 	private BookRepository bookRepository;
@@ -35,145 +39,135 @@ class BookSaleInfoServiceTest {
 	@Mock
 	private BookSaleInfoRepository bookSaleInfoRepository;
 
-	@InjectMocks
-	private BookSaleInfoServiceImpl bookSaleInfoService;
-
 	@Test
-	@DisplayName("도서 판매 정보 저장 성공")
+	@DisplayName("도서 판매 정보 등록 성공")
 	void saveBookSaleInfo_Success() {
 		// given
-		Long bookId = 1L;
-		Book book = Book.builder().id(bookId).title("Test Book").build();
-
+		Book book = Book.builder().id(1L).title("Book Title").build();
 		BookSaleInfoRegisterRequest request = BookSaleInfoRegisterRequest.builder()
-			.bookId(bookId)
-			.price(new BigDecimal("20000"))
-			.salePrice(new BigDecimal("15000"))
-			.stock(50)
+			.bookId(1L)
+			.price(BigDecimal.valueOf(100))
+			.salePrice(BigDecimal.valueOf(80))
+			.stock(10)
 			.isPackable(true)
-			.state(BookSaleInfo.State.AVAILABLE)
 			.build();
 
-		BookSaleInfo bookSaleInfo = request.toEntity(book);
-		when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
-		when(bookSaleInfoRepository.findByBook(book)).thenReturn(Optional.empty());
-		when(bookSaleInfoRepository.save(any(BookSaleInfo.class))).thenReturn(bookSaleInfo);
+		when(bookRepository.findById(1L)).thenReturn(Optional.of(book));
+		when(bookSaleInfoRepository.save(any(BookSaleInfo.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
 		// when
 		BookSaleInfoRegisterResponse response = bookSaleInfoService.save(request);
 
 		// then
 		assertThat(response).isNotNull();
-		assertThat(response.getPrice()).isEqualTo(bookSaleInfo.getPrice());
-		assertThat(response.getState()).isEqualTo(bookSaleInfo.getState().name());
-
-		verify(bookRepository, times(1)).findById(bookId);
-		verify(bookSaleInfoRepository, times(1)).findByBook(book);
+		assertThat(response.getTitle()).isEqualTo("Book Title");
+		assertThat(response.getPrice()).isEqualTo(BigDecimal.valueOf(100));
+		assertThat(response.getSalePrice()).isEqualTo(BigDecimal.valueOf(80));
 		verify(bookSaleInfoRepository, times(1)).save(any(BookSaleInfo.class));
 	}
 
 	@Test
-	@DisplayName("도서 판매 정보 저장 실패 - 중복된 도서판매정보")
-	void saveBookSaleInfo_Fail_DuplicateInfo() {
+	@DisplayName("도서 판매 정보 등록 실패 - 도서를 찾을 수 없음")
+	void saveBookSaleInfo_BookNotFound_ShouldThrowException() {
 		// given
-		Long bookId = 1L;
-		Book book = Book.builder().id(bookId).title("Test Book").build();
-
 		BookSaleInfoRegisterRequest request = BookSaleInfoRegisterRequest.builder()
-			.bookId(bookId)
-			.price(new BigDecimal("20000"))
-			.salePrice(new BigDecimal("15000"))
-			.stock(50)
+			.bookId(99L)
+			.price(BigDecimal.valueOf(100))
+			.salePrice(BigDecimal.valueOf(80))
+			.stock(10)
 			.isPackable(true)
-			.state(BookSaleInfo.State.AVAILABLE)
 			.build();
 
-		when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
-		when(bookSaleInfoRepository.findByBook(book)).thenReturn(Optional.of(BookSaleInfo.builder().build()));
+		when(bookRepository.findById(99L)).thenReturn(Optional.empty());
 
-		// when & then
+		// when / then
 		assertThatThrownBy(() -> bookSaleInfoService.save(request))
-			.isInstanceOf(BookSaleInfoAlreadyExistsException.class);
+			.isInstanceOf(BookNotFoundException.class);
 
-		verify(bookRepository, times(1)).findById(bookId);
-		verify(bookSaleInfoRepository, times(1)).findByBook(book);
-		verify(bookSaleInfoRepository, never()).save(any());
+		verify(bookSaleInfoRepository, never()).save(any(BookSaleInfo.class));
 	}
 
 	@Test
 	@DisplayName("도서 판매 정보 수정 성공")
 	void updateBookSaleInfo_Success() {
 		// given
-		Long saleInfoId = 1L;
-		Long bookId = 2L;
-		Book existingBook = Book.builder().id(bookId).title("Existing Book").build();
-		Book newBook = Book.builder().id(bookId).title("New Book").build();
-
-		BookSaleInfo existingEntity = BookSaleInfo.builder()
-			.id(saleInfoId)
-			.book(existingBook)
-			.price(new BigDecimal("30000"))
-			.salePrice(new BigDecimal("25000"))
-			.stock(20)
+		Book book = Book.builder().id(1L).title("Book Title").build();
+		BookSaleInfo bookSaleInfo = BookSaleInfo.builder()
+			.id(1L)
+			.book(book)
+			.price(BigDecimal.valueOf(100))
+			.salePrice(BigDecimal.valueOf(80))
+			.stock(10)
 			.build();
 
 		BookSaleInfoUpdateRequest request = BookSaleInfoUpdateRequest.builder()
-			.bookId(bookId)
-			.price(new BigDecimal("35000"))
-			.salePrice(new BigDecimal("30000"))
-			.stock(30)
+			.bookId(1L)
+			.price(BigDecimal.valueOf(120))
+			.salePrice(BigDecimal.valueOf(100))
+			.stock(15)
 			.isPackable(false)
-			.state(BookSaleInfo.State.LOW_STOCK)
 			.build();
 
-		BookSaleInfo updatedEntity = request.toEntity(existingEntity.toBuilder().build());
-
-		when(bookSaleInfoRepository.findById(saleInfoId)).thenReturn(Optional.of(existingEntity));
-		when(bookRepository.findById(bookId)).thenReturn(Optional.of(newBook));
-		when(bookSaleInfoRepository.save(any(BookSaleInfo.class))).thenReturn(updatedEntity);
+		when(bookSaleInfoRepository.findById(1L)).thenReturn(Optional.of(bookSaleInfo));
+		when(bookSaleInfoRepository.save(any(BookSaleInfo.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
 		// when
-		BookSaleInfoUpdateResponse response = bookSaleInfoService.update(saleInfoId, request);
+		BookSaleInfoUpdateResponse response = bookSaleInfoService.update(1L, request);
 
 		// then
 		assertThat(response).isNotNull();
-		assertThat(response.getId()).isEqualTo(saleInfoId);
-		assertThat(response.getState()).isEqualTo(BookSaleInfo.State.LOW_STOCK.name());
+		assertThat(response.getPrice()).isEqualTo(BigDecimal.valueOf(120));
+		assertThat(response.getSalePrice()).isEqualTo(BigDecimal.valueOf(100));
+		assertThat(response.getStock()).isEqualTo(15);
+		assertThat(response.getIsPackable()).isFalse();
+		verify(bookSaleInfoRepository, times(1)).save(bookSaleInfo);
+	}
 
-		verify(bookSaleInfoRepository, times(1)).findById(saleInfoId);
-		verify(bookRepository, times(1)).findById(bookId);
-		verify(bookSaleInfoRepository, times(1)).save(any(BookSaleInfo.class));
+	@Test
+	@DisplayName("도서 판매 정보 수정 실패 - 판매 정보를 찾을 수 없음")
+	void updateBookSaleInfo_NotFound_ShouldThrowException() {
+		// given
+		BookSaleInfoUpdateRequest request = BookSaleInfoUpdateRequest.builder()
+			.bookId(1L)
+			.price(BigDecimal.valueOf(120))
+			.salePrice(BigDecimal.valueOf(100))
+			.stock(15)
+			.isPackable(false)
+			.build();
+
+		when(bookSaleInfoRepository.findById(1L)).thenReturn(Optional.empty());
+
+		// when / then
+		assertThatThrownBy(() -> bookSaleInfoService.update(1L, request))
+			.isInstanceOf(BookSaleInfoNotFoundException.class);
+
+		verify(bookSaleInfoRepository, never()).save(any(BookSaleInfo.class));
 	}
 
 	@Test
 	@DisplayName("도서 판매 정보 삭제 성공")
-	void deleteBookSaleInfoById_Success() {
+	void deleteBookSaleInfo_Success() {
 		// given
-		Long saleInfoId = 1L;
-
-		when(bookSaleInfoRepository.existsById(saleInfoId)).thenReturn(true);
+		BookSaleInfo bookSaleInfo = BookSaleInfo.builder().id(1L).build();
+		when(bookSaleInfoRepository.findById(1L)).thenReturn(Optional.of(bookSaleInfo));
 
 		// when
-		bookSaleInfoService.deleteById(saleInfoId);
+		bookSaleInfoService.deleteById(1L);
 
 		// then
-		verify(bookSaleInfoRepository, times(1)).existsById(saleInfoId);
-		verify(bookSaleInfoRepository, times(1)).deleteById(saleInfoId);
+		verify(bookSaleInfoRepository, times(1)).delete(bookSaleInfo);
 	}
 
 	@Test
-	@DisplayName("도서 판매 정보 삭제 실패 - 존재하지 않는 도서판매정보")
-	void deleteBookSaleInfoById_Fail_NotFound() {
+	@DisplayName("도서 판매 정보 삭제 실패 - 판매 정보를 찾을 수 없음")
+	void deleteBookSaleInfo_NotFound_ShouldThrowException() {
 		// given
-		Long saleInfoId = 1L;
+		when(bookSaleInfoRepository.findById(1L)).thenReturn(Optional.empty());
 
-		when(bookSaleInfoRepository.existsById(saleInfoId)).thenReturn(false);
-
-		// when & then
-		assertThatThrownBy(() -> bookSaleInfoService.deleteById(saleInfoId))
+		// when / then
+		assertThatThrownBy(() -> bookSaleInfoService.deleteById(1L))
 			.isInstanceOf(BookSaleInfoNotFoundException.class);
 
-		verify(bookSaleInfoRepository, times(1)).existsById(saleInfoId);
-		verify(bookSaleInfoRepository, never()).deleteById(any());
+		verify(bookSaleInfoRepository, never()).deleteById(anyLong());
 	}
 }

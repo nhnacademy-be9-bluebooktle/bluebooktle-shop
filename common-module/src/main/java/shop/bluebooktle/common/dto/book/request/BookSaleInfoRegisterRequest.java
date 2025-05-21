@@ -1,4 +1,4 @@
-package shop.bluebooktle.backend.book.dto.request;
+package shop.bluebooktle.common.dto.book.request;
 
 import java.math.BigDecimal;
 
@@ -9,8 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Value;
-import shop.bluebooktle.backend.book.entity.Book;
-import shop.bluebooktle.backend.book.entity.BookSaleInfo;
+import shop.bluebooktle.common.dto.book.emuns.State;
 
 @Getter
 @Value
@@ -33,17 +32,7 @@ public class BookSaleInfoRegisterRequest {
 
 	Boolean isPackable;
 
-	BookSaleInfo.State state;
+	@Builder.Default
+	State state = State.AVAILABLE;
 
-	public BookSaleInfo toEntity(Book book) {
-		return BookSaleInfo.builder()
-			.book(book)
-			.price(this.price)
-			.salePrice(this.salePrice)
-			.stock(this.stock)
-			.isPackable(this.isPackable != null ? this.isPackable : false)
-			.salePercentage(BigDecimal.ZERO)
-			.state(this.state != null ? this.state : BookSaleInfo.State.AVAILABLE)
-			.build();
-	}
 }
