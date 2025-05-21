@@ -1,4 +1,4 @@
-package shop.bluebooktle.backend.config;
+package shop.bluebooktle.common.security;
 
 import java.io.IOException;
 
@@ -15,8 +15,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import shop.bluebooktle.common.principal.UserPrincipal;
-import shop.bluebooktle.common.service.AuthUserLoader;
 import shop.bluebooktle.common.util.JwtUtil;
 
 @Slf4j
@@ -40,7 +38,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 				if (userPrincipal != null) {
 					UsernamePasswordAuthenticationToken authentication =
-						new UsernamePasswordAuthenticationToken(userPrincipal, null, userPrincipal.getAuthorities());
+						new UsernamePasswordAuthenticationToken(userPrincipal, jwt, userPrincipal.getAuthorities());
 					authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
 					SecurityContextHolder.getContext().setAuthentication(authentication);

@@ -1,4 +1,4 @@
-package shop.bluebooktle.common.aop;
+package shop.bluebooktle.common.security;
 
 import java.lang.reflect.Method;
 
@@ -13,16 +13,14 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
-import shop.bluebooktle.common.annotation.Auth;
 import shop.bluebooktle.common.domain.auth.UserType;
-import shop.bluebooktle.common.principal.UserPrincipal;
 
 @Aspect
 @Component
 @Slf4j
 public class AuthenticationAspect {
 
-	@Pointcut("@annotation(shop.bluebooktle.common.annotation.Auth)")
+	@Pointcut("@annotation(shop.bluebooktle.common.security.Auth)")
 	public void authorizedMethod() {
 	}
 

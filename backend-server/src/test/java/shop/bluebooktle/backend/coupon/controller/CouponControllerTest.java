@@ -26,7 +26,7 @@ import shop.bluebooktle.backend.coupon.service.CouponService;
 import shop.bluebooktle.common.dto.coupon.request.CouponRegisterRequest;
 import shop.bluebooktle.common.dto.coupon.request.CouponUpdateRequest;
 import shop.bluebooktle.common.dto.coupon.response.CouponResponse;
-import shop.bluebooktle.common.service.AuthUserLoader;
+import shop.bluebooktle.common.security.AuthUserLoader;
 import shop.bluebooktle.common.util.JwtUtil;
 
 @WebMvcTest(controllers = CouponController.class)

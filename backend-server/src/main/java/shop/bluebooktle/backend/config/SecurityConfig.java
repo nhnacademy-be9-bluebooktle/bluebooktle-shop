@@ -9,6 +9,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import lombok.RequiredArgsConstructor;
+import shop.bluebooktle.common.security.JwtAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity

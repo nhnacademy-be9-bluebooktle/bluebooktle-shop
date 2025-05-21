@@ -22,7 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import shop.bluebooktle.backend.order.dto.request.DeliveryRuleRequest;
 import shop.bluebooktle.backend.order.entity.DeliveryRule;
 import shop.bluebooktle.backend.order.service.DeliveryRuleService;
-import shop.bluebooktle.common.service.AuthUserLoader;
+import shop.bluebooktle.common.security.AuthUserLoader;
 import shop.bluebooktle.common.util.JwtUtil;
 
 @WebMvcTest(controllers = DeliveryRuleController.class)

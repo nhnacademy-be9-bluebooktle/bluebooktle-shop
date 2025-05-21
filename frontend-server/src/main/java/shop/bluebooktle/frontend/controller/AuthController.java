@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +20,7 @@ import shop.bluebooktle.common.dto.auth.response.TokenResponse;
 import shop.bluebooktle.common.exception.ApplicationException;
 import shop.bluebooktle.common.exception.ErrorCode;
 import shop.bluebooktle.frontend.service.impl.AuthServiceImpl;
+import shop.bluebooktle.frontend.util.CookieTokenManager;
 
 @Slf4j
 @Controller
@@ -29,6 +29,7 @@ import shop.bluebooktle.frontend.service.impl.AuthServiceImpl;
 public class AuthController {
 
 	private final AuthServiceImpl authService;
+	private final CookieTokenManager cookieTokenManager;
 
 	@GetMapping("/login")
 	public String loginForm(Model model,
@@ -43,18 +44,9 @@ public class AuthController {
 	@PostMapping("/login")
 	public String login(@ModelAttribute LoginRequest loginRequest,
 		HttpServletResponse response) {
-
 		TokenResponse tokenResponse = authService.login(loginRequest);
-		Cookie accessTokenCookie = new Cookie("accessToken", tokenResponse.getAccessToken());
-		accessTokenCookie.setPath("/");
-		response.addCookie(accessTokenCookie);
+		cookieTokenManager.saveTokens(response, tokenResponse.getAccessToken(), tokenResponse.getRefreshToken());
 
-		Cookie refreshTokenCookie = new Cookie("refreshToken", tokenResponse.getRefreshToken());
-		refreshTokenCookie.setHttpOnly(true);
-		refreshTokenCookie.setPath("/");
-		response.addCookie(refreshTokenCookie);
-
-		log.info("로그인 성공: {}", loginRequest.getLoginId());
 		return "redirect:/";
 
 	}
@@ -111,19 +103,9 @@ public class AuthController {
 
 	@PostMapping("/logout")
 	public String handleLogout(HttpServletResponse response, RedirectAttributes redirectAttributes) {
-		deleteCookie(response, "accessToken");
-		deleteCookie(response, "refreshToken");
-		redirectAttributes.addFlashAttribute("globalSuccessMessage", "로그아웃 되었습니다!");
-		redirectAttributes.addFlashAttribute("globalSuccessTitle", "로그아웃 성공!");
+		cookieTokenManager.clearTokens(response);
 		log.info("로그아웃 성공");
 		return "redirect:/";
-	}
-
-	private void deleteCookie(HttpServletResponse response, String cookieName) {
-		Cookie cookie = new Cookie(cookieName, null);
-		cookie.setPath("/");
-		cookie.setMaxAge(0);
-		response.addCookie(cookie);
 	}
 
 	@ExceptionHandler(Exception.class)

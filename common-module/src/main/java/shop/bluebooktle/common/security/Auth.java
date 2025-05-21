@@ -1,4 +1,4 @@
-package shop.bluebooktle.common.annotation;
+package shop.bluebooktle.common.security;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

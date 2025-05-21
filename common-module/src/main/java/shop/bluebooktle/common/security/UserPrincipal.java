@@ -1,4 +1,4 @@
-package shop.bluebooktle.common.principal;
+package shop.bluebooktle.common.security;
 
 import java.util.Collection;
 import java.util.Collections;

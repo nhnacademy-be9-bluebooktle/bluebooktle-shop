@@ -8,8 +8,8 @@ import shop.bluebooktle.backend.user.repository.UserRepository;
 import shop.bluebooktle.common.dto.auth.UserDto;
 import shop.bluebooktle.common.entity.auth.User;
 import shop.bluebooktle.common.exception.auth.UserNotFoundException;
-import shop.bluebooktle.common.principal.UserPrincipal;
-import shop.bluebooktle.common.service.AuthUserLoader;
+import shop.bluebooktle.common.security.AuthUserLoader;
+import shop.bluebooktle.common.security.UserPrincipal;
 
 @Service("backendAuthUserLoader")
 @RequiredArgsConstructor
