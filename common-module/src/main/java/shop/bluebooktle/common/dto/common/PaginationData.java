@@ -41,18 +41,16 @@ public class PaginationData<T> {
 		private boolean isLast;
 		private boolean hasNext;
 		private boolean hasPrevious;
-		
+
 		public PaginationInfo(Page<?> page) {
-			this(
-				page.getTotalPages(),
-				page.getTotalElements(),
-				page.getNumber(),
-				page.getSize(),
-				page.isFirst(),
-				page.isLast(),
-				page.hasNext(),
-				page.hasPrevious()
-			);
+			this.totalPages = page.getTotalPages();
+			this.totalElements = page.getTotalElements();
+			this.currentPage = page.getNumber();
+			this.pageSize = page.getSize();
+			this.isFirst = page.isFirst();
+			this.isLast = page.isLast();
+			this.hasNext = page.hasNext();
+			this.hasPrevious = page.hasPrevious();
 		}
 
 		// Jackson 용 all-args 생성자 (필드 이름과 JsonProperty 이름이 일치해야 합니다)

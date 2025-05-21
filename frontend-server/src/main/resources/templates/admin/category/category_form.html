@@ -16,37 +16,31 @@
 
     <div class="admin-panel">
         <div class="admin-panel__body">
-            <form th:action="@{/admin/categories/save}" th:object="${category}" method="post">
+            <form th:action="@{/admin/categories/{categoryId}/save(categoryId=${category.id})}" th:object="${category}"
+                  method="post">
                 <input type="hidden" th:field="*{id}"/>
 
                 <div class="admin-form-group">
                     <label for="name" class="admin-form-label">카테고리 이름 <span style="color:red;">*</span></label>
-                    <input type="text" id="name" th:field="*{name}" class="admin-form-control"
-                           th:errorclass="is-invalid" placeholder="예: 국내소설, IT 전문서적">
-                    <div th:if="${#fields.hasErrors('name')}" th:errors="*{name}"
-                         class="invalid-feedback admin-form-text" style="color: red;">Name Error
+                    <input type="text" id="name" th:field="*{name}" class="admin-form-control" maxlength="50"
+                           th:errorclass="is-invalid" placeholder="예: 국내소설, IT 전문서적" required pattern="\S.*"
+                           oninvalid="this.setCustomValidity('카테고리 이름을 반드시 입력해주세요')"
+                           oninput="this.setCustomValidity('')"/>
+                    <div th:if="${#fields.hasErrors('name')}"
+                         th:errors="*{name}"
+                         class="invalid-feedback admin-form-text"
+                         style="color: red;">Name Error
                     </div>
-                </div>
-
-                <div class="admin-form-group">
-                    <label for="parentId" class="admin-form-label">부모 카테고리</label>
-                    <select id="parentId" th:field="*{parentId}" class="admin-form-control">
-                        <option th:each="parent : ${parentCategories}"
-                                th:value="${parent.id}"
-                                th:text="${parent.name}"
-                                th:selected="${category.parentId != null && category.parentId == parent.id}">
-                            부모 카테고리 선택
-                        </option>
-                    </select>
                 </div>
 
 
                 <div class="admin-form-actions" style="margin-top: 20px; text-align: right;">
-                    <a th:href="@{/admin/categories}" class="admin-btn admin-btn--default"
-                       style="margin-right: 8px;">취소</a>
+                    <a th:href="@{/admin/categories}" class="admin-btn admin-btn--default" style="margin-right:8px;">
+                        취소
+                    </a>
                     <button type="submit" class="admin-btn admin-btn--primary">
                         <i class="fas fa-save"></i>
-                        <th:block th:text="${category.id == null} ? '등록' : '수정'"></th:block>
+                        등록
                     </button>
                 </div>
             </form>

@@ -109,7 +109,11 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 
 		for (BookCategory bookCategory : bookCategories) {
 			Category category = bookCategory.getCategory();
-			result.add(new CategoryResponse(category.getId(), category.getName()));
+			result.add(new CategoryResponse(
+				category.getId(),
+				category.getName(),
+				category.getParentCategory().getName(),
+				category.getCategoryPath()));
 		}
 		//TODO book_category_id 도 반환해야할 듯
 		return result;

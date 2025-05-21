@@ -40,7 +40,6 @@ public class CategoryController {
 	@GetMapping
 	public ResponseEntity<JsendResponse<PaginationData<CategoryResponse>>> getCategories(
 		@PageableDefault(size = 10, sort = "id") Pageable pageable) {
-
 		Page<CategoryResponse> categoryPage = categoryService.getCategories(pageable);
 		PaginationData<CategoryResponse> paginationData = new PaginationData<>(categoryPage);
 		return ResponseEntity.ok(JsendResponse.success(paginationData));
@@ -58,6 +57,13 @@ public class CategoryController {
 	public ResponseEntity<JsendResponse<CategoryTreeResponse>> getCategoryTree(@PathVariable Long categoryId) {
 		CategoryTreeResponse tree = categoryService.getCategoryTreeById(categoryId);
 		return ResponseEntity.ok(JsendResponse.success(tree));
+	}
+
+	// 모든 카테고리 조회
+	@GetMapping("/all")
+	public ResponseEntity<JsendResponse<List<CategoryResponse>>> getAllCategories() {
+		List<CategoryResponse> categoryPage = categoryService.getAllCategories();
+		return ResponseEntity.ok(JsendResponse.success(categoryPage));
 	}
 
 	// 최상위 카테고리 등록
@@ -98,7 +104,6 @@ public class CategoryController {
 		@PathVariable Long categoryId,
 		@Valid @RequestBody CategoryUpdateRequest request
 	) {
-
 		categoryService.updateCategory(categoryId, request);
 		return ResponseEntity.ok(JsendResponse.success());
 	}

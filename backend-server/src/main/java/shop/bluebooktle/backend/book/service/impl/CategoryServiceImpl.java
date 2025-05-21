@@ -63,9 +63,9 @@ public class CategoryServiceImpl implements CategoryService {
 		// 카테고리 경로 등록하기
 		List<CategoryResponse> categoryResponseList = getParentCategoriesByLeafCategoryId(parent.getId());
 		categoryResponseList = categoryResponseList.reversed();
-
+		categoryPathBuilder.append("/");
 		for (CategoryResponse categoryResponse : categoryResponseList) {
-			categoryPathBuilder.append(categoryResponse.categoryId()).append("-");
+			categoryPathBuilder.append(categoryResponse.categoryId()).append("/");
 		}
 
 		// 카테고리 경로 (자신의 categoryId도 포함)
@@ -83,24 +83,24 @@ public class CategoryServiceImpl implements CategoryService {
 	public void registerRootCategory(RootCategoryRegisterRequest request) {
 		List<Category> rootCategoryList = categoryRepository.findByParentCategoryIsNull();
 		rootCategoryList.stream().map(Category::getName).forEach(categoryName -> {
-			if (request.rootCategoryName().equals(categoryName)) {
-				throw new CategoryAlreadyExistsException("이미 존재하는 카테고리명입니다. 카테고리명: " + request.rootCategoryName());
+			if (request.getRootCategoryName().equals(categoryName)) {
+				throw new CategoryAlreadyExistsException("이미 존재하는 카테고리명입니다. 카테고리명: " + request.getRootCategoryName());
 			}
 		});
 		Category rootCategory = Category.builder()
-			.name(request.rootCategoryName())
+			.name(request.getRootCategoryName())
 			.parentCategory(null)
 			.build();
 
 		Category childCategory = Category.builder()
-			.name(request.childCategoryName())
+			.name(request.getChildCategoryName())
 			.parentCategory(rootCategory)
 			.build();
 		rootCategory = categoryRepository.save(rootCategory);
 		childCategory = categoryRepository.save(childCategory);
 
-		rootCategory.setCategoryPath(rootCategory.getId().toString());
-		childCategory.setCategoryPath(rootCategory.getId().toString() + "-" + childCategory.getId().toString());
+		rootCategory.setCategoryPath("/" + rootCategory.getId().toString());
+		childCategory.setCategoryPath("/" + rootCategory.getId().toString() + "/" + childCategory.getId().toString());
 
 	}
 
@@ -108,13 +108,14 @@ public class CategoryServiceImpl implements CategoryService {
 	public void updateCategory(Long categoryId, CategoryUpdateRequest request) {
 		Category category = categoryRepository.findById(categoryId)
 			.orElseThrow(() -> new CategoryNotFoundException(categoryId));
-
-		List<Category> categoryList = getAllDescendantCategories(category.getParentCategory());
-		categoryList.stream().map(Category::getName).forEach(categoryName -> {
-			if (categoryName.equals(request.name())) {
-				throw new CategoryAlreadyExistsException("이미 존재하는 카테고리명입니다. 카테고리명: " + request.name());
-			}
-		});
+		if (category.getParentCategory() != null) {
+			List<Category> categoryList = getAllDescendantCategories(category.getParentCategory());
+			categoryList.stream().map(Category::getName).forEach(categoryName -> {
+				if (categoryName.equals(request.name())) {
+					throw new CategoryAlreadyExistsException("이미 존재하는 카테고리명입니다. 카테고리명: " + request.name());
+				}
+			});
+		}
 
 		category.setName(request.name());
 		categoryRepository.save(category);
@@ -185,7 +186,13 @@ public class CategoryServiceImpl implements CategoryService {
 	public CategoryResponse getCategory(Long id) {
 		Category selectedCategory = categoryRepository.findById(id)
 			.orElseThrow(() -> new CategoryNotFoundException(id));
-		CategoryResponse response = new CategoryResponse(selectedCategory.getId(), selectedCategory.getName());
+		CategoryResponse response = new CategoryResponse(
+			selectedCategory.getId(),
+			selectedCategory.getName(),
+			selectedCategory.getParentCategory() != null
+				? selectedCategory.getParentCategory().getName()
+				: "-",
+			selectedCategory.getCategoryPath());
 		return response;
 	}
 
@@ -197,7 +204,11 @@ public class CategoryServiceImpl implements CategoryService {
 		List<Category> categories = parentCategory.getChildCategories();
 		List<CategoryResponse> subcategories = new ArrayList<>();
 		for (Category category : categories) {
-			CategoryResponse response = new CategoryResponse(category.getId(), category.getName());
+			CategoryResponse response = new CategoryResponse(
+				category.getId(),
+				category.getName(),
+				category.getParentCategory().getName(),
+				category.getCategoryPath());
 			subcategories.add(response);
 		}
 		return subcategories;
@@ -221,7 +232,13 @@ public class CategoryServiceImpl implements CategoryService {
 		parents.add(current);
 
 		for (Category category : parents) {
-			CategoryResponse response = new CategoryResponse(category.getId(), category.getName());
+			CategoryResponse response = new CategoryResponse(
+				category.getId(),
+				category.getName(),
+				category.getParentCategory() != null
+					? category.getParentCategory().getName()
+					: "-",
+				category.getCategoryPath());
 			parentcategories.add(response);
 		}
 		return parentcategories;
@@ -233,8 +250,26 @@ public class CategoryServiceImpl implements CategoryService {
 		Page<Category> categoryPage = categoryRepository.findAll(pageable);
 
 		return categoryPage.map(c ->
-			new CategoryResponse(c.getId(), c.getName())
+			new CategoryResponse(c.getId(),
+				c.getName(),
+				c.getParentCategory() != null
+					? c.getParentCategory().getName()
+					: "-",
+				c.getCategoryPath())
 		);
+	}
+
+	@Override
+	public List<CategoryResponse> getAllCategories() {
+		List<Category> categoryList = categoryRepository.findAll();
+		return categoryList.stream().map(c ->
+			new CategoryResponse(c.getId(),
+				c.getName(),
+				c.getParentCategory() != null
+					? c.getParentCategory().getName()
+					: "-",
+				c.getCategoryPath())
+		).toList();
 	}
 
 	@Override

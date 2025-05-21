@@ -17,11 +17,11 @@ import shop.bluebooktle.common.dto.book.response.CategoryTreeResponse;
 import shop.bluebooktle.common.dto.common.JsendResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
 import shop.bluebooktle.frontend.repository.CategoryRepository;
-import shop.bluebooktle.frontend.service.AdminCategoryService;
+import shop.bluebooktle.frontend.service.CategoryService;
 
 @Service
 @RequiredArgsConstructor
-public class AdminCategoryServiceImpl implements AdminCategoryService {
+public class CategoryServiceImpl implements CategoryService {
 
 	private final CategoryRepository categoryRepository;
 
@@ -40,7 +40,7 @@ public class AdminCategoryServiceImpl implements AdminCategoryService {
 			keyword = searchKeyword;
 		}
 
-		JsendResponse<PaginationData<CategoryResponse>> response = categoryRepository.allCategories(page, size,
+		JsendResponse<PaginationData<CategoryResponse>> response = categoryRepository.getPagedCategories(page, size,
 			keyword);
 		PaginationData<CategoryResponse> data = response.data();
 		List<CategoryResponse> categories = data.getContent();

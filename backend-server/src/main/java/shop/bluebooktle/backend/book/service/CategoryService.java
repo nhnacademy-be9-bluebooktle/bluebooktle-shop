@@ -33,6 +33,8 @@ public interface CategoryService {
 
 	Page<CategoryResponse> getCategories(Pageable pageable);
 
+	List<CategoryResponse> getAllCategories();
+
 	// 최상위 카테고리부터 시작해서 모든 자식 카테고리를 재귀적으로 포함한 트리 구조 조회
 	List<CategoryTreeResponse> getCategoryTree();
 

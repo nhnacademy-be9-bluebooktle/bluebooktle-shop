@@ -10,7 +10,7 @@ import shop.bluebooktle.common.dto.book.request.RootCategoryRegisterRequest;
 import shop.bluebooktle.common.dto.book.response.CategoryResponse;
 import shop.bluebooktle.common.dto.book.response.CategoryTreeResponse;
 
-public interface AdminCategoryService {
+public interface CategoryService {
 
 	// 전체 카테고리 트리 조회
 	List<CategoryTreeResponse> searchAllCategoriesTree();

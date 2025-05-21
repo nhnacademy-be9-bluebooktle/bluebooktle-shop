@@ -19,30 +19,24 @@
 
             <form th:action="@{/admin/authors/save}" th:object="${author}" method="post">
                 <input type="hidden" th:field="*{id}"/>
+
                 <div class="admin-form-group">
                     <label for="name" class="admin-form-label">작가 이름 <span style="color:red;">*</span></label>
-                    <input type="text" id="name" th:field="*{name}" class="admin-form-control"
-                           th:errorclass="is-invalid" placeholder="작가명을 입력하세요">
-                    <div th:if="${#fields.hasErrors('name')}" th:errors="*{name}"
-                         class="invalid-feedback admin-form-text" style="color: red;"></div>
+                    <input type="text"
+                           id="name"
+                           th:field="*{name}"
+                           class="admin-form-control"
+                           th:errorclass="is-invalid"
+                           placeholder="작가명을 입력하세요"
+                           required
+                           oninvalid="this.setCustomValidity('작가 이름을 입력해주세요')"
+                           oninput="this.setCustomValidity('')"/>
+                    <div th:if="${#fields.hasErrors('name')}"
+                         th:errors="*{name}"
+                         class="invalid-feedback admin-form-text"
+                         style="color: red;">
+                    </div>
                 </div>
-
-                <div class="admin-form-group">
-                    <label for="authorKey" class="admin-form-label">작가 키 <span style="color:red;">*</span></label>
-                    <input type="text" id="authorKey" th:field="*{authorKey}" class="admin-form-control"
-                           th:errorclass="is-invalid" placeholder="작가명을 입력하세요">
-                    <div th:if="${#fields.hasErrors('authorKey')}" th:errors="*{authorKey}"
-                         class="invalid-feedback admin-form-text" style="color: red;"></div>
-                </div>
-                
-                <div class="admin-form-group">
-                    <label for="description" class="admin-form-label">작가 설명 <span style="color:red;">*</span></label>
-                    <textarea id="description" th:field="*{description}" class="admin-form-control" rows="5"
-                              th:errorclass="is-invalid" placeholder="작가에 대한 설명을 입력하세요 (대표작, 약력 등)"></textarea>
-                    <div th:if="${#fields.hasErrors('description')}" th:errors="*{description}"
-                         class="invalid-feedback admin-form-text" style="color: red;"></div>
-                </div>
-
 
                 <div class="admin-form-actions" style="margin-top: 20px; text-align: right;">
                     <a th:href="@{/admin/authors}" class="admin-btn admin-btn--default"
