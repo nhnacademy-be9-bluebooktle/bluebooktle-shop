@@ -17,7 +17,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import shop.bluebooktle.common.domain.point.ActionType;
-import shop.bluebooktle.common.domain.point.SourceType;
 import shop.bluebooktle.common.entity.BaseEntity;
 
 @Entity
@@ -25,25 +24,24 @@ import shop.bluebooktle.common.entity.BaseEntity;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(of = "id", callSuper = false)
-@SQLDelete(sql = "UPDATE point_source_type SET deleted_at = CURRENT_TIMESTAMP WHERE point_type_id = ?")
+@SQLDelete(sql = "UPDATE point_source_type SET deleted_at = CURRENT_TIMESTAMP WHERE point_source_type_id = ?")
 @SQLRestriction("deleted_at IS NULL")
 public class PointSourceType extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "point_type_id")
+	@Column(name = "point_source_type_id")
 	private Long id;
 
 	@Enumerated(EnumType.STRING)
 	@Column(name = "action_type", nullable = false, length = 4)
 	private ActionType actionType;
 
-	@Enumerated(EnumType.STRING)
 	@Column(name = "source_type", nullable = false, length = 50)
-	private SourceType sourceType;
+	private String sourceType;
 
 	@Builder
-	public PointSourceType(ActionType actionType, SourceType sourceType) {
+	public PointSourceType(ActionType actionType, String sourceType) {
 		this.actionType = actionType;
 		this.sourceType = sourceType;
 	}
