@@ -3,8 +3,8 @@ server:
 
 spring:
   datasource:
-    url: jdbc:mysql://s4.java21.net:13306/nhn_academy_123
-    username: nhn_academy_123
+    url: jdbc:mysql://localhost:3306/bluebooktle
+    username: root
     password:
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
