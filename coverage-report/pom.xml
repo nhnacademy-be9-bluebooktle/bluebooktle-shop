@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -7,29 +6,51 @@
         <groupId>shop.bluebooktle</groupId>
         <artifactId>bluebooktle-shop</artifactId>
         <version>0.0.1-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>coverage-report</artifactId>
+    <packaging>pom</packaging>
     <name>coverage-report</name>
+
     <description>Aggregated Test Coverage Report for BlueBooktle Backend</description>
+
     <dependencies>
+        <!--        <dependency>-->
+        <!--            <groupId>shop.bluebooktle</groupId>-->
+        <!--            <artifactId>common-module</artifactId>-->
+        <!--            <version>${project.version}</version>-->
+        <!--            <scope>compile</scope>-->
+        <!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>shop.bluebooktle</groupId>-->
+        <!--            <artifactId>eureka-server</artifactId>-->
+        <!--            <version>${project.version}</version>-->
+        <!--            <scope>compile</scope>-->
+        <!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>shop.bluebooktle</groupId>-->
+        <!--            <artifactId>gateway-server</artifactId>-->
+        <!--            <version>${project.version}</version>-->
+        <!--            <scope>compile</scope>-->
+        <!--        </dependency>-->
         <dependency>
             <groupId>shop.bluebooktle</groupId>
-            <artifactId>common-module</artifactId>
+            <artifactId>backend-server</artifactId>
             <version>${project.version}</version>
-            <scope>test</scope>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>shop.bluebooktle</groupId>
-            <artifactId>eureka-server</artifactId>
+            <artifactId>frontend-server</artifactId>
             <version>${project.version}</version>
-            <scope>test</scope>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>shop.bluebooktle</groupId>
-            <artifactId>gateway-server</artifactId>
+            <artifactId>auth-server</artifactId>
             <version>${project.version}</version>
-            <scope>test</scope>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 
@@ -45,10 +66,34 @@
                         <goals>
                             <goal>report-aggregate</goal>
                         </goals>
+                        <configuration>
+                            <outputDirectory>${project.reporting.outputDirectory}/jacoco-aggregate</outputDirectory>
+                            <classFiles>
+                                <fileSet>
+                                    <directory>../backend-server/target/classes</directory>
+                                </fileSet>
+                                <fileSet>
+                                    <directory>../front-server/target/classes</directory>
+                                </fileSet>
+                                <fileSet>
+                                    <directory>../auth-server/target/classes</directory>
+                                </fileSet>
+                            </classFiles>
+                            <sourceFiles>
+                                <fileSet>
+                                    <directory>../backend-server/src/main/java</directory>
+                                </fileSet>
+                                <fileSet>
+                                    <directory>../front-server/src/main/java</directory>
+                                </fileSet>
+                                <fileSet>
+                                    <directory>../auth-server/src/main/java</directory>
+                                </fileSet>
+                            </sourceFiles>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
         </plugins>
     </build>
-
 </project>
