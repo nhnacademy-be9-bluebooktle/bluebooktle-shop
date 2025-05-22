@@ -38,5 +38,5 @@ eureka:
 
 jwt:
   secret: ${JWT_SECRET_KEY_LOCAL}
-  access-token-validity-seconds: 10
+  access-token-validity-seconds: 5
   refresh-token-validity-seconds: 3600
