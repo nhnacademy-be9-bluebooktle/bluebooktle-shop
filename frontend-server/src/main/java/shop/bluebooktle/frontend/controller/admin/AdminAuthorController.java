@@ -20,7 +20,7 @@ import shop.bluebooktle.common.dto.book.request.author.AuthorRegisterRequest;
 import shop.bluebooktle.common.dto.book.request.author.AuthorRequest;
 import shop.bluebooktle.common.dto.book.request.author.AuthorUpdateRequest;
 import shop.bluebooktle.common.dto.book.response.author.AuthorResponse;
-import shop.bluebooktle.frontend.service.AuthorService;
+import shop.bluebooktle.frontend.service.AdminAuthorService;
 
 @Slf4j
 @Controller
@@ -28,7 +28,7 @@ import shop.bluebooktle.frontend.service.AuthorService;
 @RequiredArgsConstructor
 public class AdminAuthorController {
 
-	private final AuthorService authorService;
+	private final AdminAuthorService adminAuthorService;
 
 	/*@Getter
 	@Setter
@@ -88,7 +88,7 @@ public class AdminAuthorController {
 		model.addAttribute("pageTitle", "작가 관리");
 		model.addAttribute("currentURI", request.getRequestURI());
 
-		Page<AuthorResponse> authorsPage = authorService.getAuthors(page, size, searchKeyword);
+		Page<AuthorResponse> authorsPage = adminAuthorService.getAuthors(page, size, searchKeyword);
 
 		log.info("Author Pagination Data: TotalElements={}, TotalPages={}, CurrentPage(0-based)={}, PageSize={}",
 			authorsPage.getTotalElements(), authorsPage.getTotalPages(), authorsPage.getNumber(),
@@ -169,10 +169,10 @@ public class AdminAuthorController {
 			String action = (authorDto.getId() == null) ? "등록" : "수정";
 			log.info("작가 {} 처리 (임시): {}", action, authorDto.getName());
 			if (authorDto.getId() != null) {
-				authorService.updateAuthor(authorDto.getId(),
+				adminAuthorService.updateAuthor(authorDto.getId(),
 					AuthorUpdateRequest.builder().name(authorDto.getName()).build());
 			} else {
-				authorService.addAuthor(AuthorRegisterRequest.builder().name(authorDto.getName()).build());
+				adminAuthorService.addAuthor(AuthorRegisterRequest.builder().name(authorDto.getName()).build());
 			}
 			redirectAttributes.addFlashAttribute("globalSuccessMessage",
 				"작가 '" + authorDto.getName() + "' 정보가 성공적으로 " + action + "되었습니다.");
@@ -195,7 +195,7 @@ public class AdminAuthorController {
 		log.info("작가 삭제 요청: ID {}", authorId);
 		try {
 			log.info("임시 작가 삭제 성공 처리: ID {}", authorId);
-			authorService.deleteAuthor(authorId);
+			adminAuthorService.deleteAuthor(authorId);
 			redirectAttributes.addFlashAttribute("globalSuccessMessage",
 				"작가(ID: " + authorId + ")가 성공적으로 삭제(비활성)되었습니다.");
 		} catch (Exception e) {

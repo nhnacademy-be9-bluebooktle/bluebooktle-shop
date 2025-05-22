@@ -13,14 +13,14 @@ import shop.bluebooktle.common.dto.book.request.author.AuthorRegisterRequest;
 import shop.bluebooktle.common.dto.book.request.author.AuthorUpdateRequest;
 import shop.bluebooktle.common.dto.book.response.author.AuthorResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
-import shop.bluebooktle.frontend.repository.AuthorRepository;
-import shop.bluebooktle.frontend.service.AuthorService;
+import shop.bluebooktle.frontend.repository.AdminAuthorRepository;
+import shop.bluebooktle.frontend.service.AdminAuthorService;
 
 @Service
 @RequiredArgsConstructor
-public class AuthorServiceImpl implements AuthorService {
+public class AdminAuthorServiceImpl implements AdminAuthorService {
 
-	private final AuthorRepository authorRepository;
+	private final AdminAuthorRepository adminAuthorRepository;
 
 	@Override
 	public Page<AuthorResponse> getAuthors(int page, int size, String searchKeyword) {
@@ -31,7 +31,7 @@ public class AuthorServiceImpl implements AuthorService {
 			keyword = searchKeyword;
 		}
 
-		PaginationData<AuthorResponse> response = authorRepository.getPagedAuthors(page, size,
+		PaginationData<AuthorResponse> response = adminAuthorRepository.getPagedAuthors(page, size,
 			keyword);
 		PaginationData<AuthorResponse> data = response;
 		List<AuthorResponse> categories = data.getContent();
@@ -40,22 +40,22 @@ public class AuthorServiceImpl implements AuthorService {
 
 	@Override
 	public AuthorResponse getAuthor(Long id) {
-		AuthorResponse response = authorRepository.getAuthor(id);
+		AuthorResponse response = adminAuthorRepository.getAuthor(id);
 		return response;
 	}
 
 	@Override
 	public void addAuthor(AuthorRegisterRequest request) {
-		authorRepository.addAuthor(request);
+		adminAuthorRepository.addAuthor(request);
 	}
 
 	@Override
 	public void updateAuthor(Long authorId, AuthorUpdateRequest request) {
-		authorRepository.updateAuthor(authorId, request);
+		adminAuthorRepository.updateAuthor(authorId, request);
 	}
 
 	@Override
 	public void deleteAuthor(Long authorId) {
-		authorRepository.deleteAuthor(authorId);
+		adminAuthorRepository.deleteAuthor(authorId);
 	}
 }

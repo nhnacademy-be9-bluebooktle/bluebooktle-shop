@@ -26,7 +26,7 @@ import shop.bluebooktle.common.dto.book.request.category.CategoryInfoRequest;
 import shop.bluebooktle.common.dto.book.request.category.CategoryRegisterFormRequest;
 import shop.bluebooktle.common.dto.book.response.CategoryResponse;
 import shop.bluebooktle.common.dto.book.response.CategoryTreeResponse;
-import shop.bluebooktle.frontend.service.CategoryService;
+import shop.bluebooktle.frontend.service.AdminCategoryService;
 
 @Slf4j
 @Controller
@@ -34,7 +34,7 @@ import shop.bluebooktle.frontend.service.CategoryService;
 @RequiredArgsConstructor
 public class AdminCategoryController {
 
-	private final CategoryService categoryService;
+	private final AdminCategoryService adminCategoryService;
 
 	@GetMapping
 	public String listCategories(Model model, HttpServletRequest request,
@@ -48,7 +48,7 @@ public class AdminCategoryController {
 		model.addAttribute("currentURI", request.getRequestURI());
 
 		// 카테고리 목록 보여주기
-		Page<CategoryResponse> categoriesPage = categoryService.getCategories(page, size, searchKeyword);
+		Page<CategoryResponse> categoriesPage = adminCategoryService.getCategories(page, size, searchKeyword);
 		log.info("pagenumber, totalPage, size, totalElemnts: {}, {}, {}, {}", categoriesPage.getNumber(),
 			categoriesPage.getTotalPages(), categoriesPage.getSize(), categoriesPage.getTotalElements());
 		model.addAttribute("categories", categoriesPage.getContent());
@@ -70,7 +70,7 @@ public class AdminCategoryController {
 		model.addAttribute("statusFilter", statusFilter);
 
 		// Tree 구조의 카테고리
-		List<CategoryTreeResponse> tree = categoryService.searchAllCategoriesTree();
+		List<CategoryTreeResponse> tree = adminCategoryService.searchAllCategoriesTree();
 		model.addAttribute("categoryTreeListJson", tree);
 		return "admin/category/category_list";
 	}
@@ -111,7 +111,7 @@ public class AdminCategoryController {
 
 		pageTitle = "카테고리 수정 (ID: " + categoryId + ")";
 		// 카테고리 조회
-		CategoryResponse category = categoryService.getCategory(categoryId);
+		CategoryResponse category = adminCategoryService.getCategory(categoryId);
 
 		model.addAttribute("pageTitle", pageTitle);
 		model.addAttribute("category", category);
@@ -133,7 +133,7 @@ public class AdminCategoryController {
 			return "redirect:/admin/categories/" + categoryInfoRequest.categoryId() + "/edit";
 		}
 		try {
-			categoryService.updateCategory(categoryInfoRequest.categoryId(),
+			adminCategoryService.updateCategory(categoryInfoRequest.categoryId(),
 				new CategoryUpdateRequest(categoryInfoRequest.name()));
 		} catch (Exception e) {
 			redirectAttributes.addFlashAttribute("globalErrorMessage", "카테고리 수정 중 오류 발생: " + e.getMessage());
@@ -158,7 +158,7 @@ public class AdminCategoryController {
 			return "redirect:/admin/categories/new";
 		}
 		try {
-			categoryService.addRootCategory(rootCategoryRegisterRequest);
+			adminCategoryService.addRootCategory(rootCategoryRegisterRequest);
 		} catch (Exception e) {
 			redirectAttributes.addFlashAttribute("globalErrorMessage", "카테고리 등록 중 오류 발생: " + e.getMessage());
 			return "redirect:/admin/categories/new";
@@ -184,7 +184,7 @@ public class AdminCategoryController {
 			return "redirect:/admin/categories/" + categoryId + "/new";
 		}
 		try {
-			categoryService.addCategory(categoryId, categoryRegisterRequest);
+			adminCategoryService.addCategory(categoryId, categoryRegisterRequest);
 		} catch (Exception e) {
 			redirectAttributes.addFlashAttribute("globalErrorMessage", "카테고리 등록 중 오류 발생: " + e.getMessage());
 			return "redirect:/admin/categories/" + categoryId + "/new";
@@ -197,7 +197,7 @@ public class AdminCategoryController {
 	public String deleteCategory(@PathVariable Long categoryId, RedirectAttributes redirectAttributes) {
 		log.info("카테고리 비활성화 요청: ID {}", categoryId);
 		try {
-			categoryService.deleteCategory(categoryId);
+			adminCategoryService.deleteCategory(categoryId);
 			redirectAttributes.addFlashAttribute("globalSuccessMessage", "카테고리(ID: " + categoryId + ")가 비활성화되었습니다.");
 		} catch (Exception e) {
 			redirectAttributes.addFlashAttribute("globalErrorMessage", "카테고리 비활성화 중 오류 발생: " + e.getMessage());

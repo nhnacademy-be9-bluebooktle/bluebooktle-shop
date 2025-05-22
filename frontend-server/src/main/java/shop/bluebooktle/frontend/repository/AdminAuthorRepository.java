@@ -16,7 +16,7 @@ import shop.bluebooktle.common.dto.common.PaginationData;
 import shop.bluebooktle.frontend.config.FeignGlobalConfig;
 
 @FeignClient(name = "backend-server", contextId = "authorRepository", path = "/api/authors", configuration = FeignGlobalConfig.class)
-public interface AuthorRepository {
+public interface AdminAuthorRepository {
 	@GetMapping
 	PaginationData<AuthorResponse> getPagedAuthors(
 		@RequestParam("page") int page,

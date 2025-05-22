@@ -6,7 +6,7 @@ import shop.bluebooktle.common.dto.book.request.author.AuthorRegisterRequest;
 import shop.bluebooktle.common.dto.book.request.author.AuthorUpdateRequest;
 import shop.bluebooktle.common.dto.book.response.author.AuthorResponse;
 
-public interface AuthorService {
+public interface AdminAuthorService {
 	// 작가 리스트 조회
 	Page<AuthorResponse> getAuthors(int page, int size, String searchKeyword);
 

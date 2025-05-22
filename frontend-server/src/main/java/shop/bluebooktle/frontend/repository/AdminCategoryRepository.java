@@ -20,7 +20,7 @@ import shop.bluebooktle.common.dto.common.PaginationData;
 import shop.bluebooktle.frontend.config.FeignGlobalConfig;
 
 @FeignClient(name = "backend-server", contextId = "categoryRepository", path = "/api/categories", configuration = FeignGlobalConfig.class)
-public interface CategoryRepository {
+public interface AdminCategoryRepository {
 
 	@GetMapping
 	PaginationData<CategoryResponse> getPagedCategories(
