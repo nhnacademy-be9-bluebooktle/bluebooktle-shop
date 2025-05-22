@@ -79,13 +79,7 @@
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>shop.bluebooktle</groupId>
-            <artifactId>backend-server</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-            <scope>compile</scope>
+            <artifactId>spring-web</artifactId>
         </dependency>
         <dependency>
             <groupId>com.h2database</groupId>
