@@ -16,11 +16,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import shop.bluebooktle.common.dto.auth.request.LoginRequest;
 import shop.bluebooktle.common.dto.auth.request.SignupRequest;
-import shop.bluebooktle.common.dto.auth.response.TokenResponse;
 import shop.bluebooktle.common.exception.ApplicationException;
 import shop.bluebooktle.common.exception.ErrorCode;
 import shop.bluebooktle.frontend.service.impl.AuthServiceImpl;
-import shop.bluebooktle.frontend.util.CookieTokenManager;
+import shop.bluebooktle.frontend.util.CookieTokenUtil;
 
 @Slf4j
 @Controller
@@ -29,7 +28,7 @@ import shop.bluebooktle.frontend.util.CookieTokenManager;
 public class AuthController {
 
 	private final AuthServiceImpl authService;
-	private final CookieTokenManager cookieTokenManager;
+	private final CookieTokenUtil cookieTokenUtil;
 
 	@GetMapping("/login")
 	public String loginForm(Model model,
@@ -44,8 +43,7 @@ public class AuthController {
 	@PostMapping("/login")
 	public String login(@ModelAttribute LoginRequest loginRequest,
 		HttpServletResponse response) {
-		TokenResponse tokenResponse = authService.login(loginRequest);
-		cookieTokenManager.saveTokens(response, tokenResponse.getAccessToken(), tokenResponse.getRefreshToken());
+		authService.login(response, loginRequest);
 
 		return "redirect:/";
 
@@ -103,7 +101,7 @@ public class AuthController {
 
 	@PostMapping("/logout")
 	public String handleLogout(HttpServletResponse response, RedirectAttributes redirectAttributes) {
-		cookieTokenManager.clearTokens(response);
+		cookieTokenUtil.clearTokens(response);
 		log.info("로그아웃 성공");
 		return "redirect:/";
 	}
