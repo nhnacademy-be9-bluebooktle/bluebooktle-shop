@@ -61,16 +61,6 @@ public class PointPolicy extends BaseEntity {
 		this.value = value;
 	}
 
-	/**
-	 * 양방향 연관관계 편의 메서드
-	 */
-	public void setPointSourceType(PointSourceType pointSourceType) {
-		this.pointSourceType = pointSourceType;
-		if (pointSourceType.getPointPolicy() != this) {
-			pointSourceType.setPointPolicy(this);
-		}
-	}
-
 	public void changeIsActive(Boolean isActive) {
 		this.isActive = isActive;
 	}
