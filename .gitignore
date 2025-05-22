@@ -18,6 +18,3 @@ buildNumber.properties
 
 .idea
 !.idea/compiler.xml
-application-local.yml
-
-**/application-local.yml
