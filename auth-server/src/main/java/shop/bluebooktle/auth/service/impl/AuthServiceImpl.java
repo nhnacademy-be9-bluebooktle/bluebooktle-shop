@@ -114,7 +114,7 @@ public class AuthServiceImpl implements AuthService {
 	public void logout(String accessToken) {
 		Long userId = jwtUtil.getUserIdFromToken(accessToken);
 		refreshTokenService.deleteByUserId(userId);
-		accessTokenService.addTokenToBlacklist(accessToken);
+		accessTokenService.addToBlacklist(accessToken);
 	}
 
 	@Override

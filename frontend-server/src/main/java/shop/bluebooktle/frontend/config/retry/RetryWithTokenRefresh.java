@@ -18,5 +18,4 @@ import shop.bluebooktle.frontend.exception.TokenRefreshAndRetryNeededException;
 	backoff = @Backoff(delay = 150L)
 )
 public @interface RetryWithTokenRefresh {
-
 }

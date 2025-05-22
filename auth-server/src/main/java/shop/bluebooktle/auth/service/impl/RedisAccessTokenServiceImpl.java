@@ -25,7 +25,7 @@ public class RedisAccessTokenServiceImpl implements AccessTokenService {
 	}
 
 	@Override
-	public void addTokenToBlacklist(String accessToken) {
+	public void addToBlacklist(String accessToken) {
 		long remainingMillis = jwtUtil.getRemainingTimeMillis(accessToken);
 		if (remainingMillis > 0) {
 			String redisKey = BLACKLIST_KEY + accessToken;
