@@ -10,11 +10,11 @@ import shop.bluebooktle.common.dto.coupon.response.CouponTypeResponse;
 public interface AdminCouponService {
 	void registerCouponType(CouponTypeRegisterRequest request);
 
-	PaginationData<CouponTypeResponse> getAllCouponTypes();
+	PaginationData<CouponTypeResponse> getAllCouponType();
 
 	void registerCoupon(CouponRegisterRequest request);
 
-	PaginationData<CouponResponse> getAllCoupons();
+	PaginationData<CouponResponse> getAllCoupon();
 
 	void issueCoupon(UserCouponRegisterRequest request);
 }

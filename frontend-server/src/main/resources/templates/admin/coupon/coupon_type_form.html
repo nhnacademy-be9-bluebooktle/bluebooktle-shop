@@ -46,6 +46,7 @@
                     <div class="admin-form-group">
                         <label for="name" class="admin-form-label">쿠폰 정책 이름 <span class="text-danger">*</span></label>
                         <input type="text" id="name" th:field="*{name}" class="admin-form-control"
+                               th:errorclass="is-invalid"
                                placeholder="예: 신규회원 정액 할인 쿠폰">
                         <div th:if="${#fields.hasErrors('name')}" th:errors="*{name}"
                              class="invalid-feedback admin-form-text"></div>

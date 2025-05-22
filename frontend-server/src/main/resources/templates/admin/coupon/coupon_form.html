@@ -26,6 +26,11 @@
                 margin-top: 15px;
                 margin-bottom: 10px;
             }
+            
+            .admin-form-group.has-error .selectable-item {
+                border-color: red;
+                background-color: #fff5f5;
+            }
         </style>
     </th:block>
 </head>
@@ -39,6 +44,11 @@
 
     <div class="admin-panel">
         <div class="admin-panel__body">
+            <div th:if="${globalErrorMessage}" class="alert alert-danger admin-alert"
+                 style="background-color: #f8d7da; color: #721c24; padding: .75rem 1.25rem; margin-bottom: 1rem; border: 1px solid transparent; border-radius: .25rem;">
+                <strong th:text="${globalErrorMessage}"></strong>
+            </div>
+
             <form th:action="@{/admin/coupons}" th:object="${coupon}" method="post" class="admin-form">
                 <!-- 쿠폰 이름 -->
                 <fieldset class="form-section">
@@ -46,13 +56,14 @@
                     <div class="admin-form-group">
                         <label for="name" class="admin-form-label">쿠폰 이름 <span class="text-danger">*</span></label>
                         <input type="text" id="name" th:field="*{name}" class="admin-form-control"
-                               placeholder="예: 5월 IT 특별 쿠폰">
+                               th:errorclass="is-invalid" placeholder="예: 5월 IT 특별 쿠폰">
                         <div th:if="${#fields.hasErrors('name')}" th:errors="*{name}"
-                             class="invalid-feedback admin-form-text"></div>
+                             class="invalid-feedback admin-form-text" style="color: red;"></div>
                     </div>
 
                     <!-- 쿠폰 정책 선택 -->
-                    <div class="admin-form-group">
+                    <div class="admin-form-group"
+                         th:classappend="${#fields.hasErrors('couponTypeId')} ? 'has-error'">
                         <label class="admin-form-label">쿠폰 정책 <span class="text-danger">*</span></label>
                         <div th:each="type : ${couponTypes}" class="selectable-item"
                              th:classappend="${coupon.couponTypeId == type.id} ? 'selected'">

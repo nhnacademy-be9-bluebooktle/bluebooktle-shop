@@ -20,8 +20,9 @@
             border-radius: 0.5rem;
         }
 
-        .inline-issue-form-row {
-            animation: fadeIn 0.3s ease-in-out;
+        .admin-page-actions {
+            display: flex;
+            align-items: center;
         }
 
         @keyframes fadeIn {
@@ -45,9 +46,7 @@
             <a th:href="@{/admin/coupons/type/new}" class="admin-btn admin-btn--primary">
                 <i class="fas fa-plus"></i> 쿠폰 정책 등록
             </a>
-        </div>
-        <div class="admin-page-actions">
-            <a th:href="@{/admin/coupons/new}" class="admin-btn admin-btn--primary">
+            <a th:href="@{/admin/coupons/new}" class="admin-btn admin-btn--primary" style="margin-left: 10px;">
                 <i class="fas fa-plus"></i> 쿠폰 등록
             </a>
         </div>
@@ -122,19 +121,26 @@
 </div>
 
 <th:block layout:fragment="page_scripts">
-    <script th:inline="javascript">
+    <script>
         function toggleAccordion(button) {
             const currentRow = button.closest('tr');
             const couponId = currentRow.getAttribute('data-coupon-id');
-
-            // 기존 폼 제거
-            document.querySelectorAll('.inline-issue-form-row').forEach(row => row.remove());
+            // 이미 열려 있는 폼이 이 쿠폰과 관련된 것이면 닫기
+            const existingForm = document.querySelector('.inline-issue-form-row');
+            if (existingForm) {
+                if (existingForm.previousElementSibling === currentRow) {
+                    existingForm.remove(); // 토글: 다시 누르면 닫힘
+                    return;
+                } else {
+                    existingForm.remove(); // 다른 거 열려있으면 제거
+                }
+            }
 
             const formRow = document.createElement('tr');
             formRow.classList.add('inline-issue-form-row');
             formRow.innerHTML = `
             <td colspan="8">
-                <form class="inline-issue-form" th:action="@{/admin/coupons/issue}" method="post">
+                <form class="inline-issue-form" action="/admin/coupons/issue" method="post">
                     <input type="hidden" name="couponId" value="${couponId}" />
                     <div class="admin-form-group">
                         <label class="admin-form-label">사용 가능 시작일</label>

@@ -242,4 +242,5 @@ public class CouponServiceTest {
 		assertThat(result.getContent()).isInstanceOf(List.class);
 		verify(couponRepository).findAllByCoupon(any(), eq(pageable));
 	}
+
 }

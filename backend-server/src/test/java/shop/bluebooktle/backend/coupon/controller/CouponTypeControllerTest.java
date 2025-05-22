@@ -60,7 +60,7 @@ class CouponTypeControllerTest {
 			.discountPercent(10)
 			.build();
 
-		mockMvc.perform(post("/api/admin/coupon-type")
+		mockMvc.perform(post("/api/admin/coupons/type")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(request)).with(csrf()))
 			.andExpect(status().isCreated())
@@ -82,7 +82,7 @@ class CouponTypeControllerTest {
 
 		given(couponTypeService.getAllCouponTypeList(any())).willReturn(page);
 
-		mockMvc.perform(get("/api/admin/coupon-type")
+		mockMvc.perform(get("/api/admin/coupons/type")
 				.param("page", "0")
 				.param("size", "10")
 				.param("sort", "id"))

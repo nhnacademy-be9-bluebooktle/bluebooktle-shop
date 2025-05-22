@@ -36,7 +36,7 @@ import shop.bluebooktle.common.entity.auth.User;
 @DataJpaTest
 @ActiveProfiles("test")
 @Import({QueryDslConfig.class, JpaAuditingConfiguration.class})
-class CouponRepositoryTest { //custom Repository Test 진행
+class CouponRepositoryTest {
 	@Autowired
 	private CouponRepository couponRepository;
 
@@ -117,7 +117,7 @@ class CouponRepositoryTest { //custom Repository Test 진행
 				.loginId("test123")
 				.encodedPassword("password123")
 				.name("테스트 유저")
-				.nickname("유저 닉네임")
+				.nickname("test")
 				.email("test@example.com")
 				.birth("2025-01-01")
 				.phoneNumber("01012345678")

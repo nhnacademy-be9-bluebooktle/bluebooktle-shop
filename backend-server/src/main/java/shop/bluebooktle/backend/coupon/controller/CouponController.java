@@ -39,7 +39,7 @@ public class CouponController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(JsendResponse.success());
 	}
 
-	@Operation(summary = "쿠폰 조회", description = "등록된 쿠폰을 조회합니다.")
+	@Operation(summary = "쿠폰 전체 조회", description = "등록된 쿠폰 전체를 조회합니다.")
 	@GetMapping
 	public ResponseEntity<JsendResponse<PaginationData<CouponResponse>>> getAllCoupons(
 		@PageableDefault(size = 10, sort = "id") Pageable pageable) {
@@ -48,11 +48,12 @@ public class CouponController {
 		return ResponseEntity.ok(JsendResponse.success(paginationData));
 	}
 
+	// 쿠폰 발급
+	@Operation(summary = "쿠폰 직접 발급", description = "쿠폰을 직접 발급합니다.")
 	@PostMapping("/issue")
 	public ResponseEntity<JsendResponse<Void>> registerUserCoupon(
 		@RequestBody @Valid UserCouponRegisterRequest request) {
 		couponBatchLauncher.run(request);
 		return ResponseEntity.status(HttpStatus.CREATED).body(JsendResponse.success());
 	}
-
 }

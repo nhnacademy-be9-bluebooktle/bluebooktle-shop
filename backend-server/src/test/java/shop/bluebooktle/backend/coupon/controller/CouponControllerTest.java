@@ -28,8 +28,6 @@ import shop.bluebooktle.common.domain.CouponTypeTarget;
 import shop.bluebooktle.common.dto.coupon.request.CouponRegisterRequest;
 import shop.bluebooktle.common.dto.coupon.request.UserCouponRegisterRequest;
 import shop.bluebooktle.common.dto.coupon.response.CouponResponse;
-import shop.bluebooktle.common.service.AuthUserLoader;
-import shop.bluebooktle.common.util.JwtUtil;
 
 @WebMvcTest(controllers = CouponController.class)
 class CouponControllerTest {
@@ -45,12 +43,6 @@ class CouponControllerTest {
 
 	@Autowired
 	private ObjectMapper objectMapper;
-
-	@MockitoBean
-	private JwtUtil jwtUtil;
-
-	@MockitoBean
-	private AuthUserLoader authUserLoader;
 
 	@Test
 	@DisplayName("쿠폰 등록 - 성공")
@@ -76,13 +68,13 @@ class CouponControllerTest {
 		Pageable pageable = PageRequest.of(0, 10);
 		CouponResponse sample = new CouponResponse(
 			1L,
-			"10% 할인 쿠폰",
+			"무더위 쿠폰",
 			CouponTypeTarget.ORDER,
-			"type name",
-			BigDecimal.valueOf(10000),
+			"3만원 이상 구매 시 2천원 할인",
+			BigDecimal.valueOf(100),
 			LocalDateTime.now(),
-			"name",
-			"name"
+			null,
+			null
 		);
 		Page<CouponResponse> couponPage = new PageImpl<>(List.of(sample), pageable, 1);
 
@@ -94,7 +86,7 @@ class CouponControllerTest {
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.status").value("success"))
 			.andExpect(jsonPath("$.data.content").isArray())
-			.andExpect(jsonPath("$.data.content[0].couponName").value("10% 할인 쿠폰"));
+			.andExpect(jsonPath("$.data.content[0].couponName").value("무더위 쿠폰"));
 
 		verify(couponService).getAllCoupons(any());
 	}
@@ -117,3 +109,4 @@ class CouponControllerTest {
 		verify(couponBatchLauncher).run(any());
 	}
 }
+

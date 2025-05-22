@@ -8,12 +8,14 @@ import shop.bluebooktle.backend.coupon.service.UserCouponService;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/coupon")
+@RequestMapping("/api/coupons")
 public class UserCouponController {
 
 	private final UserCouponService userCouponService;
 
 	// TODO [쿠폰] 유저 별 쿠폰 전체 조회
 
-	// TODO [쿠폰] 유저 별 사용 가능한 쿠폰 전체 조회
+	// TODO [쿠폰] 유저 별 사용 가능 쿠폰 조회
+	// TODO [쿠폰] 유저 별 사용 완료 쿠폰 조회
+	// TODO [쿠폰] 유저 별 기간 만료 쿠폰 조회
 }

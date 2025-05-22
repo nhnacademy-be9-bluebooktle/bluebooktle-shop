@@ -14,7 +14,8 @@ import shop.bluebooktle.common.dto.coupon.response.CouponResponse;
 import shop.bluebooktle.common.dto.coupon.response.CouponTypeResponse;
 import shop.bluebooktle.frontend.config.FeignGlobalConfig;
 
-@FeignClient(name = "backed-server", path = "/api/admin/coupons", contextId = "adminCouponRepository", configuration = FeignGlobalConfig.class)
+// @FeignClient(name = "backed-server", url = "${backend.url}, path = "/api/coupon/admin", contextId = "adminCouponRepository", configuration = FeignGlobalConfig.class)
+@FeignClient(name = "backend-server", path = "/api/admin/coupons", contextId = "adminCouponRepository", configuration = FeignGlobalConfig.class)
 public interface AdminCouponRepository {
 	//쿠폰 정책 등록
 	@PostMapping("/type")
@@ -22,7 +23,7 @@ public interface AdminCouponRepository {
 
 	//쿠폰 정책 전체 조회
 	@GetMapping("/type")
-	JsendResponse<PaginationData<CouponTypeResponse>> getCouponType();
+	JsendResponse<PaginationData<CouponTypeResponse>> getAllCouponType();
 
 	//쿠폰 등록
 	@PostMapping
@@ -30,7 +31,7 @@ public interface AdminCouponRepository {
 
 	//전체 쿠폰 조회
 	@GetMapping
-	JsendResponse<PaginationData<CouponResponse>> getAllCoupons();
+	JsendResponse<PaginationData<CouponResponse>> getAllCoupon();
 
 	//쿠폰 발급
 	@PostMapping("/issue")
