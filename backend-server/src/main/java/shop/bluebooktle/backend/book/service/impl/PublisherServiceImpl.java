@@ -39,6 +39,11 @@ public class PublisherServiceImpl implements PublisherService {
 	public void updatePublisher(Long publisherId, PublisherRequest request) {
 		Publisher publisher = publisherRepository.findById(publisherId)
 			.orElseThrow(() -> new PublisherNotFoundException(publisherId));
+
+		if (publisherRepository.existsByName(request.getName())) {
+			throw new PublisherAlreadyExistsException("출판사명 : " + request.getName());
+		}
+
 		publisher.setName(request.getName());
 		publisherRepository.save(publisher);
 	}

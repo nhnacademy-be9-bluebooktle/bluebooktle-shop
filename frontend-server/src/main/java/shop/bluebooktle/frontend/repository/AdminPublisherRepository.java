@@ -1,10 +1,12 @@
 package shop.bluebooktle.frontend.repository;
 
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import shop.bluebooktle.common.dto.book.request.PublisherRequest;
@@ -29,17 +31,17 @@ public interface AdminPublisherRepository {
 
 	// 출판사 등록
 	@PostMapping
-	JsendResponse<Void> createPublisher(@RequestParam PublisherRequest request);
+	JsendResponse<Void> createPublisher(@RequestBody PublisherRequest request);
 
 	// 출판사명 수정
 	@PutMapping("/{publisherId}")
 	JsendResponse<Void> updatePublisher(
 		@PathVariable("publisherId") Long id,
-		@RequestParam PublisherRequest request
+		@RequestBody PublisherRequest request
 	);
 
 	// 출판사 삭제
-	@GetMapping("/{publisherId}")
+	@DeleteMapping("/{publisherId}")
 	JsendResponse<Void> deletePublisher(@PathVariable("publisherId") Long id);
 }
 
