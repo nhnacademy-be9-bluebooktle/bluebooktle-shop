@@ -23,7 +23,7 @@ import shop.bluebooktle.common.dto.coupon.response.CouponTypeResponse;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/admin/coupon-type")
+@RequestMapping("/api/admin/coupons/type")
 @Tag(name = "쿠폰 정책 API", description = "관리자 쿠폰 정책 CRUD 관련 API")
 public class CouponTypeController {
 

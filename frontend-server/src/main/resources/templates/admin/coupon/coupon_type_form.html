@@ -38,7 +38,7 @@
 
     <div class="admin-panel">
         <div class="admin-panel__body">
-            <form th:action="@{/admin/coupon-types}" th:object="${couponType}" method="post" class="admin-form">
+            <form th:action="@{/admin/coupons/type}" th:object="${couponType}" method="post" class="admin-form">
 
                 <!-- 정책 이름 -->
                 <fieldset class="form-section">
@@ -58,12 +58,12 @@
                     <div class="admin-form-group">
                         <label class="admin-form-label">적용 대상 <span class="text-danger">*</span></label>
                         <div>
-                            <input type="radio" name="targetType" id="targetAll" value="ORDER"
+                            <input type="radio" name="target" id="targetAll" value="ORDER"
                                    class="admin-form-check-input" required>
                             <label for="targetAll" class="admin-form-check-label" style="margin-right:15px;">전체
                                 주문</label>
 
-                            <input type="radio" name="targetType" id="targetBooksOrCategories" value="BOOK"
+                            <input type="radio" name="target" id="targetBooksOrCategories" value="BOOK"
                                    class="admin-form-check-input">
                             <label for="targetBooksOrCategories" class="admin-form-check-label">도서 관련</label>
                         </div>
@@ -119,9 +119,8 @@
                     </div>
                 </fieldset>
 
-                <!-- 저장 -->
                 <div class="admin-form-actions" style="text-align: right;">
-                    <a th:href="@{/admin/coupon}" class="admin-btn admin-btn--default"
+                    <a th:href="@{/admin/coupons}" class="admin-btn admin-btn--default"
                        style="margin-right: 10px;">취소</a>
                     <button type="submit" class="admin-btn admin-btn--primary">
                         <i class="fas fa-save"></i> 저장

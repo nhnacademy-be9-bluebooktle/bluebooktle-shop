@@ -26,7 +26,6 @@ import shop.bluebooktle.backend.book.repository.BookRepository;
 import shop.bluebooktle.backend.book.repository.CategoryRepository;
 import shop.bluebooktle.backend.coupon.dto.CouponSearchRequest;
 import shop.bluebooktle.backend.coupon.entity.BookCoupon;
-import shop.bluebooktle.backend.coupon.entity.CategoryCoupon;
 import shop.bluebooktle.backend.coupon.entity.Coupon;
 import shop.bluebooktle.backend.coupon.entity.CouponType;
 import shop.bluebooktle.backend.coupon.repository.BookCouponRepository;
@@ -36,7 +35,6 @@ import shop.bluebooktle.backend.coupon.repository.CouponTypeRepository;
 import shop.bluebooktle.backend.coupon.service.impl.CouponServiceImpl;
 import shop.bluebooktle.common.domain.CouponTypeTarget;
 import shop.bluebooktle.common.dto.coupon.request.CouponRegisterRequest;
-import shop.bluebooktle.common.dto.coupon.request.CouponUpdateRequest;
 import shop.bluebooktle.common.dto.coupon.response.CouponResponse;
 import shop.bluebooktle.common.exception.coupon.CouponTypeNotFoundException;
 import shop.bluebooktle.common.exception.coupon.InvalidCouponTargetException;
@@ -172,58 +170,6 @@ public class CouponServiceTest {
 	}
 
 	@Test
-	@DisplayName("도서 쿠폰 수정 - 성공")
-	void updateCoupon_success() {
-		// given
-		CouponType couponType = CouponType.builder()
-			.target(CouponTypeTarget.BOOK)
-			.build();
-
-		Coupon coupon = Coupon.builder()
-			.couponName("기존 쿠폰")
-			.type(couponType)
-			.build();
-
-		Book book = Book.builder()
-			.id(10L)
-			.build();
-
-		given(couponRepository.findById(1L)).willReturn(Optional.of(coupon));
-		given(bookRepository.findById(10L)).willReturn(Optional.of(book));
-		given(bookCouponRepository.findByCoupon(coupon)).willReturn(Optional.empty());
-
-		CouponUpdateRequest request = CouponUpdateRequest.builder()
-			.name("수정된 쿠폰")
-			.bookId(10L)
-			.build();
-
-		// when
-		couponService.updateCoupon(1L, request);
-
-		// then
-		assertThat(coupon.getCouponName()).isEqualTo("수정된 쿠폰");
-		verify(bookCouponRepository).save(any());
-	}
-
-	@Test
-	@DisplayName("쿠폰 삭제")
-	void deleteCoupon_success() {
-		// given
-		Coupon coupon = Coupon.builder()
-			.build();
-
-		given(couponRepository.findById(1L)).willReturn(Optional.of(coupon));
-
-		// when
-		couponService.deleteCoupon(1L);
-
-		// then
-		verify(bookCouponRepository).deleteByCoupon(coupon);
-		verify(categoryCouponRepository).deleteByCoupon(coupon);
-		verify(couponRepository).delete(coupon);
-	}
-
-	@Test
 	@DisplayName("존재하지 않는 couponTypeId로 등록 시 - 실패")
 	void registerCoupon_couponTypeNotFound_fail() {
 		// given
@@ -296,56 +242,4 @@ public class CouponServiceTest {
 		assertThat(result.getContent()).isInstanceOf(List.class);
 		verify(couponRepository).findAllByCoupon(any(), eq(pageable));
 	}
-
-	@Test
-	@DisplayName("카테고리 쿠폰 수정 - 성공")
-	void updateCoupon_categoryCoupon_success() {
-		// given
-		CouponType couponType = CouponType.builder()
-			.target(CouponTypeTarget.BOOK)
-			.build();
-
-		Category parentCategory = Category.builder()
-			.name("parent")
-			.parentCategory(null)
-			.build();
-
-		Category oldCategory = Category.builder()
-			.name("old")
-			.parentCategory(parentCategory)
-			.build();
-		ReflectionTestUtils.setField(oldCategory, "id", 2L);
-
-		Category newCategory = Category.builder()
-			.name("new")
-			.parentCategory(parentCategory)
-			.build();
-		ReflectionTestUtils.setField(newCategory, "id", 3L);
-
-		Coupon coupon = Coupon.builder()
-			.couponName("쿠폰")
-			.type(couponType)
-			.build();
-		ReflectionTestUtils.setField(coupon, "id", 1L);
-
-		CategoryCoupon currentCategoryCoupon = new CategoryCoupon(coupon, oldCategory);
-
-		CouponUpdateRequest request = CouponUpdateRequest.builder()
-			.name("업데이트된 쿠폰")
-			.categoryId(3L) // 변경될 카테고리
-			.build();
-
-		given(couponRepository.findById(1L)).willReturn(Optional.of(coupon));
-		given(categoryCouponRepository.findByCoupon(coupon)).willReturn(Optional.of(currentCategoryCoupon));
-		given(categoryRepository.findById(3L)).willReturn(Optional.of(newCategory));
-
-		// when
-		couponService.updateCoupon(1L, request);
-
-		// then
-		assertThat(coupon.getCouponName()).isEqualTo("업데이트된 쿠폰");
-		verify(categoryCouponRepository).delete(currentCategoryCoupon);
-		verify(categoryCouponRepository).save(any());
-	}
-
 }

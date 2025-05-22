@@ -39,7 +39,7 @@
 
     <div class="admin-panel">
         <div class="admin-panel__body">
-            <form th:action="@{/admin/coupon}" th:object="${coupon}" method="post" class="admin-form">
+            <form th:action="@{/admin/coupons}" th:object="${coupon}" method="post" class="admin-form">
                 <!-- 쿠폰 이름 -->
                 <fieldset class="form-section">
                     <legend class="admin-form-legend">기본 정보</legend>
@@ -96,7 +96,7 @@
 
                 <!-- 저장 버튼 -->
                 <div class="admin-form-actions" style="text-align: right; margin-top: 20px;">
-                    <a th:href="@{/admin/coupon}" class="admin-btn admin-btn--default"
+                    <a th:href="@{/admin/coupons}" class="admin-btn admin-btn--default"
                        style="margin-right:10px;">취소</a>
                     <button type="submit" class="admin-btn admin-btn--primary"><i class="fas fa-save"></i> 저장</button>
                 </div>

@@ -3,79 +3,157 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       xmlns:th="http://www.thymeleaf.org">
 <head>
+    <title>쿠폰 관리</title>
     <meta charset="UTF-8"/>
-    <title>쿠폰 목록</title>
+    <link rel="stylesheet" href="/css/admin_styles.css"/>
+    <style>
+        .filter-form .admin-form-control, .filter-form .admin-btn {
+            height: calc(1.5em + .75rem + 2px);
+            padding: .375rem .75rem;
+            font-size: .9rem;
+        }
+
+        .inline-issue-form {
+            padding: 1rem;
+            background-color: #f9f9f9;
+            border: 1px solid #ccc;
+            border-radius: 0.5rem;
+        }
+
+        .inline-issue-form-row {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+    </style>
 </head>
 <body>
 <div layout:fragment="admin_content">
     <div class="admin-page-header">
         <h1 class="admin-page-title">
-            <i class="fas fa-ticket-alt"></i> 쿠폰 목록
+            <i class="fas fa-gift"></i>
+            쿠폰 관리
         </h1>
-        <div>
-            <a th:href="@{/admin/coupon-types/new}" class="admin-btn admin-btn--secondary">
+        <div class="admin-page-actions">
+            <a th:href="@{/admin/coupons/type/new}" class="admin-btn admin-btn--primary">
                 <i class="fas fa-plus"></i> 쿠폰 정책 등록
             </a>
+        </div>
+        <div class="admin-page-actions">
             <a th:href="@{/admin/coupons/new}" class="admin-btn admin-btn--primary">
                 <i class="fas fa-plus"></i> 쿠폰 등록
             </a>
         </div>
     </div>
 
-    <!-- 검색 필터는 일단 비활성화 상태로 유지 -->
-    <div class="admin-panel">
+    <div class="admin-panel filter-form">
         <div class="admin-panel__body">
-            <form th:action="@{/admin/coupons}" method="get" th:object="${searchCriteria}" class="admin-form">
-                <div class="search-filters" style="display:none;"><!-- 추후 구현 예정 -->
+            <form method="get" th:action="@{/admin/coupons}" class="row gx-2 gy-2 align-items-center">
+                <div class="col-auto">
+                    <select name="searchField" class="admin-form-control">
+                        <option value="">전체</option>
+                        <option value="couponName" th:selected="${searchField == 'couponName'}">쿠폰명</option>
+                    </select>
+                </div>
+                <div class="col-auto">
+                    <input type="text" name="searchKeyword" class="admin-form-control" placeholder="검색어 입력"
+                           th:value="${searchKeyword}">
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="admin-btn admin-btn--secondary">
+                        <i class="fas fa-search"></i> 검색
+                    </button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- 쿠폰 목록 -->
-    <div class="admin-panel" style="margin-top: 20px;">
-        <div class="admin-panel__header">
-            <h2 class="admin-panel__title"><i class="fas fa-list-ul"></i> 전체 쿠폰</h2>
-        </div>
-        <div class="admin-panel__body">
-            <table class="admin-table">
+    <div class="admin-panel">
+        <div class="admin-panel__header">쿠폰 목록</div>
+        <div class="admin-panel__body table-responsive">
+            <table class="admin-table admin-table--striped admin-table--hover" id="couponTable">
                 <thead>
                 <tr>
                     <th>ID</th>
-                    <th>쿠폰 이름</th>
-                    <th>적용 대상</th>
-                    <th>세부 대상</th>
-                    <th>연관 이름</th>
-                    <th>쿠폰 정책명</th>
+                    <th>쿠폰명</th>
+                    <th>대상</th>
+                    <th>연관 정보</th>
+                    <th>쿠폰 정책</th>
+                    <th>최소 주문 금액</th>
                     <th>등록일</th>
+                    <th>관리</th>
                 </tr>
                 </thead>
                 <tbody>
-                <tr th:if="${#lists.isEmpty(coupons)}">
-                    <td colspan="7" style="text-align:center;">등록된 쿠폰이 없습니다.</td>
-                </tr>
-                <tr th:each="coupon : ${coupons}">
+                <tr th:each="coupon : ${coupons}" th:attr="data-coupon-id=${coupon.id}">
                     <td th:text="${coupon.id}">1</td>
-                    <td th:text="${coupon.couponName}">IT 카테고리 쿠폰</td>
-                    <td th:text="${coupon.target == T(shop.bluebooktle.common.domain.CouponTypeTarget).ORDER ? '주문' : '도서'}"></td>
-                    <td th:text="${coupon.bookId != null ? '도서' : (coupon.categoryId != null ? '카테고리' : '-')}"/>
-                    <td th:text="${coupon.bookName != null ? coupon.bookName : (coupon.categoryName != null ? coupon.categoryName : '-')}"/>
-                    <td th:text="${coupon.couponTypeName}">10,000원 이상 구매시 1000원 할인</td>
-                    <td th:text="${#temporals.format(coupon.createdAt, 'yyyy-MM-dd')}">2025-05-01</td>
+                    <td th:text="${coupon.couponName}">할인 쿠폰</td>
+                    <td th:text="${coupon.target.name() == 'ORDER' ? '전체 주문' : '도서 관련'}"></td>
+                    <td>
+                        <span th:if="${coupon.bookName != null}" th:text="'도서: ' + ${coupon.bookName}"></span>
+                        <span th:if="${coupon.categoryName != null}" th:text="'카테고리: ' + ${coupon.categoryName}"></span>
+                        <span th:if="${coupon.bookName == null and coupon.categoryName == null}">-</span>
+                    </td>
+                    <td th:text="${coupon.couponTypeName}">정책A</td>
+                    <td th:text="${#numbers.formatDecimal(coupon.minimumPayment, 0, 'COMMA', 0, 'POINT')} + '원'">
+                        5,000원
+                    </td>
+                    <td th:text="${#temporals.format(coupon.createdAt, 'yyyy-MM-dd HH:mm')}">2025-05-20</td>
+                    <td>
+                        <button type="button" class="admin-btn admin-btn--sm admin-btn--primary"
+                                onclick="toggleAccordion(this)">발급
+                        </button>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(coupons)}">
+                    <td colspan="8" class="text-center">등록된 쿠폰이 없습니다.</td>
                 </tr>
                 </tbody>
             </table>
         </div>
-
-        <div th:if="${totalPages != null and totalPages > 0}" class="admin-panel__footer pagination-container">
-            <th:block th:replace="~{_fragments/admin_pagination :: commonPagination(
-                        currentPage=${currentPage + 1},
-                        totalPages=${totalPages},
-                        baseUrl=${baseUrlWithParams},
-                        searchKeyword=${searchKeyword}
-            )}"></th:block>
-        </div>
     </div>
 </div>
+
+<th:block layout:fragment="page_scripts">
+    <script th:inline="javascript">
+        function toggleAccordion(button) {
+            const currentRow = button.closest('tr');
+            const couponId = currentRow.getAttribute('data-coupon-id');
+
+            // 기존 폼 제거
+            document.querySelectorAll('.inline-issue-form-row').forEach(row => row.remove());
+
+            const formRow = document.createElement('tr');
+            formRow.classList.add('inline-issue-form-row');
+            formRow.innerHTML = `
+            <td colspan="8">
+                <form class="inline-issue-form" th:action="@{/admin/coupons/issue}" method="post">
+                    <input type="hidden" name="couponId" value="${couponId}" />
+                    <div class="admin-form-group">
+                        <label class="admin-form-label">사용 가능 시작일</label>
+                        <input type="datetime-local" name="availableStartAt" class="admin-form-control" required />
+                    </div>
+                    <div class="admin-form-group">
+                        <label class="admin-form-label">사용 가능 종료일</label>
+                        <input type="datetime-local" name="availableEndAt" class="admin-form-control" required />
+                    </div>
+                    <div class="admin-form-group">
+                        <button type="submit" class="admin-btn admin-btn--primary">발급 완료</button>
+                    </div>
+                </form>
+            </td>`;
+
+            currentRow.parentNode.insertBefore(formRow, currentRow.nextSibling);
+        }
+    </script>
+</th:block>
+
 </body>
 </html>
