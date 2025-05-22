@@ -13,8 +13,8 @@ import jakarta.servlet.http.HttpServletResponse;
 @Component
 public class CookieTokenUtil {
 
-	public static final String ACCESS_TOKEN_COOKIE_NAME = "accessToken";
-	public static final String REFRESH_TOKEN_COOKIE_NAME = "refreshToken";
+	public static final String ACCESS_TOKEN_COOKIE_NAME = "BB_AT";
+	public static final String REFRESH_TOKEN_COOKIE_NAME = "BB_RT";
 
 	public Optional<String> getAccessToken(HttpServletRequest request) {
 		return getCookieValue(request, ACCESS_TOKEN_COOKIE_NAME);

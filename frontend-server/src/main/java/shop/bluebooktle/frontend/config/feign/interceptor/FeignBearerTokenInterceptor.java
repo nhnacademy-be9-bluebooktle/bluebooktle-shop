@@ -1,4 +1,4 @@
-package shop.bluebooktle.frontend.config;
+package shop.bluebooktle.frontend.config.feign.interceptor;
 
 import java.util.Optional;
 
@@ -28,9 +28,15 @@ public class FeignBearerTokenInterceptor implements RequestInterceptor {
 		ServletRequestAttributes requestAttributes = (ServletRequestAttributes)RequestContextHolder.getRequestAttributes();
 		if (requestAttributes != null) {
 			HttpServletRequest request = requestAttributes.getRequest();
-			Optional<String> accessToken = cookieTokenUtil.getAccessToken(request);
 
-			accessToken.ifPresent(token -> template.header("Authorization", "Bearer " + token));
+			String accessTokenFromAttribute = (String)request.getAttribute(CookieTokenUtil.ACCESS_TOKEN_COOKIE_NAME);
+
+			if (accessTokenFromAttribute != null) {
+				template.header("Authorization", "Bearer " + accessTokenFromAttribute);
+			} else {
+				Optional<String> accessTokenFromCookie = cookieTokenUtil.getAccessToken(request);
+				accessTokenFromCookie.ifPresent(token -> template.header("Authorization", "Bearer " + token));
+			}
 		}
 	}
 }
