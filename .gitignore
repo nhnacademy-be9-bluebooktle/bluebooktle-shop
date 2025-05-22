@@ -20,3 +20,5 @@ buildNumber.properties
 !.idea/compiler.xml
 
 application-local.yml
+
+**/application-local.yml
