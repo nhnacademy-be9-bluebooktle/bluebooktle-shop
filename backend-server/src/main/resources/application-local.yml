@@ -5,7 +5,7 @@ spring:
   datasource:
     url: jdbc:mysql://localhost:3306/bluebooktle
     username: root
-    password: marf1114!
+    password:
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
@@ -41,7 +41,7 @@ eureka:
 
 jwt:
   secret: ${JWT_SECRET_KEY_LOCAL}
-  access-token-validity-seconds: 1800
+  access-token-validity-seconds: 5
   refresh-token-validity-seconds: 3600
 
 logging:

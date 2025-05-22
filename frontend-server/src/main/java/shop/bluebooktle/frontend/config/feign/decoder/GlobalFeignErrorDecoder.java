@@ -24,7 +24,7 @@ import shop.bluebooktle.common.dto.common.JsendResponse;
 import shop.bluebooktle.common.exception.ApplicationException;
 import shop.bluebooktle.common.exception.ErrorCode;
 import shop.bluebooktle.frontend.exception.TokenRefreshAndRetryNeededException;
-import shop.bluebooktle.frontend.repository.AuthRepository;
+import shop.bluebooktle.frontend.service.AuthService;
 import shop.bluebooktle.frontend.util.CookieTokenUtil;
 
 @Slf4j
@@ -33,7 +33,7 @@ public class GlobalFeignErrorDecoder implements ErrorDecoder {
 
 	private final ObjectMapper objectMapper;
 	private final CookieTokenUtil cookieTokenUtil;
-	private final ObjectProvider<AuthRepository> authRepositoryProvider;
+	private final ObjectProvider<AuthService> authServiceProvider;
 	private static final Object tokenRefreshLock = new Object();
 
 	@Override
@@ -76,7 +76,6 @@ public class GlobalFeignErrorDecoder implements ErrorDecoder {
 
 		if (isAccessTokenExpiredError
 			&& !requestUrl.contains("/auth/refresh") && currentRequest != null && currentResponse != null) {
-
 			Optional<String> refreshTokenOptional = cookieTokenUtil.getRefreshToken(currentRequest);
 			if (refreshTokenOptional.isEmpty()) {
 				cookieTokenUtil.clearTokens(currentResponse);
@@ -87,13 +86,11 @@ public class GlobalFeignErrorDecoder implements ErrorDecoder {
 			// TOKEN 재발급 로직
 			synchronized (tokenRefreshLock) {
 				try {
-					AuthRepository authRepository = authRepositoryProvider.getObject();
-					TokenResponse tokenResponse = authRepository.refreshToken(
-						new TokenRefreshRequest(refreshTokenOptional.get()));
+					TokenRefreshRequest tokenRefreshRequest = new TokenRefreshRequest(refreshTokenOptional.get());
+					AuthService authService = authServiceProvider.getObject();
+					TokenResponse tokenResponse = authService.refreshToken(currentResponse, tokenRefreshRequest);
 
 					if (tokenResponse != null && tokenResponse.getAccessToken() != null) {
-						cookieTokenUtil.saveTokens(currentResponse, tokenResponse.getAccessToken(),
-							tokenResponse.getRefreshToken());
 						currentRequest.setAttribute(CookieTokenUtil.ACCESS_TOKEN_COOKIE_NAME,
 							tokenResponse.getAccessToken());
 						String retryMessage = String.format("Access Token 재발급 성공, 재시도 필요. URL: %s, Status: %d",

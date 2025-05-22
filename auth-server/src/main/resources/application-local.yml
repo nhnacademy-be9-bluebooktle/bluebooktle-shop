@@ -26,10 +26,9 @@ spring:
 
   data:
     redis:
-      host: s4.java21.net
+      host: localhost
       port: 6379
-      password: "*N2vya7H@muDTwdNMR!"
-      database: 287
+      database: 0
 
 eureka:
   client:

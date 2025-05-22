@@ -14,7 +14,7 @@ import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.frontend.config.feign.decoder.GlobalFeignErrorDecoder;
 import shop.bluebooktle.frontend.config.feign.decoder.JsendDecoder;
 import shop.bluebooktle.frontend.config.feign.interceptor.FeignBearerTokenInterceptor;
-import shop.bluebooktle.frontend.repository.AuthRepository;
+import shop.bluebooktle.frontend.service.AuthService;
 import shop.bluebooktle.frontend.util.CookieTokenUtil;
 
 @RequiredArgsConstructor
@@ -23,7 +23,7 @@ public class FeignGlobalConfig {
 
 	private final ObjectMapper feignObjectMapperInstance;
 	private final CookieTokenUtil cookieTokenUtil;
-	private final ObjectProvider<AuthRepository> authRepositoryProvider;
+	private final ObjectProvider<AuthService> authServiceProvider;
 
 	@Bean
 	public FeignBearerTokenInterceptor feignBearerTokenInterceptor() {
@@ -40,7 +40,7 @@ public class FeignGlobalConfig {
 		return new GlobalFeignErrorDecoder(
 			this.feignObjectMapperInstance,
 			this.cookieTokenUtil,
-			this.authRepositoryProvider);
+			this.authServiceProvider);
 	}
 
 	@Bean

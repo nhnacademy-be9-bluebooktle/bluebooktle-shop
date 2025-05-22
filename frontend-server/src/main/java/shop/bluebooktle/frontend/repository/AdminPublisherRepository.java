@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import shop.bluebooktle.common.dto.book.request.PublisherRequest;
 import shop.bluebooktle.common.dto.book.response.PublisherInfoResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
-import shop.bluebooktle.frontend.config.FeignGlobalConfig;
+import shop.bluebooktle.frontend.config.feign.FeignGlobalConfig;
 
 @FeignClient(name = "backend-server", contextId = "adminPublisherRepository", path = "/api/publishers", configuration = FeignGlobalConfig.class)
 public interface AdminPublisherRepository {

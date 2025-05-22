@@ -44,7 +44,6 @@ public class AuthController {
 	public String login(@ModelAttribute LoginRequest loginRequest,
 		HttpServletResponse response) {
 		authService.login(response, loginRequest);
-
 		return "redirect:/";
 
 	}
