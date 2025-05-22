@@ -1,4 +1,4 @@
-package shop.bluebooktle.common.security; // 패키지 경로는 실제 프로젝트에 맞게 조정하세요.
+package shop.bluebooktle.common.security;
 
 import java.io.IOException;
 
