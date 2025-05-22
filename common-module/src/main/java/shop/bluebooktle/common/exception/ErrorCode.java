@@ -28,7 +28,7 @@ public enum ErrorCode {
 	AUTH_PASSWORD_MISMATCH(HttpStatus.BAD_REQUEST, "A007", "현재 비밀번호가 일치하지 않습니다."),
 	AUTH_PASSWORD_ENCRYPTION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "A008", "비밀번호 암호화 중 오류가 발생했습니다."),
 	AUTH_TOKEN_GENERATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "A009", "토큰 발행 중 오류가 발생했습니다."),
-	AUTH_TOKEN_VALIDATION_FAILED(HttpStatus.UNAUTHORIZED, "A010", "유효하지 않거나 만료된 Access Token입니다."),
+	AUTH_TOKEN_VALIDATION_FAILED(HttpStatus.UNAUTHORIZED, "A010", "유효하지 않거나 만료된 토큰입니다."),
 	AUTH_ACCOUNT_WITHDRAWN(HttpStatus.FORBIDDEN, "A011", "탈퇴한 계정입니다."),
 	AUTH_NOT_DORMANT_ACCOUNT(HttpStatus.BAD_REQUEST, "A012", "휴면 상태가 아닌 계정입니다."),
 	AUTH_ADDRESS_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "A013", "주소는 최대 10개까지 등록할 수 있습니다."),
