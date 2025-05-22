@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import shop.bluebooktle.common.domain.auth.UserStatus;
 import shop.bluebooktle.common.entity.auth.User;
 
-public interface UserRepository extends JpaRepository<User, Long> {
+public interface UserRepository extends JpaRepository<User, Long>, UserQueryRepository {
 
 	Optional<User> findByLoginId(String loginId);
 
