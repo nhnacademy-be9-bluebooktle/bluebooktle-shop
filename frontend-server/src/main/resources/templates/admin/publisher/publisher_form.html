@@ -23,8 +23,6 @@
 
             <form th:action="@{/admin/publishers/save}" th:object="${publisher}" method="post">
                 <input type="hidden" th:field="*{id}"/>
-                <input type="hidden" th:field="*{deletedAt}"/>
-                <input type="hidden" th:field="*{createdAt}"/>
                 <div class="admin-form-group">
                     <label for="name" class="admin-form-label">출판사 이름 <span style="color:red;">*</span></label>
                     <input type="text" id="name" th:field="*{name}" class="admin-form-control"

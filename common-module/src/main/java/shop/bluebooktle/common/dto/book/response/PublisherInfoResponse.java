@@ -10,5 +10,4 @@ import lombok.Getter;
 public class PublisherInfoResponse {
 	private Long id;
 	private String name;
-
 }

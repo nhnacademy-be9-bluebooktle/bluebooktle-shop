@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import shop.bluebooktle.common.dto.book.request.TagRequest;
@@ -75,7 +76,7 @@ public class AdminTagController {
 
 	/** 태그 저장 */
 	@PostMapping("/save")
-	public String saveTag(@ModelAttribute("tag") TagInfoResponse tag,
+	public String saveTag(@Valid @ModelAttribute("tag") TagInfoResponse tag,
 		BindingResult bindingResult,
 		RedirectAttributes redirectAttributes) {
 		log.info("태그 저장 요청: {}", tag);

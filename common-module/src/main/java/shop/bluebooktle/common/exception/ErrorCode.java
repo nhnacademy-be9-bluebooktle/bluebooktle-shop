@@ -50,6 +50,10 @@ public enum ErrorCode {
 	BOOK_ALREADY_EXISTS_EXCEPTION(HttpStatus.CONFLICT, "B011", "이미 등록된 도서입니다."),
 	BOOK_SALE_INFO_ALREADY_EXISTS(HttpStatus.CONFLICT, "B012", "이미 등록된 도서 판매 정보입니다."),
 	BOOK_ID_NULL(HttpStatus.BAD_REQUEST, "B013", "도서 ID는 필수입니다."),
+	PUBLISHER_LIST_FETCH_ERROR(HttpStatus.NOT_FOUND, "B014", "출판사를 찾을 수 없습니다."),
+	PUBLISHER_CREATE_FAILED(HttpStatus.BAD_GATEWAY, "B014", "출판사 등록에 실패했습니다."),
+	PUBLISHER_UPDATE_FAILED(HttpStatus.BAD_GATEWAY, "B015", "출판사 수정에 실패했습니다."),
+	PUBLISHER_DELETE_FAILED(HttpStatus.BAD_GATEWAY, "B016", "출판사 삭제에 실패했습니다."),
 
 	// Book - 카테고리
 	BOOK_CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "BC01", "도서에 등록된 카테고리를 찾을 수 없습니다."),

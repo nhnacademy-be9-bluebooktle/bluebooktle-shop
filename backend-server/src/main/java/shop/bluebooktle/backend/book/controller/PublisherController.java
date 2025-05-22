@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
@@ -68,9 +69,16 @@ public class PublisherController {
 	// 출판사 목록 조회
 	@GetMapping
 	public ResponseEntity<JsendResponse<PaginationData<PublisherInfoResponse>>> getPublishers(
-		@PageableDefault(size = 10, sort = "id") Pageable pageable
-	) {
-		Page<PublisherInfoResponse> publisherPage = publisherService.getPublishers(pageable);
+		@PageableDefault(size = 10, sort = "id") Pageable pageable,
+		@RequestParam(value = "searchKeyword", required = false) String searchKeyword) {
+
+		Page<PublisherInfoResponse> publisherPage;
+
+		if (searchKeyword != null && !searchKeyword.isBlank()) {
+			publisherPage = publisherService.searchPublishers(searchKeyword, pageable);
+		} else {
+			publisherPage = publisherService.getPublishers(pageable);
+		}
 		PaginationData<PublisherInfoResponse> paginationData = new PaginationData<>(publisherPage);
 		return ResponseEntity.ok(JsendResponse.success(paginationData));
 	}

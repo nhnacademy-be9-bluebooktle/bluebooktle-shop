@@ -80,4 +80,10 @@ public class PublisherServiceImpl implements PublisherService {
 			));
 		return new PublisherInfoResponse(publisher.getId(), publisher.getName());
 	}
+
+	@Override
+	public Page<PublisherInfoResponse> searchPublishers(String searchKeyword, Pageable pageable) {
+		Page<Publisher> publishers = publisherRepository.searchByNameContaining(searchKeyword, pageable);
+		return publishers.map(publisher -> new PublisherInfoResponse(publisher.getId(), publisher.getName()));
+	}
 }
