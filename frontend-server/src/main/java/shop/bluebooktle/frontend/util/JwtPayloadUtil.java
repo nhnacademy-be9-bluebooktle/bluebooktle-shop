@@ -71,24 +71,36 @@ public class JwtPayloadUtil {
 		}
 
 		if (requiredType.isInstance(value)) {
-			return (T)value;
+			return requiredType.cast(value);
 		}
 
-		if (value instanceof Number) {
-			Number numValue = (Number)value;
+		if (value instanceof Number numValue) {
 			if (requiredType == Integer.class) {
-				return (T)Integer.valueOf(numValue.intValue());
+				return requiredType.cast(numValue.intValue());
 			} else if (requiredType == Long.class) {
-				return (T)Long.valueOf(numValue.longValue());
+				return requiredType.cast(numValue.longValue());
 			} else if (requiredType == Double.class) {
-				return (T)Double.valueOf(numValue.doubleValue());
+				return requiredType.cast(numValue.doubleValue());
 			} else if (requiredType == Float.class) {
-				return (T)Float.valueOf(numValue.floatValue());
+				return requiredType.cast(numValue.floatValue());
 			}
 		}
 
-		logger.warn("Claim type mismatch: '{}'. Expected: '{}', Actual: '{}'. Value: '{}'",
-			claimName, requiredType.getSimpleName(), value.getClass().getSimpleName(), value);
+		if (value instanceof String strValue) {
+			try {
+				if (requiredType == Integer.class) {
+					return requiredType.cast(Integer.parseInt(strValue));
+				} else if (requiredType == Long.class) {
+					return requiredType.cast(Long.parseLong(strValue));
+				} else if (requiredType == Double.class) {
+					return requiredType.cast(Double.parseDouble(strValue));
+				} else if (requiredType == Float.class) {
+					return requiredType.cast(Float.parseFloat(strValue));
+				}
+			} catch (NumberFormatException e) {
+				return null;
+			}
+		}
 		return null;
 	}
 }
