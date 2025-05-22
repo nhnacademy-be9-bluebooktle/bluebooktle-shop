@@ -22,7 +22,6 @@ import shop.bluebooktle.backend.book.service.BookPublisherService;
 import shop.bluebooktle.backend.book.service.BookRegisterService;
 import shop.bluebooktle.backend.book.service.BookTagService;
 import shop.bluebooktle.backend.book.service.PublisherService;
-import shop.bluebooktle.common.dto.book.BookSaleInfoState;
 import shop.bluebooktle.common.dto.book.request.BookAllRegisterByAladinRequest;
 import shop.bluebooktle.common.dto.book.request.BookAllRegisterRequest;
 import shop.bluebooktle.common.dto.book.response.AladinBookResponse;
@@ -87,7 +86,7 @@ public class BookRegisterServiceImpl implements BookRegisterService {
 			.stock(request.getStock())
 			.isPackable(request.getIsPackable() != null &&
 				request.getIsPackable())
-			.state(request.getState())
+			.bookSaleInfoState(request.getState())
 			.salePercentage(salePercentage)
 			.build();
 		bookSaleInfoRepository.save(bookSaleInfo);
@@ -141,7 +140,7 @@ public class BookRegisterServiceImpl implements BookRegisterService {
 			.salePercentage(aladinBook.getSalePercentage())
 			.stock(request.getStock())
 			.isPackable(request.getIsPackable())
-			.state(request.getState())
+			.bookSaleInfoState(request.getState())
 			.build();
 		bookSaleInfoRepository.save(saleInfo);
 	}

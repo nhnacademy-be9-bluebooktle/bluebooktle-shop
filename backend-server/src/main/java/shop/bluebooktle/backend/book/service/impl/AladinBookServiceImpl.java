@@ -8,8 +8,8 @@ import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import shop.bluebooktle.backend.book.adapter.AladinAdaptor;
-import shop.bluebooktle.backend.book.dto.response.AladinApiResponse;
 import shop.bluebooktle.backend.book.service.AladinBookService;
+import shop.bluebooktle.common.dto.book.response.AladinApiResponse;
 import shop.bluebooktle.common.dto.book.response.AladinBookResponse;
 
 @Service

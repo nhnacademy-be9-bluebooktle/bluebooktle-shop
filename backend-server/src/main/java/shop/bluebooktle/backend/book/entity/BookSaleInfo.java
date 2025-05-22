@@ -73,8 +73,4 @@ public class BookSaleInfo extends BaseEntity {
 	@Builder.Default
 	@Column(name = "search_count", nullable = false, columnDefinition = "BIGINT DEFAULT 0")
 	private Long searchCount = 0L;
-
-	public enum State {
-		AVAILABLE, LOW_STOCK, SALE_ENDED, DELETED
-	}
 }

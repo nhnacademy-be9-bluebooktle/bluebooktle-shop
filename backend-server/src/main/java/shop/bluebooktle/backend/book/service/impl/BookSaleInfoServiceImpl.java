@@ -1,7 +1,6 @@
 package shop.bluebooktle.backend.book.service.impl;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -13,14 +12,12 @@ import shop.bluebooktle.backend.book.entity.BookSaleInfo;
 import shop.bluebooktle.backend.book.repository.BookRepository;
 import shop.bluebooktle.backend.book.repository.BookSaleInfoRepository;
 import shop.bluebooktle.backend.book.service.BookSaleInfoService;
-import shop.bluebooktle.common.dto.book.BookSaleInfoState;
 import shop.bluebooktle.common.dto.book.request.BookSaleInfoRegisterRequest;
 import shop.bluebooktle.common.dto.book.request.BookSaleInfoUpdateRequest;
 import shop.bluebooktle.common.dto.book.response.BookSaleInfoRegisterResponse;
 import shop.bluebooktle.common.dto.book.response.BookSaleInfoResponse;
 import shop.bluebooktle.common.dto.book.response.BookSaleInfoUpdateResponse;
 import shop.bluebooktle.common.exception.book.BookNotFoundException;
-import shop.bluebooktle.common.exception.book.BookSaleInfoAlreadyExistsException;
 import shop.bluebooktle.common.exception.book.BookSaleInfoNotFoundException;
 
 @Service
@@ -44,7 +41,7 @@ public class BookSaleInfoServiceImpl implements BookSaleInfoService {
 			.stock(request.getStock())
 			.isPackable(request.getIsPackable())
 			.salePercentage(calculateSalePercentage(request.getPrice(), request.getSalePrice()))
-			.state(BookSaleInfoState.valueOf(request.getBookSaleInfoState().name()))
+			.bookSaleInfoState(request.getBookSaleInfoState())
 			.build();
 
 		bookSaleInfoRepository.save(bookSaleInfo);
@@ -57,7 +54,7 @@ public class BookSaleInfoServiceImpl implements BookSaleInfoService {
 			.salePercentage(bookSaleInfo.getSalePercentage())
 			.stock(bookSaleInfo.getStock())
 			.isPackable(bookSaleInfo.isPackable())
-			.state(bookSaleInfo.getState())
+			.state(bookSaleInfo.getBookSaleInfoState())
 			.build();
 	}
 
@@ -72,7 +69,7 @@ public class BookSaleInfoServiceImpl implements BookSaleInfoService {
 			.stock(request.getStock())
 			.isPackable(request.getIsPackable())
 			.salePercentage(calculateSalePercentage(request.getPrice(), request.getSalePrice()))
-			.state(request.getBookSaleInfoState())
+			.bookSaleInfoState(request.getBookSaleInfoState())
 			.build();
 
 		bookSaleInfoRepository.save(bookSaleInfo);
@@ -85,7 +82,7 @@ public class BookSaleInfoServiceImpl implements BookSaleInfoService {
 			.salePercentage(bookSaleInfo.getSalePercentage())
 			.stock(bookSaleInfo.getStock())
 			.isPackable(bookSaleInfo.isPackable())
-			.state(bookSaleInfo.getState().name())
+			.state(bookSaleInfo.getBookSaleInfoState())
 			.build();
 	}
 
@@ -103,7 +100,7 @@ public class BookSaleInfoServiceImpl implements BookSaleInfoService {
 			.salePercentage(bookSaleInfo.getSalePercentage())
 			.stock(bookSaleInfo.getStock())
 			.isPackable(bookSaleInfo.isPackable())
-			.state(bookSaleInfo.getState().name())
+			.state(bookSaleInfo.getBookSaleInfoState())
 			.build();
 	}
 

@@ -1,4 +1,4 @@
-package shop.bluebooktle.backend.book.dto.request;
+package shop.bluebooktle.common.dto.book.request;
 
 import java.math.BigDecimal;
 
@@ -15,8 +15,7 @@ import shop.bluebooktle.common.dto.book.BookSaleInfoState;
 @Value
 @Builder
 @AllArgsConstructor
-public class BookSaleInfoRegisterRequest {
-	//도서가 있어야 도서 판매정보를 등록할수있음 bookId입력받아 조회
+public class BookSaleInfoUpdateRequest {
 	@NotNull(message = "도서 ID는 필수 값입니다.")
 	@Positive(message = "도서 ID는 양수여야 합니다.")
 	Long bookId;

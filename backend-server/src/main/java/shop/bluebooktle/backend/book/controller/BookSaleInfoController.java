@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import shop.bluebooktle.backend.book.entity.BookSaleInfo;
 import shop.bluebooktle.backend.book.service.BookSaleInfoService;
 import shop.bluebooktle.common.dto.book.request.BookSaleInfoRegisterRequest;
 import shop.bluebooktle.common.dto.book.request.BookSaleInfoUpdateRequest;
@@ -39,9 +38,9 @@ public class BookSaleInfoController {
 
 	//도서판매정보 조회
 	@GetMapping("/{id}")
-	public ResponseEntity<JsendResponse<BookSaleInfoUpdateResponse>> getBookSaleInfoById(@PathVariable Long id) {
-		BookSaleInfo bookSaleInfo = bookSaleInfoService.findById(id);
-		return ResponseEntity.ok(JsendResponse.success(BookSaleInfoUpdateResponse.fromEntity(bookSaleInfo)));
+	public ResponseEntity<JsendResponse<BookSaleInfoResponse>> getBookSaleInfoById(@PathVariable Long id) {
+		BookSaleInfoResponse response = bookSaleInfoService.findById(id);
+		return ResponseEntity.ok(JsendResponse.success(response));
 	}
 
 	//도서판매정보 수정
