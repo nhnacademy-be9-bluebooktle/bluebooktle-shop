@@ -11,5 +11,5 @@ public interface AuthService {
 
 	public TokenResponse login(HttpServletResponse response, LoginRequest loginRequest);
 
-	public TokenResponse refreshToken(TokenRefreshRequest tokenRefreshRequest);
+	TokenResponse refreshToken(HttpServletResponse response, TokenRefreshRequest tokenRefreshRequest);
 }

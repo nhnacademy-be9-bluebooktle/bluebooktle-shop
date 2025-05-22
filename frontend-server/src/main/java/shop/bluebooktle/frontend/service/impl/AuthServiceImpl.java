@@ -37,8 +37,9 @@ public class AuthServiceImpl implements AuthService {
 	}
 
 	@Override
-	public TokenResponse refreshToken(TokenRefreshRequest tokenRefreshRequest) {
-		return authRepository.refreshToken(tokenRefreshRequest);
+	public TokenResponse refreshToken(HttpServletResponse response, TokenRefreshRequest tokenRefreshRequest) {
+		TokenResponse tokenResponse = authRepository.refreshToken(tokenRefreshRequest);
+		cookieTokenUtil.saveTokens(response, tokenResponse.getAccessToken(), tokenResponse.getRefreshToken());
+		return tokenResponse;
 	}
-
 }

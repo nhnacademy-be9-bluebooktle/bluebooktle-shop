@@ -147,7 +147,6 @@ public class AuthServiceImpl implements AuthService {
 
 		long refreshTokenExpirationMillis = jwtUtil.getRefreshTokenExpirationMillis();
 		refreshTokenService.save(user.getId(), newRefreshToken, refreshTokenExpirationMillis);
-		refreshTokenService.deleteByUserId(userId);
 
 		return new TokenResponse(newAccessToken, newRefreshToken);
 	}
