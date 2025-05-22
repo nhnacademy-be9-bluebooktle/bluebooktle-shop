@@ -21,9 +21,6 @@ public interface CategoryService {
 	// 카테고리 조회
 	CategoryResponse getCategory(Long id);
 
-	// 카테고리 조회
-	List<CategoryResponse> getAllCategories();
-
 	// 카테고리 생성
 	void addRootCategory(RootCategoryRegisterRequest request);
 

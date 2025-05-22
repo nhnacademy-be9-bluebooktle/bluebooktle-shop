@@ -260,19 +260,6 @@ public class CategoryServiceImpl implements CategoryService {
 	}
 
 	@Override
-	public List<CategoryResponse> getAllCategories() {
-		List<Category> categoryList = categoryRepository.findAll();
-		return categoryList.stream().map(c ->
-			new CategoryResponse(c.getId(),
-				c.getName(),
-				c.getParentCategory() != null
-					? c.getParentCategory().getName()
-					: "-",
-				c.getCategoryPath())
-		).toList();
-	}
-
-	@Override
 	@Transactional(readOnly = true)
 	public List<CategoryTreeResponse> getCategoryTree() {
 		List<Category> roots = categoryRepository.findByParentCategoryIsNull();

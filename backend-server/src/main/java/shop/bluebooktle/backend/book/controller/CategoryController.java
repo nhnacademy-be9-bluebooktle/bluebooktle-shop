@@ -58,14 +58,7 @@ public class CategoryController {
 		CategoryTreeResponse tree = categoryService.getCategoryTreeById(categoryId);
 		return ResponseEntity.ok(JsendResponse.success(tree));
 	}
-
-	// 모든 카테고리 조회
-	@GetMapping("/all")
-	public ResponseEntity<JsendResponse<List<CategoryResponse>>> getAllCategories() {
-		List<CategoryResponse> categoryPage = categoryService.getAllCategories();
-		return ResponseEntity.ok(JsendResponse.success(categoryPage));
-	}
-
+	
 	// 최상위 카테고리 등록
 	@PostMapping
 	public ResponseEntity<JsendResponse<Void>> addRootCategory(

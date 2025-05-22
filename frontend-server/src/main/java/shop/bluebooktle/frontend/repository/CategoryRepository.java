@@ -37,9 +37,6 @@ public interface CategoryRepository {
 		@PathVariable Long categoryId
 	);
 
-	@GetMapping("/all")
-	List<CategoryResponse> getAllCategories();
-
 	@PostMapping
 	Void addRootCategory(
 		@RequestBody RootCategoryRegisterRequest request
