@@ -15,12 +15,11 @@ spring:
     properties:
       hibernate:
         format_sql: true
-    database-platform: org.hibernate.dialect.H2Dialect
+    database-platform: org.hibernate.dialect.MySQL8Dialect
   h2:
     console:
       enabled: true
       path: /h2-console
-
 eureka:
   client:
     service-url:
