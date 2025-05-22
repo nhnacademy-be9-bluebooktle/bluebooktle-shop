@@ -10,7 +10,7 @@ import shop.bluebooktle.common.dto.point.response.PointRuleResponse;
 
 public interface PointPolicyService {
 
-	void create(PointPolicyCreateRequest request);
+	Long create(PointPolicyCreateRequest request);
 
 	void update(PointPolicyUpdateRequest request);
 

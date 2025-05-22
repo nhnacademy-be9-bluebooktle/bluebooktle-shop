@@ -22,12 +22,13 @@ public class PointSourceTypeServiceImpl implements PointSourceTypeService {
 	private final PointSourceTypeRepository pointSourceTypeRepository;
 
 	@Override
-	public void create(PointSourceTypeCreateRequest request) {
+	public Long create(PointSourceTypeCreateRequest request) {
 		PointSourceType pointSourceType = PointSourceType.builder()
 			.actionType(request.actionType())
 			.sourceType(request.sourceType())
 			.build();
-		pointSourceTypeRepository.save(pointSourceType);
+		PointSourceType saved = pointSourceTypeRepository.save(pointSourceType);
+		return saved.getId();
 	}
 
 	@Override

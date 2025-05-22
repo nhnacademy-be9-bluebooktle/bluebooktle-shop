@@ -50,8 +50,8 @@ POST http://localhost:9012/api/points/policies
 Content-Type: application/json
 
 {
-  "pointSourceTypeId": 5,
-  "policyType": "AMOUNT",
+  "pointSourceTypeId": 2,
+  "policyType": "PERCENTAGE",
   "value": 1000
 }
 

@@ -28,7 +28,7 @@ import shop.bluebooktle.frontend.config.FeignGlobalConfig;
 public interface PointRepository {
 
 	@PostMapping("/policies")
-	Void createPolicy(@RequestBody PointPolicyCreateRequest req);
+	Long createPolicy(@RequestBody PointPolicyCreateRequest req);
 
 	@GetMapping("/policies/{id}")
 	PointPolicyResponse getPolicy(@PathVariable("id") Long id);
@@ -46,7 +46,7 @@ public interface PointRepository {
 	List<PointRuleResponse> getAllRules();
 
 	@PostMapping("/source")
-	Void createSourceType(@RequestBody PointSourceTypeCreateRequest req);
+	Long createSourceType(@RequestBody PointSourceTypeCreateRequest req);
 
 	@GetMapping("/source/{id}")
 	PointSourceTypeResponse getSourceType(@PathVariable("id") Long id);

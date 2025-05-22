@@ -7,6 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -17,8 +18,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
+import shop.bluebooktle.common.domain.point.PolicyType;
 import shop.bluebooktle.common.dto.point.request.PointPolicyCreateRequest;
 import shop.bluebooktle.common.dto.point.request.PointPolicyUpdateRequest;
+import shop.bluebooktle.common.dto.point.request.PointPolicyWithSourceCreateRequest;
+import shop.bluebooktle.common.dto.point.request.PointSourceTypeCreateRequest;
 import shop.bluebooktle.common.dto.point.response.PointRuleResponse;
 import shop.bluebooktle.frontend.service.PointService;
 
@@ -52,43 +56,60 @@ public class AdminPointPolicyController {
 		return "admin/point/point_settings_form";
 	}
 
-	@PostMapping
-	public String savePointPolicySettings(
-		@ModelAttribute("earningRules") List<PointRuleResponse> earningRules,
-		RedirectAttributes redirectAttributes,
-		HttpServletRequest request
+	@PostMapping("/{policyId}")
+	public String updateSinglePolicy(
+		@PathVariable Long policyId,
+		PointPolicyUpdateRequest req,
+		RedirectAttributes ra
 	) {
-		log.info("포인트 정책 저장 요청: {}", earningRules);
-
 		try {
-			for (PointRuleResponse rule : earningRules) {
-				if (rule.pointPolicyId() == null) {
-					// 신규 생성
-					pointService.createPolicy(
-						new PointPolicyCreateRequest(
-							rule.pointSourceTypeId(),
-							rule.policyType(),
-							rule.value()
-						)
-					);
-				} else {
-					// 업데이트
-					pointService.updatePolicy(
-						new PointPolicyUpdateRequest(
-							rule.pointPolicyId(),
-							rule.policyType(),
-							rule.value(),
-							rule.isActive()
-						)
-					);
-				}
-			}
-			redirectAttributes.addFlashAttribute("globalSuccessMessage", "포인트 정책이 성공적으로 저장되었습니다.");
+			// URL 에서 넘어온 policyId 확인(보안검증 생략)
+			req = new PointPolicyUpdateRequest(
+				policyId,
+				req.policyType(),
+				req.value(),
+				req.isActive()
+			);
+			pointService.updatePolicy(req);
+			ra.addFlashAttribute("globalSuccessMessage",
+				"Policy " + policyId + "가 수정되었습니다.");
 		} catch (Exception e) {
-			log.error("포인트 정책 저장 중 오류 발생", e);
-			redirectAttributes.addFlashAttribute("globalErrorMessage", "포인트 정책 저장 중 오류가 발생했습니다: " + e.getMessage());
+			ra.addFlashAttribute("globalErrorMessage",
+				"Policy " + policyId + " 수정 실패: " + e.getMessage());
 		}
 		return "redirect:/admin/points/settings";
+	}
+
+	@PostMapping("/new")
+	public String createNewPointPolicy(
+		@ModelAttribute PointPolicyWithSourceCreateRequest req,
+		RedirectAttributes redirectAttributes
+	) {
+		try {
+			Long newSourceTypeId = pointService.createSourceType(
+				new PointSourceTypeCreateRequest(req.actionType(), req.sourceType())
+			);
+
+			PointPolicyCreateRequest policyReq =
+				new PointPolicyCreateRequest(newSourceTypeId, req.policyType(), req.value());
+			Long newPolicyId = pointService.createPolicy(policyReq);
+
+			redirectAttributes.addFlashAttribute("globalSuccessMessage",
+				"생성 완료: PolicyID=" + newPolicyId + " / SourceTypeID=" + newSourceTypeId);
+		} catch (Exception e) {
+			redirectAttributes.addFlashAttribute("globalErrorMessage", "생성 실패: " + e.getMessage());
+		}
+		return "redirect:/admin/points/settings";
+	}
+
+	@GetMapping("/new")
+	public String showNewPolicyForm(Model model) {
+		// 1) 폼 바인딩용 DTO (actionType, sourceType, policyType, value)
+		model.addAttribute("policyCreateRequest",
+			new PointPolicyWithSourceCreateRequest(null, null, null, null));
+		// 2) 정책 유형 드롭다운 옵션
+		model.addAttribute("policyTypes", PolicyType.values());
+		return "admin/point/policy_form";
 	}
 
 	// --- 뷰 모델 DTO ---
@@ -99,4 +120,5 @@ public class AdminPointPolicyController {
 		private List<PointRuleResponse> earningRules = new ArrayList<>();
 		private List<Object> membershipRates = new ArrayList<>();
 	}
+
 }

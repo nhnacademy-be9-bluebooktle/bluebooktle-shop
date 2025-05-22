@@ -21,8 +21,8 @@ public class PointServiceImpl implements PointService {
 	private final PointRepository pointRepository;
 
 	@Override
-	public void createPolicy(PointPolicyCreateRequest request) {
-		pointRepository.createPolicy(request);
+	public Long createPolicy(PointPolicyCreateRequest request) {
+		return pointRepository.createPolicy(request);
 	}
 
 	@Override
@@ -51,8 +51,8 @@ public class PointServiceImpl implements PointService {
 	}
 
 	@Override
-	public void createSourceType(PointSourceTypeCreateRequest request) {
-		pointRepository.createSourceType(request);
+	public Long createSourceType(PointSourceTypeCreateRequest request) {
+		return pointRepository.createSourceType(request);
 	}
 
 	@Override

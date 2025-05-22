@@ -8,7 +8,7 @@ import shop.bluebooktle.common.dto.point.response.PointSourceTypeResponse;
 
 public interface PointSourceTypeService {
 
-	void create(PointSourceTypeCreateRequest request);
+	Long create(PointSourceTypeCreateRequest request);
 
 	void delete(Long id);
 

@@ -33,10 +33,10 @@ public class PointSourceTypeController {
 
 	@Operation(summary = "포인트 발생 유형 생성", description = "포인트 발생 유형을 생성합니다.")
 	@PostMapping
-	public ResponseEntity<JsendResponse<Void>> createSource(
+	public ResponseEntity<JsendResponse<Long>> createSource(
 		@Valid @RequestBody PointSourceTypeCreateRequest request) {
-		pointSourceTypeService.create(request);
-		return ResponseEntity.status(HttpStatus.CREATED).body(JsendResponse.success());
+		Long id = pointSourceTypeService.create(request);
+		return ResponseEntity.status(HttpStatus.CREATED).body(JsendResponse.success(id));
 	}
 
 	@Operation(summary = "단건 조회", description = "포인트 발생 유형을 조회합니다.")

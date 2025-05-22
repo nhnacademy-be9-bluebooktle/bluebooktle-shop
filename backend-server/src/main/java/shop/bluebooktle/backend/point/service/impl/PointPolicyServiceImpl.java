@@ -29,7 +29,7 @@ public class PointPolicyServiceImpl implements PointPolicyService {
 	private final PointSourceTypeRepository pointSourceTypeRepository;
 
 	@Override
-	public void create(PointPolicyCreateRequest request) {
+	public Long create(PointPolicyCreateRequest request) {
 		PointSourceType pst = pointSourceTypeRepository.findById(request.pointSourceTypeId())
 			.orElseThrow(PointSourceNotFountException::new);
 
@@ -37,13 +37,14 @@ public class PointPolicyServiceImpl implements PointPolicyService {
 			throw new PointPolicyCreationNotAllowedException();
 		}
 
-		pointPolicyRepository.save(
+		PointPolicy pointPolicy = pointPolicyRepository.save(
 			PointPolicy.builder()
 				.pointSourceType(pst)
 				.policyType(request.policyType())
 				.value(request.value())
 				.build()
 		);
+		return pointPolicy.getId();
 	}
 
 	@Override

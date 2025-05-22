@@ -1,5 +1,5 @@
 server:
-  port: 9080
+  port: 9012
 
 spring:
   datasource:
@@ -23,20 +23,30 @@ spring:
     console:
       enabled: true
       path: /h2-console
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      database: 0
+#  elasticsearch:
+#    uris: http://localhost:9200
+#  rabbitmq:
+#    host: localhost
+
 
 eureka:
   client:
     service-url:
       defaultZone: "http://${EUREKA_ID}:${EUREKA_PASSWORD}@localhost:9761/eureka"
 
-toss:
-  api:
-    url: https://api.tosspayments.com/v1
-  secret-key: test_sk_LlDJaYngroXzQGEQlMlv8ezGdRpX
-  client-key: test_ck_0RnYX2w532oJMLLx9JBPVNeyqApQ
+jwt:
+  secret: ${JWT_SECRET_KEY_LOCAL}
+  access-token-validity-seconds: 1800
+  refresh-token-validity-seconds: 3600
 
 logging:
   level:
-    shop.bluebooktle.book: DEBUG
-    org.hibernate.SQL: DEBUG
-    shop.bluebooktle.frontend.repository: DEBUG
+    shop.bluebooktle: DEBUG
+    org.hibernate.SQL: info
+    org.hibernate.orm.jdbc.bind: trace
+    org.springframework.transaction.interceptor: trace

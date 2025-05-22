@@ -33,9 +33,9 @@ public class PointPolicyController {
 
 	@Operation(summary = "포인트 정책 생성", description = "포인트 정책을 생성합니다.")
 	@PostMapping
-	public ResponseEntity<JsendResponse<Void>> createPointPolicy(@Valid @RequestBody PointPolicyCreateRequest request) {
-		pointPolicyService.create(request);
-		return ResponseEntity.status(HttpStatus.CREATED).body(JsendResponse.success());
+	public ResponseEntity<JsendResponse<Long>> createPointPolicy(@Valid @RequestBody PointPolicyCreateRequest request) {
+		Long id = pointPolicyService.create(request);
+		return ResponseEntity.status(HttpStatus.CREATED).body(JsendResponse.success(id));
 	}
 
 	@Operation(summary = "포인트 정책 조회", description = "포인트 정책을 조회합니다.")

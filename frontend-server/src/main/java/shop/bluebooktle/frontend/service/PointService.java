@@ -11,7 +11,7 @@ import shop.bluebooktle.common.dto.point.response.PointSourceTypeResponse;
 
 public interface PointService {
 
-	void createPolicy(PointPolicyCreateRequest request);
+	Long createPolicy(PointPolicyCreateRequest request);
 
 	PointPolicyResponse getPolicy(Long id);
 
@@ -23,7 +23,7 @@ public interface PointService {
 
 	List<PointRuleResponse> getAllRules();
 
-	void createSourceType(PointSourceTypeCreateRequest request);
+	Long createSourceType(PointSourceTypeCreateRequest request);
 
 	PointSourceTypeResponse getSourceType(Long id);
 
