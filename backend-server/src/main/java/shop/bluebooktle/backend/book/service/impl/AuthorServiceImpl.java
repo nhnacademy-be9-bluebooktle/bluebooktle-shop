@@ -1,5 +1,7 @@
 package shop.bluebooktle.backend.book.service.impl;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -99,5 +101,15 @@ public class AuthorServiceImpl implements AuthorService {
 			.name(author.getName())
 			.createdAt(author.getCreatedAt())
 			.build();
+	}
+
+	@Override
+	public Page<AuthorResponse> getAuthors(Pageable pageable) {
+		Page<Author> authors = authorRepository.findAll(pageable);
+		return authors.map(a -> AuthorResponse.builder()
+			.id(a.getId())
+			.name(a.getName())
+			.createdAt(a.getCreatedAt())
+			.build());
 	}
 }

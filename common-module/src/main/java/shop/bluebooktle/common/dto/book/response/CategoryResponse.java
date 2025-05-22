@@ -2,6 +2,8 @@ package shop.bluebooktle.common.dto.book.response;
 
 public record CategoryResponse(
 	Long categoryId,
-	String name
+	String name,
+	String parentName,
+	String categoryPath
 ) {
 }
