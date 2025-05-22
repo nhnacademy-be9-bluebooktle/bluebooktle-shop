@@ -47,12 +47,10 @@
                 <thead>
                 <tr>
                     <th>ID</th>
-                    <th>이미지</th>
                     <th>포장명</th>
                     <th>가격</th>
-                    <th>설명</th>
-                    <th>상태</th>
-                    <th>관리</th>
+                    <th>수정</th>
+                    <th>삭제</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -61,23 +59,15 @@
                 </tr>
                 <tr th:each="option : ${packagingOptions}">
                     <td th:text="${option.id}">1</td>
-                    <td>
-                        <img th:if="${option.imageUrl != null && !option.imageUrl.isEmpty()}"
-                             th:src="${option.imageUrl}" alt="포장 이미지" class="option-image-preview">
-                        <span th:unless="${option.imageUrl != null && !option.imageUrl.isEmpty()}">-</span>
-                    </td>
                     <td th:text="${option.name}">기본 선물 포장</td>
                     <td th:text="${#numbers.formatInteger(option.price, 0, 'COMMA') + '원'}">2,000원</td>
-                    <td th:text="${option.description ?: '-'}">빨간색 포장지 사용</td>
-                    <td>
-                        <span th:text="${option.isActive ? '활성' : '비활성'}"
-                              th:classappend="${option.isActive ? 'status-active' : 'status-inactive'}">활성</span>
-                    </td>
-                    <td>
+                    <td class="category-action">
                         <a th:href="@{/admin/packaging/options/{id}/edit(id=${option.id})}"
                            class="admin-btn admin-btn--sm admin-btn--info" title="수정">
                             <i class="fas fa-edit"></i>
                         </a>
+                    </td>
+                    <td>
                         <form th:action="@{/admin/packaging/options/{id}/delete(id=${option.id})}" method="post"
                               style="display:inline;"
                               onsubmit="return confirm('정말로 이 포장 옵션을 삭제하시겠습니까?');">

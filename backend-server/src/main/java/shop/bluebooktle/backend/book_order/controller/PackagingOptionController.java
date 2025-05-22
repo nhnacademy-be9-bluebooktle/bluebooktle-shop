@@ -18,8 +18,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.book_order.service.PackagingOptionService;
 import shop.bluebooktle.common.dto.book_order.request.PackagingOptionRequest;
-import shop.bluebooktle.common.dto.book_order.request.PackagingOptionUpdateRequest;
-import shop.bluebooktle.common.dto.book_order.response.PackagingOptionResponse;
+import shop.bluebooktle.common.dto.book_order.response.PackagingOptionInfoResponse;
 import shop.bluebooktle.common.dto.common.JsendResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
 
@@ -31,7 +30,7 @@ public class PackagingOptionController {
 
 	/** 포장 옵션 등록 */
 	@PostMapping
-	public ResponseEntity<JsendResponse<PackagingOptionResponse>> createPackagingOption(
+	public ResponseEntity<JsendResponse<PackagingOptionInfoResponse>> createPackagingOption(
 		@RequestBody @Valid PackagingOptionRequest request) {
 		return ResponseEntity.status(HttpStatus.CREATED)
 			.body(JsendResponse.success(packagingOptionService.createPackagingOption(request)));
@@ -39,19 +38,20 @@ public class PackagingOptionController {
 
 	/** 포장 옵션 전체 조회 */
 	@GetMapping
-	public ResponseEntity<JsendResponse<PaginationData<PackagingOptionResponse>>> getPackagingOptions(
+	public ResponseEntity<JsendResponse<PaginationData<PackagingOptionInfoResponse>>> getPackagingOptions(
 		@PageableDefault(size = 10, sort = "id") Pageable pageable) {
-		Page<PackagingOptionResponse> resultPage = packagingOptionService.getPackagingOption(
+		Page<PackagingOptionInfoResponse> resultPage = packagingOptionService.getPackagingOption(
 			pageable); // 페이징 처리된 응답 객체 가져오기
-		PaginationData<PackagingOptionResponse> paginationData = new PaginationData<>(resultPage); // PaginationData 감싸기
+		PaginationData<PackagingOptionInfoResponse> paginationData = new PaginationData<>(
+			resultPage); // PaginationData 감싸기
 		return ResponseEntity.ok(JsendResponse.success(paginationData));
 	}
 
 	/** 포장 옵션 수정 */
 	@PutMapping("/{packagingOptionId}")
-	public ResponseEntity<JsendResponse<PackagingOptionResponse>> updatePackagingOption(
+	public ResponseEntity<JsendResponse<PackagingOptionInfoResponse>> updatePackagingOption(
 		@PathVariable Long packagingOptionId,
-		@RequestBody @Valid PackagingOptionUpdateRequest request) {
+		@RequestBody @Valid PackagingOptionRequest request) {
 		return ResponseEntity.ok(
 			JsendResponse.success(packagingOptionService.updatePackagingOption(packagingOptionId, request)));
 	}

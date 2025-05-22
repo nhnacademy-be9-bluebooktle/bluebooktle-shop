@@ -24,8 +24,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import shop.bluebooktle.backend.book_order.service.PackagingOptionService;
 import shop.bluebooktle.common.dto.book_order.request.PackagingOptionRequest;
-import shop.bluebooktle.common.dto.book_order.response.PackagingOptionResponse;
-import shop.bluebooktle.common.security.AuthUserLoader;
+import shop.bluebooktle.common.dto.book_order.response.PackagingOptionInfoResponse;
+import shop.bluebooktle.common.service.AuthUserLoader;
 import shop.bluebooktle.common.util.JwtUtil;
 
 @WebMvcTest(PackagingOptionController.class)
@@ -55,7 +55,7 @@ class PackagingOptionControllerTest {
 			.price(BigDecimal.valueOf(1500))
 			.build();
 
-		PackagingOptionResponse response = PackagingOptionResponse.builder()
+		PackagingOptionInfoResponse response = PackagingOptionInfoResponse.builder()
 			.packagingOptionId(1L)
 			.name("기본 포장지")
 			.price(BigDecimal.valueOf(1500))
@@ -76,19 +76,19 @@ class PackagingOptionControllerTest {
 	@WithMockUser
 	void getPackagingOptions_success() throws Exception {
 		// given
-		PackagingOptionResponse option1 = PackagingOptionResponse.builder()
+		PackagingOptionInfoResponse option1 = PackagingOptionInfoResponse.builder()
 			.packagingOptionId(1L)
 			.name("기본 포장지")
 			.price(BigDecimal.valueOf(1000))
 			.build();
 
-		PackagingOptionResponse option2 = PackagingOptionResponse.builder()
+		PackagingOptionInfoResponse option2 = PackagingOptionInfoResponse.builder()
 			.packagingOptionId(2L)
 			.name("고급 포장지")
 			.price(BigDecimal.valueOf(3000))
 			.build();
 
-		Page<PackagingOptionResponse> page = new PageImpl<>(List.of(option1, option2));
+		Page<PackagingOptionInfoResponse> page = new PageImpl<>(List.of(option1, option2));
 
 		given(packagingOptionService.getPackagingOption(any(Pageable.class)))
 			.willReturn(page);

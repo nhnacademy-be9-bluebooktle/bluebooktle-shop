@@ -10,8 +10,7 @@ import shop.bluebooktle.backend.book_order.entity.PackagingOption;
 import shop.bluebooktle.backend.book_order.repository.PackagingOptionRepository;
 import shop.bluebooktle.backend.book_order.service.PackagingOptionService;
 import shop.bluebooktle.common.dto.book_order.request.PackagingOptionRequest;
-import shop.bluebooktle.common.dto.book_order.request.PackagingOptionUpdateRequest;
-import shop.bluebooktle.common.dto.book_order.response.PackagingOptionResponse;
+import shop.bluebooktle.common.dto.book_order.response.PackagingOptionInfoResponse;
 import shop.bluebooktle.common.exception.book_order.PackagingOptionNotFoundException;
 
 @Service
@@ -22,7 +21,7 @@ public class PackagingOptionServiceImpl implements PackagingOptionService {
 
 	/** 포장 옵션 등록 */
 	@Override
-	public PackagingOptionResponse createPackagingOption(PackagingOptionRequest request) {
+	public PackagingOptionInfoResponse createPackagingOption(PackagingOptionRequest request) {
 		if (packagingOptionRepository.existsByName(request.getName())) {
 			throw new PackagingOptionNotFoundException(); // 이미 등록된 포장 옵션 이름이라면 에러 발생
 		}
@@ -32,7 +31,7 @@ public class PackagingOptionServiceImpl implements PackagingOptionService {
 			.build();
 		PackagingOption saved = packagingOptionRepository.save(option);
 
-		return PackagingOptionResponse.builder()
+		return PackagingOptionInfoResponse.builder()
 			.packagingOptionId(saved.getId())
 			.name(saved.getName())
 			.price(saved.getPrice())
@@ -41,9 +40,9 @@ public class PackagingOptionServiceImpl implements PackagingOptionService {
 
 	/** 포장 옵션 전체 조회 */
 	@Override
-	public Page<PackagingOptionResponse> getPackagingOption(Pageable pageable) {
+	public Page<PackagingOptionInfoResponse> getPackagingOption(Pageable pageable) {
 		Page<PackagingOption> page = packagingOptionRepository.findAllByDeletedAtIsNull(pageable);
-		return page.map(o -> PackagingOptionResponse.builder()
+		return page.map(o -> PackagingOptionInfoResponse.builder()
 			.packagingOptionId(o.getId())
 			.name(o.getName())
 			.price(o.getPrice())
@@ -52,14 +51,15 @@ public class PackagingOptionServiceImpl implements PackagingOptionService {
 
 	/** 포장 옵션 수정 */
 	@Override
-	public PackagingOptionResponse updatePackagingOption(Long packagingOptionId, PackagingOptionUpdateRequest request) {
+	public PackagingOptionInfoResponse updatePackagingOption(Long packagingOptionId,
+		PackagingOptionRequest request) {
 		PackagingOption option = packagingOptionRepository.findByIdAndDeletedAtIsNull(packagingOptionId)
 			.orElseThrow(PackagingOptionNotFoundException::new);
 
 		option.setName(request.getName());
 		option.setPrice(request.getPrice());
 
-		return PackagingOptionResponse.builder()
+		return PackagingOptionInfoResponse.builder()
 			.packagingOptionId(option.getId())
 			.name(option.getName())
 			.price(option.getPrice())

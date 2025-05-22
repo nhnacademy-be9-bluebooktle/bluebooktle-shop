@@ -7,7 +7,7 @@ import lombok.Value;
 
 @Value
 @Builder
-public class PackagingOptionResponse {
+public class PackagingOptionInfoResponse {
 	Long packagingOptionId;
 	String name;
 	BigDecimal price;
