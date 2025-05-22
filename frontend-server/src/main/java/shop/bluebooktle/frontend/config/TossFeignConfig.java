@@ -5,12 +5,10 @@ import java.util.Base64;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
 
-@Configuration
 public class TossFeignConfig {
 
 	@Value("${toss.secret-key}")

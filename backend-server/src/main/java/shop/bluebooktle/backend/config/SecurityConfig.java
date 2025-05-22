@@ -25,7 +25,7 @@ public class SecurityConfig {
 			.httpBasic(httpBasic -> httpBasic.disable())
 			.formLogin(formLogin -> formLogin.disable())
 			.authorizeHttpRequests(authz -> authz
-				.anyRequest().authenticated()
+				.anyRequest().permitAll()
 			);
 
 		http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
