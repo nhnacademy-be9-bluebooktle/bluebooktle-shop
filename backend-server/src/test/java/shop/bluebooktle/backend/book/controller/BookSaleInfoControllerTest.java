@@ -71,7 +71,7 @@ class BookSaleInfoControllerTest {
 			.salePercentage(BigDecimal.valueOf(10))
 			.stock(50)
 			.isPackable(true)
-			.state("AVAILABLE")
+			.state(BookSaleInfoState.AVAILABLE)
 			.build();
 
 		Mockito.when(bookSaleInfoService.save(any(BookSaleInfoRegisterRequest.class)))
@@ -119,7 +119,7 @@ class BookSaleInfoControllerTest {
 			.salePercentage(bookSaleInfo.getSalePercentage())
 			.stock(bookSaleInfo.getStock())
 			.isPackable(bookSaleInfo.isPackable())
-			.state(bookSaleInfo.getBookSaleInfoState().name())
+			.state(bookSaleInfo.getBookSaleInfoState())
 			.build();
 
 		// Mock 설정
@@ -138,7 +138,7 @@ class BookSaleInfoControllerTest {
 			.andExpect(jsonPath("$.data.salePercentage").value(response.getSalePercentage().intValue()))
 			.andExpect(jsonPath("$.data.stock").value(response.getStock()))
 			.andExpect(jsonPath("$.data.isPackable").value(response.getIsPackable()))
-			.andExpect(jsonPath("$.data.state").value(response.getState()));
+			.andExpect(jsonPath("$.data.state").value(response.getState().name()));
 	}
 
 	@Test
@@ -165,7 +165,7 @@ class BookSaleInfoControllerTest {
 			.salePercentage(BigDecimal.valueOf(9.1))
 			.stock(40)
 			.isPackable(false)
-			.state("AVAILABLE")
+			.state(BookSaleInfoState.AVAILABLE)
 			.build();
 
 		Mockito.when(bookSaleInfoService.update(eq(id), any(BookSaleInfoUpdateRequest.class)))

@@ -66,8 +66,8 @@ public class CategoryControllerTest {
 	void getCategoriesWithPaginationSuccess() throws Exception {
 		// given
 		List<CategoryResponse> categories = List.of(
-			new CategoryResponse(1L, "Category 1"),
-			new CategoryResponse(2L, "Category 2")
+			new CategoryResponse(1L, "Category 1", null, "/1"),
+			new CategoryResponse(2L, "Category 2", null, "/2")
 		);
 		Page<CategoryResponse> categoryPage = new PageImpl<>(categories);
 		when(categoryService.getCategories(any(Pageable.class))).thenReturn(categoryPage);
@@ -188,7 +188,7 @@ public class CategoryControllerTest {
 	void getCategorySuccess() throws Exception {
 		// given
 		Long categoryId = 1L;
-		CategoryResponse response = new CategoryResponse(categoryId, "Category Name");
+		CategoryResponse response = new CategoryResponse(categoryId, "Category Name", null, "");
 
 		when(categoryService.getCategory(categoryId)).thenReturn(response);
 
@@ -246,8 +246,8 @@ public class CategoryControllerTest {
 		// given
 		Long parentCategoryId = 1L;
 		List<CategoryResponse> subcategories = List.of(
-			new CategoryResponse(2L, "Subcategory 1"),
-			new CategoryResponse(3L, "Subcategory 2")
+			new CategoryResponse(2L, "Subcategory 1", null, ""),
+			new CategoryResponse(3L, "Subcategory 2", null, "")
 		);
 
 		when(categoryService.getSubcategoriesByParentCategoryId(parentCategoryId))
@@ -272,8 +272,8 @@ public class CategoryControllerTest {
 		// given
 		Long childCategoryId = 1L;
 		List<CategoryResponse> parentCategories = List.of(
-			new CategoryResponse(2L, "Parent Category 1"),
-			new CategoryResponse(3L, "Parent Category 2")
+			new CategoryResponse(2L, "Parent Category 1", null, "/1/2"),
+			new CategoryResponse(3L, "Parent Category 2", null, "/2/3")
 		);
 
 		when(categoryService.getParentCategoriesByLeafCategoryId(childCategoryId))
