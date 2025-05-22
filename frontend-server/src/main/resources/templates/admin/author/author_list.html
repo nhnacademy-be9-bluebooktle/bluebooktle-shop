@@ -42,8 +42,6 @@
                 <tr>
                     <th>ID</th>
                     <th>작가명</th>
-                    <th>작가 설명 (일부)</th>
-                    <th>작가 KEY</th>
                     <th>등록일</th>
                     <th>작업</th>
                 </tr>
@@ -52,8 +50,6 @@
                 <tr th:each="author : ${authors}">
                     <td th:text="${author.id}">1</td>
                     <td th:text="${author.name}">김스프링</td>
-                    <td th:text="${#strings.abbreviate(author.description, 50)}">스프링 부트 전문가...</td>
-                    <td th:text="${author.authorKey}">KSPRING001</td>
                     <td th:text="${#temporals.format(author.createdAt, 'yyyy-MM-dd HH:mm')}">2025-05-09 10:00</td>
                     <td class="category-actions">
                         <a th:href="@{/admin/authors/{id}/edit(id=${author.id})}"

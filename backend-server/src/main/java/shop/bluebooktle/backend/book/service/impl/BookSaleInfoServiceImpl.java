@@ -12,7 +12,6 @@ import shop.bluebooktle.backend.book.entity.BookSaleInfo;
 import shop.bluebooktle.backend.book.repository.BookRepository;
 import shop.bluebooktle.backend.book.repository.BookSaleInfoRepository;
 import shop.bluebooktle.backend.book.service.BookSaleInfoService;
-import shop.bluebooktle.common.dto.book.BookSaleInfoState;
 import shop.bluebooktle.common.dto.book.request.BookSaleInfoRegisterRequest;
 import shop.bluebooktle.common.dto.book.request.BookSaleInfoUpdateRequest;
 import shop.bluebooktle.common.dto.book.response.BookSaleInfoRegisterResponse;
@@ -31,6 +30,7 @@ public class BookSaleInfoServiceImpl implements BookSaleInfoService {
 
 	@Override
 	public BookSaleInfoRegisterResponse save(BookSaleInfoRegisterRequest request) {
+		//도서가 있어야 도서 판매정보를 등록할수있음 bookId로 조회
 		Book book = bookRepository.findById(request.getBookId())
 			.orElseThrow(BookNotFoundException::new);
 
@@ -41,7 +41,7 @@ public class BookSaleInfoServiceImpl implements BookSaleInfoService {
 			.stock(request.getStock())
 			.isPackable(request.getIsPackable())
 			.salePercentage(calculateSalePercentage(request.getPrice(), request.getSalePrice()))
-			.bookSaleInfoState(BookSaleInfoState.valueOf(request.getBookSaleInfoState().name()))
+			.bookSaleInfoState(request.getBookSaleInfoState())
 			.build();
 
 		bookSaleInfoRepository.save(bookSaleInfo);
@@ -54,7 +54,7 @@ public class BookSaleInfoServiceImpl implements BookSaleInfoService {
 			.salePercentage(bookSaleInfo.getSalePercentage())
 			.stock(bookSaleInfo.getStock())
 			.isPackable(bookSaleInfo.isPackable())
-			.state(bookSaleInfo.getBookSaleInfoState().name())
+			.state(bookSaleInfo.getBookSaleInfoState())
 			.build();
 	}
 
@@ -69,7 +69,7 @@ public class BookSaleInfoServiceImpl implements BookSaleInfoService {
 			.stock(request.getStock())
 			.isPackable(request.getIsPackable())
 			.salePercentage(calculateSalePercentage(request.getPrice(), request.getSalePrice()))
-			.bookSaleInfoState(BookSaleInfoState.valueOf(request.getBookSaleInfoState().name()))
+			.bookSaleInfoState(request.getBookSaleInfoState())
 			.build();
 
 		bookSaleInfoRepository.save(bookSaleInfo);
@@ -82,7 +82,7 @@ public class BookSaleInfoServiceImpl implements BookSaleInfoService {
 			.salePercentage(bookSaleInfo.getSalePercentage())
 			.stock(bookSaleInfo.getStock())
 			.isPackable(bookSaleInfo.isPackable())
-			.state(bookSaleInfo.getBookSaleInfoState().name())
+			.state(bookSaleInfo.getBookSaleInfoState())
 			.build();
 	}
 
@@ -100,7 +100,7 @@ public class BookSaleInfoServiceImpl implements BookSaleInfoService {
 			.salePercentage(bookSaleInfo.getSalePercentage())
 			.stock(bookSaleInfo.getStock())
 			.isPackable(bookSaleInfo.isPackable())
-			.state(bookSaleInfo.getBookSaleInfoState().name())
+			.state(bookSaleInfo.getBookSaleInfoState())
 			.build();
 	}
 

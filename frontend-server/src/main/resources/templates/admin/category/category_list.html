@@ -17,6 +17,104 @@
         .table-responsive {
             overflow-x: auto;
         }
+
+        /* 전체 카테고리 트리 패널 스타일 */
+        .admin-panel--tree {
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+            margin: 1.5rem 0;
+        }
+
+        /* 패널 헤더 */
+        .admin-panel--tree .admin-panel__header {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .admin-panel--tree .admin-panel__title {
+            margin: 0;
+            font-size: 1.125rem;
+            color: #1a73e8; /* 블루보틀 블루 계열 */
+        }
+
+        /* 패널 바디 */
+        .admin-panel--tree .admin-panel__body {
+            padding: 1rem;
+            position: relative;
+            min-height: 120px;
+        }
+
+        /* 로더(옵션) */
+        .admin-panel__loader {
+            display: flex;
+            align-items: center;
+            font-size: 0.95rem;
+            color: #666;
+        }
+
+        .admin-panel__loader i {
+            margin-right: 0.5rem;
+        }
+
+        /* 트리 구조 기본 스타일 */
+        .admin-panel--tree #category-container ul {
+            list-style: none;
+            padding-left: 1rem;
+            margin: 0.5rem 0;
+            border-left: 2px solid #ddd;
+        }
+
+        .admin-panel--tree #category-container li {
+            position: relative;
+            padding-left: 12px;
+            margin: 6px 0;
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 0.95rem;
+            color: #333;
+        }
+
+        .admin-panel--tree #category-container li::before {
+            content: '';
+            position: absolute;
+            left: -2px;
+            top: 10px;
+            width: 10px;
+            height: 2px;
+            background: #ccc;
+        }
+
+        .admin-panel--tree #category-container li:hover {
+            background: #f0f4ff;
+            border-radius: 4px;
+            cursor: default;
+        }
+
+        /* 공통 유틸 스타일 */
+        .category-actions a,
+        .category-actions button {
+            margin-left: var(--admin-spacing-sm);
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        /* 1) 테이블 고정 레이아웃, 100% 너비 */
+        .admin-table {
+            table-layout: fixed;
+            width: 100%;
+        }
+
+        /* 2) 5번째 컬럼을 화면 폭의 15%로 할당하고 중앙 정렬 */
+        .admin-table th:nth-child(5),
+        .admin-table td.category-actions {
+            width: 15%;
+            text-align: center;
+            vertical-align: middle;
+        }
+
     </style>
 </head>
 <body>
@@ -28,7 +126,7 @@
         </h1>
         <div class="admin-page-actions">
             <a th:href="@{/admin/categories/new}" class="admin-btn admin-btn--primary">
-                <i class="fas fa-plus"></i> 새 카테고리 등록
+                <i class="fas fa-plus"></i> 최상위 카테고리 등록
             </a>
         </div>
     </div>
@@ -45,6 +143,43 @@
             </form>
         </div>
     </div>
+    <div class="admin-panel admin-panel--tree"
+         th:if="${categoryTreeListJson != null and !#lists.isEmpty(categoryTreeListJson)}">
+        <header class="admin-panel__header">
+            <h2 class="admin-panel__title">전체 카테고리 트리</h2>
+        </header>
+        <div id="category-container" class="admin-panel__body"></div>
+    </div>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        // 서버에서 Model에 담아온 List<Dto>를 JS 배열/객체로 인라인 변환
+        const categoryData = /*[[${categoryTreeListJson}]]*/ [];
+        /*]]>*/
+
+        // 트리 구조 순회하여 HTML 생성하는 함수
+        function renderCategoryTree(categories) {
+            const ul = document.createElement('ul');
+
+            categories.forEach(category => {
+                const li = document.createElement('li');
+                li.textContent = category.name;
+
+                if (category.children && category.children.length > 0) {
+                    const childUl = renderCategoryTree(category.children);
+                    li.appendChild(childUl);
+                }
+
+                ul.appendChild(li);
+            });
+
+            return ul;
+        }
+
+        const container = document.getElementById('category-container');
+        const tree = renderCategoryTree(categoryData);
+        container.appendChild(tree);
+    </script>
+
 
     <div class="admin-panel">
         <div class="admin-panel__header">
@@ -58,41 +193,37 @@
                     <th>카테고리명</th>
                     <th>부모 카테고리명</th>
                     <th>경로</th>
-                    <th>상태</th>
                     <th>관리</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr th:each="cat : ${categories}" th:if="${cat != null}">
-                    <td th:text="${cat.id}">1</td>
+                    <td th:text="${cat.categoryId}">1</td>
                     <td>
                         <span class="category-item" th:text="${cat.name}">카테고리 이름</span>
                     </td>
                     <td th:text="${cat.parentName} ?: '-'">-</td>
                     <td th:text="${cat.categoryPath}">/path/to/category</td>
-                    <td th:text="${cat.isActive()} ? '활성' : '비활성'">상태</td>
-                    <td class="category-actions">
-                        <a th:href="@{/admin/categories/{id}/edit(id=${cat.id})}"
+                    <td class="category-actions text-center">
+                        <a th:href="@{/admin/categories/{categoryId}/new(categoryId=${cat.categoryId})}"
+                           class="admin-btn admin-btn--sm admin-btn--outline-primary" title="하위 카테고리 생성">
+                            <i class="fas fa-plus"></i>
+                        </a>
+                        <a th:href="@{/admin/categories/{categoryId}/edit(categoryId=${cat.categoryId})}"
                            class="admin-btn admin-btn--sm admin-btn--outline-primary" title="수정">
                             <i class="fas fa-edit"></i>
                         </a>
-                        <form th:if="${cat.isActive()}" th:action="@{/admin/categories/{id}/delete(id=${cat.id})}"
+                        <form th:action="@{/admin/categories/{id}/delete(id=${cat.categoryId})}"
                               method="post" style="display: inline;"
                               onsubmit="return confirm('정말로 이 카테고리를 비활성화 하시겠습니까?');">
                             <button type="submit" class="admin-btn admin-btn--sm admin-btn--danger" title="비활성화">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </form>
-                        <form th:unless="${cat.isActive()}" th:action="@{/admin/categories/{id}/activate(id=${cat.id})}"
-                              method="post" style="display: inline;">
-                            <button type="submit" class="admin-btn admin-btn--sm admin-btn--success" title="활성화">
-                                <i class="fas fa-check-circle"></i>
-                            </button>
-                        </form>
                     </td>
                 </tr>
                 <tr th:if="${categories == null or #lists.isEmpty(categories)}">
-                    <td colspan="6" class="text-center">등록된 카테고리가 없습니다.</td>
+                    <td colspan="5" class="text-center">등록된 카테고리가 없습니다.</td>
                 </tr>
                 </tbody>
             </table>
