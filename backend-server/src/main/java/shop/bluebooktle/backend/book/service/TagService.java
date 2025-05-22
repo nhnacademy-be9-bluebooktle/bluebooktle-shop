@@ -17,6 +17,9 @@ public interface TagService {
 	// 태그 조회
 	TagInfoResponse getTag(Long tagId);
 
+	// 태그 키워드 조회
+	Page<TagInfoResponse> searchTags(String searchKeyword, Pageable pageable);
+
 	// 태그 목록 조회
 	Page<TagInfoResponse> getTags(Pageable pageable);
 

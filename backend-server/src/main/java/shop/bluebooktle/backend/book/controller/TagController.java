@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
@@ -62,10 +63,17 @@ public class TagController {
 	// 태그 목록 조회
 	@GetMapping
 	public ResponseEntity<JsendResponse<PaginationData<TagInfoResponse>>> getTags(
-		@PageableDefault(size = 10, sort = "id") Pageable pageable) {
-		Page<TagInfoResponse> tagPage = tagService.getTags(pageable);
+		@PageableDefault(size = 10, sort = "id") Pageable pageable,
+		@RequestParam(value = "searchKeyword", required = false) String searchKeyword) {
+
+		Page<TagInfoResponse> tagPage;
+
+		if (searchKeyword != null && !searchKeyword.isBlank()) {
+			tagPage = tagService.searchTags(searchKeyword, pageable);
+		} else {
+			tagPage = tagService.getTags(pageable);
+		}
 		PaginationData<TagInfoResponse> paginationData = new PaginationData<>(tagPage);
 		return ResponseEntity.ok(JsendResponse.success(paginationData));
 	}
-
 }

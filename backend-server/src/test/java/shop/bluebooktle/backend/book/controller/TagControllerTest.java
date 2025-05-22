@@ -5,6 +5,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
@@ -95,7 +96,7 @@ class TagControllerTest {
 	@WithMockUser
 	void testGetTag() throws Exception {
 		Long tagId = 1L;
-		TagInfoResponse response = new TagInfoResponse(tagId, "Tag Name");
+		TagInfoResponse response = new TagInfoResponse(tagId, "Tag Name", LocalDateTime.now());
 		when(tagService.getTag(tagId)).thenReturn(response);
 
 		mockMvc.perform(get("/api/tags/{tagId}", tagId))
@@ -111,8 +112,8 @@ class TagControllerTest {
 	@DisplayName("태그 목록 조회 성공")
 	@WithMockUser
 	void testGetTags() throws Exception {
-		TagInfoResponse tag1 = new TagInfoResponse(1L, "Tag 1");
-		TagInfoResponse tag2 = new TagInfoResponse(2L, "Tag 2");
+		TagInfoResponse tag1 = new TagInfoResponse(1L, "Tag 1", LocalDateTime.now());
+		TagInfoResponse tag2 = new TagInfoResponse(2L, "Tag 2", LocalDateTime.now());
 		Page<TagInfoResponse> tagPage = new PageImpl<>(List.of(tag1, tag2));
 		PaginationData<TagInfoResponse> paginationData = new PaginationData<>(tagPage);
 		when(tagService.getTags(any(Pageable.class))).thenReturn(tagPage);

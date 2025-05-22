@@ -39,6 +39,11 @@ public class TagServiceImpl implements TagService {
 	public void updateTag(Long tagId, TagRequest request) {
 		Tag tag = tagRepository.findById(tagId)
 			.orElseThrow(() -> new TagNotFoundException(tagId));
+
+		if (tagRepository.existsByName(request.getName())) {
+			throw new TagAlreadyExistsException("태그명 : " + request.getName());
+		}
+
 		tag.setName(request.getName());
 		tagRepository.save(tag);
 	}
@@ -48,14 +53,14 @@ public class TagServiceImpl implements TagService {
 	public TagInfoResponse getTag(Long publisherId) {
 		Tag tag = tagRepository.findById(publisherId)
 			.orElseThrow(() -> new TagNotFoundException(publisherId));
-		return new TagInfoResponse(tag.getId(), tag.getName());
+		return new TagInfoResponse(tag.getId(), tag.getName(), tag.getCreatedAt());
 	}
 
 	@Override
 	@Transactional(readOnly = true)
 	public Page<TagInfoResponse> getTags(Pageable pageable) {
-		Page<Tag> tags = tagRepository.findAll(pageable);
-		return tags.map(tag -> new TagInfoResponse(tag.getId(), tag.getName()));
+		Page<Tag> tags = tagRepository.findAllByDeletedAtIsNull(pageable);
+		return tags.map(tag -> new TagInfoResponse(tag.getId(), tag.getName(), tag.getCreatedAt()));
 	}
 
 	@Override
@@ -66,5 +71,12 @@ public class TagServiceImpl implements TagService {
 		bookTagRepository.deleteAllByTag(tag);
 		// 태그 삭제
 		tagRepository.delete(tag);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public Page<TagInfoResponse> searchTags(String searchKeyword, Pageable pageable) {
+		Page<Tag> tags = tagRepository.searchByNameContaining(searchKeyword, pageable);
+		return tags.map(tag -> new TagInfoResponse(tag.getId(), tag.getName(), tag.getCreatedAt()));
 	}
 }
