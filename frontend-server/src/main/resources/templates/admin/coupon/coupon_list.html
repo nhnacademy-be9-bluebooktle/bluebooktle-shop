@@ -51,6 +51,17 @@
             </a>
         </div>
     </div>
+    <div class="alert-kitsch error-kitsch" style="margin-bottom: 1rem;"
+         th:if="${error == 'true' && errorMessage != null && !errorMessage.isEmpty()}">
+        <i class="fas fa-exclamation-triangle"></i>
+        <span class="pixel-font-kitsch" th:text="${errorMessage}">에러 메시지가 여기에 표시됩니다.</span>
+    </div>
+    <div class="alert-kitsch success-kitsch" style="margin-bottom: 1rem;"
+         th:if="${globalSuccessMessage != null}">
+        <i class="fas fa-check-circle"></i>
+        <strong class="pixel-font-kitsch" th:text="${globalSuccessTitle}">성공</strong>
+        <span class="pixel-font-kitsch" th:text="${globalSuccessMessage}">작업이 완료되었습니다.</span>
+    </div>
 
     <div class="admin-panel filter-form">
         <div class="admin-panel__body">

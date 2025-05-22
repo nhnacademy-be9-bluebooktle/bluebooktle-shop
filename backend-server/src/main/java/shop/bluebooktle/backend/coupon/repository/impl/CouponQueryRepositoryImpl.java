@@ -52,7 +52,9 @@ public class CouponQueryRepositoryImpl implements CouponQueryRepository {
 
 		BooleanBuilder builder = new BooleanBuilder();
 
-		builder.and(couponType.target.eq(request.getTarget()));
+		if (request.getTarget() != null) {
+			builder.and(couponType.target.eq(request.getTarget()));
+		}
 
 		if (request.getBookId() != null) {
 			builder.and(bookCoupon.book.id.eq(request.getBookId()));

@@ -11,6 +11,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,6 +30,7 @@ import shop.bluebooktle.common.dto.coupon.request.CouponTypeRegisterRequest;
 import shop.bluebooktle.common.dto.coupon.request.UserCouponRegisterRequest;
 import shop.bluebooktle.common.dto.coupon.response.CouponResponse;
 import shop.bluebooktle.common.dto.coupon.response.CouponTypeResponse;
+import shop.bluebooktle.common.exception.ApplicationException;
 import shop.bluebooktle.frontend.service.AdminCouponService;
 
 @Slf4j
@@ -38,10 +40,7 @@ import shop.bluebooktle.frontend.service.AdminCouponService;
 public class AdminCouponController {
 
 	private final AdminCouponService adminCouponService;
-	// private final BookService bookService; //TODO [쿠폰] 도서 List 용도
-	// private final CategoryService categoryService; //TODO 카테고리 List 용도
 
-	/* 쿠폰 정책 등 */
 	@GetMapping("/type/new")
 	public String showCouponTypeForm(Model model, HttpServletRequest request) {
 		if (!model.containsAttribute("couponType")) {
@@ -52,38 +51,28 @@ public class AdminCouponController {
 	}
 
 	@PostMapping("/type")
-	public String registerCouponType(
-		@Valid @ModelAttribute("couponType") CouponTypeRegisterRequest request,
+	public String registerCouponType(@Valid @ModelAttribute("couponType") CouponTypeRegisterRequest request,
 		BindingResult bindingResult,
 		RedirectAttributes redirectAttributes) {
 		log.info("쿠폰 정책 요청: {}", request);
 
 		if (bindingResult.hasErrors()) {
 			log.warn("쿠폰 정책 저장 폼 유효성 검증 실패: {}", bindingResult.getAllErrors());
-
 			redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.couponType",
 				bindingResult);
 			redirectAttributes.addFlashAttribute("couponType", request);
-			redirectAttributes.addFlashAttribute("globalErrorMessage", "입력값을 확인해주세요.");
-
+			redirectAttributes.addFlashAttribute("error", "true");
+			redirectAttributes.addFlashAttribute("errorCode", "VALIDATION_ERROR");
+			redirectAttributes.addFlashAttribute("errorMessage", "입력값을 확인해주세요.");
 			return "redirect:/admin/coupons/type/new";
 		}
 
-		try {
-			adminCouponService.registerCouponType(request);
-			redirectAttributes.addFlashAttribute("globalSuccessMessage",
-				"쿠폰 정책 " + request.getName() + "이 성공적으로 등록되었습니다.");
-		} catch (Exception e) {
-			log.error("쿠폰 정책 등록 실패", e);
-			redirectAttributes.addFlashAttribute("globalErrorMessage", "저장 중 오류 발생");
-			redirectAttributes.addFlashAttribute("couponType", request);
-			return "redirect:/admin/coupons/type/new";
-		}
-
+		adminCouponService.registerCouponType(request);
+		redirectAttributes.addFlashAttribute("globalSuccessMessage", "쿠폰 정책 " + request.getName() + "이 성공적으로 등록되었습니다.");
+		redirectAttributes.addFlashAttribute("globalSuccessTitle", "정책 등록 완료");
 		return "redirect:/admin/coupons";
 	}
 
-	/* 쿠폰 등록*/
 	@GetMapping("/new")
 	public String showCouponForm(Model model, HttpServletRequest request) {
 		model.addAttribute("currentURI", request.getRequestURI());
@@ -92,83 +81,79 @@ public class AdminCouponController {
 			model.addAttribute("coupon", new CouponRegisterRequest());
 		}
 
-		//쿠폰 정책 목록
 		PaginationData<CouponTypeResponse> couponTypeData = adminCouponService.getAllCouponType();
 		model.addAttribute("couponTypes", couponTypeData.getContent());
-
-		// 도서 목록
-		// model.addAttribute("books", bookService.getAll()); //TODO [쿠폰] bookService 완성 후 작업
-		// 카테고리 목록
-		// model.addAttribute("categories", categoryService.getAll()); //TODO [쿠폰] categoryService 완성 후 작업
 		return "admin/coupon/coupon_form";
 	}
 
 	@PostMapping
-	public String registerCoupon(
-		@Valid @ModelAttribute("coupon") CouponRegisterRequest request,
+	public String registerCoupon(@Valid @ModelAttribute("coupon") CouponRegisterRequest request,
 		BindingResult bindingResult,
 		RedirectAttributes redirectAttributes) {
 
 		if (bindingResult.hasErrors()) {
 			redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.coupon", bindingResult);
 			redirectAttributes.addFlashAttribute("coupon", request);
-			// model.addAttribute("books", bookService.getAll());
-			// model.addAttribute("categories", categoryService.getAll());
-			return "/admin/coupon/coupon_form";
-		}
-
-		try {
-			adminCouponService.registerCoupon(request);
-			redirectAttributes.addFlashAttribute("globalSuccessMessage", "쿠폰이 성공적으로 등록되었습니다.");
-			return "redirect:/admin/coupons";
-		} catch (Exception e) {
-			log.error("쿠폰 등록 실패", e);
-			redirectAttributes.addFlashAttribute("globalErrorMessage", "쿠폰 등록 중 오류 발생");
-			redirectAttributes.addFlashAttribute("coupon", request);
+			redirectAttributes.addFlashAttribute("error", "true");
+			redirectAttributes.addFlashAttribute("errorCode", "VALIDATION_ERROR");
+			redirectAttributes.addFlashAttribute("errorMessage", "입력값을 확인해주세요.");
 			return "redirect:/admin/coupons/new";
 		}
+
+		adminCouponService.registerCoupon(request);
+		redirectAttributes.addFlashAttribute("globalSuccessMessage", "쿠폰이 성공적으로 등록되었습니다.");
+		redirectAttributes.addFlashAttribute("globalSuccessTitle", "쿠폰 등록 완료");
+		return "redirect:/admin/coupons";
 	}
 
-	// 쿠폰 전체 조회
 	@GetMapping
 	public String getAllCoupon(Model model, HttpServletRequest request,
 		@RequestParam(value = "issueCouponId", required = false) Long issueCouponId,
 		@RequestParam(value = "page", defaultValue = "0") int page,
 		@RequestParam(value = "size", defaultValue = "10") int size,
 		@RequestParam(value = "searchField", required = false) String searchField,
-		@RequestParam(value = "searchKeyword", required = false) String searchKeyword) {
+		@RequestParam(value = "searchKeyword", required = false) String searchKeyword,
+		@ModelAttribute("error") String error,
+		@ModelAttribute("errorCode") String errorCode,
+		@ModelAttribute("errorMessage") String errorMessage,
+		@ModelAttribute("globalSuccessMessage") String globalSuccessMessage,
+		@ModelAttribute("globalSuccessTitle") String globalSuccessTitle) {
 
 		log.info("AdminCouponController - getAllCoupon: page={}, size={}, searchField={}, searchKeyword={}",
 			page, size, searchField, searchKeyword);
 
 		model.addAttribute("currentURI", request.getRequestURI());
 
+		if ("true".equals(error)) {
+			model.addAttribute("error", true);
+			model.addAttribute("errorCode", errorCode);
+			model.addAttribute("errorMessage", errorMessage);
+		}
+		if (globalSuccessMessage != null) {
+			model.addAttribute("globalSuccessMessage", globalSuccessMessage);
+			model.addAttribute("globalSuccessTitle", globalSuccessTitle);
+		}
+
 		PaginationData<CouponResponse> allCoupons = adminCouponService.getAllCoupon();
-		log.info("전체 쿠폰 개수: {}", allCoupons.getContent().size());
-
-		//검색 필터링
 		List<CouponResponse> filteredCoupons = allCoupons.getContent().stream()
-			.filter(coupon ->
-				(searchKeyword == null || searchKeyword.trim().isEmpty()) ||
-					(searchField == null || searchField.trim().isEmpty()) ||
-					(searchField.equals("couponName") && coupon.getCouponName() != null &&
-						coupon.getCouponName().toLowerCase().contains(searchKeyword.toLowerCase()))
-			).collect(Collectors.toList());
+			.filter(coupon -> (searchKeyword == null || searchKeyword.trim().isEmpty()) ||
+				(searchField == null || searchField.trim().isEmpty()) ||
+				("couponName".equals(searchField) && coupon.getCouponName() != null &&
+					coupon.getCouponName().toLowerCase().contains(searchKeyword.toLowerCase())))
+			.collect(Collectors.toList());
 
-		//페이징
-		Sort sort = Sort.by(Sort.Direction.DESC, "createAt");
+		Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
 		Pageable pageable = PageRequest.of(page, size, sort);
 
 		if (issueCouponId != null) {
-			model.addAttribute("couponId", issueCouponId);       // 모달 내부 form에 쓸 쿠폰 ID
-			model.addAttribute("issueCouponId", issueCouponId);  // 모달 자체를 띄우기 위한 조건
+			model.addAttribute("couponId", issueCouponId);
+			model.addAttribute("issueCouponId", issueCouponId);
 		}
 
 		int start = (int)pageable.getOffset();
 		int end = Math.min(start + pageable.getPageSize(), filteredCoupons.size());
-
 		List<CouponResponse> pageContent =
-			(start >= filteredCoupons.size() || start > end) ? List.of() : filteredCoupons.subList(start, end);
+			(start >= filteredCoupons.size() || start >= end) ? List.of() : filteredCoupons.subList(start, end);
 
 		Page<CouponResponse> couponPage = new PageImpl<>(pageContent, pageable, filteredCoupons.size());
 
@@ -185,46 +170,40 @@ public class AdminCouponController {
 		if (searchKeyword != null && !searchKeyword.isEmpty())
 			uriBuilder.queryParam("searchKeyword", searchKeyword);
 
-		String baseUrlWithParams = uriBuilder.toUriString();
-		model.addAttribute("baseUrlWithParams", baseUrlWithParams);
-
-		//검색 상태 유지
+		model.addAttribute("baseUrlWithParams", uriBuilder.toUriString());
 		model.addAttribute("searchField", searchField);
 		model.addAttribute("searchKeyword", searchKeyword);
 
 		return "admin/coupon/coupon_list";
 	}
 
-	// 쿠폰 발급
 	@PostMapping("/issue")
-	public String issueCoupon(
-		@Valid @ModelAttribute("userCoupon") UserCouponRegisterRequest request,
+	public String issueCoupon(@Valid @ModelAttribute("userCoupon") UserCouponRegisterRequest request,
 		BindingResult bindingResult,
-		RedirectAttributes redirectAttributes
-	) {
+		RedirectAttributes redirectAttributes) {
 		log.info("쿠폰 발급 요청: {}", request);
 
 		if (bindingResult.hasErrors()) {
-			log.warn("쿠폰 발급 폼 유효성 검증 실패: {}", bindingResult.getAllErrors());
-
 			redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.userCoupon",
 				bindingResult);
 			redirectAttributes.addFlashAttribute("userCoupon", request);
-			redirectAttributes.addFlashAttribute("globalErrorMessage", "입력값을 확인해주세요.");
-
+			redirectAttributes.addFlashAttribute("error", "true");
+			redirectAttributes.addFlashAttribute("errorCode", "VALIDATION_ERROR");
+			redirectAttributes.addFlashAttribute("errorMessage", "입력값을 확인해주세요.");
 			return "redirect:/admin/coupons?issueCouponId=" + request.getCouponId();
 		}
 
-		try {
-			adminCouponService.issueCoupon(request);
-			redirectAttributes.addFlashAttribute("globalSuccessMessage", "쿠폰이 성공적으로 발급되었습니다.");
-		} catch (Exception e) {
-			log.error("쿠폰 발급 실패", e);
-			redirectAttributes.addFlashAttribute("globalErrorMessage", "발급 중 오류 발생");
-			redirectAttributes.addFlashAttribute("userCoupon", request);
-			return "redirect:/admin/coupons?issueCouponId=" + request.getCouponId();
-		}
+		adminCouponService.issueCoupon(request);
+		redirectAttributes.addFlashAttribute("globalSuccessMessage", "쿠폰이 성공적으로 발급되었습니다.");
+		redirectAttributes.addFlashAttribute("globalSuccessTitle", "발급 완료");
+		return "redirect:/admin/coupons";
+	}
 
+	@ExceptionHandler(ApplicationException.class)
+	public String handleApplicationException(ApplicationException ex, RedirectAttributes redirectAttributes) {
+		redirectAttributes.addFlashAttribute("error", "true");
+		redirectAttributes.addFlashAttribute("errorCode", ex.getErrorCode().getCode());
+		redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
 		return "redirect:/admin/coupons";
 	}
 }

@@ -5,7 +5,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import shop.bluebooktle.common.dto.common.JsendResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
 import shop.bluebooktle.common.dto.coupon.request.CouponRegisterRequest;
 import shop.bluebooktle.common.dto.coupon.request.CouponTypeRegisterRequest;
@@ -14,26 +13,25 @@ import shop.bluebooktle.common.dto.coupon.response.CouponResponse;
 import shop.bluebooktle.common.dto.coupon.response.CouponTypeResponse;
 import shop.bluebooktle.frontend.config.FeignGlobalConfig;
 
-// @FeignClient(name = "backed-server", url = "${backend.url}, path = "/api/coupon/admin", contextId = "adminCouponRepository", configuration = FeignGlobalConfig.class)
 @FeignClient(name = "backend-server", path = "/api/admin/coupons", contextId = "adminCouponRepository", configuration = FeignGlobalConfig.class)
 public interface AdminCouponRepository {
 	//쿠폰 정책 등록
 	@PostMapping("/type")
-	JsendResponse<Void> registerCouponType(@RequestBody CouponTypeRegisterRequest request);
+	void registerCouponType(@RequestBody CouponTypeRegisterRequest request);
 
 	//쿠폰 정책 전체 조회
 	@GetMapping("/type")
-	JsendResponse<PaginationData<CouponTypeResponse>> getAllCouponType();
+	PaginationData<CouponTypeResponse> getAllCouponType();
 
 	//쿠폰 등록
 	@PostMapping
-	JsendResponse<Void> registerCoupon(@RequestBody CouponRegisterRequest request);
+	void registerCoupon(@RequestBody CouponRegisterRequest request);
 
 	//전체 쿠폰 조회
 	@GetMapping
-	JsendResponse<PaginationData<CouponResponse>> getAllCoupon();
+	PaginationData<CouponResponse> getAllCoupon();
 
 	//쿠폰 발급
 	@PostMapping("/issue")
-	JsendResponse<Void> issueCoupon(@RequestBody UserCouponRegisterRequest request);
+	void issueCoupon(@RequestBody UserCouponRegisterRequest request);
 }
