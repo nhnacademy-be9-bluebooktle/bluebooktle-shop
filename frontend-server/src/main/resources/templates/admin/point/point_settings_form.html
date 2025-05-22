@@ -61,86 +61,104 @@
 
     <div class="admin-panel">
         <div class="admin-panel__body">
-            <form th:action="@{/admin/points/settings}" th:object="${pointSettings}" method="post" class="admin-form">
+            <form class="admin-form" method="post" th:action="@{/admin/points/settings}">
 
+                <!-- 포인트 적립 규칙 -->
                 <fieldset class="policy-section">
                     <legend>포인트 적립 규칙</legend>
-                    <div th:each="rule, iterStat : *{earningRules}" class="policy-item">
-                        <input type="hidden" th:name="|earningRules[${iterStat.index}].sourceTypeKey|"
-                               th:value="${rule.sourceTypeKey}"/>
-                        <input type="hidden" th:name="|earningRules[${iterStat.index}].sourceTypeName|"
-                               th:value="${rule.sourceTypeName}"/>
+                    <div class="policy-item" th:each="rule, iterStat : ${earningRules}">
+                        <input th:name="|earningRules[${iterStat.index}].pointSourceTypeId|"
+                               th:value="${rule.pointSourceTypeId}"
+                               type="hidden"/>
+                        <input th:name="|earningRules[${iterStat.index}].pointPolicyId|"
+                               th:value="${rule.pointPolicyId}"
+                               type="hidden"/>
 
-                        <span class="item-label" th:text="${rule.sourceTypeName}">회원가입 시</span>
+                        <span class="item-label" th:text="${rule.sourceType}">회원가입 시</span>
 
-                        <div class="admin-form-group" style="flex-basis: 100px; flex-grow:0;">
-                            <input type="checkbox" th:id="'earningActive_' + ${iterStat.index}"
-                                   th:name="|earningRules[${iterStat.index}].isActive|" th:checked="${rule.isActive}"
-                                   class="admin-form-check-input">
-                            <label th:for="'earningActive_' + ${iterStat.index}"
-                                   class="admin-form-check-label">활성화</label>
+                        <div class="admin-form-group" style="flex-basis:100px;flex-grow:0;">
+                            <input class="admin-form-check-input"
+                                   th:checked="${rule.active}"
+                                   th:id="'earningActive_' + ${iterStat.index}"
+                                   th:name="|earningRules[${iterStat.index}].active|"
+                                   type="checkbox"/>
+                            <label class="admin-form-check-label"
+                                   th:for="'earningActive_' + ${iterStat.index}">활성화</label>
                         </div>
 
-                        <div class="admin-form-group" style="flex-basis: 200px; flex-grow:0;">
-                            <select th:id="'earningType_' + ${iterStat.index}"
-                                    th:name="|earningRules[${iterStat.index}].earningType|"
-                                    class="admin-form-control admin-form-control-sm">
-                                <option th:each="opt : ${earningTypeOptions}" th:value="${opt.value}"
-                                        th:text="${opt.text}" th:selected="${opt.value == rule.earningType}">타입
+                        <div class="admin-form-group" style="flex-basis:200px;flex-grow:0;">
+                            <select class="admin-form-control admin-form-control-sm"
+                                    th:id="'earningType_' + ${iterStat.index}"
+                                    th:name="|earningRules[${iterStat.index}].policyType|">
+                                <option th:each="opt : ${earningTypeOptions}"
+                                        th:selected="${opt.value == rule.policyType}"
+                                        th:text="${opt.text}"
+                                        th:value="${opt.value}">
                                 </option>
                             </select>
                         </div>
+
                         <div class="admin-form-group">
-                            <input type="number" th:id="'earningValue_' + ${iterStat.index}"
-                                   th:name="|earningRules[${iterStat.index}].earningValue|"
-                                   th:value="${rule.earningValue}" class="admin-form-control admin-form-control-sm"
-                                   step="any" placeholder="값">
+                            <input class="admin-form-control admin-form-control-sm"
+                                   placeholder="값"
+                                   step="any"
+                                   th:id="'earningValue_' + ${iterStat.index}"
+                                   th:name="|earningRules[${iterStat.index}].value|"
+                                   th:value="${rule.value}"
+                                   type="number"/>
                         </div>
                     </div>
-                    <div th:if="${#fields.hasErrors('earningRules')}" th:errors="*{earningRules}"
-                         class="invalid-feedback admin-form-text" style="display:block;"></div>
+                    <div class="invalid-feedback admin-form-text" style="display:block;"
+                         th:errors="*{earningRules}" th:if="${#fields.hasErrors('earningRules')}"></div>
                 </fieldset>
 
+                <!-- 멤버십 등급 추가 적립률 -->
                 <fieldset class="policy-section">
                     <legend>회원 등급별 구매 시 추가 적립률</legend>
-                    <div th:each="rate, iterStat : *{membershipRates}" class="policy-item">
-                        <input type="hidden" th:name="|membershipRates[${iterStat.index}].membershipLevelId|"
-                               th:value="${rate.membershipLevelId}"/>
-                        <input type="hidden" th:name="|membershipRates[${iterStat.index}].membershipLevelName|"
-                               th:value="${rate.membershipLevelName}"/>
+                    <div class="policy-item" th:each="rate, iterStat : *{membershipRates}">
+                        <input th:name="|membershipRates[${iterStat.index}].membershipLevelId|"
+                               th:value="${rate.membershipLevelId}"
+                               type="hidden"/>
+                        <input th:name="|membershipRates[${iterStat.index}].pointPolicyId|"
+                               th:value="${rate.pointPolicyId}"
+                               type="hidden"/>
 
-                        <span class="item-label" th:text="${rate.membershipLevelName}">BRONZE</span>
+                        <span class="item-label" th:text="${rate.membershipLevel}">BRONZE</span>
 
-                        <div class="admin-form-group" style="flex-basis: 100px; flex-grow:0;">
-                            <input type="checkbox" th:id="'membershipActive_' + ${iterStat.index}"
-                                   th:name="|membershipRates[${iterStat.index}].isActive|" th:checked="${rate.isActive}"
-                                   class="admin-form-check-input">
-                            <label th:for="'membershipActive_' + ${iterStat.index}"
-                                   class="admin-form-check-label">활성화</label>
+                        <div class="admin-form-group" style="flex-basis:100px;flex-grow:0;">
+                            <input class="admin-form-check-input"
+                                   th:checked="${rate.active}"
+                                   th:id="'membershipActive_' + ${iterStat.index}"
+                                   th:name="|membershipRates[${iterStat.index}].active|"
+                                   type="checkbox"/>
+                            <label class="admin-form-check-label"
+                                   th:for="'membershipActive_' + ${iterStat.index}">활성화</label>
                         </div>
 
                         <div class="admin-form-group">
-                            <input type="number" th:id="'additionalRate_' + ${iterStat.index}"
-                                   th:name="|membershipRates[${iterStat.index}].additionalPurchaseRate|"
-                                   th:value="${rate.additionalPurchaseRate}"
-                                   class="admin-form-control admin-form-control-sm" step="0.1" placeholder="추가 적립률">
-                            <span style="margin-left: 5px;">%</span>
+                            <input class="admin-form-control admin-form-control-sm"
+                                   placeholder="추가 적립률"
+                                   step="0.1"
+                                   th:id="'additionalRate_' + ${iterStat.index}"
+                                   th:name="|membershipRates[${iterStat.index}].value|"
+                                   th:value="${rate.value}"
+                                   type="number"/>
+                            <span style="margin-left:5px;">%</span>
                         </div>
                     </div>
-                    <div th:if="${#fields.hasErrors('membershipRates')}" th:errors="*{membershipRates}"
-                         class="invalid-feedback admin-form-text" style="display:block;"></div>
+                    <div class="invalid-feedback admin-form-text" style="display:block;"
+                         th:errors="*{membershipRates}" th:if="${#fields.hasErrors('membershipRates')}"></div>
                 </fieldset>
 
-                <div class="admin-form-actions" style="margin-top: 20px; text-align: center;">
-                    <button type="submit" class="admin-btn admin-btn--primary admin-btn--lg">
+                <div class="admin-form-actions" style="margin-top:20px;text-align:center;">
+                    <button class="admin-btn admin-btn--primary admin-btn--lg" type="submit">
                         <i class="fas fa-save"></i> 포인트 정책 저장
                     </button>
                 </div>
+
             </form>
         </div>
     </div>
 </div>
-
-
 </body>
 </html>
