@@ -1,6 +1,4 @@
-package shop.bluebooktle.frontend.config;
-
-import java.util.concurrent.TimeUnit;
+package shop.bluebooktle.frontend.config.feign;
 
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;
@@ -13,6 +11,9 @@ import feign.Retryer;
 import feign.codec.Decoder;
 import feign.codec.ErrorDecoder;
 import lombok.RequiredArgsConstructor;
+import shop.bluebooktle.frontend.config.feign.decoder.GlobalFeignErrorDecoder;
+import shop.bluebooktle.frontend.config.feign.decoder.JsendDecoder;
+import shop.bluebooktle.frontend.config.feign.interceptor.FeignBearerTokenInterceptor;
 import shop.bluebooktle.frontend.repository.AuthRepository;
 import shop.bluebooktle.frontend.util.CookieTokenUtil;
 
@@ -49,6 +50,6 @@ public class FeignGlobalConfig {
 
 	@Bean
 	public Retryer feignRetryer() {
-		return new Retryer.Default(100L, TimeUnit.SECONDS.toMillis(1), 2);
+		return Retryer.NEVER_RETRY;
 	}
 }

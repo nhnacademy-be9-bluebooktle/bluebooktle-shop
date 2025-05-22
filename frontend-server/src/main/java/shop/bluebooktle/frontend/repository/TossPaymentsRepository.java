@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import shop.bluebooktle.common.dto.payment.request.TossConfirmRequest;
 import shop.bluebooktle.common.dto.payment.response.TossConfirmResponse;
-import shop.bluebooktle.frontend.config.TossFeignConfig;
+import shop.bluebooktle.frontend.config.feign.TossFeignConfig;
 
 @FeignClient(
 	name = "tossPaymentsClient",

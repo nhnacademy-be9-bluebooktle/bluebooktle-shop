@@ -1,4 +1,4 @@
-package shop.bluebooktle.frontend.config;
+package shop.bluebooktle.frontend.config.feign;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;

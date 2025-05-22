@@ -1,4 +1,4 @@
-package shop.bluebooktle.frontend.config;
+package shop.bluebooktle.frontend.config.feign.decoder;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -12,7 +12,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import feign.Response;
-import feign.RetryableException;
 import feign.Util;
 import feign.codec.ErrorDecoder;
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,6 +23,7 @@ import shop.bluebooktle.common.dto.auth.response.TokenResponse;
 import shop.bluebooktle.common.dto.common.JsendResponse;
 import shop.bluebooktle.common.exception.ApplicationException;
 import shop.bluebooktle.common.exception.ErrorCode;
+import shop.bluebooktle.frontend.exception.TokenRefreshAndRetryNeededException;
 import shop.bluebooktle.frontend.repository.AuthRepository;
 import shop.bluebooktle.frontend.util.CookieTokenUtil;
 
@@ -94,13 +94,11 @@ public class GlobalFeignErrorDecoder implements ErrorDecoder {
 					if (tokenResponse != null && tokenResponse.getAccessToken() != null) {
 						cookieTokenUtil.saveTokens(currentResponse, tokenResponse.getAccessToken(),
 							tokenResponse.getRefreshToken());
-						response.request().header("Authorization", "Bearer " + tokenResponse.getAccessToken());
-						return new RetryableException(
-							response.status(),
-							"Access Token 재발급 후 재시도",
-							response.request().httpMethod(),
-							(Long)null,
-							response.request());
+						currentRequest.setAttribute(CookieTokenUtil.ACCESS_TOKEN_COOKIE_NAME,
+							tokenResponse.getAccessToken());
+						String retryMessage = String.format("Access Token 재발급 성공, 재시도 필요. URL: %s, Status: %d",
+							requestUrl, response.status());
+						return new TokenRefreshAndRetryNeededException(retryMessage);
 					} else {
 						cookieTokenUtil.clearTokens(currentResponse);
 						return new ApplicationException(ErrorCode.AUTH_TOKEN_REISSUE_FAILED,
