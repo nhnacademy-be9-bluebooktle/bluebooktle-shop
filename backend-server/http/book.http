@@ -82,7 +82,7 @@ POST http://localhost:{{port}}/api/books
 Content-Type: application/json
 
 {
-  "title": "테스트 제목",
+  "title": "테스트 제목1111",
   "authorIdList": [
     1
   ],
@@ -93,13 +93,13 @@ Content-Type: application/json
     1,
     2
   ],
-  "ThumbnailUrl": "https://image.aladin.co.kr/product/35650/80/coversum/k762036819_1.jpg",
+  "ThumbnailUrl": "https://image.aladin.co.kr/product/35650/80/coversum/22.jpg",
   "categoryIdList": [
     2,
     3
   ],
   "description": "테스트 설명",
-  "isbn": "1234567890125",
+  "isbn": "1234567890126",
   "publishDate": "2025-05-15",
   "price": 20000,
   "salePrice": 18000,
