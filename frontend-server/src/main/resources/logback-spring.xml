@@ -18,7 +18,7 @@
                 <maxHistory>7</maxHistory>
             </rollingPolicy>
             <encoder>
-                <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+                <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n%throwable</pattern>
             </encoder>
         </appender>
 
@@ -37,7 +37,6 @@
         <springProperty name="PROFILE" source="spring.profiles.active"/>
 
         <property name="LOG_FOLDER" value="logs/${PROFILE}/server"/>
-
         <property name="LOG_FILE" value="${LOG_FOLDER}/${APP_NAME}-${PORT}.log"/>
 
         <appender name="systemLogAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
@@ -50,14 +49,13 @@
                 <maxHistory>7</maxHistory>
             </rollingPolicy>
             <encoder>
-                <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+                <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n%throwable</pattern>
             </encoder>
         </appender>
 
         <logger name="shop.bluebooktle.frontend" level="DEBUG" additivity="false">
             <appender-ref ref="systemLogAppender"/>
         </logger>
-
         <root level="INFO">
             <appender-ref ref="systemLogAppender"/>
         </root>
@@ -66,17 +64,17 @@
     <springProfile name="local">
         <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
             <encoder>
-                <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+                <pattern>%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr([%15.15t]){faint}
+                    %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}
+                </pattern>
             </encoder>
         </appender>
 
         <logger name="shop.bluebooktle.frontend" level="DEBUG" additivity="false">
             <appender-ref ref="STDOUT"/>
         </logger>
-
-        <root level="info">
+        <root level="INFO">
             <appender-ref ref="STDOUT"/>
         </root>
-
     </springProfile>
 </configuration>

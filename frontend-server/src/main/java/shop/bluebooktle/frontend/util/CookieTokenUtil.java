@@ -11,7 +11,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 @Component
-public class CookieTokenManager {
+public class CookieTokenUtil {
 
 	public static final String ACCESS_TOKEN_COOKIE_NAME = "accessToken";
 	public static final String REFRESH_TOKEN_COOKIE_NAME = "refreshToken";

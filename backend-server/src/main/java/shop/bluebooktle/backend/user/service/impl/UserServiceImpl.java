@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.user.repository.UserRepository;
 import shop.bluebooktle.backend.user.service.UserService;
@@ -19,6 +20,7 @@ public class UserServiceImpl implements UserService {
 	private final UserRepository userRepository;
 
 	@Override
+	@Transactional()
 	public UserResponse findByUserId(Long userId) {
 		if (userId == null) {
 			throw new InvalidUserIdException();
