@@ -14,13 +14,13 @@ import shop.bluebooktle.frontend.util.JwtPayloadUtil;
 @ControllerAdvice
 public class GlobalUserInfoAdvice {
 
-	private static final String CLAIM_USER_ID = "sub";
+	private static final String CLAIM_USER_ID = "userId";
 	private static final String CLAIM_USER_NICKNAME = "userNickname";
 	private static final String CLAIM_USER_TYPE = "userType";
 
 	@ModelAttribute
 	public void addUserInfoToModel(Model model,
-		@CookieValue(name = CookieTokenUtil.REFRESH_TOKEN_COOKIE_NAME, required = false) String accessToken) {
+		@CookieValue(name = CookieTokenUtil.REFRESH_TOKEN_COOKIE_NAME, required = false) String refreshToken) {
 
 		boolean isLoggedIn = false;
 		Long userId = null;
