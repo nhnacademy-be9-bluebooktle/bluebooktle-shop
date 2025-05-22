@@ -60,12 +60,6 @@ public class CouponQueryRepositoryImpl implements CouponQueryRepository {
 		if (request.getCategoryId() != null) {
 			builder.and(categoryCoupon.category.id.eq(request.getCategoryId()));
 		}
-		if (request.getBookId() != null) {
-			builder.and(bookCoupon.book.id.eq(request.getBookId()));
-		}
-		if (request.getCategoryId() != null) {
-			builder.and(categoryCoupon.category.id.eq(request.getCategoryId()));
-		}
 
 		List<CouponResponse> content = queryFactory.select(new QCouponResponse(
 				coupon.id,
