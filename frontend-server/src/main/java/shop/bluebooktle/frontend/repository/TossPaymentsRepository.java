@@ -5,9 +5,9 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import shop.bluebooktle.frontend.config.feign.TossFeignConfig;
 import shop.bluebooktle.common.dto.payment.request.PaymentConfirmRequest;
 import shop.bluebooktle.common.dto.payment.response.PaymentConfirmResponse;
-import shop.bluebooktle.frontend.config.feign.TossFeignConfig;
 
 @FeignClient(
 	name = "tossPaymentsClient",
