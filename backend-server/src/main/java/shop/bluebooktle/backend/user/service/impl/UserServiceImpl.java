@@ -20,7 +20,7 @@ public class UserServiceImpl implements UserService {
 	private final UserRepository userRepository;
 
 	@Override
-	@Transactional()
+	@Transactional
 	public UserResponse findByUserId(Long userId) {
 		if (userId == null) {
 			throw new InvalidUserIdException();
