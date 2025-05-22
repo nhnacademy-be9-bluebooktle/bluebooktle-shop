@@ -70,7 +70,6 @@ public class GlobalFeignErrorDecoder implements ErrorDecoder {
 			}
 		} else if (response.status() == HttpStatus.UNAUTHORIZED.value()) {
 			if (!requestUrl.contains("/auth/refresh")) {
-				log.warn("HTTP 401 (Jsend 파싱 불가 또는 형식 아님). Access Token 만료로 간주: {}", requestUrl);
 				isAccessTokenExpiredError = true;
 			}
 		}
@@ -95,6 +94,7 @@ public class GlobalFeignErrorDecoder implements ErrorDecoder {
 					if (tokenResponse != null && tokenResponse.getAccessToken() != null) {
 						cookieTokenUtil.saveTokens(currentResponse, tokenResponse.getAccessToken(),
 							tokenResponse.getRefreshToken());
+						response.request().header("Authorization", "Bearer " + tokenResponse.getAccessToken());
 						return new RetryableException(
 							response.status(),
 							"Access Token 재발급 후 재시도",
