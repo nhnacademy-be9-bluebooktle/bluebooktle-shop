@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import shop.bluebooktle.common.dto.book.BookSaleInfoState;
 
 @Getter
 @Builder
@@ -17,6 +18,5 @@ public class BookSaleInfoRegisterResponse {
 	BigDecimal salePercentage;
 	Integer stock;
 	Boolean isPackable;
-	String state;
-
+	BookSaleInfoState state;
 }

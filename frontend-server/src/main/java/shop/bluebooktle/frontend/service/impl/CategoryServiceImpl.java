@@ -14,7 +14,6 @@ import shop.bluebooktle.common.dto.book.request.CategoryUpdateRequest;
 import shop.bluebooktle.common.dto.book.request.RootCategoryRegisterRequest;
 import shop.bluebooktle.common.dto.book.response.CategoryResponse;
 import shop.bluebooktle.common.dto.book.response.CategoryTreeResponse;
-import shop.bluebooktle.common.dto.common.JsendResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
 import shop.bluebooktle.frontend.repository.CategoryRepository;
 import shop.bluebooktle.frontend.service.CategoryService;
@@ -27,8 +26,8 @@ public class CategoryServiceImpl implements CategoryService {
 
 	@Override
 	public List<CategoryTreeResponse> searchAllCategoriesTree() {
-		JsendResponse<List<CategoryTreeResponse>> response = categoryRepository.allCategoriesTree();
-		return response.data();
+		List<CategoryTreeResponse> response = categoryRepository.allCategoriesTree();
+		return response;
 	}
 
 	@Override
@@ -40,22 +39,22 @@ public class CategoryServiceImpl implements CategoryService {
 			keyword = searchKeyword;
 		}
 
-		JsendResponse<PaginationData<CategoryResponse>> response = categoryRepository.getPagedCategories(page, size,
+		PaginationData<CategoryResponse> response = categoryRepository.getPagedCategories(page, size,
 			keyword);
-		PaginationData<CategoryResponse> data = response.data();
-		List<CategoryResponse> categories = data.getContent();
-		return new PageImpl<>(categories, pageable, data.getTotalElements());
+		// PaginationData<CategoryResponse> data = response;
+		List<CategoryResponse> categories = response.getContent();
+		return new PageImpl<>(categories, pageable, response.getTotalElements());
 	}
 
 	@Override
 	public CategoryResponse getCategory(Long id) {
-		return categoryRepository.getCategory(id).data();
+		return categoryRepository.getCategory(id);
 	}
 
 	@Override
 	public List<CategoryResponse> getAllCategories() {
-		JsendResponse<List<CategoryResponse>> allCategories = categoryRepository.getAllCategories();
-		return allCategories.data();
+		List<CategoryResponse> allCategories = categoryRepository.getAllCategories();
+		return allCategories;
 	}
 
 	@Override

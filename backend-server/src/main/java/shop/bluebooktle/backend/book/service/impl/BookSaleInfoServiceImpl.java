@@ -44,7 +44,7 @@ public class BookSaleInfoServiceImpl implements BookSaleInfoService {
 			.stock(request.getStock())
 			.isPackable(request.getIsPackable())
 			.salePercentage(calculateSalePercentage(request.getPrice(), request.getSalePrice()))
-			.bookSaleInfoState(BookSaleInfoState.valueOf(request.getBookSaleInfoState().name()))
+			.state(BookSaleInfoState.valueOf(request.getBookSaleInfoState().name()))
 			.build();
 
 		bookSaleInfoRepository.save(bookSaleInfo);
@@ -57,7 +57,7 @@ public class BookSaleInfoServiceImpl implements BookSaleInfoService {
 			.salePercentage(bookSaleInfo.getSalePercentage())
 			.stock(bookSaleInfo.getStock())
 			.isPackable(bookSaleInfo.isPackable())
-			.state(bookSaleInfo.getBookSaleInfoState().name())
+			.state(bookSaleInfo.getState())
 			.build();
 	}
 
@@ -72,7 +72,7 @@ public class BookSaleInfoServiceImpl implements BookSaleInfoService {
 			.stock(request.getStock())
 			.isPackable(request.getIsPackable())
 			.salePercentage(calculateSalePercentage(request.getPrice(), request.getSalePrice()))
-			.bookSaleInfoState(BookSaleInfoState.valueOf(request.getBookSaleInfoState().name()))
+			.state(request.getBookSaleInfoState())
 			.build();
 
 		bookSaleInfoRepository.save(bookSaleInfo);
@@ -85,7 +85,7 @@ public class BookSaleInfoServiceImpl implements BookSaleInfoService {
 			.salePercentage(bookSaleInfo.getSalePercentage())
 			.stock(bookSaleInfo.getStock())
 			.isPackable(bookSaleInfo.isPackable())
-			.state(bookSaleInfo.getBookSaleInfoState().name())
+			.state(bookSaleInfo.getState().name())
 			.build();
 	}
 
@@ -103,7 +103,7 @@ public class BookSaleInfoServiceImpl implements BookSaleInfoService {
 			.salePercentage(bookSaleInfo.getSalePercentage())
 			.stock(bookSaleInfo.getStock())
 			.isPackable(bookSaleInfo.isPackable())
-			.state(bookSaleInfo.getBookSaleInfoState().name())
+			.state(bookSaleInfo.getState().name())
 			.build();
 	}
 

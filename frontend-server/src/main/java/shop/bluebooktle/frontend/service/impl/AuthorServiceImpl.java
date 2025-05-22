@@ -12,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.common.dto.book.request.author.AuthorRegisterRequest;
 import shop.bluebooktle.common.dto.book.request.author.AuthorUpdateRequest;
 import shop.bluebooktle.common.dto.book.response.author.AuthorResponse;
-import shop.bluebooktle.common.dto.common.JsendResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
 import shop.bluebooktle.frontend.repository.AuthorRepository;
 import shop.bluebooktle.frontend.service.AuthorService;
@@ -32,17 +31,17 @@ public class AuthorServiceImpl implements AuthorService {
 			keyword = searchKeyword;
 		}
 
-		JsendResponse<PaginationData<AuthorResponse>> response = authorRepository.getPagedAuthors(page, size,
+		PaginationData<AuthorResponse> response = authorRepository.getPagedAuthors(page, size,
 			keyword);
-		PaginationData<AuthorResponse> data = response.data();
+		PaginationData<AuthorResponse> data = response;
 		List<AuthorResponse> categories = data.getContent();
 		return new PageImpl<>(categories, pageable, data.getTotalElements());
 	}
 
 	@Override
 	public AuthorResponse getAuthor(Long id) {
-		JsendResponse<AuthorResponse> response = authorRepository.getAuthor(id);
-		return response.data();
+		AuthorResponse response = authorRepository.getAuthor(id);
+		return response;
 	}
 
 	@Override

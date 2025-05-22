@@ -16,7 +16,6 @@ import shop.bluebooktle.common.dto.book.request.CategoryUpdateRequest;
 import shop.bluebooktle.common.dto.book.request.RootCategoryRegisterRequest;
 import shop.bluebooktle.common.dto.book.response.CategoryResponse;
 import shop.bluebooktle.common.dto.book.response.CategoryTreeResponse;
-import shop.bluebooktle.common.dto.common.JsendResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
 import shop.bluebooktle.frontend.config.FeignGlobalConfig;
 
@@ -24,45 +23,45 @@ import shop.bluebooktle.frontend.config.FeignGlobalConfig;
 public interface CategoryRepository {
 
 	@GetMapping
-	JsendResponse<PaginationData<CategoryResponse>> getPagedCategories(
+	PaginationData<CategoryResponse> getPagedCategories(
 		@RequestParam("page") int page,
 		@RequestParam("size") int size,
 		@RequestParam(value = "searchKeyword", required = false) String searchKeyword
 	);
 
 	@GetMapping("/tree")
-	JsendResponse<List<CategoryTreeResponse>> allCategoriesTree();
+	List<CategoryTreeResponse> allCategoriesTree();
 
 	@GetMapping("/{categoryId}")
-	JsendResponse<CategoryResponse> getCategory(
+	CategoryResponse getCategory(
 		@PathVariable Long categoryId
 	);
 
 	@GetMapping("/all")
-	JsendResponse<List<CategoryResponse>> getAllCategories();
+	List<CategoryResponse> getAllCategories();
 
 	@PostMapping
-	JsendResponse<Void> addRootCategory(
+	Void addRootCategory(
 		@RequestBody RootCategoryRegisterRequest request
 	);
 
 	@PostMapping("/{parentCategoryId}")
-	JsendResponse<Void> addCategory(
+	void addCategory(
 		@PathVariable Long parentCategoryId,
 		@RequestBody CategoryRegisterRequest categoryRegisterRequest
 	);
 
 	@PostMapping
-	JsendResponse<Void> saveCategory(@RequestBody CategoryRegisterRequest categoryRegisterRequest);
+	void saveCategory(@RequestBody CategoryRegisterRequest categoryRegisterRequest);
 
 	@PutMapping("/{categoryId}")
-	JsendResponse<Void> updateCategory(
+	void updateCategory(
 		@PathVariable("categoryId") Long categoryId,
 		@RequestBody CategoryUpdateRequest categoryUpdateRequest
 	);
 
 	@DeleteMapping("/{categoryId}")
-	JsendResponse<Void> deleteCategory(
+	void deleteCategory(
 		@PathVariable("categoryId") Long categoryId
 	);
 

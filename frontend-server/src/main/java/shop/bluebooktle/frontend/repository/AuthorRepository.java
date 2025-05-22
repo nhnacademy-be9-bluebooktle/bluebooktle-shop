@@ -12,37 +12,36 @@ import org.springframework.web.bind.annotation.RequestParam;
 import shop.bluebooktle.common.dto.book.request.author.AuthorRegisterRequest;
 import shop.bluebooktle.common.dto.book.request.author.AuthorUpdateRequest;
 import shop.bluebooktle.common.dto.book.response.author.AuthorResponse;
-import shop.bluebooktle.common.dto.common.JsendResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
 import shop.bluebooktle.frontend.config.FeignGlobalConfig;
 
 @FeignClient(name = "backend-server", contextId = "authorRepository", path = "/api/authors", configuration = FeignGlobalConfig.class)
 public interface AuthorRepository {
 	@GetMapping
-	JsendResponse<PaginationData<AuthorResponse>> getPagedAuthors(
+	PaginationData<AuthorResponse> getPagedAuthors(
 		@RequestParam("page") int page,
 		@RequestParam("size") int size,
 		@RequestParam(value = "searchKeyword", required = false) String searchKeyword
 	);
 
 	@GetMapping("/{authorId}")
-	JsendResponse<AuthorResponse> getAuthor(
+	AuthorResponse getAuthor(
 		@PathVariable Long authorId
 	);
 
 	@PostMapping
-	JsendResponse<Void> addAuthor(
+	void addAuthor(
 		@RequestBody AuthorRegisterRequest request
 	);
 
 	@PutMapping("/{authorId}")
-	JsendResponse<Void> updateAuthor(
+	void updateAuthor(
 		@PathVariable("authorId") Long authorId,
 		@RequestBody AuthorUpdateRequest AuthorUpdateRequest
 	);
 
 	@DeleteMapping("/{authorId}")
-	JsendResponse<Void> deleteAuthor(
+	void deleteAuthor(
 		@PathVariable("authorId") Long authorId
 	);
 

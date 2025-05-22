@@ -13,6 +13,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Value;
+import shop.bluebooktle.common.dto.book.BookSaleInfoState;
 
 @Getter
 @Value
@@ -47,7 +48,7 @@ public class BookAllRegisterRequest {
 	Boolean isPackable;
 
 	@NotBlank(message = "판매상태는 필수 값입니다.")
-	String state;
+	BookSaleInfoState state;
 
 	@NotEmpty(message = "작가는 최소 1개 이상 필요합니다.")
 	List<@Positive(message = "작가 ID는 양수값이어야 합니다.") Long> authorIdList;
