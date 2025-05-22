@@ -5,18 +5,18 @@ import shop.bluebooktle.common.exception.ErrorCode;
 
 public class PublisherUpdateException extends ApplicationException {
 	public PublisherUpdateException() {
-		super(ErrorCode.TAG_UPDATE_FAILED);
+		super(ErrorCode.PUBLISHER_UPDATE_FAILED);
 	}
 
 	public PublisherUpdateException(String message) {
-		super(ErrorCode.TAG_UPDATE_FAILED, ErrorCode.TAG_UPDATE_FAILED.getMessage() + message);
+		super(ErrorCode.PUBLISHER_UPDATE_FAILED, ErrorCode.PUBLISHER_UPDATE_FAILED.getMessage() + message);
 	}
 
 	public PublisherUpdateException(Throwable cause) {
-		super(ErrorCode.TAG_UPDATE_FAILED, cause);
+		super(ErrorCode.PUBLISHER_UPDATE_FAILED, cause);
 	}
 
 	public PublisherUpdateException(String message, Throwable cause) {
-		super(ErrorCode.TAG_UPDATE_FAILED, message, cause);
+		super(ErrorCode.PUBLISHER_UPDATE_FAILED, message, cause);
 	}
 }

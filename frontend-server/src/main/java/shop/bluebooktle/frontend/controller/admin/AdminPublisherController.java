@@ -1,5 +1,7 @@
 package shop.bluebooktle.frontend.controller.admin;
 
+import java.time.LocalDateTime;
+
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -62,7 +64,7 @@ public class AdminPublisherController {
 			pageTitle = "출판사 수정 (ID: " + publisherId + ")";
 		} else {
 			pageTitle = "새 출판사 등록";
-			publisher = new PublisherInfoResponse(null, "");
+			publisher = new PublisherInfoResponse(null, "", LocalDateTime.now());
 		}
 		model.addAttribute("pageTitle", pageTitle);
 		model.addAttribute("publisher", publisher);

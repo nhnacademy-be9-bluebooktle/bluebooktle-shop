@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.common.dto.book.request.TagRequest;
 import shop.bluebooktle.common.dto.book.response.TagInfoResponse;
-import shop.bluebooktle.common.dto.common.JsendResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
 import shop.bluebooktle.common.exception.book.TagCreateException;
 import shop.bluebooktle.common.exception.book.TagDeleteException;
@@ -35,47 +34,48 @@ public class AdminTagServiceImpl implements AdminTagService {
 			keyword = searchKeyword;
 		}
 
-		JsendResponse<PaginationData<TagInfoResponse>> response = tagRepository.getTags(page, size, keyword);
-
-		if (!"success".equalsIgnoreCase(response.status())) { // JSend 상태가 success 가 아니면 태그 목록 조회 예외를 던짐
+		try {
+			PaginationData<TagInfoResponse> data = tagRepository.getTags(page, size, keyword);
+			List<TagInfoResponse> tags = data.getContent();
+			return new PageImpl<>(tags, pageable, data.getTotalElements());
+		} catch (Exception e) {
 			throw new TagListFetchException();
 		}
-		// Feign 으로 받은 JSend 형태의 페이징 응답 -> Spring Data Page<T> 객체로 변환해 주는 작업
-		PaginationData<TagInfoResponse> data = response.data(); // 페이징된 태그 목록과 객체 꺼냄
-		List<TagInfoResponse> tags = data.getContent();
-		return new PageImpl<>(tags, pageable, data.getTotalElements());
 	}
 
 	@Override
 	public TagInfoResponse getTag(Long id) {
-		JsendResponse<TagInfoResponse> response = tagRepository.getTag(id);
-		if (!"success".equalsIgnoreCase(response.status())) {
+		try {
+			return tagRepository.getTag(id);
+		} catch (Exception e) {
 			throw new TagNotFoundException();
 		}
-		return response.data();
 	}
 
 	@Override
 	public void createTag(TagRequest request) {
-		JsendResponse<Void> response = tagRepository.createTag(request);
-		if (!"success".equalsIgnoreCase(response.status())) { // JSend 상태가 success 가 아니면 예외를 던짐
-			throw new TagCreateException();
+		try {
+			tagRepository.createTag(request);
+		} catch (Exception e) {
+			throw new TagCreateException(e);
 		}
 	}
 
 	@Override
 	public void updateTag(Long id, TagRequest request) {
-		JsendResponse<Void> response = tagRepository.updateTag(id, request);
-		if (!"success".equalsIgnoreCase(response.status())) { // JSend 상태가 success 가 아니면 예외를 던짐
+		try {
+			tagRepository.updateTag(id, request); // 실제 데이터 수정 (name만 수정)
+		} catch (Exception e) {
 			throw new TagUpdateException();
 		}
 	}
 
 	@Override
 	public void deleteTag(Long id) {
-		JsendResponse<Void> response = tagRepository.deleteTag(id);
-		if (!"success".equalsIgnoreCase(response.status())) { // JSend 상태가 success 가 아니면 예외를 던짐
-			throw new TagDeleteException();
+		try {
+			tagRepository.deleteTag(id);
+		} catch (Exception e) {
+			throw new TagDeleteException(e);
 		}
 	}
 }

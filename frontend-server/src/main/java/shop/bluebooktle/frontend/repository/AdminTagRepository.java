@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import shop.bluebooktle.common.dto.book.request.TagRequest;
 import shop.bluebooktle.common.dto.book.response.TagInfoResponse;
-import shop.bluebooktle.common.dto.common.JsendResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
 import shop.bluebooktle.frontend.config.FeignGlobalConfig;
 
@@ -20,7 +19,7 @@ import shop.bluebooktle.frontend.config.FeignGlobalConfig;
 public interface AdminTagRepository {
 	// 태그 전체 조회
 	@GetMapping
-	JsendResponse<PaginationData<TagInfoResponse>> getTags(
+	PaginationData<TagInfoResponse> getTags(
 		@RequestParam("page") int page,    // 페이지 번호
 		@RequestParam("size") int size,    // 페이지 당 아이템 수
 		@RequestParam(value = "searchKeyword", required = false) String searchKeyword // 검색 키워드 (옵션)
@@ -28,20 +27,20 @@ public interface AdminTagRepository {
 
 	// 단일 태그 조회
 	@GetMapping("/{tagId}")
-	JsendResponse<TagInfoResponse> getTag(@PathVariable("tagId") Long id);
+	TagInfoResponse getTag(@PathVariable("tagId") Long id);
 
 	// 태그 등록
 	@PostMapping
-	JsendResponse<Void> createTag(@RequestBody TagRequest request);
+	void createTag(@RequestBody TagRequest request);
 
 	// 태그 수정 (태그명 수정)
 	@PutMapping("/{tagId}")
-	JsendResponse<Void> updateTag(
+	void updateTag(
 		@PathVariable("tagId") Long id,
 		@RequestBody TagRequest request
 	);
 
 	// 태그 삭제
 	@DeleteMapping("/{tagId}")
-	JsendResponse<Void> deleteTag(@PathVariable("tagId") Long id);
+	void deleteTag(@PathVariable("tagId") Long id);
 }

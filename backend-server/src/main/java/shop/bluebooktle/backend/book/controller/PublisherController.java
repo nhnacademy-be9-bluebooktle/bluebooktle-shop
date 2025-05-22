@@ -19,8 +19,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import shop.bluebooktle.backend.book.service.PublisherService;
-import shop.bluebooktle.common.annotation.Auth;
-import shop.bluebooktle.common.domain.auth.UserType;
 import shop.bluebooktle.common.dto.book.request.PublisherRequest;
 import shop.bluebooktle.common.dto.book.response.PublisherInfoResponse;
 import shop.bluebooktle.common.dto.common.JsendResponse;
@@ -42,7 +40,7 @@ public class PublisherController {
 	}
 
 	// 출판사명 수정
-	@Auth(type = UserType.ADMIN)
+	// @Auth(type = UserType.ADMIN)
 	@PutMapping("/{publisherId}")
 	public ResponseEntity<JsendResponse<Void>> updatePublisher(
 		@PathVariable Long publisherId,

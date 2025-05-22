@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import shop.bluebooktle.common.dto.book.request.PublisherRequest;
 import shop.bluebooktle.common.dto.book.response.PublisherInfoResponse;
-import shop.bluebooktle.common.dto.common.JsendResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
 import shop.bluebooktle.frontend.config.FeignGlobalConfig;
 
@@ -19,7 +18,7 @@ import shop.bluebooktle.frontend.config.FeignGlobalConfig;
 public interface AdminPublisherRepository {
 	// 출판사 조회
 	@GetMapping
-	JsendResponse<PaginationData<PublisherInfoResponse>> getPublishers(
+	PaginationData<PublisherInfoResponse> getPublishers(
 		@RequestParam("page") int page,
 		@RequestParam("size") int size,
 		@RequestParam(value = "searchKeyword", required = false) String searchKeyword
@@ -27,21 +26,21 @@ public interface AdminPublisherRepository {
 
 	// 출판사ID로 단일 조회
 	@GetMapping("/{publisherId}")
-	JsendResponse<PublisherInfoResponse> getPublisher(@PathVariable("publisherId") Long id);
+	PublisherInfoResponse getPublisher(@PathVariable("publisherId") Long id);
 
 	// 출판사 등록
 	@PostMapping
-	JsendResponse<Void> createPublisher(@RequestBody PublisherRequest request);
+	void createPublisher(@RequestBody PublisherRequest request);
 
 	// 출판사명 수정
 	@PutMapping("/{publisherId}")
-	JsendResponse<Void> updatePublisher(
+	void updatePublisher(
 		@PathVariable("publisherId") Long id,
 		@RequestBody PublisherRequest request
 	);
 
 	// 출판사 삭제
 	@DeleteMapping("/{publisherId}")
-	JsendResponse<Void> deletePublisher(@PathVariable("publisherId") Long id);
+	void deletePublisher(@PathVariable("publisherId") Long id);
 }
 

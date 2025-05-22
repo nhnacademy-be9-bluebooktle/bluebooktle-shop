@@ -54,14 +54,14 @@ public class PublisherServiceImpl implements PublisherService {
 		Publisher publisher = publisherRepository.findById(publisherId)
 			.orElseThrow(() -> new PublisherNotFoundException(publisherId));
 
-		return new PublisherInfoResponse(publisher.getId(), publisher.getName());
+		return new PublisherInfoResponse(publisher.getId(), publisher.getName(), publisher.getCreatedAt());
 	}
 
 	@Override
 	@Transactional(readOnly = true)
 	public Page<PublisherInfoResponse> getPublishers(Pageable pageable) {
 		Page<Publisher> publisherPage = publisherRepository.findAll(pageable);
-		return publisherPage.map(p -> new PublisherInfoResponse(p.getId(), p.getName()));
+		return publisherPage.map(p -> new PublisherInfoResponse(p.getId(), p.getName(), p.getCreatedAt()));
 	}
 
 	@Override
@@ -83,12 +83,13 @@ public class PublisherServiceImpl implements PublisherService {
 					.name(publisherName)
 					.build()
 			));
-		return new PublisherInfoResponse(publisher.getId(), publisher.getName());
+		return new PublisherInfoResponse(publisher.getId(), publisher.getName(), publisher.getCreatedAt());
 	}
 
 	@Override
 	public Page<PublisherInfoResponse> searchPublishers(String searchKeyword, Pageable pageable) {
 		Page<Publisher> publishers = publisherRepository.searchByNameContaining(searchKeyword, pageable);
-		return publishers.map(publisher -> new PublisherInfoResponse(publisher.getId(), publisher.getName()));
+		return publishers.map(
+			publisher -> new PublisherInfoResponse(publisher.getId(), publisher.getName(), publisher.getCreatedAt()));
 	}
 }

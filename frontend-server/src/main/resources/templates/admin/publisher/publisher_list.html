@@ -51,7 +51,9 @@
                 <tr th:each="publisher : ${publishers}">
                     <td th:text="${publisher.id}">1</td>
                     <td th:text="${publisher.name}">블루출판사</td>
-                    <td th:text="${#temporals.format(publisher.createdAt, 'yyyy-MM-dd HH:mm')}">2025-04-19 10:00</td>
+                    <td th:text="${publisher.createdAt != null ? #temporals.format(publisher.createdAt, 'yyyy-MM-dd HH:mm') : '-'}">
+                        2025-05-14 10:00
+                    </td>
                     <td class="category-actions">
                         <a th:href="@{/admin/publishers/{id}/edit(id=${publisher.id})}"
                            class="admin-btn admin-btn--sm admin-btn--outline-primary" title="수정">
