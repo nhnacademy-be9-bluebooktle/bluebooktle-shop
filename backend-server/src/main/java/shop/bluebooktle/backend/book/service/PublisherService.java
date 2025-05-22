@@ -20,9 +20,11 @@ public interface PublisherService {
 	// 출판사 목록 조회
 	Page<PublisherInfoResponse> getPublishers(Pageable pageable);
 
+	// 태그 키워드 조회
+	Page<PublisherInfoResponse> searchPublishers(String searchKeyword, Pageable pageable);
+
 	// 출판사 삭제
 	void deletePublisher(Long publisherId);
 
 	PublisherInfoResponse registerPublisherByName(String publisherName);
-
 }

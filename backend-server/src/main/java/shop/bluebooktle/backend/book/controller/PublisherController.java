@@ -12,14 +12,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import shop.bluebooktle.backend.book.service.PublisherService;
-import shop.bluebooktle.common.annotation.Auth;
-import shop.bluebooktle.common.domain.auth.UserType;
 import shop.bluebooktle.common.dto.book.request.PublisherRequest;
 import shop.bluebooktle.common.dto.book.response.PublisherInfoResponse;
 import shop.bluebooktle.common.dto.common.JsendResponse;
@@ -41,7 +40,7 @@ public class PublisherController {
 	}
 
 	// 출판사명 수정
-	@Auth(type = UserType.ADMIN)
+	// @Auth(type = UserType.ADMIN)
 	@PutMapping("/{publisherId}")
 	public ResponseEntity<JsendResponse<Void>> updatePublisher(
 		@PathVariable Long publisherId,
@@ -68,9 +67,16 @@ public class PublisherController {
 	// 출판사 목록 조회
 	@GetMapping
 	public ResponseEntity<JsendResponse<PaginationData<PublisherInfoResponse>>> getPublishers(
-		@PageableDefault(size = 10, sort = "id") Pageable pageable
-	) {
-		Page<PublisherInfoResponse> publisherPage = publisherService.getPublishers(pageable);
+		@PageableDefault(size = 10, sort = "id") Pageable pageable,
+		@RequestParam(value = "searchKeyword", required = false) String searchKeyword) {
+
+		Page<PublisherInfoResponse> publisherPage;
+
+		if (searchKeyword != null && !searchKeyword.isBlank()) {
+			publisherPage = publisherService.searchPublishers(searchKeyword, pageable);
+		} else {
+			publisherPage = publisherService.getPublishers(pageable);
+		}
 		PaginationData<PublisherInfoResponse> paginationData = new PaginationData<>(publisherPage);
 		return ResponseEntity.ok(JsendResponse.success(paginationData));
 	}

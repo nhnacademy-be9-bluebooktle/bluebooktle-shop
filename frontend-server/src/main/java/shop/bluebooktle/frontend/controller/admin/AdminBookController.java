@@ -266,9 +266,9 @@ public class AdminBookController {
 
 		// AdminPublisherController.PublisherDto 생성자 시그니처 확인 필요
 		// 예시: public PublisherDto(Long id, String name, LocalDateTime createdAt, LocalDateTime deletedAt)
-		model.addAttribute("allPublishers", Arrays.asList(
-			new AdminPublisherController.PublisherDto(1L, "위키북스", LocalDateTime.now().minusMonths(2), null)
-		));
+		// model.addAttribute("allPublishers", Arrays.asList(
+		// 	new AdminPublisherController.PublisherDto(1L, "위키북스", LocalDateTime.now().minusMonths(2), null)
+		// ));
 		model.addAttribute("saleStateOptions", Arrays.asList("AVAILABLE", "LOW_STOCK", "SALE_ENDED", "DELETED"));
 
 		return "admin/book/book_form";

@@ -43,37 +43,28 @@
                     <th>ID</th>
                     <th>태그명</th>
                     <th>등록일</th>
-                    <th>상태</th>
-                    <th>작업</th>
+                    <th>수정</th>
+                    <th>삭제</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr th:each="tag : ${tags}">
                     <td th:text="${tag.id}">1</td>
                     <td th:text="${tag.name}">스프링부트</td>
-                    <td th:text="${#temporals.format(tag.createdAt, 'yyyy-MM-dd HH:mm')}">2025-05-14 10:00</td>
-                    <td>
-                        <span th:if="${tag.deletedAt == null}" class="badge badge-success"
-                              style="color: green;">활성</span>
-                        <span th:unless="${tag.deletedAt == null}" class="badge badge-danger"
-                              style="color: red;">비활성</span>
+                    <td th:text="${tag.createdAt != null ? #temporals.format(tag.createdAt, 'yyyy-MM-dd HH:mm') : '-'}">
+                        2025-05-14 10:00
                     </td>
                     <td class="category-actions">
                         <a th:href="@{/admin/tags/{id}/edit(id=${tag.id})}"
                            class="admin-btn admin-btn--sm admin-btn--outline-primary" title="수정">
                             <i class="fas fa-edit"></i>
                         </a>
-                        <form th:if="${tag.deletedAt == null}" th:action="@{/admin/tags/{id}/delete(id=${tag.id})}"
-                              method="post" style="display: inline;" onsubmit="return confirm('이 태그를 비활성화 하시겠습니까?');">
-                            <button type="submit" class="admin-btn admin-btn--sm admin-btn--danger" title="비활성화">
-                                <i class="fas fa-toggle-off"></i>
-                            </button>
-                        </form>
-                        <form th:unless="${tag.deletedAt == null}"
-                              th:action="@{/admin/tags/{id}/activate(id=${tag.id})}" method="post"
-                              style="display: inline;" onsubmit="return confirm('이 태그를 다시 활성화 하시겠습니까?');">
-                            <button type="submit" class="admin-btn admin-btn--sm admin-btn--success" title="활성화">
-                                <i class="fas fa-toggle-on"></i>
+                    </td>
+                    <td>
+                        <form th:action="@{/admin/tags/{id}/delete(id=${tag.id})}" method="post"
+                              style="display: inline;" onsubmit="return confirm('정말 삭제하시겠습니까?');">
+                            <button type="submit" class="admin-btn admin-btn--sm admin-btn--danger" title="삭제">
+                                <i class="fas fa-trash"></i>
                             </button>
                         </form>
                     </td>
@@ -83,6 +74,12 @@
                 </tr>
                 </tbody>
             </table>
+            <div th:if="${totalPages != null and totalPages > 0}" class="pagination-container">
+                <th:block th:replace="~{_fragments/admin_pagination :: commonPagination(
+                            currentPage=${currentPage+ 1}, totalPages=${totalPages},
+                            baseUrl=${baseUrlWithParams},
+                            searchKeyword=${searchKeyword} )}"></th:block>
+            </div>
         </div>
     </div>
 </div>

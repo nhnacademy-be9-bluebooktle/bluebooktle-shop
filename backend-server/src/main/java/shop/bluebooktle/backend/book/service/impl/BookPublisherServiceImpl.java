@@ -72,7 +72,8 @@ public class BookPublisherServiceImpl implements BookPublisherService {
 		return publisherListByBook.stream()
 			.map(p -> new PublisherInfoResponse(
 				p.getPublisher().getId(),
-				p.getPublisher().getName()))
+				p.getPublisher().getName(),
+				p.getPublisher().getCreatedAt()))
 			.toList();
 	}
 
