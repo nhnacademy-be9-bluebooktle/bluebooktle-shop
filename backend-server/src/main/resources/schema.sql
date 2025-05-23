@@ -1,5 +1,5 @@
 CREATE TABLE `publisher` (
-	`publisher_id`	bigint	NOT NULL,
+	`publisher_id`	bigint	NOT NULL AUTO_INCREMENT,
 	`name`	varchar(20)	NOT NULL,
 	`created_at`	timestamp	NOT NULL	DEFAULT CURRENT_TIMESTAMP,
 	`deleted_at`	timestamp	NULL,
@@ -8,7 +8,7 @@ CREATE TABLE `publisher` (
 );
 
 CREATE TABLE `author` (
-	`author_id`	bigint	NOT NULL,
+	`author_id`	bigint	NOT NULL AUTO_INCREMENT,
 	`name`	varchar(10)	NOT NULL,
 	`created_at`	timestamp	NOT NULL	DEFAULT CURRENT_TIMESTAMP,
 	`deleted_at`	timestamp	NULL,
@@ -17,7 +17,7 @@ CREATE TABLE `author` (
 );
 
 CREATE TABLE `tag` (
-	`tag_id`	bigint	NOT NULL,
+	`tag_id`	bigint	NOT NULL AUTO_INCREMENT,
 	`name`	varchar(20)	NOT NULL,
 	`created_at`	timestamp	NOT NULL	DEFAULT CURRENT_TIMESTAMP,
 	`deleted_at`	timestamp	NULL,
@@ -26,7 +26,7 @@ CREATE TABLE `tag` (
 );
 
 CREATE TABLE `delivery_rule` (
-	`delivery_rule_id`	bigint	NOT NULL,
+	`delivery_rule_id`	bigint	NOT NULL AUTO_INCREMENT,
 	`name`	varchar(50)	NOT NULL,
 	`price`	decimal(10,2)	NOT NULL,
 	`delivery_fee`	decimal(10,2)	NOT NULL,
@@ -37,7 +37,7 @@ CREATE TABLE `delivery_rule` (
 );
 
 CREATE TABLE `payment_type` (
-	`payment_type_id`	bigint	NOT NULL,
+	`payment_type_id`	bigint	NOT NULL AUTO_INCREMENT,
 	`method`	varchar(50)	NOT NULL,
 	`created_at`	timestamp	NOT NULL	DEFAULT CURRENT_TIMESTAMP,
 	`deleted_at`	timestamp	NULL,
@@ -46,7 +46,7 @@ CREATE TABLE `payment_type` (
 );
 
 CREATE TABLE `book` (
-	`book_id`	bigint	NOT NULL,
+	`book_id`	bigint	NOT NULL AUTO_INCREMENT,
 	`title`	varchar(255)	NOT NULL,
 	`index`	text	NULL,
 	`description`	text	NOT NULL,
@@ -59,7 +59,7 @@ CREATE TABLE `book` (
 );
 
 CREATE TABLE `coupon_type` (
-	`coupon_type_id`	bigint	NOT NULL,
+	`coupon_type_id`	bigint	NOT NULL AUTO_INCREMENT,
 	`name`	varchar(100)	NOT NULL	COMMENT '구분자',
 	`target`	ENUM('ORDER', 'BOOK')	NOT NULL,
 	`minimum_payment`	decimal(10,2)	NOT NULL,
@@ -70,7 +70,7 @@ CREATE TABLE `coupon_type` (
 );
 
 CREATE TABLE `membership_level` (
-	`membership_id`	bigint	NOT NULL,
+	`membership_id`	bigint	NOT NULL AUTO_INCREMENT,
 	`name`	varchar(10)	NOT NULL,
 	`rate`	int	NOT NULL,
 	`min_net_spent`	decimal(10,2)	NOT NULL,
@@ -82,7 +82,7 @@ CREATE TABLE `membership_level` (
 );
 
 CREATE TABLE `category` (
-	`category_id`	bigint	NOT NULL,
+	`category_id`	bigint	NOT NULL AUTO_INCREMENT,
 	`parent_category_id`	bigint	NULL,
 	`name`	varchar(50)	NOT NULL,
 	`created_at`	timestamp	NOT NULL	DEFAULT CURRENT_TIMESTAMP,
@@ -95,7 +95,7 @@ CREATE TABLE `category` (
 );
 
 CREATE TABLE `order_state` (
-	`order_state_id`	bigint	NOT NULL,
+	`order_state_id`	bigint	NOT NULL AUTO_INCREMENT,
 	`state`	ENUM('PENDING', 'SHIPPING', 'COMPLETED', 'RETURNED', 'CANCELED')
 		NOT NULL	COMMENT '대기,배송중,완료,반품,주문취소',
 	`created_at`	timestamp	NOT NULL	DEFAULT CURRENT_TIMESTAMP,
@@ -105,7 +105,7 @@ CREATE TABLE `order_state` (
 );
 
 CREATE TABLE `point_source_type` (
-	`point_type_id`	bigint	NOT NULL,
+	`point_type_id`	bigint	NOT NULL AUTO_INCREMENT,
 	`action_type`	ENUM('USE', 'EARN')	NOT NULL,
 	`source_type`	varchar(50)	NOT NULL	COMMENT '로그인 적립, 회원가입 적립, 리뷰 적립 등 : 결제 사용',
 	`created_at`	timestamp	NOT NULL	DEFAULT CURRENT_TIMESTAMP,
@@ -115,7 +115,7 @@ CREATE TABLE `point_source_type` (
 );
 
 CREATE TABLE `img` (
-	`img_id`	bigint	NOT NULL,
+	`img_id`	bigint	NOT NULL AUTO_INCREMENT,
 	`img_url`	varchar(255)	NOT NULL,
 	`created_at`	timestamp	NOT NULL	DEFAULT CURRENT_TIMESTAMP,
 	`deleted_at`	timestamp	NULL,
@@ -124,7 +124,7 @@ CREATE TABLE `img` (
 );
 
 CREATE TABLE `packaging_option` (
-	`package_id`	bigint	NOT NULL,
+	`package_id`	bigint	NOT NULL AUTO_INCREMENT,
 	`name`	varchar(20)	NOT NULL,
 	`price`	decimal(10,2)	NOT NULL,
 	`created_at`	timestamp	NOT NULL	DEFAULT CURRENT_TIMESTAMP,
@@ -134,7 +134,7 @@ CREATE TABLE `packaging_option` (
 );
 
 CREATE TABLE `payment_detail` (
-	`payment_detail_id`	bigint	NOT NULL,
+	`payment_detail_id`	bigint	NOT NULL AUTO_INCREMENT,
 	`payment_type_id`	bigint	NOT NULL,
 	`key`	varchar(255)	NULL,
 	`created_at`	timestamp	NOT NULL	DEFAULT CURRENT_TIMESTAMP,
@@ -147,7 +147,7 @@ CREATE TABLE `payment_detail` (
 );
 
 CREATE TABLE `book_author` (
-	`book_author_id`	bigint	NOT NULL,
+	`book_author_id`	bigint	NOT NULL AUTO_INCREMENT,
 	`author_id`	bigint	NOT NULL,
 	`book_id`	bigint	NOT NULL,
 
@@ -161,7 +161,7 @@ CREATE TABLE `book_author` (
 );
 
 CREATE TABLE `book_sale_info` (
-	`book_sale_info_id`	bigint	NOT NULL,
+	`book_sale_info_id`	bigint	NOT NULL AUTO_INCREMENT,
 	`book_id`	bigint	NOT NULL,
 	`price`	decimal(10,2)	NOT NULL,
 	`sale_price`	decimal(10,2)	NOT NULL,
@@ -181,7 +181,7 @@ CREATE TABLE `book_sale_info` (
 );
 
 CREATE TABLE `book_publisher` (
-	`book_publisher_id`	bigint	NOT NULL,
+	`book_publisher_id`	bigint	NOT NULL AUTO_INCREMENT,
 	`book_id`	bigint	NOT NULL,
 	`publisher_id`	bigint	NOT NULL,
 
@@ -195,7 +195,7 @@ CREATE TABLE `book_publisher` (
 );
 
 CREATE TABLE `book_tag` (
-	`book_tag_id`	bigint	NOT NULL,
+	`book_tag_id`	bigint	NOT NULL AUTO_INCREMENT,
 	`tag_id`	bigint	NOT NULL,
 	`book_id`	bigint	NOT NULL,
 
@@ -234,7 +234,7 @@ CREATE TABLE `relative_coupon` (
 );
 
 CREATE TABLE `coupon` (
-	`coupon_id`	bigint	NOT NULL,
+	`coupon_id`	bigint	NOT NULL AUTO_INCREMENT,
 	`coupon_type_id`	bigint	NOT NULL,
 	`name`	varchar(100)	NOT NULL,
 	`available_start_at`	timestamp	NOT NULL,
@@ -249,7 +249,7 @@ CREATE TABLE `coupon` (
 );
 
 CREATE TABLE `users` (
-	`user_id`	bigint	NOT NULL,
+	`user_id`	bigint	NOT NULL AUTO_INCREMENT,
 	`membership_id`	bigint	NOT NULL,
 	`login_id`	varchar(50)	NOT NULL,
 	`password`	varchar(255)	NOT NULL,
@@ -271,7 +271,7 @@ CREATE TABLE `users` (
 );
 
 CREATE TABLE `book_category` (
-	`book_category_id`	bigint	NOT NULL,
+	`book_category_id`	bigint	NOT NULL AUTO_INCREMENT,
 	`book_id`	bigint	NOT NULL,
 	`category_id`	bigint	NOT NULL,
 
@@ -286,7 +286,7 @@ CREATE TABLE `book_category` (
 );
 
 CREATE TABLE `book_img` (
-	`book_img_id`	bigint	NOT NULL,
+	`book_img_id`	bigint	NOT NULL AUTO_INCREMENT,
 	`book_id`	bigint	NOT NULL,
 	`img_id`	bigint	NOT NULL,
 	`is_thumbnail`	boolean	NOT NULL,
@@ -331,7 +331,7 @@ CREATE TABLE `category_coupon` (
 );
 
 CREATE TABLE `user_coupon` (
-	`user_coupon_id`	bigint	NOT NULL,
+	`user_coupon_id`	bigint	NOT NULL AUTO_INCREMENT,
 	`coupon_id`	bigint	NOT NULL,
 	`created_at`	timestamp	NOT NULL	DEFAULT CURRENT_TIMESTAMP,
 	`used_at`	timestamp	NULL,
@@ -348,7 +348,7 @@ CREATE TABLE `user_coupon` (
 );
 
 CREATE TABLE `point_history` (
-	`point_id`	bigint	NOT NULL,
+	`point_id`	bigint	NOT NULL AUTO_INCREMENT,
 	`point_type_id`	bigint	NOT NULL,
 	`user_id`	bigint	NOT NULL,
 	`value`	decimal(10,2)	NOT NULL,
@@ -365,7 +365,7 @@ CREATE TABLE `point_history` (
 );
 
 CREATE TABLE `address` (
-	`address_id`	bigint	NOT NULL,
+	`address_id`	bigint	NOT NULL AUTO_INCREMENT,
 	`user_id`	bigint	NOT NULL,
 	`alias`	varchar(50)	NOT NULL,
 	`road_address`	varchar(255)	NOT NULL,
@@ -394,7 +394,7 @@ CREATE TABLE `book_likes` (
 );
 
 CREATE TABLE `cart` (
-	`cart_id`	bigint	NOT NULL,
+	`cart_id`	bigint	NOT NULL AUTO_INCREMENT,
 	`user_id`	bigint	NOT NULL,
 	`created_at`	timestamp	NOT NULL	DEFAULT CURRENT_TIMESTAMP,
 	`deleted_at`	timestamp	NULL,
@@ -406,7 +406,7 @@ CREATE TABLE `cart` (
 );
 
 CREATE TABLE `orders` (
-	`order_id`	bigint	NOT NULL,
+	`order_id`	bigint	NOT NULL AUTO_INCREMENT,
 	`order_state_id`	bigint	NOT NULL,
 	`delivery_rule_id`	bigint	NOT NULL,
 	`user_id`	bigint	NULL,
@@ -438,7 +438,7 @@ CREATE TABLE `orders` (
 );
 
 CREATE TABLE `cart_book` (
-	`cart_book_id`	bigint	NOT NULL,
+	`cart_book_id`	bigint	NOT NULL AUTO_INCREMENT,
 	`book_id`	bigint	NOT NULL,
 	`cart_id`	bigint	NOT NULL,
 	`quantity`	int	NULL,
@@ -455,7 +455,7 @@ CREATE TABLE `cart_book` (
 );
 
 CREATE TABLE `payment` (
-	`payment_id`	bigint	NOT NULL,
+	`payment_id`	bigint	NOT NULL AUTO_INCREMENT,
 	`order_id`	bigint	NOT NULL,
 	`payment_detail_id`	bigint	NOT NULL,
 	`price`	decimal(10,2)	NOT NULL,
@@ -472,7 +472,7 @@ CREATE TABLE `payment` (
 );
 
 CREATE TABLE `book_order` (
-	`book_order_id`	bigint	NOT NULL,
+	`book_order_id`	bigint	NOT NULL AUTO_INCREMENT,
 	`order_id`	bigint	NOT NULL,
 	`book_id`	bigint	NOT NULL,
 	`quantity`	int	NOT NULL,
@@ -490,7 +490,7 @@ CREATE TABLE `book_order` (
 );
 
 CREATE TABLE `refund` (
-	`refund_id`	bigint	NOT NULL,
+	`refund_id`	bigint	NOT NULL AUTO_INCREMENT,
 	`order_id`	bigint	NOT NULL,
 	`date`	datetime	NOT NULL,
 	`reason`	ENUM('CHANGE_OF_MIND', 'DEFECT', 'DAMAGED', 'WRONG_DELIVERY', 'OTHER')	NOT NULL	COMMENT '단순 변심, 결함, 파손, 오배송',
@@ -507,7 +507,7 @@ CREATE TABLE `refund` (
 );
 
 CREATE TABLE `payment_point_history` (
-	`payment_point_history_id`	bigint	NOT NULL,
+	`payment_point_history_id`	bigint	NOT NULL AUTO_INCREMENT,
 	`payment_id`	bigint	NOT NULL,
 	`point_id`	bigint	NOT NULL,
 	`user_id`	bigint	NOT NULL,
@@ -525,7 +525,7 @@ CREATE TABLE `payment_point_history` (
 );
 
 CREATE TABLE `review` (
-	`review_id`	bigint	NOT NULL,
+	`review_id`	bigint	NOT NULL AUTO_INCREMENT,
 	`user_id`	bigint	NOT NULL,
 	`book_order_id`	bigint	NOT NULL,
 	`img_id`	bigint	NULL,
@@ -548,7 +548,7 @@ CREATE TABLE `review` (
 );
 
 CREATE TABLE `user_coupon_book_order` (
-	`user_coupon_book_order_id`	bigint	NOT NULL,
+	`user_coupon_book_order_id`	bigint	NOT NULL AUTO_INCREMENT,
 	`user_coupon_id`	bigint	NOT NULL,
 	`book_order_id`	bigint	NOT NULL,
 	`order_id`	bigint	NOT NULL,
@@ -570,7 +570,7 @@ CREATE TABLE `user_coupon_book_order` (
 );
 
 CREATE TABLE `order_packaging` (
-	`order_packaging_id`	bigint	NOT NULL,
+	`order_packaging_id`	bigint	NOT NULL AUTO_INCREMENT,
 	`package_id`	bigint	NOT NULL,
 	`book_order_id`	bigint	NOT NULL,
 	`quantity`	int	NOT NULL,

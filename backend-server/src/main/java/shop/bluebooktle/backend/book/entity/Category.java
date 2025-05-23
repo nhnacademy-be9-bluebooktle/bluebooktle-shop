@@ -18,6 +18,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -56,6 +57,7 @@ public class Category extends BaseEntity {
 		this.childCategories.add(child);
 	}
 
+	@Builder
 	public Category(Category parentCategory, String name) {
 		this.parentCategory = parentCategory;
 		this.name = name;

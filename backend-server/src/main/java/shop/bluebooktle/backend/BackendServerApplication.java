@@ -15,7 +15,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 	"shop.bluebooktle.backend",
 	"shop.bluebooktle.common.entity"
 })
-
 @EnableJpaAuditing
 public class BackendServerApplication {
 	public static void main(String[] args) {

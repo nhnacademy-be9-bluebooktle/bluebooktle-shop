@@ -1,12 +1,14 @@
 package shop.bluebooktle.backend.book.dto.request;
 
-import shop.bluebooktle.backend.book.entity.Category;
+import org.hibernate.validator.constraints.Length;
 
+import jakarta.validation.constraints.NotBlank;
+import lombok.Builder;
+
+@Builder
 public record CategoryRegisterRequest(
+	@NotBlank @Length(max = 50)
 	String name,
 	Long parentCategoryId
 ) {
-	public Category toEntity(Category parentCategory) {
-		return new Category(parentCategory, this.name);
-	}
 }
