@@ -16,13 +16,12 @@ import shop.bluebooktle.common.exception.payment.PaymentTypeNotFoundException;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional
 public class PaymentTypeServiceImpl implements PaymentTypeService {
 
 	private final PaymentTypeRepository paymentTypeRepository;
 
 	@Override
-	@Transactional
 	public void create(PaymentTypeRequest paymentTypeRequest) {
 		if (paymentTypeRepository.existsByMethod(paymentTypeRequest.method())) {
 			throw new PaymentTypeAlreadyExistException();
@@ -32,10 +31,9 @@ public class PaymentTypeServiceImpl implements PaymentTypeService {
 	}
 
 	@Override
-	@Transactional
 	public void update(Long id, PaymentTypeRequest newPaymentTypeRequest) {
 		PaymentType pt = paymentTypeRepository.findById(id)
-			.orElseThrow(() -> new PaymentTypeNotFoundException());
+			.orElseThrow(PaymentTypeNotFoundException::new);
 
 		if (!pt.getMethod().equals(newPaymentTypeRequest.method())
 			&& paymentTypeRepository.existsByMethod(newPaymentTypeRequest.method())) {
@@ -46,21 +44,22 @@ public class PaymentTypeServiceImpl implements PaymentTypeService {
 	}
 
 	@Override
-	@Transactional
 	public void delete(Long id) {
 		PaymentType pt = paymentTypeRepository.findById(id)
-			.orElseThrow(() -> new PaymentTypeNotFoundException());
+			.orElseThrow(PaymentTypeNotFoundException::new);
 		paymentTypeRepository.delete(pt);
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public PaymentTypeResponse get(PaymentTypeRequest paymentTypeRequest) {
 		PaymentType pt = paymentTypeRepository.findByMethod(paymentTypeRequest.method())
-			.orElseThrow(() -> new PaymentTypeNotFoundException());
+			.orElseThrow(PaymentTypeNotFoundException::new);
 		return PaymentTypeResponse.fromEntity(pt);
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public Page<PaymentTypeResponse> getAll(Pageable pageable) {
 		return paymentTypeRepository.findAll(pageable).map(PaymentTypeResponse::fromEntity);
 	}

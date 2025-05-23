@@ -4,6 +4,8 @@
       xmlns:th="http://www.thymeleaf.org">
 <head>
     <title th:text="${pageTitle} ?: '포인트 정책 설정'"></title>
+
+    <!-- 페이지 전용 CSS -->
     <th:block layout:fragment="page_css">
         <style>
             .policy-section {
@@ -49,10 +51,17 @@
             }
         </style>
     </th:block>
+
+    <!-- Bootstrap 5 CSS -->
+    <link
+            crossorigin="anonymous"
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+            integrity="sha384-ENjdO4Dr2bkBIFxQpeoA6VQbRjYHadPvX8aBkVXnEj5MCGFemxLKGPaXtkKf0Xbg"
+            rel="stylesheet">
 </head>
 <body>
 <div layout:fragment="admin_content">
-    <div class="admin-page-header">
+    <div class="admin-page-header mb-4">
         <h1 class="admin-page-title">
             <i class="fas fa-coins"></i>
             <th:block th:text="${pageTitle} ?: '포인트 정책 설정'"></th:block>
@@ -61,86 +70,100 @@
 
     <div class="admin-panel">
         <div class="admin-panel__body">
-            <form th:action="@{/admin/points/settings}" th:object="${pointSettings}" method="post" class="admin-form">
 
-                <fieldset class="policy-section">
-                    <legend>포인트 적립 규칙</legend>
-                    <div th:each="rule, iterStat : *{earningRules}" class="policy-item">
-                        <input type="hidden" th:name="|earningRules[${iterStat.index}].sourceTypeKey|"
-                               th:value="${rule.sourceTypeKey}"/>
-                        <input type="hidden" th:name="|earningRules[${iterStat.index}].sourceTypeName|"
-                               th:value="${rule.sourceTypeName}"/>
+            <!-- 기존 정책 수정 폼 -->
+            <fieldset class="policy-section">
+                <legend>포인트 적립 규칙</legend>
 
-                        <span class="item-label" th:text="${rule.sourceTypeName}">회원가입 시</span>
+                <div class="policy-item" th:each="rule : ${earningRules}">
+                    <form th:action="@{/admin/points/settings/{id}(id=${rule.pointPolicyId})}"
+                          method="post"
+                          style="display:flex; align-items:center; gap:15px;">
 
-                        <div class="admin-form-group" style="flex-basis: 100px; flex-grow:0;">
-                            <input type="checkbox" th:id="'earningActive_' + ${iterStat.index}"
-                                   th:name="|earningRules[${iterStat.index}].isActive|" th:checked="${rule.isActive}"
-                                   class="admin-form-check-input">
-                            <label th:for="'earningActive_' + ${iterStat.index}"
-                                   class="admin-form-check-label">활성화</label>
-                        </div>
+                        <!-- sourceType, IDs -->
+                        <input type="hidden" name="pointSourceTypeId" th:value="${rule.pointSourceTypeId}"/>
+                        <input type="hidden" name="pointPolicyId"       th:value="${rule.pointPolicyId}"/>
 
-                        <div class="admin-form-group" style="flex-basis: 200px; flex-grow:0;">
-                            <select th:id="'earningType_' + ${iterStat.index}"
-                                    th:name="|earningRules[${iterStat.index}].earningType|"
-                                    class="admin-form-control admin-form-control-sm">
-                                <option th:each="opt : ${earningTypeOptions}" th:value="${opt.value}"
-                                        th:text="${opt.text}" th:selected="${opt.value == rule.earningType}">타입
-                                </option>
-                            </select>
-                        </div>
-                        <div class="admin-form-group">
-                            <input type="number" th:id="'earningValue_' + ${iterStat.index}"
-                                   th:name="|earningRules[${iterStat.index}].earningValue|"
-                                   th:value="${rule.earningValue}" class="admin-form-control admin-form-control-sm"
-                                   step="any" placeholder="값">
-                        </div>
-                    </div>
-                    <div th:if="${#fields.hasErrors('earningRules')}" th:errors="*{earningRules}"
-                         class="invalid-feedback admin-form-text" style="display:block;"></div>
-                </fieldset>
+                        <span class="item-label" th:text="${rule.sourceType}"></span>
+
+                        <!-- 활성화 -->
+                        <input type="checkbox" name="isActive" th:checked="${rule.active}"/>
+
+                        <!-- 정책 유형 -->
+                        <select name="policyType">
+                            <option th:each="opt : ${earningTypeOptions}"
+                                    th:value="${opt.value}"
+                                    th:text="${opt.text}"
+                                    th:selected="${opt.value == rule.policyType}"></option>
+                        </select>
+
+                        <!-- 값 -->
+                        <input type="number" name="value"
+                               step="any"
+                               th:value="${rule.value}"
+                               placeholder="값"/>
+
+                        <!-- 개별 수정 버튼 -->
+                        <button type="submit" class="btn btn-sm btn-primary">
+                            수정
+                        </button>
+                    </form>
+                </div>
+                <a class="btn btn-primary mb-3" th:href="@{/admin/points/settings/new}">
+                    + 새 포인트 규칙 생성
+                </a>
+            </fieldset>
+
+
 
                 <fieldset class="policy-section">
                     <legend>회원 등급별 구매 시 추가 적립률</legend>
-                    <div th:each="rate, iterStat : *{membershipRates}" class="policy-item">
-                        <input type="hidden" th:name="|membershipRates[${iterStat.index}].membershipLevelId|"
-                               th:value="${rate.membershipLevelId}"/>
-                        <input type="hidden" th:name="|membershipRates[${iterStat.index}].membershipLevelName|"
-                               th:value="${rate.membershipLevelName}"/>
-
-                        <span class="item-label" th:text="${rate.membershipLevelName}">BRONZE</span>
-
-                        <div class="admin-form-group" style="flex-basis: 100px; flex-grow:0;">
-                            <input type="checkbox" th:id="'membershipActive_' + ${iterStat.index}"
-                                   th:name="|membershipRates[${iterStat.index}].isActive|" th:checked="${rate.isActive}"
-                                   class="admin-form-check-input">
-                            <label th:for="'membershipActive_' + ${iterStat.index}"
-                                   class="admin-form-check-label">활성화</label>
+                    <div class="policy-item" th:each="rate,iterStat : ${membershipRates}">
+                        <input th:name="|membershipRates[${iterStat.index}].membershipLevelId|"
+                               th:value="${rate.membershipLevelId}"
+                               type="hidden"/>
+                        <input th:name="|membershipRates[${iterStat.index}].pointPolicyId|"
+                               th:value="${rate.pointPolicyId}"
+                               type="hidden"/>
+                        <span class="item-label" th:text="${rate.membershipLevel}"></span>
+                        <div class="admin-form-group" style="flex-basis:100px;flex-grow:0;">
+                            <input class="admin-form-check-input"
+                                   th:checked="${rate.active}"
+                                   th:id="'membershipActive_' + ${iterStat.index}"
+                                   th:name="|membershipRates[${iterStat.index}].active|"
+                                   type="checkbox"/>
+                            <label class="admin-form-check-label"
+                                   th:for="'membershipActive_' + ${iterStat.index}">활성화</label>
                         </div>
-
                         <div class="admin-form-group">
-                            <input type="number" th:id="'additionalRate_' + ${iterStat.index}"
-                                   th:name="|membershipRates[${iterStat.index}].additionalPurchaseRate|"
-                                   th:value="${rate.additionalPurchaseRate}"
-                                   class="admin-form-control admin-form-control-sm" step="0.1" placeholder="추가 적립률">
-                            <span style="margin-left: 5px;">%</span>
+                            <input class="admin-form-control admin-form-control-sm"
+                                   placeholder="추가 적립률"
+                                   step="0.1"
+                                   th:id="'additionalRate_' + ${iterStat.index}"
+                                   th:name="|membershipRates[${iterStat.index}].value|"
+                                   th:value="${rate.value}"
+                                   type="number"/>
+                            <span>%</span>
                         </div>
                     </div>
-                    <div th:if="${#fields.hasErrors('membershipRates')}" th:errors="*{membershipRates}"
-                         class="invalid-feedback admin-form-text" style="display:block;"></div>
                 </fieldset>
 
-                <div class="admin-form-actions" style="margin-top: 20px; text-align: center;">
-                    <button type="submit" class="admin-btn admin-btn--primary admin-btn--lg">
+                <div class="admin-form-actions text-center mb-4">
+                    <button class="admin-btn admin-btn--primary admin-btn--lg" type="submit">
                         <i class="fas fa-save"></i> 포인트 정책 저장
                     </button>
                 </div>
             </form>
+
+
         </div>
     </div>
 </div>
 
-
+<!-- Bootstrap 5 JS Bundle (Popper 포함) -->
+<script
+        crossorigin="anonymous"
+        integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+Y5n1mG1QXnE+Ar5+hR7sF86dIHNS"
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
