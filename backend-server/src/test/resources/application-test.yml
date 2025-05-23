@@ -14,8 +14,3 @@ spring:
   sql:
     init:
       mode: never  # <-- schema.sql 무시 :
-
-jwt:
-  secret: ZAhD+UMfgBr63TxTO6kHWHhLuWT1EBA7XN9yEqN+875Q8BFN7KtMKZsHbNqOx5RZueo1wMlIAZCMrs0VGvQwhRk/npVx2HvjqcimJvLIy48HrKnpH7+5LvxL81D/fjc35nFX9JM3BF8mnbTNsQiqNUV+nW61QxhuRKC0e74t7mk=
-  access-token-validity-seconds: 1800
-  refresh-token-validity-seconds: 3600

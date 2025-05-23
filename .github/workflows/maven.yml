@@ -29,6 +29,7 @@ jobs:
       changed: ${{ steps.list.outputs.changed }}
       pr_base_ref: ${{ steps.pr_info.outputs.base_ref }}
       pr_head_sha: ${{ steps.pr_info.outputs.head_sha }}
+      effective_base_branch: ${{ steps.set_branch.outputs.branch }} # <-- 출력 추가
     steps:
       - name: Get PR info for comment trigger
         id: pr_info
@@ -80,9 +81,22 @@ jobs:
           fi
           echo "changed=${modules[*]}" >> $GITHUB_OUTPUT
 
+      - name: Set Effective Base Branch # <-- 단계 추가
+        id: set_branch
+        run: |
+          if [[ "${{ github.event_name }}" == "push" ]]; then
+            echo "branch=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            echo "branch=${{ github.event.pull_request.base.ref }}" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.event_name }}" == "issue_comment" && "${{ steps.pr_info.outputs.base_ref }}" != "" ]]; then
+            echo "branch=${{ steps.pr_info.outputs.base_ref }}" >> $GITHUB_OUTPUT
+          else
+            echo "branch=" >> $GITHUB_OUTPUT # 기본값 설정 (필요시 조정)
+          fi
+
   build:
     needs: detect_changes
-    if: >
+    if: > # if 조건은 그대로 유지
       needs.detect_changes.outputs.changed != '' &&
       (
         (github.event_name == 'push' && (github.ref_name == 'develop' || github.ref_name == 'master')) ||
@@ -91,8 +105,8 @@ jobs:
       )
     runs-on: ubuntu-latest
     env:
-      EFFECTIVE_BASE_BRANCH: ${{ (github.event_name == 'push' && github.ref_name) || (github.event_name == 'pull_request' && github.event.pull_request.base.ref) || (github.event_name == 'issue_comment' && needs.detect_changes.outputs.pr_base_ref) || '' }}
-    environment: ${{ env.EFFECTIVE_BASE_BRANCH == 'master' && 'prod' || 'dev' }}
+      EFFECTIVE_BASE_BRANCH: ${{ needs.detect_changes.outputs.effective_base_branch }} # <-- needs 컨텍스트 사용
+    environment: ${{ needs.detect_changes.outputs.effective_base_branch == 'master' && 'prod' || 'dev' }} # <-- needs 컨텍스트 사용 (L95)
     steps:
       - uses: actions/checkout@v4
         with:
@@ -104,7 +118,9 @@ jobs:
           cache: maven
       - name: Set Spring Profile Active and Config URI
         run: |
-          echo "SPRING_PROFILES_ACTIVE=${{ env.EFFECTIVE_BASE_BRANCH == 'master' && 'prod' || 'dev' }}" >> $GITHUB_ENV
+          # needs 컨텍스트를 사용하여 'prod' 또는 'dev' 설정
+          PROFILE=${{ needs.detect_changes.outputs.effective_base_branch == 'master' && 'prod' || 'dev' }}
+          echo "SPRING_PROFILES_ACTIVE=$PROFILE" >> $GITHUB_ENV
           echo "CONFIG_SERVER_URI=${{ secrets.CONFIG_SERVER_URI }}" >> $GITHUB_ENV
       - run: |
           MODULE_CSV=$(echo "${{ needs.detect_changes.outputs.changed }}" | sed 's/ /,/g')
@@ -117,7 +133,7 @@ jobs:
 
   deploy:
     needs: [ detect_changes, build ]
-    if: >
+    if: > # if 조건은 그대로 유지
       needs.detect_changes.outputs.changed != '' &&
       (
         (github.event_name == 'push' && (github.ref_name == 'develop' || github.ref_name == 'master')) ||
@@ -126,8 +142,8 @@ jobs:
       )
     runs-on: ubuntu-latest
     env:
-      EFFECTIVE_BASE_BRANCH: ${{ (github.event_name == 'push' && github.ref_name) || (github.event_name == 'pull_request' && github.event.pull_request.base.ref) || (github.event_name == 'issue_comment' && needs.detect_changes.outputs.pr_base_ref) || '' }}
-    environment: ${{ env.EFFECTIVE_BASE_BRANCH == 'master' && 'prod' || 'dev' }}
+      EFFECTIVE_BASE_BRANCH: ${{ needs.detect_changes.outputs.effective_base_branch }} # <-- needs 컨텍스트 사용
+    environment: ${{ needs.detect_changes.outputs.effective_base_branch == 'master' && 'prod' || 'dev' }} # <-- needs 컨텍스트 사용 (L130)
     steps:
       - uses: actions/download-artifact@v4
         with:
@@ -135,7 +151,9 @@ jobs:
           path: downloaded_jars
       - name: Set Spring Profile Active and Config URI
         run: |
-          echo "SPRING_PROFILES_ACTIVE=${{ env.EFFECTIVE_BASE_BRANCH == 'master' && 'prod' || 'dev' }}" >> $GITHUB_ENV
+          # needs 컨텍스트를 사용하여 'prod' 또는 'dev' 설정
+          PROFILE=${{ needs.detect_changes.outputs.effective_base_branch == 'master' && 'prod' || 'dev' }}
+          echo "SPRING_PROFILES_ACTIVE=$PROFILE" >> $GITHUB_ENV
           echo "CONFIG_SERVER_URI=${{ secrets.CONFIG_SERVER_URI }}" >> $GITHUB_ENV
       - run: |
           echo ">>> Deploy modules: ${{ needs.detect_changes.outputs.changed }}"
@@ -147,7 +165,7 @@ jobs:
           password: ${{ secrets.SSH_PASSWORD }}
           port: ${{ secrets.SSH_PORT }}
           source: "downloaded_jars"
-          target: "~/app/${{ env.SPRING_PROFILES_ACTIVE }}/jars/"
+          target: "~/app/${{ env.SPRING_PROFILES_ACTIVE }}/jars/" # env.SPRING_PROFILES_ACTIVE 사용
           strip_components: 1
       - uses: appleboy/ssh-action@master
         with:
@@ -157,10 +175,10 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           script: |
             set -e
-            export SPRING_PROFILES_ACTIVE="${{ env.SPRING_PROFILES_ACTIVE }}"
+            export SPRING_PROFILES_ACTIVE="${{ env.SPRING_PROFILES_ACTIVE }}" # env.SPRING_PROFILES_ACTIVE 사용
             export CONFIG_SERVER_URI="${{ env.CONFIG_SERVER_URI }}"
-            EBB="${{ env.EFFECTIVE_BASE_BRANCH }}"
-
+            EBB="${{ env.EFFECTIVE_BASE_BRANCH }}" # env.EFFECTIVE_BASE_BRANCH 사용
+            
             if [ "$EBB" = "master" ]; then
               S=prod_startup.sh
             else
