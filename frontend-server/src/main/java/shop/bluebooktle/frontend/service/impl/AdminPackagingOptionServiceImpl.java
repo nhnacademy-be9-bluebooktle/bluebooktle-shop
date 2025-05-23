@@ -7,7 +7,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
-import shop.bluebooktle.common.dto.book_order.request.PackagingOptionRequest;
 import shop.bluebooktle.common.dto.book_order.response.PackagingOptionInfoResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
 import shop.bluebooktle.frontend.repository.AdminPackagingOptionRepository;
@@ -16,10 +15,10 @@ import shop.bluebooktle.frontend.service.AdminPackagingOptionService;
 @Service
 @RequiredArgsConstructor
 public class AdminPackagingOptionServiceImpl implements AdminPackagingOptionService {
-	private final AdminPackagingOptionRepository PackagingOptionRepository;
+	private final AdminPackagingOptionRepository packagingOptionRepository;
 
 	@Override
-	public Page<PackagingOptionInfoResponse> getPackingOptions(int page, int size, String searchKeyword) {
+	public Page<PackagingOptionInfoResponse> getPackagingOptions(int page, int size, String searchKeyword) {
 		Pageable pageable = PageRequest.of(page, size);
 
 		String keyword = null;
@@ -27,28 +26,28 @@ public class AdminPackagingOptionServiceImpl implements AdminPackagingOptionServ
 			keyword = searchKeyword;
 		}
 
-		PaginationData<PackagingOptionInfoResponse> data = PackagingOptionRepository.getPackagingOptions(page, size,
+		PaginationData<PackagingOptionInfoResponse> data = packagingOptionRepository.getPackagingOptions(page, size,
 			keyword);
 		return new PageImpl<>(data.getContent(), pageable, data.getTotalElements());
 	}
 
 	@Override
-	public PackagingOptionInfoResponse getPackingOption(Long id) {
-		return null;
+	public PackagingOptionInfoResponse getPackagingOption(Long id) {
+		return packagingOptionRepository.getPackagingOption(id);
 	}
 
 	@Override
 	public void deletePackingOption(Long id) {
-
+		packagingOptionRepository.deletePackagingOption(id);
 	}
 
 	@Override
-	public void updatePackingOption(Long id, PackagingOptionRequest request) {
-
+	public void updatePackingOption(Long id, PackagingOptionInfoResponse request) {
+		packagingOptionRepository.updatePackagingOption(id, request);
 	}
 
 	@Override
-	public void createPackingOption(PackagingOptionRequest request) {
-
+	public void createPackingOption(PackagingOptionInfoResponse request) {
+		packagingOptionRepository.createPackagingOption(request);
 	}
 }

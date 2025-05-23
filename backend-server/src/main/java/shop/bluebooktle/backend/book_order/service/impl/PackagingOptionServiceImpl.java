@@ -32,7 +32,7 @@ public class PackagingOptionServiceImpl implements PackagingOptionService {
 		PackagingOption saved = packagingOptionRepository.save(option);
 
 		return PackagingOptionInfoResponse.builder()
-			.packagingOptionId(saved.getId())
+			.id(saved.getId())
 			.name(saved.getName())
 			.price(saved.getPrice())
 			.build();
@@ -43,7 +43,7 @@ public class PackagingOptionServiceImpl implements PackagingOptionService {
 	public Page<PackagingOptionInfoResponse> getPackagingOption(Pageable pageable) {
 		Page<PackagingOption> page = packagingOptionRepository.findAllByDeletedAtIsNull(pageable);
 		return page.map(o -> PackagingOptionInfoResponse.builder()
-			.packagingOptionId(o.getId())
+			.id(o.getId())
 			.name(o.getName())
 			.price(o.getPrice())
 			.build());
@@ -60,7 +60,7 @@ public class PackagingOptionServiceImpl implements PackagingOptionService {
 		option.setPrice(request.getPrice());
 
 		return PackagingOptionInfoResponse.builder()
-			.packagingOptionId(option.getId())
+			.id(option.getId())
 			.name(option.getName())
 			.price(option.getPrice())
 			.build();

@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import shop.bluebooktle.common.dto.book_order.request.PackagingOptionRequest;
 import shop.bluebooktle.common.dto.book_order.response.PackagingOptionInfoResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
 import shop.bluebooktle.frontend.config.FeignGlobalConfig;
@@ -29,13 +28,13 @@ public interface AdminPackagingOptionRepository {
 
 	// 포장 옵션 등록
 	@PostMapping
-	void createPackagingOption(@RequestBody PackagingOptionRequest request);
+	void createPackagingOption(@RequestBody PackagingOptionInfoResponse request);
 
 	// 포장 옵션 수정
 	@PutMapping("/{packagingOptionId}")
 	void updatePackagingOption(
 		@PathVariable("packagingOptionId") long id,
-		@RequestBody PackagingOptionRequest request);
+		@RequestBody PackagingOptionInfoResponse request);
 
 	// 포장 옵션 삭제
 	@DeleteMapping("/{packagingOptionId}")

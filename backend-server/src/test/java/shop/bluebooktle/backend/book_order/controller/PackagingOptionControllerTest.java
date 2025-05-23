@@ -56,7 +56,7 @@ class PackagingOptionControllerTest {
 			.build();
 
 		PackagingOptionInfoResponse response = PackagingOptionInfoResponse.builder()
-			.packagingOptionId(1L)
+			.id(1L)
 			.name("기본 포장지")
 			.price(BigDecimal.valueOf(1500))
 			.build();
@@ -77,13 +77,13 @@ class PackagingOptionControllerTest {
 	void getPackagingOptions_success() throws Exception {
 		// given
 		PackagingOptionInfoResponse option1 = PackagingOptionInfoResponse.builder()
-			.packagingOptionId(1L)
+			.id(1L)
 			.name("기본 포장지")
 			.price(BigDecimal.valueOf(1000))
 			.build();
 
 		PackagingOptionInfoResponse option2 = PackagingOptionInfoResponse.builder()
-			.packagingOptionId(2L)
+			.id(2L)
 			.name("고급 포장지")
 			.price(BigDecimal.valueOf(3000))
 			.build();

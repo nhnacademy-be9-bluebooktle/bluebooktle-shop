@@ -2,13 +2,19 @@ package shop.bluebooktle.common.dto.book_order.response;
 
 import java.math.BigDecimal;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Value;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
-@Value
+@Getter
+@Setter
 @Builder
+@AllArgsConstructor
+@RequiredArgsConstructor
 public class PackagingOptionInfoResponse {
-	Long packagingOptionId;
+	Long id;
 	String name;
 	BigDecimal price;
 }
