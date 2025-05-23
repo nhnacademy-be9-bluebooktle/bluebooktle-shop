@@ -280,7 +280,13 @@ public class CategoryServiceImpl implements CategoryService {
 	public Page<CategoryResponse> searchCategories(String searchKeyword, Pageable pageable) {
 		Page<Category> categories = categoryRepository.searchByNameContaining(searchKeyword, pageable);
 		return categories.map(
-			c -> new CategoryResponse(c.getId(), c.getName(), c.getParentCategory().getName(), c.getCategoryPath()));
+			c -> new CategoryResponse(
+				c.getId(),
+				c.getName(),
+				c.getParentCategory() != null
+					? c.getParentCategory().getName()
+					: "-",
+				c.getCategoryPath()));
 	}
 
 	private CategoryTreeResponse toTreeDto(Category category) {
