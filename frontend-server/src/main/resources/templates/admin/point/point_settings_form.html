@@ -76,35 +76,35 @@
                 <legend>포인트 적립 규칙</legend>
 
                 <div class="policy-item" th:each="rule : ${earningRules}">
-                    <form th:action="@{/admin/points/settings/{id}(id=${rule.pointPolicyId})}"
-                          method="post"
-                          style="display:flex; align-items:center; gap:15px;">
+                    <form method="post"
+                          style="display:flex; align-items:center; gap:15px;"
+                          th:action="@{/admin/points/settings/{id}(id=${rule.pointPolicyId})}">
 
                         <!-- sourceType, IDs -->
-                        <input type="hidden" name="pointSourceTypeId" th:value="${rule.pointSourceTypeId}"/>
-                        <input type="hidden" name="pointPolicyId"       th:value="${rule.pointPolicyId}"/>
+                        <input name="pointSourceTypeId" th:value="${rule.pointSourceTypeId}" type="hidden"/>
+                        <input name="pointPolicyId" th:value="${rule.pointPolicyId}" type="hidden"/>
 
                         <span class="item-label" th:text="${rule.sourceType}"></span>
 
                         <!-- 활성화 -->
-                        <input type="checkbox" name="isActive" th:checked="${rule.active}"/>
+                        <input name="isActive" th:checked="${rule.active}" type="checkbox"/>
 
                         <!-- 정책 유형 -->
                         <select name="policyType">
                             <option th:each="opt : ${earningTypeOptions}"
-                                    th:value="${opt.value}"
+                                    th:selected="${opt.value == rule.policyType}"
                                     th:text="${opt.text}"
-                                    th:selected="${opt.value == rule.policyType}"></option>
+                                    th:value="${opt.value}"></option>
                         </select>
 
                         <!-- 값 -->
-                        <input type="number" name="value"
+                        <input name="value" placeholder="값"
                                step="any"
                                th:value="${rule.value}"
-                               placeholder="값"/>
+                               type="number"/>
 
                         <!-- 개별 수정 버튼 -->
-                        <button type="submit" class="btn btn-sm btn-primary">
+                        <button class="btn btn-sm btn-primary" type="submit">
                             수정
                         </button>
                     </form>
@@ -115,45 +115,37 @@
             </fieldset>
 
 
-
-                <fieldset class="policy-section">
-                    <legend>회원 등급별 구매 시 추가 적립률</legend>
-                    <div class="policy-item" th:each="rate,iterStat : ${membershipRates}">
-                        <input th:name="|membershipRates[${iterStat.index}].membershipLevelId|"
-                               th:value="${rate.membershipLevelId}"
-                               type="hidden"/>
-                        <input th:name="|membershipRates[${iterStat.index}].pointPolicyId|"
-                               th:value="${rate.pointPolicyId}"
-                               type="hidden"/>
-                        <span class="item-label" th:text="${rate.membershipLevel}"></span>
-                        <div class="admin-form-group" style="flex-basis:100px;flex-grow:0;">
-                            <input class="admin-form-check-input"
-                                   th:checked="${rate.active}"
-                                   th:id="'membershipActive_' + ${iterStat.index}"
-                                   th:name="|membershipRates[${iterStat.index}].active|"
-                                   type="checkbox"/>
-                            <label class="admin-form-check-label"
-                                   th:for="'membershipActive_' + ${iterStat.index}">활성화</label>
-                        </div>
-                        <div class="admin-form-group">
-                            <input class="admin-form-control admin-form-control-sm"
-                                   placeholder="추가 적립률"
-                                   step="0.1"
-                                   th:id="'additionalRate_' + ${iterStat.index}"
-                                   th:name="|membershipRates[${iterStat.index}].value|"
-                                   th:value="${rate.value}"
-                                   type="number"/>
-                            <span>%</span>
-                        </div>
+            <fieldset class="policy-section">
+                <legend>회원 등급별 구매 시 추가 적립률</legend>
+                <div class="policy-item" th:each="rate,iterStat : ${membershipRates}">
+                    <input th:name="|membershipRates[${iterStat.index}].membershipLevelId|"
+                           th:value="${rate.membershipLevelId}"
+                           type="hidden"/>
+                    <input th:name="|membershipRates[${iterStat.index}].pointPolicyId|"
+                           th:value="${rate.pointPolicyId}"
+                           type="hidden"/>
+                    <span class="item-label" th:text="${rate.membershipLevel}"></span>
+                    <div class="admin-form-group" style="flex-basis:100px;flex-grow:0;">
+                        <input class="admin-form-check-input"
+                               th:checked="${rate.active}"
+                               th:id="'membershipActive_' + ${iterStat.index}"
+                               th:name="|membershipRates[${iterStat.index}].active|"
+                               type="checkbox"/>
+                        <label class="admin-form-check-label"
+                               th:for="'membershipActive_' + ${iterStat.index}">활성화</label>
                     </div>
-                </fieldset>
-
-                <div class="admin-form-actions text-center mb-4">
-                    <button class="admin-btn admin-btn--primary admin-btn--lg" type="submit">
-                        <i class="fas fa-save"></i> 포인트 정책 저장
-                    </button>
+                    <div class="admin-form-group">
+                        <input class="admin-form-control admin-form-control-sm"
+                               placeholder="추가 적립률"
+                               step="0.1"
+                               th:id="'additionalRate_' + ${iterStat.index}"
+                               th:name="|membershipRates[${iterStat.index}].value|"
+                               th:value="${rate.value}"
+                               type="number"/>
+                        <span>%</span>
+                    </div>
                 </div>
-            </form>
+            </fieldset>
 
 
         </div>
