@@ -21,7 +21,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import shop.bluebooktle.backend.book_order.service.PackagingOptionService;
 import shop.bluebooktle.common.dto.book_order.request.PackagingOptionRequest;
 import shop.bluebooktle.common.dto.book_order.response.PackagingOptionInfoResponse;
-import shop.bluebooktle.common.service.AuthUserLoader;
 import shop.bluebooktle.common.util.JwtUtil;
 
 @WebMvcTest(PackagingOptionController.class)
@@ -38,9 +37,6 @@ class PackagingOptionControllerTest {
 
 	@MockitoBean
 	private JwtUtil jwtUtil;
-
-	@MockitoBean
-	private AuthUserLoader authUserLoader;
 
 	@Test
 	@DisplayName("포장 옵션 등록 - 성공")
