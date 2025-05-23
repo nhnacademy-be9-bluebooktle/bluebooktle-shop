@@ -124,4 +124,14 @@ public class JwtUtil {
 		}
 	}
 
+	public long getTokenExpiration(String token) {
+		return getClaims(token).getExpiration().getTime();
+	}
+
+	public long getRemainingTimeMillis(String token) {
+		long expirationTimeMillis = getTokenExpiration(token);
+		long currentTimeMillis = System.currentTimeMillis();
+		return expirationTimeMillis - currentTimeMillis;
+	}
+
 }

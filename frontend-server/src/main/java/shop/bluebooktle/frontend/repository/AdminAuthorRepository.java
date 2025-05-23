@@ -13,7 +13,7 @@ import shop.bluebooktle.common.dto.book.request.author.AuthorRegisterRequest;
 import shop.bluebooktle.common.dto.book.request.author.AuthorUpdateRequest;
 import shop.bluebooktle.common.dto.book.response.author.AuthorResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
-import shop.bluebooktle.frontend.config.FeignGlobalConfig;
+import shop.bluebooktle.frontend.config.feign.FeignGlobalConfig;
 
 @FeignClient(name = "backend-server", contextId = "authorRepository", path = "/api/authors", configuration = FeignGlobalConfig.class)
 public interface AdminAuthorRepository {

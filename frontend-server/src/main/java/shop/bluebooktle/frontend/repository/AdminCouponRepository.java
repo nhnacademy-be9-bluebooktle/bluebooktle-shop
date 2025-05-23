@@ -11,7 +11,7 @@ import shop.bluebooktle.common.dto.coupon.request.CouponTypeRegisterRequest;
 import shop.bluebooktle.common.dto.coupon.request.UserCouponRegisterRequest;
 import shop.bluebooktle.common.dto.coupon.response.CouponResponse;
 import shop.bluebooktle.common.dto.coupon.response.CouponTypeResponse;
-import shop.bluebooktle.frontend.config.FeignGlobalConfig;
+import shop.bluebooktle.frontend.config.feign.FeignGlobalConfig;
 
 @FeignClient(name = "backend-server", path = "/api/admin/coupons", contextId = "adminCouponRepository", configuration = FeignGlobalConfig.class)
 public interface AdminCouponRepository {

@@ -13,7 +13,7 @@ import shop.bluebooktle.backend.cart.service.CartService;
 import shop.bluebooktle.common.dto.common.JsendResponse;
 import shop.bluebooktle.common.entity.auth.User;
 import shop.bluebooktle.common.exception.auth.UserNotFoundException;
-import shop.bluebooktle.common.principal.UserPrincipal;
+import shop.bluebooktle.common.security.UserPrincipal;
 
 @RestController
 @RequestMapping("/api/cart/convert")

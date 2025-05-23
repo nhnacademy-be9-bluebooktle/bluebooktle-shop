@@ -25,7 +25,7 @@ import shop.bluebooktle.backend.book.service.PublisherService;
 import shop.bluebooktle.common.dto.book.request.PublisherRequest;
 import shop.bluebooktle.common.dto.book.response.PublisherInfoResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
-import shop.bluebooktle.common.service.AuthUserLoader;
+import shop.bluebooktle.common.security.AuthUserLoader;
 import shop.bluebooktle.common.util.JwtUtil;
 
 @WebMvcTest(PublisherController.class)

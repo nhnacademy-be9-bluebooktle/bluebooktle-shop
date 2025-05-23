@@ -37,7 +37,7 @@ import shop.bluebooktle.common.entity.auth.MembershipLevel;
 import shop.bluebooktle.common.entity.auth.User;
 import shop.bluebooktle.common.exception.coupon.CouponNotFoundException;
 import shop.bluebooktle.common.exception.coupon.UserCouponNotFoundException;
-import shop.bluebooktle.common.service.AuthUserLoader;
+import shop.bluebooktle.common.security.AuthUserLoader;
 import shop.bluebooktle.common.util.JwtUtil;
 
 @ExtendWith(MockitoExtension.class)

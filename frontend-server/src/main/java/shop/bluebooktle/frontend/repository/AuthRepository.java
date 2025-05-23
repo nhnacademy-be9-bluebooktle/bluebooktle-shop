@@ -8,7 +8,7 @@ import shop.bluebooktle.common.dto.auth.request.LoginRequest;
 import shop.bluebooktle.common.dto.auth.request.SignupRequest;
 import shop.bluebooktle.common.dto.auth.request.TokenRefreshRequest;
 import shop.bluebooktle.common.dto.auth.response.TokenResponse;
-import shop.bluebooktle.frontend.config.FeignGlobalConfig;
+import shop.bluebooktle.frontend.config.feign.FeignGlobalConfig;
 
 @FeignClient(name = "auth-server", contextId = "authRepository", path = "/auth", configuration = FeignGlobalConfig.class)
 public interface AuthRepository {

@@ -1,4 +1,4 @@
-package shop.bluebooktle.frontend.config;
+package shop.bluebooktle.frontend.config.feign.decoder;
 
 import java.io.IOException;
 import java.lang.reflect.ParameterizedType;

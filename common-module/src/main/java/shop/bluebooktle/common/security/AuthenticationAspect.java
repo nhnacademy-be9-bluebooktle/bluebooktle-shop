@@ -1,4 +1,4 @@
-package shop.bluebooktle.common.aop;
+package shop.bluebooktle.common.security;
 
 import java.lang.reflect.Method;
 
@@ -13,31 +13,28 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
-import shop.bluebooktle.common.annotation.Auth;
 import shop.bluebooktle.common.domain.auth.UserType;
-import shop.bluebooktle.common.principal.UserPrincipal;
+import shop.bluebooktle.common.exception.auth.UnauthoriedException;
 
 @Aspect
 @Component
 @Slf4j
 public class AuthenticationAspect {
 
-	@Pointcut("@annotation(shop.bluebooktle.common.annotation.Auth)")
+	@Pointcut("@annotation(shop.bluebooktle.common.security.Auth)")
 	public void authorizedMethod() {
 	}
 
 	@Before("authorizedMethod()")
 	public void checkAuthorization(
 		JoinPoint joinPoint) {
-		log.debug("AuthenticationAspect: @Auth 어노테이션 인가 검사 시작");
-
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
 		if (authentication == null || !authentication.isAuthenticated()
 			|| !(authentication.getPrincipal() instanceof UserPrincipal)) {
 			log.warn("AuthenticationAspect: SecurityContextHolder에 유효한 인증 정보가 없습니다. Authentication: {}",
 				authentication);
-			throw new AccessDeniedException("접근 거부: 인증 정보가 유효하지 않습니다.");
+			throw new UnauthoriedException();
 		}
 
 		UserPrincipal userPrincipal = (UserPrincipal)authentication.getPrincipal();
