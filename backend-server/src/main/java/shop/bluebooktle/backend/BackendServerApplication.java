@@ -18,6 +18,7 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 @EnableAspectJAutoProxy()
 public class BackendServerApplication {
 	public static void main(String[] args) {
+		// build 테스트
 		SpringApplication.run(BackendServerApplication.class, args);
 	}
 }
