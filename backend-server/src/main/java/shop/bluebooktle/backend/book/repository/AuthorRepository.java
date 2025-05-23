@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import shop.bluebooktle.backend.book.entity.Author;
 
 @Repository
-public interface AuthorRepository extends JpaRepository<Author, Long> {
+public interface AuthorRepository extends JpaRepository<Author, Long>, AuthorQueryRepository {
 
 	// (작가 이름으로) 작가 조회
 	Optional<Author> findByName(String name);

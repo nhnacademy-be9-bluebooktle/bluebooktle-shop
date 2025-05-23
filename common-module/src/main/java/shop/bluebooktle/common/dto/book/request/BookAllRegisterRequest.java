@@ -47,7 +47,7 @@ public class BookAllRegisterRequest {
 
 	Boolean isPackable;
 
-	@NotBlank(message = "판매상태는 필수 값입니다.")
+	@NotNull(message = "판매상태는 필수 값입니다.")
 	BookSaleInfoState state;
 
 	@NotEmpty(message = "작가는 최소 1개 이상 필요합니다.")
