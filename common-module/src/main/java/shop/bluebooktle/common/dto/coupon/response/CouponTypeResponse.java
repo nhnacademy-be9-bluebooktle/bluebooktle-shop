@@ -4,10 +4,12 @@ import java.math.BigDecimal;
 
 import com.querydsl.core.annotations.QueryProjection;
 
-import lombok.Value;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import shop.bluebooktle.common.domain.CouponTypeTarget;
 
-@Value
+@Getter
+@NoArgsConstructor
 public class CouponTypeResponse {
 	Long id;
 	String name;

@@ -48,10 +48,10 @@ public class AdminPointPolicyController {
 		model.addAttribute("membershipRates", new ArrayList<>());
 
 		// 폼 내 선택 옵션
-		model.addAttribute("earningTypeOptions", List.of(
-			new AdminCouponController.SelectOption("AMOUNT", "정액(P)"),
-			new AdminCouponController.SelectOption("PERCENTAGE", "정률(%)")
-		));
+		// model.addAttribute("earningTypeOptions", List.of(
+		// 	new AdminCouponController.SelectOption("AMOUNT", "정액(P)"),
+		// 	new AdminCouponController.SelectOption("PERCENTAGE", "정률(%)")
+		// ));
 
 		return "admin/point/point_settings_form";
 	}
