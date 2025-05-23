@@ -12,6 +12,9 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import shop.bluebooktle.backend.book.entity.QBook;
+import shop.bluebooktle.backend.book.entity.QCategory;
 import shop.bluebooktle.backend.coupon.dto.CouponSearchRequest;
 import shop.bluebooktle.backend.coupon.entity.QAbsoluteCoupon;
 import shop.bluebooktle.backend.coupon.entity.QBookCoupon;
@@ -29,6 +32,7 @@ import shop.bluebooktle.common.dto.coupon.response.QUserCouponResponse;
 import shop.bluebooktle.common.dto.coupon.response.UserCouponResponse;
 import shop.bluebooktle.common.entity.auth.User;
 
+@Slf4j
 @Repository
 @RequiredArgsConstructor
 public class CouponQueryRepositoryImpl implements CouponQueryRepository {
@@ -43,10 +47,26 @@ public class CouponQueryRepositoryImpl implements CouponQueryRepository {
 		QBookCoupon bookCoupon = QBookCoupon.bookCoupon;
 		QCategoryCoupon categoryCoupon = QCategoryCoupon.categoryCoupon;
 
+		QBook book = QBook.book;
+		QCategory category = QCategory.category;
+
 		BooleanBuilder builder = new BooleanBuilder();
 
 		if (request.getTarget() != null) {
-			builder.and(couponType.target.eq(request.getTarget())); // (ORDER, BOOK)
+			builder.and(couponType.target.eq(request.getTarget()));
+		}
+
+		if (request.getBookId() != null) {
+			builder.and(bookCoupon.book.id.eq(request.getBookId()));
+		}
+		if (request.getCategoryId() != null) {
+			builder.and(categoryCoupon.category.id.eq(request.getCategoryId()));
+		}
+		if (request.getBookId() != null) {
+			builder.and(bookCoupon.book.id.eq(request.getBookId()));
+		}
+		if (request.getCategoryId() != null) {
+			builder.and(categoryCoupon.category.id.eq(request.getCategoryId()));
 		}
 
 		List<CouponResponse> content = queryFactory.select(new QCouponResponse(
@@ -62,7 +82,9 @@ public class CouponQueryRepositoryImpl implements CouponQueryRepository {
 			.from(coupon)
 			.join(coupon.couponType, couponType)
 			.leftJoin(bookCoupon).on(bookCoupon.coupon.eq(coupon))
+			.leftJoin(bookCoupon.book, book)
 			.leftJoin(categoryCoupon).on(categoryCoupon.coupon.eq(coupon))
+			.leftJoin(categoryCoupon.category, category)
 			.where(builder)
 			.offset(pageable.getOffset()) // offset/limit 페이징 처리
 			.limit(pageable.getPageSize())

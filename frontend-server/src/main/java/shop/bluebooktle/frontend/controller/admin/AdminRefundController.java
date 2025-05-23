@@ -185,13 +185,13 @@ public class AdminRefundController {
 		// commonPagination에 searchKeyword가 필요하지만, 이 페이지는 여러 검색 필드가 있으므로 직접 페이징 UI 구성 또는 commonPagination 수정 필요.
 		// 여기서는 직접 페이징 UI 구현 가정.
 
-		model.addAttribute("statusOptions", Arrays.asList(
-			new AdminCouponController.SelectOption("ALL", "전체 상태"),
-			new AdminCouponController.SelectOption("REQUESTED", "환불 요청"),
-			new AdminCouponController.SelectOption("PROCESSING", "처리 중"),
-			new AdminCouponController.SelectOption("COMPLETED", "환불 완료"),
-			new AdminCouponController.SelectOption("REJECTED", "환불 거절")
-		));
+		// model.addAttribute("statusOptions", Arrays.asList(
+		// 	new AdminCouponController.SelectOption("ALL", "전체 상태"),
+		// 	new AdminCouponController.SelectOption("REQUESTED", "환불 요청"),
+		// 	new AdminCouponController.SelectOption("PROCESSING", "처리 중"),
+		// 	new AdminCouponController.SelectOption("COMPLETED", "환불 완료"),
+		// 	new AdminCouponController.SelectOption("REJECTED", "환불 거절")
+		// ));
 		model.addAttribute("getStatusDisplayName",
 			(java.util.function.Function<String, String>)this::getStatusDisplayName);
 
@@ -220,20 +220,20 @@ public class AdminRefundController {
 			model.addAttribute("refund", refundDetail);
 			model.addAttribute("pageTitle", "환불 상세 (ID: " + refundId + ")");
 			// 상태 변경 시 선택 가능한 다음 상태 목록 (예시)
-			List<AdminCouponController.SelectOption> nextStatusOptions = new ArrayList<>();
-			switch (refundDetail.getStatus()) {
-				case "REQUESTED":
-					nextStatusOptions.add(new AdminCouponController.SelectOption("PROCESSING", "처리 중으로 변경"));
-					nextStatusOptions.add(new AdminCouponController.SelectOption("COMPLETED", "즉시 완료로 변경"));
-					nextStatusOptions.add(new AdminCouponController.SelectOption("REJECTED", "거절로 변경"));
-					break;
-				case "PROCESSING":
-					nextStatusOptions.add(new AdminCouponController.SelectOption("COMPLETED", "완료로 변경"));
-					nextStatusOptions.add(new AdminCouponController.SelectOption("REJECTED", "거절로 변경"));
-					break;
-				// COMPLETED, REJECTED 상태에서는 더 이상 변경 불가 (예시 로직)
-			}
-			model.addAttribute("nextStatusOptions", nextStatusOptions);
+			// List<AdminCouponController.SelectOption> nextStatusOptions = new ArrayList<>();
+			// switch (refundDetail.getStatus()) {
+			// 	case "REQUESTED":
+			// 		nextStatusOptions.add(new AdminCouponController.SelectOption("PROCESSING", "처리 중으로 변경"));
+			// 		nextStatusOptions.add(new AdminCouponController.SelectOption("COMPLETED", "즉시 완료로 변경"));
+			// 		nextStatusOptions.add(new AdminCouponController.SelectOption("REJECTED", "거절로 변경"));
+			// 		break;
+			// 	case "PROCESSING":
+			// 		nextStatusOptions.add(new AdminCouponController.SelectOption("COMPLETED", "완료로 변경"));
+			// 		nextStatusOptions.add(new AdminCouponController.SelectOption("REJECTED", "거절로 변경"));
+			// 		break;
+			// 	// COMPLETED, REJECTED 상태에서는 더 이상 변경 불가 (예시 로직)
+			// }
+			// model.addAttribute("nextStatusOptions", nextStatusOptions);
 			model.addAttribute("getStatusDisplayName",
 				(java.util.function.Function<String, String>)this::getStatusDisplayName);
 

@@ -17,6 +17,7 @@ import org.springframework.test.context.ActiveProfiles;
 import jakarta.persistence.EntityManager;
 import shop.bluebooktle.backend.config.JpaAuditingConfiguration;
 import shop.bluebooktle.backend.config.QueryDslConfig;
+import shop.bluebooktle.backend.coupon.dto.CouponSearchRequest;
 import shop.bluebooktle.backend.coupon.entity.Coupon;
 import shop.bluebooktle.backend.coupon.entity.CouponType;
 import shop.bluebooktle.backend.coupon.entity.UserCoupon;
@@ -26,6 +27,7 @@ import shop.bluebooktle.backend.user.repository.UserRepository;
 import shop.bluebooktle.common.domain.CouponTypeTarget;
 import shop.bluebooktle.common.domain.auth.UserStatus;
 import shop.bluebooktle.common.domain.auth.UserType;
+import shop.bluebooktle.common.dto.coupon.response.CouponResponse;
 import shop.bluebooktle.common.dto.coupon.response.CouponTypeResponse;
 import shop.bluebooktle.common.dto.coupon.response.UserCouponResponse;
 import shop.bluebooktle.common.entity.auth.MembershipLevel;
@@ -34,7 +36,7 @@ import shop.bluebooktle.common.entity.auth.User;
 @DataJpaTest
 @ActiveProfiles("test")
 @Import({QueryDslConfig.class, JpaAuditingConfiguration.class})
-class CouponRepositoryTest { //custom Repository Test 진행
+class CouponRepositoryTest {
 	@Autowired
 	private CouponRepository couponRepository;
 
@@ -47,34 +49,34 @@ class CouponRepositoryTest { //custom Repository Test 진행
 	@Autowired
 	private EntityManager em;
 
-	// @Test
-	// @DisplayName("쿠폰 전체 조회")
-	// void testFindAllByCoupon() {
-	// 	// given
-	// 	CouponType type = CouponType.builder()
-	// 		.name("타입 A")
-	// 		.target(CouponTypeTarget.ORDER)
-	// 		.minimumPayment(new BigDecimal("10000"))
-	// 		.build();
-	// 	em.persist(type);
-	//
-	// 	Coupon coupon = Coupon.builder()
-	// 		.couponName("쿠폰1")
-	// 		.type(type)
-	// 		.build();
-	// 	em.persist(coupon);
-	//
-	// 	em.flush();
-	// 	em.clear();
-	//
-	// 	// when
-	// 	CouponSearchRequest request = new CouponSearchRequest(); // target 없음
-	// 	Page<CouponResponse> result = couponRepository.findAllByCoupon(request, PageRequest.of(0, 10));
-	//
-	// 	// then
-	// 	assertThat(result.getTotalElements()).isEqualTo(1);
-	// 	assertThat(result.getContent().getFirst().getCouponName()).isEqualTo("쿠폰1");
-	// }
+	@Test
+	@DisplayName("쿠폰 전체 조회")
+	void testFindAllByCoupon() {
+		// given
+		CouponType type = CouponType.builder()
+			.name("타입 A")
+			.target(CouponTypeTarget.ORDER)
+			.minimumPayment(new BigDecimal("10000"))
+			.build();
+		em.persist(type);
+
+		Coupon coupon = Coupon.builder()
+			.couponName("쿠폰1")
+			.type(type)
+			.build();
+		em.persist(coupon);
+
+		em.flush();
+		em.clear();
+
+		// when
+		CouponSearchRequest request = new CouponSearchRequest(); // target 없음
+		Page<CouponResponse> result = couponRepository.findAllByCoupon(request, PageRequest.of(0, 10));
+
+		// then
+		assertThat(result.getTotalElements()).isEqualTo(1);
+		assertThat(result.getContent().getFirst().getCouponName()).isEqualTo("쿠폰1");
+	}
 
 	@Test
 	@DisplayName("쿠폰 정책 전체 조회 테스트")
@@ -115,7 +117,7 @@ class CouponRepositoryTest { //custom Repository Test 진행
 				.loginId("test123")
 				.encodedPassword("password123")
 				.name("테스트 유저")
-				.nickname("유저 닉네임")
+				.nickname("test")
 				.email("test@example.com")
 				.birth("2025-01-01")
 				.phoneNumber("01012345678")
