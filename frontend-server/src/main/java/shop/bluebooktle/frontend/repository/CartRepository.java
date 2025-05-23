@@ -17,7 +17,7 @@ import shop.bluebooktle.common.dto.cart.request.MemberCartItemRequest;
 import shop.bluebooktle.common.dto.cart.request.MemberCartRemoveOneRequest;
 import shop.bluebooktle.common.dto.cart.request.MemberCartRemoveSelectedRequest;
 import shop.bluebooktle.common.dto.cart.response.CartItemResponse;
-import shop.bluebooktle.frontend.config.FeignGlobalConfig;
+import shop.bluebooktle.frontend.config.feign.FeignGlobalConfig;
 
 @FeignClient(
 	name = "backend-server",
