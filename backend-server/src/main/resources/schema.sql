@@ -565,7 +565,6 @@ CREATE TABLE `payment_point_history`
     `payment_point_history_id` bigint    NOT NULL AUTO_INCREMENT,
     `payment_id`               bigint    NOT NULL,
     `point_id`                 bigint    NOT NULL,
-    `user_id`                  bigint    NOT NULL,
     `created_at`               timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `deleted_at`               timestamp NULL,
 
@@ -575,10 +574,7 @@ CREATE TABLE `payment_point_history`
             REFERENCES `payment` (`payment_id`),
     CONSTRAINT `FK_payment_point_history_point_id_point_history`
         FOREIGN KEY (`point_id`)
-            REFERENCES `point_history` (`point_id`),
-    CONSTRAINT `FK_payment_point_history_user_id_point_history`
-        FOREIGN KEY (`user_id`)
-            REFERENCES `point_history` (`user_id`)
+            REFERENCES `point_history` (`point_id`)
 );
 
 CREATE TABLE `review`
