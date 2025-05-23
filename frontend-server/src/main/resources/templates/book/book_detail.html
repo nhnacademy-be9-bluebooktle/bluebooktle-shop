@@ -464,17 +464,17 @@
         <div class="book-detail-layout-kitsch">
             <div class="book-image-column-kitsch">
                 <img alt="판타지 소설 표지" class="main-book-image-kitsch"
-                     id="mainBookImage" src="https://picsum.photos/350/520?random=201"> 
+                     id="mainBookImage" src="https://picsum.photos/350/520?random=201">
                 <div class="book-thumbnails-kitsch">
                     <img alt="썸네일1" class="active-thumbnail-kitsch"
                          onclick="changeMainImage('https://picsum.photos/350/520?random=211')"
-                         src="https://picsum.photos/60/90?random=211"> 
+                         src="https://picsum.photos/60/90?random=211">
                     <img alt="썸네일2" onclick="changeMainImage('https://picsum.photos/350/520?random=212')"
-                         src="https://picsum.photos/60/90?random=212"> 
+                         src="https://picsum.photos/60/90?random=212">
                     <img alt="썸네일3" onclick="changeMainImage('https://picsum.photos/350/520?random=213')"
-                         src="https://picsum.photos/60/90?random=213"> 
+                         src="https://picsum.photos/60/90?random=213">
                     <img alt="썸네일4" onclick="changeMainImage('https://picsum.photos/350/520?random=214')"
-                         src="https://picsum.photos/60/90?random=214"> 
+                         src="https://picsum.photos/60/90?random=214">
                 </div>
             </div>
 
@@ -521,9 +521,15 @@
                         <button class="btn-kitsch primary-btn-kitsch retro-shadow-kitsch"><i class="fas fa-bolt"></i>
                             바로구매
                         </button>
-                        <button class="btn-kitsch secondary-btn-kitsch color2-kitsch retro-shadow-kitsch"><i
-                                class="fas fa-shopping-cart"></i> 장바구니
-                        </button>
+                        <form th:action="@{/cart}" method="post" onsubmit="syncQuantityForForm()"
+                              style="display:inline;">
+                            <input type="hidden" name="bookId" th:value="${bookId}"/>
+                            <input type="hidden" name="quantity" id="hiddenDetailQuantity" value="1"/>
+                            <button type="submit"
+                                    class="btn-kitsch secondary-btn-kitsch color2-kitsch retro-shadow-kitsch">
+                                <i class="fas fa-shopping-cart"></i> 장바구니
+                            </button>
+                        </form>
                         <button class="btn-kitsch secondary-btn-kitsch color5-kitsch retro-shadow-kitsch like-btn-kitsch"
                                 onclick="toggleBookLike(this)"><i class="far fa-heart"></i> <span>좋아요</span></button>
                         <button class="btn-kitsch secondary-btn-kitsch color1-kitsch retro-shadow-kitsch"><i
@@ -557,7 +563,7 @@
                         책은 단순한 소설이 아니다! 이것은 전설이다! 픽셀 하나하나에 장인의 혼이 담겨 있으며, 코드 한 줄 한 줄이 세상을 바꿀 마법 주문이다. </p>
                     <p>주인공 '비트(Bit)'와 함께 버그 몬스터를 물리치고, 메모리 공주를 구출하며, 최종 보스 '커널 패닉'에 맞서 싸워라! 당신의 선택에 따라 이야기가 달라지는 인터랙티브
                         어드벤처! 지금 바로 이 전설에 동참하라!</p>
-                    <img alt="책 내부 삽화 예시" src="https://picsum.photos/600/200?random=221" /* URL 수정 */
+                    <img alt="책 내부 삽화 예시" src="https://picsum.photos/600/200?random=221"> /* URL 수정 */
                     style="width:100%; border-radius:5px; border:2px solid var(--kitsch-color-2); margin-top:1rem;">
                 </div>
                 <div class="tab-pane-kitsch" id="toc-content">
@@ -675,6 +681,15 @@
             quantityInput.value = currentValue;
         }
 
+        // 폼 제출시 수량 동기화 메서드
+        function syncQuantityForForm() {
+            const detailQty = document.getElementById('detailQuantity');
+            const hiddenQty = document.getElementById('hiddenDetailQuantity');
+            if (detailQty && hiddenQty) {
+                hiddenQty.value = detailQty.value;
+            }
+        }
+
         // 좋아요 버튼 토글 (상세페이지용)
         function toggleBookLike(buttonElement) {
             const icon = buttonElement.querySelector('i');
@@ -728,7 +743,6 @@
         }
 
 
-
         // 이미지 확대 모달 함수는 유지
         function showImageInModal(src, modalId = 'bookDetailImageModal') {
             const modalImageElementId = modalId === 'bookDetailImageModal' ? 'bookDetailModalImageSrc' : 'modalImageSrc';
@@ -746,6 +760,18 @@
                 changeMainImage(mainImageSrc, Array.from(document.querySelectorAll('.book-thumbnails-kitsch img')).find(thumb => thumb.getAttribute('onclick').includes(mainImageSrc)) || firstThumbnail);
             }
             // 리뷰 모달 초기화 JS 제거
+
+            // 장바구니 버튼 작동 수행 시 state에 있는 수량 전달 위한 script
+            const addToCartForm = document.querySelector('form[action="/cart/add"]');
+            if (addToCartForm) {
+                addToCartForm.addEventListener('submit', function () {
+                    const quantity = document.getElementById('detailQuantity').value;
+                    const hiddenQtyInput = addToCartForm.querySelector('input[name="quantity"]');
+                    if (hiddenQtyInput) {
+                        hiddenQtyInput.value = quantity;
+                    }
+                });
+            }
         });
 
         // 리뷰 더보기 Mock 함수 유지

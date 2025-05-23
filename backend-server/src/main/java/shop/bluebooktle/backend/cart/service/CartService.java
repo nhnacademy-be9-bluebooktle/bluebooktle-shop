@@ -2,11 +2,14 @@ package shop.bluebooktle.backend.cart.service;
 
 import java.util.List;
 
-import shop.bluebooktle.backend.cart.dto.response.CartItemResponse;
+import shop.bluebooktle.common.dto.cart.response.CartItemResponse;
 import shop.bluebooktle.common.entity.auth.User;
 
 public interface CartService {
 	// 회원용
+
+	User findUserEntityById(Long userId);
+
 	void addBookToUserCart(User user, Long bookId, int quantity);
 
 	List<CartItemResponse> getUserCartItems(User user);
