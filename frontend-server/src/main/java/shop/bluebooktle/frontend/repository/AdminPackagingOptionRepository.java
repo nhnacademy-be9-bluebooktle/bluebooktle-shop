@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import shop.bluebooktle.common.dto.book_order.response.PackagingOptionInfoResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
-import shop.bluebooktle.frontend.config.FeignGlobalConfig;
+import shop.bluebooktle.frontend.config.feign.FeignGlobalConfig;
 
 @FeignClient(name = "backend-server", contextId = "adminPackagingOptionRepository", path = "/api/options", configuration = FeignGlobalConfig.class)
 public interface AdminPackagingOptionRepository {
