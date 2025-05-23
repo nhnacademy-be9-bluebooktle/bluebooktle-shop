@@ -45,7 +45,7 @@ public class PointPolicy extends BaseEntity {
 	private PointSourceType pointSourceType;
 
 	@Enumerated(EnumType.STRING)
-	@Column(name = "type", nullable = false, length = 20)
+	@Column(name = "policy_type", nullable = false, length = 20)
 	private PolicyType policyType;
 
 	@Column(name = "value", nullable = false, precision = 10, scale = 2)
