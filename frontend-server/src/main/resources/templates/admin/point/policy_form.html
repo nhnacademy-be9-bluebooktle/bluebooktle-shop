@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html th:object="${policyCreateRequest}" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>포인트 정책 생성</title>
+    <link href="/static/css/admin.css" rel="stylesheet">
+</head>
+<body>
+<div class="admin-panel">
+    <div class="admin-panel__body">
+        <form class="admin-form"
+              method="post"
+              th:action="@{/admin/points/settings/new}">
+
+
+            <!-- 소스 타입 생성 섹션 -->
+            <fieldset class="policy-section">
+                <legend>포인트 소스 타입 생성</legend>
+                <div class="form-group">
+                    <label for="actionType">액션 타입</label>
+                    <select id="actionType"
+                            required
+                            th:field="*{actionType}">
+                        <option th:each="type : ${T(shop.bluebooktle.common.domain.point.ActionType).values()}"
+                                th:text="${type}"
+                                th:value="${type}">ACTION
+                        </option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="sourceType">소스 타입</label>
+                    <input id="sourceType"
+                           placeholder="예: PURCHASE"
+                           required
+                           th:field="*{sourceType}"
+                           type="text"/>
+                </div>
+            </fieldset>
+
+            <!-- 정책 생성 섹션 (USE일 때 비활성화) -->
+            <fieldset class="policy-section" id="policySection">
+                <legend>포인트 정책 생성</legend>
+                <div class="form-group">
+                    <label for="policyType">정책 유형</label>
+                    <select id="policyType"
+                            required
+                            th:field="*{policyType}">
+                        <option th:each="pt : ${policyTypes}"
+                                th:text="${pt}"
+                                th:value="${pt}">POLICY
+                        </option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="value">값</label>
+                    <input id="value"
+                           placeholder="예: 0.05"
+                           required
+                           step="0.01"
+                           th:field="*{value}"
+                           type="number"/>
+                </div>
+            </fieldset>
+
+            <button class="btn-kitsch primary-btn-kitsch" type="submit">
+                새 포인트 정책 생성
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- USE 선택 시 정책 섹션을 disabled 처리 -->
+<script th:inline="javascript">
+    (function () {
+        const actionSelect = document.getElementById('actionType');
+        const policyFs = document.getElementById('policySection');
+
+        function togglePolicySection() {
+            // ActionType enum 이름이 "USE"일 때만 비활성화
+            policyFs.disabled = (actionSelect.value === 'USE');
+        }
+
+        actionSelect.addEventListener('change', togglePolicySection);
+        // 초기 로드 시에도 한 번 실행
+        togglePolicySection();
+    })();
+</script>
+</body>
+</html>

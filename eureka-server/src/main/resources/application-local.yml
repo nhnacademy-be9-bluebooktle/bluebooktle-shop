@@ -10,4 +10,3 @@ eureka:
     enabled: true
     serviceUrl:
       defaultZone: http://blue:blueBooktle12@localhost:9761/eureka/
-

@@ -1,0 +1,82 @@
+### @name Common
+@token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwidXNlck5pY2tuYW1lIjoi7YWM7Iqk7Yq464uJ64Sk7J6EIiwidXNlclR5cGUiOiJVU0VSIiwiaWF0IjoxNzQ3ODMxNjM1LCJleHAiOjE3NDc4MzM0MzV9.r2Nx0VBXVwK_zmf9YopD--TySQnkIVd6DfXYZ07xbZE
+
+### 포인트 발생 유형 생성
+POST http://localhost:9012/api/points/source
+Content-Type: application/json
+
+{
+  "actionType": "EARN",
+  "sourceType": "회원가입"
+}
+
+### 포인트 발생 유형 생성
+POST http://localhost:9012/api/points/source
+Content-Type: application/json
+
+{
+  "actionType": "EARN",
+  "sourceType": "리뷰작성"
+}
+
+### 포인트 발생 유형 생성
+POST http://localhost:9012/api/points/source
+Content-Type: application/json
+
+{
+  "actionType": "USE",
+  "sourceType": "결제사용"
+}
+
+
+### 포인트 발생 유형 단건 조회
+GET http://localhost:9012/api/points/source/1
+Accept: application/json
+
+### 포인트 발생 유형 전체 조회
+GET http://localhost:9012/api/points/source
+Accept: application/json
+
+### 특정 ActionType별 포인트 발생 유형 조회
+GET http://localhost:9012/api/points/source?actionType=EARN
+Accept: application/json
+
+### 포인트 발생 유형 삭제
+DELETE http://localhost:9012/api/points/source/1
+Accept: application/json
+
+### 포인트 정책 생성
+POST http://localhost:9012/api/points/policies
+Content-Type: application/json
+
+{
+  "pointSourceTypeId": 2,
+  "policyType": "PERCENTAGE",
+  "value": 1000
+}
+
+### 단일 포인트 정책 조회
+GET http://localhost:9012/api/points/policies/1
+Accept: application/json
+
+### 포인트 정책 업데이트
+PUT http://localhost:9012/api/points/policies
+Content-Type: application/json
+
+{
+  "pointPolicyId": 2,
+  "amount": 1,
+  "policyType": "PERCENTAGE",
+  "isActive": true
+}
+
+### 전체 포인트 정책 조회
+GET http://localhost:9012/api/points/policies
+Accept: application/json
+
+### 포인트 정책 삭제
+DELETE http://localhost:9012/api/points/policies/1
+Accept: application/json
+
+### 포인트 규정 조회
+GET http://localhost:9012/api/points/rules

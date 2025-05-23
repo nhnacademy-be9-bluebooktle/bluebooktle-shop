@@ -13,20 +13,21 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.validation.Valid;
-import shop.bluebooktle.common.dto.payment.request.TossConfirmRequest;
-import shop.bluebooktle.common.dto.payment.response.TossConfirmResponse;
-import shop.bluebooktle.frontend.service.TossPaymentsService;
+import shop.bluebooktle.common.dto.payment.request.PaymentConfirmRequest;
+import shop.bluebooktle.common.dto.payment.response.PaymentConfirmResponse;
+import shop.bluebooktle.frontend.service.PaymentsService;
 
 @Controller
 @RequestMapping("/order")
 public class OrderController {
 
-	private final TossPaymentsService tossPaymentsService;
+	private final PaymentsService paymentsService;
+	
 	@Value("${toss.client-key}")
 	private String clientKey;
 
-	public OrderController(TossPaymentsService tossPaymentsService) {
-		this.tossPaymentsService = tossPaymentsService;
+	public OrderController(PaymentsService paymentsService) {
+		this.paymentsService = paymentsService;
 	}
 
 	@GetMapping("/checkout")
@@ -50,14 +51,14 @@ public class OrderController {
 		@RequestParam Integer amount,
 		RedirectAttributes redirectAttributes
 	) {
-		TossConfirmRequest req = new TossConfirmRequest(paymentKey, orderId, amount);
-		TossConfirmResponse resp = tossPaymentsService.confirm(req);
+		PaymentConfirmRequest req = new PaymentConfirmRequest(paymentKey, orderId, amount);
+		PaymentConfirmResponse resp = paymentsService.confirm(req);
 		redirectAttributes.addFlashAttribute("orderData", resp);
 		return "redirect:/order/complete";
 	}
 
 	@GetMapping("/complete")
-	public String orderCompletePage(@Valid @ModelAttribute("orderData") TossConfirmResponse data,
+	public String orderCompletePage(@Valid @ModelAttribute("orderData") PaymentConfirmResponse data,
 		BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
 			return "order/fail";

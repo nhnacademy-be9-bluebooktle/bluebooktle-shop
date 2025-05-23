@@ -138,11 +138,12 @@ public enum ErrorCode {
 	POINT_INSUFFICIENT_BALANCE(HttpStatus.BAD_REQUEST, "P005", "포인트 잔액이 부족합니다."),
 	POINT_HISTORY_NOT_FOUND(HttpStatus.NOT_FOUND, "P006", "포인트 이력을 찾을 수 없습니다."),
 	POINT_SOURCE_TYPE_NOT_FOUND(HttpStatus.NOT_FOUND, "P007", "포인트 발생/사용 타입을 찾을 수 없습니다."),
-	PAYMENT_INVALID_AMOUNT(HttpStatus.BAD_REQUEST, "P008", "결제 금액이 유효하지 않습니다."),
-	REFUND_NOT_POSSIBLE(HttpStatus.BAD_REQUEST, "P009", "현재 상태에서는 반품/환불이 불가능합니다."),
-	REFUND_ALREADY_PROCESSED(HttpStatus.CONFLICT, "P0010", "이미 처리된 반품/환불 요청입니다."),
-	REFUND_INVALID_REASON(HttpStatus.BAD_REQUEST, "P011", "유효하지 않은 반품 사유입니다."),
-	REFUND_NOT_FOUND(HttpStatus.NOT_FOUND, "P012", "환불 정보를 찾을 수 없습니다."),
+	POINT_POLICY_CREATION_NOT_ALLOWED(HttpStatus.BAD_REQUEST, "P008", "포인트 정책 생성이 허용되지 않습니다."),
+	PAYMENT_INVALID_AMOUNT(HttpStatus.BAD_REQUEST, "P009", "결제 금액이 유효하지 않습니다."),
+	REFUND_NOT_POSSIBLE(HttpStatus.BAD_REQUEST, "P010", "현재 상태에서는 반품/환불이 불가능합니다."),
+	REFUND_ALREADY_PROCESSED(HttpStatus.CONFLICT, "P0011", "이미 처리된 반품/환불 요청입니다."),
+	REFUND_INVALID_REASON(HttpStatus.BAD_REQUEST, "P012", "유효하지 않은 반품 사유입니다."),
+	REFUND_NOT_FOUND(HttpStatus.NOT_FOUND, "P013", "환불 정보를 찾을 수 없습니다."),
 
 	// Coupon Errors (쿠폰 오류) - K (Koopon)
 	K_COUPON_NOT_FOUND(HttpStatus.NOT_FOUND, "K001", "쿠폰을 찾을 수 없습니다."),
