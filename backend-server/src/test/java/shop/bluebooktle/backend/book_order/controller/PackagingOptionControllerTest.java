@@ -25,7 +25,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import shop.bluebooktle.backend.book_order.service.PackagingOptionService;
 import shop.bluebooktle.common.dto.book_order.request.PackagingOptionRequest;
 import shop.bluebooktle.common.dto.book_order.response.PackagingOptionResponse;
-import shop.bluebooktle.common.service.AuthUserLoader;
+import shop.bluebooktle.common.security.AuthUserLoader;
 import shop.bluebooktle.common.util.JwtUtil;
 
 @WebMvcTest(PackagingOptionController.class)

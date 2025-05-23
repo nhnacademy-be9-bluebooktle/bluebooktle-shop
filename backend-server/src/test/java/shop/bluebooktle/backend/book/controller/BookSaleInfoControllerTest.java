@@ -28,7 +28,7 @@ import shop.bluebooktle.common.dto.book.request.BookSaleInfoUpdateRequest;
 import shop.bluebooktle.common.dto.book.response.BookSaleInfoRegisterResponse;
 import shop.bluebooktle.common.dto.book.response.BookSaleInfoResponse;
 import shop.bluebooktle.common.dto.book.response.BookSaleInfoUpdateResponse;
-import shop.bluebooktle.common.service.AuthUserLoader;
+import shop.bluebooktle.common.security.AuthUserLoader;
 import shop.bluebooktle.common.util.JwtUtil;
 
 @WebMvcTest(BookSaleInfoController.class)

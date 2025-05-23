@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import shop.bluebooktle.common.dto.book.request.TagRequest;
 import shop.bluebooktle.common.dto.book.response.TagInfoResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
-import shop.bluebooktle.frontend.config.FeignGlobalConfig;
+import shop.bluebooktle.frontend.config.feign.FeignGlobalConfig;
 
 /** 백엔드의 /api/tags REST 엔드포인트를 호출하는 HTTP 클라이언트 */
 @FeignClient(name = "backend-server", contextId = "adminTagRepository", path = "/api/tags", configuration = FeignGlobalConfig.class)

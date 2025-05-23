@@ -10,20 +10,21 @@ import shop.bluebooktle.auth.service.RefreshTokenService;
 @Service
 public class RedisRefreshTokenServiceImpl implements RefreshTokenService {
 	private final RedisTemplate<String, String> redisTemplate;
+	private static final String REFRESH_TOKEN_KEY = "refreshToken:";
 
 	public RedisRefreshTokenServiceImpl(RedisTemplate<String, String> redisTemplate) {
 		this.redisTemplate = redisTemplate;
 	}
 
 	public void save(Long userId, String refreshToken, long ttlMillis) {
-		redisTemplate.opsForValue().set("refreshToken:" + userId, refreshToken, ttlMillis, TimeUnit.MILLISECONDS);
+		redisTemplate.opsForValue().set(REFRESH_TOKEN_KEY + userId, refreshToken, ttlMillis, TimeUnit.MILLISECONDS);
 	}
 
 	public String findByUserId(Long userId) {
-		return redisTemplate.opsForValue().get("refreshToken:" + userId);
+		return redisTemplate.opsForValue().get(REFRESH_TOKEN_KEY + userId);
 	}
 
 	public void deleteByUserId(Long userId) {
-		redisTemplate.delete("refreshToken:" + userId);
+		redisTemplate.delete(REFRESH_TOKEN_KEY + userId);
 	}
 }

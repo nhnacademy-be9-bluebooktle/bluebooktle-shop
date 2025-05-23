@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import shop.bluebooktle.common.dto.common.PaginationData;
 import shop.bluebooktle.common.dto.coupon.response.UserCouponResponse;
-import shop.bluebooktle.frontend.config.FeignGlobalConfig;
+import shop.bluebooktle.frontend.config.feign.FeignGlobalConfig;
 
 @FeignClient(name = "backed-server", path = "/api/coupon", contextId = "couponRepository", configuration = FeignGlobalConfig.class)
 public interface CouponRepository {
