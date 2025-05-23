@@ -11,6 +11,7 @@ import shop.bluebooktle.backend.book_order.repository.PackagingOptionRepository;
 import shop.bluebooktle.backend.book_order.service.PackagingOptionService;
 import shop.bluebooktle.common.dto.book_order.request.PackagingOptionRequest;
 import shop.bluebooktle.common.dto.book_order.response.PackagingOptionInfoResponse;
+import shop.bluebooktle.common.exception.book_order.PackagingOptionAlreadyExistsException;
 import shop.bluebooktle.common.exception.book_order.PackagingOptionNotFoundException;
 
 @Service
@@ -23,7 +24,7 @@ public class PackagingOptionServiceImpl implements PackagingOptionService {
 	@Override
 	public PackagingOptionInfoResponse createPackagingOption(PackagingOptionRequest request) {
 		if (packagingOptionRepository.existsByName(request.getName())) {
-			throw new PackagingOptionNotFoundException(); // 이미 등록된 포장 옵션 이름이라면 에러 발생
+			throw new PackagingOptionAlreadyExistsException(); // 이미 등록된 포장 옵션 이름이라면 에러 발생
 		}
 		PackagingOption option = PackagingOption.builder()
 			.name(request.getName())
@@ -38,15 +39,33 @@ public class PackagingOptionServiceImpl implements PackagingOptionService {
 			.build();
 	}
 
+	/** 포장 옵션 단건 조회(임시) */
+	@Override
+	@Transactional(readOnly = true)
+	public PackagingOptionInfoResponse getPackagingOption(Long packagingOptionId) {
+		PackagingOption packagingOption = packagingOptionRepository.findById(packagingOptionId)
+			.orElseThrow(() -> new PackagingOptionNotFoundException());
+
+		return new PackagingOptionInfoResponse(packagingOption.getId(), packagingOption.getName(),
+			packagingOption.getPrice());
+	}
+
+	/** 포장 옵션 단건 조회 */
+	@Override
+	@Transactional(readOnly = true)
+	public Page<PackagingOptionInfoResponse> searchPackagingOption(String searchKeyword, Pageable pageable) {
+		Page<PackagingOption> options = packagingOptionRepository.searchNameContaining(searchKeyword, pageable);
+		return options.map(
+			option -> new PackagingOptionInfoResponse(option.getId(), option.getName(), option.getPrice()));
+	}
+
 	/** 포장 옵션 전체 조회 */
 	@Override
-	public Page<PackagingOptionInfoResponse> getPackagingOption(Pageable pageable) {
-		Page<PackagingOption> page = packagingOptionRepository.findAllByDeletedAtIsNull(pageable);
-		return page.map(o -> PackagingOptionInfoResponse.builder()
-			.id(o.getId())
-			.name(o.getName())
-			.price(o.getPrice())
-			.build());
+	@Transactional(readOnly = true)
+	public Page<PackagingOptionInfoResponse> getPackagingOptions(Pageable pageable) {
+		Page<PackagingOption> options = packagingOptionRepository.findAllByDeletedAtIsNull(pageable);
+		return options.map(
+			option -> new PackagingOptionInfoResponse(option.getId(), option.getName(), option.getPrice()));
 	}
 
 	/** 포장 옵션 수정 */
@@ -69,7 +88,7 @@ public class PackagingOptionServiceImpl implements PackagingOptionService {
 	/** 포장 옵션 삭제 */
 	@Override
 	public void deletePackagingOption(Long packagingOptionId) {
-		PackagingOption option = packagingOptionRepository.findById(packagingOptionId)
+		PackagingOption option = packagingOptionRepository.findByIdAndDeletedAtIsNull(packagingOptionId)
 			.orElseThrow(PackagingOptionNotFoundException::new);
 		packagingOptionRepository.delete(option);
 	}

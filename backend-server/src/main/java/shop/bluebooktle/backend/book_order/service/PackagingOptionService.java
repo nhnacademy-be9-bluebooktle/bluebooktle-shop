@@ -12,7 +12,12 @@ public interface PackagingOptionService {
 	PackagingOptionInfoResponse createPackagingOption(PackagingOptionRequest request);
 
 	/** 포장 옵션 전체 조회 */
-	Page<PackagingOptionInfoResponse> getPackagingOption(Pageable pageable);
+	Page<PackagingOptionInfoResponse> getPackagingOptions(Pageable pageable);
+
+	/** 포장 옵션 단건 조회 */
+	PackagingOptionInfoResponse getPackagingOption(Long packagingOptionId);
+
+	Page<PackagingOptionInfoResponse> searchPackagingOption(String searchKeyword, Pageable pageable);
 
 	/** 포장 옵션 수정 */
 	PackagingOptionInfoResponse updatePackagingOption(Long packagingOptionId, PackagingOptionRequest request);

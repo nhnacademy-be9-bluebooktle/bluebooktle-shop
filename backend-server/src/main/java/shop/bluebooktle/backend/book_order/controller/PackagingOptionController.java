@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
@@ -39,12 +40,27 @@ public class PackagingOptionController {
 	/** 포장 옵션 전체 조회 */
 	@GetMapping
 	public ResponseEntity<JsendResponse<PaginationData<PackagingOptionInfoResponse>>> getPackagingOptions(
-		@PageableDefault(size = 10, sort = "id") Pageable pageable) {
-		Page<PackagingOptionInfoResponse> resultPage = packagingOptionService.getPackagingOption(
-			pageable); // 페이징 처리된 응답 객체 가져오기
-		PaginationData<PackagingOptionInfoResponse> paginationData = new PaginationData<>(
-			resultPage); // PaginationData 감싸기
+		@PageableDefault(size = 10, sort = "id") Pageable pageable,
+		@RequestParam(value = "searchKeyword", required = false) String searchKeyword) {
+
+		Page<PackagingOptionInfoResponse> packagingOptionPage;
+
+		if (searchKeyword != null && !searchKeyword.isBlank()) {
+			packagingOptionPage = packagingOptionService.searchPackagingOption(searchKeyword, pageable);
+		} else {
+			packagingOptionPage = packagingOptionService.getPackagingOptions(pageable);
+		}
+
+		PaginationData<PackagingOptionInfoResponse> paginationData = new PaginationData<>(packagingOptionPage);
 		return ResponseEntity.ok(JsendResponse.success(paginationData));
+	}
+
+	/** 포장 옵션 단건 조회 */
+	@GetMapping("/{packagingOptionId}")
+	public ResponseEntity<JsendResponse<PackagingOptionInfoResponse>> getPackagingOption(
+		@PathVariable Long packagingOptionId) {
+		PackagingOptionInfoResponse response = packagingOptionService.getPackagingOption(packagingOptionId);
+		return ResponseEntity.ok(JsendResponse.success(response));
 	}
 
 	/** 포장 옵션 수정 */

@@ -39,7 +39,7 @@ public class AdminPackagingOptionController {
 		log.info("어드민 포장 옵션 목록 페이지 요청. URI: {}", request.getRequestURI());
 		model.addAttribute("pageTitle", "포장 옵션 관리");
 		model.addAttribute("currentURI", request.getRequestURI());
-		model.addAttribute("optionPackagings", optionPage.getContent());
+		model.addAttribute("packagingOptions", optionPage.getContent());
 		model.addAttribute("currentPage", page);
 		model.addAttribute("totalPages", optionPage.getTotalPages());
 		model.addAttribute("searchKeyword", searchKeyword);
@@ -111,7 +111,7 @@ public class AdminPackagingOptionController {
 				packagingOptionService.updatePackingOption(option.getId(), option);
 			}
 			String action = (option.getId() == null) ? "등록" : "수정";
-			log.info("포장 옵션 {} 처리 (임시): Name={}, DeletedAt={}", action, option.getName());
+			log.info("포장 옵션 {} 처리: Name={}, DeletedAt={}", action, option.getName());
 			redirectAttributes.addFlashAttribute("globalSuccessMessage",
 				"포장 옵션 '" + option.getName() + "'가 성공적으로 " + action + "되었습니다.");
 		} catch (Exception e) {
@@ -128,13 +128,13 @@ public class AdminPackagingOptionController {
 	}
 
 	@PostMapping("/{optionId}/delete")
-	public String deletePackagingOption(@PathVariable Long id, RedirectAttributes redirectAttributes) {
-		log.info("포장 옵션 삭제 요청: ID {}", id);
+	public String deletePackagingOption(@PathVariable Long optionId, RedirectAttributes redirectAttributes) {
+		log.info("포장 옵션 삭제 요청: ID {}", optionId);
 		try {
-			packagingOptionService.deletePackingOption(id);
-			log.info("임시 포장 옵션 삭제 성공 처리: ID {}", id);
+			packagingOptionService.deletePackingOption(optionId);
+			log.info("임시 포장 옵션 삭제 성공 처리: ID {}", optionId);
 			redirectAttributes.addFlashAttribute("globalSuccessMessage",
-				"포장 옵션(ID: " + id + ")가 성공적으로 삭제되었습니다.");
+				"포장 옵션(ID: " + optionId + ")가 성공적으로 삭제되었습니다.");
 		} catch (Exception e) {
 			log.error("포장 옵션 삭제 중 오류 발생", e);
 			redirectAttributes.addFlashAttribute("globalErrorMessage", "포장 옵션 삭제 중 오류가 발생했습니다: " + e.getMessage());

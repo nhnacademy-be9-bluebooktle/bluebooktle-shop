@@ -52,16 +52,12 @@
 
                     <div class="admin-form-group">
                         <label for="price" class="admin-form-label">가격 (원) <span class="text-danger">*</span></label>
-                        <input type="number" id="price" th:field="*{price}" class="admin-form-control"
-                               placeholder="예: 2500" required step="100">
+                        <input type="number" id="price" name="price" class="admin-form-control"
+                               th:value="${#numbers.formatInteger(packagingOption.price, 0)}"
+                               placeholder="예: 2500" required step="1" inputmode="numeric" pattern="[0-9]*">
                         <div th:if="${#fields.hasErrors('price')}" th:errors="*{price}"
                              class="invalid-feedback admin-form-text"></div>
                     </div>
-
-                    <!--                    <div class="admin-form-group">-->
-                    <!--                        <input type="checkbox" id="isActive" th:field="*{isActive}" class="admin-form-check-input">-->
-                    <!--                        <label for="isActive" class="admin-form-check-label">이 포장 옵션 활성화</label>-->
-                    <!--                    </div>-->
                 </fieldset>
 
                 <div class="admin-form-actions" style="margin-top: 20px; text-align: right;">

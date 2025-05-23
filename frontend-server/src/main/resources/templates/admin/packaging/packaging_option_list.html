@@ -39,6 +39,19 @@
     </div>
 
     <div class="admin-panel">
+        <div class="admin-panel__body">
+            <form th:action="@{/admin/packaging/options}" method="get" class="admin-form-inline">
+                <div class="admin-form-group">
+                    <input type="text" name="searchKeyword" th:value="${searchKeyword}" placeholder="포장 옵션명 검색"
+                           class="admin-form-control" style="width: auto; display: inline-block; margin-right: 8px;">
+                    <button type="submit" class="admin-btn admin-btn--secondary"><i class="fas fa-search"></i> 검색
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="admin-panel">
         <div class="admin-panel__header">
             <h2 class="admin-panel__title"><i class="fas fa-list-ul"></i> 포장 옵션 목록</h2>
         </div>

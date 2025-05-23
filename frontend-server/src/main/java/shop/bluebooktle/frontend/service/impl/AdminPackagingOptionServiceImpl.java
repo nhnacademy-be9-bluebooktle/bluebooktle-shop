@@ -1,5 +1,7 @@
 package shop.bluebooktle.frontend.service.impl;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -28,7 +30,8 @@ public class AdminPackagingOptionServiceImpl implements AdminPackagingOptionServ
 
 		PaginationData<PackagingOptionInfoResponse> data = packagingOptionRepository.getPackagingOptions(page, size,
 			keyword);
-		return new PageImpl<>(data.getContent(), pageable, data.getTotalElements());
+		List<PackagingOptionInfoResponse> options = data.getContent();
+		return new PageImpl<>(options, pageable, data.getTotalElements());
 	}
 
 	@Override
