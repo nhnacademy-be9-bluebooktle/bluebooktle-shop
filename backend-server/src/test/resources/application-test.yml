@@ -15,7 +15,11 @@ spring:
     init:
       mode: never  # <-- schema.sql 무시 :
 
+  data:
+    redis:
+      host: localhost
+      port: 6379
 jwt:
-  secret: ZAhD+UMfgBr63TxTO6kHWHhLuWT1EBA7XN9yEqN+875Q8BFN7KtMKZsHbNqOx5RZueo1wMlIAZCMrs0VGvQwhRk/npVx2HvjqcimJvLIy48HrKnpH7+5LvxL81D/fjc35nFX9JM3BF8mnbTNsQiqNUV+nW61QxhuRKC0e74t7mk=
+  secret: F22T/ZZH9vtITsBb8DYLXMiPt/ogfuCKE2QDKubLE/wOz3+9GB2wJUtDxilTH6x/Vy8pQ8NTXa1KhAwj6Zos5gE9LzrEfpJ+G3TbPqa/qZg9ULHsK6Udw7UzF/aSIhTA7ccm3hWsJY/Me9SNIMJWj3/60k1acorA/vU9syUI0yI=
   access-token-validity-seconds: 1800
   refresh-token-validity-seconds: 3600
