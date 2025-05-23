@@ -17,7 +17,7 @@ public class GuestCartRepositoryImpl implements GuestCartRepository {
 	private final RedisTemplate<String, Object> redisTemplate;
 
 	private String getKey(String guestId) {
-		return "guest:" + guestId;
+		return guestId;
 	}
 
 	@Override
