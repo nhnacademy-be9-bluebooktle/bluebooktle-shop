@@ -52,7 +52,6 @@ jobs:
       - name: Generate changed-services list
         id: list
         run: |
-          # common-module 변경 시 모든 서비스 고정 순서로 배포
           if [[ "${{ steps.filter.outputs.common-module }}" == "true" ]]; then
             modules=(eureka-server gateway-server backend-server frontend-server auth-server)
           else
@@ -95,7 +94,7 @@ jobs:
           distribution: temurin
           java-version: '21'
           cache: maven
-                
+
       # Redis 설정
       - name: Set up Redis
         uses: supercharge/redis-github-action@1.7.0
