@@ -112,4 +112,10 @@ public class AuthorServiceImpl implements AuthorService {
 			.createdAt(a.getCreatedAt())
 			.build());
 	}
+
+	@Override
+	public Page<AuthorResponse> searchAuthors(String searchKeyword, Pageable pageable) {
+		Page<Author> authors = authorRepository.searchByNameContaining(searchKeyword, pageable);
+		return authors.map(a -> new AuthorResponse(a.getId(), a.getName(), a.getCreatedAt()));
+	}
 }

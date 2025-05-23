@@ -38,4 +38,6 @@ public interface CategoryService {
 
 	CategoryTreeResponse getCategoryTreeById(Long categoryId);
 
+	Page<CategoryResponse> searchCategories(String searchKeyword, Pageable pageable);
+
 }
