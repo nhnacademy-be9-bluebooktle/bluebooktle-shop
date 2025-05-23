@@ -100,7 +100,7 @@ jobs:
         uses: supercharge/redis-github-action@1.7.0
         with:
           redis-version: 'latest'
-          
+
       - run: |
           MODULE_CSV=$(echo "${{ needs.detect_changes.outputs.changed }}" | sed 's/ /,/g')
           mvn -B clean package -pl "$MODULE_CSV" -am
