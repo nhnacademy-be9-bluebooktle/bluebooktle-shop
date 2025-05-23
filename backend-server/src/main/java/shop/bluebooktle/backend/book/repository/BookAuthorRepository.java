@@ -1,6 +1,7 @@
 package shop.bluebooktle.backend.book.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -24,4 +25,6 @@ public interface BookAuthorRepository extends JpaRepository<BookAuthor, Long> {
 	boolean existsByBookAndAuthor(Book book, Author author);
 
 	List<BookAuthor> findByBookId(Long bookId);
+
+	Optional<BookAuthor> findByBookAndAuthor(Book book, Author author);
 }

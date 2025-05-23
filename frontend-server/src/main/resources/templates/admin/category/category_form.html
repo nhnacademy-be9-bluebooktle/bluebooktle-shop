@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html layout:decorate="~{_layouts/admin_layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${pageTitle} ?: '카테고리 폼'"></title>
+</head>
+<body>
+<div layout:fragment="admin_content">
+    <div class="admin-page-header">
+        <h1 class="admin-page-title">
+            <i class="fas fa-sitemap"></i>
+            <th:block th:text="${pageTitle}"></th:block>
+        </h1>
+    </div>
+
+    <div class="admin-panel">
+        <div class="admin-panel__body">
+            <form th:action="@{/admin/categories/{categoryId}/save(categoryId=${category.id})}" th:object="${category}"
+                  method="post">
+                <input type="hidden" th:field="*{id}"/>
+
+                <div class="admin-form-group">
+                    <label for="name" class="admin-form-label">카테고리 이름 <span style="color:red;">*</span></label>
+                    <input type="text" id="name" th:field="*{name}" class="admin-form-control" maxlength="50"
+                           th:errorclass="is-invalid" placeholder="예: 국내소설, IT 전문서적" required pattern="\S.*"
+                           oninvalid="this.setCustomValidity('카테고리 이름을 반드시 입력해주세요')"
+                           oninput="this.setCustomValidity('')"/>
+                    <div th:if="${#fields.hasErrors('name')}"
+                         th:errors="*{name}"
+                         class="invalid-feedback admin-form-text"
+                         style="color: red;">Name Error
+                    </div>
+                </div>
+
+
+                <div class="admin-form-actions" style="margin-top: 20px; text-align: right;">
+                    <a th:href="@{/admin/categories}" class="admin-btn admin-btn--default" style="margin-right:8px;">
+                        취소
+                    </a>
+                    <button type="submit" class="admin-btn admin-btn--primary">
+                        <i class="fas fa-save"></i>
+                        등록
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>

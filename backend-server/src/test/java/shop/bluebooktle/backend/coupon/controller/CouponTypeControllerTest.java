@@ -1,6 +1,7 @@
 package shop.bluebooktle.backend.coupon.controller;
 
 import static org.mockito.BDDMockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -10,6 +11,7 @@ import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -17,6 +19,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -26,8 +29,11 @@ import shop.bluebooktle.backend.coupon.service.CouponTypeService;
 import shop.bluebooktle.common.domain.CouponTypeTarget;
 import shop.bluebooktle.common.dto.coupon.request.CouponTypeRegisterRequest;
 import shop.bluebooktle.common.dto.coupon.response.CouponTypeResponse;
+import shop.bluebooktle.common.security.AuthUserLoader;
+import shop.bluebooktle.common.util.JwtUtil;
 
 @WebMvcTest(controllers = CouponTypeController.class)
+@AutoConfigureMockMvc(addFilters = false) //Security 필터 비활성화
 class CouponTypeControllerTest {
 
 	@Autowired
@@ -39,8 +45,15 @@ class CouponTypeControllerTest {
 	@Autowired
 	private ObjectMapper objectMapper;
 
+	@MockitoBean
+	private JwtUtil jwtUtil;
+
+	@MockitoBean
+	private AuthUserLoader authUserLoader;
+
 	@Test
 	@DisplayName("쿠폰 정책 등록 - 성공")
+	@WithMockUser
 	void registerCouponType_success() throws Exception {
 		CouponTypeRegisterRequest request = CouponTypeRegisterRequest.builder()
 			.name("도서 10% 할인")
@@ -49,9 +62,9 @@ class CouponTypeControllerTest {
 			.discountPercent(10)
 			.build();
 
-		mockMvc.perform(post("/api/admin/coupon-type")
+		mockMvc.perform(post("/api/admin/coupons/type")
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(request)))
+				.content(objectMapper.writeValueAsString(request)).with(csrf()))
 			.andExpect(status().isCreated())
 			.andExpect(jsonPath("$.status").value("success"));
 
@@ -60,6 +73,7 @@ class CouponTypeControllerTest {
 
 	@Test
 	@DisplayName("쿠폰 정책 전체 조회 - 성공")
+	@WithMockUser
 	void getAllCouponTypeList_success() throws Exception {
 		Pageable pageable = PageRequest.of(0, 10, Sort.by("id"));
 		List<CouponTypeResponse> content = List.of(
@@ -70,7 +84,7 @@ class CouponTypeControllerTest {
 
 		given(couponTypeService.getAllCouponTypeList(any())).willReturn(page);
 
-		mockMvc.perform(get("/api/admin/coupon-type")
+		mockMvc.perform(get("/api/admin/coupons/type")
 				.param("page", "0")
 				.param("size", "10")
 				.param("sort", "id"))

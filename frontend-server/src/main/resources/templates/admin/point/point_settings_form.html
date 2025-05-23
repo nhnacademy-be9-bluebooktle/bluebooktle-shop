@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html layout:decorate="~{_layouts/admin_layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${pageTitle} ?: '포인트 정책 설정'"></title>
+
+    <!-- 페이지 전용 CSS -->
+    <th:block layout:fragment="page_css">
+        <style>
+            .policy-section {
+                margin-bottom: 30px;
+            }
+
+            .policy-section legend {
+                font-size: 1.2em;
+                margin-bottom: 15px;
+                padding-bottom: 5px;
+                border-bottom: 1px solid #eee;
+            }
+
+            .policy-item {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                gap: 15px;
+                padding: 10px;
+                border: 1px solid #f0f0f0;
+                margin-bottom: 10px;
+                border-radius: 4px;
+            }
+
+            .policy-item .item-label {
+                font-weight: bold;
+                min-width: 150px;
+            }
+
+            .policy-item .admin-form-group {
+                margin-bottom: 0;
+                flex-grow: 1;
+            }
+
+            .policy-item .admin-form-control-sm {
+                width: 100px;
+                display: inline-block;
+                margin-right: 5px;
+            }
+
+            .policy-item .admin-form-check-input {
+                margin-right: 5px;
+            }
+        </style>
+    </th:block>
+
+    <!-- Bootstrap 5 CSS -->
+    <link
+            crossorigin="anonymous"
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+            integrity="sha384-ENjdO4Dr2bkBIFxQpeoA6VQbRjYHadPvX8aBkVXnEj5MCGFemxLKGPaXtkKf0Xbg"
+            rel="stylesheet">
+</head>
+<body>
+<div layout:fragment="admin_content">
+    <div class="admin-page-header mb-4">
+        <h1 class="admin-page-title">
+            <i class="fas fa-coins"></i>
+            <th:block th:text="${pageTitle} ?: '포인트 정책 설정'"></th:block>
+        </h1>
+    </div>
+
+    <div class="admin-panel">
+        <div class="admin-panel__body">
+
+            <!-- 기존 정책 수정 폼 -->
+            <fieldset class="policy-section">
+                <legend>포인트 적립 규칙</legend>
+
+                <div class="policy-item" th:each="rule : ${earningRules}">
+                    <form method="post"
+                          style="display:flex; align-items:center; gap:15px;"
+                          th:action="@{/admin/points/settings/{id}(id=${rule.pointPolicyId})}">
+
+                        <!-- sourceType, IDs -->
+                        <input name="pointSourceTypeId" th:value="${rule.pointSourceTypeId}" type="hidden"/>
+                        <input name="pointPolicyId" th:value="${rule.pointPolicyId}" type="hidden"/>
+
+                        <span class="item-label" th:text="${rule.sourceType}"></span>
+
+                        <!-- 활성화 -->
+                        <input name="isActive" th:checked="${rule.active}" type="checkbox"/>
+
+                        <!-- 정책 유형 -->
+                        <select name="policyType">
+                            <option th:each="opt : ${earningTypeOptions}"
+                                    th:selected="${opt.value == rule.policyType}"
+                                    th:text="${opt.text}"
+                                    th:value="${opt.value}"></option>
+                        </select>
+
+                        <!-- 값 -->
+                        <input name="value" placeholder="값"
+                               step="any"
+                               th:value="${rule.value}"
+                               type="number"/>
+
+                        <!-- 개별 수정 버튼 -->
+                        <button class="btn btn-sm btn-primary" type="submit">
+                            수정
+                        </button>
+                    </form>
+                </div>
+                <a class="btn btn-primary mb-3" th:href="@{/admin/points/settings/new}">
+                    + 새 포인트 규칙 생성
+                </a>
+            </fieldset>
+
+
+            <fieldset class="policy-section">
+                <legend>회원 등급별 구매 시 추가 적립률</legend>
+                <div class="policy-item" th:each="rate,iterStat : ${membershipRates}">
+                    <input th:name="|membershipRates[${iterStat.index}].membershipLevelId|"
+                           th:value="${rate.membershipLevelId}"
+                           type="hidden"/>
+                    <input th:name="|membershipRates[${iterStat.index}].pointPolicyId|"
+                           th:value="${rate.pointPolicyId}"
+                           type="hidden"/>
+                    <span class="item-label" th:text="${rate.membershipLevel}"></span>
+                    <div class="admin-form-group" style="flex-basis:100px;flex-grow:0;">
+                        <input class="admin-form-check-input"
+                               th:checked="${rate.active}"
+                               th:id="'membershipActive_' + ${iterStat.index}"
+                               th:name="|membershipRates[${iterStat.index}].active|"
+                               type="checkbox"/>
+                        <label class="admin-form-check-label"
+                               th:for="'membershipActive_' + ${iterStat.index}">활성화</label>
+                    </div>
+                    <div class="admin-form-group">
+                        <input class="admin-form-control admin-form-control-sm"
+                               placeholder="추가 적립률"
+                               step="0.1"
+                               th:id="'additionalRate_' + ${iterStat.index}"
+                               th:name="|membershipRates[${iterStat.index}].value|"
+                               th:value="${rate.value}"
+                               type="number"/>
+                        <span>%</span>
+                    </div>
+                </div>
+            </fieldset>
+
+
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap 5 JS Bundle (Popper 포함) -->
+<script
+        crossorigin="anonymous"
+        integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+Y5n1mG1QXnE+Ar5+hR7sF86dIHNS"
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

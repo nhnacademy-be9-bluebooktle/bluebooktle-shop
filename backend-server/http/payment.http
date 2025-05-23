@@ -1,8 +1,8 @@
 ### PaymentType 전체 조회
-GET localhost:9002/api/payments/types
+GET localhost:9012/api/payments/types
 
 ### PaymentType 삽입
-POST localhost:9002/api/payments/types
+POST localhost:9012/api/payments/types
 Content-Type: application/json
 
 {
@@ -10,7 +10,7 @@ Content-Type: application/json
 }
 
 ### PaymentType 수정
-PUT localhost:9002/api/payments/types/1
+PUT localhost:9012/api/payments/types/1
 Content-Type: application/json
 
 {
@@ -18,5 +18,5 @@ Content-Type: application/json
 }
 
 ### PaymentType 삭제
-DELETE localhost:9002/api/payments/types/2
+DELETE localhost:9012/api/payments/types/2
 Content-Type: application/json

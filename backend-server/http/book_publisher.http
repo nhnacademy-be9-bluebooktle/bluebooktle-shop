@@ -1,0 +1,86 @@
+@portNum = 9012
+
+@baseUrl = http://localhost:{{portNum}}/api
+
+@bookUrl = http://localhost:{{portNum}}/api/books
+@book1 = 1
+@book2 = 2
+
+@publisherUrl = http://localhost:{{portNum}}/api/publishers
+@publisher_test_1 = 1
+@publisher_test_2 = 2
+@publisher_test_3 = 3
+
+### 도서 등록1
+POST {{bookUrl}}
+Content-Type: application/json
+
+{
+  "title": "아낌없이 주는 나무",
+  "description": "아낌없이 주는 나무 설명",
+  "isbn": "9780060256654",
+  "publishDate": "2025-05-15"
+}
+
+### 도서 등록2
+POST {{bookUrl}}
+Content-Type: application/json
+
+{
+  "title": "소년은 온다",
+  "description": "소년은 온다 설명",
+  "isbn": "9788936434120",
+  "publishDate": "2025-05-15"
+}
+
+
+### 출판사 등록 성공 - 1
+POST {{publisherUrl}}
+Content-Type: application/json
+
+{
+  "name": "출판사테스트1"
+}
+
+### 출판사 등록 성공 - 2
+POST {{publisherUrl}}
+Content-Type: application/json
+
+{
+  "name": "출판사테스트2"
+}
+
+### 출판사 등록 성공 - 3
+POST {{publisherUrl}}
+Content-Type: application/json
+
+{
+  "name": "출판사테스트3"
+}
+
+### 출판사테스트1에 도서 등록 성공
+POST {{baseUrl}}/publishers/{{publisher_test_1}}/books/{{book1}}
+
+### 출판사테스트1에 도서 등록 실패 (이미 등록된 출판사)
+POST {{baseUrl}}/publishers/{{publisher_test_1}}/books/{{book1}}
+
+### 출판사테스트1에 도서 등록 성공
+POST {{baseUrl}}/publishers/{{publisher_test_1}}/books/{{book2}}
+
+### 출판사테스트3에 도서 등록 성공
+POST {{baseUrl}}/publishers/{{publisher_test_3}}/books/{{book1}}
+
+### 출판사테스트1에 등록된 도서 목록 반환
+GET {{baseUrl}}/publishers/{{publisher_test_1}}/books
+
+### 도서에 해당 출판사(출판사테스트1) 삭제
+DELETE {{baseUrl}}/publishers/{{publisher_test_1}}/books/{{book1}}
+
+### 도서에 해당 출판사(출판사테스트1) 삭제
+DELETE {{baseUrl}}/publishers/{{publisher_test_3}}/books/{{book1}}
+
+### 출판사테스트1(id = 1) 삭제 실패 (출판사에 해당되는 도서가 있을 경우 삭제 불가능)
+DELETE {{publisherUrl}}/{{publisher_test_1}}
+
+### 출판사테스트3(id = 3) 삭제 성공
+DELETE {{publisherUrl}}/{{publisher_test_3}}

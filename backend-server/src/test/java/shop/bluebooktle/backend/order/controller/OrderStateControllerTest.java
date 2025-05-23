@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -19,6 +20,8 @@ import shop.bluebooktle.backend.order.dto.response.OrderStateResponse;
 import shop.bluebooktle.backend.order.entity.OrderState;
 import shop.bluebooktle.backend.order.service.OrderStateService;
 import shop.bluebooktle.common.domain.OrderStatus;
+import shop.bluebooktle.common.security.AuthUserLoader;
+import shop.bluebooktle.common.util.JwtUtil;
 
 @WebMvcTest(controllers = OrderStateController.class)
 class OrderStateControllerTest {
@@ -29,8 +32,15 @@ class OrderStateControllerTest {
 	@MockitoBean
 	private OrderStateService orderStateService;
 
+	@MockitoBean
+	private JwtUtil jwtUtil;
+
+	@MockitoBean
+	private AuthUserLoader authUserLoader;
+
 	@Test
 	@DisplayName("주문 상태 전체 조회 - 성공")
+	@WithMockUser
 	void getAllStatus_success() throws Exception {
 		OrderState pending = OrderState.builder().state(OrderStatus.PENDING).build();
 		OrderState completed = OrderState.builder().state(OrderStatus.COMPLETED).build();
@@ -47,6 +57,7 @@ class OrderStateControllerTest {
 
 	@Test
 	@DisplayName("주문 상태 단일 조회 - 성공")
+	@WithMockUser
 	void getStatus_success() throws Exception {
 		OrderStatus status = OrderStatus.SHIPPING;
 
@@ -66,6 +77,7 @@ class OrderStateControllerTest {
 
 	@Test
 	@DisplayName("주문 상태 단일 조회 - 실패 (존재하지 않는 상태)")
+	@WithMockUser
 	void getStatus_notFound() throws Exception {
 		OrderStatus status = OrderStatus.RETURNED;
 

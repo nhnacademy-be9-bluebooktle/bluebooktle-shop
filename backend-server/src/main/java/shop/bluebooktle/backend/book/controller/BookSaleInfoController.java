@@ -13,12 +13,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import shop.bluebooktle.backend.book.dto.request.BookSaleInfoRegisterRequest;
-import shop.bluebooktle.backend.book.dto.request.BookSaleInfoUpdateRequest;
-import shop.bluebooktle.backend.book.dto.response.BookSaleInfoRegisterResponse;
-import shop.bluebooktle.backend.book.dto.response.BookSaleInfoUpdateResponse;
-import shop.bluebooktle.backend.book.entity.BookSaleInfo;
 import shop.bluebooktle.backend.book.service.BookSaleInfoService;
+import shop.bluebooktle.common.dto.book.request.BookSaleInfoRegisterRequest;
+import shop.bluebooktle.common.dto.book.request.BookSaleInfoUpdateRequest;
+import shop.bluebooktle.common.dto.book.response.BookSaleInfoRegisterResponse;
+import shop.bluebooktle.common.dto.book.response.BookSaleInfoResponse;
+import shop.bluebooktle.common.dto.book.response.BookSaleInfoUpdateResponse;
 import shop.bluebooktle.common.dto.common.JsendResponse;
 
 @RestController
@@ -38,9 +38,9 @@ public class BookSaleInfoController {
 
 	//도서판매정보 조회
 	@GetMapping("/{id}")
-	public ResponseEntity<JsendResponse<BookSaleInfoUpdateResponse>> getBookSaleInfoById(@PathVariable Long id) {
-		BookSaleInfo bookSaleInfo = bookSaleInfoService.findById(id);
-		return ResponseEntity.ok(JsendResponse.success(BookSaleInfoUpdateResponse.fromEntity(bookSaleInfo)));
+	public ResponseEntity<JsendResponse<BookSaleInfoResponse>> getBookSaleInfoById(@PathVariable Long id) {
+		BookSaleInfoResponse response = bookSaleInfoService.findById(id);
+		return ResponseEntity.ok(JsendResponse.success(response));
 	}
 
 	//도서판매정보 수정

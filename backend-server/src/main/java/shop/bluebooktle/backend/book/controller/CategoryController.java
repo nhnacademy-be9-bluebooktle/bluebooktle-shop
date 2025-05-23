@@ -14,17 +14,18 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import shop.bluebooktle.backend.book.dto.request.CategoryRegisterRequest;
-import shop.bluebooktle.backend.book.dto.request.CategoryUpdateRequest;
-import shop.bluebooktle.backend.book.dto.request.RootCategoryRegisterRequest;
-import shop.bluebooktle.backend.book.dto.response.CategoryResponse;
-import shop.bluebooktle.backend.book.dto.response.CategoryTreeResponse;
 import shop.bluebooktle.backend.book.service.CategoryService;
+import shop.bluebooktle.common.dto.book.request.CategoryRegisterRequest;
+import shop.bluebooktle.common.dto.book.request.CategoryUpdateRequest;
+import shop.bluebooktle.common.dto.book.request.RootCategoryRegisterRequest;
+import shop.bluebooktle.common.dto.book.response.CategoryResponse;
+import shop.bluebooktle.common.dto.book.response.CategoryTreeResponse;
 import shop.bluebooktle.common.dto.common.JsendResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
 
@@ -39,9 +40,15 @@ public class CategoryController {
 	// 모든 카테고리 조회 (단계적 구조로 출력 x)
 	@GetMapping
 	public ResponseEntity<JsendResponse<PaginationData<CategoryResponse>>> getCategories(
-		@PageableDefault(size = 10, sort = "id") Pageable pageable) {
-
-		Page<CategoryResponse> categoryPage = categoryService.getCategories(pageable);
+		@PageableDefault(size = 10, sort = "id") Pageable pageable,
+		@RequestParam(value = "searchKeyword", required = false) String searchKeyword
+	) {
+		Page<CategoryResponse> categoryPage;
+		if (searchKeyword != null && !searchKeyword.isBlank()) {
+			categoryPage = categoryService.searchCategories(searchKeyword, pageable);
+		} else {
+			categoryPage = categoryService.getCategories(pageable);
+		}
 		PaginationData<CategoryResponse> paginationData = new PaginationData<>(categoryPage);
 		return ResponseEntity.ok(JsendResponse.success(paginationData));
 	}
@@ -98,9 +105,7 @@ public class CategoryController {
 		@PathVariable Long categoryId,
 		@Valid @RequestBody CategoryUpdateRequest request
 	) {
-
 		categoryService.updateCategory(categoryId, request);
-		// TODO 업데이트면 return ResponseEntity.noContent().build(); 이렇게 해야할지.. 응답코드 : 204
 		return ResponseEntity.ok(JsendResponse.success());
 	}
 

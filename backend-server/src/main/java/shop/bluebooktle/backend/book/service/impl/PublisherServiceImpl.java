@@ -6,12 +6,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
-import shop.bluebooktle.backend.book.dto.request.PublisherRequest;
-import shop.bluebooktle.backend.book.dto.response.PublisherInfoResponse;
 import shop.bluebooktle.backend.book.entity.Publisher;
 import shop.bluebooktle.backend.book.repository.BookPublisherRepository;
 import shop.bluebooktle.backend.book.repository.PublisherRepository;
 import shop.bluebooktle.backend.book.service.PublisherService;
+import shop.bluebooktle.common.dto.book.request.PublisherRequest;
+import shop.bluebooktle.common.dto.book.response.PublisherInfoResponse;
 import shop.bluebooktle.common.exception.book.PublisherAlreadyExistsException;
 import shop.bluebooktle.common.exception.book.PublisherCannotDeleteException;
 import shop.bluebooktle.common.exception.book.PublisherNotFoundException;
@@ -39,6 +39,11 @@ public class PublisherServiceImpl implements PublisherService {
 	public void updatePublisher(Long publisherId, PublisherRequest request) {
 		Publisher publisher = publisherRepository.findById(publisherId)
 			.orElseThrow(() -> new PublisherNotFoundException(publisherId));
+
+		if (publisherRepository.existsByName(request.getName())) {
+			throw new PublisherAlreadyExistsException("출판사명 : " + request.getName());
+		}
+
 		publisher.setName(request.getName());
 		publisherRepository.save(publisher);
 	}
@@ -49,14 +54,14 @@ public class PublisherServiceImpl implements PublisherService {
 		Publisher publisher = publisherRepository.findById(publisherId)
 			.orElseThrow(() -> new PublisherNotFoundException(publisherId));
 
-		return new PublisherInfoResponse(publisher.getId(), publisher.getName());
+		return new PublisherInfoResponse(publisher.getId(), publisher.getName(), publisher.getCreatedAt());
 	}
 
 	@Override
 	@Transactional(readOnly = true)
 	public Page<PublisherInfoResponse> getPublishers(Pageable pageable) {
 		Page<Publisher> publisherPage = publisherRepository.findAll(pageable);
-		return publisherPage.map(p -> new PublisherInfoResponse(p.getId(), p.getName()));
+		return publisherPage.map(p -> new PublisherInfoResponse(p.getId(), p.getName(), p.getCreatedAt()));
 	}
 
 	@Override
@@ -68,5 +73,23 @@ public class PublisherServiceImpl implements PublisherService {
 			throw new PublisherCannotDeleteException();
 		}
 		publisherRepository.delete(publisher);
+	}
+
+	@Override
+	public PublisherInfoResponse registerPublisherByName(String publisherName) {
+		Publisher publisher = publisherRepository.findByName(publisherName)
+			.orElseGet(() -> publisherRepository.save(
+				Publisher.builder()
+					.name(publisherName)
+					.build()
+			));
+		return new PublisherInfoResponse(publisher.getId(), publisher.getName(), publisher.getCreatedAt());
+	}
+
+	@Override
+	public Page<PublisherInfoResponse> searchPublishers(String searchKeyword, Pageable pageable) {
+		Page<Publisher> publishers = publisherRepository.searchByNameContaining(searchKeyword, pageable);
+		return publishers.map(
+			publisher -> new PublisherInfoResponse(publisher.getId(), publisher.getName(), publisher.getCreatedAt()));
 	}
 }

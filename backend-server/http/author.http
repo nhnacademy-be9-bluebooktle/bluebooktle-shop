@@ -1,0 +1,21 @@
+### 작가 생성
+POST http://localhost:9012/api/authors
+Content-Type: application/json
+
+{
+  "name": "홍길동"
+}
+
+### 특정 작가 조회
+GET http://localhost:9012/api/authors/1
+
+### 작가 수정
+PATCH http://localhost:9012/api/authors/1
+Content-Type: application/json
+
+{
+  "name": "홍길동 (수정)"
+}
+
+### 작가 삭제
+DELETE http://localhost:9012/api/authors/1

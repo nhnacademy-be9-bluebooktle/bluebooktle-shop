@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html layout:decorate="~{_layouts/admin_layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>쿠폰 등록</title>
+    <th:block layout:fragment="page_css">
+        <style>
+            .selectable-item {
+                border: 1px solid #ccc;
+                padding: 10px;
+                margin-bottom: 5px;
+                border-radius: 5px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .selectable-item.selected {
+                background-color: #e6f7ff;
+                border-color: #1890ff;
+            }
+
+            .admin-form-group h4 {
+                margin-top: 15px;
+                margin-bottom: 10px;
+            }
+            
+            .admin-form-group.has-error .selectable-item {
+                border-color: red;
+                background-color: #fff5f5;
+            }
+        </style>
+    </th:block>
+</head>
+<body>
+<div layout:fragment="admin_content">
+    <div class="admin-page-header">
+        <h1 class="admin-page-title">
+            <i class="fas fa-plus-circle"></i> 쿠폰 등록
+        </h1>
+    </div>
+
+    <div class="admin-panel">
+        <div class="admin-panel__body">
+            <div th:if="${globalErrorMessage}" class="alert alert-danger admin-alert"
+                 style="background-color: #f8d7da; color: #721c24; padding: .75rem 1.25rem; margin-bottom: 1rem; border: 1px solid transparent; border-radius: .25rem;">
+                <strong th:text="${globalErrorMessage}"></strong>
+            </div>
+
+            <form th:action="@{/admin/coupons}" th:object="${coupon}" method="post" class="admin-form">
+                <!-- 쿠폰 이름 -->
+                <fieldset class="form-section">
+                    <legend class="admin-form-legend">기본 정보</legend>
+                    <div class="admin-form-group">
+                        <label for="name" class="admin-form-label">쿠폰 이름 <span class="text-danger">*</span></label>
+                        <input type="text" id="name" th:field="*{name}" class="admin-form-control"
+                               th:errorclass="is-invalid" placeholder="예: 5월 IT 특별 쿠폰">
+                        <div th:if="${#fields.hasErrors('name')}" th:errors="*{name}"
+                             class="invalid-feedback admin-form-text" style="color: red;"></div>
+                    </div>
+
+                    <!-- 쿠폰 정책 선택 -->
+                    <div class="admin-form-group"
+                         th:classappend="${#fields.hasErrors('couponTypeId')} ? 'has-error'">
+                        <label class="admin-form-label">쿠폰 정책 <span class="text-danger">*</span></label>
+                        <div th:each="type : ${couponTypes}" class="selectable-item"
+                             th:classappend="${coupon.couponTypeId == type.id} ? 'selected'">
+                            <span th:text="${type.name}">정책 이름</span>
+                            <button type="button" class="admin-btn admin-btn--sm admin-btn--secondary"
+                                    th:attr="data-id=${type.id}, data-target=${type.target}"
+                                    onclick="selectCouponType(this)">선택하기
+                            </button>
+                        </div>
+                        <input type="hidden" th:field="*{couponTypeId}"/>
+                        <div th:if="${#fields.hasErrors('couponTypeId')}" th:errors="*{couponTypeId}"
+                             class="invalid-feedback admin-form-text"></div>
+                    </div>
+                </fieldset>
+
+                <!-- 도서 선택 -->
+                <div class="admin-form-group" id="bookSection" style="display: none;">
+                    <h4>도서 선택</h4>
+                    <div th:each="book : ${books}" class="selectable-item"
+                         th:classappend="${coupon.bookId == book.id} ? 'selected'">
+                        <span th:text="${book.name}">도서명</span>
+                        <button type="button" class="admin-btn admin-btn--sm admin-btn--info"
+                                th:attr="data-id=${book.id}" onclick="selectBook(this)">선택
+                        </button>
+                    </div>
+                    <input type="hidden" th:field="*{bookId}"/>
+                </div>
+
+                <!-- 카테고리 선택 -->
+                <div class="admin-form-group" id="categorySection" style="display: none;">
+                    <h4>카테고리 선택</h4>
+                    <div th:each="category : ${categories}" class="selectable-item"
+                         th:classappend="${coupon.categoryId == category.id} ? 'selected'">
+                        <span th:text="${category.name}">카테고리명</span>
+                        <button type="button" class="admin-btn admin-btn--sm admin-btn--info"
+                                th:attr="data-id=${category.id}" onclick="selectCategory(this)">선택
+                        </button>
+                    </div>
+                    <input type="hidden" th:field="*{categoryId}"/>
+                </div>
+
+                <!-- 저장 버튼 -->
+                <div class="admin-form-actions" style="text-align: right; margin-top: 20px;">
+                    <a th:href="@{/admin/coupons}" class="admin-btn admin-btn--default"
+                       style="margin-right:10px;">취소</a>
+                    <button type="submit" class="admin-btn admin-btn--primary"><i class="fas fa-save"></i> 저장</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<th:block layout:fragment="page_scripts">
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        function selectCouponType(button) {
+            const selectedId = button.dataset.id;
+            const target = button.dataset.target;
+
+            document.querySelector("input[name='couponTypeId']").value = selectedId;
+
+            // UI 갱신
+            document.querySelectorAll(".selectable-item").forEach(item => item.classList.remove("selected"));
+            button.closest(".selectable-item").classList.add("selected");
+
+            // BOOK이면 도서/카테고리 보여주기
+            if (target === 'BOOK') {
+                document.getElementById("bookSection").style.display = 'block';
+                document.getElementById("categorySection").style.display = 'block';
+            } else {
+                document.getElementById("bookSection").style.display = 'none';
+                document.getElementById("categorySection").style.display = 'none';
+                document.querySelector("input[name='bookId']").value = '';
+                document.querySelector("input[name='categoryId']").value = '';
+            }
+        }
+
+        function selectBook(button) {
+            const id = button.dataset.id;
+            document.querySelector("input[name='bookId']").value = id;
+
+            document.querySelectorAll("#bookSection .selectable-item").forEach(item => item.classList.remove("selected"));
+            button.closest(".selectable-item").classList.add("selected");
+        }
+
+        function selectCategory(button) {
+            const id = button.dataset.id;
+            document.querySelector("input[name='categoryId']").value = id;
+
+            document.querySelectorAll("#categorySection .selectable-item").forEach(item => item.classList.remove("selected"));
+            button.closest(".selectable-item").classList.add("selected");
+        }
+
+        /*]]>*/
+    </script>
+</th:block>
+</body>
+</html>

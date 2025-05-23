@@ -31,4 +31,6 @@ public interface BookPublisherRepository extends JpaRepository<BookPublisher, Lo
 	Optional<BookPublisher> findByBookId(Long bookId);
 
 	boolean existsByPublisher(Publisher publisher);
+
+	Optional<BookPublisher> findByBookAndPublisher(Book book, Publisher publisher);
 }

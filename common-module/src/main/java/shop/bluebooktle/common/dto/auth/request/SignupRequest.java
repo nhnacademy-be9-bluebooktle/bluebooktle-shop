@@ -34,7 +34,7 @@ public class SignupRequest {
 	@Size(min = 8, max = 8, message = "유효한 생일 형식이 아닙니다.")
 	private String birth;
 
-	@NotBlank(message = "이메일은 필수입니다.")
-	@Size(min = 11, max = 11, message = "유효한 전화번호 형식이 아닙니다.")
+	@NotBlank(message = "연락처는 필수입니다.")
+	@Size(min = 11, max = 11, message = "유효한 연락처 형식이 아닙니다.")
 	private String phoneNumber;
 }

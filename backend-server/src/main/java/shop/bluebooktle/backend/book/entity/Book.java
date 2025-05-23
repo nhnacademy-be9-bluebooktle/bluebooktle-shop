@@ -43,7 +43,7 @@ public class Book extends BaseEntity {
 	@Column(name = "title", nullable = false, length = 255)
 	private String title;
 
-	@Column(name = "index", columnDefinition = "TEXT")
+	@Column(name = "`index`", columnDefinition = "TEXT")
 	private String index;
 
 	@Column(name = "description", nullable = false, columnDefinition = "TEXT")

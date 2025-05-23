@@ -10,17 +10,16 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import shop.bluebooktle.common.dto.auth.request.LoginRequest;
 import shop.bluebooktle.common.dto.auth.request.SignupRequest;
-import shop.bluebooktle.common.dto.auth.response.TokenResponse;
 import shop.bluebooktle.common.exception.ApplicationException;
 import shop.bluebooktle.common.exception.ErrorCode;
-import shop.bluebooktle.frontend.service.AuthService;
+import shop.bluebooktle.frontend.service.impl.AuthServiceImpl;
+import shop.bluebooktle.frontend.util.CookieTokenUtil;
 
 @Slf4j
 @Controller
@@ -28,7 +27,8 @@ import shop.bluebooktle.frontend.service.AuthService;
 @RequiredArgsConstructor
 public class AuthController {
 
-	private final AuthService authService;
+	private final AuthServiceImpl authService;
+	private final CookieTokenUtil cookieTokenUtil;
 
 	@GetMapping("/login")
 	public String loginForm(Model model,
@@ -43,18 +43,7 @@ public class AuthController {
 	@PostMapping("/login")
 	public String login(@ModelAttribute LoginRequest loginRequest,
 		HttpServletResponse response) {
-
-		TokenResponse tokenResponse = authService.login(loginRequest);
-		Cookie accessTokenCookie = new Cookie("accessToken", tokenResponse.getAccessToken());
-		accessTokenCookie.setPath("/");
-		response.addCookie(accessTokenCookie);
-
-		Cookie refreshTokenCookie = new Cookie("refreshToken", tokenResponse.getRefreshToken());
-		refreshTokenCookie.setHttpOnly(true);
-		refreshTokenCookie.setPath("/");
-		response.addCookie(refreshTokenCookie);
-
-		log.info("로그인 성공: {}", loginRequest.getLoginId());
+		authService.login(response, loginRequest);
 		return "redirect:/";
 
 	}
@@ -103,7 +92,7 @@ public class AuthController {
 			return "redirect:/signup";
 		} catch (Exception e) {
 			redirectAttributes.addFlashAttribute("error", "true");
-			redirectAttributes.addFlashAttribute("errorMessage", "알 수 없는 오류로 회원가입에 실패했습니다. 잠시 후 다시 시도해주세요.");
+			redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
 			redirectAttributes.addFlashAttribute("signupRequest", signupRequest);
 			return "redirect:/signup";
 		}
@@ -111,19 +100,9 @@ public class AuthController {
 
 	@PostMapping("/logout")
 	public String handleLogout(HttpServletResponse response, RedirectAttributes redirectAttributes) {
-		deleteCookie(response, "accessToken");
-		deleteCookie(response, "refreshToken");
-		redirectAttributes.addFlashAttribute("globalSuccessMessage", "로그아웃 되었습니다!");
-		redirectAttributes.addFlashAttribute("globalSuccessTitle", "로그아웃 성공!");
-
+		cookieTokenUtil.clearTokens(response);
+		log.info("로그아웃 성공");
 		return "redirect:/";
-	}
-
-	private void deleteCookie(HttpServletResponse response, String cookieName) {
-		Cookie cookie = new Cookie(cookieName, null);
-		cookie.setPath("/");
-		cookie.setMaxAge(0);
-		response.addCookie(cookie);
 	}
 
 	@ExceptionHandler(Exception.class)

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html layout:decorate="~{_layouts/admin_layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${pageTitle} ?: '카테고리 폼'"></title>
+</head>
+<body>
+<div layout:fragment="admin_content">
+    <div class="admin-page-header">
+        <h1 class="admin-page-title">
+            <i class="fas fa-sitemap"></i>
+            <th:block th:text="${pageTitle}"></th:block>
+        </h1>
+    </div>
+
+    <div class="admin-panel">
+        <div class="admin-panel__body">
+            <form th:action="@{/admin/categories/save}" th:object="${category}" method="post">
+                <input type="hidden" th:field="*{id}"/>
+
+                <!-- ② 최상위 등록 폼 -->
+                <div id="rootGroup" class="admin-form-group">
+                    <div>
+                        <label for="rootCategoryName" class="admin-form-label">최상위 카테고리 이름 <span
+                                style="color:red;">*</span></label>
+                        <input type="text" id="rootCategoryName" th:field="*{rootCategoryName}"
+                               class="admin-form-control" placeholder="예: 소설"/>
+                    </div>
+                    <div style="margin-top:1rem">
+                        <label for="childCategoryName" class="admin-form-label">자식 카테고리 이름 <span
+                                style="color:red;">*</span></label>
+                        <input type="text" id="childCategoryName" th:field="*{childCategoryName}"
+                               class="admin-form-control" placeholder="예: 국내소설"/>
+                    </div>
+                </div>
+
+                <div class="admin-form-actions" style="margin-top: 20px; text-align: right;">
+                    <a th:href="@{/admin/categories}" class="admin-btn admin-btn--default" style="margin-right:8px;">
+                        취소
+                    </a>
+                    <button type="submit" class="admin-btn admin-btn--primary">
+                        <i class="fas fa-save"></i>
+                        등록
+                    </button>
+                </div>
+            </form>
+
+            <script th:inline="javascript">
+                /*<![CDATA[*/
+                const rootRadio = document.getElementById('typeRoot');
+                const childRadio = document.getElementById('typeChild');
+                const rootGroup = document.getElementById('rootGroup');
+                const childGroup = document.getElementById('childGroup');
+
+                function toggleGroups() {
+                    if (rootRadio.checked) {
+                        rootGroup.style.display = 'block';
+                        childGroup.style.display = 'none';
+                    } else {
+                        rootGroup.style.display = 'none';
+                        childGroup.style.display = 'block';
+                    }
+                }
+
+                rootRadio.addEventListener('change', toggleGroups);
+                childRadio.addEventListener('change', toggleGroups);
+                toggleGroups(); // 초기 상태
+                /*]]>*/
+            </script>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -8,8 +8,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
-import shop.bluebooktle.backend.book.dto.response.BookInfoResponse;
-import shop.bluebooktle.backend.book.dto.response.TagInfoResponse;
 import shop.bluebooktle.backend.book.entity.Book;
 import shop.bluebooktle.backend.book.entity.BookTag;
 import shop.bluebooktle.backend.book.entity.Tag;
@@ -17,6 +15,8 @@ import shop.bluebooktle.backend.book.repository.BookRepository;
 import shop.bluebooktle.backend.book.repository.BookTagRepository;
 import shop.bluebooktle.backend.book.repository.TagRepository;
 import shop.bluebooktle.backend.book.service.BookTagService;
+import shop.bluebooktle.common.dto.book.response.BookInfoResponse;
+import shop.bluebooktle.common.dto.book.response.TagInfoResponse;
 import shop.bluebooktle.common.exception.book.BookNotFoundException;
 import shop.bluebooktle.common.exception.book.BookTagAlreadyExistsException;
 import shop.bluebooktle.common.exception.book.BookTagNotFoundException;
@@ -47,18 +47,19 @@ public class BookTagServiceImpl implements BookTagService {
 	}
 
 	@Override
-	public void deleteBookTag(Long bookId, Long tagId) {
-		Book book = findBookOrThrow(bookId);
-		Tag tag = findTagOrThrow(tagId);
-
-		// 도서태그 테이블에 존재하지 않을 경우
-		if (!bookTagRepository.existsByBookAndTag(book, tag)) {
-			throw new BookTagNotFoundException(bookId, tagId);
+	public void registerBookTag(Long bookId, List<Long> tagIdList) {
+		for (Long tagId : tagIdList) {
+			registerBookTag(bookId, tagId);
 		}
-		BookTag bookTag = BookTag.builder()
-			.tag(tag)
-			.book(book)
-			.build();
+	}
+
+	@Override
+	public void deleteBookTag(Long tagId, Long bookId) {
+		Tag tag = findTagOrThrow(tagId);
+		Book book = findBookOrThrow(bookId);
+
+		BookTag bookTag = bookTagRepository.findByBookAndTag(book, tag)
+			.orElseThrow(() -> new BookTagNotFoundException(bookId, tagId));
 		bookTagRepository.delete(bookTag);
 	}
 
@@ -70,7 +71,8 @@ public class BookTagServiceImpl implements BookTagService {
 		return bookTagsByBook.stream()
 			.map(t -> new TagInfoResponse(
 				t.getTag().getId(),
-				t.getTag().getName()))
+				t.getTag().getName(),
+				t.getTag().getCreatedAt()))
 			.toList();
 	}
 

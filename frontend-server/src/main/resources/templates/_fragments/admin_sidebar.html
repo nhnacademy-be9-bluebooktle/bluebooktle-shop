@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<aside class="admin-sidebar" th:fragment="adminSidebarFragment">
+    <nav class="admin-sidebar__nav">
+        <ul>
+            <li class="admin-sidebar__nav-item">
+                <a th:href="@{/admin/dashboard}"
+                   th:classappend="${#strings.startsWith(currentURI, '/admin/dashboard')} ? 'active' : ''">
+                    <i class="fas fa-tachometer-alt"></i> 대시보드
+                </a>
+            </li>
+
+            <li class="admin-sidebar__nav-item">
+                <a th:href="@{/admin/categories}"
+                   th:classappend="${#strings.startsWith(currentURI, '/admin/categories')} ? 'active' : ''">
+                    <i class="fas fa-sitemap"></i> 카테고리 관리
+                </a>
+            </li>
+
+            <li class="admin-sidebar__nav-item">
+                <a th:href="@{/admin/authors}"
+                   th:classappend="${#strings.startsWith(currentURI, '/admin/authors')} ? 'active' : ''">
+                    <i class="fas fa-feather-alt"></i> 작가 관리
+                </a>
+            </li>
+
+            <li class="admin-sidebar__nav-item">
+                <a th:href="@{/admin/publishers}"
+                   th:classappend="${#strings.startsWith(currentURI, '/admin/publishers')} ? 'active' : ''">
+                    <i class="fas fa-building"></i> 출판사 관리
+                </a>
+            </li>
+
+            <li class="admin-sidebar__nav-item">
+                <a th:href="@{/admin/tags}"
+                   th:classappend="${#strings.startsWith(currentURI, '/admin/tags')} ? 'active' : ''">
+                    <i class="fas fa-tags"></i> 태그 관리
+                </a>
+            </li>
+
+            <li class="admin-sidebar__nav-item has-submenu"
+                th:classappend="${#strings.startsWith(currentURI, '/admin/books')} ? 'open active-parent' : ''">
+                <a href="#"> <i class="fas fa-book"></i> 도서 관리 <i class="fas fa-angle-down submenu-toggle-icon"></i>
+                </a>
+                <ul class="admin-sidebar__nav-submenu">
+                    <li><a th:href="@{/admin/books}"
+                           th:classappend="${currentURI == '/admin/books'} ? 'active' : ''">도서 목록</a></li>
+                    <li><a th:href="@{/admin/books/new}"
+                           th:classappend="${currentURI == '/admin/books/new'} ? 'active' : ''">도서 등록</a></li>
+                </ul>
+            </li>
+
+            <li class="admin-sidebar__nav-item">
+                <a th:href="@{/admin/members}"
+                   th:classappend="${#strings.startsWith(currentURI, '/admin/members')} ? 'active' : ''">
+                    <i class="fas fa-users"></i> 회원 관리
+                </a>
+            </li>
+
+            <li class="admin-sidebar__nav-item">
+                <a th:href="@{/admin/orders}"
+                   th:classappend="${#strings.startsWith(currentURI, '/admin/orders')} ? 'active' : ''">
+                    <i class="fas fa-shopping-cart"></i> 주문 관리
+                </a>
+            </li>
+
+            <li class="admin-sidebar__nav-item has-submenu"
+                th:classappend="${#strings.startsWith(currentURI, '/admin/coupons') or #strings.startsWith(currentURI, '/admin/points')} ? 'open active-parent' : ''">
+                <a href="#">
+                    <i class="fas fa-gift"></i> 프로모션 관리 <i class="fas fa-angle-down submenu-toggle-icon"></i>
+                </a>
+                <ul class="admin-sidebar__nav-submenu">
+                    <li><a th:href="@{/admin/coupons}"
+                           th:classappend="${#strings.startsWith(currentURI, '/admin/coupons')} ? 'active' : ''">쿠폰
+                        정책</a></li>
+                    <li><a th:href="@{/admin/points/settings}"
+                           th:classappend="${#strings.startsWith(currentURI, '/admin/points/settings')} ? 'active' : ''">포인트
+                        정책</a></li>
+                </ul>
+            </li>
+
+            <li class="admin-sidebar__nav-item has-submenu"
+                th:classappend="${#strings.startsWith(currentURI, '/admin/delivery') or
+                                     #strings.startsWith(currentURI, '/admin/packaging') or
+                                     #strings.startsWith(currentURI, '/admin/reviews') or
+                                     #strings.startsWith(currentURI, '/admin/refunds') or
+                                     #strings.startsWith(currentURI, '/admin/membership')} ? 'open active-parent' : ''">
+                <a href="#">
+                    <i class="fas fa-cogs"></i> 기타 정책 관리 <i class="fas fa-angle-down submenu-toggle-icon"></i>
+                </a>
+                <ul class="admin-sidebar__nav-submenu">
+                    <li><a th:href="@{/admin/delivery/settings}"
+                           th:classappend="${#strings.startsWith(currentURI, '/admin/delivery/settings')} ? 'active' : ''">배송
+                        정책</a></li>
+                    <li><a th:href="@{/admin/packaging/options}"
+                           th:classappend="${#strings.startsWith(currentURI, '/admin/packaging/options')} ? 'active' : ''">포장
+                        옵션</a></li>
+
+                    <li><a th:href="@{/admin/refunds}"
+                           th:classappend="${#strings.startsWith(currentURI, '/admin/refunds')} ? 'active' : ''">환불
+                        관리</a></li>
+                    <li><a th:href="@{/admin/membership/levels}"
+                           th:classappend="${#strings.startsWith(currentURI, '/admin/membership/levels')} ? 'active' : ''">회원
+                        등급 정책</a></li>
+                </ul>
+            </li>
+        </ul>
+    </nav>
+</aside>
+</body>
+</html>

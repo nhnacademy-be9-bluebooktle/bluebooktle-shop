@@ -19,6 +19,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import shop.bluebooktle.backend.coupon.entity.Coupon;
@@ -35,6 +37,8 @@ import shop.bluebooktle.common.entity.auth.MembershipLevel;
 import shop.bluebooktle.common.entity.auth.User;
 import shop.bluebooktle.common.exception.coupon.CouponNotFoundException;
 import shop.bluebooktle.common.exception.coupon.UserCouponNotFoundException;
+import shop.bluebooktle.common.security.AuthUserLoader;
+import shop.bluebooktle.common.util.JwtUtil;
 
 @ExtendWith(MockitoExtension.class)
 class UserCouponServiceTest {
@@ -50,6 +54,12 @@ class UserCouponServiceTest {
 	private CouponRepository couponRepository;
 	@Mock
 	private MembershipLevelRepository membershipLevelRepository;
+
+	@MockitoBean
+	private JwtUtil jwtUtil;
+
+	@MockitoBean
+	private AuthUserLoader authUserLoader;
 
 	private User user;
 	private Coupon coupon;
@@ -74,6 +84,7 @@ class UserCouponServiceTest {
 
 	@Test
 	@DisplayName("쿠폰 발급 - 성공")
+	@WithMockUser
 	void registerCoupon_success() {
 		// given
 		User user1 = User.builder()
@@ -81,6 +92,7 @@ class UserCouponServiceTest {
 			.name("유저1")
 			.membershipLevel(membership)
 			.email("user1@example.com")
+			.nickname("유저1")
 			.phoneNumber("01012345678")
 			.birth("1990-01-01")
 			.build();
@@ -89,6 +101,7 @@ class UserCouponServiceTest {
 			.loginId("user2")
 			.name("유저2")
 			.membershipLevel(membership)
+			.nickname("유저2")
 			.email("user2@example.com")
 			.phoneNumber("01023456789")
 			.birth("1991-01-01")
@@ -112,6 +125,7 @@ class UserCouponServiceTest {
 
 	@Test
 	@DisplayName("쿠폰 발급 실패 - 쿠폰 없음")
+	@WithMockUser
 	void registerCoupon_couponNotFound() {
 		UserCouponRegisterRequest request = UserCouponRegisterRequest.builder()
 			.couponId(2L)
@@ -127,6 +141,7 @@ class UserCouponServiceTest {
 
 	@Test
 	@DisplayName("유저 쿠폰 전체 조회 - 성공")
+	@WithMockUser
 	void getAllUserCoupons_success() {
 		Pageable pageable = PageRequest.of(0, 10);
 		Page<UserCouponResponse> page = new PageImpl<>(List.of());
@@ -141,20 +156,22 @@ class UserCouponServiceTest {
 
 	@Test
 	@DisplayName("유저 사용 가능 쿠폰 조회 - 성공")
+	@WithMockUser
 	void getAvailableUserCoupons_success() {
 		Pageable pageable = PageRequest.of(0, 10);
 		Page<UserCouponResponse> page = new PageImpl<>(List.of());
 
-		given(userCouponRepository.findAllByAvailableUserCoupon(user, pageable)).willReturn(page);
+		given(userCouponRepository.findAllByUsableUserCoupon(user, pageable)).willReturn(page);
 
-		Page<UserCouponResponse> result = userCouponService.getAvailableUserCoupons(user, pageable);
+		Page<UserCouponResponse> result = userCouponService.getUsableUserCoupons(user, pageable);
 
 		assertThat(result.getContent()).isInstanceOf(List.class);
-		verify(userCouponRepository).findAllByAvailableUserCoupon(user, pageable);
+		verify(userCouponRepository).findAllByUsableUserCoupon(user, pageable);
 	}
 
 	@Test
 	@DisplayName("쿠폰 사용 - 성공")
+	@WithMockUser
 	void useCoupon_success() {
 		UserCoupon userCoupon = mock(UserCoupon.class);
 		given(userCouponRepository.findById(1L)).willReturn(Optional.of(userCoupon));
@@ -166,30 +183,11 @@ class UserCouponServiceTest {
 
 	@Test
 	@DisplayName("쿠폰 사용 - 존재하지 않음")
+	@WithMockUser
 	void useCoupon_notFound() {
 		given(userCouponRepository.findById(1L)).willReturn(Optional.empty());
 
 		assertThatThrownBy(() -> userCouponService.useCoupon(1L))
-			.isInstanceOf(UserCouponNotFoundException.class);
-	}
-
-	@Test
-	@DisplayName("쿠폰 삭제 - 성공")
-	void deleteCoupon_success() {
-		UserCoupon userCoupon = mock(UserCoupon.class);
-		given(userCouponRepository.findById(1L)).willReturn(Optional.of(userCoupon));
-
-		userCouponService.deleteCoupon(1L);
-
-		verify(userCouponRepository).delete(userCoupon);
-	}
-
-	@Test
-	@DisplayName("쿠폰 삭제 - 존재하지 않음")
-	void deleteCoupon_notFound() {
-		given(userCouponRepository.findById(1L)).willReturn(Optional.empty());
-
-		assertThatThrownBy(() -> userCouponService.deleteCoupon(1L))
 			.isInstanceOf(UserCouponNotFoundException.class);
 	}
 }

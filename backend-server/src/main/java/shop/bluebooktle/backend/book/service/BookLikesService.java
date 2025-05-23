@@ -2,7 +2,7 @@ package shop.bluebooktle.backend.book.service;
 
 import java.util.List;
 
-import shop.bluebooktle.backend.book.dto.response.BookLikesResponse;
+import shop.bluebooktle.common.dto.book.response.BookLikesResponse;
 
 public interface BookLikesService {
 	// 사용자가 도서 좋아요 누르기

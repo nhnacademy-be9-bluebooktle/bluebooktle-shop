@@ -1,0 +1,82 @@
+<configuration>
+    <springProfile name="prod">
+        <springProperty name="APP_NAME" source="spring.application.name"/>
+        <springProperty name="PORT" source="server.port"/>
+        <springProperty name="PROFILE" source="spring.profiles.active"/>
+
+        <property name="LOG_FOLDER" value="logs/${PROFILE}/server"/>
+
+        <property name="LOG_FILE" value="${LOG_FOLDER}/${APP_NAME}-${PORT}.log"/>
+
+        <appender name="systemLogAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <file>${LOG_FILE}</file>
+            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                <fileNamePattern>${LOG_FOLDER}/${APP_NAME}-${PORT}-%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+                <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                    <maxFileSize>10MB</maxFileSize>
+                </timeBasedFileNamingAndTriggeringPolicy>
+                <maxHistory>7</maxHistory>
+            </rollingPolicy>
+            <encoder>
+                <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            </encoder>
+        </appender>
+
+        <logger name="shop.bluebooktle.eureka" level="INFO" additivity="false">
+            <appender-ref ref="systemLogAppender"/>
+        </logger>
+
+        <root level="INFO">
+            <appender-ref ref="systemLogAppender"/>
+        </root>
+    </springProfile>
+
+    <springProfile name="dev">
+        <springProperty name="APP_NAME" source="spring.application.name"/>
+        <springProperty name="PORT" source="server.port"/>
+        <springProperty name="PROFILE" source="spring.profiles.active"/>
+
+        <property name="LOG_FOLDER" value="logs/${PROFILE}/server"/>
+
+        <property name="LOG_FILE" value="${LOG_FOLDER}/${APP_NAME}-${PORT}.log"/>
+
+        <appender name="systemLogAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <file>${LOG_FILE}</file>
+            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                <fileNamePattern>${LOG_FOLDER}/${APP_NAME}-${PORT}-%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+                <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                    <maxFileSize>10MB</maxFileSize>
+                </timeBasedFileNamingAndTriggeringPolicy>
+                <maxHistory>7</maxHistory>
+            </rollingPolicy>
+            <encoder>
+                <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            </encoder>
+        </appender>
+
+        <logger name="shop.bluebooktle.eureka" level="DEBUG" additivity="false">
+            <appender-ref ref="systemLogAppender"/>
+        </logger>
+
+        <root level="INFO">
+            <appender-ref ref="systemLogAppender"/>
+        </root>
+    </springProfile>
+
+    <springProfile name="local">
+        <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder>
+                <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            </encoder>
+        </appender>
+
+        <logger name="shop.bluebooktle.eureka" level="DEBUG" additivity="false">
+            <appender-ref ref="STDOUT"/>
+        </logger>
+
+        <root level="info">
+            <appender-ref ref="STDOUT"/>
+        </root>
+
+    </springProfile>
+</configuration>

@@ -11,7 +11,7 @@ public interface DeliveryRuleService {
 	DeliveryRule getDefaultRule();
 
 	// 정책 조회
-	DeliveryRule getRule(String name);
+	DeliveryRule getRule(Long id);
 
 	// 관리자 용 정책 추가 기능
 	DeliveryRule createPolicy(String name, BigDecimal price, BigDecimal deliveryFee);
@@ -20,5 +20,5 @@ public interface DeliveryRuleService {
 	List<DeliveryRule> getAll();
 
 	// 정책 삭제
-	void deletePolicy(String name);
+	void deletePolicy(Long id);
 }

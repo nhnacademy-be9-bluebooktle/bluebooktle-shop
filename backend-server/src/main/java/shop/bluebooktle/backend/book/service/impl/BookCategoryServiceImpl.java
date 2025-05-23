@@ -9,9 +9,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
-import shop.bluebooktle.backend.book.dto.request.BookInfoRequest;
-import shop.bluebooktle.backend.book.dto.response.BookInfoResponse;
-import shop.bluebooktle.backend.book.dto.response.CategoryResponse;
 import shop.bluebooktle.backend.book.entity.Book;
 import shop.bluebooktle.backend.book.entity.BookCategory;
 import shop.bluebooktle.backend.book.entity.Category;
@@ -19,6 +16,9 @@ import shop.bluebooktle.backend.book.repository.BookCategoryRepository;
 import shop.bluebooktle.backend.book.repository.BookRepository;
 import shop.bluebooktle.backend.book.repository.CategoryRepository;
 import shop.bluebooktle.backend.book.service.BookCategoryService;
+import shop.bluebooktle.common.dto.book.request.BookInfoRequest;
+import shop.bluebooktle.common.dto.book.response.BookInfoResponse;
+import shop.bluebooktle.common.dto.book.response.CategoryResponse;
 import shop.bluebooktle.common.exception.book.BookCategoryAlreadyExistsException;
 import shop.bluebooktle.common.exception.book.BookCategoryLimitExceededException;
 import shop.bluebooktle.common.exception.book.BookCategoryNotFoundException;
@@ -55,20 +55,25 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 	}
 
 	@Override
+	public void registerBookCategory(Long bookId, List<Long> categoryIdList) {
+		for (Long categoryId : categoryIdList) {
+			registerBookCategory(bookId, categoryId);
+		}
+	}
+
+	@Override
 	public void deleteBookCategory(Long bookId, Long categoryId) {
 		Book book = requireBook(bookId);
 		Category category = requireCategory(categoryId);
 
-		if (!bookCategoryRepository.existsByBookAndCategory(book, category)) {
-			throw new BookCategoryNotFoundException(book.getId(), category.getId());
-		}
+		BookCategory bookCategory = bookCategoryRepository.findByBookAndCategory(book, category)
+			.orElseThrow(() -> new BookCategoryNotFoundException(bookId, categoryId));
 
 		long count = bookCategoryRepository.countByBook(book);
 		if (count <= 1) {
 			throw new BookCategoryRequiredException(book.getId());
 		}
 
-		BookCategory bookCategory = new BookCategory(book, category);
 		bookCategoryRepository.delete(bookCategory);
 	}
 
@@ -104,7 +109,11 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 
 		for (BookCategory bookCategory : bookCategories) {
 			Category category = bookCategory.getCategory();
-			result.add(new CategoryResponse(category.getId(), category.getName()));
+			result.add(new CategoryResponse(
+				category.getId(),
+				category.getName(),
+				category.getParentCategory().getName(),
+				category.getCategoryPath()));
 		}
 		//TODO book_category_id 도 반환해야할 듯
 		return result;

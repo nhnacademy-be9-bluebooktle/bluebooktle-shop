@@ -1,4 +1,5 @@
-@baseUrl = http://localhost:9002/api/categories
+@port = 9012
+@baseUrl = http://localhost:{{port}}/api/categories
 
 @category1 = 1
 @category1_1 = 2
@@ -90,6 +91,14 @@ Content-Type: application/json
 
 {
   "name": "카테고리1_1_1_1"
+}
+
+### 카테고리1_1의 하위 카테고리 등록
+POST {{baseUrl}}/8
+Content-Type: application/json
+
+{
+  "name": "카테고리1_1_1_2"
 }
 
 

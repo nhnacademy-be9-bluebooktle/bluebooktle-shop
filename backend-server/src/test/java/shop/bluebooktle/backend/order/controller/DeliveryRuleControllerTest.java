@@ -1,6 +1,7 @@
 package shop.bluebooktle.backend.order.controller;
 
 import static org.mockito.BDDMockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -12,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -20,6 +22,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import shop.bluebooktle.backend.order.dto.request.DeliveryRuleRequest;
 import shop.bluebooktle.backend.order.entity.DeliveryRule;
 import shop.bluebooktle.backend.order.service.DeliveryRuleService;
+import shop.bluebooktle.common.security.AuthUserLoader;
+import shop.bluebooktle.common.util.JwtUtil;
 
 @WebMvcTest(controllers = DeliveryRuleController.class)
 class DeliveryRuleControllerTest {
@@ -33,8 +37,15 @@ class DeliveryRuleControllerTest {
 	@Autowired
 	private ObjectMapper objectMapper;
 
+	@MockitoBean
+	private JwtUtil jwtUtil;
+
+	@MockitoBean
+	private AuthUserLoader authUserLoader;
+
 	@Test
 	@DisplayName("배송 정책 등록 - 성공")
+	@WithMockUser
 	void createDeliveryPolicy_success() throws Exception {
 		DeliveryRuleRequest request = new DeliveryRuleRequest("기본 배송", new BigDecimal("30000"), new BigDecimal("3000"));
 
@@ -47,7 +58,7 @@ class DeliveryRuleControllerTest {
 
 		mockMvc.perform(post("/api/admin/delivery-rules")
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(request)))
+				.content(objectMapper.writeValueAsString(request)).with(csrf()))
 			.andExpect(status().isCreated())
 			.andExpect(jsonPath("$.status").value("success"));
 
@@ -56,25 +67,28 @@ class DeliveryRuleControllerTest {
 
 	@Test
 	@DisplayName("단일 배송 정책 조회 - 성공")
+	@WithMockUser
 	void getRule_success() throws Exception {
+		Long id = 1L;
 		DeliveryRule rule = DeliveryRule.builder()
 			.name("기본 배송")
 			.price(new BigDecimal("30000"))
 			.deliveryFee(new BigDecimal("3000"))
 			.build();
 
-		given(deliveryRuleService.getRule(eq("기본 배송"))).willReturn(rule);
+		given(deliveryRuleService.getRule(id)).willReturn(rule);
 
-		mockMvc.perform(get("/api/admin/delivery-rules")
-				.param("name", "기본 배송"))
+		mockMvc.perform(get("/api/admin/delivery-rules/{id}", id))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.status").value("success"));
+			.andExpect(jsonPath("$.status").value("success"))
+			.andExpect(jsonPath("$.data.name").value("기본 배송"));
 
-		verify(deliveryRuleService).getRule("기본 배송");
+		verify(deliveryRuleService).getRule(id);
 	}
 
 	@Test
 	@DisplayName("전체 배송 정책 조회 - 성공")
+	@WithMockUser
 	void getAllRules_success() throws Exception {
 		List<DeliveryRule> rules = List.of(
 			DeliveryRule.builder()
@@ -96,12 +110,13 @@ class DeliveryRuleControllerTest {
 
 	@Test
 	@DisplayName("배송 정책 삭제 - 성공")
+	@WithMockUser
 	void deleteRule_success() throws Exception {
-		mockMvc.perform(delete("/api/admin/delivery-rules")
-				.param("name", "기본 배송"))
+		Long id = 1L;
+		mockMvc.perform(delete("/api/admin/delivery-rules/{id}", id).with(csrf()))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.status").value("success"));
 
-		verify(deliveryRuleService).deletePolicy("기본 배송");
+		verify(deliveryRuleService).deletePolicy(id);
 	}
 }

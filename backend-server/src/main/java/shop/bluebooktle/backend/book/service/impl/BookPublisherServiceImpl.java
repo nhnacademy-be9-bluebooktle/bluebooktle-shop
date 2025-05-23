@@ -8,8 +8,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
-import shop.bluebooktle.backend.book.dto.response.BookInfoResponse;
-import shop.bluebooktle.backend.book.dto.response.PublisherInfoResponse;
 import shop.bluebooktle.backend.book.entity.Book;
 import shop.bluebooktle.backend.book.entity.BookPublisher;
 import shop.bluebooktle.backend.book.entity.Publisher;
@@ -17,6 +15,8 @@ import shop.bluebooktle.backend.book.repository.BookPublisherRepository;
 import shop.bluebooktle.backend.book.repository.BookRepository;
 import shop.bluebooktle.backend.book.repository.PublisherRepository;
 import shop.bluebooktle.backend.book.service.BookPublisherService;
+import shop.bluebooktle.common.dto.book.response.BookInfoResponse;
+import shop.bluebooktle.common.dto.book.response.PublisherInfoResponse;
 import shop.bluebooktle.common.exception.book.BookNotFoundException;
 import shop.bluebooktle.common.exception.book.BookPublisherAlreadyExistsException;
 import shop.bluebooktle.common.exception.book.BookPublisherNotFoundException;
@@ -47,16 +47,20 @@ public class BookPublisherServiceImpl implements BookPublisherService {
 	}
 
 	@Override
+	public void registerBookPublisher(Long bookId, List<Long> publisherIdList) {
+		for (Long publisherId : publisherIdList) {
+			registerBookPublisher(bookId, publisherId);
+		}
+	}
+
+	@Override
 	public void deleteBookPublisher(Long bookId, Long publisherId) {
 		Book book = findBookOrThrow(bookId);
 		Publisher publisher = findPublisherOrThrow(publisherId);
-		if (!bookPublisherRepository.existsByBookAndPublisher(book, publisher)) {
-			throw new BookPublisherNotFoundException(bookId, publisherId);
-		}
-		BookPublisher bookPublisher = BookPublisher.builder()
-			.book(book)
-			.publisher(publisher)
-			.build();
+
+		BookPublisher bookPublisher = bookPublisherRepository.findByBookAndPublisher(book, publisher)
+			.orElseThrow(() -> new BookPublisherNotFoundException(bookId, publisherId));
+
 		bookPublisherRepository.delete(bookPublisher);
 	}
 
@@ -68,7 +72,8 @@ public class BookPublisherServiceImpl implements BookPublisherService {
 		return publisherListByBook.stream()
 			.map(p -> new PublisherInfoResponse(
 				p.getPublisher().getId(),
-				p.getPublisher().getName()))
+				p.getPublisher().getName(),
+				p.getPublisher().getCreatedAt()))
 			.toList();
 	}
 

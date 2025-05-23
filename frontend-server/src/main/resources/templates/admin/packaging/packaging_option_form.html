@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html layout:decorate="~{_layouts/admin_layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${pageTitle} ?: '포장 옵션 폼'"></title>
+    <th:block layout:fragment="page_css">
+        <style>
+            .form-section {
+                margin-bottom: 20px;
+            }
+
+            #imagePreview {
+                max-width: 200px;
+                max-height: 200px;
+                margin-top: 10px;
+                border: 1px solid #ddd;
+                padding: 5px;
+                display: none;
+            }
+
+            #imagePreview.has-image {
+                display: block;
+            }
+        </style>
+    </th:block>
+</head>
+<body>
+<div layout:fragment="admin_content">
+    <div class="admin-page-header">
+        <h1 class="admin-page-title">
+            <i class="fas fa-gift"></i>
+            <th:block th:text="${pageTitle}"></th:block>
+        </h1>
+    </div>
+
+    <div class="admin-panel">
+        <div class="admin-panel__body">
+            <form th:action="@{/admin/packaging/options/save}" th:object="${packagingOption}" method="post"
+                  class="admin-form">
+                <input type="hidden" th:field="*{id}"/>
+
+                <fieldset class="form-section">
+                    <legend class="admin-form-legend">포장 옵션 정보</legend>
+                    <div class="admin-form-group">
+                        <label for="name" class="admin-form-label">포장명 <span class="text-danger">*</span></label>
+                        <input type="text" id="name" th:field="*{name}" class="admin-form-control"
+                               placeholder="예: 고급 리본 포장" required>
+                        <div th:if="${#fields.hasErrors('name')}" th:errors="*{name}"
+                             class="invalid-feedback admin-form-text"></div>
+                    </div>
+
+                    <div class="admin-form-group">
+                        <label for="price" class="admin-form-label">가격 (원) <span class="text-danger">*</span></label>
+                        <input type="number" id="price" th:field="*{price}" class="admin-form-control"
+                               placeholder="예: 2500" required step="100">
+                        <div th:if="${#fields.hasErrors('price')}" th:errors="*{price}"
+                             class="invalid-feedback admin-form-text"></div>
+                    </div>
+
+                    <div class="admin-form-group">
+                        <label for="description" class="admin-form-label">설명</label>
+                        <textarea id="description" th:field="*{description}" class="admin-form-control" rows="3"
+                                  placeholder="포장 옵션에 대한 설명을 입력하세요."></textarea>
+                    </div>
+
+                    <div class="admin-form-group">
+                        <label for="imageUrl" class="admin-form-label">이미지 URL</label>
+                        <input type="url" id="imageUrl" th:field="*{imageUrl}" class="admin-form-control"
+                               placeholder="https://example.com/image.jpg">
+                        <img id="imagePreview" src="#" alt="이미지 미리보기"
+                             th:classappend="*{imageUrl != null && !imageUrl.isEmpty()} ? 'has-image' : ''"
+                             th:src="*{imageUrl} ?: '#'">
+                        <small class="admin-form-text">포장 옵션을 나타내는 이미지의 URL을 입력하세요.</small>
+                    </div>
+
+                    <div class="admin-form-group">
+                        <input type="checkbox" id="isActive" th:field="*{isActive}" class="admin-form-check-input">
+                        <label for="isActive" class="admin-form-check-label">이 포장 옵션 활성화</label>
+                    </div>
+                </fieldset>
+
+                <div class="admin-form-actions" style="margin-top: 20px; text-align: right;">
+                    <a th:href="@{/admin/packaging/options}" class="admin-btn admin-btn--default"
+                       style="margin-right: 8px;">취소</a>
+                    <button type="submit" class="admin-btn admin-btn--primary">
+                        <i class="fas fa-save"></i>
+                        <th:block th:text="*{id == null} ? '포장 옵션 추가' : '포장 옵션 수정'"></th:block>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<th:block layout:fragment="page_scripts">
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function () {
+            const imageUrlInput = document.getElementById('imageUrl');
+            const imagePreview = document.getElementById('imagePreview');
+
+            if (imageUrlInput && imagePreview) {
+                // 초기 이미지 미리보기 설정 (페이지 로드 시)
+                if (imageUrlInput.value) {
+                    imagePreview.src = imageUrlInput.value;
+                    imagePreview.classList.add('has-image');
+                } else {
+                    imagePreview.classList.remove('has-image');
+                }
+
+                imageUrlInput.addEventListener('input', function () {
+                    if (this.value) {
+                        imagePreview.src = this.value;
+                        imagePreview.classList.add('has-image');
+                    } else {
+                        imagePreview.src = '#'; // 빈 값일 경우 src 초기화
+                        imagePreview.classList.remove('has-image');
+                    }
+                });
+            }
+        });
+    </script>
+</th:block>
+</body>
+</html>

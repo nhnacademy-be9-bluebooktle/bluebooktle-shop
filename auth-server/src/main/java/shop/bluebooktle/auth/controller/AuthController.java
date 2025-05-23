@@ -2,6 +2,7 @@ package shop.bluebooktle.auth.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,11 +13,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.auth.service.AuthService;
+import shop.bluebooktle.common.domain.auth.UserType;
 import shop.bluebooktle.common.dto.auth.request.LoginRequest;
 import shop.bluebooktle.common.dto.auth.request.SignupRequest;
 import shop.bluebooktle.common.dto.auth.request.TokenRefreshRequest;
 import shop.bluebooktle.common.dto.auth.response.TokenResponse;
 import shop.bluebooktle.common.dto.common.JsendResponse;
+import shop.bluebooktle.common.security.Auth;
 
 @RestController
 @RequestMapping("/auth")
@@ -46,5 +49,15 @@ public class AuthController {
 		@Valid @RequestBody TokenRefreshRequest tokenRefreshRequest) {
 		TokenResponse tokenResponse = authService.refreshToken(tokenRefreshRequest);
 		return ResponseEntity.ok(JsendResponse.success(tokenResponse));
+	}
+
+	@Operation(summary = "로그아웃", description = "사용자 AccessToken과 RefreshToken을 만료합니다.")
+	@PostMapping("/logout")
+	@Auth(type = UserType.USER)
+	public ResponseEntity<JsendResponse<Void>> logout(
+		Authentication authentication) {
+		String accessToken = (String)authentication.getCredentials();
+		authService.logout(accessToken);
+		return ResponseEntity.ok(JsendResponse.success());
 	}
 }

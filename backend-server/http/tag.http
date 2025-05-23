@@ -1,4 +1,6 @@
-@baseUrl = http://localhost:9002/api/tags
+@port = 9012
+
+@baseUrl = http://localhost:{{port}}/api/tags
 
 ### 태그 등록 성공 - 1
 POST {{baseUrl}}

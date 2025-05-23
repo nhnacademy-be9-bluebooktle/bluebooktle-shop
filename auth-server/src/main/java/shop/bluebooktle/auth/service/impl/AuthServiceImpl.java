@@ -9,11 +9,10 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.auth.repository.MembershipLevelRepository;
 import shop.bluebooktle.auth.repository.UserRepository;
+import shop.bluebooktle.auth.service.AccessTokenService;
 import shop.bluebooktle.auth.service.AuthService;
 import shop.bluebooktle.auth.service.RefreshTokenService;
-import shop.bluebooktle.auth.util.JwtUtil;
 import shop.bluebooktle.common.domain.auth.UserStatus;
-import shop.bluebooktle.common.domain.auth.UserType;
 import shop.bluebooktle.common.dto.auth.request.LoginRequest;
 import shop.bluebooktle.common.dto.auth.request.SignupRequest;
 import shop.bluebooktle.common.dto.auth.request.TokenRefreshRequest;
@@ -27,6 +26,7 @@ import shop.bluebooktle.common.exception.auth.InvalidRefreshTokenException;
 import shop.bluebooktle.common.exception.auth.LoginIdAlreadyExistsException;
 import shop.bluebooktle.common.exception.auth.UserNotFoundException;
 import shop.bluebooktle.common.exception.auth.WithdrawnAccountException;
+import shop.bluebooktle.common.util.JwtUtil;
 
 @Service
 @RequiredArgsConstructor
@@ -38,6 +38,7 @@ public class AuthServiceImpl implements AuthService {
 	private final PasswordEncoder passwordEncoder;
 	private final JwtUtil jwtUtil;
 	private final RefreshTokenService refreshTokenService;
+	private final AccessTokenService accessTokenService;
 
 	@Override
 	@Transactional
@@ -109,16 +110,25 @@ public class AuthServiceImpl implements AuthService {
 	}
 
 	@Override
+	public void logout(String accessToken) {
+		Long userId = jwtUtil.getUserIdFromToken(accessToken);
+		refreshTokenService.deleteByUserId(userId);
+		accessTokenService.addToBlacklist(accessToken);
+	}
+
+	@Override
 	public TokenResponse refreshToken(TokenRefreshRequest tokenRefreshRequest) {
 		String refreshToken = tokenRefreshRequest.getRefreshToken();
 
 		if (!jwtUtil.validateToken(refreshToken)) {
 			throw new InvalidRefreshTokenException();
 		}
-
-		String userNickname = jwtUtil.getUserNicknameFromToken(refreshToken);
 		Long userId = jwtUtil.getUserIdFromToken(refreshToken);
-		UserType userType = jwtUtil.getUserTypeFromToken(refreshToken);
+
+		String redisRefreshToken = refreshTokenService.findByUserId(userId);
+		if (!redisRefreshToken.equals(refreshToken)) {
+			throw new InvalidRefreshTokenException();
+		}
 
 		User user = userRepository.findById(userId)
 			.orElseThrow(UserNotFoundException::new);
@@ -128,13 +138,11 @@ public class AuthServiceImpl implements AuthService {
 		} else if (user.getStatus() == UserStatus.WITHDRAWN) {
 			throw new WithdrawnAccountException("탈퇴된 계정입니다.");
 		}
-
-		String newAccessToken = jwtUtil.createAccessToken(userId, userNickname, userType);
-		String newRefreshToken = jwtUtil.createRefreshToken(userId, userNickname, userType);
-
 		long refreshTokenExpirationMillis = jwtUtil.getRefreshTokenExpirationMillis();
+		String newAccessToken = jwtUtil.createAccessToken(userId, user.getNickname(), user.getType());
+		String newRefreshToken = jwtUtil.createRefreshToken(userId, user.getNickname(), user.getType());
+
 		refreshTokenService.save(user.getId(), newRefreshToken, refreshTokenExpirationMillis);
-		refreshTokenService.deleteByUserId(userId);
 
 		return new TokenResponse(newAccessToken, newRefreshToken);
 	}

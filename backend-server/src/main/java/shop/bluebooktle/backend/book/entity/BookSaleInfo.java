@@ -22,6 +22,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import shop.bluebooktle.common.dto.book.BookSaleInfoState;
 import shop.bluebooktle.common.entity.BaseEntity;
 
 @Entity
@@ -63,7 +64,7 @@ public class BookSaleInfo extends BaseEntity {
 	@Builder.Default
 	@Column(name = "state")
 	@Enumerated(EnumType.STRING)
-	private State state = State.AVAILABLE;
+	private BookSaleInfoState bookSaleInfoState = BookSaleInfoState.AVAILABLE;
 
 	@Builder.Default
 	@Column(name = "view_count", nullable = false, columnDefinition = "BIGINT DEFAULT 0")
@@ -72,8 +73,4 @@ public class BookSaleInfo extends BaseEntity {
 	@Builder.Default
 	@Column(name = "search_count", nullable = false, columnDefinition = "BIGINT DEFAULT 0")
 	private Long searchCount = 0L;
-
-	public enum State {
-		AVAILABLE, LOW_STOCK, SALE_ENDED, DELETED
-	}
 }

@@ -1,16 +1,20 @@
 package shop.bluebooktle.backend.book.repository;
 
-import java.util.Optional;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import shop.bluebooktle.backend.book.entity.Author;
 
-public interface AuthorRepository extends JpaRepository<Author, Long> {
+@Repository
+public interface AuthorRepository extends JpaRepository<Author, Long>, AuthorQueryRepository {
 
-	// 작가 전체 이름으로 조회 (정확하게 일치하는 이름)
+	// (작가 이름으로) 작가 조회
 	Optional<Author> findByName(String name);
+
+	boolean existsByName(String name);
 
 	// 작가 이름 부분 일치 조회
 	List<Author> findByNameContaining(String name);
@@ -32,4 +36,5 @@ public interface AuthorRepository extends JpaRepository<Author, Long> {
 
 	// 삭제되지 않은 작가 이름 부분 일치 조회
 	List<Author> findByNameContainingAndDeletedAtIsNull(String name);
+
 }

@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
-import shop.bluebooktle.backend.book.dto.response.BookInfoResponse;
 import shop.bluebooktle.backend.book.service.BookTagService;
+import shop.bluebooktle.common.dto.book.response.BookInfoResponse;
 import shop.bluebooktle.common.dto.common.JsendResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
 
@@ -30,7 +30,7 @@ public class BookTagController {
 		@PathVariable Long tagId,
 		@PathVariable Long bookId
 	) {
-		bookTagService.registerBookTag(tagId, bookId);
+		bookTagService.registerBookTag(bookId, tagId);
 		return ResponseEntity.status(HttpStatus.CREATED).body(JsendResponse.success());
 	}
 

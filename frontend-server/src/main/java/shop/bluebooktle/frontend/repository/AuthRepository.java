@@ -8,18 +8,16 @@ import shop.bluebooktle.common.dto.auth.request.LoginRequest;
 import shop.bluebooktle.common.dto.auth.request.SignupRequest;
 import shop.bluebooktle.common.dto.auth.request.TokenRefreshRequest;
 import shop.bluebooktle.common.dto.auth.response.TokenResponse;
-import shop.bluebooktle.common.dto.common.JsendResponse;
-import shop.bluebooktle.frontend.config.FeignGlobalConfig;
+import shop.bluebooktle.frontend.config.feign.FeignGlobalConfig;
 
-@FeignClient(name = "auth-server", path = "/auth", configuration = FeignGlobalConfig.class)
+@FeignClient(name = "auth-server", contextId = "authRepository", path = "/auth", configuration = FeignGlobalConfig.class)
 public interface AuthRepository {
-
 	@PostMapping("/signup")
-	JsendResponse<Void> signup(@RequestBody SignupRequest signupRequest);
+	void signup(@RequestBody SignupRequest signupRequest);
 
 	@PostMapping("/login")
-	JsendResponse<TokenResponse> login(@RequestBody LoginRequest loginRequest);
+	TokenResponse login(@RequestBody LoginRequest loginRequest);
 
 	@PostMapping("/refresh")
-	JsendResponse<TokenResponse> refreshToken(@RequestBody TokenRefreshRequest tokenRefreshRequest);
+	TokenResponse refreshToken(@RequestBody TokenRefreshRequest tokenRefreshRequest);
 }

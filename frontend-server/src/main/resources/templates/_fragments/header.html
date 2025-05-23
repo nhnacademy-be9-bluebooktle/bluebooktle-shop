@@ -13,7 +13,7 @@
 
             <form action="/books" class="header-search-form-kitsch" method="get" th:action="@{/books}">
                 <input class="input-kitsch header-search-input-kitsch" name="query" placeholder="레트로 감성 책 검색!"
-                       type="text" value="판타지">
+                       type="text" value="">
                 <button class="btn-kitsch primary-btn-kitsch header-search-btn-kitsch" type="submit">
                     <i class="fas fa-search"></i>
                 </button>
@@ -48,7 +48,7 @@
     </div>
     <div class="header-marquee-kitsch" th:if="${isLoggedIn}">
         <p class="pixel-font-kitsch" th:if="${userNickname != null}"
-           th:text="'🎉 ' + ${userNickname} + '님, 오늘은 책을 찾아볼까요? 👾 쿠폰 이벤트 확인!'"></p>
+           th:text="'🎉 ' + ${userNickname} + '님, 오늘의 책을 찾아볼까요? 👾 쿠폰 이벤트 확인!'"></p>
         <p class="pixel-font-kitsch" th:if="${userNickname == null}"
            th:text="'🎉 회원님, 오늘은 어떤 책을 찾아볼까요? 👾 쿠폰 이벤트 확인!'"></p>
     </div>

@@ -5,14 +5,16 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import shop.bluebooktle.backend.book.dto.request.BookInfoRequest;
-import shop.bluebooktle.backend.book.dto.response.BookInfoResponse;
-import shop.bluebooktle.backend.book.dto.response.CategoryResponse;
+import shop.bluebooktle.common.dto.book.request.BookInfoRequest;
+import shop.bluebooktle.common.dto.book.response.BookInfoResponse;
+import shop.bluebooktle.common.dto.book.response.CategoryResponse;
 
 public interface BookCategoryService {
 
 	// 도서 카테고리 등록 -> 도서당 최대 10개 카테고리 가짐
 	void registerBookCategory(Long bookId, Long categoryId);
+
+	void registerBookCategory(Long bookId, List<Long> categoryIdList);
 
 	// 도서 카테고리 삭제
 	void deleteBookCategory(Long bookId, Long categoryId);

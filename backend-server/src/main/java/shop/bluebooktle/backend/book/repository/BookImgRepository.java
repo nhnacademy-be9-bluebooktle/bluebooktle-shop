@@ -1,6 +1,7 @@
 package shop.bluebooktle.backend.book.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -8,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 
 import shop.bluebooktle.backend.book.entity.Book;
 import shop.bluebooktle.backend.book.entity.BookImg;
+import shop.bluebooktle.backend.book.entity.Img;
 
 public interface BookImgRepository extends JpaRepository<BookImg, Long> {
 
@@ -23,5 +25,17 @@ public interface BookImgRepository extends JpaRepository<BookImg, Long> {
 	@Query("SELECT bi.img.imgUrl FROM BookImg bi WHERE bi.book = :book AND bi.img.deletedAt IS NULL")
 	List<String> findActiveImgUrlsByBook(@Param("book") Book book);
 
+	@Query("SELECT bi.img FROM BookImg bi WHERE bi.book = :book")
+	List<Img> findImagesByBook(@Param("book") Book book);
+
+	@Query("SELECT bi.book FROM BookImg bi WHERE bi.img = :img")
+	List<Book> findBooksByImg(@Param("img") Img img);
+
+	boolean existsByBookAndImg(Book book, Img img);
+
 	List<BookImg> findByBookId(Long bookId);
+
+	List<BookImg> findByImgId(Long imgId);
+
+	Optional<BookImg> findByBookIdAndImgId(Long bookId, Long imgId);
 }

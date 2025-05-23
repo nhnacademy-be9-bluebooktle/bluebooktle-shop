@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
-import shop.bluebooktle.backend.book.dto.response.BookLikesResponse;
 import shop.bluebooktle.backend.book.service.BookLikesService;
+import shop.bluebooktle.common.dto.book.response.BookLikesResponse;
 import shop.bluebooktle.common.dto.common.JsendResponse;
 
 @RestController

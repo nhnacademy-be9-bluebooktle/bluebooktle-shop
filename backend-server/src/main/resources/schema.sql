@@ -11,7 +11,7 @@ CREATE TABLE `publisher`
 CREATE TABLE `author`
 (
     `author_id`  bigint      NOT NULL AUTO_INCREMENT,
-    `name`       varchar(50) NOT NULL,
+    `name`       varchar(50) NOT NULL COMMENT 'Unique',
     `created_at` timestamp   NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `deleted_at` timestamp   NULL,
 
@@ -117,13 +117,29 @@ CREATE TABLE `order_state`
 
 CREATE TABLE `point_source_type`
 (
-    `point_type_id` bigint               NOT NULL AUTO_INCREMENT,
-    `action_type`   ENUM ('USE', 'EARN') NOT NULL,
-    `source_type`   varchar(50)          NOT NULL COMMENT '로그인 적립, 회원가입 적립, 리뷰 적립 등 : 결제 사용',
-    `created_at`    timestamp            NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `deleted_at`    timestamp            NULL,
+    `point_source_type_id` bigint               NOT NULL AUTO_INCREMENT,
+    `action_type`          ENUM ('USE', 'EARN') NOT NULL,
+    `source_type`          varchar(50)          NOT NULL COMMENT '로그인 적립, 회원가입 적립, 리뷰 적립 등 : 결제 사용',
+    `created_at`           timestamp            NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `deleted_at`           timestamp            NULL,
 
-    CONSTRAINT `PK_POINT_SOURCE_TYPE` PRIMARY KEY (`point_type_id`)
+    CONSTRAINT `PK_POINT_SOURCE_TYPE` PRIMARY KEY (`point_source_type_id`)
+);
+
+CREATE TABLE `point_policy`
+(
+    `point_policy_id`      bigint                       NOT NULL AUTO_INCREMENT,
+    `point_source_type_id` bigint                       NOT NULL,
+    `policy_type`          ENUM ('AMOUNT','PERCENTAGE') NOT NULL,
+    `value`                decimal(10, 2)               NOT NULL,
+    `is_active`            boolean                      NOT NULL DEFAULT true,
+    `created_at`           timestamp                    NOT NULL DEFAULT current_timestamp,
+    `deleted_at`           timestamp                    NULL,
+
+    CONSTRAINT `PK_POINT_POLICY` PRIMARY KEY (`point_policy_id`),
+    CONSTRAINT `FK_point_source_type_TO_point_policy_1`
+        FOREIGN KEY (`point_source_type_id`)
+            REFERENCES `point_source_type` (`point_source_type_id`)
 );
 
 CREATE TABLE `img`
@@ -200,8 +216,8 @@ CREATE TABLE `book_sale_info`
 CREATE TABLE `book_publisher`
 (
     `book_publisher_id` bigint NOT NULL AUTO_INCREMENT,
-    `book_id`           bigint NOT NULL,
     `publisher_id`      bigint NOT NULL,
+    `book_id`           bigint NOT NULL,
 
     CONSTRAINT `PK_BOOK_PUBLISHER` PRIMARY KEY (`book_publisher_id`),
     CONSTRAINT `FK_book_publisher_book_id_book`
@@ -295,8 +311,8 @@ CREATE TABLE `users`
 CREATE TABLE `book_category`
 (
     `book_category_id` bigint NOT NULL AUTO_INCREMENT,
-    `book_id`          bigint NOT NULL,
     `category_id`      bigint NOT NULL,
+    `book_id`          bigint NOT NULL,
 
     CONSTRAINT `PK_BOOK_CATEGORY` PRIMARY KEY (`book_category_id`),
     UNIQUE KEY `UK_book_category_book_category` (`book_id`, `category_id`),
@@ -378,17 +394,17 @@ CREATE TABLE `user_coupon`
 
 CREATE TABLE `point_history`
 (
-    `point_id`      bigint         NOT NULL AUTO_INCREMENT,
-    `point_type_id` bigint         NOT NULL,
-    `user_id`       bigint         NOT NULL,
-    `value`         decimal(10, 2) NOT NULL,
-    `created_at`    timestamp      NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `deleted_at`    timestamp      NULL,
+    `point_id`             bigint         NOT NULL AUTO_INCREMENT,
+    `point_source_type_id` bigint         NOT NULL,
+    `user_id`              bigint         NOT NULL,
+    `value`                decimal(10, 2) NOT NULL,
+    `created_at`           timestamp      NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `deleted_at`           timestamp      NULL,
 
     CONSTRAINT `PK_POINT_HISTORY` PRIMARY KEY (`point_id`),
-    CONSTRAINT `FK_point_history_point_type_id_point_source_type`
-        FOREIGN KEY (`point_type_id`)
-            REFERENCES `point_source_type` (`point_type_id`),
+    CONSTRAINT `FK_point_history_point_source_type_id_point_source_type`
+        FOREIGN KEY (`point_source_type_id`)
+            REFERENCES `point_source_type` (`point_source_type_id`),
     CONSTRAINT `FK_point_history_user_id_user`
         FOREIGN KEY (`user_id`)
             REFERENCES `users` (`user_id`)
@@ -546,10 +562,11 @@ CREATE TABLE `refund`
 
 CREATE TABLE `payment_point_history`
 (
-    `payment_point_history_id` bigint NOT NULL AUTO_INCREMENT,
-    `payment_id`               bigint NOT NULL,
-    `point_id`                 bigint NOT NULL,
-    `user_id`                  bigint NOT NULL,
+    `payment_point_history_id` bigint    NOT NULL AUTO_INCREMENT,
+    `payment_id`               bigint    NOT NULL,
+    `point_id`                 bigint    NOT NULL,
+    `created_at`               timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `deleted_at`               timestamp NULL,
 
     CONSTRAINT `PK_PAYMENT_POINT_HISTORY` PRIMARY KEY (`payment_point_history_id`),
     CONSTRAINT `FK_payment_point_history_payment_id_payment`
@@ -557,10 +574,7 @@ CREATE TABLE `payment_point_history`
             REFERENCES `payment` (`payment_id`),
     CONSTRAINT `FK_payment_point_history_point_id_point_history`
         FOREIGN KEY (`point_id`)
-            REFERENCES `point_history` (`point_id`),
-    CONSTRAINT `FK_payment_point_history_user_id_point_history`
-        FOREIGN KEY (`user_id`)
-            REFERENCES `point_history` (`user_id`)
+            REFERENCES `point_history` (`point_id`)
 );
 
 CREATE TABLE `review`
