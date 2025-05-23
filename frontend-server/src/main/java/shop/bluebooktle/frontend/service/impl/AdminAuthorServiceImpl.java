@@ -30,10 +30,8 @@ public class AdminAuthorServiceImpl implements AdminAuthorService {
 		if (searchKeyword != null && !searchKeyword.isBlank()) {
 			keyword = searchKeyword;
 		}
-
-		PaginationData<AuthorResponse> response = adminAuthorRepository.getPagedAuthors(page, size,
+		PaginationData<AuthorResponse> data = adminAuthorRepository.getPagedAuthors(page, size,
 			keyword);
-		PaginationData<AuthorResponse> data = response;
 		List<AuthorResponse> categories = data.getContent();
 		return new PageImpl<>(categories, pageable, data.getTotalElements());
 	}

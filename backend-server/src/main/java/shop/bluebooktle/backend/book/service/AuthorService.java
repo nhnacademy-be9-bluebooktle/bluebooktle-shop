@@ -27,4 +27,7 @@ public interface AuthorService {
 	// 작가 목록 조회
 	Page<AuthorResponse> getAuthors(Pageable pageable);
 
+	// 작가 키워드 조회
+	Page<AuthorResponse> searchAuthors(String searchKeyword, Pageable pageable);
+
 }

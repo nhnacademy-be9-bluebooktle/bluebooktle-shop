@@ -30,53 +30,6 @@ public class AdminAuthorController {
 
 	private final AdminAuthorService adminAuthorService;
 
-	/*@Getter
-	@Setter
-	@ToString
-	static class AuthorDto {
-		private Long id;
-		private String name;
-		private String description;
-		private String authorKey;
-		private LocalDateTime createdAt;
-		private LocalDateTime deletedAt;
-		private boolean isActive;
-
-		public AuthorDto() {
-			this.isActive = true;
-		}
-
-		public AuthorDto(Long id, String name, String description, String authorKey, LocalDateTime createdAt,
-			LocalDateTime deletedAt) {
-			this.id = id;
-			this.name = name;
-			this.description = description;
-			this.authorKey = authorKey;
-			this.createdAt = createdAt;
-			this.deletedAt = deletedAt;
-			this.isActive = (deletedAt == null);
-		}
-	}
-
-	// 임시 작가 데이터 목록
-	private static final List<AuthorDto> allAuthorsForDemo = new ArrayList<>();
-
-	static {
-		allAuthorsForDemo.add(
-			new AuthorDto(1L, "김스프링", "스프링 부트 전문가. 다수의 베스트셀러 저자.", "KSPRING001", LocalDateTime.now().minusDays(10),
-				null));
-		allAuthorsForDemo.add(
-			new AuthorDto(2L, "이자바", "자바 기초부터 고급까지, 명쾌한 설명으로 유명.", "LJAVA002", LocalDateTime.now().minusDays(5), null));
-		allAuthorsForDemo.add(
-			new AuthorDto(3L, "박노드", "Node.js와 풀스택 개발 가이드 저술.", "PNODE003", LocalDateTime.now().minusDays(20),
-				LocalDateTime.now().minusDays(1)));
-		for (int i = 4; i <= 25; i++) { // 데이터 추가
-			allAuthorsForDemo.add(new AuthorDto((long)i, "작가 " + i, "작가 " + i + "에 대한 설명입니다. 다양한 분야에서 활동 중입니다.",
-				"AUTHORKEY" + String.format("%03d", i), LocalDateTime.now().minusDays(i * 3),
-				(i % 7 == 0) ? LocalDateTime.now().minusDays(i) : null));
-		}
-	}*/
-
 	@GetMapping
 	public String listAuthors(Model model, HttpServletRequest request,
 		@RequestParam(value = "page", defaultValue = "0") int page, // 0-based
