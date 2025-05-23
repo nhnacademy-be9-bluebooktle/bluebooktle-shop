@@ -136,7 +136,10 @@ CREATE TABLE `point_policy`
     `created_at`           timestamp                    NOT NULL DEFAULT current_timestamp,
     `deleted_at`           timestamp                    NULL,
 
-    CONSTRAINT `PK_POINT_POLICY` PRIMARY KEY (`point_policy_id`)
+    CONSTRAINT `PK_POINT_POLICY` PRIMARY KEY (`point_policy_id`),
+    CONSTRAINT `FK_point_source_type_TO_point_policy_1`
+        FOREIGN KEY (`point_source_type_id`)
+            REFERENCES `point_source_type` (`point_source_type_id`)
 );
 
 CREATE TABLE `img`
