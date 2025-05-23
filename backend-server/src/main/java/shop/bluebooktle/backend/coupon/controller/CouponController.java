@@ -5,38 +5,42 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import shop.bluebooktle.backend.coupon.batch.CouponBatchLauncher;
 import shop.bluebooktle.backend.coupon.service.CouponService;
 import shop.bluebooktle.common.dto.common.JsendResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
 import shop.bluebooktle.common.dto.coupon.request.CouponRegisterRequest;
-import shop.bluebooktle.common.dto.coupon.request.CouponUpdateRequest;
+import shop.bluebooktle.common.dto.coupon.request.UserCouponRegisterRequest;
 import shop.bluebooktle.common.dto.coupon.response.CouponResponse;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping
+@RequestMapping("/api/admin/coupons")
+@Tag(name = "쿠폰 API", description = "관리자 쿠폰 CRUD API")
 public class CouponController {
 
 	private final CouponService couponService;
+	private final CouponBatchLauncher couponBatchLauncher;
 
-	@PostMapping("/api/admin/coupons")
+	@Operation(summary = "쿠폰 등록", description = "새로운 쿠폰을 등록합니다.")
+	@PostMapping
 	public ResponseEntity<JsendResponse<Void>> registerCoupon(@Valid @RequestBody CouponRegisterRequest request) {
 		couponService.registerCoupon(request);
 		return ResponseEntity.status(HttpStatus.CREATED).body(JsendResponse.success());
 	}
 
-	@GetMapping("/api/admin/coupons")
+	@Operation(summary = "쿠폰 전체 조회", description = "등록된 쿠폰 전체를 조회합니다.")
+	@GetMapping
 	public ResponseEntity<JsendResponse<PaginationData<CouponResponse>>> getAllCoupons(
 		@PageableDefault(size = 10, sort = "id") Pageable pageable) {
 		Page<CouponResponse> couponPage = couponService.getAllCoupons(pageable);
@@ -44,16 +48,12 @@ public class CouponController {
 		return ResponseEntity.ok(JsendResponse.success(paginationData));
 	}
 
-	@PatchMapping("/api/admin/coupon/{id}")
-	public ResponseEntity<JsendResponse<Void>> updateCoupon(@PathVariable Long id,
-		@Valid @RequestBody CouponUpdateRequest request) {
-		couponService.updateCoupon(id, request);
-		return ResponseEntity.ok(JsendResponse.success());
-	}
-
-	@DeleteMapping("/api/admin/coupon/{id}")
-	public ResponseEntity<JsendResponse<Void>> deleteCoupon(@PathVariable Long id) {
-		couponService.deleteCoupon(id);
-		return ResponseEntity.ok(JsendResponse.success());
+	// 쿠폰 발급
+	@Operation(summary = "쿠폰 직접 발급", description = "쿠폰을 직접 발급합니다.")
+	@PostMapping("/issue")
+	public ResponseEntity<JsendResponse<Void>> registerUserCoupon(
+		@RequestBody @Valid UserCouponRegisterRequest request) {
+		couponBatchLauncher.run(request);
+		return ResponseEntity.status(HttpStatus.CREATED).body(JsendResponse.success());
 	}
 }

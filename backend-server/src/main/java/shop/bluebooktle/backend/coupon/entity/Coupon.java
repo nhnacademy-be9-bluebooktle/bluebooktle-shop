@@ -44,8 +44,4 @@ public class Coupon extends BaseEntity {
 		this.couponType = type;
 		this.couponName = couponName;
 	}
-
-	public void update(String couponName) {
-		this.couponName = couponName;
-	}
 }

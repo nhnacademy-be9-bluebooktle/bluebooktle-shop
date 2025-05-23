@@ -105,12 +105,12 @@ public class AdminDeliveryPolicyController {
 		model.addAttribute("deliveryRule", ruleDto);
 
 		// 적용 지역 타입 옵션 (실제로는 Enum 또는 DB에서 관리)
-		model.addAttribute("regionTypes", Arrays.asList(
-			new AdminCouponController.SelectOption("ALL", "전국"),
-			new AdminCouponController.SelectOption("JEJU_ISLAND", "제주도"),
-			new AdminCouponController.SelectOption("MOUNTAINOUS_AREAS", "도서산간지역"),
-			new AdminCouponController.SelectOption("EXCEPT_JEJU_MOUNTAINOUS", "제주/도서산간 제외")
-		));
+		// model.addAttribute("regionTypes", Arrays.asList(
+		// 	new AdminCouponController.SelectOption("ALL", "전국"),
+		// 	new AdminCouponController.SelectOption("JEJU_ISLAND", "제주도"),
+		// 	new AdminCouponController.SelectOption("MOUNTAINOUS_AREAS", "도서산간지역"),
+		// 	new AdminCouponController.SelectOption("EXCEPT_JEJU_MOUNTAINOUS", "제주/도서산간 제외")
+		// ));
 
 		return "admin/delivery/delivery_rule_form";
 	}

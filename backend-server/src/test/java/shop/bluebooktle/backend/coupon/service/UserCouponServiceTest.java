@@ -190,27 +190,5 @@ class UserCouponServiceTest {
 		assertThatThrownBy(() -> userCouponService.useCoupon(1L))
 			.isInstanceOf(UserCouponNotFoundException.class);
 	}
-
-	@Test
-	@DisplayName("쿠폰 삭제 - 성공")
-	@WithMockUser
-	void deleteCoupon_success() {
-		UserCoupon userCoupon = mock(UserCoupon.class);
-		given(userCouponRepository.findById(1L)).willReturn(Optional.of(userCoupon));
-
-		userCouponService.deleteCoupon(1L);
-
-		verify(userCouponRepository).delete(userCoupon);
-	}
-
-	@Test
-	@DisplayName("쿠폰 삭제 - 존재하지 않음")
-	@WithMockUser
-	void deleteCoupon_notFound() {
-		given(userCouponRepository.findById(1L)).willReturn(Optional.empty());
-
-		assertThatThrownBy(() -> userCouponService.deleteCoupon(1L))
-			.isInstanceOf(UserCouponNotFoundException.class);
-	}
 }
 
