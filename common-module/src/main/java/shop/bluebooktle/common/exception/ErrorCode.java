@@ -91,6 +91,7 @@ public enum ErrorCode {
 	G_PACKAGING_QUANTITY_EXCEEDS_BOOK_ORDER(HttpStatus.BAD_REQUEST, "G009", "포장 수량은 도서 주문 수량을 초과할 수 없습니다."),
 	G_ORDER_PACKAGING_DELETE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "G010", "포장 정보 삭제 중 오류가 발생했습니다."),
 	G_ORDER_PACKAGING_OPTION_NOT_FOUND(HttpStatus.NOT_FOUND, "G011", "주문 포장 옵션을 찾을 수 없습니다."),
+	G_ORDER_PACKAGING_OPTION_ALREADY_EXITS(HttpStatus.CONFLICT, "G012", "이미 해당 포장 옵션이 등록되어 있습니다."),
 
 	// 도서 - 이미지
 	BOOK_IMG_BOOK_ID_NULL(HttpStatus.BAD_REQUEST, "BI01", "도서 ID는 필수입니다."),

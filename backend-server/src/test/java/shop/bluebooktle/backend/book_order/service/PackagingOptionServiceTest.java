@@ -18,8 +18,8 @@ import shop.bluebooktle.backend.book_order.entity.PackagingOption;
 import shop.bluebooktle.backend.book_order.repository.PackagingOptionRepository;
 import shop.bluebooktle.backend.book_order.service.impl.PackagingOptionServiceImpl;
 import shop.bluebooktle.common.dto.book_order.request.PackagingOptionRequest;
-import shop.bluebooktle.common.dto.book_order.request.PackagingOptionUpdateRequest;
-import shop.bluebooktle.common.dto.book_order.response.PackagingOptionResponse;
+import shop.bluebooktle.common.dto.book_order.response.PackagingOptionInfoResponse;
+import shop.bluebooktle.common.exception.book_order.PackagingOptionAlreadyExistsException;
 import shop.bluebooktle.common.exception.book_order.PackagingOptionNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
@@ -50,10 +50,10 @@ public class PackagingOptionServiceTest {
 		when(packagingOptionRepository.save(any())).thenReturn(responseSaved);
 
 		// when
-		PackagingOptionResponse response = packagingOptionService.createPackagingOption(request);
+		PackagingOptionInfoResponse response = packagingOptionService.createPackagingOption(request);
 
 		// then
-		assertThat(response.getPackagingOptionId()).isEqualTo(1L);
+		assertThat(response.getId()).isEqualTo(1L);
 		assertThat(response.getName()).isEqualTo("기본 포장지");
 		assertThat(response.getPrice()).isEqualTo(BigDecimal.valueOf(1500));
 	}
@@ -71,7 +71,7 @@ public class PackagingOptionServiceTest {
 
 		// then
 		assertThatThrownBy(() -> packagingOptionService.createPackagingOption(request))
-			.isInstanceOf(PackagingOptionNotFoundException.class);
+			.isInstanceOf(PackagingOptionAlreadyExistsException.class); // 수정됨
 	}
 
 	@Test
@@ -84,7 +84,7 @@ public class PackagingOptionServiceTest {
 			.build();
 		option.setId(1L);
 
-		PackagingOptionUpdateRequest request = PackagingOptionUpdateRequest.builder()
+		PackagingOptionRequest request = PackagingOptionRequest.builder()
 			.name("수정된 포장지")
 			.price(BigDecimal.valueOf(3000))
 			.build();
@@ -92,7 +92,7 @@ public class PackagingOptionServiceTest {
 		when(packagingOptionRepository.findByIdAndDeletedAtIsNull(1L)).thenReturn(Optional.of(option));
 
 		// when
-		PackagingOptionResponse response = packagingOptionService.updatePackagingOption(1L, request);
+		PackagingOptionInfoResponse response = packagingOptionService.updatePackagingOption(1L, request);
 
 		// then
 		assertThat(response.getName()).isEqualTo("수정된 포장지");
@@ -109,7 +109,8 @@ public class PackagingOptionServiceTest {
 			.build();
 		option.setId(1L);
 
-		when(packagingOptionRepository.findById(1L)).thenReturn(Optional.of(option));
+		when(packagingOptionRepository.findByIdAndDeletedAtIsNull(1L)) // 수정됨
+			.thenReturn(Optional.of(option));
 
 		// when
 		packagingOptionService.deletePackagingOption(1L);
@@ -121,7 +122,8 @@ public class PackagingOptionServiceTest {
 	@Test
 	@DisplayName("포장 옵션 삭제 실패 - 존재하지 않음")
 	void deletePackagingOption_notFound() {
-		when(packagingOptionRepository.findById(1L)).thenReturn(Optional.empty());
+		when(packagingOptionRepository.findByIdAndDeletedAtIsNull(1L)) // 수정됨
+			.thenReturn(Optional.empty());
 
 		assertThatThrownBy(() -> packagingOptionService.deletePackagingOption(1L))
 			.isInstanceOf(PackagingOptionNotFoundException.class);
