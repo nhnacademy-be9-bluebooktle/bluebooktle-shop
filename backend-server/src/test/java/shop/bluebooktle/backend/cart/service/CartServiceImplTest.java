@@ -17,7 +17,6 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import shop.bluebooktle.backend.book.entity.Book;
 import shop.bluebooktle.backend.book.repository.BookRepository;
-import shop.bluebooktle.backend.cart.dto.response.CartItemResponse;
 import shop.bluebooktle.backend.cart.entity.Cart;
 import shop.bluebooktle.backend.cart.entity.CartBook;
 import shop.bluebooktle.backend.cart.repository.CartBookRepository;
@@ -26,6 +25,7 @@ import shop.bluebooktle.backend.cart.repository.redis.GuestCartRepository;
 import shop.bluebooktle.backend.cart.service.impl.CartServiceImpl;
 import shop.bluebooktle.common.domain.auth.UserStatus;
 import shop.bluebooktle.common.domain.auth.UserType;
+import shop.bluebooktle.common.dto.cart.response.CartItemResponse;
 import shop.bluebooktle.common.entity.auth.MembershipLevel;
 import shop.bluebooktle.common.entity.auth.User;
 

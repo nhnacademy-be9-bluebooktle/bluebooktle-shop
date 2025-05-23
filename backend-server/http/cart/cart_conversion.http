@@ -1,0 +1,47 @@
+### GET request to example server
+GET https://examples.http-client.intellij.net/get
+    ?generated-in=IntelliJ IDEA
+
+### 비회원 장바구니 → 회원 장바구니로 전환 (회원가입 직후)
+POST http://localhost:9009/api/cart/convert/to-member
+Content-Type: application/json
+
+{
+  "guestId": "guest-1234",
+  "user": {
+    "id": 1,
+    "loginId": "abc123",
+    "email": "abc@example.com",
+    "membership": {
+      "membershipId": 2,
+      "name": "GOLD",
+      "rate": 3,
+      "minNetSpent": 50000.00,
+      "maxNetSpent": 199999.99,
+      "createdAt": "2024-01-01T00:00:00",
+      "deletedAt": null
+    }
+  }
+}
+
+### 비회원 장바구니 → 기존 회원 장바구니에 병합 (로그인 직후)
+PATCH http://localhost:9009/api/cart/convert/merge
+Content-Type: application/json
+
+{
+  "guestId": "guest-1234",
+  "user": {
+    "id": 1,
+    "loginId": "abc123",
+    "email": "abc@example.com",
+    "membership": {
+      "membershipId": 2,
+      "name": "GOLD",
+      "rate": 3,
+      "minNetSpent": 50000.00,
+      "maxNetSpent": 199999.99,
+      "createdAt": "2024-01-01T00:00:00",
+      "deletedAt": null
+    }
+  }
+}

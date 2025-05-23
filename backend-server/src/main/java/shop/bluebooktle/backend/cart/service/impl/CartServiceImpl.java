@@ -9,13 +9,14 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.book.entity.Book;
 import shop.bluebooktle.backend.book.repository.BookRepository;
-import shop.bluebooktle.backend.cart.dto.response.CartItemResponse;
 import shop.bluebooktle.backend.cart.entity.Cart;
 import shop.bluebooktle.backend.cart.entity.CartBook;
 import shop.bluebooktle.backend.cart.repository.CartBookRepository;
 import shop.bluebooktle.backend.cart.repository.CartRepository;
 import shop.bluebooktle.backend.cart.repository.redis.GuestCartRepository;
 import shop.bluebooktle.backend.cart.service.CartService;
+import shop.bluebooktle.backend.user.repository.UserRepository;
+import shop.bluebooktle.common.dto.cart.response.CartItemResponse;
 import shop.bluebooktle.common.entity.auth.User;
 import shop.bluebooktle.common.exception.auth.UserNotFoundException;
 import shop.bluebooktle.common.exception.cart.CartNotFoundException;
@@ -29,8 +30,16 @@ public class CartServiceImpl implements CartService {
 	private final CartBookRepository cartBookRepository;
 	private final BookRepository bookRepository;
 	private final GuestCartRepository guestCartRepository;
+	private final UserRepository userRepository;
 
 	// ----------------- 회원용 -----------------
+
+	@Override
+	@Transactional
+	public User findUserEntityById(Long userId) {
+		return userRepository.findById(userId)
+			.orElseThrow(UserNotFoundException::new);
+	}
 
 	@Override
 	@Transactional
@@ -95,7 +104,6 @@ public class CartServiceImpl implements CartService {
 	@Transactional
 	public void removeSelectedBooksFromUserCart(User user, List<Long> bookIds) {
 		Cart cart = cartRepository.findByUser(user)
-			// TODO Custom ERROR 만들기
 			.orElseThrow(CartNotFoundException::new);
 		List<CartBook> cartBooks = cartBookRepository.findAllByCartAndBookIdIn(cart, bookIds);
 		cartBookRepository.deleteAll(cartBooks);
@@ -157,7 +165,6 @@ public class CartServiceImpl implements CartService {
 	public void convertGuestCartToMemberCart(String guestId, User user) {
 		Map<Long, Integer> guestCart = guestCartRepository.getCart(guestId);
 		if (guestCart.isEmpty()) {
-			return;
 		}
 
 		Cart cart = cartRepository.save(Cart.builder().user(user).build());
@@ -182,7 +189,6 @@ public class CartServiceImpl implements CartService {
 	public void mergeGuestCartToMemberCart(String guestId, User user) {
 		Map<Long, Integer> guestCart = guestCartRepository.getCart(guestId);
 		if (guestCart.isEmpty()) {
-			return;
 		}
 
 		Cart cart = getOrCreateCart(user);

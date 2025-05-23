@@ -1,4 +1,4 @@
-package shop.bluebooktle.backend.cart.dto.response;
+package shop.bluebooktle.common.dto.cart.response;
 
 public record CartItemResponse(
 	Long bookId,
