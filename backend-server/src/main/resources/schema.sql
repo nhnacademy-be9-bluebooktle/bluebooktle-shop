@@ -136,7 +136,10 @@ CREATE TABLE `point_policy`
     `created_at`           timestamp                    NOT NULL DEFAULT current_timestamp,
     `deleted_at`           timestamp                    NULL,
 
-    CONSTRAINT `PK_POINT_POLICY` PRIMARY KEY (`point_policy_id`)
+    CONSTRAINT `PK_POINT_POLICY` PRIMARY KEY (`point_policy_id`),
+    CONSTRAINT `FK_point_source_type_TO_point_policy_1`
+        FOREIGN KEY (`point_source_type_id`)
+            REFERENCES `point_source_type` (`point_source_type_id`)
 );
 
 CREATE TABLE `img`
@@ -562,7 +565,6 @@ CREATE TABLE `payment_point_history`
     `payment_point_history_id` bigint    NOT NULL AUTO_INCREMENT,
     `payment_id`               bigint    NOT NULL,
     `point_id`                 bigint    NOT NULL,
-    `user_id`                  bigint    NOT NULL,
     `created_at`               timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `deleted_at`               timestamp NULL,
 
@@ -572,10 +574,7 @@ CREATE TABLE `payment_point_history`
             REFERENCES `payment` (`payment_id`),
     CONSTRAINT `FK_payment_point_history_point_id_point_history`
         FOREIGN KEY (`point_id`)
-            REFERENCES `point_history` (`point_id`),
-    CONSTRAINT `FK_payment_point_history_user_id_point_history`
-        FOREIGN KEY (`user_id`)
-            REFERENCES `point_history` (`user_id`)
+            REFERENCES `point_history` (`point_id`)
 );
 
 CREATE TABLE `review`
