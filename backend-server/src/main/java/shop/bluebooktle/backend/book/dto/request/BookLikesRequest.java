@@ -1,4 +1,4 @@
-package shop.bluebooktle.backend.book.dto.response;
+package shop.bluebooktle.backend.book.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,8 +9,7 @@ import lombok.Value;
 @Getter
 @Value
 @Builder
-public class BookLikesResponse {
-	Long bookId;
-	boolean isLiked;
-	int countLikes;
+public class BookLikesRequest {
+	long bookId;
+	long userId;
 }
