@@ -11,39 +11,39 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
-import shop.bluebooktle.backend.book.entity.Author;
-import shop.bluebooktle.backend.book.entity.QAuthor;
-import shop.bluebooktle.backend.book.repository.AuthorQueryRepository;
+import shop.bluebooktle.backend.book.entity.Category;
+import shop.bluebooktle.backend.book.entity.QCategory;
+import shop.bluebooktle.backend.book.repository.CategoryQueryRepository;
 
 @Repository
 @RequiredArgsConstructor
-public class AuthorQueryRepositoryImpl implements AuthorQueryRepository {
+public class CategoryQueryRepositoryImpl implements CategoryQueryRepository {
 	private final JPAQueryFactory queryFactory;
 
 	@Override
-	public Page<Author> searchByNameContaining(String searchKeyword, Pageable pageable) {
-		QAuthor author = QAuthor.author;  // QueryDSL Q타입 엔티티 참조
+	public Page<Category> searchByNameContaining(String searchKeyword, Pageable pageable) {
+		QCategory category = QCategory.category;  // QueryDSL Q타입 엔티티 참조
 
-		BooleanBuilder where = new BooleanBuilder().and(author.deletedAt.isNull()); // deletedAt IS NULL 조건
+		BooleanBuilder where = new BooleanBuilder().and(category.deletedAt.isNull()); // deletedAt IS NULL 조건
 
 		// 검색 키워드가 주어졌으면 대소문자 구분 없이 부분 매칭 추가
 		if (searchKeyword != null && !searchKeyword.isEmpty()) {
-			where.and(author.name.containsIgnoreCase(searchKeyword));
+			where.and(category.name.containsIgnoreCase(searchKeyword));
 		}
 
 		// 실제 데이터 조회
-		List<Author> content = queryFactory
-			.selectFrom(author)
+		List<Category> content = queryFactory
+			.selectFrom(category)
 			.where(where)
-			.orderBy(author.name.asc())        // 이름 오름차순 정렬
+			.orderBy(category.name.asc())        // 이름 오름차순 정렬
 			.offset(pageable.getOffset())   // 조회 시작 위치
 			.limit(pageable.getPageSize())  // 페이지 크기
 			.fetch();
 
 		// 전체 개수 카운트 (페이징용 total)
 		Long total = queryFactory
-			.select(author.count())
-			.from(author)
+			.select(category.count())
+			.from(category)
 			.where(where)
 			.fetchOne();
 
@@ -55,6 +55,5 @@ public class AuthorQueryRepositoryImpl implements AuthorQueryRepository {
 		}
 
 		return new PageImpl<>(content, pageable, totalCount);
-
 	}
 }

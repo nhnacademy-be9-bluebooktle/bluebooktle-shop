@@ -276,6 +276,13 @@ public class CategoryServiceImpl implements CategoryService {
 		return toTreeDto(category);
 	}
 
+	@Override
+	public Page<CategoryResponse> searchCategories(String searchKeyword, Pageable pageable) {
+		Page<Category> categories = categoryRepository.searchByNameContaining(searchKeyword, pageable);
+		return categories.map(
+			c -> new CategoryResponse(c.getId(), c.getName(), c.getParentCategory().getName(), c.getCategoryPath()));
+	}
+
 	private CategoryTreeResponse toTreeDto(Category category) {
 		CategoryTreeResponse response = new CategoryTreeResponse(category.getId(), category.getName());
 		for (Category child : category.getChildCategories()) {

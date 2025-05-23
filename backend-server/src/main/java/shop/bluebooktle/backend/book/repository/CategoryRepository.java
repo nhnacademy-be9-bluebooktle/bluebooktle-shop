@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import shop.bluebooktle.backend.book.entity.Category;
 
-public interface CategoryRepository extends JpaRepository<Category, Long> {
+public interface CategoryRepository extends JpaRepository<Category, Long>, CategoryQueryRepository {
 	// 특정 부모 카테고리의 자식 카테고리 조회
 	List<Category> findByParentCategory(Category parent);
 
@@ -32,5 +32,5 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
 	boolean existsByIdAndParentCategoryIsNull(Long id);
 
 	Category findParentCategoryById(Long id);
-	
+
 }

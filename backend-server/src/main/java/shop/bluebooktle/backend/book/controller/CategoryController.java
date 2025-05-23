@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
@@ -39,8 +40,15 @@ public class CategoryController {
 	// 모든 카테고리 조회 (단계적 구조로 출력 x)
 	@GetMapping
 	public ResponseEntity<JsendResponse<PaginationData<CategoryResponse>>> getCategories(
-		@PageableDefault(size = 10, sort = "id") Pageable pageable) {
-		Page<CategoryResponse> categoryPage = categoryService.getCategories(pageable);
+		@PageableDefault(size = 10, sort = "id") Pageable pageable,
+		@RequestParam(value = "searchKeyword", required = false) String searchKeyword
+	) {
+		Page<CategoryResponse> categoryPage;
+		if (searchKeyword != null && !searchKeyword.isBlank()) {
+			categoryPage = categoryService.searchCategories(searchKeyword, pageable);
+		} else {
+			categoryPage = categoryService.getCategories(pageable);
+		}
 		PaginationData<CategoryResponse> paginationData = new PaginationData<>(categoryPage);
 		return ResponseEntity.ok(JsendResponse.success(paginationData));
 	}
@@ -58,7 +66,7 @@ public class CategoryController {
 		CategoryTreeResponse tree = categoryService.getCategoryTreeById(categoryId);
 		return ResponseEntity.ok(JsendResponse.success(tree));
 	}
-	
+
 	// 최상위 카테고리 등록
 	@PostMapping
 	public ResponseEntity<JsendResponse<Void>> addRootCategory(
