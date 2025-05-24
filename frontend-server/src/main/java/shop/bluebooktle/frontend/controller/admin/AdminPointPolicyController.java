@@ -1,15 +1,18 @@
 package shop.bluebooktle.frontend.controller.admin;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,7 +27,7 @@ import shop.bluebooktle.common.dto.point.request.PointPolicyUpdateRequest;
 import shop.bluebooktle.common.dto.point.request.PointPolicyWithSourceCreateRequest;
 import shop.bluebooktle.common.dto.point.request.PointSourceTypeCreateRequest;
 import shop.bluebooktle.common.dto.point.response.PointRuleResponse;
-import shop.bluebooktle.frontend.service.PointService;
+import shop.bluebooktle.frontend.service.AdminPointService;
 
 @Slf4j
 @Controller
@@ -32,7 +35,7 @@ import shop.bluebooktle.frontend.service.PointService;
 @RequiredArgsConstructor
 public class AdminPointPolicyController {
 
-	private final PointService pointService;
+	private final AdminPointService pointService;
 
 	@GetMapping
 	public String showPointPolicySettings(Model model, HttpServletRequest request) {
@@ -44,14 +47,10 @@ public class AdminPointPolicyController {
 		List<PointRuleResponse> earningRules = pointService.getAllRules();
 		model.addAttribute("earningRules", earningRules);
 
+		model.addAttribute("earningTypeOptions", Arrays.asList(PolicyType.values()));
+
 		// TODO: membershipRates 설정
 		model.addAttribute("membershipRates", new ArrayList<>());
-
-		// 폼 내 선택 옵션
-		// model.addAttribute("earningTypeOptions", List.of(
-		// 	new AdminCouponController.SelectOption("AMOUNT", "정액(P)"),
-		// 	new AdminCouponController.SelectOption("PERCENTAGE", "정률(%)")
-		// ));
 
 		return "admin/point/point_settings_form";
 	}
@@ -63,7 +62,6 @@ public class AdminPointPolicyController {
 		RedirectAttributes ra
 	) {
 		try {
-			// URL 에서 넘어온 policyId 확인(보안검증 생략)
 			req = new PointPolicyUpdateRequest(
 				policyId,
 				req.policyType(),
@@ -104,12 +102,29 @@ public class AdminPointPolicyController {
 
 	@GetMapping("/new")
 	public String showNewPolicyForm(Model model) {
-		// 1) 폼 바인딩용 DTO (actionType, sourceType, policyType, value)
 		model.addAttribute("policyCreateRequest",
 			new PointPolicyWithSourceCreateRequest(null, null, null, null));
-		// 2) 정책 유형 드롭다운 옵션
 		model.addAttribute("policyTypes", PolicyType.values());
 		return "admin/point/policy_form";
+	}
+
+	@DeleteMapping("/{policyId}")
+	public String deletePolicyAndSource(
+		@PathVariable Long policyId,
+		@RequestParam Long pointSourceTypeId,
+		RedirectAttributes ra
+	) {
+		try {
+			pointService.deletePolicy(policyId);
+			pointService.deleteSourceType(pointSourceTypeId);
+			ra.addFlashAttribute("globalSuccessMessage",
+				"Policy " + pointSourceTypeId + "가 삭제되었습니다." +
+					" / SourceTypeID=" + pointSourceTypeId);
+		} catch (Exception e) {
+			ra.addFlashAttribute("globalErrorMessage",
+				"Policy " + policyId + " / SourceTypeID=" + pointSourceTypeId + " 삭제 실패: " + e.getMessage());
+		}
+		return "redirect:/admin/points/settings";
 	}
 
 	// --- 뷰 모델 DTO ---

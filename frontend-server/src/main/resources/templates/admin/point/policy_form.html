@@ -30,7 +30,7 @@
                 <div class="form-group">
                     <label for="sourceType">소스 타입</label>
                     <input id="sourceType"
-                           placeholder="예: PURCHASE"
+                           placeholder="예: 구매 적립"
                            required
                            th:field="*{sourceType}"
                            type="text"/>
@@ -54,9 +54,8 @@
                 <div class="form-group">
                     <label for="value">값</label>
                     <input id="value"
-                           placeholder="예: 0.05"
+                           placeholder="예: PERCENTAGE : 10 (10% 적립), AMOUNT : 1000 (1000원 적립)"
                            required
-                           step="0.01"
                            th:field="*{value}"
                            type="number"/>
                 </div>

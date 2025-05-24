@@ -9,7 +9,7 @@ import shop.bluebooktle.common.dto.point.response.PointPolicyResponse;
 import shop.bluebooktle.common.dto.point.response.PointRuleResponse;
 import shop.bluebooktle.common.dto.point.response.PointSourceTypeResponse;
 
-public interface PointService {
+public interface AdminPointService {
 
 	Long createPolicy(PointPolicyCreateRequest request);
 

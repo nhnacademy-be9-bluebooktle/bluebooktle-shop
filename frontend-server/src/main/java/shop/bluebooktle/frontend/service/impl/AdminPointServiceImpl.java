@@ -11,14 +11,14 @@ import shop.bluebooktle.common.dto.point.request.PointSourceTypeCreateRequest;
 import shop.bluebooktle.common.dto.point.response.PointPolicyResponse;
 import shop.bluebooktle.common.dto.point.response.PointRuleResponse;
 import shop.bluebooktle.common.dto.point.response.PointSourceTypeResponse;
-import shop.bluebooktle.frontend.repository.PointRepository;
-import shop.bluebooktle.frontend.service.PointService;
+import shop.bluebooktle.frontend.repository.AdminPointRepository;
+import shop.bluebooktle.frontend.service.AdminPointService;
 
 @Service
 @RequiredArgsConstructor
-public class PointServiceImpl implements PointService {
+public class AdminPointServiceImpl implements AdminPointService {
 
-	private final PointRepository pointRepository;
+	private final AdminPointRepository pointRepository;
 
 	@Override
 	public Long createPolicy(PointPolicyCreateRequest request) {
