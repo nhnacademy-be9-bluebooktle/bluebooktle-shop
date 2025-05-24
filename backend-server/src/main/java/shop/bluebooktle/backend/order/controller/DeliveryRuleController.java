@@ -1,64 +1,77 @@
 package shop.bluebooktle.backend.order.controller;
 
-import java.net.URI;
-import java.util.List;
-import java.util.stream.Collectors;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
-import shop.bluebooktle.backend.order.dto.request.DeliveryRuleRequest;
-import shop.bluebooktle.backend.order.dto.response.DeliveryRuleResponse;
-import shop.bluebooktle.backend.order.entity.DeliveryRule;
 import shop.bluebooktle.backend.order.service.DeliveryRuleService;
 import shop.bluebooktle.common.dto.common.JsendResponse;
+import shop.bluebooktle.common.dto.common.PaginationData;
+import shop.bluebooktle.common.dto.order.request.DeliveryRuleCreateRequest;
+import shop.bluebooktle.common.dto.order.request.DeliveryRuleUpdateRequest;
+import shop.bluebooktle.common.dto.order.response.DeliveryRuleResponse;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/admin/delivery-rules")
 @RequiredArgsConstructor
 public class DeliveryRuleController {
 
-	private final DeliveryRuleService deliveryRuleService;
+	private final DeliveryRuleService service;
 
-	@PostMapping("/admin/delivery-rules")
-	public ResponseEntity<JsendResponse<Long>> createDeliveryPolicy(@RequestBody DeliveryRuleRequest request) {
-		DeliveryRule rule = deliveryRuleService.createPolicy(
-			request.name(),
-			request.price(),
-			request.deliveryFee()
-		);
-		URI location = URI.create("/admin/delivery-rules/" + rule.getId());
-		return ResponseEntity
-			.created(location) // 201 Created + Location header
-			.body(JsendResponse.success(rule.getId()));
+	@GetMapping("/default")
+	public ResponseEntity<JsendResponse<DeliveryRuleResponse>> getDefault() {
+		DeliveryRuleResponse dto = service.getDefaultRule();
+		return ResponseEntity.ok(JsendResponse.success(dto));
 	}
 
-	@GetMapping("/admin/delivery-rules/{id}")
-	public ResponseEntity<JsendResponse<DeliveryRuleResponse>> getRule(@PathVariable Long id) {
-		DeliveryRule rule = deliveryRuleService.getRule(id);
-		return ResponseEntity.ok(JsendResponse.success(DeliveryRuleResponse.from(rule)));
+	@GetMapping("/{id}")
+	public ResponseEntity<JsendResponse<DeliveryRuleResponse>> getById(@PathVariable Long id) {
+		DeliveryRuleResponse dto = service.getRule(id);
+		return ResponseEntity.ok(JsendResponse.success(dto));
 	}
 
-	// 전체 조회
-	@GetMapping("/admin/delivery-rules/all")
-	public ResponseEntity<JsendResponse<List<DeliveryRuleResponse>>> getAllRules() {
-		List<DeliveryRuleResponse> rules = deliveryRuleService.getAll().stream()
-			.map(DeliveryRuleResponse::from)
-			.collect(Collectors.toList());
-		return ResponseEntity.ok(JsendResponse.success(rules));
+	@GetMapping
+	public ResponseEntity<JsendResponse<PaginationData<DeliveryRuleResponse>>> getAll(Pageable pageable) {
+		Page<DeliveryRuleResponse> page = service.getAll(pageable);
+		PaginationData<DeliveryRuleResponse> paginationData = new PaginationData<>(page);
+		return ResponseEntity.ok(JsendResponse.success(paginationData));
 	}
 
-	@DeleteMapping("/admin/delivery-rules/{id}")
-	public ResponseEntity<JsendResponse<Void>> deleteRule(@PathVariable Long id) {
-		deliveryRuleService.deletePolicy(id);
+	@GetMapping("/active")
+	public ResponseEntity<JsendResponse<PaginationData<DeliveryRuleResponse>>> getActive(Pageable pageable) {
+		Page<DeliveryRuleResponse> page = service.getAllByIsActive(pageable);
+		PaginationData<DeliveryRuleResponse> paginationData = new PaginationData<>(page);
+		return ResponseEntity.ok(JsendResponse.success(paginationData));
+	}
+
+	@PostMapping
+	public ResponseEntity<JsendResponse<Long>> create(@RequestBody DeliveryRuleCreateRequest request) {
+		Long id = service.createRule(request);
+		return ResponseEntity.status(HttpStatus.CREATED).body(JsendResponse.success(id));
+	}
+
+	@PutMapping("/{id}")
+	public ResponseEntity<JsendResponse<Void>> update(
+		@PathVariable Long id,
+		@RequestBody DeliveryRuleUpdateRequest request
+	) {
+		service.updateRule(id, request);
 		return ResponseEntity.ok(JsendResponse.success());
 	}
 
+	@DeleteMapping("/{id}")
+	public ResponseEntity<JsendResponse<Void>> delete(@PathVariable Long id) {
+		service.deleteRule(id);
+		return ResponseEntity.ok(JsendResponse.success());
+	}
 }

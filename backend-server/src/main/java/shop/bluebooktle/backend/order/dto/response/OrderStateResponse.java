@@ -1,7 +1,7 @@
 package shop.bluebooktle.backend.order.dto.response;
 
 import shop.bluebooktle.backend.order.entity.OrderState;
-import shop.bluebooktle.common.domain.OrderStatus;
+import shop.bluebooktle.common.domain.order.OrderStatus;
 
 public record OrderStateResponse(
 	Long id,

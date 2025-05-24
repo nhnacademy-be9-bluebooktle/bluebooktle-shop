@@ -16,7 +16,7 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import shop.bluebooktle.common.domain.OrderStatus;
+import shop.bluebooktle.common.domain.order.OrderStatus;
 import shop.bluebooktle.common.entity.BaseEntity;
 
 @Entity

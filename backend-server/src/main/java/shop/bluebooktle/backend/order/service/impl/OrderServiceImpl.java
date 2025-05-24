@@ -12,7 +12,7 @@ import shop.bluebooktle.backend.order.entity.Order;
 import shop.bluebooktle.backend.order.repository.OrderRepository;
 import shop.bluebooktle.backend.order.repository.OrderStateRepository;
 import shop.bluebooktle.backend.order.service.OrderService;
-import shop.bluebooktle.common.domain.OrderStatus;
+import shop.bluebooktle.common.domain.order.OrderStatus;
 import shop.bluebooktle.common.entity.auth.User;
 import shop.bluebooktle.common.exception.order.OrderNotFoundException;
 
@@ -42,5 +42,5 @@ public class OrderServiceImpl implements OrderService {
 		return orderRepository.findByOrderKey(orderKey)
 			.orElseThrow(() -> new OrderNotFoundException("주문을 찾을 수 없습니다."));
 	}
-	
+
 }

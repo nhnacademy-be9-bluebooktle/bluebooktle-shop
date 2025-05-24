@@ -2,19 +2,19 @@ package shop.bluebooktle.backend.order.repository;
 
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import shop.bluebooktle.backend.order.entity.DeliveryRule;
+import shop.bluebooktle.common.domain.order.Region;
 
 public interface DeliveryRuleRepository extends JpaRepository<DeliveryRule, Long> {
+	boolean existsByRuleName(String name);
 
-	// 정책 이름으로 조회
-	Optional<DeliveryRule> findById(Long id);
+	Page<DeliveryRule> findAllByIsActiveTrue(Pageable pageable);
 
-	// INSERT INTO delivery_rule (name, price, delivery_fee)
-	// VALUES ('기본 배송 정책', 30000.00, 5000.00);
+	Optional<DeliveryRule> findByRegion(Region region);
 
-	// 중복 정책명 확인
-	boolean existsByName(String name);
-
+	Optional<DeliveryRule> findByRegionAndIsActiveTrue(Region region);
 }

@@ -1,6 +1,7 @@
 package shop.bluebooktle.backend.order.service;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.*;
 
 import java.math.BigDecimal;
@@ -13,120 +14,196 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 import shop.bluebooktle.backend.order.entity.DeliveryRule;
 import shop.bluebooktle.backend.order.repository.DeliveryRuleRepository;
 import shop.bluebooktle.backend.order.service.impl.DeliveryRuleServiceImpl;
+import shop.bluebooktle.common.domain.order.Region;
+import shop.bluebooktle.common.dto.order.request.DeliveryRuleCreateRequest;
+import shop.bluebooktle.common.dto.order.response.DeliveryRuleResponse;
 import shop.bluebooktle.common.exception.order.delivery_rule.CannotDeleteDefaultPolicyException;
 import shop.bluebooktle.common.exception.order.delivery_rule.DefaultDeliveryRuleNotFoundException;
 import shop.bluebooktle.common.exception.order.delivery_rule.DeliveryRuleAlreadyExistsException;
+import shop.bluebooktle.common.exception.order.delivery_rule.DeliveryRuleNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 class DeliveryRuleServiceTest {
 
 	@InjectMocks
-	private DeliveryRuleServiceImpl deliveryRuleService;
+	private DeliveryRuleServiceImpl service;
 
 	@Mock
-	private DeliveryRuleRepository deliveryRuleRepository;
+	private DeliveryRuleRepository repository;
 
 	@Test
-	@DisplayName("기본 배송 정책 조회 - 성공")
+	@DisplayName("기본 정책 조회 - 성공")
 	void getDefaultRule_success() {
-		DeliveryRule rule = DeliveryRule.builder()
-			.name("기본 배송 정책")
-			.price(BigDecimal.valueOf(30000))
-			.deliveryFee(BigDecimal.ZERO)
+		DeliveryRule entity = DeliveryRule.builder()
+			.ruleName("기본 배송 정책")
+			.deliveryFee(new BigDecimal("2500"))
+			.freeDeliveryThreshold(new BigDecimal("50000"))
+			.region(Region.ALL)
+			.isActive(true)
 			.build();
+		given(repository.findByRegionAndIsActiveTrue(Region.ALL))
+			.willReturn(Optional.of(entity));
 
-		given(deliveryRuleRepository.findById(1L)).willReturn(Optional.of(rule));
+		DeliveryRuleResponse result = service.getDefaultRule();
 
-		DeliveryRule result = deliveryRuleService.getDefaultRule();
-
-		assertThat(result).isEqualTo(rule);
+		assertThat(result.ruleName()).isEqualTo(entity.getRuleName());
+		assertThat(result.deliveryFee()).isEqualByComparingTo(entity.getDeliveryFee());
+		assertThat(result.freeDeliveryThreshold()).isEqualByComparingTo(entity.getFreeDeliveryThreshold());
 	}
 
 	@Test
-	@DisplayName("기본 배송 정책 조회 - 실패")
+	@DisplayName("기본 정책 조회 - 실패")
 	void getDefaultRule_fail() {
-		given(deliveryRuleRepository.findById(1L)).willReturn(Optional.empty());
+		given(repository.findByRegionAndIsActiveTrue(Region.ALL))
+			.willReturn(Optional.empty());
 
-		assertThatThrownBy(() -> deliveryRuleService.getDefaultRule())
+		assertThatThrownBy(() -> service.getDefaultRule())
 			.isInstanceOf(DefaultDeliveryRuleNotFoundException.class);
 	}
 
 	@Test
-	@DisplayName("새로운 배송 정책 생성 - 성공")
-	void createPolicy_success() {
-		String name = "새 정책";
-		BigDecimal price = BigDecimal.valueOf(50000);
-		BigDecimal fee = BigDecimal.valueOf(2500);
+	@DisplayName("배송 정책 생성 - 성공")
+	void createRule_success() {
+		DeliveryRuleCreateRequest req = new DeliveryRuleCreateRequest(
+			"제주 추가비용",
+			new BigDecimal("3000"),
+			null,
+			Region.JEJU,
+			true
+		);
+		given(repository.existsByRuleName(req.ruleName())).willReturn(false);
+		given(repository.findByRegionAndIsActiveTrue(Region.ALL)).willReturn(Optional.empty());
 
-		given(deliveryRuleRepository.existsByName(name)).willReturn(false);
-		given(deliveryRuleRepository.save(any())).willAnswer(invocation -> invocation.getArgument(0));
+		DeliveryRule saved = DeliveryRule.builder()
+			.ruleName(req.ruleName())
+			.deliveryFee(req.deliveryFee())
+			.freeDeliveryThreshold(req.freeDeliveryThreshold())
+			.region(req.region())
+			.isActive(true)
+			.build();
+		saved.setId(10L);
+		given(repository.save(any(DeliveryRule.class))).willReturn(saved);
 
-		DeliveryRule result = deliveryRuleService.createPolicy(name, price, fee);
+		Long id = service.createRule(req);
 
-		assertThat(result.getName()).isEqualTo(name);
-		assertThat(result.getPrice()).isEqualTo(price);
-		assertThat(result.getDeliveryFee()).isEqualTo(fee);
+		assertThat(id).isEqualTo(10L);
 	}
 
 	@Test
-	@DisplayName("기존 이름으로 배송 정책 생성 - 실패")
-	void createPolicy_duplicateName_fail() {
-		given(deliveryRuleRepository.existsByName("중복된이름")).willReturn(true);
+	@DisplayName("배송 정책 생성 - 중복 이름 실패")
+	void createRule_duplicateName_fail() {
+		DeliveryRuleCreateRequest req = new DeliveryRuleCreateRequest(
+			"중복",
+			BigDecimal.ZERO,
+			BigDecimal.ZERO,
+			Region.ALL,
+			true
+		);
+		given(repository.existsByRuleName(req.ruleName())).willReturn(true);
 
-		assertThatThrownBy(() -> deliveryRuleService.createPolicy("중복된이름", BigDecimal.TEN, BigDecimal.ONE))
+		assertThatThrownBy(() -> service.createRule(req))
 			.isInstanceOf(DeliveryRuleAlreadyExistsException.class);
 	}
 
 	@Test
-	@DisplayName("배송 정책 삭제 - 성공")
-	void deletePolicy_success() {
-		Long id = 2L;
-		DeliveryRule rule = DeliveryRule.builder().name("삭제 가능 정책").build();
-		given(deliveryRuleRepository.findById(id)).willReturn(Optional.of(rule));
-
-		deliveryRuleService.deletePolicy(id);
-
-		verify(deliveryRuleRepository).delete(rule);
-	}
-
-	@Test
-	@DisplayName("기본 배송 정책 삭제 시도 - 실패")
-	void deleteDefaultPolicy_fail() {
-		Long id = 1L;
-		DeliveryRule rule = DeliveryRule.builder().name("기본 배송 정책").build();
-		given(deliveryRuleRepository.findById(id)).willReturn(Optional.of(rule));
-
-		assertThatThrownBy(() -> deliveryRuleService.deletePolicy(id))
-			.isInstanceOf(CannotDeleteDefaultPolicyException.class);
-	}
-
-	@Test
-	@DisplayName("배송 정책 단건 조회 - 성공")
-	void getRule_success() {
-		Long id = 3L;
-		DeliveryRule rule = DeliveryRule.builder().name("프리미엄 배송").build();
-		given(deliveryRuleRepository.findById(id)).willReturn(Optional.of(rule));
-
-		DeliveryRule result = deliveryRuleService.getRule(id);
-
-		assertThat(result.getName()).isEqualTo("프리미엄 배송");
-	}
-
-	@Test
-	@DisplayName("배송 정책 전체 조회 - 성공")
-	void getAll_success() {
-		List<DeliveryRule> rules = List.of(
-			DeliveryRule.builder().name("A").build(),
-			DeliveryRule.builder().name("B").build()
+	@DisplayName("기본 정책 중복 생성 실패")
+	void createRule_duplicateDefault_fail() {
+		DeliveryRuleCreateRequest req = new DeliveryRuleCreateRequest(
+			"기본",
+			BigDecimal.ZERO,
+			BigDecimal.ZERO,
+			Region.ALL,
+			true
 		);
-		given(deliveryRuleRepository.findAll()).willReturn(rules);
+		given(repository.existsByRuleName(req.ruleName())).willReturn(false);
+		given(repository.findByRegionAndIsActiveTrue(Region.ALL))
+			.willReturn(Optional.of(DeliveryRule.builder()
+				.ruleName(req.ruleName())
+				.deliveryFee(req.deliveryFee())
+				.freeDeliveryThreshold(req.freeDeliveryThreshold())
+				.region(req.region())
+				.isActive(req.isActive())
+				.build()));
 
-		List<DeliveryRule> result = deliveryRuleService.getAll();
+		assertThatThrownBy(() -> service.createRule(req))
+			.isInstanceOf(DeliveryRuleAlreadyExistsException.class);
+	}
 
-		assertThat(result).hasSize(2);
+	@Test
+	@DisplayName("단건 조회 - 성공")
+	void getRule_success() {
+		DeliveryRule entity = DeliveryRule.builder()
+			.ruleName("프리미엄")
+			.deliveryFee(BigDecimal.ONE)
+			.freeDeliveryThreshold(BigDecimal.TEN)
+			.region(Region.MOUNTAINOUS_AREA)
+			.isActive(true)
+			.build();
+		given(repository.findById(5L)).willReturn(Optional.of(entity));
+
+		DeliveryRuleResponse dto = service.getRule(5L);
+
+		assertThat(dto.ruleName()).isEqualTo(entity.getRuleName());
+	}
+
+	@Test
+	@DisplayName("단건 조회 - 실패")
+	void getRule_notFound_fail() {
+		given(repository.findById(99L)).willReturn(Optional.empty());
+
+		assertThatThrownBy(() -> service.getRule(99L))
+			.isInstanceOf(DeliveryRuleNotFoundException.class);
+	}
+
+	@Test
+	@DisplayName("전체 조회 - 성공")
+	void getAll_success() {
+		DeliveryRule a = DeliveryRule.builder()
+			.ruleName("A").deliveryFee(BigDecimal.ONE)
+			.freeDeliveryThreshold(null).region(Region.ALL).isActive(true)
+			.build();
+		DeliveryRule b = DeliveryRule.builder()
+			.ruleName("B").deliveryFee(BigDecimal.TEN)
+			.freeDeliveryThreshold(null).region(Region.ALL).isActive(true)
+			.build();
+		Page<DeliveryRule> page = new PageImpl<>(List.of(a, b));
+		Pageable pageable = Pageable.unpaged();
+		given(repository.findAll(pageable)).willReturn(page);
+
+		Page<DeliveryRuleResponse> result = service.getAll(pageable);
+
+		assertThat(result.getTotalElements()).isEqualTo(2);
+		assertThat(result.getContent()).extracting(DeliveryRuleResponse::ruleName)
+			.containsExactly("A", "B");
+	}
+
+	@Test
+	@DisplayName("삭제 - 성공")
+	void deleteRule_success() {
+		DeliveryRule entity = DeliveryRule.builder()
+			.region(Region.JEJU).isActive(true).build();
+		given(repository.findById(7L)).willReturn(Optional.of(entity));
+
+		service.deleteRule(7L);
+
+		then(repository).should().delete(entity);
+	}
+
+	@Test
+	@DisplayName("기본 정책 삭제 시도 - 실패")
+	void deleteDefaultRule_fail() {
+		DeliveryRule entity = DeliveryRule.builder()
+			.region(Region.ALL).isActive(true).build();
+		given(repository.findById(1L)).willReturn(Optional.of(entity));
+
+		assertThatThrownBy(() -> service.deleteRule(1L))
+			.isInstanceOf(CannotDeleteDefaultPolicyException.class);
 	}
 }
