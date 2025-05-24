@@ -8,17 +8,27 @@ import java.util.UUID;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
+import shop.bluebooktle.frontend.service.AdminCategoryService;
 
 @Controller
+@RequiredArgsConstructor
 public class MainController {
 
+	private final AdminCategoryService adminCategoryService;
+
 	@GetMapping("/")
-	public String mainPage(HttpServletRequest request, HttpServletResponse response) {
+	public String mainPage(
+		Model model,
+		HttpServletRequest request,
+		HttpServletResponse response
+	) {
 		boolean hasGuestId = Arrays.stream(Optional.ofNullable(request.getCookies()).orElse(new Cookie[0]))
 			.anyMatch(cookie -> "GUEST_ID".equals(cookie.getName()));
 
@@ -31,7 +41,6 @@ public class MainController {
 				.build();
 			response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 		}
-
 		return "main";
 	}
 }
