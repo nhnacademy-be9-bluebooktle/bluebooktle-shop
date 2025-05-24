@@ -1,24 +1,33 @@
 package shop.bluebooktle.backend.order.service;
 
 import java.math.BigDecimal;
-import java.util.List;
 
-import shop.bluebooktle.backend.order.entity.DeliveryRule;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
+import shop.bluebooktle.common.domain.order.Region;
+import shop.bluebooktle.common.dto.order.request.DeliveryRuleCreateRequest;
+import shop.bluebooktle.common.dto.order.request.DeliveryRuleUpdateRequest;
+import shop.bluebooktle.common.dto.order.response.DeliveryRuleResponse;
 
 public interface DeliveryRuleService {
 
-	// "기본 정책" 1개만 존재 (30,000원 이상 → 무료 배송, 미만 → 5,000원 배송비 부과)
-	DeliveryRule getDefaultRule();
+	// 기본 정책 조회. region이 ALL인 정책을 반환
+	DeliveryRuleResponse getDefaultRule();
 
-	// 정책 조회
-	DeliveryRule getRule(Long id);
+	DeliveryRuleResponse getRule(Long id);
 
-	// 관리자 용 정책 추가 기능
-	DeliveryRule createPolicy(String name, BigDecimal price, BigDecimal deliveryFee);
+	Long createRule(DeliveryRuleCreateRequest request);
 
-	// 정책 전체 조회
-	List<DeliveryRule> getAll();
+	Page<DeliveryRuleResponse> getAll(Pageable pageable);
 
-	// 정책 삭제
-	void deletePolicy(Long id);
+	// 활성화된 정책 조회
+	Page<DeliveryRuleResponse> getAllByIsActive(Pageable pageable);
+
+	void deleteRule(Long id);
+
+	// 결제 금액과 지역을 기반으로 실제 적용될 배송비 계산
+	BigDecimal calculateDeliveryFee(BigDecimal orderAmount, Region region);
+
+	void updateRule(Long id, DeliveryRuleUpdateRequest request);
 }

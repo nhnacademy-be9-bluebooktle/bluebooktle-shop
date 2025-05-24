@@ -7,7 +7,7 @@ import java.util.UUID;
 import org.springframework.data.domain.Pageable;
 
 import shop.bluebooktle.backend.order.entity.Order;
-import shop.bluebooktle.common.domain.OrderStatus;
+import shop.bluebooktle.common.domain.order.OrderStatus;
 import shop.bluebooktle.common.entity.auth.User;
 
 public interface OrderService {

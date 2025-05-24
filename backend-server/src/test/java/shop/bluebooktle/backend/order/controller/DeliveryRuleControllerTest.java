@@ -19,9 +19,9 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import shop.bluebooktle.backend.order.dto.request.DeliveryRuleRequest;
 import shop.bluebooktle.backend.order.entity.DeliveryRule;
 import shop.bluebooktle.backend.order.service.DeliveryRuleService;
+import shop.bluebooktle.common.dto.order.request.DeliveryRuleRequest;
 import shop.bluebooktle.common.security.AuthUserLoader;
 import shop.bluebooktle.common.util.JwtUtil;
 
