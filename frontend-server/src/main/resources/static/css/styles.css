@@ -847,7 +847,7 @@ ul {
     display: flex;
     /* flex-wrap: wrap; */ /* 기존 wrap 속성 제거 또는 nowrap으로 명시 */
     flex-wrap: nowrap; /* 자식 요소들이 한 줄로만 나열되도록 강제 */
-    justify-content: flex-start; /* 왼쪽부터 정렬 (기본값이나 명시) */
+    justify-content: center; /* 왼쪽부터 정렬 (기본값이나 명시) */
     gap: 1.5rem;
     margin-top: 1rem;
     overflow-x: auto; /* 내용이 넘칠 경우 가로 스크롤바 표시 */
