@@ -6,18 +6,9 @@
     <title th:text="${pageTitle} ?: '배송 정책 관리'">배송 정책 관리</title>
     <th:block layout:fragment="page_css">
         <style>
-            .status-active {
-                color: green;
-                font-weight: bold;
-            }
-
-            .status-inactive {
-                color: red;
-            }
-
-            .current {
-                font-weight: bold;
-            }
+            .status-active { color: green; font-weight: bold; }
+            .status-inactive { color: red; }
+            .current { font-weight: bold; }
         </style>
     </th:block>
 </head>
@@ -29,7 +20,7 @@
             <span th:text="${pageTitle} ?: '배송 정책 관리'">배송 정책 관리</span>
         </h1>
         <div>
-            <a class="admin-btn admin-btn--primary" th:href="@{/admin/delivery/rules/new}">
+            <a class="admin-btn admin-btn--primary" th:href="@{/admin/delivery/settings/new}">
                 <i class="fas fa-plus"></i> 새 배송 정책 추가
             </a>
         </div>
@@ -53,35 +44,49 @@
                 </tr>
                 </thead>
                 <tbody>
-                <!-- 데이터가 없을 때 -->
-                <tr th:if="${deliveryRules.content.empty}">
+                <tr th:if="${deliveryRules.content.isEmpty()}">
                     <td colspan="7" style="text-align:center;">등록된 배송 정책이 없습니다.</td>
                 </tr>
-                <!-- 데이터 있을 때 -->
                 <tr th:each="rule : ${deliveryRules.content}">
                     <td th:text="${rule.id}">1</td>
                     <td th:text="${rule.ruleName}">기본 배송비</td>
-                    <td th:text="${rule.deliveryFee != null} ? (#numbers.formatDecimal(rule.deliveryFee, 0, 'COMMA') + '원') : '-'">
-                        3,000원
+                    <td>
+                        <form th:action="@{/admin/delivery/settings/{id}(id=${rule.id})}"
+                              method="post"
+                              style="display:inline-flex; align-items:center; gap:4px;">
+                            <input type="number"
+                                   name="deliveryFee"
+                                   th:value="${rule.deliveryFee}"
+                                   min="0" step="1"
+                                   class="admin-form-control"/>
                     </td>
-                    <td th:text="${rule.freeDeliveryThreshold != null} ? (#numbers.formatDecimal(rule.freeDeliveryThreshold, 0, 'COMMA') + '원 이상') : '-'">
-                        50,000원 이상
+                    <td>
+                        <input type="number"
+                               name="freeDeliveryThreshold"
+                               th:value="${rule.freeDeliveryThreshold}"
+                               min="0" step="1"
+                               class="admin-form-control"/>
                     </td>
                     <td th:text="${rule.region}">ALL</td>
                     <td>
-                        <span th:classappend="${rule.isActive} ? ' status-active' : ' status-inactive'"
-                              th:text="${rule.isActive} ? '활성' : '비활성'">활성</span>
+                        <input type="checkbox"
+                               name="isActive"
+                               th:checked="${rule.isActive()}"
+                               value="true"
+                               class="admin-form-check-input"/>
+                        <input type="hidden" name="isActive" value="false"/>
                     </td>
                     <td>
-                        <a class="admin-btn admin-btn--sm admin-btn--info"
-                           th:href="@{/admin/delivery/rules/{id}/edit(id=${rule.id})}" title="수정">
-                            <i class="fas fa-edit"></i>
-                        </a>
-                        <form method="post" onsubmit="return confirm('정말로 이 배송 정책을 삭제하시겠습니까?');"
-                              style="display:inline;" th:action="@{/admin/delivery/rules/{id}/delete(id=${rule.id})}">
-                            <button class="admin-btn admin-btn--sm admin-btn--danger" title="삭제" type="submit">
-                                <i class="fas fa-trash"></i>
-                            </button>
+                        <button type="submit"
+                                class="admin-btn admin-btn--sm admin-btn--primary"
+                                style="margin-right:4px;">저장</button>
+                        </form>
+                        <form th:action="@{/admin/delivery/settings/{id}(id=${rule.id})}"
+                              th:method="delete"
+                              style="display:inline-flex;"
+                              onsubmit="return confirm('정말로 이 배송 정책을 삭제하시겠습니까?');">
+                            <button type="submit"
+                                    class="admin-btn admin-btn--sm admin-btn--danger">삭제</button>
                         </form>
                     </td>
                 </tr>
@@ -89,19 +94,17 @@
             </table>
         </div>
 
-        <!-- 페이징 네비게이션 -->
         <div class="admin-pagination">
             <ul>
-                <li th:each="i : ${#numbers.sequence(0, deliveryRules.totalPages - 1)}">
-                    <a th:classappend="${i == deliveryRules.number} ? ' current'"
-                       th:href="@{/admin/delivery/rules(page=${i},size=${deliveryRules.size})}"
+                <li th:each="i : ${#numbers.sequence(0, deliveryRules.pagination.totalPages - 1)}">
+                    <a th:classappend="${i == deliveryRules.pagination.currentPage} ? ' current' : ''"
+                       th:href="@{/admin/delivery/settings(page=${i},size=${deliveryRules.pagination.pageSize})}"
                        th:text="${i + 1}">1</a>
                 </li>
             </ul>
         </div>
     </div>
 </div>
-
 <th:block layout:fragment="page_scripts">
 </th:block>
 </body>

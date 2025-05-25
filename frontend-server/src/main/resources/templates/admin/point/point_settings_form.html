@@ -88,13 +88,14 @@
 
                         <!-- 활성화 -->
                         <span>활성화</span>
-                        <label> <input name="isActive" type="hidden" value="false"/>
-
+                        <label>
                             <input name="isActive"
                                    th:checked="${rule.isActive()}"
                                    type="checkbox"
                                    value="true"/>
+                            <input name="isActive" type="hidden" value="false"/>
                         </label>
+
 
                         <!-- 정책 유형 -->
                         <label>

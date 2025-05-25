@@ -21,7 +21,7 @@ import shop.bluebooktle.frontend.config.feign.FeignGlobalConfig;
 
 @FeignClient(
 	name = "backend-server",
-	contextId = "pointRepository",
+	contextId = "AdminPointRepository",
 	path = "/api/points",
 	configuration = FeignGlobalConfig.class
 )
