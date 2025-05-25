@@ -48,7 +48,8 @@ class DeliveryRuleServiceTest {
 			.region(Region.ALL)
 			.isActive(true)
 			.build();
-		given(repository.findByRegionAndIsActiveTrue(Region.ALL))
+		// 구현체는 findByRegion(...)을 호출합니다.
+		given(repository.findByRegion(Region.ALL))
 			.willReturn(Optional.of(entity));
 
 		DeliveryRuleResponse result = service.getDefaultRule();
@@ -61,7 +62,7 @@ class DeliveryRuleServiceTest {
 	@Test
 	@DisplayName("기본 정책 조회 - 실패")
 	void getDefaultRule_fail() {
-		given(repository.findByRegionAndIsActiveTrue(Region.ALL))
+		given(repository.findByRegion(Region.ALL))
 			.willReturn(Optional.empty());
 
 		assertThatThrownBy(() -> service.getDefaultRule())
@@ -74,12 +75,12 @@ class DeliveryRuleServiceTest {
 		DeliveryRuleCreateRequest req = new DeliveryRuleCreateRequest(
 			"제주 추가비용",
 			new BigDecimal("3000"),
-			null,
+			new BigDecimal("10000"),
 			Region.JEJU,
 			true
 		);
 		given(repository.existsByRuleName(req.ruleName())).willReturn(false);
-		given(repository.findByRegionAndIsActiveTrue(Region.ALL)).willReturn(Optional.empty());
+		// JEJU는 기본 정책(ALL)이 아니므로 추가 중복 검사는 생략됩니다.
 
 		DeliveryRule saved = DeliveryRule.builder()
 			.ruleName(req.ruleName())
@@ -123,14 +124,17 @@ class DeliveryRuleServiceTest {
 			true
 		);
 		given(repository.existsByRuleName(req.ruleName())).willReturn(false);
+		// 기본 정책 중복 검사용
 		given(repository.findByRegionAndIsActiveTrue(Region.ALL))
-			.willReturn(Optional.of(DeliveryRule.builder()
-				.ruleName(req.ruleName())
-				.deliveryFee(req.deliveryFee())
-				.freeDeliveryThreshold(req.freeDeliveryThreshold())
-				.region(req.region())
-				.isActive(req.isActive())
-				.build()));
+			.willReturn(Optional.of(
+				DeliveryRule.builder()
+					.ruleName("기존 기본")
+					.deliveryFee(BigDecimal.ZERO)
+					.freeDeliveryThreshold(BigDecimal.ZERO)
+					.region(Region.ALL)
+					.isActive(true)
+					.build()
+			));
 
 		assertThatThrownBy(() -> service.createRule(req))
 			.isInstanceOf(DeliveryRuleAlreadyExistsException.class);
@@ -167,11 +171,11 @@ class DeliveryRuleServiceTest {
 	void getAll_success() {
 		DeliveryRule a = DeliveryRule.builder()
 			.ruleName("A").deliveryFee(BigDecimal.ONE)
-			.freeDeliveryThreshold(null).region(Region.ALL).isActive(true)
+			.freeDeliveryThreshold(BigDecimal.ZERO).region(Region.ALL).isActive(true)
 			.build();
 		DeliveryRule b = DeliveryRule.builder()
 			.ruleName("B").deliveryFee(BigDecimal.TEN)
-			.freeDeliveryThreshold(null).region(Region.ALL).isActive(true)
+			.freeDeliveryThreshold(BigDecimal.ZERO).region(Region.ALL).isActive(true)
 			.build();
 		Page<DeliveryRule> page = new PageImpl<>(List.of(a, b));
 		Pageable pageable = Pageable.unpaged();
