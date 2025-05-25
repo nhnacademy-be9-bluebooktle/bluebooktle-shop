@@ -90,26 +90,6 @@ public class BookRegisterServiceImpl implements BookRegisterService {
 		Long bookId = bookRepository.findByIsbn(request.getIsbn())
 			.orElseThrow().getId();
 
-		// 도서 ID와 이미지로 도서 이미지 관계 생성
-		// bookImgService.registerBookImg(bookId, request.getThumbnailUrl());
-
-		// 이미지 생성
-		// ImgRegisterRequest imgRegisterRequest = ImgRegisterRequest.builder()
-		// 		.imgUrl(request.getThumbnailUrl())
-		// 		.build();
-		//
-		// imgService.registerImg(imgRegisterRequest);
-		//
-		// // image id
-		// Long imgId = imgRepository.findByImgUrl(request.getThumbnailUrl())
-		// 	.map(Img::getId)
-		// 	.orElseThrow(() -> new ImgNotFoundException());
-		//
-		// // 책과 연결
-		// BookImgRegisterRequest bookImgRegisterRequest = BookImgRegisterRequest.builder()
-		// 		.imgId(imgId)
-		// 		.isThumbnail(true)
-		// 		.build();
 		bookImgService.registerBookImg(bookId,request.getThumbnailUrl());
 
 		BookSaleInfo bookSaleInfo = BookSaleInfo.builder()
