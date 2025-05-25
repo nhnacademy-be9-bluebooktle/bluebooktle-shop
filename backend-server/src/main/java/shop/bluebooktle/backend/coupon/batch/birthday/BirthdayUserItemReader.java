@@ -9,9 +9,11 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import shop.bluebooktle.backend.user.repository.UserRepository;
 import shop.bluebooktle.common.entity.auth.User;
 
+@Slf4j
 @Component
 @StepScope
 @RequiredArgsConstructor
@@ -25,6 +27,7 @@ public class BirthdayUserItemReader implements ItemReader<User> {
 		if (userIterator == null) {
 			String month = String.format("%02d", LocalDate.now().getMonthValue());
 			List<User> users = userRepository.findByBirthdayMonth(month);
+			log.info("Reader : 생일자 {}월 유저 수 : {}", month, users.size());
 			userIterator = users.iterator();
 		}
 		return userIterator.hasNext() ? userIterator.next() : null;
