@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import shop.bluebooktle.common.domain.auth.UserProvider;
 import shop.bluebooktle.common.domain.auth.UserStatus;
 import shop.bluebooktle.common.domain.auth.UserType;
 import shop.bluebooktle.common.entity.auth.User;
@@ -22,6 +23,7 @@ public class UserResponse {
 	private String nickname;
 	private String birth;
 	private String phoneNumber;
+	private UserProvider userProvider;
 	private BigDecimal pointBalance;
 	private UserType type;
 	private UserStatus status;
@@ -30,7 +32,7 @@ public class UserResponse {
 
 	@Builder
 	public UserResponse(Long id, String loginId, String name, String email, String nickname, String birth,
-		String phoneNumber, BigDecimal pointBalance, UserType type, UserStatus status,
+		String phoneNumber, UserProvider userProvider, BigDecimal pointBalance, UserType type, UserStatus status,
 		LocalDateTime lastLoginAt, String membershipLevelName) {
 		this.id = id;
 		this.loginId = loginId;
@@ -39,6 +41,7 @@ public class UserResponse {
 		this.nickname = nickname;
 		this.birth = birth;
 		this.phoneNumber = phoneNumber;
+		this.userProvider = userProvider;
 		this.pointBalance = pointBalance;
 		this.type = type;
 		this.status = status;

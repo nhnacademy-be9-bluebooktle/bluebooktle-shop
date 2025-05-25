@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.auth.service.AuthService;
 import shop.bluebooktle.common.domain.auth.UserType;
 import shop.bluebooktle.common.dto.auth.request.LoginRequest;
+import shop.bluebooktle.common.dto.auth.request.PaycoLoginRequest;
 import shop.bluebooktle.common.dto.auth.request.SignupRequest;
 import shop.bluebooktle.common.dto.auth.request.TokenRefreshRequest;
 import shop.bluebooktle.common.dto.auth.response.TokenResponse;
@@ -59,5 +60,12 @@ public class AuthController {
 		String accessToken = (String)authentication.getCredentials();
 		authService.logout(accessToken);
 		return ResponseEntity.ok(JsendResponse.success());
+	}
+
+	@Operation(summary = "페이코 로그인", description = "페이코 인가 코드를 받아 로그인/회원가입 처리 후 토큰을 발급합니다.")
+	@PostMapping("/payco")
+	public ResponseEntity<JsendResponse<TokenResponse>> paycoLogin(@RequestBody PaycoLoginRequest paycoLoginRequest) {
+		TokenResponse tokenResponse = authService.paycoLogin(paycoLoginRequest.getCode());
+		return ResponseEntity.ok(JsendResponse.success(tokenResponse));
 	}
 }

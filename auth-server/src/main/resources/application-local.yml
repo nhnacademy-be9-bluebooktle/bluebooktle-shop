@@ -40,3 +40,11 @@ jwt:
   secret: ${JWT_SECRET_KEY_LOCAL}
   access-token-validity-seconds: 5
   refresh-token-validity-seconds: 3600
+
+oauth:
+  payco:
+    client-id: "3RDKLuGWlBifp1UfHtinDmZ"
+    client-secret: Gtq69R7bRy6DN2LVjEdiePoH
+    redirect-uri: "http://www.localhost:9080/oauth/payco"
+    auth-url: "https://id.payco.com"
+    api-url: "https://apis-payco.krp.toastoven.net"

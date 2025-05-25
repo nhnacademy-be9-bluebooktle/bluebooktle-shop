@@ -23,7 +23,7 @@ public enum ErrorCode {
 	AUTH_LOGIN_ID_ALREADY_EXISTS(HttpStatus.CONFLICT, "A002", "이미 사용 중인 아이디입니다."),
 	AUTH_EMAIL_ALREADY_EXISTS(HttpStatus.CONFLICT, "A003", "이미 사용 중인 이메일입니다."),
 	AUTH_INACTIVE_ACCOUNT(HttpStatus.FORBIDDEN, "A004", "비활성화(휴면) 상태 계정입니다. 인증 후 활성화 해주세요."),
-	AUTH_INVALID_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "A005", "유효하지 않거나 만료된 Refresh Token입니다."),
+	AUTH_INVALID_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "A005", "유효하지 않은 인증정보입니다."),
 	AUTH_USER_NOT_FOUND(HttpStatus.NOT_FOUND, "A006", "사용자를 찾을 수 없습니다."),
 	AUTH_PASSWORD_MISMATCH(HttpStatus.BAD_REQUEST, "A007", "현재 비밀번호가 일치하지 않습니다."),
 	AUTH_PASSWORD_ENCRYPTION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "A008", "비밀번호 암호화 중 오류가 발생했습니다."),
@@ -36,6 +36,7 @@ public enum ErrorCode {
 	AUTH_MEMBERSHIP_LEVEL_NOT_FOUND(HttpStatus.NOT_FOUND, "A015", "회원 등급 정보를 찾을 수 없습니다."),
 	AUTH_INVALID_USER_ID(HttpStatus.BAD_REQUEST, "A016", "유효하지 않은 계정 ID입니다."),
 	AUTH_TOKEN_REISSUE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "A017", "토큰 재발급에 실패했습니다. "),
+	AUTH_OAUTH_LOGIN_FAILED(HttpStatus.BAD_REQUEST, "A018", "OAUTH 로그인에 실패했습니다."),
 
 	// Book Errors (도서 관련 오류) - B
 	BOOK_NOT_FOUND(HttpStatus.NOT_FOUND, "B001", "도서를 찾을 수 없습니다."),

@@ -122,7 +122,9 @@
                     </form>
                 </section>
 
-                <section class="mypage-section-kitsch" id="passwordChangeSection">
+                <section class="mypage-section-kitsch" id="passwordChangeSection"
+                         th:if="${user != null && user.userProvider == T(shop.bluebooktle.common.domain.auth.UserProvider).BLUEBOOKTLE}">
+
                     <h3 class="section-title-kitsch"><i class="fas fa-key"></i> 비밀번호 변경</h3>
                     <form action="/mypage/password/update" id="passwordChangeForm" method="post">
                         <div class="form-group-kitsch">

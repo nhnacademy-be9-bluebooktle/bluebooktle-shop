@@ -12,4 +12,6 @@ public interface AuthService {
 	public TokenResponse login(HttpServletResponse response, LoginRequest loginRequest);
 
 	TokenResponse refreshToken(HttpServletResponse response, TokenRefreshRequest tokenRefreshRequest);
+
+	public void paycoLogin(HttpServletResponse response, String code);
 }

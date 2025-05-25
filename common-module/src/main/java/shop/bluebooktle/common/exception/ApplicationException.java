@@ -33,8 +33,16 @@ public class ApplicationException extends RuntimeException {
 		return errorCode.getCode();
 	}
 
+	public String getMessage() {
+		String superMessage = super.getMessage();
+		if (superMessage != null) {
+			return superMessage;
+		}
+		return errorCode.getMessage();
+	}
+
 	public HttpStatus getHttpStatus() {
 		return errorCode.getStatus();
 	}
-	
+
 }

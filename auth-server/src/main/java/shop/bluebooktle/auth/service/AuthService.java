@@ -13,4 +13,6 @@ public interface AuthService {
 	void logout(String accessToken);
 
 	TokenResponse refreshToken(TokenRefreshRequest tokenRefreshRequest);
+
+	TokenResponse paycoLogin(String code);
 }

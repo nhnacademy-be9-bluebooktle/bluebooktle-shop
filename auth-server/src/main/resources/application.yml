@@ -7,3 +7,7 @@ spring:
 
   jpa:
     open-in-view: false
+
+oauth:
+  payco:
+    client-id: "3RDKLuGWlBifp1UfHtinDmZ"

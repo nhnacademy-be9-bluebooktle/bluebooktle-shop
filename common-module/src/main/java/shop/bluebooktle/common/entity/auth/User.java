@@ -28,6 +28,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import shop.bluebooktle.common.domain.auth.UserProvider;
 import shop.bluebooktle.common.domain.auth.UserStatus;
 import shop.bluebooktle.common.domain.auth.UserType;
 import shop.bluebooktle.common.entity.BaseEntity;
@@ -61,10 +62,10 @@ public class User extends BaseEntity {
 	@Column(name = "name", nullable = false, length = 20)
 	private String name;
 
-	@Column(name = "email", nullable = false, unique = true, length = 50)
+	@Column(name = "email", unique = true, length = 50)
 	private String email;
 
-	@Column(name = "nickname", nullable = false, unique = true, length = 20)
+	@Column(name = "nickname", nullable = false, unique = true, length = 50)
 	private String nickname;
 
 	@Column(name = "birth", nullable = false)
@@ -72,6 +73,10 @@ public class User extends BaseEntity {
 
 	@Column(name = "phone_number", nullable = false, length = 11)
 	private String phoneNumber;
+
+	@Enumerated(EnumType.STRING)
+	@Column(name = "provider", nullable = false)
+	private UserProvider provider;
 
 	@Column(name = "point_balance", nullable = false, precision = 10, scale = 2)
 	private BigDecimal pointBalance;
@@ -92,10 +97,8 @@ public class User extends BaseEntity {
 
 	@Builder
 	public User(Long id, MembershipLevel membershipLevel, String loginId, String encodedPassword, String name,
-		String email,
-		String nickname,
-		String birth, String phoneNumber, UserType type, UserStatus status,
-		LocalDateTime lastLoginAt) {
+		String email, String nickname, String birth, String phoneNumber, UserProvider provider, UserType type,
+		UserStatus status, LocalDateTime lastLoginAt) {
 		this.id = id;
 		this.membershipLevel = membershipLevel;
 		this.loginId = loginId;
@@ -105,6 +108,7 @@ public class User extends BaseEntity {
 		this.nickname = nickname;
 		this.birth = birth;
 		this.phoneNumber = phoneNumber;
+		this.provider = (provider == null) ? UserProvider.BLUEBOOKTLE : provider;
 		this.pointBalance = (pointBalance == null) ? BigDecimal.ZERO : pointBalance;
 		this.type = (type == null) ? UserType.USER : type;
 		this.status = (status == null) ? UserStatus.ACTIVE : status;
