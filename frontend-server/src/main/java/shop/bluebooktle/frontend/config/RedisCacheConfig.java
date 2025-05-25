@@ -27,7 +27,11 @@ public class RedisCacheConfig {
 
 		// 3) 캐시 구성에 적용
 		RedisCacheConfiguration conf = RedisCacheConfiguration.defaultCacheConfig()
-			.serializeValuesWith(pair)           // ← JSON 직렬화 사용
+			.serializeValuesWith(
+				RedisSerializationContext.SerializationPair.fromSerializer(
+					new GenericJackson2JsonRedisSerializer()
+				)
+			)
 			.entryTtl(Duration.ofHours(1))
 			.disableCachingNullValues();
 
