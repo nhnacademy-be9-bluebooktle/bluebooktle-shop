@@ -10,7 +10,7 @@ Content-Type: application/json
 GET http://localhost:9012/api/authors/1
 
 ### 작가 수정
-PATCH http://localhost:9012/api/authors/1
+PUT http://localhost:9012/api/authors/1
 Content-Type: application/json
 
 {
