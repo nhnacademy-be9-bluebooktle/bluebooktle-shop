@@ -182,9 +182,10 @@
 
             <div th:if="${totalPages > 0}" class="pagination-container">
                 <th:block th:replace="~{_fragments/admin_pagination :: commonPagination(
-                            currentPage=${currentPage},
+                            currentPage=${currentPage + 1},
                             totalPages=${totalPages},
-                            baseUrl=${baseUrlWithParams}
+                            baseUrl=${baseUrlWithParams},
+                            searchKeyword=${searchKeyword}
                             )}"></th:block>
             </div>
         </div>
