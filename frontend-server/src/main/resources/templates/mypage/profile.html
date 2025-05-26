@@ -123,30 +123,46 @@
                 </section>
 
                 <section class="mypage-section-kitsch" id="passwordChangeSection"
-                         th:if="${user != null && user.userProvider == T(shop.bluebooktle.common.domain.auth.UserProvider).BLUEBOOKTLE}">
+                         th:if="${user != null && user.provider.name() == 'BLUEBOOKTLE'}">
 
                     <h3 class="section-title-kitsch"><i class="fas fa-key"></i> 비밀번호 변경</h3>
-                    <form action="/mypage/password/update" id="passwordChangeForm" method="post">
+
+                    <form th:action="@{/mypage/profile/password}" id="passwordChangeForm" method="post"
+                          th:object="${PasswordUpdateRequest}">
                         <div class="form-group-kitsch">
                             <label class="label-kitsch handwriting-font-kitsch" for="currentPassword">현재 비밀번호:</label>
-                            <input class="input-kitsch pixel-font-kitsch" id="currentPassword" name="currentPassword"
-                                   required type="password">
+                            <input class="input-kitsch pixel-font-kitsch" id="currentPassword"
+                                   th:field="*{currentPassword}" required type="password"
+                                   th:classappend="${#fields.hasErrors('currentPassword')} ? 'is-invalid-kitsch' : ''">
+                            <div th:if="${#fields.hasErrors('currentPassword')}"
+                                 class="error-message-kitsch pixel-font-kitsch">
+                                <p th:each="err : ${#fields.errors('currentPassword')}" th:text="${err}"></p>
+                            </div>
                         </div>
+
                         <div class="form-group-kitsch">
                             <label class="label-kitsch handwriting-font-kitsch" for="newPassword">새 비밀번호:</label>
-                            <input class="input-kitsch pixel-font-kitsch" id="newPassword" name="newPassword"
-                                   required type="password">
-                            <p class="password-change-note-kitsch">
-                                <i class="fas fa-info-circle"></i> 영문, 숫자, 특수문자 포함 8자 이상으로 만들어주세요!
-                            </p>
+                            <input class="input-kitsch pixel-font-kitsch" id="newPassword"
+                                   th:field="*{newPassword}" required type="password"
+                                   th:classappend="${#fields.hasErrors('newPassword')} ? 'is-invalid-kitsch' : ''">
+                            <div th:if="${#fields.hasErrors('newPassword')}"
+                                 class="error-message-kitsch pixel-font-kitsch">
+                                <p th:each="err : ${#fields.errors('newPassword')}" th:text="${err}"></p>
+                            </div>
                         </div>
+
                         <div class="form-group-kitsch">
                             <label class="label-kitsch handwriting-font-kitsch" for="confirmNewPassword">새 비밀번호
                                 확인:</label>
                             <input class="input-kitsch pixel-font-kitsch" id="confirmNewPassword"
-                                   name="confirmNewPassword"
-                                   required type="password">
+                                   th:field="*{confirmNewPassword}" required type="password"
+                                   th:classappend="${#fields.hasErrors('confirmNewPassword')} ? 'is-invalid-kitsch' : ''">
+                            <div th:if="${#fields.hasErrors('confirmNewPassword')}"
+                                 class="error-message-kitsch pixel-font-kitsch">
+                                <p th:each="err : ${#fields.errors('confirmNewPassword')}" th:text="${err}"></p>
+                            </div>
                         </div>
+
                         <div class="mypage-actions-kitsch">
                             <button class="btn-kitsch secondary-btn-kitsch color3-kitsch retro-shadow-kitsch"
                                     type="submit">
@@ -163,17 +179,7 @@
 </div>
 <th:block layout:fragment="page_scripts">
     <script>
-        document.getElementById('passwordChangeForm')?.addEventListener('submit', function (e) {
-            e.preventDefault();
-            const newPassword = document.getElementById('newPassword').value;
-            const confirmNewPassword = document.getElementById('confirmNewPassword').value;
-            if (newPassword !== confirmNewPassword) {
-                alert('새 비밀번호와 확인 비밀번호가 일치하지 않습니다. (Mock)');
-                return false;
-            }
-            alert('비밀번호가 성공적으로 변경되었습니다! (Mock)');
-            this.reset();
-        });
+
 
         document.addEventListener('DOMContentLoaded', function () {
             const currentPath = window.location.pathname;
@@ -209,53 +215,5 @@
     </script>
 </th:block>
 
-
-<th:block layout:fragment="page_scripts">
-    <script>
-
-        document.getElementById('passwordChangeForm')?.addEventListener('submit', function (e) {
-            e.preventDefault();
-            const newPassword = document.getElementById('newPassword').value;
-            const confirmNewPassword = document.getElementById('confirmNewPassword').value;
-            if (newPassword !== confirmNewPassword) {
-                alert('새 비밀번호와 확인 비밀번호가 일치하지 않습니다. (Mock)');
-                return false;
-            }
-            alert('비밀번호가 성공적으로 변경되었습니다! (Mock)');
-            this.reset();
-        });
-
-        document.addEventListener('DOMContentLoaded', function () {
-            const currentPath = window.location.pathname;
-            const sidebarLinks = document.querySelectorAll('.mypage-sidebar-kitsch .sidebar-menu-kitsch li a');
-            sidebarLinks.forEach(link => {
-                link.classList.remove('active');
-                if (link.getAttribute('href') === currentPath) {
-                    link.classList.add('active');
-                }
-            });
-            if (currentPath === '/mypage' || currentPath === '/mypage/') {
-                const profileLink = document.querySelector('.mypage-sidebar-kitsch .sidebar-menu-kitsch li a[href$="/mypage/profile"]');
-                if (profileLink) profileLink.classList.add('active');
-            }
-
-            document.querySelectorAll('.modal-overlay-kitsch[data-auto-show="true"]').forEach(modal => {
-                if (modal.style.display !== 'flex') {
-                    modal.style.display = 'flex';
-                }
-            });
-
-            document.querySelectorAll('.js-modal-close-trigger').forEach(trigger => {
-                trigger.addEventListener('click', function () {
-                    const targetModalId = this.getAttribute('data-modal-target');
-                    const modalToClose = document.getElementById(targetModalId);
-                    if (modalToClose) {
-                        modalToClose.style.display = 'none';
-                    }
-                });
-            });
-        });
-    </script>
-</th:block>
 </body>
 </html>

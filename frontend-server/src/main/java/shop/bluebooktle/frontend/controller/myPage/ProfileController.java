@@ -13,9 +13,11 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import shop.bluebooktle.common.dto.auth.request.PasswordUpdateRequest;
 import shop.bluebooktle.common.dto.user.request.UserUpdateRequest;
 import shop.bluebooktle.common.dto.user.response.UserResponse;
 import shop.bluebooktle.common.exception.ApplicationException;
+import shop.bluebooktle.frontend.service.AuthService;
 import shop.bluebooktle.frontend.service.UserService;
 
 @Controller
@@ -24,6 +26,7 @@ import shop.bluebooktle.frontend.service.UserService;
 public class ProfileController {
 
 	private final UserService userService;
+	private final AuthService authService;
 
 	private String convertToDisplayFormat(String yyyymmdd) {
 		if (StringUtils.hasText(yyyymmdd) && yyyymmdd.length() == 8) {
@@ -57,6 +60,9 @@ public class ProfileController {
 					userUpdateRequest.setBirthDate(convertToDisplayFormat(userResponse.getBirth()));
 				}
 				model.addAttribute("UserUpdateRequest", userUpdateRequest);
+			}
+			if (!model.containsAttribute("PasswordUpdateRequest")) {
+				model.addAttribute("PasswordUpdateRequest", new PasswordUpdateRequest());
 			}
 		} catch (ApplicationException e) {
 			redirectAttributes.addFlashAttribute("globalErrorMessage", e.getErrorCode().getMessage());
@@ -100,6 +106,43 @@ public class ProfileController {
 			userUpdateRequest.setBirthDate(convertToDisplayFormat(userUpdateRequest.getBirthDate()));
 			redirectAttributes.addFlashAttribute("UserUpdateRequest", userUpdateRequest);
 			return "redirect:/mypage/profile";
+		}
+	}
+
+	@PostMapping("/password")
+	public String changePassword(
+		@Valid @ModelAttribute("PasswordUpdateRequest") PasswordUpdateRequest passwordUpdateRequest,
+		BindingResult bindingResult,
+		RedirectAttributes redirectAttributes) {
+
+		if (bindingResult.hasErrors()) {
+			redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.PasswordUpdateRequest",
+				bindingResult);
+			redirectAttributes.addFlashAttribute("PasswordUpdateRequest", passwordUpdateRequest);
+			return "redirect:/mypage/profile#passwordChangeSection";
+		}
+
+		if (!passwordUpdateRequest.getNewPassword().equals(passwordUpdateRequest.getConfirmNewPassword())) {
+			bindingResult.rejectValue("confirmNewPassword", "password.mismatch", "새 비밀번호와 확인 비밀번호가 일치하지 않습니다.");
+			redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.PasswordUpdateRequest",
+				bindingResult);
+			redirectAttributes.addFlashAttribute("PasswordUpdateRequest", passwordUpdateRequest);
+			return "redirect:/mypage/profile#passwordChangeSection";
+		}
+
+		try {
+			authService.changePassword(passwordUpdateRequest);
+			redirectAttributes.addFlashAttribute("globalSuccessMessage", "비밀번호가 성공적으로 변경되었습니다. \n다시 로그인해주세요");
+			return "redirect:/logout";
+		} catch (ApplicationException e) {
+			redirectAttributes.addFlashAttribute("globalErrorMessage", e.getErrorCode().getMessage());
+			redirectAttributes.addFlashAttribute("globalErrorTitle", e.getErrorCode().getCode());
+			redirectAttributes.addFlashAttribute("PasswordUpdateRequest", passwordUpdateRequest);
+			return "redirect:/mypage/profile#passwordChangeSection";
+		} catch (Exception e) {
+			redirectAttributes.addFlashAttribute("globalErrorMessage", "비밀번호 변경 중 오류 발생: " + e.getMessage());
+			redirectAttributes.addFlashAttribute("PasswordUpdateRequest", passwordUpdateRequest);
+			return "redirect:/mypage/profile#passwordChangeSection";
 		}
 	}
 }

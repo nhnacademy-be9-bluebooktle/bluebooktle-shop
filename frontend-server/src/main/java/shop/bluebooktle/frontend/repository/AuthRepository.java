@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import shop.bluebooktle.common.dto.auth.request.LoginRequest;
+import shop.bluebooktle.common.dto.auth.request.PasswordUpdateRequest;
 import shop.bluebooktle.common.dto.auth.request.PaycoLoginRequest;
 import shop.bluebooktle.common.dto.auth.request.SignupRequest;
 import shop.bluebooktle.common.dto.auth.request.TokenRefreshRequest;
@@ -22,6 +23,12 @@ public interface AuthRepository {
 	@PostMapping("/refresh")
 	TokenResponse refreshToken(@RequestBody TokenRefreshRequest tokenRefreshRequest);
 
+	@PostMapping("/logout")
+	void logout();
+
 	@PostMapping("/payco")
 	TokenResponse paycoLogin(@RequestBody PaycoLoginRequest paycoLoginRequest);
+
+	@PostMapping("/password/change")
+	void changePassword(@RequestBody PasswordUpdateRequest request);
 }

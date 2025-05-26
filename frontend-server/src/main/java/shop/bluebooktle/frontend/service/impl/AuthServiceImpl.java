@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import shop.bluebooktle.common.dto.auth.request.LoginRequest;
+import shop.bluebooktle.common.dto.auth.request.PasswordUpdateRequest;
 import shop.bluebooktle.common.dto.auth.request.PaycoLoginRequest;
 import shop.bluebooktle.common.dto.auth.request.SignupRequest;
 import shop.bluebooktle.common.dto.auth.request.TokenRefreshRequest;
@@ -44,6 +45,22 @@ public class AuthServiceImpl implements AuthService {
 		TokenResponse tokenResponse = authRepository.refreshToken(tokenRefreshRequest);
 		cookieTokenUtil.saveTokens(response, tokenResponse.getAccessToken(), tokenResponse.getRefreshToken());
 		return tokenResponse;
+	}
+
+	@Override
+	public void changePassword(PasswordUpdateRequest passwordUpdateRequest) {
+		authRepository.changePassword(passwordUpdateRequest);
+	}
+
+	@Override
+	public void logout(HttpServletResponse response) {
+		try {
+			authRepository.logout();
+		} catch (Exception e) {
+			throw new ApplicationException(ErrorCode.BAD_GATEWAY,
+				"로그아웃 중 오류: " + e.getMessage());
+		}
+		cookieTokenUtil.clearTokens(response);
 	}
 
 	@Override

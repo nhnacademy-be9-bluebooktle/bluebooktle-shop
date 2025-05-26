@@ -6,6 +6,7 @@ import java.nio.charset.StandardCharsets;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,7 +24,7 @@ import shop.bluebooktle.common.dto.auth.request.LoginRequest;
 import shop.bluebooktle.common.dto.auth.request.SignupRequest;
 import shop.bluebooktle.common.exception.ApplicationException;
 import shop.bluebooktle.common.exception.ErrorCode;
-import shop.bluebooktle.frontend.service.impl.AuthServiceImpl;
+import shop.bluebooktle.frontend.service.AuthService;
 import shop.bluebooktle.frontend.util.CookieTokenUtil;
 
 @Slf4j
@@ -38,7 +39,7 @@ public class AuthController {
 	@Value("${oauth.payco.redirect-uri}")
 	private String paycoRedirectUri;
 
-	private final AuthServiceImpl authService;
+	private final AuthService authService;
 	private final CookieTokenUtil cookieTokenUtil;
 
 	@GetMapping("/login")
@@ -118,10 +119,16 @@ public class AuthController {
 		}
 	}
 
-	@PostMapping("/logout")
-	public String handleLogout(HttpServletResponse response, RedirectAttributes redirectAttributes) {
+	@GetMapping("/logout")
+	public String handleLogout(HttpServletResponse response,
+		@ModelAttribute("globalSuccessMessage") String message,
+		RedirectAttributes redirectAttributes) {
+
+		if (StringUtils.hasText(message)) {
+			redirectAttributes.addFlashAttribute("globalSuccessMessage", message);
+		}
+
 		cookieTokenUtil.clearTokens(response);
-		log.info("로그아웃 성공");
 		return "redirect:/";
 	}
 

@@ -133,6 +133,10 @@ public class User extends BaseEntity {
 		this.lastLoginAt = LocalDateTime.now();
 	}
 
+	public void updatePassword(String encodedPassword) {
+		this.password = encodedPassword;
+	}
+
 	public void updateStatus(UserStatus newStatus) {
 		this.status = newStatus;
 	}

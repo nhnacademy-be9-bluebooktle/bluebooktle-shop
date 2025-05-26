@@ -23,6 +23,7 @@ import shop.bluebooktle.common.domain.auth.UserProvider;
 import shop.bluebooktle.common.domain.auth.UserStatus;
 import shop.bluebooktle.common.domain.auth.UserType;
 import shop.bluebooktle.common.dto.auth.request.LoginRequest;
+import shop.bluebooktle.common.dto.auth.request.PasswordUpdateRequest;
 import shop.bluebooktle.common.dto.auth.request.PaycoProfileMember;
 import shop.bluebooktle.common.dto.auth.request.PaycoProfileResponse;
 import shop.bluebooktle.common.dto.auth.request.PaycoTokenResponse;
@@ -155,6 +156,28 @@ public class AuthServiceImpl implements AuthService {
 		String newRefreshToken = jwtUtil.createRefreshToken(userId, user.getNickname(), user.getType());
 		refreshTokenService.save(user.getId(), newRefreshToken, jwtUtil.getRefreshTokenExpirationMillis());
 		return new TokenResponse(newAccessToken, newRefreshToken);
+	}
+
+	@Override
+	@Transactional
+	public void changePassword(Long userId, PasswordUpdateRequest request) {
+		if (!request.getNewPassword().equals(request.getConfirmNewPassword())) {
+			throw new ApplicationException(ErrorCode.INVALID_INPUT_VALUE, "새 비밀번호와 확인 비밀번호가 일치하지 않습니다.");
+		}
+
+		User user = userRepository.findById(userId)
+			.orElseThrow(UserNotFoundException::new);
+
+		if (user.getProvider() != UserProvider.BLUEBOOKTLE) {
+			throw new ApplicationException(ErrorCode.INVALID_INPUT_VALUE, "소셜 로그인 사용자는 비밀번호를 변경할 수 없습니다.");
+		}
+
+		if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
+			throw new AuthenticationFailedException("현재 비밀번호가 일치하지 않습니다.");
+		}
+
+		user.updatePassword(passwordEncoder.encode(request.getNewPassword()));
+		userRepository.save(user);
 	}
 
 	@Override
