@@ -1,4 +1,4 @@
-package shop.bluebooktle.common.domain;
+package shop.bluebooktle.common.domain.order;
 
 public enum OrderStatus {
 	PENDING,
