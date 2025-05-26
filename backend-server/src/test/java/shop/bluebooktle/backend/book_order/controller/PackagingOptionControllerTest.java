@@ -1,120 +1,131 @@
 package shop.bluebooktle.backend.book_order.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.web.servlet.MockMvc;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import shop.bluebooktle.backend.book_order.service.PackagingOptionService;
-import shop.bluebooktle.common.util.JwtUtil;
 
 @WebMvcTest(PackagingOptionController.class)
+@AutoConfigureMockMvc(addFilters = false)
 class PackagingOptionControllerTest {
 
-	@Autowired
-	private MockMvc mockMvc;
-
-	@Autowired
-	private ObjectMapper objectMapper;
-
-	@MockitoBean
-	private PackagingOptionService packagingOptionService;
-
-	@MockitoBean
-	private JwtUtil jwtUtil;
-
+	// @Autowired
+	// private MockMvc mockMvc;
+	//
+	// @Autowired
+	// private ObjectMapper objectMapper;
+	//
+	// @MockitoBean
+	// private PackagingOptionService packagingOptionService;
+	//
 	// @Test
 	// @DisplayName("포장 옵션 등록 - 성공")
-	// @WithMockUser
 	// void createPackagingOption_success() throws Exception {
-	// 	PackagingOptionRequest request = PackagingOptionRequest.builder()
-	// 		.name("기본 포장지")
-	// 		.price(BigDecimal.valueOf(1500))
+	// 	// given
+	// 	PackagingOptionRequest req = PackagingOptionRequest.builder()
+	// 		.name("Gift Wrap")
+	// 		.price(BigDecimal.valueOf(500))
 	// 		.build();
+	// 	PackagingOptionInfoResponse respDto = PackagingOptionInfoResponse.builder()
+	// 		.id(1L).name("Gift Wrap").price(BigDecimal.valueOf(500)).build();
+	// 	given(packagingOptionService.createPackagingOption(any())).willReturn(respDto);
 	//
-	// 	PackagingOptionInfoResponse response = PackagingOptionInfoResponse.builder()
-	// 		.id(1L)
-	// 		.name("기본 포장지")
-	// 		.price(BigDecimal.valueOf(1500))
-	// 		.build();
-	//
-	// 	given(packagingOptionService.createPackagingOption(request)).willReturn(response);
-	//
+	// 	// when & then
 	// 	mockMvc.perform(post("/api/options")
 	// 			.contentType(MediaType.APPLICATION_JSON)
-	// 			.content(objectMapper.writeValueAsString(request)).with(csrf()))
+	// 			.content(objectMapper.writeValueAsString(req)))
 	// 		.andExpect(status().isCreated())
 	// 		.andExpect(jsonPath("$.status").value("success"))
-	// 		.andExpect(jsonPath("$.data.name").value("기본 포장지"));
+	// 		.andExpect(jsonPath("$.data.id").value(1))
+	// 		.andExpect(jsonPath("$.data.name").value("Gift Wrap"));
+	//
+	// 	then(packagingOptionService).should().createPackagingOption(any(PackagingOptionRequest.class));
 	// }
-
+	//
 	// @Test
-	// @DisplayName("포장 옵션 전체 조회 - 성공")
-	// @WithMockUser
-	// void getPackagingOptions_success() throws Exception {
+	// @DisplayName("전체 조회 - 성공")
+	// void getPackagingOptions_noKeyword() throws Exception {
 	// 	// given
-	// 	PackagingOptionInfoResponse option1 = PackagingOptionInfoResponse.builder()
-	// 		.id(1L)
-	// 		.name("기본 포장지")
-	// 		.price(BigDecimal.valueOf(1000))
-	// 		.build();
-	//
-	// 	PackagingOptionInfoResponse option2 = PackagingOptionInfoResponse.builder()
-	// 		.id(2L)
-	// 		.name("고급 포장지")
-	// 		.price(BigDecimal.valueOf(3000))
-	// 		.build();
-	//
-	// 	Page<PackagingOptionInfoResponse> page = new PageImpl<>(List.of(option1, option2));
-	//
-	// 	// given(packagingOptionService.getPackagingOptions(any(Pageable.class)))
-	// 	// 	.willReturn(page);
+	// 	PackagingOptionInfoResponse dto = new PackagingOptionInfoResponse(2L, "Box", BigDecimal.valueOf(300));
+	// 	Pageable pageable = PageRequest.of(0, 10);
+	// 	given(packagingOptionService.getPackagingOptions(pageable))
+	// 		.willReturn(new PageImpl<>(List.of(dto), pageable, 1));
 	//
 	// 	// when & then
 	// 	mockMvc.perform(get("/api/options")
-	// 			.param("page", "0")
-	// 			.param("size", "10"))
+	// 			.contentType(MediaType.APPLICATION_JSON))
 	// 		.andExpect(status().isOk())
 	// 		.andExpect(jsonPath("$.status").value("success"))
-	// 		.andExpect(jsonPath("$.data.content[0].name").value("기본 포장지"))
-	// 		.andExpect(jsonPath("$.data.content[1].name").value("고급 포장지"));
+	// 		.andExpect(jsonPath("$.data.content[0].id").value(2));
+	//
+	// 	then(packagingOptionService).should().getPackagingOptions(pageable);
 	// }
-
+	//
 	// @Test
-	// @DisplayName("포장 옵션 수정 - 성공")
-	// @WithMockUser
+	// @DisplayName("검색 조회 - 성공")
+	// void getPackagingOptions_withKeyword() throws Exception {
+	// 	// given
+	// 	String keyword = "Gift";
+	// 	PackagingOptionInfoResponse dto = new PackagingOptionInfoResponse(3L, "Gift Box", BigDecimal.valueOf(1000));
+	// 	Pageable pageable = PageRequest.of(0, 10);
+	// 	given(packagingOptionService.searchPackagingOption(eq(keyword), eq(pageable)))
+	// 		.willReturn(new PageImpl<>(List.of(dto), pageable, 1));
+	//
+	// 	// when & then
+	// 	mockMvc.perform(get("/api/options")
+	// 			.param("searchKeyword", keyword)
+	// 			.contentType(MediaType.APPLICATION_JSON))
+	// 		.andExpect(status().isOk())
+	// 		.andExpect(jsonPath("$.status").value("success"))
+	// 		.andExpect(jsonPath("$.data.content[0].name").value("Gift Box"));
+	//
+	// 	then(packagingOptionService).should().searchPackagingOption(keyword, pageable);
+	// }
+	//
+	// @Test
+	// @DisplayName("단건 조회 - 성공")
+	// void getPackagingOption_success() throws Exception {
+	// 	// given
+	// 	PackagingOptionInfoResponse dto = new PackagingOptionInfoResponse(4L, "Envelope", BigDecimal.valueOf(200));
+	// 	given(packagingOptionService.getPackagingOption(4L)).willReturn(dto);
+	//
+	// 	// when & then
+	// 	mockMvc.perform(get("/api/options/4")
+	// 			.contentType(MediaType.APPLICATION_JSON))
+	// 		.andExpect(status().isOk())
+	// 		.andExpect(jsonPath("$.data.id").value(4))
+	// 		.andExpect(jsonPath("$.data.name").value("Envelope"));
+	// }
+	//
+	// @Test
+	// @DisplayName("수정 - 성공")
 	// void updatePackagingOption_success() throws Exception {
-	// 	PackagingOptionUpdateRequest request = PackagingOptionUpdateRequest.builder()
-	// 		.name("보라 포장지")
-	// 		.price(BigDecimal.valueOf(2500))
-	// 		.build();
+	// 	// given
+	// 	PackagingOptionRequest req = PackagingOptionRequest.builder()
+	// 		.name("New Name").price(BigDecimal.valueOf(800)).build();
+	// 	PackagingOptionInfoResponse dto = new PackagingOptionInfoResponse(5L, "New Name", BigDecimal.valueOf(800));
+	// 	given(packagingOptionService.updatePackagingOption(eq(5L), any())).willReturn(dto);
 	//
-	// 	PackagingOptionResponse response = PackagingOptionResponse.builder()
-	// 		.packagingOptionId(1L)
-	// 		.name("보라 포장지")
-	// 		.price(BigDecimal.valueOf(2500))
-	// 		.build();
-	//
-	// 	given(packagingOptionService.updatePackagingOption(1L, request)).willReturn(response);
-	//
-	// 	mockMvc.perform(put("/api/options/1")
+	// 	// when & then
+	// 	mockMvc.perform(put("/api/options/5")
 	// 			.contentType(MediaType.APPLICATION_JSON)
-	// 			.content(objectMapper.writeValueAsString(request)))
+	// 			.content(objectMapper.writeValueAsString(req)))
 	// 		.andExpect(status().isOk())
-	// 		.andExpect(jsonPath("$.status").value("success"))
-	// 		.andExpect(jsonPath("$.data.name").value("보라 포장지"));
-	// }
-
-	// @Test
-	// @DisplayName("포장 옵션 삭제 - 성공")
-	// @WithMockUser
-	// void deletePackagingOption_success() throws Exception {
-	// 	doNothing().when(packagingOptionService).deletePackagingOption(1L);
+	// 		.andExpect(jsonPath("$.data.name").value("New Name"));
 	//
-	// 	mockMvc.perform(delete("/api/options/1"))
+	// 	then(packagingOptionService).should().updatePackagingOption(eq(5L), any(PackagingOptionRequest.class));
+	// }
+	//
+	// @Test
+	// @DisplayName("삭제 - 성공")
+	// void deletePackagingOption_success() throws Exception {
+	// 	// given: delete returns void
+	// 	willDoNothing().given(packagingOptionService).deletePackagingOption(6L);
+	//
+	// 	// when & then
+	// 	mockMvc.perform(delete("/api/options/6")
+	// 			.contentType(MediaType.APPLICATION_JSON))
 	// 		.andExpect(status().isOk())
 	// 		.andExpect(jsonPath("$.status").value("success"));
+	//
+	// 	then(packagingOptionService).should().deletePackagingOption(6L);
 	// }
 }
