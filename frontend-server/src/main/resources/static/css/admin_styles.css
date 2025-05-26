@@ -42,7 +42,7 @@
     /* Layout */
     --admin-header-height: 60px;
     --admin-sidebar-width: 240px;
-    --admin-content-max-width: 1200px; /* 필요한 경우 콘텐츠 최대 너비 제한 */
+    --admin-content-max-width: 1400px; /* 필요한 경우 콘텐츠 최대 너비 제한 */
 
     /* Z-index */
     --admin-zindex-sidebar: 1030;
