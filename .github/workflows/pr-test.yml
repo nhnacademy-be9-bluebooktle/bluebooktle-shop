@@ -3,8 +3,6 @@ name: PR Test - Maven
 on:
   pull_request:
     branches: [ "develop", "master" ]
-  issue_comment:
-    types: [ created ]
 
 permissions:
   contents: read
@@ -13,36 +11,21 @@ permissions:
 
 jobs:
   test:
-    if: |
-      github.event_name == 'pull_request' ||
-      (
-        github.event_name == 'issue_comment' &&
-        github.event.issue.pull_request &&
-        contains(github.event.comment.body, 'REBUILD')
-      )
     runs-on: ubuntu-latest
     steps:
-      - name: Get PR HEAD SHA for comment
-        id: pr_sha
-        if: github.event_name == 'issue_comment'
-        run: |
-          PR_API_URL="${{ github.event.issue.pull_request.url }}"
-          PR_DATA=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" -H "Accept: application/vnd.github.v3+json" $PR_API_URL)
-          echo "head_sha=$(echo "$PR_DATA" | jq -r .head.sha)" >> $GITHUB_OUTPUT
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
+      # 1. 코드 체크아웃
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event_name == 'issue_comment' && steps.pr_sha.outputs.head_sha || github.ref }}
-          fetch-depth: 0 # SonarQube PR 분석 시 전체 히스토리 필요
+          # SonarQube PR 분석 시 전체 히스토리 필요
+          fetch-depth: 0
 
       - name: Set up Redis
         uses: supercharge/redis-github-action@1.7.0
         with:
           redis-version: 'latest'
 
+      # 2. JDK 21 설정 및 Maven 캐시
       - name: Set up JDK 21 and Maven Cache
         uses: actions/setup-java@v4
         with:
@@ -50,37 +33,26 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
+      # 3. 빌드, 테스트, 커버리지 생성 및 SonarQube 분석
       - name: Build, Test, Generate Coverage & Analyze with SonarQube
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
-          if [[ "${{ github.event_name }}" == "issue_comment" ]]; then
-            PR_API_URL="${{ github.event.issue.pull_request.url }}"
-            PR_DATA=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" $PR_API_URL)
-            PR_NUMBER=$(echo "$PR_DATA" | jq -r .number)
-            PR_BASE_REF=$(echo "$PR_DATA" | jq -r .base.ref)
-            PR_HEAD_REF=$(echo "$PR_DATA" | jq -r .head.ref)
-            export SONAR_PULLREQUEST_KEY="$PR_NUMBER"
-            export SONAR_PULLREQUEST_BASE="$PR_BASE_REF"
-            export SONAR_PULLREQUEST_BRANCH="$PR_HEAD_REF"
-            echo "SonarQube PR parameters set for PR #$PR_NUMBER"
-          fi
           mvn -B clean verify sonar:sonar \
             -Dsonar.projectKey=bluebooktle \
             -Dsonar.projectName='bluebooktle' \
             -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
             -Dsonar.token=${{ secrets.SONAR_TOKEN }} \
 
+      # 4. 단위 테스트 결과 게시
       - name: Publish Unit Test Results
-        if: success()
+        if: success() # 또는 always() - SonarQube 분석 실패와 관계없이 게시하고 싶다면
         uses: EnricoMi/publish-unit-test-result-action@v2
         with:
           files: "**/target/surefire-reports/**/*.xml"
 
+      # 5. PR 코멘트에 커버리지 리포트 게시
       - name: Publish JaCoCo Coverage Report
         uses: madrapps/jacoco-report@v1.6.1
-        if: always()
+        if: always() # SonarQube 분석이 실패하더라도 커버리지 리포트는 게시
         with:
           paths: ${{ github.workspace }}/coverage-report/target/site/jacoco-aggregate/jacoco.xml
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -89,3 +61,4 @@ jobs:
           update-comment: true
           skip-if-no-changes: false
           title: '📊 Code Coverage Report (Aggregated)'
+          debug-mode: false
