@@ -50,8 +50,19 @@ POST http://localhost:9012/api/points/policies
 Content-Type: application/json
 
 {
+  "pointSourceTypeId": 1,
+  "policyType": "AMOUNT",
+  "value": 1000
+}
+
+
+### 포인트 정책 생성
+POST http://localhost:9012/api/points/policies
+Content-Type: application/json
+
+{
   "pointSourceTypeId": 2,
-  "policyType": "PERCENTAGE",
+  "policyType": "AMOUNT",
   "value": 1000
 }
 
@@ -80,3 +91,27 @@ Accept: application/json
 
 ### 포인트 규정 조회
 GET http://localhost:9012/api/points/rules
+
+### 포인트 이력 조회 (페이징)
+GET http://localhost:9012/api/points/history?page=0&size=10
+Accept: application/json
+#Authorization: Bearer {{token}}
+
+
+
+### 포인트 생성 (적립/차감)
+POST http://localhost:9012/api/points
+Content-Type: application/json
+#Authorization: Bearer {{token}}
+
+{
+  "pointSourceTypeId": 2,
+  "value": 1000.00
+}
+
+###
+
+### 총 포인트 조회
+GET http://localhost:9012/api/points/total
+Accept: application/json
+#Authorization: Bearer {{token}}
