@@ -28,7 +28,7 @@ import shop.bluebooktle.frontend.service.AdminTagService;
 @RequiredArgsConstructor
 public class AdminTagController {
 
-	private final AdminTagService adminTagService;
+	private final AdminTagService tagService;
 
 	/** 태그 목록 조회 */
 	@GetMapping
@@ -36,7 +36,7 @@ public class AdminTagController {
 		@RequestParam(value = "page", defaultValue = "0") int page,
 		@RequestParam(value = "size", defaultValue = "10") int size,
 		@RequestParam(value = "searchKeyword", required = false) String searchKeyword) {
-		Page<TagInfoResponse> tagPage = adminTagService.getTags(page, size, searchKeyword);
+		Page<TagInfoResponse> tagPage = tagService.getTags(page, size, searchKeyword);
 
 		log.info("어드민 태그 목록 페이지 요청. URI: {}", request.getRequestURI());
 		model.addAttribute("pageTitle", "태그 관리");
@@ -62,7 +62,7 @@ public class AdminTagController {
 		TagInfoResponse tag;
 
 		if (tagId != null) {
-			tag = adminTagService.getTag(tagId); // 수정 시 기존 데이터 조회
+			tag = tagService.getTag(tagId); // 수정 시 기존 데이터 조회
 			pageTitle = "태그 수정 (ID: " + tagId + ")";
 		} else {
 			pageTitle = "새 태그 등록";
@@ -102,9 +102,9 @@ public class AdminTagController {
 		try {
 			// 실제 서비스 로직 호출 (DB에 저장/수정)
 			if (tag.getId() == null) {
-				adminTagService.createTag(new TagRequest(tag.getName()));
+				tagService.createTag(new TagRequest(tag.getName()));
 			} else {
-				adminTagService.updateTag(tag.getId(), new TagRequest(tag.getName())); // name 만 수정
+				tagService.updateTag(tag.getId(), new TagRequest(tag.getName())); // name 만 수정
 			}
 			String action = (tag.getId() == null) ? "등록" : "수정";
 			log.info("태그 {} 처리 (임시): Name={}, DeletedAt={}", action, tag.getName());
@@ -129,9 +129,9 @@ public class AdminTagController {
 		log.info("태그 삭제 요청: ID {}", tagId);
 		try {
 			// 실제 서비스 로직 호출 - tagId에 해당하는 레코드의 deleted_at을 현재 시간으로 업데이트
-			adminTagService.deleteTag(tagId);
+			tagService.deleteTag(tagId);
 			log.info("태그 삭제 성공 처리: ID {}", tagId);
-			redirectAttributes.addFlashAttribute("globalSuccessMessage", "태그(ID: " + tagId + ")가 성공적으로 비활성화 처리되었습니다.");
+			redirectAttributes.addFlashAttribute("globalSuccessMessage", "태그(ID: " + tagId + ")가 성공적으로 삭제되었습니다.");
 		} catch (Exception e) {
 			log.error("태그 비활성화 중 오류 발생", e);
 			redirectAttributes.addFlashAttribute("globalErrorMessage", "태그 비활성화 중 오류가 발생했습니다: " + e.getMessage());
