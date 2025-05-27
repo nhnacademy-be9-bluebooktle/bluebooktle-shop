@@ -1,6 +1,7 @@
 package shop.bluebooktle.frontend.service;
 
 import java.util.List;
+import java.math.BigDecimal;
 
 import shop.bluebooktle.common.dto.point.request.PointPolicyCreateRequest;
 import shop.bluebooktle.common.dto.point.request.PointPolicyUpdateRequest;
@@ -8,9 +9,15 @@ import shop.bluebooktle.common.dto.point.request.PointSourceTypeCreateRequest;
 import shop.bluebooktle.common.dto.point.response.PointPolicyResponse;
 import shop.bluebooktle.common.dto.point.response.PointRuleResponse;
 import shop.bluebooktle.common.dto.point.response.PointSourceTypeResponse;
+import org.springframework.data.domain.Pageable;
+
+import shop.bluebooktle.common.dto.common.PaginationData;
+import shop.bluebooktle.common.dto.point.request.PointHistoryCreateRequest;
+import shop.bluebooktle.common.dto.point.response.PointHistoryResponse;
 
 public interface PointService {
 
+	PaginationData<PointHistoryResponse> getMyPointHistories(Pageable pageable);
 	Long createPolicy(PointPolicyCreateRequest request);
 
 	PointPolicyResponse getPolicy(Long id);
@@ -21,6 +28,9 @@ public interface PointService {
 
 	List<PointPolicyResponse> getAllPolicies();
 
+	void createPointHistory(PointHistoryCreateRequest request);
+
+	BigDecimal getTotalPoints();
 	List<PointRuleResponse> getAllRules();
 
 	Long createSourceType(PointSourceTypeCreateRequest request);

@@ -37,38 +37,32 @@ public class PointHistoryController {
 	private final PointHistoryService pointHistoryService;
 
 	@Operation(summary = "포인트 이력 조회", description = "로그인한 유저의 포인트 이력을 페이징하여 조회합니다.")
-	// @Auth(type = UserType.USER)
+	@Auth(type = UserType.USER)
 	@GetMapping("/history")
 	public ResponseEntity<JsendResponse<PaginationData<PointHistoryResponse>>> getMyPointHistories(
 		@Parameter(hidden = true) @AuthenticationPrincipal UserPrincipal userPrincipal,
 		@PageableDefault(size = 10, sort = "createdAt") Pageable pageable
 	) {
-		//TODO
-		Long userId = 1L;
-		// if (userPrincipal == null) {
-		// 	throw new InvalidTokenException();
-		// }
-
+		if (userPrincipal == null) {
+			throw new InvalidTokenException();
+		}
 		Page<PointHistoryResponse> pointHistories = pointHistoryService.getPointHistoriesByUserId(
-			userId, pageable);
+			userPrincipal.getUserId(), pageable);
 		PaginationData<PointHistoryResponse> paginationData = new PaginationData<>(pointHistories);
 		return ResponseEntity.ok(JsendResponse.success(paginationData));
 	}
 
 	@Operation(summary = "포인트 적립/사용 등록", description = "현재 로그인한 유저의 포인트 이력을 생성합니다.")
-	// @Auth(type = UserType.USER)
+	@Auth(type = UserType.USER)
 	@PostMapping
 	public ResponseEntity<JsendResponse<Void>> createPointHistory(
 		@Parameter(hidden = true) @AuthenticationPrincipal UserPrincipal userPrincipal,
 		@Valid @RequestBody PointHistoryCreateRequest request
 	) {
-		//TODO
-		Long userId = 1L;
-		// if (userPrincipal == null) {
-		// 	throw new InvalidTokenException();
-		// }
-
-		pointHistoryService.savePointHistory(userId, request);
+		if (userPrincipal == null) {
+			throw new InvalidTokenException();
+		}
+		pointHistoryService.savePointHistory(userPrincipal.getUserId(), request);
 		return ResponseEntity.ok(JsendResponse.success(null));
 	}
 

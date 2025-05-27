@@ -88,12 +88,17 @@ public class AdminPointPolicyController {
 				new PointSourceTypeCreateRequest(req.actionType(), req.sourceType())
 			);
 
-			PointPolicyCreateRequest policyReq =
-				new PointPolicyCreateRequest(newSourceTypeId, req.policyType(), req.value());
-			Long newPolicyId = pointService.createPolicy(policyReq);
+			if (req.policyType() != null) {
+				PointPolicyCreateRequest policyReq =
+					new PointPolicyCreateRequest(newSourceTypeId, req.policyType(), req.value());
+				Long newPolicyId = pointService.createPolicy(policyReq);
+				redirectAttributes.addFlashAttribute("globalSuccessMessage",
+					"포인트 적립 유형 생성 완료: PolicyID=" + newPolicyId + " / SourceTypeID=" + newSourceTypeId);
+			} else {
+				redirectAttributes.addFlashAttribute("globalSuccessMessage",
+					"포인트 사용 유형 생성 완료: SourceTypeID=" + newSourceTypeId);
+			}
 
-			redirectAttributes.addFlashAttribute("globalSuccessMessage",
-				"생성 완료: PolicyID=" + newPolicyId + " / SourceTypeID=" + newSourceTypeId);
 		} catch (Exception e) {
 			redirectAttributes.addFlashAttribute("globalErrorMessage", "생성 실패: " + e.getMessage());
 		}
