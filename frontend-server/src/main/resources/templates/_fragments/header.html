@@ -11,6 +11,13 @@
                 <p class="logo-sub-kitsch handwriting-font-kitsch">당신을 위한 서점</p>
             </a>
 
+            <!-- 여기에 카테고리 아이콘 추가 -->
+            <button type="button"
+                    class="btn-kitsch secondary-btn-kitsch color1-kitsch retro-shadow-kitsch-small categories-btn-header-kitsch"
+                    title="카테고리 보기">
+                <i class="fas fa-bars"></i>
+            </button>
+
             <form action="/books" class="header-search-form-kitsch" method="get" th:action="@{/books}">
                 <input class="input-kitsch header-search-input-kitsch" name="query" placeholder="레트로 감성 책 검색!"
                        type="text" value="">
@@ -46,12 +53,105 @@
             </div>
         </div>
     </div>
+
+    <div class="category-container">
+        <div class="categories-panel-kitsch">
+            <div class="category-tree-container"></div>
+        </div>
+    </div>
     <div class="header-marquee-kitsch" th:if="${isLoggedIn}">
         <p class="pixel-font-kitsch" th:if="${userNickname != null}"
            th:text="'🎉 ' + ${userNickname} + '님, 오늘의 책을 찾아볼까요? 👾 쿠폰 이벤트 확인!'"></p>
         <p class="pixel-font-kitsch" th:if="${userNickname == null}"
            th:text="'🎉 회원님, 오늘은 어떤 책을 찾아볼까요? 👾 쿠폰 이벤트 확인!'"></p>
     </div>
+
+    <script>
+        document.querySelectorAll('.categories-btn-header-kitsch').forEach(btn => {
+            const panel = btn.closest('.site-header-kitsch')
+                .querySelector('.categories-panel-kitsch');
+            const icon = btn.querySelector('i');
+
+            btn.addEventListener('click', e => {
+                e.preventDefault();
+                const isOpen = panel.classList.toggle('active');
+                btn.setAttribute('aria-expanded', isOpen);
+
+                if (isOpen) {
+                    icon.classList.remove('fa-bars');
+                    icon.classList.add('fa-times');
+                } else {
+                    icon.classList.remove('fa-times');
+                    icon.classList.add('fa-bars');
+                }
+            });
+
+            // 밖 클릭 시 닫기
+            document.addEventListener('click', e => {
+                if (!btn.contains(e.target) && !panel.contains(e.target)) {
+                    panel.classList.remove('active');
+                    btn.setAttribute('aria-expanded', 'false');
+                    icon.classList.remove('fa-times');
+                    icon.classList.add('fa-bars');
+                }
+            });
+        });
+    </script>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        const data = /*[[${categoryTree}]]*/ [];
+
+        /*]]>*/
+
+        function makeTree(nodes) {
+            return nodes.map(cat => {
+                const detail = document.createElement('details');
+                const sum = document.createElement('summary');
+
+                // leaf 면 클래스 달기
+                if (!cat.children || cat.children.length === 0) {
+                    detail.classList.add('leaf-category');
+                }
+
+                // existing arrow + toggle 로직…
+                if (cat.children && cat.children.length) {
+                    const arrow = document.createElement('i');
+                    arrow.className = 'fas fa-chevron-right arrow-icon';
+                    sum.appendChild(arrow);
+                    detail.addEventListener('toggle', () => {
+                        arrow.classList.replace(
+                            detail.open ? 'fa-chevron-right' : 'fa-chevron-down',
+                            detail.open ? 'fa-chevron-down' : 'fa-chevron-right'
+                        );
+                    });
+                }
+
+                // 2) 북 이모티콘 + 텍스트 노드
+                const text = document.createTextNode(` 📖 ${cat.name}`);
+                sum.appendChild(text);
+
+                detail.appendChild(sum);
+
+                // 3) 재귀 자식 처리
+                if (cat.children && cat.children.length) {
+                    const wrapper = document.createElement('div');
+                    wrapper.classList.add('categories-list-nested');
+                    makeTree(cat.children).forEach(child => wrapper.appendChild(child));
+                    detail.appendChild(wrapper);
+                }
+
+                return detail;
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const container = document.querySelector('.category-tree-container');
+            makeTree(data).forEach(el => container.appendChild(el));
+        });
+
+    </script>
+
 </header>
 
 <header class="site-header-kitsch" th:fragment="headerFragmentLoggedOut">
@@ -62,6 +162,13 @@
                 </h1>
                 <p class="logo-sub-kitsch handwriting-font-kitsch">당신을 위한 서점</p>
             </a>
+
+            <!-- 여기에 카테고리 아이콘 추가 -->
+            <button type="button"
+                    class="btn-kitsch secondary-btn-kitsch color1-kitsch retro-shadow-kitsch-small categories-btn-header-kitsch"
+                    title="카테고리 보기">
+                <i class="fas fa-bars"></i>
+            </button>
 
             <form action="/books" class="header-search-form-kitsch" method="get" th:action="@{/books}">
                 <input class="input-kitsch header-search-input-kitsch" name="query" placeholder="어떤 책을 찾으세요?"
@@ -83,10 +190,110 @@
             </div>
         </div>
     </div>
+    <div class="category-container">
+        <div class="categories-panel-kitsch">
+            <div class="category-tree-container"></div>
+        </div>
+    </div>
+
+
     <div class="header-marquee-kitsch">
         <p class="pixel-font-kitsch">✨ BlueBooktle에 오신 것을 환영합니다! 신간 도서 & 이벤트 확인! ✨</p>
     </div>
+
+    <script>
+        document.querySelectorAll('.categories-btn-header-kitsch').forEach(btn => {
+            const panel = btn.closest('.site-header-kitsch')
+                .querySelector('.categories-panel-kitsch');
+            const icon = btn.querySelector('i');
+
+            btn.addEventListener('click', e => {
+                e.preventDefault();
+                const isOpen = panel.classList.toggle('active');
+                btn.setAttribute('aria-expanded', isOpen);
+
+                if (isOpen) {
+                    icon.classList.remove('fa-bars');
+                    icon.classList.add('fa-times');
+                } else {
+                    icon.classList.remove('fa-times');
+                    icon.classList.add('fa-bars');
+                }
+            });
+
+            // 밖 클릭 시 닫기
+            document.addEventListener('click', e => {
+                if (!btn.contains(e.target) && !panel.contains(e.target)) {
+                    panel.classList.remove('active');
+                    btn.setAttribute('aria-expanded', 'false');
+                    icon.classList.remove('fa-times');
+                    icon.classList.add('fa-bars');
+                }
+            });
+        });
+    </script>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        const data = /*[[${categoryTree}]]*/ [];
+
+        /*]]>*/
+
+        function makeTree(nodes) {
+            return nodes.map(cat => {
+                const detail = document.createElement('details');
+                const sum = document.createElement('summary');
+
+                // leaf 면 클래스 달기
+                if (!cat.children || cat.children.length === 0) {
+                    detail.classList.add('leaf-category');
+                }
+
+                // existing arrow + toggle 로직…
+                if (cat.children && cat.children.length) {
+                    const arrow = document.createElement('i');
+                    arrow.className = 'fas fa-chevron-right arrow-icon';
+                    sum.appendChild(arrow);
+                    detail.addEventListener('toggle', () => {
+                        arrow.classList.replace(
+                            detail.open ? 'fa-chevron-right' : 'fa-chevron-down',
+                            detail.open ? 'fa-chevron-down' : 'fa-chevron-right'
+                        );
+                    });
+                }
+
+                // 📖 아이콘 + 링크
+                const link = document.createElement('a');
+                link.href = `/categories/${cat.id}`;            // 실제 카테고리 URL 패턴에 맞게 수정
+                link.innerHTML = `📖 ${cat.name}`;
+                link.classList.add('category-link-kitsch');     // 필요하다면 스타일용 클래스
+                // 클릭해도 details 토글은 막기
+                link.addEventListener('click', e => e.stopPropagation());
+                sum.appendChild(link);
+
+                detail.appendChild(sum);
+
+                // 3) 재귀 자식 처리
+                if (cat.children && cat.children.length) {
+                    const wrapper = document.createElement('div');
+                    wrapper.classList.add('categories-list-nested');
+                    makeTree(cat.children).forEach(child => wrapper.appendChild(child));
+                    detail.appendChild(wrapper);
+                }
+
+                return detail;
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const container = document.querySelector('.category-tree-container');
+            makeTree(data).forEach(el => container.appendChild(el));
+        });
+
+    </script>
+
 </header>
+
 
 </body>
 </html>
