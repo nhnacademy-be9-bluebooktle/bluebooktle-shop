@@ -36,3 +36,8 @@ logging:
   level:
     shop.bluebooktle.book: DEBUG
     org.hibernate.SQL: DEBUG
+
+oauth:
+  payco:
+    client-id: "3RDKLuGWlBifp1UfHtinDmZ"
+    redirect-uri: "http://www.localhost:9080/oauth/payco"
