@@ -2,6 +2,7 @@ package shop.bluebooktle.frontend.service.impl;
 
 import java.util.List;
 
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -15,18 +16,18 @@ import shop.bluebooktle.common.dto.book.request.RootCategoryRegisterRequest;
 import shop.bluebooktle.common.dto.book.response.CategoryResponse;
 import shop.bluebooktle.common.dto.book.response.CategoryTreeResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
-import shop.bluebooktle.frontend.repository.AdminCategoryRepository;
+import shop.bluebooktle.frontend.repository.CategoryRepository;
 import shop.bluebooktle.frontend.service.AdminCategoryService;
 
 @Service
 @RequiredArgsConstructor
 public class AdminCategoryServiceImpl implements AdminCategoryService {
 
-	private final AdminCategoryRepository adminCategoryRepository;
+	private final CategoryRepository categoryRepository;
 
 	@Override
-	public List<CategoryTreeResponse> searchAllCategoriesTree() {
-		List<CategoryTreeResponse> response = adminCategoryRepository.allCategoriesTree();
+	public List<CategoryTreeResponse> getCategoryTree() {
+		List<CategoryTreeResponse> response = categoryRepository.allCategoriesTree();
 		return response;
 	}
 
@@ -39,7 +40,7 @@ public class AdminCategoryServiceImpl implements AdminCategoryService {
 			keyword = searchKeyword;
 		}
 
-		PaginationData<CategoryResponse> response = adminCategoryRepository.getPagedCategories(page, size,
+		PaginationData<CategoryResponse> response = categoryRepository.getPagedCategories(page, size,
 			keyword);
 		// PaginationData<CategoryResponse> data = response;
 		List<CategoryResponse> categories = response.getContent();
@@ -48,26 +49,30 @@ public class AdminCategoryServiceImpl implements AdminCategoryService {
 
 	@Override
 	public CategoryResponse getCategory(Long id) {
-		return adminCategoryRepository.getCategory(id);
+		return categoryRepository.getCategory(id);
 	}
 
 	@Override
+	@CacheEvict(value = "categoryTree", allEntries = true)
 	public void addRootCategory(RootCategoryRegisterRequest request) {
-		adminCategoryRepository.addRootCategory(request);
+		categoryRepository.addRootCategory(request);
 	}
 
 	@Override
+	@CacheEvict(value = "categoryTree", allEntries = true)
 	public void addCategory(Long parentCategoryId, CategoryRegisterRequest request) {
-		adminCategoryRepository.addCategory(parentCategoryId, request);
+		categoryRepository.addCategory(parentCategoryId, request);
 	}
 
 	@Override
+	@CacheEvict(value = "categoryTree", allEntries = true)
 	public void updateCategory(Long categoryId, CategoryUpdateRequest request) {
-		adminCategoryRepository.updateCategory(categoryId, request);
+		categoryRepository.updateCategory(categoryId, request);
 	}
 
 	@Override
+	@CacheEvict(value = "categoryTree", allEntries = true)
 	public void deleteCategory(Long parentCategoryId) {
-		adminCategoryRepository.deleteCategory(parentCategoryId);
+		categoryRepository.deleteCategory(parentCategoryId);
 	}
 }

@@ -1,4 +1,4 @@
-package shop.bluebooktle.frontend.config;
+package shop.bluebooktle.frontend.config.advice;
 
 import java.util.Map;
 
