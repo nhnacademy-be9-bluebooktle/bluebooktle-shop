@@ -11,8 +11,10 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.book.entity.Book;
 import shop.bluebooktle.backend.book.entity.BookSaleInfo;
+import shop.bluebooktle.backend.book.entity.Img;
 import shop.bluebooktle.backend.book.repository.BookRepository;
 import shop.bluebooktle.backend.book.repository.BookSaleInfoRepository;
+import shop.bluebooktle.backend.book.repository.ImgRepository;
 import shop.bluebooktle.backend.book.service.AladinBookService;
 import shop.bluebooktle.backend.book.service.AuthorService;
 import shop.bluebooktle.backend.book.service.BookAuthorService;
@@ -21,14 +23,19 @@ import shop.bluebooktle.backend.book.service.BookImgService;
 import shop.bluebooktle.backend.book.service.BookPublisherService;
 import shop.bluebooktle.backend.book.service.BookRegisterService;
 import shop.bluebooktle.backend.book.service.BookTagService;
+import shop.bluebooktle.backend.book.service.ImgService;
 import shop.bluebooktle.backend.book.service.PublisherService;
 import shop.bluebooktle.common.dto.book.request.BookAllRegisterByAladinRequest;
 import shop.bluebooktle.common.dto.book.request.BookAllRegisterRequest;
+import shop.bluebooktle.common.dto.book.request.BookImgRegisterRequest;
+import shop.bluebooktle.common.dto.book.request.img.ImgRegisterRequest;
 import shop.bluebooktle.common.dto.book.response.AladinBookResponse;
 import shop.bluebooktle.common.dto.book.response.PublisherInfoResponse;
 import shop.bluebooktle.common.dto.book.response.author.AuthorResponse;
+import shop.bluebooktle.common.dto.book.response.img.ImgResponse;
 import shop.bluebooktle.common.exception.book.AladinBookNotFoundException;
 import shop.bluebooktle.common.exception.book.BookAlreadyExistsException;
+import shop.bluebooktle.common.exception.book.ImgNotFoundException;
 
 @Service
 @Transactional
@@ -46,6 +53,8 @@ public class BookRegisterServiceImpl implements BookRegisterService {
 	private final BookAuthorService bookAuthorService;
 	private final AuthorService authorService;
 	private final PublisherService publisherService;
+	private final ImgService imgService;
+	private final ImgRepository imgRepository;
 
 	@Override
 	public void registerBook(BookAllRegisterRequest request) {
@@ -75,9 +84,13 @@ public class BookRegisterServiceImpl implements BookRegisterService {
 
 		bookTagService.registerBookTag(book.getId(), request.getTagIdList());
 
-		// TODO 일단 이미지를 url을 받아와서 저장되도록(이미지 테이블에 저장 및 도서이미지에 저장)
 		// TODO 이미지 파일 이미지 서버(MINIO)에 저장 로직 구현
-		bookImgService.registerBookImg(book.getId(), request.getThumbnailUrl());
+
+		// 도서 ID 조회
+		Long bookId = bookRepository.findByIsbn(request.getIsbn())
+			.orElseThrow().getId();
+
+		bookImgService.registerBookImg(bookId,request.getThumbnailUrl());
 
 		BookSaleInfo bookSaleInfo = BookSaleInfo.builder()
 			.book(book)

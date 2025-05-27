@@ -61,7 +61,6 @@ public class BookAllRegisterRequest {
 
 	List<@Positive(message = "태그 ID는 양수값이어야 합니다.") Long> tagIdList;
 
-	@NotBlank
+	@NotBlank(message = "썸네일은 필수 값입니다.")
 	String ThumbnailUrl;
-
 }
