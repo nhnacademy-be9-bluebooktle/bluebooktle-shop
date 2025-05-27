@@ -1,5 +1,6 @@
 package shop.bluebooktle.backend.book_order.controller;
 
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -12,7 +13,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
@@ -24,13 +24,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import shop.bluebooktle.backend.book_order.service.PackagingOptionService;
 import shop.bluebooktle.common.dto.book_order.request.PackagingOptionRequest;
-import shop.bluebooktle.common.dto.book_order.response.PackagingOptionResponse;
+import shop.bluebooktle.common.dto.book_order.response.PackagingOptionInfoResponse;
 import shop.bluebooktle.common.security.AuthUserLoader;
 import shop.bluebooktle.common.util.JwtUtil;
 
-@WebMvcTest(PackagingOptionController.class)
-@AutoConfigureMockMvc(addFilters = false)
-class PackagingOptionControllerTest {
+@WebMvcTest(controllers = PackagingOptionController.class)
+@WithMockUser
+public class PackagingOptionControllerTest {
 
 	@Autowired
 	private MockMvc mockMvc;
@@ -41,102 +41,145 @@ class PackagingOptionControllerTest {
 	@MockitoBean
 	private PackagingOptionService packagingOptionService;
 
+	// Spring Security 필터 빈 모킹
 	@MockitoBean
 	private JwtUtil jwtUtil;
-
 	@MockitoBean
 	private AuthUserLoader authUserLoader;
 
 	@Test
 	@DisplayName("포장 옵션 등록 - 성공")
-	@WithMockUser
 	void createPackagingOption_success() throws Exception {
-		PackagingOptionRequest request = PackagingOptionRequest.builder()
-			.name("기본 포장지")
-			.price(BigDecimal.valueOf(1500))
+		// given
+		PackagingOptionRequest req = PackagingOptionRequest.builder()
+			.name("땡땡이 포장지")
+			.price(BigDecimal.valueOf(500))
 			.build();
+		PackagingOptionInfoResponse respDto =
+			PackagingOptionInfoResponse.builder()
+				.id(1L)
+				.name("땡땡이 포장지")
+				.price(BigDecimal.valueOf(500))
+				.build();
 
-		PackagingOptionResponse response = PackagingOptionResponse.builder()
-			.packagingOptionId(1L)
-			.name("기본 포장지")
-			.price(BigDecimal.valueOf(1500))
-			.build();
+		given(packagingOptionService.createPackagingOption(any(PackagingOptionRequest.class)))
+			.willReturn(respDto);
 
-		given(packagingOptionService.createPackagingOption(request)).willReturn(response);
-
+		// when & then
 		mockMvc.perform(post("/api/options")
+				.with(csrf())
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(request)).with(csrf()))
+				.content(objectMapper.writeValueAsString(req)))
 			.andExpect(status().isCreated())
 			.andExpect(jsonPath("$.status").value("success"))
-			.andExpect(jsonPath("$.data.name").value("기본 포장지"));
+			.andExpect(jsonPath("$.data.id").value(1))
+			.andExpect(jsonPath("$.data.name").value("땡땡이 포장지"));
+
+		then(packagingOptionService).should()
+			.createPackagingOption(any(PackagingOptionRequest.class));
 	}
 
 	@Test
-	@DisplayName("포장 옵션 전체 조회 - 성공")
-	@WithMockUser
-	void getPackagingOptions_success() throws Exception {
+	@DisplayName("전체 조회 - 성공")
+	void getPackagingOptions_noKeyword() throws Exception {
 		// given
-		PackagingOptionResponse option1 = PackagingOptionResponse.builder()
-			.packagingOptionId(1L)
-			.name("기본 포장지")
-			.price(BigDecimal.valueOf(1000))
-			.build();
-
-		PackagingOptionResponse option2 = PackagingOptionResponse.builder()
-			.packagingOptionId(2L)
-			.name("고급 포장지")
-			.price(BigDecimal.valueOf(3000))
-			.build();
-
-		Page<PackagingOptionResponse> page = new PageImpl<>(List.of(option1, option2));
-
-		given(packagingOptionService.getPackagingOption(any(Pageable.class)))
-			.willReturn(page);
+		PackagingOptionInfoResponse dto =
+			new PackagingOptionInfoResponse(2L, "Box", BigDecimal.valueOf(300));
+		given(packagingOptionService.getPackagingOptions(any(Pageable.class)))
+			.willReturn(new PageImpl<>(List.of(dto)));
 
 		// when & then
 		mockMvc.perform(get("/api/options")
-				.param("page", "0")
-				.param("size", "10"))
+				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.status").value("success"))
-			.andExpect(jsonPath("$.data.content[0].name").value("기본 포장지"))
-			.andExpect(jsonPath("$.data.content[1].name").value("고급 포장지"));
+			.andExpect(jsonPath("$.data.content[0].id").value(2));
+
+		then(packagingOptionService).should()
+			.getPackagingOptions(any(Pageable.class));
 	}
 
-	// @Test
-	// @DisplayName("포장 옵션 수정 - 성공")
-	// @WithMockUser
-	// void updatePackagingOption_success() throws Exception {
-	// 	PackagingOptionUpdateRequest request = PackagingOptionUpdateRequest.builder()
-	// 		.name("보라 포장지")
-	// 		.price(BigDecimal.valueOf(2500))
-	// 		.build();
-	//
-	// 	PackagingOptionResponse response = PackagingOptionResponse.builder()
-	// 		.packagingOptionId(1L)
-	// 		.name("보라 포장지")
-	// 		.price(BigDecimal.valueOf(2500))
-	// 		.build();
-	//
-	// 	given(packagingOptionService.updatePackagingOption(1L, request)).willReturn(response);
-	//
-	// 	mockMvc.perform(put("/api/options/1")
-	// 			.contentType(MediaType.APPLICATION_JSON)
-	// 			.content(objectMapper.writeValueAsString(request)))
-	// 		.andExpect(status().isOk())
-	// 		.andExpect(jsonPath("$.status").value("success"))
-	// 		.andExpect(jsonPath("$.data.name").value("보라 포장지"));
-	// }
+	@Test
+	@DisplayName("검색 조회 - 성공")
+	void getPackagingOptions_withKeyword() throws Exception {
+		// given
+		String keyword = "선물";
+		PackagingOptionInfoResponse dto =
+			new PackagingOptionInfoResponse(3L, "선물 상자", BigDecimal.valueOf(1000));
+		given(packagingOptionService.searchPackagingOption(eq(keyword), any(Pageable.class)))
+			.willReturn(new PageImpl<>(List.of(dto)));
 
-	// @Test
-	// @DisplayName("포장 옵션 삭제 - 성공")
-	// @WithMockUser
-	// void deletePackagingOption_success() throws Exception {
-	// 	doNothing().when(packagingOptionService).deletePackagingOption(1L);
-	//
-	// 	mockMvc.perform(delete("/api/options/1"))
-	// 		.andExpect(status().isOk())
-	// 		.andExpect(jsonPath("$.status").value("success"));
-	// }
+		// when & then
+		mockMvc.perform(get("/api/options")
+				.param("searchKeyword", keyword)
+				.contentType(MediaType.APPLICATION_JSON))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.status").value("success"))
+			.andExpect(jsonPath("$.data.content[0].name").value("선물 상자"));
+
+		then(packagingOptionService).should()
+			.searchPackagingOption(eq(keyword), any(Pageable.class));
+	}
+
+	@Test
+	@DisplayName("단건 조회 - 성공")
+	void getPackagingOption_success() throws Exception {
+		// given
+		PackagingOptionInfoResponse dto =
+			new PackagingOptionInfoResponse(4L, "리본 포장지", BigDecimal.valueOf(200));
+		given(packagingOptionService.getPackagingOption(4L)).willReturn(dto);
+
+		// when & then
+		mockMvc.perform(get("/api/options/4")
+				.contentType(MediaType.APPLICATION_JSON))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.status").value("success"))
+			.andExpect(jsonPath("$.data.id").value(4))
+			.andExpect(jsonPath("$.data.name").value("리본 포장지"));
+
+		then(packagingOptionService).should().getPackagingOption(4L);
+	}
+
+	@Test
+	@DisplayName("수정 - 성공")
+	void updatePackagingOption_success() throws Exception {
+		// given
+		PackagingOptionRequest req =
+			PackagingOptionRequest.builder()
+				.name("체크 포장지")
+				.price(BigDecimal.valueOf(800))
+				.build();
+		PackagingOptionInfoResponse dto =
+			new PackagingOptionInfoResponse(5L, "체크 포장지", BigDecimal.valueOf(800));
+		given(packagingOptionService.updatePackagingOption(eq(5L), any(PackagingOptionRequest.class)))
+			.willReturn(dto);
+
+		// when & then
+		mockMvc.perform(put("/api/options/5")
+				.with(csrf())
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(req)))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.status").value("success"))
+			.andExpect(jsonPath("$.data.name").value("체크 포장지"));
+
+		then(packagingOptionService).should()
+			.updatePackagingOption(eq(5L), any(PackagingOptionRequest.class));
+	}
+
+	@Test
+	@DisplayName("삭제 - 성공")
+	void deletePackagingOption_success() throws Exception {
+		// given
+		willDoNothing().given(packagingOptionService).deletePackagingOption(6L);
+
+		// when & then
+		mockMvc.perform(delete("/api/options/6")
+				.with(csrf())
+				.contentType(MediaType.APPLICATION_JSON))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.status").value("success"));
+
+		then(packagingOptionService).should().deletePackagingOption(6L);
+	}
 }

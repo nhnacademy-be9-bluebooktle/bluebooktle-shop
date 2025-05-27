@@ -1,4 +1,4 @@
-package shop.bluebooktle.backend.book_order.repository;
+package shop.bluebooktle.backend.book_order.jpa;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
