@@ -1,7 +1,5 @@
 package shop.bluebooktle.backend.book.controller;
 
-import java.util.List;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -74,21 +72,6 @@ public class BookController {
 	public ResponseEntity<JsendResponse<Void>> deleteBook(@PathVariable Long bookId) {
 		bookService.deleteBook(bookId);
 		return ResponseEntity.ok(JsendResponse.success());
-	}
-
-	//해당 도서 관련된 모든 정보(도서,도서 판매정보,작가,출판사,태그,이미지,카테고리)까지 bookId로 조회
-	@GetMapping("/all/{bookId}")
-	public ResponseEntity<JsendResponse<BookAllResponse>> getBookAll(@PathVariable Long bookId) {
-		BookAllResponse bookAllResponse = bookService.findBookAllById(bookId);
-		return ResponseEntity.ok(JsendResponse.success(bookAllResponse));
-	}
-
-	//해당 도서 관련된 모든 정보(도서,도서 판매정보,작가,출판사,태그,이미지,카테고리)까지 제목으로 조회
-	@GetMapping("/all/by-title")
-	public ResponseEntity<JsendResponse<List<BookAllResponse>>> getBookAllByTitle(@RequestParam("title") String title) {
-		List<BookAllResponse> bookAllRespons = bookService
-			.getBookAllByTitle(title);
-		return ResponseEntity.ok(JsendResponse.success(bookAllRespons));
 	}
 
 	@GetMapping

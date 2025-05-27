@@ -3,6 +3,9 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       xmlns:th="http://www.thymeleaf.org">
 <head>
+    <!-- ① CKEditor 5 Classic build CDN -->
+    <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
+
     <title th:text="${pageTitle} ?: '도서 폼'"></title>
     <style>
         .form-section {
@@ -134,8 +137,8 @@
                     <div class="admin-form-group">
                         <label for="description" class="admin-form-label">상세 설명 <span
                                 class="text-danger">*</span></label>
-                        <textarea id="description" th:field="*{description}" class="admin-form-control" rows="10"
-                                  placeholder="WYSIWYG 에디터 적용 예정"></textarea>
+                        <textarea id="description" th:field="*{description}" class="admin-form-control"
+                                  rows="10"></textarea>
                         <div th:if="${#fields.hasErrors('description')}" th:errors="*{description}"
                              class="invalid-feedback"></div>
                     </div>
@@ -622,6 +625,15 @@
                 alert("업로드 중 오류 발생");
             }
         }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            ClassicEditor
+                .create(document.querySelector('#description'))
+                .catch(error => {
+                    console.error('CKEditor 초기화 실패:', error);
+                });
+        });
+
     </script>
 </th:block>
 

@@ -188,6 +188,9 @@ public class BookServiceImpl implements BookService {
 		}
 
 		List<BookAllResponse> content = bookPage.getContent().stream()
+			.filter(book ->
+				bookSaleInfoRepository.existsByBookId(book.getId())
+			)
 			.map(book -> {
 				BookSaleInfo saleInfo = getBookSaleInfoByBookId(book.getId());
 				return BookAllResponse.builder()
