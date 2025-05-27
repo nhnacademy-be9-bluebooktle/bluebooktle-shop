@@ -9,15 +9,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.point.entity.PointHistory;
-import shop.bluebooktle.backend.point.entity.PointSourceType;
 import shop.bluebooktle.backend.point.repository.PointHistoryRepository;
-import shop.bluebooktle.backend.point.repository.PointSourceTypeRepository;
 import shop.bluebooktle.backend.point.service.PointHistoryService;
 import shop.bluebooktle.backend.user.repository.UserRepository;
+import shop.bluebooktle.common.domain.point.PointSourceTypeEnum;
 import shop.bluebooktle.common.dto.point.request.PointHistoryCreateRequest;
 import shop.bluebooktle.common.dto.point.response.PointHistoryResponse;
 import shop.bluebooktle.common.dto.point.response.PointSourceTypeResponse;
 import shop.bluebooktle.common.entity.auth.User;
+import shop.bluebooktle.common.exception.auth.UserNotFoundException;
 
 @Service
 @RequiredArgsConstructor
@@ -25,21 +25,19 @@ import shop.bluebooktle.common.entity.auth.User;
 public class PointHistoryServiceImpl implements PointHistoryService {
 
 	private final PointHistoryRepository pointHistoryRepository;
-	private final PointSourceTypeRepository pointSourceTypeRepository;
 	private final UserRepository userRepository;
 
 	@Override
 	@Transactional
 	public void savePointHistory(Long userId, PointHistoryCreateRequest request) {
 		User user = userRepository.findById(userId)
-			.orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다: " + userId));
+			.orElseThrow(UserNotFoundException::new);
 
-		PointSourceType sourceType = pointSourceTypeRepository.findById(request.pointSourceTypeId())
-			.orElseThrow(() -> new IllegalArgumentException("포인트 소스 타입을 찾을 수 없습니다: " + request.pointSourceTypeId()));
+		PointSourceTypeEnum sourceTypeEnum = PointSourceTypeEnum.fromId(request.pointSourceTypeId());
 
 		PointHistory history = PointHistory.builder()
 			.user(user)
-			.pointSourceType(sourceType)
+			.sourceType(sourceTypeEnum)
 			.value(request.value())
 			.build();
 
@@ -50,15 +48,15 @@ public class PointHistoryServiceImpl implements PointHistoryService {
 	public Page<PointHistoryResponse> getPointHistoriesByUserId(Long userId, Pageable pageable) {
 		Page<PointHistory> page = pointHistoryRepository.findByUserIdOrderByCreatedAtDesc(userId, pageable);
 
-		return page.map(history -> new PointHistoryResponse(
-			history.getId(),
-			history.getValue(),
+		return page.map(p -> new PointHistoryResponse(
+			p.getId(),
+			p.getValue(),
 			new PointSourceTypeResponse(
-				history.getPointSourceType().getId(),
-				history.getPointSourceType().getActionType(),
-				history.getPointSourceType().getSourceType()
+				p.getSourceType().getId(),
+				p.getSourceType().getActionType(),
+				p.getSourceType().getSourceType()
 			),
-			history.getCreatedAt()
+			p.getCreatedAt()
 		));
 	}
 

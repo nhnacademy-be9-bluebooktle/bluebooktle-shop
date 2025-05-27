@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
+import shop.bluebooktle.common.domain.point.PointSourceTypeEnum;
 import shop.bluebooktle.common.dto.common.PaginationData;
 import shop.bluebooktle.common.dto.point.request.PointHistoryCreateRequest;
 import shop.bluebooktle.common.dto.point.response.PointHistoryResponse;
@@ -19,10 +20,11 @@ import shop.bluebooktle.common.dto.point.response.PointRuleResponse;
 import shop.bluebooktle.common.dto.point.response.PointSourceTypeResponse;
 import shop.bluebooktle.frontend.repository.PointRepository;
 import shop.bluebooktle.frontend.service.PointService;
+import shop.bluebooktle.frontend.service.PointHistoryService;
 
 @Service
 @RequiredArgsConstructor
-public class PointServiceImpl implements PointService {
+public class PointHistoryServiceImpl implements PointHistoryService {
 	private final PointHistoryRepository pointHistoryRepository;
 
 	private final PointRepository pointRepository;
@@ -54,6 +56,12 @@ public class PointServiceImpl implements PointService {
 		pointHistoryRepository.createPointHistory(request);
 	public List<PointPolicyResponse> getAllPolicies() {
 		return pointRepository.getAllPolicies();
+	}
+
+	// 포인트 로그 생성시 createPointHistory(PointSourceTypeEnum.LOGIN_EARN, 500)
+	@Override
+	public void createPointHistory(PointSourceTypeEnum sourceType, BigDecimal value) {
+		createPointHistory(new PointHistoryCreateRequest(sourceType.getId(), value));
 	}
 
 	@Override

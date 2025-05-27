@@ -11,11 +11,12 @@ import shop.bluebooktle.common.dto.point.response.PointRuleResponse;
 import shop.bluebooktle.common.dto.point.response.PointSourceTypeResponse;
 import org.springframework.data.domain.Pageable;
 
+import shop.bluebooktle.common.domain.point.PointSourceTypeEnum;
 import shop.bluebooktle.common.dto.common.PaginationData;
 import shop.bluebooktle.common.dto.point.request.PointHistoryCreateRequest;
 import shop.bluebooktle.common.dto.point.response.PointHistoryResponse;
 
-public interface PointService {
+public interface PointHistoryService {
 
 	PaginationData<PointHistoryResponse> getMyPointHistories(Pageable pageable);
 	Long createPolicy(PointPolicyCreateRequest request);
@@ -29,6 +30,9 @@ public interface PointService {
 	List<PointPolicyResponse> getAllPolicies();
 
 	void createPointHistory(PointHistoryCreateRequest request);
+
+	void createPointHistory(PointSourceTypeEnum sourceType, BigDecimal value);
+
 
 	BigDecimal getTotalPoints();
 	List<PointRuleResponse> getAllRules();

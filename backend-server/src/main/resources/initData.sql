@@ -1,5 +1,5 @@
 INSERT INTO delivery_rule
-VALUES (1, '기본 배송 정책', 30000.00, 5000.00, now());
+VALUES (1, '기본 배송 정책', 30000.00, 5000.00, 'ALL', true, now(), null);
 
 INSERT INTO order_state
 VALUES (1, 'PENDING', now(), null);

@@ -137,6 +137,51 @@
             color: var(--kitsch-color-4);
         }
 
+        /* pagination-kitsch 꾸미기 */
+        .pagination-list-kitsch {
+            list-style: none;
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0;
+            margin: 0;
+        }
+
+        .page-item-kitsch {
+            /* 기본 테두리와 그림자 */
+            border: 2px solid var(--kitsch-color-1);
+            border-radius: 4px;
+            box-shadow: 1px 1px 0 var(--kitsch-color-5);
+        }
+
+        .page-link-kitsch {
+            display: block;
+            padding: 0.5rem 0.75rem;
+            text-decoration: none;
+            font-family: var(--font-display);
+            color: var(--kitsch-color-1);
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .page-item-kitsch:hover .page-link-kitsch:not(.disabled) {
+            background-color: var(--kitsch-color-1);
+            color: var(--kitsch-text-light);
+        }
+
+        .page-item-kitsch.active-kitsch {
+            background-color: var(--kitsch-color-1);
+        }
+
+        .page-item-kitsch.active-kitsch .page-link-kitsch {
+            color: var(--kitsch-text-light);
+            font-weight: bold;
+        }
+
+        .page-item-kitsch.disabled .page-link-kitsch {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
 
         @media (max-width: 768px) {
             .point-history-controls-kitsch {
@@ -194,6 +239,7 @@
             .point-history-table-kitsch .point-description-kitsch {
                 text-align: right;
             }
+
 
             /* 모바일에서는 오른쪽 정렬 유지 */
         }
@@ -284,21 +330,57 @@
                     </div>
                 </div>
 
-                <!-- 페이징 -->
-                <nav aria-label="Page navigation" class="pagination-kitsch" style="margin-top: 2.5rem;">
-                    <ul>
-                        <li th:classappend="${!pointHistories.pagination.hasPrevious} ? 'disabled'">
-                            <a th:href="@{/points(page=${pointHistories.pagination.currentPage - 1})}">이전</a>
+                <nav aria-label="Page navigation"
+                     class="pagination-kitsch"
+                     style="margin-top: 2.5rem;"
+                     th:if="${pointHistories.pagination.totalPages > 0}">
+
+                    <!-- lastIndex = totalPages-1 (최소 0) -->
+                    <ul class="pagination-list-kitsch"
+                        th:with="lastIndex=${pointHistories.pagination.totalPages > 0
+                           ? pointHistories.pagination.totalPages - 1
+                           : 0}">
+
+                        <!-- 이전 -->
+                        <li class="page-item-kitsch"
+                            th:classappend="${!pointHistories.pagination.hasPrevious} ? ' disabled'">
+                            <a class="page-link-kitsch"
+                               aria-label="Previous"
+                               th:href="@{${currentURI}(page=${
+            pointHistories.pagination.hasPrevious
+              ? pointHistories.pagination.currentPage - 1
+              : 0
+         })}">
+                                &laquo; 이전
+                            </a>
                         </li>
-                        <li th:classappend="${i == pointHistories.pagination.currentPage} ? 'active-kitsch'"
-                            th:each="i : ${#numbers.sequence(0, pointHistories.pagination.getTotalPages()-1)}">
-                            <a th:href="@{/points(page=${i})}" th:text="${i+1}">1</a>
+
+                        <!-- 페이지 번호 (0~lastIndex) -->
+                        <li class="page-item-kitsch"
+                            th:each="idx : ${#numbers.sequence(0, lastIndex)}"
+                            th:classappend="${idx == pointHistories.pagination.currentPage} ? ' active-kitsch'">
+                            <a class="page-link-kitsch"
+                               th:href="@{${currentURI}(page=${idx})}"
+                               th:text="${idx + 1}">1</a>
                         </li>
-                        <li th:classappend="${!pointHistories.pagination.hasNext} ? 'disabled'">
-                            <a th:href="@{/points(page=${pointHistories.pagination.currentPage + 1})}">다음</a>
+
+                        <!-- 다음 -->
+                        <li class="page-item-kitsch"
+                            th:classappend="${!pointHistories.pagination.hasNext} ? ' disabled'">
+                            <a class="page-link-kitsch"
+                               aria-label="Next"
+                               th:href="@{${currentURI}(page=${
+            pointHistories.pagination.hasNext
+              ? pointHistories.pagination.currentPage + 1
+              : pointHistories.pagination.currentPage
+         })}">
+                                다음 &raquo;
+                            </a>
                         </li>
+
                     </ul>
                 </nav>
+
 
             </main>
         </div>

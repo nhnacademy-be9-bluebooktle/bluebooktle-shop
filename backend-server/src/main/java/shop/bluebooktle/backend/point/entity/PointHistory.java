@@ -6,6 +6,7 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -20,8 +21,10 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import shop.bluebooktle.common.domain.point.PointSourceTypeEnum;
 import shop.bluebooktle.common.entity.BaseEntity;
 import shop.bluebooktle.common.entity.auth.User;
+import shop.bluebooktle.common.util.PointSourceTypeConverter;
 
 @Entity
 @Table(name = "point_history")
@@ -38,9 +41,9 @@ public class PointHistory extends BaseEntity {
 	@Column(name = "point_id")
 	private Long id;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "point_source_type_id", nullable = false)
-	private PointSourceType pointSourceType;
+	@Convert(converter = PointSourceTypeConverter.class)
+	@Column(name = "point_source_type_id", nullable = false)
+	private PointSourceTypeEnum sourceType;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id", nullable = false)
@@ -50,8 +53,8 @@ public class PointHistory extends BaseEntity {
 	private BigDecimal value;
 
 	@Builder
-	public PointHistory(PointSourceType pointSourceType, User user, BigDecimal value) {
-		this.pointSourceType = pointSourceType;
+	public PointHistory(PointSourceTypeEnum sourceType, User user, BigDecimal value) {
+		this.sourceType = sourceType;
 		this.user = user;
 		this.value = value;
 	}
