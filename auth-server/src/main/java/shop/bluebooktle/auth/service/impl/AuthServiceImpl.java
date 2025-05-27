@@ -210,7 +210,6 @@ public class AuthServiceImpl implements AuthService {
 		long refreshTokenExpirationMillis = jwtUtil.getRefreshTokenExpirationMillis();
 		refreshTokenService.save(user.getId(), refreshToken, refreshTokenExpirationMillis);
 
-		log.info("PAYCO 로그인 성공. User ID: {}", user.getId());
 		return new TokenResponse(accessToken, refreshToken);
 	}
 
@@ -220,7 +219,6 @@ public class AuthServiceImpl implements AuthService {
 		String name = paycoMember.getName();
 		String mobile = paycoMember.getMobile();
 		String birthday = paycoMember.getBirthday();
-		log.info("신규 PAYCO 사용자 등록 시작. Login ID: {}", loginId);
 
 		if (userRepository.existsByLoginId(loginId)) {
 			throw new LoginIdAlreadyExistsException("PAYCO ID 충돌. 잠시 후 다시 시도하세요.");
@@ -232,13 +230,10 @@ public class AuthServiceImpl implements AuthService {
 		MembershipLevel defaultLevel = membershipLevelRepository.findByName("일반")
 			.orElseThrow(() -> new ApplicationException(ErrorCode.INTERNAL_SERVER_ERROR, "기본 멤버십 등급을 찾을 수 없습니다."));
 
+		// 정보 없으면 기본값 사용
 		String nickname = "payco_" + loginId;
 		String finalBirth = StringUtils.hasText(birthday) ? birthday.replaceAll("[^0-9]", "") : "00000000";
 		String finalPhoneNumber = StringUtils.hasText(mobile) ? normalizePhoneNumber(mobile) : "01000000000";
-
-		if ("00000000".equals(finalBirth) || "01000000000".equals(finalPhoneNumber)) {
-			log.warn("PAYCO 신규 가입 시, birth/phoneNumber에 PAYCO 정보가 없거나 변환 실패하여 기본값을 사용합니다.");
-		}
 
 		User newUser = User.builder()
 			.loginId(loginId)

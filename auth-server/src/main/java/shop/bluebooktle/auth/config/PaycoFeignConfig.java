@@ -13,7 +13,6 @@ import shop.bluebooktle.common.exception.ErrorCode;
 @Configuration
 public class PaycoFeignConfig {
 
-	// Feign 에러 디코더 설정
 	@Bean
 	public ErrorDecoder feignErrorDecoder() {
 		return (methodKey, response) -> {
