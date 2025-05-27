@@ -113,6 +113,149 @@ ul {
     margin-right: 0.5em;
 }
 
+
+.categories-btn-header-kitsch i {
+    display: inline-block;
+    width: 1rem; /* 이 값은 font-size(em)과 같게 */
+    text-align: center;
+}
+
+.categories-btn-header-kitsch i,
+.cart-btn-header-kitsch i {
+    margin-right: 0;
+}
+
+.category-container {
+    position: absolute;
+    left: 0;
+    right: 0;
+    width: 90%;
+    margin: 0 auto;
+    padding-top: 0.5rem;
+    z-index: 10 !important;
+}
+
+.category-container .categories-panel-kitsch {
+    display: none;
+    width: 90%;
+    margin: 0 auto;
+    background: var(--kitsch-bg-alt);
+    border: 2px solid var(--kitsch-text-dark);
+    box-shadow: 2px 2px 0px var(--kitsch-text-dark);
+    border-radius: 5px;
+    box-sizing: content-box;
+}
+
+.category-tree-container {
+    width: 90%;
+    margin: 0 12px 0 auto;
+    padding: 1rem 0; /* 위/아래 여백 */
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+/* 스크롤바 전체 영역 (수직) */
+.category-tree-container::-webkit-scrollbar {
+    width: 12px;
+}
+
+/* 스크롤바 손잡이 */
+.category-tree-container::-webkit-scrollbar-thumb {
+    background-color: var(--kitsch-color-4);
+    border-radius: 10px;
+    border: 2px solid var(--kitsch-text-dark);
+    margin: 8px 0;
+}
+
+.category-tree-container::-webkit-scrollbar-thumb:hover {
+    background-color: var(--kitsch-color-3);
+    margin: 8px 0;
+}
+
+/* 스크롤바 트랙 (배경) */
+.category-tree-container::-webkit-scrollbar-track {
+    background: var(--kitsch-bg-alt); /* 스크롤바 트랙 배경 */
+    border-radius: 10px;
+    border: 1px solid var(--kitsch-text-dark);
+
+    margin: 8px 0;
+}
+
+.categories-panel-kitsch.active {
+    display: block;
+    animation: slideDown 0.3s ease-out forwards;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-10px);
+        opacity: 0
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1
+    }
+}
+
+.categories-list-kitsch,
+.categories-list-nested {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.categories-list-nested {
+    padding-left: 1.5em;
+}
+
+.categories-panel-kitsch details {
+    margin: 0.3em 0;
+    color: var(--kitsch-color-5);
+}
+
+.categories-panel-kitsch summary {
+    cursor: pointer;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    margin-right: 1rem;
+    color: var(--kitsch-color-5);
+    padding: 0.4em 0.6em;
+    border-radius: 4px;
+    transition: background-color 0.3s ease,
+    color 0.3s ease
+}
+
+.categories-panel-kitsch summary:hover {
+    background-color: var(--kitsch-color-4);
+    color: var(--kitsch-text-light);
+    /* optional: 안쪽 그림자 추가로 입체감 */
+    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
+}
+
+.arrow-icon {
+    width: 1em;
+    text-align: center;
+    margin-right: 0.5em;
+    transition: transform 0.2s;
+}
+
+.categories-panel-kitsch .leaf-category > summary {
+    padding-left: 1.5rem;
+}
+
+.categories-panel-kitsch summary a.category-link-kitsch {
+    color: inherit; /* summary의 기본 컬러를 물려받고 */
+    text-decoration: none;
+    flex: 1; /* summary 폭을 꽉 채워서 아이콘 옆에 배치 */
+}
+
+.categories-panel-kitsch summary a.category-link-kitsch:hover {
+    text-decoration: underline;
+    transform: none !important;
+}
+
 .primary-btn-kitsch {
     background-color: var(--kitsch-color-2);
     color: var(--kitsch-text-dark);
@@ -282,6 +425,8 @@ ul {
 /* Header Kitsch - 정렬 개선 적용 */
 /* =========================== */
 .site-header-kitsch {
+    position: relative;
+    overflow: visible;
     background-color: var(--kitsch-color-3); /* 핫핑크 배경 */
     color: var(--kitsch-text-light); /* 헤더 내 기본 텍스트 밝게 */
     padding-top: 0.5rem; /* 헤더 상단 내부 여백 */
@@ -426,6 +571,8 @@ ul {
 
 /* 마퀴 스타일 (기존 유지) */
 .header-marquee-kitsch {
+    position: relative;
+    z-index: 0;
     background-color: var(--kitsch-text-dark);
     color: var(--kitsch-color-2);
     margin-top: 1em;
@@ -700,7 +847,7 @@ ul {
     display: flex;
     /* flex-wrap: wrap; */ /* 기존 wrap 속성 제거 또는 nowrap으로 명시 */
     flex-wrap: nowrap; /* 자식 요소들이 한 줄로만 나열되도록 강제 */
-    justify-content: flex-start; /* 왼쪽부터 정렬 (기본값이나 명시) */
+    justify-content: center; /* 왼쪽부터 정렬 (기본값이나 명시) */
     gap: 1.5rem;
     margin-top: 1rem;
     overflow-x: auto; /* 내용이 넘칠 경우 가로 스크롤바 표시 */

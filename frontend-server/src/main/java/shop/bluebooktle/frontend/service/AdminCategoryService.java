@@ -13,7 +13,7 @@ import shop.bluebooktle.common.dto.book.response.CategoryTreeResponse;
 public interface AdminCategoryService {
 
 	// 전체 카테고리 트리 조회
-	List<CategoryTreeResponse> searchAllCategoriesTree();
+	List<CategoryTreeResponse> getCategoryTree();
 
 	// 카테고리 리스트 조회
 	Page<CategoryResponse> getCategories(int page, int size, String searchKeyword);

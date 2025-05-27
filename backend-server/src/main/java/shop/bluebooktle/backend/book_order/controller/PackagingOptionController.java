@@ -12,14 +12,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.book_order.service.PackagingOptionService;
 import shop.bluebooktle.common.dto.book_order.request.PackagingOptionRequest;
-import shop.bluebooktle.common.dto.book_order.request.PackagingOptionUpdateRequest;
-import shop.bluebooktle.common.dto.book_order.response.PackagingOptionResponse;
+import shop.bluebooktle.common.dto.book_order.response.PackagingOptionInfoResponse;
 import shop.bluebooktle.common.dto.common.JsendResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
 
@@ -31,7 +31,7 @@ public class PackagingOptionController {
 
 	/** 포장 옵션 등록 */
 	@PostMapping
-	public ResponseEntity<JsendResponse<PackagingOptionResponse>> createPackagingOption(
+	public ResponseEntity<JsendResponse<PackagingOptionInfoResponse>> createPackagingOption(
 		@RequestBody @Valid PackagingOptionRequest request) {
 		return ResponseEntity.status(HttpStatus.CREATED)
 			.body(JsendResponse.success(packagingOptionService.createPackagingOption(request)));
@@ -39,19 +39,35 @@ public class PackagingOptionController {
 
 	/** 포장 옵션 전체 조회 */
 	@GetMapping
-	public ResponseEntity<JsendResponse<PaginationData<PackagingOptionResponse>>> getPackagingOptions(
-		@PageableDefault(size = 10, sort = "id") Pageable pageable) {
-		Page<PackagingOptionResponse> resultPage = packagingOptionService.getPackagingOption(
-			pageable); // 페이징 처리된 응답 객체 가져오기
-		PaginationData<PackagingOptionResponse> paginationData = new PaginationData<>(resultPage); // PaginationData 감싸기
+	public ResponseEntity<JsendResponse<PaginationData<PackagingOptionInfoResponse>>> getPackagingOptions(
+		@PageableDefault(size = 10, sort = "id") Pageable pageable,
+		@RequestParam(value = "searchKeyword", required = false) String searchKeyword) {
+
+		Page<PackagingOptionInfoResponse> packagingOptionPage;
+
+		if (searchKeyword != null && !searchKeyword.isBlank()) {
+			packagingOptionPage = packagingOptionService.searchPackagingOption(searchKeyword, pageable);
+		} else {
+			packagingOptionPage = packagingOptionService.getPackagingOptions(pageable);
+		}
+
+		PaginationData<PackagingOptionInfoResponse> paginationData = new PaginationData<>(packagingOptionPage);
 		return ResponseEntity.ok(JsendResponse.success(paginationData));
+	}
+
+	/** 포장 옵션 단건 조회 */
+	@GetMapping("/{packagingOptionId}")
+	public ResponseEntity<JsendResponse<PackagingOptionInfoResponse>> getPackagingOption(
+		@PathVariable Long packagingOptionId) {
+		PackagingOptionInfoResponse response = packagingOptionService.getPackagingOption(packagingOptionId);
+		return ResponseEntity.ok(JsendResponse.success(response));
 	}
 
 	/** 포장 옵션 수정 */
 	@PutMapping("/{packagingOptionId}")
-	public ResponseEntity<JsendResponse<PackagingOptionResponse>> updatePackagingOption(
+	public ResponseEntity<JsendResponse<PackagingOptionInfoResponse>> updatePackagingOption(
 		@PathVariable Long packagingOptionId,
-		@RequestBody @Valid PackagingOptionUpdateRequest request) {
+		@RequestBody @Valid PackagingOptionRequest request) {
 		return ResponseEntity.ok(
 			JsendResponse.success(packagingOptionService.updatePackagingOption(packagingOptionId, request)));
 	}

@@ -70,7 +70,7 @@ public class AdminCategoryController {
 		model.addAttribute("statusFilter", statusFilter);
 
 		// Tree 구조의 카테고리
-		List<CategoryTreeResponse> tree = adminCategoryService.searchAllCategoriesTree();
+		List<CategoryTreeResponse> tree = adminCategoryService.getCategoryTree();
 		model.addAttribute("categoryTreeListJson", tree);
 		return "admin/category/category_list";
 	}

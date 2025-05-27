@@ -30,12 +30,14 @@ CREATE TABLE `tag`
 
 CREATE TABLE `delivery_rule`
 (
-    `delivery_rule_id` bigint         NOT NULL AUTO_INCREMENT,
-    `name`             varchar(50)    NOT NULL,
-    `price`            decimal(10, 2) NOT NULL,
-    `delivery_fee`     decimal(10, 2) NOT NULL,
-    `created_at`       timestamp      NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `deleted_at`       timestamp      NULL,
+    `delivery_rule_id`        bigint         NOT NULL AUTO_INCREMENT,
+    `rule_name`               varchar(50)    NOT NULL,
+    `free_delivery_threshold` decimal(10, 2),
+    `delivery_fee`            decimal(10, 2) NOT NULL,
+    `region`                  ENUM ('ALL', 'JEJU', 'MOUNTAINOUS_AREA'),
+    `is_active`               boolean        NOT NULL,
+    `created_at`              timestamp      NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `deleted_at`              timestamp      NULL,
 
     CONSTRAINT `PK_DELIVERY_RULE` PRIMARY KEY (`delivery_rule_id`)
 );
@@ -291,11 +293,12 @@ CREATE TABLE `users`
     `login_id`      varchar(50)                             NOT NULL,
     `password`      varchar(255)                            NOT NULL,
     `name`          varchar(20)                             NOT NULL,
-    `email`         varchar(50)                             NOT NULL,
-    `nickname`      varchar(20)                             NOT NULL,
+    `email`         varchar(50)                             NULL,
+    `nickname`      varchar(50)                             NOT NULL,
     `birth`         varchar(8)                              NOT NULL,
     `phone_number`  varchar(11)                             NOT NULL,
     `point_balance` decimal(10, 2)                          NOT NULL,
+    `provider`      ENUM ('BLUEBOOKTLE', 'PAYCO')           NOT NULL,
     `type`          ENUM ('USER', 'ADMIN')                  NOT NULL DEFAULT 'USER',
     `status`        ENUM ('ACTIVE', 'DORMANT', 'WITHDRAWN') NOT NULL DEFAULT 'ACTIVE' COMMENT '일반,휴면, 탈퇴',
     `last_login_at` timestamp                               NULL,

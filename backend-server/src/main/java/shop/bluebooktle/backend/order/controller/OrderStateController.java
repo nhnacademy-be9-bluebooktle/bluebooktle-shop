@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.order.dto.response.OrderStateResponse;
 import shop.bluebooktle.backend.order.service.OrderStateService;
-import shop.bluebooktle.common.domain.OrderStatus;
+import shop.bluebooktle.common.domain.order.OrderStatus;
 import shop.bluebooktle.common.dto.common.JsendResponse;
 import shop.bluebooktle.common.exception.order.order_state.OrderStateNotFoundException;
 

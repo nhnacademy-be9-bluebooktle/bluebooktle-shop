@@ -21,11 +21,11 @@ import shop.bluebooktle.frontend.config.feign.FeignGlobalConfig;
 
 @FeignClient(
 	name = "backend-server",
-	contextId = "pointRepository",
+	contextId = "AdminPointRepository",
 	path = "/api/points",
 	configuration = FeignGlobalConfig.class
 )
-public interface PointRepository {
+public interface AdminPointRepository {
 
 	@PostMapping("/policies")
 	Long createPolicy(@RequestBody PointPolicyCreateRequest req);
