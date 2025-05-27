@@ -7,6 +7,7 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Value;
 import shop.bluebooktle.common.dto.book.BookSaleInfoState;
 
@@ -14,6 +15,7 @@ import shop.bluebooktle.common.dto.book.BookSaleInfoState;
 @Builder
 @Value
 @AllArgsConstructor
+@NoArgsConstructor(force = true)
 public class BookAllResponse {
 	Long id;
 	String title;
