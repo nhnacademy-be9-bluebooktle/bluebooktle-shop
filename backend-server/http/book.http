@@ -93,7 +93,8 @@ Content-Type: application/json
     1,
     2
   ],
-  "ThumbnailUrl": "https://image.aladin.co.kr/product/35650/80/coversum/k762036819_1.jpg",
+  "index": "목차",
+  "imgUrl": "https://image.aladin.co.kr/product/35650/80/coversum/k762036819_1.jpg",
   "categoryIdList": [
     2,
     3

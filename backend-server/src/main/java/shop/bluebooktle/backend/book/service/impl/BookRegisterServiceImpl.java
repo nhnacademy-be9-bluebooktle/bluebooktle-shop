@@ -11,10 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.book.entity.Book;
 import shop.bluebooktle.backend.book.entity.BookSaleInfo;
-import shop.bluebooktle.backend.book.entity.Img;
 import shop.bluebooktle.backend.book.repository.BookRepository;
 import shop.bluebooktle.backend.book.repository.BookSaleInfoRepository;
-import shop.bluebooktle.backend.book.repository.ImgRepository;
 import shop.bluebooktle.backend.book.service.AladinBookService;
 import shop.bluebooktle.backend.book.service.AuthorService;
 import shop.bluebooktle.backend.book.service.BookAuthorService;
@@ -23,19 +21,14 @@ import shop.bluebooktle.backend.book.service.BookImgService;
 import shop.bluebooktle.backend.book.service.BookPublisherService;
 import shop.bluebooktle.backend.book.service.BookRegisterService;
 import shop.bluebooktle.backend.book.service.BookTagService;
-import shop.bluebooktle.backend.book.service.ImgService;
 import shop.bluebooktle.backend.book.service.PublisherService;
 import shop.bluebooktle.common.dto.book.request.BookAllRegisterByAladinRequest;
 import shop.bluebooktle.common.dto.book.request.BookAllRegisterRequest;
-import shop.bluebooktle.common.dto.book.request.BookImgRegisterRequest;
-import shop.bluebooktle.common.dto.book.request.img.ImgRegisterRequest;
 import shop.bluebooktle.common.dto.book.response.AladinBookResponse;
 import shop.bluebooktle.common.dto.book.response.PublisherInfoResponse;
 import shop.bluebooktle.common.dto.book.response.author.AuthorResponse;
-import shop.bluebooktle.common.dto.book.response.img.ImgResponse;
 import shop.bluebooktle.common.exception.book.AladinBookNotFoundException;
 import shop.bluebooktle.common.exception.book.BookAlreadyExistsException;
-import shop.bluebooktle.common.exception.book.ImgNotFoundException;
 
 @Service
 @Transactional
@@ -53,8 +46,6 @@ public class BookRegisterServiceImpl implements BookRegisterService {
 	private final BookAuthorService bookAuthorService;
 	private final AuthorService authorService;
 	private final PublisherService publisherService;
-	private final ImgService imgService;
-	private final ImgRepository imgRepository;
 
 	@Override
 	public void registerBook(BookAllRegisterRequest request) {
@@ -65,34 +56,28 @@ public class BookRegisterServiceImpl implements BookRegisterService {
 		Book book = Book.builder()
 			.title(request.getTitle())
 			.isbn(request.getIsbn())
+			.index(request.getIndex())
 			.description(request.getDescription())
 			.publishDate(request.getPublishDate() != null ?
 				request.getPublishDate().atStartOfDay() : null)
 			.build();
 		bookRepository.save(book);
 
-		//할인율 계산 따로 뺄것
+		// 작가, 출판사, 카테고리, 태그 연결
+		bookAuthorService.registerBookAuthor(book.getId(), request.getAuthorIdList());
+		bookPublisherService.registerBookPublisher(book.getId(), request.getPublisherIdList());
+		bookCategoryService.registerBookCategory(book.getId(), request.getCategoryIdList());
+		bookTagService.registerBookTag(book.getId(), request.getTagIdList());
+
+		// 이미지 연결
+		bookImgService.registerBookImg(book.getId(), request.getImgUrl());
+
+		// 판매 정보 저장
 		BigDecimal salePercentage = request.getPrice().subtract(request.getSalePrice())
 			.divide(request.getPrice(), 2, BigDecimal.ROUND_HALF_UP)
 			.multiply(BigDecimal.valueOf(100));
 
-		bookAuthorService.registerBookAuthor(book.getId(), request.getAuthorIdList());
-
-		bookPublisherService.registerBookPublisher(book.getId(), request.getAuthorIdList());
-
-		bookCategoryService.registerBookCategory(book.getId(), request.getCategoryIdList());
-
-		bookTagService.registerBookTag(book.getId(), request.getTagIdList());
-
-		// TODO 이미지 파일 이미지 서버(MINIO)에 저장 로직 구현
-
-		// 도서 ID 조회
-		Long bookId = bookRepository.findByIsbn(request.getIsbn())
-			.orElseThrow().getId();
-
-		bookImgService.registerBookImg(bookId,request.getThumbnailUrl());
-
-		BookSaleInfo bookSaleInfo = BookSaleInfo.builder()
+		BookSaleInfo saleInfo = BookSaleInfo.builder()
 			.book(book)
 			.price(request.getPrice())
 			.salePrice(request.getSalePrice())
@@ -102,7 +87,7 @@ public class BookRegisterServiceImpl implements BookRegisterService {
 			.bookSaleInfoState(request.getState())
 			.salePercentage(salePercentage)
 			.build();
-		bookSaleInfoRepository.save(bookSaleInfo);
+		bookSaleInfoRepository.save(saleInfo);
 	}
 
 	@Override

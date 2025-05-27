@@ -3,8 +3,14 @@ package shop.bluebooktle.backend.book.service.impl;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.book.entity.Book;
@@ -23,6 +29,7 @@ import shop.bluebooktle.common.dto.book.response.BookAllResponse;
 import shop.bluebooktle.common.dto.book.response.BookRegisterResponse;
 import shop.bluebooktle.common.dto.book.response.BookResponse;
 import shop.bluebooktle.common.dto.book.response.BookUpdateResponse;
+import shop.bluebooktle.common.dto.common.PaginationData;
 import shop.bluebooktle.common.exception.book.BookAlreadyExistsException;
 import shop.bluebooktle.common.exception.book.BookNotFoundException;
 
@@ -49,6 +56,7 @@ public class BookServiceImpl implements BookService {
 
 		return BookRegisterResponse.builder()
 			.title(request.getTitle())
+			.index(request.getIndex())
 			.description(request.getDescription())
 			.publishDate(request.getPublishDate())
 			.isbn(request.getIsbn())
@@ -64,6 +72,7 @@ public class BookServiceImpl implements BookService {
 		return BookResponse.builder()
 			.title(book.getTitle())
 			.description(book.getDescription())
+			.index(book.getIndex())
 			.publishDate(LocalDate.from(book.getPublishDate()))
 			.isbn(book.getIsbn())
 			.build();
@@ -114,15 +123,16 @@ public class BookServiceImpl implements BookService {
 			.id(book.getId())                             // 책 ID
 			.title(book.getTitle())                       // 책 제목
 			.description(book.getDescription())           // 책 설명
+			.index(book.getIndex())
 			.publishDate(book.getPublishDate())           // 출판일
 			.isbn(book.getIsbn())                         // ISBN
 			.price(saleInfo.getPrice())                   // 정가
 			.salePrice(saleInfo.getSalePrice())           // 할인가
 			.stock(saleInfo.getStock())                   // 재고
 			.salePercentage(saleInfo.getSalePercentage()) // 할인율
-			.thumbnailUrl(getThumbnailUrlByBookId(book.getId()))    // 썸네일 URL
+			.imgUrl(getThumbnailUrlByBookId(book.getId()))    // 썸네일 URL
 			.authors(getAuthorsByBookId(book.getId()))               // 저자 리스트
-			.publisher(getPublisherByBookId(book.getId()))           // 출판사 이름
+			.publishers(getPublisherByBookId(book.getId()))           // 출판사 이름
 			.categories(getCategoriesByBookId(book.getId()))         // 카테고리 리스트
 			.tags(getTagsByBookId(book.getId()))                     // 태그 리스트
 			.bookSaleInfoState(saleInfo.getBookSaleInfoState())
@@ -145,15 +155,16 @@ public class BookServiceImpl implements BookService {
 					.id(book.getId())                             // 책 ID
 					.title(book.getTitle())                       // 책 제목
 					.description(book.getDescription())           // 책 설명
+					.index(book.getIndex())
 					.publishDate(book.getPublishDate())           // 출판일
 					.isbn(book.getIsbn())                         // ISBN
 					.price(saleInfo.getPrice())                   // 정가
 					.salePrice(saleInfo.getSalePrice())           // 할인가
 					.stock(saleInfo.getStock())                   // 재고
 					.salePercentage(saleInfo.getSalePercentage()) // 할인율
-					.thumbnailUrl(getThumbnailUrlByBookId(book.getId()))    // 썸네일 URL
+					.imgUrl(getThumbnailUrlByBookId(book.getId()))    // 썸네일 URL
 					.authors(getAuthorsByBookId(book.getId()))               // 저자 리스트
-					.publisher(getPublisherByBookId(book.getId()))           // 출판사 이름
+					.publishers(getPublisherByBookId(book.getId()))           // 출판사 이름
 					.categories(getCategoriesByBookId(book.getId()))         // 카테고리 리스트
 					.tags(getTagsByBookId(book.getId()))                     // 태그 리스트
 					.bookSaleInfoState(saleInfo.getBookSaleInfoState())
@@ -166,10 +177,61 @@ public class BookServiceImpl implements BookService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public Book getBookById(Long bookId) {
-		return bookRepository.findById(bookId)
-			.orElseThrow(BookNotFoundException::new);
+	public PaginationData<BookAllResponse> findAllBooks(int page, int size, String searchKeyword) {
+		Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+		Page<Book> bookPage;
+
+		if (StringUtils.hasText(searchKeyword)) {
+			bookPage = bookRepository.findByTitleContainingIgnoreCase(searchKeyword, pageable);
+		} else {
+			bookPage = bookRepository.findAll(pageable);
+		}
+
+		List<BookAllResponse> content = bookPage.getContent().stream()
+			.map(book -> {
+				BookSaleInfo saleInfo = getBookSaleInfoByBookId(book.getId());
+				return BookAllResponse.builder()
+					.id(book.getId())                             // 책 ID
+					.title(book.getTitle())                       // 책 제목
+					.description(book.getDescription())           // 책 설명
+					.index(book.getIndex())
+					.isbn(book.getIsbn())                         // ISBN
+					.price(saleInfo.getPrice())                   // 정가
+					.salePrice(saleInfo.getSalePrice())           // 할인가
+					.stock(saleInfo.getStock())                   // 재고
+					.salePercentage(saleInfo.getSalePercentage()) // 할인율
+					.imgUrl(getThumbnailUrlByBookId(book.getId()))    // 썸네일 URL
+					.authors(getAuthorsByBookId(book.getId()))               // 저자 리스트
+					.publishers(getPublisherByBookId(book.getId()))           // 출판사 이름
+					.categories(getCategoriesByBookId(book.getId()))         // 카테고리 리스트
+					.tags(getTagsByBookId(book.getId()))                     // 태그 리스트
+					.bookSaleInfoState(saleInfo.getBookSaleInfoState())
+					.viewCount(saleInfo.getViewCount())                      // 조회수
+					.searchCount(saleInfo.getSearchCount())
+					.createdAt(book.getCreatedAt())
+					.deletedAt(book.getDeletedAt())
+					.build();
+			})
+			.toList();
+
+		Page<BookAllResponse> dtoPage = new PageImpl<>(content, pageable, bookPage.getTotalElements());
+
+		return new PaginationData<>(dtoPage);
 	}
+
+	// //메인페이지에 표시될 정보(id, title, author, price, salePrice, imgUrl) 조회
+	// @Override
+	// @Transactional(readOnly = true)
+	// public Page<BookInfoResponse> getBooksForMainPage(Long bookId, Pageable pageable) {
+	// 	return bookRepository.findBooksForMainPage(bookId, pageable);
+	// }
+	//
+	// //제목으로 검색하여 표시될 정보(id, title, author, price, salePrice, imgUrl) 조회
+	// @Override
+	// @Transactional(readOnly = true)
+	// public Page<BookInfoResponse> searchBooksByTitle(String title, Pageable pageable) {
+	// 	return bookRepository.findBooksForSearchPageBytitle(title, pageable);
+	// }
 
 	private List<String> getAuthorsByBookId(Long bookId) {
 		return bookAuthorRepository.findByBookId(bookId)
@@ -178,12 +240,11 @@ public class BookServiceImpl implements BookService {
 			.toList();
 	}
 
-	private String getPublisherByBookId(Long bookId) {
+	private List<String> getPublisherByBookId(Long bookId) {
 		return bookPublisherRepository.findByBookId(bookId)
 			.stream()
 			.map(bookPublisher -> bookPublisher.getPublisher().getName())
-			.findFirst()
-			.orElse(""); // 없으면 기본값으로 빈 문자열 반환
+			.toList();
 	}
 
 	private List<String> getCategoriesByBookId(Long bookId) {
@@ -211,11 +272,6 @@ public class BookServiceImpl implements BookService {
 	private BookSaleInfo getBookSaleInfoByBookId(Long bookId) {
 		return bookSaleInfoRepository.findByBookId(bookId)
 			.orElseThrow(BookNotFoundException::new);
-	}
-
-	@Override
-	public boolean existsBookById(Long id) {
-		return bookRepository.existsById(id);
 	}
 
 	private Book toEntity(BookRegisterRequest request) {

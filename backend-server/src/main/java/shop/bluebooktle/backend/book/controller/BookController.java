@@ -26,6 +26,7 @@ import shop.bluebooktle.common.dto.book.response.BookRegisterResponse;
 import shop.bluebooktle.common.dto.book.response.BookResponse;
 import shop.bluebooktle.common.dto.book.response.BookUpdateResponse;
 import shop.bluebooktle.common.dto.common.JsendResponse;
+import shop.bluebooktle.common.dto.common.PaginationData;
 
 @RestController
 @RequestMapping("/api/books")
@@ -89,4 +90,36 @@ public class BookController {
 			.getBookAllByTitle(title);
 		return ResponseEntity.ok(JsendResponse.success(bookAllRespons));
 	}
+
+	@GetMapping
+	public ResponseEntity<JsendResponse<PaginationData<BookAllResponse>>> getPagedBooks(
+		@RequestParam("page") int page,
+		@RequestParam("size") int size,
+		@RequestParam(value = "searchKeyword", required = false) String searchKeyword
+	) {
+		PaginationData<BookAllResponse> data = bookService.findAllBooks(page, size, searchKeyword);
+		return ResponseEntity.ok(JsendResponse.success(data));
+	}
+
+	// TODO 관리자페이지 먼저 하고나서 수정
+
+	// //메인페이지에 표시될 정보(id, title, author, price, salePrice, imgUrl) 조회
+	// @GetMapping("/main/{bookId}")
+	// public ResponseEntity<JsendResponse<Page<BookInfoResponse>>> getBooksForMainPage(
+	// 	@PathVariable Long bookId,
+	// 	@PageableDefault(size = 10) Pageable pageable) {
+	//
+	// 	Page<BookInfoResponse> bookMainResponses = bookService
+	// 		.getBooksForMainPage(bookId, pageable);
+	// 	return ResponseEntity.ok(JsendResponse.success(bookMainResponses));
+	// }
+	//
+	// //제목으로 검색하여 표시될 정보(id, title, author, price, salePrice, imgUrl) 조회
+	// @GetMapping("/search")
+	// public ResponseEntity<JsendResponse<Page<BookInfoResponse>>> searchBooks(
+	// 	@RequestParam("title") String title,
+	// 	@PageableDefault(size = 10) Pageable pageable) {
+	// 	Page<BookInfoResponse> books = bookService.searchBooksByTitle(title, pageable);
+	// 	return ResponseEntity.ok(JsendResponse.success(books));
+	// }
 }

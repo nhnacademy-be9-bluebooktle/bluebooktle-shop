@@ -12,6 +12,7 @@ import lombok.Getter;
 public class BookResponse {
 	String title;
 	String description;
+	String index;
 	LocalDate publishDate;
 	String isbn;
 }

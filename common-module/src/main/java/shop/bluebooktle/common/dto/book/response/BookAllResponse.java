@@ -19,17 +19,22 @@ public class BookAllResponse {
 	String title;
 	String description;
 	LocalDateTime publishDate;
+	String index;
 	String isbn;
 	BigDecimal price;
 	BigDecimal salePrice;
 	Integer stock;
 	BigDecimal salePercentage;
-	String thumbnailUrl;
+	String imgUrl;
+	Boolean isPackable;
 	List<String> authors;
-	String publisher;
+	List<String> publishers;
 	List<String> categories;
 	List<String> tags;
 	BookSaleInfoState bookSaleInfoState;
 	Long viewCount;
 	Long searchCount;
+	LocalDateTime createdAt;
+	LocalDateTime deletedAt;
+
 }

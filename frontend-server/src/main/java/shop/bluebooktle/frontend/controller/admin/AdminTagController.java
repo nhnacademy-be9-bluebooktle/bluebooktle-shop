@@ -3,6 +3,7 @@ package shop.bluebooktle.frontend.controller.admin;
 import java.time.LocalDateTime;
 
 import org.springframework.data.domain.Page;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -48,6 +50,17 @@ public class AdminTagController {
 		model.addAttribute("size", size);
 
 		return "admin/tag/tag_list";
+	}
+
+	/** AJAX/팝업용 — JSON 페이징 결과 반환 */
+	@GetMapping(path = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public Page<TagInfoResponse> listTagsJson(
+		@RequestParam(defaultValue = "0") int page,
+		@RequestParam(defaultValue = "10") int size,
+		@RequestParam(required = false) String searchKeyword) {
+
+		return tagService.getTags(page, size, searchKeyword);
 	}
 
 	/** 태그 등록 또는 수정 폼 진입 */
