@@ -84,8 +84,8 @@
             </div>
 
             <form th:action="@{/admin/books/save}" th:object="${book}" method="post" enctype="multipart/form-data">
-                <input type="hidden" th:field="*{id}"/>
-                <input type="hidden" th:field="*{deletedAt}"/>
+                <!--                <input type="hidden" th:field="*{id}"/>-->
+                <!--                <input type="hidden" th:field="*{deletedAt}"/>-->
 
                 <!-- 알라딘 도서 검색 -->
                 <div class="aladin-search-container"
@@ -129,7 +129,7 @@
                     </div>
                     <div class="admin-form-group">
                         <label for="bookIndex" class="admin-form-label">목차</label>
-                        <textarea id="bookIndex" th:field="*{bookIndex}" class="admin-form-control" rows="5"></textarea>
+                        <textarea id="bookIndex" th:field="*{index}" class="admin-form-control" rows="5"></textarea>
                     </div>
                     <div class="admin-form-group">
                         <label for="description" class="admin-form-label">상세 설명 <span
@@ -151,9 +151,9 @@
                         <div class="col-md-4 admin-form-group">
                             <label for="regularPrice" class="admin-form-label">정가 <span
                                     class="text-danger">*</span></label>
-                            <input type="number" id="regularPrice" th:field="*{regularPrice}" class="admin-form-control"
+                            <input type="number" id="regularPrice" th:field="*{price}" class="admin-form-control"
                                    th:errorclass="is-invalid">
-                            <div th:if="${#fields.hasErrors('regularPrice')}" th:errors="*{regularPrice}"
+                            <div th:if="${#fields.hasErrors('regularPrice')}" th:errors="*{price}"
                                  class="invalid-feedback"></div>
                         </div>
                         <div class="col-md-4 admin-form-group">
@@ -176,8 +176,8 @@
                         <div class="col-md-6 admin-form-group">
                             <label for="saleState" class="admin-form-label">판매 상태 <span
                                     class="text-danger">*</span></label>
-                            <select id="saleState" th:field="*{saleState}" class="admin-form-control">
-                                <option th:each="stateOpt : ${saleStateOptions}" th:value="${stateOpt}"
+                            <select id="saleState" th:field="*{state}" class="admin-form-control">
+                                <option th:each="stateOpt : ${stateOptions}" th:value="${stateOpt}"
                                         th:text="${stateOpt}"></option>
                             </select>
                         </div>
@@ -204,7 +204,7 @@
                         <div id="categoryPopup" class="popup-small-overlay" style="display: none;">
                             <input type="text" id="categorySearch" placeholder="카테고리 검색" class="popup-input">
                             <ul id="categoryResults" class="popup-multi-select">
-                                <li th:each="category : ${allCategories}">
+                                <li th:each="category : ${allCategoriesForMapping}">
                                     <label>
                                         <input type="checkbox" th:value="${category.id}" th:text="${category.name}">
                                     </label>
@@ -226,7 +226,7 @@
                         <div id="authorPopup" class="popup-small-overlay" style="display: none;">
                             <input type="text" id="authorSearch" placeholder="작가 검색" class="popup-input">
                             <ul id="authorResults" class="popup-multi-select">
-                                <li th:each="author : ${allAuthors}">
+                                <li th:each="author : ${allAuthorsForMapping}">
                                     <label>
                                         <input type="checkbox" th:value="${author.id}" th:text="${author.name}">
                                     </label>
