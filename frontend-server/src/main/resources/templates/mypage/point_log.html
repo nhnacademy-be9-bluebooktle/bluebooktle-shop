@@ -310,12 +310,10 @@
                                 th:text="${history.pointSourceType.sourceType}">로그인 적립
                             </td>
                             <td class="point-earned-kitsch" data-label="적립"
-                                th:text="${history.pointSourceType.actionType == T(shop.bluebooktle.common.domain.point.ActionType).EARN ? '+' + history.value : '-'}">
-                                +3000
+                                th:text="${history.pointSourceType.actionType.name() == 'EARN' ? '+' + history.value : ''}">
                             </td>
                             <td class="point-used-kitsch" data-label="사용"
-                                th:text="${history.pointSourceType.actionType == T(shop.bluebooktle.common.domain.point.ActionType).USE ? '-' + history.value : '-'}">
-                                -
+                                th:text="${history.pointSourceType.actionType.name() == 'USE' ? '-' + history.value  : ''}">
                             </td>
                         </tr>
                         </tbody>
@@ -346,11 +344,7 @@
                             th:classappend="${!pointHistories.pagination.hasPrevious} ? ' disabled'">
                             <a class="page-link-kitsch"
                                aria-label="Previous"
-                               th:href="@{${currentURI}(page=${
-            pointHistories.pagination.hasPrevious
-              ? pointHistories.pagination.currentPage - 1
-              : 0
-         })}">
+                               th:href="@{${currentURI}(page=${pointHistories.pagination.hasPrevious ? pointHistories.pagination.currentPage - 1 : 0})}">
                                 &laquo; 이전
                             </a>
                         </li>
