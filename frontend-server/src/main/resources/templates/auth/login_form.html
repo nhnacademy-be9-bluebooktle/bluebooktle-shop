@@ -125,9 +125,16 @@
             <div class="social-login-kitsch">
                 <p class="handwriting-font-kitsch"
                    style="margin-bottom: 0.8rem; font-size:1.1rem; color: var(--kitsch-color-5)">다른 계정으로 로그인:</p>
-                <a class="btn-kitsch retro-shadow-kitsch-small" href="/oauth2/authorization/payco">
+                <a class="btn-kitsch retro-shadow-kitsch-small"
+                   th:href="${'https://id.payco.com/oauth2.0/authorize' +
+                       '?response_type=code' +
+                       '&client_id=' + paycoClientId +
+                       '&redirect_uri=' + paycoRedirectUriEncoded +
+                       '&serviceProviderCode=FRIENDS' +
+                       '&state=PAYCO_LOGIN_STATE_STRING' +
+                       '&userLocale=ko_KR'}">
                     <img alt="PAYCO 로그인" style="height: 20px; margin-right: 0.5em;"
-                         th:src="@{/images/PAYCO_Logo_Basic.svg}"> 로그인
+                         th:src="@{/images/PAYCO_Logo_Basic.svg}">로그인
                 </a>
             </div>
         </div>
