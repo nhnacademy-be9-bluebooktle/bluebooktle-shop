@@ -2,6 +2,7 @@ name: CI & CD
 
 on:
   push:
+    branches: [ develop, master ]
     paths:
       - 'backend-server/**'
       - 'frontend-server/**'
@@ -71,20 +72,8 @@ jobs:
   build:
     needs: detect_changes
     if: >
-      needs.detect_changes.outputs.changed != '' &&
-      (
-        (github.event_name == 'push')
-        ||
-        (github.event_name == 'pull_request' &&
-         github.event.pull_request.base.ref == 'develop' &&
-         github.event.action == 'closed' &&
-         github.event.pull_request.merged == true)
-        ||
-        (github.event_name == 'pull_request' &&
-         github.event.pull_request.base.ref == 'master' &&
-         github.event.action == 'closed' &&
-         github.event.pull_request.merged == true)
-      )
+      needs.detect_changes.outputs.changed != '' && github.event_name == 'push'
+
     runs-on: ubuntu-latest
     environment: ${{ github.ref_name == 'master' && 'prod' || 'dev' }}
     env:
@@ -116,20 +105,8 @@ jobs:
   deploy:
     needs: [ detect_changes, build ]
     if: >
-      needs.detect_changes.outputs.changed != '' &&
-      (
-        (github.event_name == 'push')
-        ||
-        (github.event_name == 'pull_request' &&
-         github.event.pull_request.base.ref == 'develop' &&
-         github.event.action == 'closed' &&
-         github.event.pull_request.merged == true)
-        ||
-        (github.event_name == 'pull_request' &&
-         github.event.pull_request.base.ref == 'master' &&
-         github.event.action == 'closed' &&
-         github.event.pull_request.merged == true)
-      )
+      needs.detect_changes.outputs.changed != '' && github.event_name == 'push'
+
     runs-on: ubuntu-latest
     environment: ${{ github.ref_name == 'master' && 'prod' || 'dev' }}
     env:
@@ -161,7 +138,7 @@ jobs:
           password: ${{ secrets.SSH_PASSWORD }}
           port: ${{ secrets.SSH_PORT }}
           script: |
-            set -e
+            set -e 
 
             export SPRING_PROFILES_ACTIVE="${{ env.SPRING_PROFILES_ACTIVE }}"
             export CONFIG_SERVER_URI="${{ env.CONFIG_SERVER_URI }}"
@@ -174,7 +151,7 @@ jobs:
             fi
             chmod +x ~/$S
 
-            CHANGED_STRING=" ${{ needs.detect_changes.outputs.changed }} "
+            CHANGED_STRING=" ${{ needs.detect_changes.outputs.changed }} " 
             DEPLOY_ORDER=(eureka-server gateway-server backend-server auth-server frontend-server)
 
             echo ">>> Changed Services Detected: [${{ needs.detect_changes.outputs.changed }}]"
@@ -184,7 +161,7 @@ jobs:
             for M in "${DEPLOY_ORDER[@]}"; do
               if echo "$CHANGED_STRING" | grep -q " $M "; then
                 echo "  :arrow_forward: Deploying $M..."
-                bash ~/$S "$M"
+                bash ~/$S "$M" 
                 DEPLOYED_COUNT=$((DEPLOYED_COUNT + 1))
               else
                 echo "  :heavy_minus_sign: Skipping $M (no changes detected)."
