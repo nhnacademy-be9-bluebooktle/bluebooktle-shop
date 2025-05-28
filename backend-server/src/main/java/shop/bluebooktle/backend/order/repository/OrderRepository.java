@@ -12,10 +12,11 @@ import shop.bluebooktle.backend.order.entity.Order;
 import shop.bluebooktle.common.domain.order.OrderStatus;
 import shop.bluebooktle.common.entity.auth.User;
 
-public interface OrderRepository extends JpaRepository<Order, Long>, OrderQueryRepository {
+public interface OrderRepository extends JpaRepository<Order, Long> {
 
-	List<Order> findByUserAndCreatedAtBetween(User user, LocalDateTime createdAtAfter, LocalDateTime createdAtBefore,
-		Pageable pageable);
+	// 사용자 + 기간 조회
+	@EntityGraph(attributePaths = {"orderState"})
+	List<Order> findByUserAndOrderDateBetween(User user, LocalDateTime start, LocalDateTime end, Pageable pageable);
 
 	// 사용자 + 상태(enum) 조회
 	@EntityGraph(attributePaths = {"orderState"})
@@ -23,7 +24,7 @@ public interface OrderRepository extends JpaRepository<Order, Long>, OrderQueryR
 
 	// 사용자 + 상태 + 기간 조회
 	@EntityGraph(attributePaths = {"orderState"})
-	List<Order> findByUserAndOrderState_StateAndCreatedAtBetween(User user, OrderStatus state, LocalDateTime start,
+	List<Order> findByUserAndOrderState_StateAndOrderDateBetween(User user, OrderStatus state, LocalDateTime start,
 		LocalDateTime end, Pageable pageable);
 
 	// 사용자 전체 조회
@@ -32,12 +33,5 @@ public interface OrderRepository extends JpaRepository<Order, Long>, OrderQueryR
 
 	// 주문 UUID 키로 단일 주문 조회 (비회원용)
 	Optional<Order> findByOrderKey(String orderKey);
-
-	@EntityGraph(attributePaths = {
-		"bookOrders.book.bookImgs.img",
-		"bookOrders.orderPackagings.packagingOption",
-		"userCouponBookOrders.userCoupon.coupon.couponType"
-	})
-	Optional<Order> findByIdAndUser_Id(Long orderId, Long userId);
 
 }
