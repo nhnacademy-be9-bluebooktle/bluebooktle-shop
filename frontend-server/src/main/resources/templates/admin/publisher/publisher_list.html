@@ -13,7 +13,7 @@
             <th:block th:text="${pageTitle} ?: '출판사 관리'"></th:block>
         </h1>
         <div class="admin-page-actions">
-            <a th:href="@{/admin/publishers/new}" class="admin-btn admin-btn--primary">
+            <a th:href="@{/admin/chulpansa/new}" class="admin-btn admin-btn--primary">
                 <i class="fas fa-plus"></i> 새 출판사 등록
             </a>
         </div>
@@ -21,7 +21,7 @@
 
     <div class="admin-panel">
         <div class="admin-panel__body">
-            <form th:action="@{/admin/publishers}" method="get" class="admin-form-inline">
+            <form th:action="@{/admin/chulpansa}" method="get" class="admin-form-inline">
                 <div class="admin-form-group">
                     <input type="text" name="searchKeyword" th:value="${searchKeyword}" placeholder="출판사명 검색"
                            class="admin-form-control" style="width: auto; display: inline-block; margin-right: 8px;">
@@ -55,13 +55,13 @@
                         2025-05-14 10:00
                     </td>
                     <td class="category-actions">
-                        <a th:href="@{/admin/publishers/{id}/edit(id=${publisher.id})}"
+                        <a th:href="@{/admin/chulpansa/{id}/edit(id=${publisher.id})}"
                            class="admin-btn admin-btn--sm admin-btn--outline-primary" title="수정">
                             <i class="fas fa-edit"></i>
                         </a>
                     </td>
                     <td>
-                        <form th:action="@{/admin/publishers/{id}/delete(id=${publisher.id})}" method="post"
+                        <form th:action="@{/admin/chulpansa/{id}/delete(id=${publisher.id})}" method="post"
                               style="display: inline;" onsubmit="return confirm('정말 삭제하시겠습니까?');">
                             <button type="submit" class="admin-btn admin-btn--sm admin-btn--danger" title="삭제">
                                 <i class="fas fa-trash"></i>
