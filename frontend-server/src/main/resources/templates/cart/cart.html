@@ -385,113 +385,67 @@
                         <button class="text-btn-kitsch" onclick="selectAllCartItems(true)"><i
                                 class="fas fa-check-double"></i> 전체선택
                         </button>
-                        <button class="text-btn-kitsch" onclick="deleteSelectedCartItems()"><i
-                                class="fas fa-trash-alt"></i> 선택삭제
-                        </button>
+                        <form id="selectedDeleteForm" th:action="@{/cart/selected}" method="post"
+                              style="display:inline;">
+                            <input type="hidden" name="_method" value="delete"/>
+                            <input type="hidden" name="bookIds" id="bookIdsInput"/>
+                            <button type="button" class="text-btn-kitsch" onclick="submitSelectedDeleteForm()">
+                                <i class="fas fa-trash-alt"></i> 선택삭제
+                            </button>
+                        </form>
                     </div>
                 </div>
 
-                <div class="cart-item-kitsch">
+                <div class="cart-item-kitsch" th:each="item : ${cartItems}">
                     <div class="cart-item-checkbox-kitsch">
                         <label class="checkbox-kitsch">
-                            <input checked class="cart-item-select" onchange="updateCartSummary()" type="checkbox"
-                                   value="101">
+                            <input checked class="cart-item-select"
+                                   th:value="${item.bookId}"
+                                   onchange="updateCartSummary()"
+                                   type="checkbox">
                             <span class="checkbox-custom-kitsch"></span>
                         </label>
                     </div>
-                    <div class="cart-item-info-kitsch">
-                        <a th:href="@{/books/101}"><img alt="코딩 대모험"
-                                                        src="https://picsum.photos/80/120?random=101"></a>
-                        <div class="cart-item-details-kitsch">
-                            <a class="item-title-kitsch" th:href="@{/books/101}">코딩 대모험</a>
-                            <p class="item-author-kitsch">저자: 고냥이 개발자</p>
 
+                    <div class="cart-item-info-kitsch">
+                        <!-- 썸네일: 아직 없으므로 더미 이미지로 -->
+                        <a th:href="@{/books/{id}(id=${item.bookId})}">
+                            <img alt="임시 썸네일" src="https://via.placeholder.com/80x120?text=준비중">
+                        </a>
+                        <div class="cart-item-details-kitsch">
+                            <!-- 제목, 저자: 개발중 문구로 대체 -->
+                            <a class="item-title-kitsch" th:href="@{/books/{id}(id=${item.bookId})}"
+                               th:text="'[도서 ' + ${item.bookId} + ']'"></a>
+                            <p class="item-author-kitsch">정보 제공 준비중</p>
                         </div>
                     </div>
+
                     <div class="quantity-input-kitsch">
                         <button class="quantity-btn-kitsch minus-btn-kitsch" onclick="changeCartItemQuantity(this, -1)">
                             -
                         </button>
-                        <input class="quantity-value-kitsch" data-price="25200" min="1"
-                               onchange="updateCartItemSubtotal(this)" type="number"
-                               value="1">
+                        <input class="quantity-value-kitsch"
+                               data-price="10000"
+                               min="1"
+                               onchange="updateCartItemSubtotal(this)"
+                               type="number"
+                               th:value="${item.quantity}"/>
                         <button class="quantity-btn-kitsch plus-btn-kitsch" onclick="changeCartItemQuantity(this, 1)">
                             +
                         </button>
                     </div>
-                    <div class="cart-item-price-kitsch item-unit-price">25,200원</div>
+
+                    <div class="cart-item-price-kitsch item-unit-price">10,000원</div> <!-- 임시 단가 -->
                     <div class="cart-item-delete-kitsch">
-                        <button class="text-btn-kitsch" onclick="deleteCartItem(this)"><i
-                                class="fas fa-times-circle"></i></button>
+                        <form th:action="@{/cart}" method="post" th:object="${item}">
+                            <input type="hidden" name="_method" value="delete"/>
+                            <input type="hidden" name="bookId" th:value="${item.bookId}"/>
+                            <button type="submit" class="text-btn-kitsch">
+                                <i class="fas fa-times-circle"></i>
+                            </button>
+                        </form>
                     </div>
                 </div>
-
-                <div class="cart-item-kitsch">
-                    <div class="cart-item-checkbox-kitsch">
-                        <label class="checkbox-kitsch">
-                            <input checked class="cart-item-select" onchange="updateCartSummary()" type="checkbox"
-                                   value="102">
-                            <span class="checkbox-custom-kitsch"></span>
-                        </label>
-                    </div>
-                    <div class="cart-item-info-kitsch">
-                        <a th:href="@{/books/102}"><img alt="픽셀 아트로 배우는 알고리즘"
-                                                        src="https://picsum.photos/80/120?random=102"></a>
-                        <div class="cart-item-details-kitsch">
-                            <a class="item-title-kitsch" th:href="@{/books/102}">픽셀 아트로 배우는 알고리즘</a>
-                            <p class="item-author-kitsch">글: 닥터 도트</p>
-                        </div>
-                    </div>
-                    <div class="quantity-input-kitsch">
-                        <button class="quantity-btn-kitsch minus-btn-kitsch" onclick="changeCartItemQuantity(this, -1)">
-                            -
-                        </button>
-                        <input class="quantity-value-kitsch" data-price="31500" min="1"
-                               onchange="updateCartItemSubtotal(this)" type="number"
-                               value="2">
-                        <button class="quantity-btn-kitsch plus-btn-kitsch" onclick="changeCartItemQuantity(this, 1)">
-                            +
-                        </button>
-                    </div>
-                    <div class="cart-item-price-kitsch item-unit-price">31,500원</div>
-                    <div class="cart-item-delete-kitsch">
-                        <button class="text-btn-kitsch" onclick="deleteCartItem(this)"><i
-                                class="fas fa-times-circle"></i></button>
-                    </div>
-                </div>
-
-                <div class="cart-item-kitsch">
-                    <div class="cart-item-checkbox-kitsch">
-                        <label class="checkbox-kitsch">
-                            <input class="cart-item-select" onchange="updateCartSummary()" type="checkbox" value="105">
-                            <span class="checkbox-custom-kitsch"></span>
-                        </label>
-                    </div>
-                    <div class="cart-item-info-kitsch">
-                        <a th:href="@{/books/105}"><img alt="게임보이 개발 비급" src="https://picsum.photos/80/120?random=105"></a>
-                        <div class="cart-item-details-kitsch">
-                            <a class="item-title-kitsch" th:href="@{/books/105}">게임보이 개발 비급</a>
-                            <p class="item-author-kitsch">레트로 장인</p>
-                        </div>
-                    </div>
-                    <div class="quantity-input-kitsch">
-                        <button class="quantity-btn-kitsch minus-btn-kitsch" onclick="changeCartItemQuantity(this, -1)">
-                            -
-                        </button>
-                        <input class="quantity-value-kitsch" data-price="33300" min="1"
-                               onchange="updateCartItemSubtotal(this)" type="number"
-                               value="1">
-                        <button class="quantity-btn-kitsch plus-btn-kitsch" onclick="changeCartItemQuantity(this, 1)">
-                            +
-                        </button>
-                    </div>
-                    <div class="cart-item-price-kitsch item-unit-price">33,300원</div>
-                    <div class="cart-item-delete-kitsch">
-                        <button class="text-btn-kitsch" onclick="deleteCartItem(this)"><i
-                                class="fas fa-times-circle"></i></button>
-                    </div>
-                </div>
-
             </div>
 
             <div class="cart-summary-panel-kitsch">
@@ -553,14 +507,27 @@
         }
 
         function changeCartItemQuantity(buttonElement, amount) {
-            const quantityInput = buttonElement.parentElement.querySelector('.quantity-value-kitsch');
-            let currentValue = parseInt(quantityInput.value);
-            currentValue += amount;
-            if (currentValue < 1) {
-                currentValue = 1;
-            }
-            quantityInput.value = currentValue;
-            updateCartSummary(); // 수량 변경 후 전체 요약 업데이트
+            const cartItem = buttonElement.closest('.cart-item-kitsch');
+            const quantityInput = cartItem.querySelector('.quantity-value-kitsch');
+            const bookId = cartItem.querySelector('.cart-item-select').value;
+
+            const newQuantity = parseInt(quantityInput.value) + amount;
+            if (newQuantity < 1) return;
+
+            const url = amount > 0 ? '/cart/increase' : '/cart/decrease';
+
+            fetch(url + '?bookId=' + bookId, {
+                method: 'POST'
+            })
+                .then(response => {
+                    if (!response.ok) throw new Error("수량 변경 실패");
+                    quantityInput.value = newQuantity;
+                    updateCartSummary();
+                })
+                .catch(err => {
+                    alert("수량 변경에 실패했습니다.");
+                    console.error(err);
+                });
         }
 
         function updateCartSummary() {
@@ -608,6 +575,19 @@
             updateCartSummary();
         }
 
+        // 선택된 항목들 삭제 메서드
+        function submitSelectedDeleteForm() {
+            const selectedCheckboxes = document.querySelectorAll('.cart-item-select:checked');
+            if (selectedCheckboxes.length === 0) {
+                alert("삭제할 상품을 선택해주세요.");
+                return;
+            }
+
+            const bookIds = Array.from(selectedCheckboxes).map(cb => cb.value);
+            document.getElementById("bookIdsInput").value = bookIds.join(",");
+            document.getElementById("selectedDeleteForm").submit();
+        }
+
         function deleteCartItem(buttonElement) {
             const cartItem = buttonElement.closest('.cart-item-kitsch');
             if (cartItem) {
@@ -631,21 +611,18 @@
         }
 
         function toggleEmptyCartMessage() {
-            const cartItemsPanel = document.getElementById('cartWithItems');
+            const cartItemsPanel = document.querySelector('.cart-items-panel-kitsch');
+            const summaryPanel = document.querySelector('.cart-summary-panel-kitsch');
             const emptyCartMsg = document.getElementById('emptyCartMessage');
             const cartItemElements = document.querySelectorAll('.cart-item-kitsch');
 
             if (cartItemElements.length === 0) {
-                cartItemsPanel.style.display = 'none'; // 아이템 목록 및 요약 패널 숨김
-                if (document.querySelector('.cart-summary-panel-kitsch')) {
-                    document.querySelector('.cart-summary-panel-kitsch').style.display = 'none';
-                }
+                if (cartItemsPanel) cartItemsPanel.style.display = 'none';
+                if (summaryPanel) summaryPanel.style.display = 'none';
                 emptyCartMsg.style.display = 'block';
             } else {
-                cartItemsPanel.style.display = 'block'; // 또는 grid 등 원래 display 속성
-                if (document.querySelector('.cart-summary-panel-kitsch')) {
-                    document.querySelector('.cart-summary-panel-kitsch').style.display = 'block';
-                }
+                if (cartItemsPanel) cartItemsPanel.style.display = 'block';
+                if (summaryPanel) summaryPanel.style.display = 'block';
                 emptyCartMsg.style.display = 'none';
             }
         }
