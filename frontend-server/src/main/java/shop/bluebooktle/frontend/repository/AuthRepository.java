@@ -12,7 +12,7 @@ import shop.bluebooktle.common.dto.auth.request.TokenRefreshRequest;
 import shop.bluebooktle.common.dto.auth.response.TokenResponse;
 import shop.bluebooktle.frontend.config.feign.FeignGlobalConfig;
 
-@FeignClient(name = "auth-server", contextId = "authRepository", path = "/auth", configuration = FeignGlobalConfig.class)
+@FeignClient(url = "${server.gateway-url}", name = "authRepository", path = "/auth", configuration = FeignGlobalConfig.class)
 public interface AuthRepository {
 	@PostMapping("/signup")
 	void signup(@RequestBody SignupRequest signupRequest);

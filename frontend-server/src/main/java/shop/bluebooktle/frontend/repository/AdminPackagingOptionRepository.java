@@ -13,7 +13,7 @@ import shop.bluebooktle.common.dto.book_order.response.PackagingOptionInfoRespon
 import shop.bluebooktle.common.dto.common.PaginationData;
 import shop.bluebooktle.frontend.config.feign.FeignGlobalConfig;
 
-@FeignClient(name = "backend-server", contextId = "adminPackagingOptionRepository", path = "/api/options", configuration = FeignGlobalConfig.class)
+@FeignClient(url = "${server.gateway-url}", name = "adminPackagingOptionRepository", path = "/api/options", configuration = FeignGlobalConfig.class)
 public interface AdminPackagingOptionRepository {
 	// 포장 옵션 조회
 	@GetMapping

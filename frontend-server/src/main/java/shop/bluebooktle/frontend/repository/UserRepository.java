@@ -15,7 +15,7 @@ import shop.bluebooktle.common.dto.user.response.UserResponse;
 import shop.bluebooktle.frontend.config.feign.FeignGlobalConfig;
 import shop.bluebooktle.frontend.config.retry.RetryWithTokenRefresh;
 
-@FeignClient(name = "backend-server", contextId = "userRepository", path = "/api/users", configuration = FeignGlobalConfig.class)
+@FeignClient(url = "${server.gateway-url}", name = "userRepository", path = "/api/users", configuration = FeignGlobalConfig.class)
 public interface UserRepository {
 	@GetMapping("/me")
 	@RetryWithTokenRefresh
