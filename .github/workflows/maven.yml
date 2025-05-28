@@ -143,25 +143,26 @@ jobs:
           password: ${{ secrets.SSH_PASSWORD }}
           port: ${{ secrets.SSH_PORT }}
           script: |
+            bash << 'EOF'
             set -e 
-
+            
             export SPRING_PROFILES_ACTIVE="${{ env.SPRING_PROFILES_ACTIVE }}"
             export CONFIG_SERVER_URI="${{ env.CONFIG_SERVER_URI }}"
             BR=${{ github.ref_name }}
-
+            
             if [ "$BR" = "master" ]; then
               S=prod_startup.sh
             else
               S=dev_startup.sh
             fi
             chmod +x ~/$S
-
+            
             CHANGED_STRING=" ${{ needs.detect_changes.outputs.changed }} " 
             DEPLOY_ORDER=(eureka-server gateway-server backend-server auth-server frontend-server)
-
+            
             echo ">>> Changed Services Detected: [${{ needs.detect_changes.outputs.changed }}]"
             echo ">>> Starting deployment following order: ${DEPLOY_ORDER[*]}"
-
+            
             DEPLOYED_COUNT=0
             for M in "${DEPLOY_ORDER[@]}"; do
               if echo "$CHANGED_STRING" | grep -q " $M "; then
@@ -172,5 +173,6 @@ jobs:
                 echo "  :heavy_minus_sign: Skipping $M (no changes detected)."
               fi
             done
-
+            
             echo ">>> Deployment finished ($DEPLOYED_COUNT services deployed)."
+            EOF
