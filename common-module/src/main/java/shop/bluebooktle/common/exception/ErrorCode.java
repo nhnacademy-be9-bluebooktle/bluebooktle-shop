@@ -36,7 +36,8 @@ public enum ErrorCode {
 	AUTH_MEMBERSHIP_LEVEL_NOT_FOUND(HttpStatus.NOT_FOUND, "A015", "회원 등급 정보를 찾을 수 없습니다."),
 	AUTH_INVALID_USER_ID(HttpStatus.BAD_REQUEST, "A016", "유효하지 않은 계정 ID입니다."),
 	AUTH_TOKEN_REISSUE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "A017", "토큰 재발급에 실패했습니다. "),
-	AUTH_OAUTH_LOGIN_FAILED(HttpStatus.BAD_REQUEST, "A018", "OAUTH 로그인에 실패했습니다."),
+	USER_MEMBERSHIP_NOT_FOUNT(HttpStatus.BAD_REQUEST, "A018", "회원 등급을 찾을 수 없습니다. "),
+	AUTH_OAUTH_LOGIN_FAILED(HttpStatus.BAD_REQUEST, "A019", "OAUTH 로그인에 실패했습니다."),
 
 	// Book Errors (도서 관련 오류) - B
 	BOOK_NOT_FOUND(HttpStatus.NOT_FOUND, "B001", "도서를 찾을 수 없습니다."),

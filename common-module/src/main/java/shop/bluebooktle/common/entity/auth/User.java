@@ -115,6 +115,21 @@ public class User extends BaseEntity {
 		this.lastLoginAt = lastLoginAt;
 	}
 
+	public void updateAdminInfo(String name, String nickname, String email, String phoneNumber,
+		String birth, UserType type, UserStatus status,
+		MembershipLevel membershipLevel) {
+		this.name = name;
+		this.nickname = nickname;
+		this.email = email;
+		this.phoneNumber = phoneNumber;
+		this.birth = birth;
+		this.type = type;
+		this.status = status;
+		if (membershipLevel != null) {
+			this.membershipLevel = membershipLevel;
+		}
+	}
+
 	public void addAddress(Address address) {
 		this.addresses.add(address);
 		address.assignUser(this);
