@@ -17,20 +17,101 @@
                 align-items: center;
             }
 
+            .admin-form-group h4 {
+                margin-top: 15px;
+                margin-bottom: 10px;
+            }
+
+            .admin-form-group.has-error .selectable-item {
+                border-color: red;
+                background-color: #fff5f5;
+            }
+
             .selectable-item.selected {
                 background-color: #e6f7ff;
                 border-color: #1890ff;
             }
 
-            .admin-form-group h4 {
-                margin-top: 15px;
-                margin-bottom: 10px;
+            .popup-tree, .popup-tree ul {
+                list-style: none;
+                padding-left: 1rem;
             }
-            
-            .admin-form-group.has-error .selectable-item {
-                border-color: red;
-                background-color: #fff5f5;
+
+            .tab-container {
+                display: flex;
+                border-bottom: 2px solid #ddd;
+                margin-bottom: 15px;
             }
+
+            .tab-button {
+                background-color: #f2f2f2;
+                border: 1px solid #ccc;
+                border-bottom: none;
+                padding: 10px 20px;
+                cursor: pointer;
+                font-weight: normal;
+                color: #555;
+                border-radius: 6px 6px 0 0;
+                margin-right: 5px;
+                transition: all 0.2s ease-in-out;
+            }
+
+            .tab-button.active {
+                background-color: #ffffff;
+                font-weight: bold;
+                color: #000;
+                border-color: #ccc;
+                border-bottom: 2px solid #ffffff;
+            }
+
+            #categoryTree {
+                list-style: none;
+                padding-left: 10px;
+                border: 1px solid #ddd;
+                max-height: 300px;
+                overflow-y: auto;
+                background: #fcfcfc;
+                border-radius: 8px;
+                padding: 10px;
+            }
+
+            #categoryTree li {
+                margin: 4px 0;
+                position: relative;
+                padding-left: 20px;
+            }
+
+            #categoryTree li::before {
+                content: "";
+                position: absolute;
+                top: 10px;
+                left: 5px;
+                width: 10px;
+                height: 1px;
+                background: #ccc;
+            }
+
+            #categoryTree input[type="radio"] {
+                margin-right: 5px;
+            }
+
+            #categoryTree label {
+                display: inline-block;
+                padding: 4px 8px;
+                border-radius: 4px;
+                transition: background 0.2s;
+            }
+
+            #categoryTree label:hover {
+                background-color: #eef6ff;
+                cursor: pointer;
+            }
+
+            .hidden {
+                display: none;
+            }
+
+
         </style>
     </th:block>
 </head>
@@ -73,36 +154,61 @@
                                     onclick="selectCouponType(this)">선택하기
                             </button>
                         </div>
-                        <input type="hidden" th:field="*{couponTypeId}"/>
                         <div th:if="${#fields.hasErrors('couponTypeId')}" th:errors="*{couponTypeId}"
                              class="invalid-feedback admin-form-text"></div>
                     </div>
+                    <input type="hidden" th:field="*{couponTypeId}"/>
                 </fieldset>
+                <input type="hidden" id="couponTypeTargetHidden" name="couponTypeTarget" th:value="${couponTypeTarget}">
 
                 <!-- 도서 선택 -->
-                <div class="admin-form-group" id="bookSection" style="display: none;">
-                    <h4>도서 선택</h4>
-                    <div th:each="book : ${books}" class="selectable-item"
-                         th:classappend="${coupon.bookId == book.id} ? 'selected'">
-                        <span th:text="${book.name}">도서명</span>
-                        <button type="button" class="admin-btn admin-btn--sm admin-btn--info"
-                                th:attr="data-id=${book.id}" onclick="selectBook(this)">선택
+                <!-- BOOK 관련 선택 영역 -->
+                <div id="bookCategorySection" style="display: none;">
+                    <!-- 탭 메뉴 -->
+                    <div class="tab-container">
+                        <button type="button" class="tab-button active" id="bookTabBtn"
+                                onclick="switchBookCategoryTab('book')">
+                            도서 선택
+                        </button>
+                        <button type="button" class="tab-button" id="categoryTabBtn"
+                                onclick="switchBookCategoryTab('category')">
+                            카테고리 선택
                         </button>
                     </div>
-                    <input type="hidden" th:field="*{bookId}"/>
+
+                    <!-- 도서 리스트 -->
+                    <div id="bookListSection">
+                        <h4>도서 선택</h4>
+                        <div th:each="book : ${books}" class="selectable-item"
+                             th:classappend="${coupon.bookId == book.id} ? 'selected'">
+                            <span th:text="${book.title}">도서 제목</span>
+                            <button type="button" class="admin-btn admin-btn--sm admin-btn--info"
+                                    th:attr="data-id=${book.id}" onclick="selectBook(this)">선택
+                            </button>
+                        </div>
+                        <input type="hidden" th:field="*{bookId}"/>
+                        <!-- 도서 페이징 -->
+                        <div th:if="${totalPages > 1}" class="pagination-container">
+                            <th:block th:replace="~{_fragments/admin_pagination :: commonPagination(
+                            currentPage=${currentPageZeroBased + 1},
+                            totalPages=${totalPages},
+                            baseUrl=${baseUrlWithParams},
+                            searchKeyword=${searchKeyword})}"/>
+                        </div>
+                    </div>
+
+
+                    <!-- 카테고리 트리 -->
+                    <div id="categoryTreeSection" style="display: none;">
+                        <h4>카테고리 선택</h4>
+                        <ul id="categoryTree" class="popup-tree"></ul>
+                        <input type="hidden" th:field="*{categoryId}"/>
+                    </div>
                 </div>
 
-                <!-- 카테고리 선택 -->
-                <div class="admin-form-group" id="categorySection" style="display: none;">
-                    <h4>카테고리 선택</h4>
-                    <div th:each="category : ${categories}" class="selectable-item"
-                         th:classappend="${coupon.categoryId == category.id} ? 'selected'">
-                        <span th:text="${category.name}">카테고리명</span>
-                        <button type="button" class="admin-btn admin-btn--sm admin-btn--info"
-                                th:attr="data-id=${category.id}" onclick="selectCategory(this)">선택
-                        </button>
-                    </div>
-                    <input type="hidden" th:field="*{categoryId}"/>
+
+                <div id="categorySelectionDisplay"
+                     style="margin-top:10px; font-size:14px; color:#333;">
                 </div>
 
                 <!-- 저장 버튼 -->
@@ -119,46 +225,112 @@
 <th:block layout:fragment="page_scripts">
     <script th:inline="javascript">
         /*<![CDATA[*/
+        // 전역 데이터 (categoryTree, couponTypeTarget)
+        const categoryTree = /*[[${categoryTree}]]*/ [];
+        const couponTypeTarget = /*[[${couponTypeTarget != null} ? '"' + couponTypeTarget + '"' : 'null']]*/ null;
+
+
+        // 쿠폰 정책 선택
         function selectCouponType(button) {
             const selectedId = button.dataset.id;
             const target = button.dataset.target;
 
             document.querySelector("input[name='couponTypeId']").value = selectedId;
 
-            // UI 갱신
+            // 선택한 정책 target 값을 hidden input에 저장
+            document.querySelector("#couponTypeTargetHidden").value = target;
+
             document.querySelectorAll(".selectable-item").forEach(item => item.classList.remove("selected"));
             button.closest(".selectable-item").classList.add("selected");
 
-            // BOOK이면 도서/카테고리 보여주기
             if (target === 'BOOK') {
-                document.getElementById("bookSection").style.display = 'block';
-                document.getElementById("categorySection").style.display = 'block';
+                document.getElementById("bookCategorySection").style.display = 'block';
+                switchBookCategoryTab('book');
             } else {
-                document.getElementById("bookSection").style.display = 'none';
-                document.getElementById("categorySection").style.display = 'none';
+                document.getElementById("bookCategorySection").style.display = 'none';
                 document.querySelector("input[name='bookId']").value = '';
                 document.querySelector("input[name='categoryId']").value = '';
             }
         }
 
+        // BOOK/카테고리 탭 전환
+        function switchBookCategoryTab(tab) {
+            document.getElementById("bookListSection").style.display = tab === 'book' ? 'block' : 'none';
+            document.getElementById("categoryTreeSection").style.display = tab === 'category' ? 'block' : 'none';
+
+            document.getElementById("bookTabBtn").classList.toggle("active", tab === 'book');
+            document.getElementById("categoryTabBtn").classList.toggle("active", tab === 'category');
+        }
+
+        // 도서 선택
         function selectBook(button) {
             const id = button.dataset.id;
             document.querySelector("input[name='bookId']").value = id;
 
-            document.querySelectorAll("#bookSection .selectable-item").forEach(item => item.classList.remove("selected"));
+            document.querySelectorAll("#bookListSection .selectable-item").forEach(item => item.classList.remove("selected"));
             button.closest(".selectable-item").classList.add("selected");
         }
 
-        function selectCategory(button) {
-            const id = button.dataset.id;
-            document.querySelector("input[name='categoryId']").value = id;
+        // 카테고리 트리 렌더링
+        function renderCategoryTree(nodes, container) {
+            container.innerHTML = '';
+            nodes.forEach(node => {
+                const li = document.createElement('li');
 
-            document.querySelectorAll("#categorySection .selectable-item").forEach(item => item.classList.remove("selected"));
-            button.closest(".selectable-item").classList.add("selected");
+                const wrapper = document.createElement('div');
+                wrapper.style.display = 'flex';
+                wrapper.style.alignItems = 'center';
+                wrapper.style.gap = '4px';
+
+                const iconSpan = document.createElement('span');
+                iconSpan.style.cursor = 'pointer';
+                iconSpan.textContent = node.children && node.children.length > 0 ? '📂' : '📄';
+
+                const label = document.createElement('label');
+                label.style.cursor = 'pointer';
+                const cb = document.createElement('input');
+                cb.type = 'radio';
+                cb.name = 'categoryId';
+                cb.value = node.id;
+                cb.style.marginRight = '6px';
+                label.appendChild(cb);
+                label.append(` ${node.name}`);
+
+                wrapper.appendChild(iconSpan);
+                wrapper.appendChild(label);
+                li.appendChild(wrapper);
+
+                if (node.children && node.children.length > 0) {
+                    const childUl = document.createElement('ul');
+                    renderCategoryTree(node.children, childUl);
+                    childUl.classList.add('hidden');
+                    li.appendChild(childUl);
+
+                    iconSpan.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        childUl.classList.toggle('hidden');
+                        iconSpan.textContent = childUl.classList.contains('hidden') ? '📂' : '📁';
+                    });
+                }
+
+                container.appendChild(li);
+            });
         }
 
+        // 초기 렌더링
+        document.addEventListener('DOMContentLoaded', () => {
+            renderCategoryTree(categoryTree, document.getElementById("categoryTree"));
+
+            // 페이지 로딩 시 쿠폰 정책 target이 BOOK이면 보여줌
+            if (couponTypeTarget === 'BOOK') {
+                document.getElementById("bookCategorySection").style.display = 'block';
+                switchBookCategoryTab('book');
+            }
+        });
         /*]]>*/
     </script>
 </th:block>
+
+
 </body>
 </html>

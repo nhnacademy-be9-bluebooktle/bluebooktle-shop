@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,6 +25,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import shop.bluebooktle.common.dto.book.response.BookAllResponse;
+import shop.bluebooktle.common.dto.book.response.CategoryTreeResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
 import shop.bluebooktle.common.dto.coupon.request.CouponRegisterRequest;
 import shop.bluebooktle.common.dto.coupon.request.CouponTypeRegisterRequest;
@@ -31,6 +34,8 @@ import shop.bluebooktle.common.dto.coupon.request.UserCouponRegisterRequest;
 import shop.bluebooktle.common.dto.coupon.response.CouponResponse;
 import shop.bluebooktle.common.dto.coupon.response.CouponTypeResponse;
 import shop.bluebooktle.common.exception.ApplicationException;
+import shop.bluebooktle.frontend.service.AdminBookService;
+import shop.bluebooktle.frontend.service.AdminCategoryService;
 import shop.bluebooktle.frontend.service.AdminCouponService;
 
 @Slf4j
@@ -40,6 +45,8 @@ import shop.bluebooktle.frontend.service.AdminCouponService;
 public class AdminCouponController {
 
 	private final AdminCouponService adminCouponService;
+	private final AdminCategoryService adminCategoryService;
+	private final AdminBookService adminBookService;
 
 	@GetMapping("/type/new")
 	public String showCouponTypeForm(Model model, HttpServletRequest request) {
@@ -73,16 +80,47 @@ public class AdminCouponController {
 		return "redirect:/admin/coupons";
 	}
 
+	// 쿠폰 등록 페이지
 	@GetMapping("/new")
-	public String showCouponForm(Model model, HttpServletRequest request) {
+	public String showCouponForm(Model model, HttpServletRequest request,
+		@RequestParam(value = "page", defaultValue = "0") int page,
+		@RequestParam(value = "size", defaultValue = "10") int size,
+		@RequestParam(value = "searchKeyword", required = false) String searchKeyword
+	) {
 		model.addAttribute("currentURI", request.getRequestURI());
 
 		if (!model.containsAttribute("coupon")) {
 			model.addAttribute("coupon", new CouponRegisterRequest());
 		}
 
+		// 쿠폰 정책 정보
 		PaginationData<CouponTypeResponse> couponTypeData = adminCouponService.getAllCouponType();
 		model.addAttribute("couponTypes", couponTypeData.getContent());
+
+		// 도서 정보
+		Page<BookAllResponse> books = adminBookService.getPagedBooks(page, size, null); // TODO 검색 구현
+		model.addAttribute("books", books.getContent());
+		model.addAttribute("currentPageZeroBased", books.getNumber());
+		model.addAttribute("totalPages", books.getTotalPages());
+		model.addAttribute("totalElements", books.getTotalElements());
+		model.addAttribute("currentSize", books.getSize());
+
+		UriComponentsBuilder uriBuilder = UriComponentsBuilder
+			.fromPath(request.getRequestURI())
+			.queryParam("size", size);
+
+		if (StringUtils.hasText(searchKeyword)) {
+			uriBuilder.queryParam("searchKeyword", searchKeyword);
+		}
+
+		model.addAttribute("baseUrlWithParams", uriBuilder.toUriString());
+		model.addAttribute("searchKeyword", searchKeyword);
+
+		//카테고리 정보
+		List<CategoryTreeResponse> categoryTree = adminCategoryService.getCategoryTree();
+		model.addAttribute("categoryTree", categoryTree);
+		log.info("카테고리 size : {}", categoryTree.size()); //TODO [쿠폰] 로그 제거
+
 		return "admin/coupon/coupon_form";
 	}
 
