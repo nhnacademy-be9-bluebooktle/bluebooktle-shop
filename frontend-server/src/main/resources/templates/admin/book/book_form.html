@@ -420,7 +420,7 @@
         }
 
         function loadPublishers(page, size, keyword) {
-            fetch(`/admin/publishers/search?page=${page}&size=${size}&searchKeyword=${encodeURIComponent(keyword)}`, {
+            fetch(`/admin/chulpansa/search?page=${page}&size=${size}&searchKeyword=${encodeURIComponent(keyword)}`, {
                 headers: {'Accept': 'application/json'}
             })
                 .then(res => res.json())

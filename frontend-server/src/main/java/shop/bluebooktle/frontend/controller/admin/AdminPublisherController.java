@@ -104,9 +104,9 @@ public class AdminPublisherController {
 			redirectAttributes.addFlashAttribute("publisher", publisher);
 			redirectAttributes.addFlashAttribute("globalErrorMessage", "입력값을 확인해주세요.");
 			if (publisher.getId() != null) {
-				return "redirect:/admin/publishers/" + publisher.getId() + "/edit";
+				return "redirect:/admin/chulpansa/" + publisher.getId() + "/edit";
 			} else {
-				return "redirect:/admin/publishers/new";
+				return "redirect:/admin/chulpansa/new";
 			}
 		}
 
@@ -127,12 +127,12 @@ public class AdminPublisherController {
 			redirectAttributes.addFlashAttribute("globalErrorMessage", "출판사 저장 중 오류가 발생했습니다: " + e.getMessage());
 			redirectAttributes.addFlashAttribute("publisher", publisher);
 			if (publisher.getId() != null) {
-				return "redirect:/admin/publishers/" + publisher.getId() + "/edit";
+				return "redirect:/admin/chulpansa/" + publisher.getId() + "/edit";
 			} else {
-				return "redirect:/admin/publishers/new";
+				return "redirect:/admin/chulpansa/new";
 			}
 		}
-		return "redirect:/admin/publishers";
+		return "redirect:/admin/chulpansa";
 	}
 
 	@PostMapping("/{publisherId}/delete") // 비활성화
@@ -147,6 +147,6 @@ public class AdminPublisherController {
 			log.error("출판사 비활성화 중 오류 발생", e);
 			redirectAttributes.addFlashAttribute("globalErrorMessage", "출판사 비활성화 중 오류가 발생했습니다: " + e.getMessage());
 		}
-		return "redirect:/admin/publishers";
+		return "redirect:/admin/chulpansa";
 	}
 }
