@@ -382,8 +382,16 @@
             );
             const js = await res.json();
             const results = Array.isArray(js) ? js : (js.data || []);
+            // 결과가 한 건도 없으면
+            if (results.length === 0) {
+                alert('✅ 더 이상 검색 결과가 없습니다.');
+                // 이전 페이지로 되돌리기
+                renderPaginationControls(page - 1, true);
+                return;
+            }
+
             displayAladinSearchResults(results);
-            renderPaginationControls(results.length === pageSize);
+            renderPaginationControls(page, results.length === pageSize);
         }
 
         // 2) 기존에 쓰던 뿌려주기
@@ -412,16 +420,24 @@
         }
 
 
-        function renderPaginationControls(query, page, currentCount) {
+        function renderPaginationControls(page, hasNext) {
             const container = document.getElementById('paginationControls');
-            const disableNext = currentCount < pageSize;
+            const maxPage = 3;
+            const totalPages = hasNext ? maxPage : page;
+
+            const disablePrev = page <= 1;
+            const disableNext = page >= totalPages;
 
             container.innerHTML = `
-    <button type="button" ${page <= 1 ? 'disabled' : ''}
-      onclick="searchAladinBooks(${page - 1})">« 이전</button>
-    <span style="margin:0 1rem;">페이지 ${page}</span>
+    <button type="button" ${disablePrev ? 'disabled' : ''}
+        onclick="searchAladinBooks(${page - 1})">
+      « 이전
+    </button>
+    <span style="margin:0 1rem;">페이지 ${page} / ${totalPages}</span>
     <button type="button" ${disableNext ? 'disabled' : ''}
-      onclick="searchAladinBooks(${page + 1})">다음 »</button>
+        onclick="searchAladinBooks(${page + 1})">
+      다음 »
+    </button>
   `;
         }
 
