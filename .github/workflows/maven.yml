@@ -52,25 +52,28 @@ jobs:
       - name: Generate changed-services list
         id: list
         run: |
+          modules=()
+          [[ "${{ steps.filter.outputs.eureka-server }}"   == "true" ]] && modules+=("eureka-server")
+          [[ "${{ steps.filter.outputs.gateway-server }}"  == "true" ]] && modules+=("gateway-server")
+          [[ "${{ steps.filter.outputs.backend-server }}"  == "true" ]] && modules+=("backend-server")
+          [[ "${{ steps.filter.outputs.frontend-server }}" == "true" ]] && modules+=("frontend-server")
+          [[ "${{ steps.filter.outputs.auth-server }}"     == "true" ]] && modules+=("auth-server")
+
           if [[ "${{ steps.filter.outputs.common-module }}" == "true" ]]; then
-            modules=(eureka-server gateway-server backend-server frontend-server auth-server)
-          else
-            modules=()
-            [[ "${{ steps.filter.outputs.eureka-server }}"   == "true" ]] && modules+=("eureka-server")
-            [[ "${{ steps.filter.outputs.gateway-server }}"  == "true" ]] && modules+=("gateway-server")
-            [[ "${{ steps.filter.outputs.backend-server }}"  == "true" ]] && modules+=("backend-server")
-            [[ "${{ steps.filter.outputs.frontend-server }}" == "true" ]] && modules+=("frontend-server")
-            [[ "${{ steps.filter.outputs.auth-server }}"     == "true" ]] && modules+=("auth-server")
+            modules+=("backend-server")
+            modules+=("frontend-server")
+            modules+=("auth-server")
           fi
-          echo "changed=${modules[*]}" >> $GITHUB_OUTPUT
+
+          unique_modules=$(echo "${modules[@]}" | tr ' ' '\n' | sort -u | tr '\n' ' ')
+          echo "changed=${unique_modules% }" >> $GITHUB_OUTPUT
 
   build:
     needs: detect_changes
     if: >
       needs.detect_changes.outputs.changed != '' &&
       (
-        (github.event_name == 'push' &&
-         (github.ref_name == 'develop' || github.ref_name == 'master'))
+        (github.event_name == 'push')
         ||
         (github.event_name == 'pull_request' &&
          github.event.pull_request.base.ref == 'develop' &&
@@ -115,8 +118,7 @@ jobs:
     if: >
       needs.detect_changes.outputs.changed != '' &&
       (
-        (github.event_name == 'push' &&
-         (github.ref_name == 'develop' || github.ref_name == 'master'))
+        (github.event_name == 'push')
         ||
         (github.event_name == 'pull_request' &&
          github.event.pull_request.base.ref == 'develop' &&

@@ -25,7 +25,7 @@ import shop.bluebooktle.frontend.service.AdminPublisherService;
 
 @Slf4j
 @Controller
-@RequestMapping("/admin/publishers")
+@RequestMapping("/admin/test-path")
 @RequiredArgsConstructor
 public class AdminPublisherController {
 	private final AdminPublisherService adminPublisherService;
