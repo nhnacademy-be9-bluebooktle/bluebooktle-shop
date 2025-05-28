@@ -1,4 +1,4 @@
-@baseUrl = http://localhost:9002/api/publishers
+@baseUrl = http://localhost:9012/api/publishers
 
 ### 출판사 등록 성공 - 1
 POST {{baseUrl}}
