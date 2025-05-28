@@ -21,10 +21,12 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.common.domain.CouponTypeTarget;
 import shop.bluebooktle.common.dto.book.BookSaleInfoState;
+import shop.bluebooktle.common.dto.book.response.BookCartOrderResponse;
 import shop.bluebooktle.common.dto.book_order.response.PackagingOptionInfoResponse;
 import shop.bluebooktle.common.dto.coupon.response.CouponResponse;
 import shop.bluebooktle.common.dto.payment.request.PaymentConfirmRequest;
 import shop.bluebooktle.common.dto.payment.response.PaymentConfirmResponse;
+import shop.bluebooktle.common.dto.user.response.UserResponse;
 import shop.bluebooktle.frontend.service.AdminPackagingOptionService;
 import shop.bluebooktle.frontend.service.PaymentsService;
 import shop.bluebooktle.frontend.service.UserService;
@@ -41,39 +43,18 @@ public class OrderController {
 	@Value("${toss.client-key}")
 	private String clientKey;
 
+	private final String SUCCESS_URL = "/order/success";
+	private final String FAILURE_URL = "/order/fail";
+
 	@GetMapping("/checkout")
 	public ModelAndView checkoutPage() {
 		ModelAndView mav = new ModelAndView("order/checkout");
+		UserResponse userResponse = userService.getMe();
 
-		// 1) 가짜 주문 항목 (BookCartOrderResponse) 들
-		List<BookCartOrderResponse> cartItems = List.of(
-			BookCartOrderResponse.builder()
-				.id(101L)
-				.title("코딩 대모험")
-				.price(new BigDecimal("28000"))
-				.salePrice(new BigDecimal("25200"))
-				.stock(10)
-				.salePercentage(new BigDecimal("10"))
-				.thumbnailUrl("https://picsum.photos/70/105?random=101")
-				.categories(List.of("판타지", "어드벤처"))
-				.bookSaleInfoState(BookSaleInfoState.AVAILABLE)
-				.build()
-				.withQuantity(1),    // withQuantity() 는 아래 유틸 메서드 참고
-			BookCartOrderResponse.builder()
-				.id(102L)
-				.title("픽셀 아트로 배우는 알고리즘")
-				.price(new BigDecimal("35000"))
-				.salePrice(new BigDecimal("31500"))
-				.stock(5)
-				.salePercentage(new BigDecimal("10"))
-				.thumbnailUrl("https://picsum.photos/70/105?random=102")
-				.categories(List.of("교육", "IT"))
-				.bookSaleInfoState(BookSaleInfoState.AVAILABLE)
-				.build()
-				.withQuantity(2)
-		);
-		mav.addObject("cartItems", cartItems);
-		
+		List<BookCartOrderResponse> bookItems = createMockBookItems();
+
+		mav.addObject("bookItems", bookItems);
+
 		Page<PackagingOptionInfoResponse> page = adminPackagingOptionService.getPackagingOptions(0, 20, null);
 		List<PackagingOptionInfoResponse> packagingOptions = page.getContent();
 		mav.addObject("packagingOptions", packagingOptions);
@@ -85,7 +66,7 @@ public class OrderController {
 		List<CouponResponse> orderCoupons = createMockOrderCoupons();
 		mav.addObject("orderCoupons", orderCoupons);
 
-		mav.addObject("availablePoints", 3500);
+		mav.addObject("availablePoints", userResponse.getPointBalance());
 
 		mav.addObject("checkoutRequest", new CheckoutRequest());
 
@@ -93,10 +74,10 @@ public class OrderController {
 		mav.addObject("clientKey", clientKey);
 		mav.addObject("orderId", UUID.randomUUID().toString());
 		mav.addObject("orderName", "테스트 주문");
-		mav.addObject("successUrl", "/order/complete");
-		mav.addObject("failUrl", "/order/fail");
-		mav.addObject("customerEmail", "test@fake.com");
-		mav.addObject("customerName", "테스트유저");
+		mav.addObject("successUrl", SUCCESS_URL);
+		mav.addObject("failUrl", FAILURE_URL);
+		mav.addObject("customerEmail", userResponse.getEmail());
+		mav.addObject("customerName", userResponse.getName());
 		mav.addObject("amount", 0); // JS에서 계산 후 동적으로 세팅
 
 		return mav;
@@ -109,6 +90,7 @@ public class OrderController {
 		@RequestParam Integer amount,
 		RedirectAttributes redirectAttributes
 	) {
+
 		PaymentConfirmRequest req = new PaymentConfirmRequest(paymentKey, orderId, amount);
 		PaymentConfirmResponse resp = paymentsService.confirm(req);
 		redirectAttributes.addFlashAttribute("orderData", resp);
@@ -121,7 +103,7 @@ public class OrderController {
 		if (bindingResult.hasErrors()) {
 			return "order/fail";
 		}
-
+		// 여기서 주문, 도서 주문 테이블 생성
 		return "order/complete";
 	}
 
@@ -129,6 +111,35 @@ public class OrderController {
 	public String orderFailPage() {
 
 		return "order/fail";
+	}
+
+	private List<BookCartOrderResponse> createMockBookItems() {
+		return List.of(
+			new BookCartOrderResponse(
+				101L,
+				"코딩 대모험",
+				new BigDecimal("28000"),
+				new BigDecimal("25200"),
+				10,
+				new BigDecimal("10"),
+				"https://picsum.photos/70/105?random=101",
+				List.of("판타지", "어드벤처"),
+				BookSaleInfoState.AVAILABLE,
+				1
+			),
+			new BookCartOrderResponse(
+				102L,
+				"픽셀 아트로 배우는 알고리즘",
+				new BigDecimal("35000"),
+				new BigDecimal("31500"),
+				5,
+				new BigDecimal("10"),
+				"https://picsum.photos/70/105?random=102",
+				List.of("교육", "IT"),
+				BookSaleInfoState.AVAILABLE,
+				2
+			)
+		);
 	}
 
 	private Map<Long, List<CouponResponse>> createMockItemCoupons() {
