@@ -18,9 +18,9 @@ import shop.bluebooktle.frontend.config.feign.FeignGlobalConfig;
 import shop.bluebooktle.frontend.config.retry.RetryWithTokenRefresh;
 
 @FeignClient(
-	name = "backend-server",
+	url = "${server.gateway-url}",
 	path = "/api/cart",
-	contextId = "cartRepository",
+	name = "cartRepository",
 	configuration = FeignGlobalConfig.class
 )
 public interface CartRepository {

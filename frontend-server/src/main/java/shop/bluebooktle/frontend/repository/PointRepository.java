@@ -20,8 +20,8 @@ import shop.bluebooktle.common.dto.point.response.PointSourceTypeResponse;
 import shop.bluebooktle.frontend.config.feign.FeignGlobalConfig;
 
 @FeignClient(
-	name = "backend-server",
-	contextId = "pointRepository",
+	url = "${server.gateway-url}",
+	name = "pointRepository",
 	path = "/api/points",
 	configuration = FeignGlobalConfig.class
 )
