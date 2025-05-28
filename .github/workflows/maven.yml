@@ -10,6 +10,7 @@ on:
       - 'common-module/**'
       - 'auth-server/**'
   pull_request:
+    types: [ opened, synchronize, reopened, closed ]
     paths:
       - 'backend-server/**'
       - 'frontend-server/**'
@@ -72,17 +73,8 @@ jobs:
     if: >
       needs.detect_changes.outputs.changed != '' &&
       (
-        (github.event_name == 'push')
-        ||
-        (github.event_name == 'pull_request' &&
-         github.event.pull_request.base.ref == 'develop' &&
-         github.event.action == 'closed' &&
-         github.event.pull_request.merged == true)
-        ||
-        (github.event_name == 'pull_request' &&
-         github.event.pull_request.base.ref == 'master' &&
-         github.event.action == 'closed' &&
-         github.event.pull_request.merged == true)
+        github.event_name == 'push' ||
+        (github.event_name == 'pull_request' && (github.event.action != 'closed' || github.event.pull_request.merged == true))
       )
     runs-on: ubuntu-latest
     environment: ${{ github.ref_name == 'master' && 'prod' || 'dev' }}
@@ -117,17 +109,8 @@ jobs:
     if: >
       needs.detect_changes.outputs.changed != '' &&
       (
-        (github.event_name == 'push')
-        ||
-        (github.event_name == 'pull_request' &&
-         github.event.pull_request.base.ref == 'develop' &&
-         github.event.action == 'closed' &&
-         github.event.pull_request.merged == true)
-        ||
-        (github.event_name == 'pull_request' &&
-         github.event.pull_request.base.ref == 'master' &&
-         github.event.action == 'closed' &&
-         github.event.pull_request.merged == true)
+        github.event_name == 'push' ||
+        (github.event_name == 'pull_request' && (github.event.action != 'closed' || github.event.pull_request.merged == true))
       )
     runs-on: ubuntu-latest
     environment: ${{ github.ref_name == 'master' && 'prod' || 'dev' }}
