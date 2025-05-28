@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import shop.bluebooktle.frontend.config.feign.FeignGlobalConfig;
 
-@FeignClient(name = "backend-server", contextId = "adminImgRepository", path = "/api/imgs", configuration = FeignGlobalConfig.class)
+@FeignClient(url = "${server.gateway-url}", name = "adminImgRepository", path = "/api/imgs", configuration = FeignGlobalConfig.class)
 public interface AdminImgRepository {
 	@GetMapping("/presignedUploadUrl")
 	String getPresignedUploadUrl(@RequestParam("fileName") String fileName);

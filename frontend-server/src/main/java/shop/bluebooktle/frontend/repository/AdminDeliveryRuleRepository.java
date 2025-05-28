@@ -16,9 +16,9 @@ import shop.bluebooktle.common.dto.order.response.DeliveryRuleResponse;
 import shop.bluebooktle.frontend.config.feign.FeignGlobalConfig;
 
 @FeignClient(
-	name = "backend-server",
+	url = "${server.gateway-url}",
 	path = "/api/admin/delivery-rules",
-	contextId = "adminDeliveryRuleRepository",
+	name = "adminDeliveryRuleRepository",
 	configuration = FeignGlobalConfig.class
 )
 public interface AdminDeliveryRuleRepository {

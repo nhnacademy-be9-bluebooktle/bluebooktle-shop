@@ -20,9 +20,9 @@ import shop.bluebooktle.common.dto.cart.response.CartItemResponse;
 import shop.bluebooktle.frontend.config.feign.FeignGlobalConfig;
 
 @FeignClient(
-	name = "backend-server",
+	url = "${server.gateway-url}",
 	path = "/api/cart",
-	contextId = "cartRepository",
+	name = "cartRepository",
 	configuration = FeignGlobalConfig.class
 )
 public interface CartRepository {
