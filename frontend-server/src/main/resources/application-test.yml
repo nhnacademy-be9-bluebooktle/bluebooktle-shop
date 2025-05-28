@@ -1,6 +1,6 @@
 server:
   port: 9080
-
+  gateway-url: localhost:9000
 spring:
   # H2 DB 설정
   datasource:
