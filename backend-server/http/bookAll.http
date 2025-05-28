@@ -2,7 +2,7 @@
 #도서관련 모든정보 (작가,출판사,태그,이미지,카테고리) 한번에 등록 아직 수정필요!!
 
 ### 도서 직접 등록
-POST http://localhost:9002/api/books/all
+POST http://localhost:9012/api/books/all
 Content-Type: application/json
 
 {
@@ -33,97 +33,23 @@ Content-Type: application/json
   "state": "AVAILABLE"
 }
 
-### 도서 직접 등록 실패 - 중복isbn
-POST http://localhost:9002/api/books/all
-Content-Type: application/json
-
-{
-  "title": "제목",
-  "author": [
-    "작가"
-  ],
-  "publisher": "출판사",
-  "tag": [
-    "태그"
-  ],
-  "imageUrl": [
-    "https://image.aladin.co.kr/product/35650/80/coversum/k762036819_1.jpg"
-  ],
-  "category": [
-    "카테고리"
-  ],
-  "isbn": "1234567890123",
-  "description": "테스트 설명",
-  "publishDate": "2025-05-12",
-  "price": 20000,
-  "salePrice": 18000,
-  "stock": 99,
-  "isPackable": true,
-  "state": "AVAILABLE"
-}
-
-### 도서 직접 등록 실패 - 필수필드 title 누락
-POST http://localhost:9002/api/books/all
-Content-Type: application/json
-
-{
-  "author": [
-    "작가"
-  ],
-  "publisher": "출판사",
-  "tag": [
-    "태그"
-  ],
-  "imageUrl": [
-    "https://image.aladin.co.kr/product/35650/80/coversum/k762036819_1.jpg"
-  ],
-  "category": [
-    "카테고리"
-  ],
-  "isbn": "1234567890123",
-  "description": "테스트 설명",
-  "publishDate": "2025-05-12",
-  "price": 20000,
-  "salePrice": 18000,
-  "stock": 99,
-  "isPackable": true,
-  "state": "AVAILABLE"
-}
-
-### 도서 직접 등록 실패 - isbn글자수 잘못된 형식
-POST http://localhost:9002/api/books/all
-Content-Type: application/json
-
-{
-  "title": "제목",
-  "author": [
-    "작가"
-  ],
-  "publisher": "출판사",
-  "tag": [
-    "태그"
-  ],
-  "imageUrl": [
-    "https://image.aladin.co.kr/product/35650/80/coversum/k762036819_1.jpg"
-  ],
-  "category": [
-    "카테고리"
-  ],
-  "isbn": "1234567890123456",
-  "description": "테스트 설명",
-  "publishDate": "2025-05-12",
-  "price": 20000,
-  "salePrice": 18000,
-  "stock": 99,
-  "isPackable": true,
-  "state": "AVAILABLE"
-}
-
 ### 도서 조회 - book id로
-GET http://localhost:9002/api/books/all/1
+GET http://localhost:9012/api/books/all/1
 Content-Type: application/json
 
 ### 모든 도서 조회 - 제목으로
-GET http://localhost:9002/api/books/all/by-title?title=자바
+GET http://localhost:9012/api/books/all/by-title?title=제목
 Content-Type: application/json
+
+#### 메인페이지에 표시될 정보(id, title, author, price, salePrice, imgUrl) 조회
+#GET http://localhost:9012/api/books/main/1
+#Content-Type: application/json
+#
+#### 제목으로 검색하여 표시될 정보(id, title, author, price, salePrice, imgUrl) 조회
+#GET http://localhost:9012/api/books/search?title=제목
+#Content-Type: application/json
+
+### minio Presigned URL 발급 요청
+GET http://localhost:9012/api/books/image/upload-url?fileName=cover.jpg
+Accept: application/json
 

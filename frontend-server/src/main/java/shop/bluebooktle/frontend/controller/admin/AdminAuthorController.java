@@ -1,6 +1,7 @@
 package shop.bluebooktle.frontend.controller.admin;
 
 import org.springframework.data.domain.Page;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -68,6 +70,17 @@ public class AdminAuthorController {
 		model.addAttribute("searchKeyword", searchKeyword);
 
 		return "admin/author/author_list";
+	}
+
+	/** AJAX/팝업용 — JSON 페이징 결과 반환 */
+	@GetMapping(path = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public Page<AuthorResponse> listAuthorsJson(
+		@RequestParam(defaultValue = "0") int page,
+		@RequestParam(defaultValue = "10") int size,
+		@RequestParam(required = false) String searchKeyword
+	) {
+		return adminAuthorService.getAuthors(page, size, searchKeyword);
 	}
 
 	// authorForm, saveAuthor, deleteAuthor 메소드는 기존 내용 유지 (필요시 DTO 필드 등 확인)
