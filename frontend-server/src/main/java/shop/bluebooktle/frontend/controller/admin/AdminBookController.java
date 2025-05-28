@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -25,6 +26,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import shop.bluebooktle.common.dto.book.BookSaleInfoState;
 import shop.bluebooktle.common.dto.book.request.BookAllRegisterRequest;
+import shop.bluebooktle.common.dto.book.response.AladinBookResponse;
 import shop.bluebooktle.common.dto.book.response.BookAllResponse;
 import shop.bluebooktle.common.dto.book.response.CategoryTreeResponse;
 import shop.bluebooktle.common.dto.book.response.PublisherInfoResponse;
@@ -263,4 +265,15 @@ public class AdminBookController {
 		redirectAttributes.addFlashAttribute("globalSuccessMessage", "도서(ID:" + bookId + ")가 비활성화되었습니다.");
 		return "redirect:/admin/books";
 	}
+
+	@GetMapping("/aladin-search")
+	@ResponseBody
+	public List<AladinBookResponse> aladinSearch(
+		@RequestParam("keyword") String keyword,
+		@RequestParam(value = "page", defaultValue = "1") int page,
+		@RequestParam(value = "size", defaultValue = "10") int size
+	) {
+		return adminBookService.searchAladin(keyword, page, size);
+	}
+
 }

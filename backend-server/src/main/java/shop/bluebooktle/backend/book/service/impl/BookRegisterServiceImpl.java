@@ -121,7 +121,7 @@ public class BookRegisterServiceImpl implements BookRegisterService {
 		bookPublisherService.registerBookPublisher(book.getId(), publisher.getId());
 
 		// TODO 이미지 파일 이미지 서버(MINIO)에 저장 로직 구현
-		bookImgService.registerBookImg(book.getId(), aladinBook.getImageUrl());
+		bookImgService.registerBookImg(book.getId(), aladinBook.getImgUrl());
 
 		for (Long categoryId : request.getCategoryIdList()) {
 			bookCategoryService.registerBookCategory(book.getId(), categoryId);

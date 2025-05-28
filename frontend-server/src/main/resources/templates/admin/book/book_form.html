@@ -119,13 +119,12 @@
                 <div class="admin-panel">
                     <div class="admin-panel__body">
 
-                        <!-- 알라딘 검색 결과 표시 (추후 데이터 연동될 부분) -->
-                        <div id="aladinSearchResults" style="margin-bottom: 20px; display: none;">
+                        <!-- 알라딘 검색 결과 표시-->
+                        <div id="aladinSearchResults" style="margin-bottom:20px; display:none;">
                             <h4>검색 결과</h4>
-                            <ul id="aladinResultsList" style="list-style: none; padding: 0;">
-
-                            </ul>
+                            <ul id="aladinResultsList" style="list-style:none; padding:0;"></ul>
                         </div>
+                        <div id="paginationControls" style="margin-top:10px;"></div>
                     </div>
                 </div>
 
@@ -346,19 +345,30 @@
 <th:block layout:fragment="page_scripts">
     <script th:inline="javascript">
         // 알라딘 도서 검색
-        function searchAladinBooks() {
+        let currentPage = 1;
+        const pageSize = 10;
+
+        // 1) 실제 화면에 결과를 뿌리고 버튼만 렌더링
+        async function searchAladinBooks(page = 1) {
             const query = document.getElementById('aladinSearchInput').value.trim();
             if (!query) {
                 alert('검색어를 입력해주세요.');
                 return;
             }
-            console.log(`알라딘 검색 실행: ${query}`);
-            displayAladinSearchResults([
-                {id: 1, title: '스프링 입문을 위한 자바', author: '김영한', publisher: '인프런', isbn: '9791162243150'},
-                {id: 2, title: '모던 자바스크립트', author: '이웅모', publisher: '위키북스', isbn: '9791162241469'},
-            ]);
+            currentPage = page;
+
+            const res = await fetch(
+                `/admin/books/aladin-search?keyword=${encodeURIComponent(query)}`
+                + `&page=${page}&size=${pageSize}`,
+                {headers: {'Accept': 'application/json'}}
+            );
+            const js = await res.json();
+            const results = Array.isArray(js) ? js : (js.data || []);
+            displayAladinSearchResults(results);
+            renderPaginationControls(results.length === pageSize);
         }
 
+        // 2) 기존에 쓰던 뿌려주기
         function displayAladinSearchResults(results) {
             const resultsContainer = document.getElementById('aladinSearchResults');
             const resultsList = document.getElementById('aladinResultsList');
@@ -370,18 +380,38 @@
                     const li = document.createElement('li');
                     li.style.marginBottom = '10px';
                     li.innerHTML = `
-                        <strong>${book.title}</strong><br>
-                        저자: ${book.author}, 출판사: ${book.publisher}, ISBN: ${book.isbn}<br>
-                        <button type="button" class="admin-btn admin-btn--default"
-                                style="margin-top:5px;"
-                                onclick="selectAladinBook(${book.id})">
-                            선택
-                        </button>`;
+          <strong>${book.title}</strong><br>
+          저자: ${book.author}, 출판사: ${book.publisher}, ISBN: ${book.isbn}<br>
+          <button type="button" class="admin-btn admin-btn--default"
+                  style="margin-top:5px;"
+                  onclick="selectAladinBook(${book.id})">
+            선택
+          </button>`;
                     resultsList.appendChild(li);
                 });
             }
             resultsContainer.style.display = 'block';
         }
+
+
+        function renderPaginationControls(query, page, currentCount) {
+            const container = document.getElementById('paginationControls');
+            const disableNext = currentCount < pageSize;
+
+            container.innerHTML = `
+    <button type="button" ${page <= 1 ? 'disabled' : ''}
+      onclick="searchAladinBooks(${page - 1})">« 이전</button>
+    <span style="margin:0 1rem;">페이지 ${page}</span>
+    <button type="button" ${disableNext ? 'disabled' : ''}
+      onclick="searchAladinBooks(${page + 1})">다음 »</button>
+  `;
+        }
+
+
+        // 페이지 로드시 검색 버튼에 바인딩
+        document.querySelector('.admin-btn--primary').addEventListener('click', () => {
+            searchAladinBooks(1);
+        });
 
         // 페이지가 로드된 직후, 만약 pubPage 쿼리 파라미터가 있으면 팝업을 열어두자
         document.addEventListener('DOMContentLoaded', () => {

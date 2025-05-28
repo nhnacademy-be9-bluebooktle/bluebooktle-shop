@@ -22,17 +22,20 @@ import shop.bluebooktle.common.exception.book.AladinBookNotFoundException;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/aladin/books") //수정필요
+@RequestMapping("/api/aladin/books") //수정필요
 public class AladinBookController {
 
 	private final AladinBookService aladinBookService;
 	private final BookRegisterService bookRegisterService;
 
 	// 알라딘 API 도서 검색
-	// TODO Pagenation 구현
-	@GetMapping
-	public ResponseEntity<JsendResponse<List<AladinBookResponse>>> searchBooks(@RequestParam String query) {
-		List<AladinBookResponse> result = aladinBookService.searchBooks(query);
+	@GetMapping("/aladin-search")
+	public ResponseEntity<JsendResponse<List<AladinBookResponse>>> searchBooks(
+		@RequestParam("keyword") String keyword,
+		@RequestParam(value = "page", defaultValue = "1") int page,
+		@RequestParam(value = "size", defaultValue = "10") int size
+	) {
+		List<AladinBookResponse> result = aladinBookService.searchBooks(keyword, page, size);
 		return ResponseEntity.ok(JsendResponse.success(result));
 	}
 

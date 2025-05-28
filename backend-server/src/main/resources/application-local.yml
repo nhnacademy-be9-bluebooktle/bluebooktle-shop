@@ -43,11 +43,19 @@ eureka:
     service-url:
       defaultZone: "http://${EUREKA_ID}:${EUREKA_PASSWORD}@localhost:9761/eureka"
 
-# 이미지저장서버 minio 로컬
+
+## 이미지저장서버 minio 로컬
+#minio:
+#  endpoint: http://localhost:9090
+#  access-key: minioadmin
+#  secret-key: minioadmin
+#  bucket: bluebooktle-bookimage
+
+# 이미지저장서버 minio
 minio:
-  endpoint: http://localhost:9090
-  access-key: minioadmin
-  secret-key: minioadmin
+  endpoint: http://storage.java21.net:8000
+  access-key: CWgqLifvei5RJjvU8ryr
+  secret-key: 4xFvjHC5TCUIljLbDaviFfEhkbk8NKXjYgRfCE8e
   bucket: bluebooktle-bookimage
 
 jwt:

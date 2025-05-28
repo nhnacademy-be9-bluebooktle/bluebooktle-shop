@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.common.dto.book.request.BookAllRegisterRequest;
+import shop.bluebooktle.common.dto.book.response.AladinBookResponse;
 import shop.bluebooktle.common.dto.book.response.BookAllResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
 import shop.bluebooktle.frontend.repository.AdminBookRepository;
@@ -46,5 +47,10 @@ public class AdminBookServiceImpl implements AdminBookService {
 	@Override
 	public void deleteBook(Long bookId) {
 		adminBookRepository.deleteBook(bookId);
+	}
+
+	@Override
+	public List<AladinBookResponse> searchAladin(String keyword, int page, int size) {
+		return adminBookRepository.searchAladinBooks(keyword, page, size);
 	}
 }

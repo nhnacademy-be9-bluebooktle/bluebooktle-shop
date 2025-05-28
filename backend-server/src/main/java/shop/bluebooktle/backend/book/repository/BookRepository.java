@@ -23,6 +23,8 @@ public interface BookRepository extends JpaRepository<Book, Long> {
 
 	Page<Book> findByTitleContainingIgnoreCase(String title, Pageable pageable);
 
+	// List<BookCartOrderResponse> findBookCartOrderResponseByBookId(Long bookId);
+
 	//메인페이지에 표시될 정보(id, title, author, price, salePrice, imgUrl) 조회
 	//쿼리 impl로 빼기!!
 	// @Query("SELECT new shop.bluebooktle.common.dto.book.response.book.BookInfoResponse( " +
