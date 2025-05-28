@@ -1,5 +1,6 @@
 package shop.bluebooktle.auth.service.impl;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -12,6 +13,7 @@ import org.springframework.util.StringUtils;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import shop.bluebooktle.auth.coupon.CouponIssueProducer;
 import shop.bluebooktle.auth.repository.MembershipLevelRepository;
 import shop.bluebooktle.auth.repository.UserRepository;
 import shop.bluebooktle.auth.repository.payco.PaycoApiClient;
@@ -31,6 +33,7 @@ import shop.bluebooktle.common.dto.auth.request.PaycoTokenResponse;
 import shop.bluebooktle.common.dto.auth.request.SignupRequest;
 import shop.bluebooktle.common.dto.auth.request.TokenRefreshRequest;
 import shop.bluebooktle.common.dto.auth.response.TokenResponse;
+import shop.bluebooktle.common.dto.coupon.request.WelcomeCouponIssueMessage;
 import shop.bluebooktle.common.entity.auth.MembershipLevel;
 import shop.bluebooktle.common.entity.auth.User;
 import shop.bluebooktle.common.exception.ApplicationException;
@@ -59,6 +62,7 @@ public class AuthServiceImpl implements AuthService {
 	private final PaycoAuthClient paycoAuthClient;
 	private final PaycoApiClient paycoApiClient;
 	private final PointService pointService;
+	private final CouponIssueProducer couponIssueProducer;
 
 	@Value("${oauth.payco.client-id}")
 	private String paycoClientId;
@@ -97,6 +101,18 @@ public class AuthServiceImpl implements AuthService {
 		userRepository.save(user);
 		// TODO: Transaction 분리
 		pointService.signUpPoint(user.getId());
+
+		try {
+			couponIssueProducer.sendWelcomeCoupon(WelcomeCouponIssueMessage.builder()
+				.userId(user.getId())
+				.couponId(2L)
+				.availableStartAt(LocalDateTime.now())
+				.availableEndAt(LocalDateTime.now().plusDays(30))
+				.build());
+		} catch (Exception e) {
+			log.error("웰컴 쿠폰 발급 실패", e);
+			// 발급 실패 했을 경우
+		}
 	}
 
 	@Override
