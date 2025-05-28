@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.book_order.entity.PackagingOption;
-import shop.bluebooktle.backend.book_order.repository.PackagingOptionRepository;
+import shop.bluebooktle.backend.book_order.jpa.PackagingOptionRepository;
 import shop.bluebooktle.backend.book_order.service.PackagingOptionService;
 import shop.bluebooktle.common.dto.book_order.request.PackagingOptionRequest;
 import shop.bluebooktle.common.dto.book_order.response.PackagingOptionInfoResponse;
