@@ -1,6 +1,7 @@
 server:
   port: 9080
   baseUrl: "http://www.localhost:9080"
+  gateway-url: localhost:9000
 
 spring:
   cache:
@@ -31,3 +32,4 @@ oauth:
   payco:
     client-id: "3RDKLuGWlBifp1UfHtinDmZ"
     redirect-uri: "http://www.localhost:9080/oauth/payco"
+
