@@ -45,12 +45,7 @@ public class CategoryRepositoryTest {
 		category2 = categoryRepository.save(new Category(null, "일반 소설"));
 		category3 = categoryRepository.save(new Category(null, "장르 소설"));
 
-		em.persist(category1);
-		em.persist(category2);
-		em.persist(category3);
-
 		category4 = categoryRepository.save(new Category(null, "국내 현대 소설"));
-		em.persist(category4);
 		em.flush();
 
 		em.createQuery(

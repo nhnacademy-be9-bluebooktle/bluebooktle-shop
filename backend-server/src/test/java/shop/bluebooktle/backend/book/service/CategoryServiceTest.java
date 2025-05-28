@@ -71,7 +71,7 @@ public class CategoryServiceTest {
 					return c;
 				});
 
-			var req = new RootCategoryRegisterRequest("부모 카테고리", "자식 카테고리");
+			RootCategoryRegisterRequest req = new RootCategoryRegisterRequest("부모 카테고리", "자식 카테고리");
 			categoryService.registerRootCategory(req);
 
 			// save() 가 루트+자식 총 2회 호출됐는지 검증
@@ -85,7 +85,7 @@ public class CategoryServiceTest {
 			when(categoryRepository.findByParentCategoryIsNull())
 				.thenReturn(List.of(new Category(null, "중복 이름", "/1")));
 
-			var req = new RootCategoryRegisterRequest("중복 이름", "자식 카테고리");
+			RootCategoryRegisterRequest req = new RootCategoryRegisterRequest("중복 이름", "자식 카테고리");
 			assertThatThrownBy(() -> categoryService.registerRootCategory(req))
 				.isInstanceOf(CategoryAlreadyExistsException.class)
 				.hasMessageContaining("이미 존재하는 카테고리명입니다");
@@ -175,7 +175,7 @@ public class CategoryServiceTest {
 		@Test
 		@DisplayName("성공: 이름 변경 후 save() 1회 호출")
 		void success() {
-			var req = new CategoryUpdateRequest("새 이름");
+			CategoryUpdateRequest req = new CategoryUpdateRequest("새 이름");
 
 			// save() stub
 			when(categoryRepository.save(any(Category.class)))
@@ -200,7 +200,7 @@ public class CategoryServiceTest {
 			ReflectionTestUtils.setField(existing, "id", 3L);
 			parent.addChildCategory(existing);
 
-			var req = new CategoryUpdateRequest("중복이름");
+			CategoryUpdateRequest req = new CategoryUpdateRequest("중복이름");
 
 			assertThatThrownBy(() -> categoryService.updateCategory(2L, req))
 				.isInstanceOf(CategoryAlreadyExistsException.class)
@@ -214,15 +214,6 @@ public class CategoryServiceTest {
 	@Nested
 	@DisplayName("카테고리 삭제")
 	class DeleteCategoryTests {
-
-		@InjectMocks
-		private CategoryServiceImpl categoryService;
-
-		@Mock
-		private CategoryRepository categoryRepository;
-
-		@Mock
-		private BookCategoryRepository bookCategoryRepository;
 
 		@Test
 		@DisplayName("실패: 해당 카테고리에 BookCategory 존재 시 예외")
