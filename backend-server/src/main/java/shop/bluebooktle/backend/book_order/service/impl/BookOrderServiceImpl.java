@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.book.entity.Book;
 import shop.bluebooktle.backend.book.repository.BookRepository;
 import shop.bluebooktle.backend.book_order.entity.BookOrder;
-import shop.bluebooktle.backend.book_order.repository.BookOrderRepository;
+import shop.bluebooktle.backend.book_order.jpa.BookOrderRepository;
 import shop.bluebooktle.backend.book_order.service.BookOrderService;
 import shop.bluebooktle.backend.order.entity.Order;
 import shop.bluebooktle.backend.order.repository.OrderRepository;
@@ -55,7 +55,7 @@ public class BookOrderServiceImpl implements BookOrderService {
 	/** 도서 주문 조회 */
 	@Override
 	public BookOrderResponse getBookOrder(Long bookOrderId) {
-		BookOrder order = bookOrderRepository.findByIdAndDeletedAtIsNull(bookOrderId)
+		BookOrder order = bookOrderRepository.findById(bookOrderId)
 			.orElseThrow(BookOrderNotFoundException::new);
 
 		return BookOrderResponse.builder()
@@ -70,7 +70,7 @@ public class BookOrderServiceImpl implements BookOrderService {
 	/** 도서 주문 수정 */
 	@Override
 	public BookOrderResponse updateBookOrder(Long bookOrderId, BookOrderUpdateRequest request) {
-		BookOrder order = bookOrderRepository.findByIdAndDeletedAtIsNull(bookOrderId)
+		BookOrder order = bookOrderRepository.findById(bookOrderId)
 			.orElseThrow(BookOrderNotFoundException::new);
 
 		order.setQuantity(request.getQuantity());
@@ -88,7 +88,7 @@ public class BookOrderServiceImpl implements BookOrderService {
 	/** 도서 주문 삭제 */
 	@Override
 	public void deleteBookOrder(Long bookOrderId) {
-		BookOrder order = bookOrderRepository.findByIdAndDeletedAtIsNull(bookOrderId)
+		BookOrder order = bookOrderRepository.findById(bookOrderId)
 			.orElseThrow(BookOrderNotFoundException::new);
 		bookOrderRepository.delete(order);
 	}

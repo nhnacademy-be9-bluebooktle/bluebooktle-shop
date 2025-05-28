@@ -1,7 +1,5 @@
 package shop.bluebooktle.backend.book.controller;
 
-import java.util.List;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -26,6 +24,7 @@ import shop.bluebooktle.common.dto.book.response.BookRegisterResponse;
 import shop.bluebooktle.common.dto.book.response.BookResponse;
 import shop.bluebooktle.common.dto.book.response.BookUpdateResponse;
 import shop.bluebooktle.common.dto.common.JsendResponse;
+import shop.bluebooktle.common.dto.common.PaginationData;
 
 @RestController
 @RequestMapping("/api/books")
@@ -75,18 +74,35 @@ public class BookController {
 		return ResponseEntity.ok(JsendResponse.success());
 	}
 
-	//해당 도서 관련된 모든 정보(도서,도서 판매정보,작가,출판사,태그,이미지,카테고리)까지 bookId로 조회
-	@GetMapping("/all/{bookId}")
-	public ResponseEntity<JsendResponse<BookAllResponse>> getBookAll(@PathVariable Long bookId) {
-		BookAllResponse bookAllResponse = bookService.findBookAllById(bookId);
-		return ResponseEntity.ok(JsendResponse.success(bookAllResponse));
+	@GetMapping
+	public ResponseEntity<JsendResponse<PaginationData<BookAllResponse>>> getPagedBooks(
+		@RequestParam("page") int page,
+		@RequestParam("size") int size,
+		@RequestParam(value = "searchKeyword", required = false) String searchKeyword
+	) {
+		PaginationData<BookAllResponse> data = bookService.findAllBooks(page, size, searchKeyword);
+		return ResponseEntity.ok(JsendResponse.success(data));
 	}
 
-	//해당 도서 관련된 모든 정보(도서,도서 판매정보,작가,출판사,태그,이미지,카테고리)까지 제목으로 조회
-	@GetMapping("/all/by-title")
-	public ResponseEntity<JsendResponse<List<BookAllResponse>>> getBookAllByTitle(@RequestParam("title") String title) {
-		List<BookAllResponse> bookAllRespons = bookService
-			.getBookAllByTitle(title);
-		return ResponseEntity.ok(JsendResponse.success(bookAllRespons));
-	}
+	// TODO 관리자페이지 먼저 하고나서 수정
+
+	// //메인페이지에 표시될 정보(id, title, author, price, salePrice, imgUrl) 조회
+	// @GetMapping("/main/{bookId}")
+	// public ResponseEntity<JsendResponse<Page<BookInfoResponse>>> getBooksForMainPage(
+	// 	@PathVariable Long bookId,
+	// 	@PageableDefault(size = 10) Pageable pageable) {
+	//
+	// 	Page<BookInfoResponse> bookMainResponses = bookService
+	// 		.getBooksForMainPage(bookId, pageable);
+	// 	return ResponseEntity.ok(JsendResponse.success(bookMainResponses));
+	// }
+	//
+	// //제목으로 검색하여 표시될 정보(id, title, author, price, salePrice, imgUrl) 조회
+	// @GetMapping("/search")
+	// public ResponseEntity<JsendResponse<Page<BookInfoResponse>>> searchBooks(
+	// 	@RequestParam("title") String title,
+	// 	@PageableDefault(size = 10) Pageable pageable) {
+	// 	Page<BookInfoResponse> books = bookService.searchBooksByTitle(title, pageable);
+	// 	return ResponseEntity.ok(JsendResponse.success(books));
+	// }
 }

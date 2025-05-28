@@ -1,4 +1,4 @@
-package shop.bluebooktle.backend.book_order.repository.impl;
+package shop.bluebooktle.backend.book_order.jpa.impl;
 
 import java.util.List;
 
@@ -13,7 +13,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.book_order.entity.PackagingOption;
 import shop.bluebooktle.backend.book_order.entity.QPackagingOption;
-import shop.bluebooktle.backend.book_order.repository.PackagingOptionQueryRepository;
+import shop.bluebooktle.backend.book_order.jpa.PackagingOptionQueryRepository;
 
 @Repository
 @RequiredArgsConstructor

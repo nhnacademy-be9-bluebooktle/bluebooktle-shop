@@ -127,9 +127,14 @@
                     });
                 }
 
-                // 2) 북 이모티콘 + 텍스트 노드
-                const text = document.createTextNode(` 📖 ${cat.name}`);
-                sum.appendChild(text);
+                // 📖 아이콘 + 링크
+                const link = document.createElement('a');
+                link.href = `/categories/${cat.id}`;            // 실제 카테고리 URL 패턴에 맞게 수정
+                link.innerHTML = `📖 ${cat.name}`;
+                link.classList.add('category-link-kitsch');     // 필요하다면 스타일용 클래스
+                // 클릭해도 details 토글은 막기
+                link.addEventListener('click', e => e.stopPropagation());
+                sum.appendChild(link);
 
                 detail.appendChild(sum);
 

@@ -56,30 +56,28 @@ public class BookRegisterServiceImpl implements BookRegisterService {
 		Book book = Book.builder()
 			.title(request.getTitle())
 			.isbn(request.getIsbn())
+			.index(request.getIndex())
 			.description(request.getDescription())
 			.publishDate(request.getPublishDate() != null ?
 				request.getPublishDate().atStartOfDay() : null)
 			.build();
 		bookRepository.save(book);
 
-		//할인율 계산 따로 뺄것
+		// 작가, 출판사, 카테고리, 태그 연결
+		bookAuthorService.registerBookAuthor(book.getId(), request.getAuthorIdList());
+		bookPublisherService.registerBookPublisher(book.getId(), request.getPublisherIdList());
+		bookCategoryService.registerBookCategory(book.getId(), request.getCategoryIdList());
+		bookTagService.registerBookTag(book.getId(), request.getTagIdList());
+
+		// 이미지 연결
+		bookImgService.registerBookImg(book.getId(), request.getImgUrl());
+
+		// 판매 정보 저장
 		BigDecimal salePercentage = request.getPrice().subtract(request.getSalePrice())
 			.divide(request.getPrice(), 2, BigDecimal.ROUND_HALF_UP)
 			.multiply(BigDecimal.valueOf(100));
 
-		bookAuthorService.registerBookAuthor(book.getId(), request.getAuthorIdList());
-
-		bookPublisherService.registerBookPublisher(book.getId(), request.getAuthorIdList());
-
-		bookCategoryService.registerBookCategory(book.getId(), request.getCategoryIdList());
-
-		bookTagService.registerBookTag(book.getId(), request.getTagIdList());
-
-		// TODO 일단 이미지를 url을 받아와서 저장되도록(이미지 테이블에 저장 및 도서이미지에 저장)
-		// TODO 이미지 파일 이미지 서버(MINIO)에 저장 로직 구현
-		bookImgService.registerBookImg(book.getId(), request.getThumbnailUrl());
-
-		BookSaleInfo bookSaleInfo = BookSaleInfo.builder()
+		BookSaleInfo saleInfo = BookSaleInfo.builder()
 			.book(book)
 			.price(request.getPrice())
 			.salePrice(request.getSalePrice())
@@ -89,7 +87,7 @@ public class BookRegisterServiceImpl implements BookRegisterService {
 			.bookSaleInfoState(request.getState())
 			.salePercentage(salePercentage)
 			.build();
-		bookSaleInfoRepository.save(bookSaleInfo);
+		bookSaleInfoRepository.save(saleInfo);
 	}
 
 	@Override

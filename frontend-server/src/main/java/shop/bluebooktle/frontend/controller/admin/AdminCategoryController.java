@@ -3,6 +3,7 @@ package shop.bluebooktle.frontend.controller.admin;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -73,6 +75,18 @@ public class AdminCategoryController {
 		List<CategoryTreeResponse> tree = adminCategoryService.getCategoryTree();
 		model.addAttribute("categoryTreeListJson", tree);
 		return "admin/category/category_list";
+	}
+
+	/** AJAX/팝업용 — JSON 페이징 결과 반환 */
+	@GetMapping(path = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public Page<CategoryResponse> searchCategoriesJson(
+		@RequestParam(defaultValue = "0") int page,
+		@RequestParam(defaultValue = "10") int size,
+		@RequestParam(required = false) String searchKeyword
+	) {
+		log.debug("AJAX 카테고리 검색: page={}, size={}, keyword={}", page, size, searchKeyword);
+		return adminCategoryService.getCategories(page, size, searchKeyword);
 	}
 
 	@GetMapping({"/new"})
