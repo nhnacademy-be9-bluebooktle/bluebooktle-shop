@@ -8,6 +8,7 @@ import shop.bluebooktle.common.dto.user.request.UserSearchRequest;
 import shop.bluebooktle.common.dto.user.request.UserUpdateRequest;
 import shop.bluebooktle.common.dto.user.response.AdminUserResponse;
 import shop.bluebooktle.common.dto.user.response.UserResponse;
+import shop.bluebooktle.common.dto.user.response.UserTotalPointResponse;
 
 public interface UserService {
 	UserResponse findByUserId(Long userId);
@@ -19,4 +20,6 @@ public interface UserService {
 	AdminUserResponse findUserByIdAdmin(Long userId);
 
 	void updateUserAdmin(Long userId, AdminUserUpdateRequest request);
+
+	UserTotalPointResponse findUserTotalPoints(Long userId);
 }

@@ -72,7 +72,7 @@ public class PointServiceImpl implements PointService {
 		PointHistory last = pointHistoryRepository
 			.findTopByUserIdAndSourceTypeOrderByCreatedAtDesc(userId, PointSourceTypeEnum.LOGIN_EARN)
 			.orElse(null);
-		
+
 		if (last == null || !last.getCreatedAt().toLocalDate().equals(LocalDate.now())) {
 			adjustUserPointAndSavePointHistory(userId, PointSourceTypeEnum.LOGIN_EARN);
 		}

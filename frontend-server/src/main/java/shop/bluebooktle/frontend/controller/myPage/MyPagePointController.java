@@ -38,6 +38,7 @@ public class MyPagePointController {
 		PaginationData<PointHistoryResponse> histories =
 			pointHistoryService.getMyPointHistories(pageable);
 		model.addAttribute("pointHistories", histories);
+		model.addAttribute("totalPoints", userService.getUserTotalPoints().totalPointBalance());
 
 		return "mypage/point_log";
 	}
