@@ -11,6 +11,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import shop.bluebooktle.backend.user.repository.UserQueryRepository;
+import shop.bluebooktle.common.domain.auth.UserStatus;
 import shop.bluebooktle.common.entity.auth.QUser;
 import shop.bluebooktle.common.entity.auth.User;
 
@@ -27,7 +28,8 @@ public class UserQueryRepositoryImpl implements UserQueryRepository {
 
 		BooleanBuilder builder = new BooleanBuilder();
 
-		builder.and(Expressions.stringTemplate("substring({0}, 5, 2)", user.birth).eq(month));
+		builder.and(Expressions.stringTemplate("substring({0}, 5, 2)", user.birth).eq(month))
+			.and(user.status.eq(UserStatus.ACTIVE));
 
 		List<User> users = queryFactory
 			.selectFrom(user)
