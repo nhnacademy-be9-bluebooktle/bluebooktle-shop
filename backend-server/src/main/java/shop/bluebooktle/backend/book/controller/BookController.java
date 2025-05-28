@@ -98,7 +98,6 @@ public class BookController {
 		@RequestParam(value = "page", defaultValue = "1") int page,
 		@RequestParam(value = "size", defaultValue = "10") int size
 	) {
-		log.info("[API] Aladin search keyword={}, page={}, size={}", keyword, page, size);
 		List<AladinBookResponse> result = aladinBookService.searchBooks(keyword, page, size);
 		return ResponseEntity.ok(JsendResponse.success(result));
 	}
