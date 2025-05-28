@@ -25,7 +25,7 @@ import shop.bluebooktle.frontend.service.AdminPublisherService;
 
 @Slf4j
 @Controller
-// 조선대 서버에서 'publishers', 'wrappers', '-' 포함된 path 차단으로 chulpansa 사용
+// 조선대 서버에서 'publishers', 'wrappers', '-' 포함된 path 차단으로 chulpansa 사용함
 @RequestMapping("/admin/chulpansa")
 @RequiredArgsConstructor
 public class AdminPublisherController {
