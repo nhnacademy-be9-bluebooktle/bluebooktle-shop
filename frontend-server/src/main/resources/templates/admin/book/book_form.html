@@ -363,99 +363,118 @@
 <th:block layout:fragment="page_scripts">
     <script th:inline="javascript">
         // 알라딘 도서 검색
-        let currentPage = 1;
+        const MAX_PAGE = 3;
         const pageSize = 10;
+        let currentPage = 1;
 
+        // 알라딘 도서 검색
         async function searchAladinBooks(page = 1) {
+            // 1 ≤ page ≤ MAX_PAGE 고정
+            page = Math.max(1, Math.min(page, MAX_PAGE));
+            currentPage = page;
+
             const query = document.getElementById('aladinSearchInput').value.trim();
             if (!query) {
                 alert('검색어를 입력해주세요.');
                 return;
             }
-            currentPage = page;
 
-            const res = await fetch(
-                `/admin/books/aladin-search?keyword=${encodeURIComponent(query)}`
-                + `&page=${page}&size=${pageSize}`,
-                {headers: {'Accept': 'application/json'}}
-            );
-            const js = await res.json();
-            const results = Array.isArray(js) ? js : (js.data || []);
-            if (results.length === 0) {
-                alert('✅ 더 이상 검색 결과가 없습니다.');
-                renderPaginationControls(page - 1, true);
-                return;
-            }
-
-            displayAladinSearchResults(results);
-            renderPaginationControls(page, results.length === pageSize);
-        }
-
-        function displayAladinSearchResults(results) {
+            // 이전 결과 완전 초기화
             const resultsContainer = document.getElementById('aladinSearchResults');
             const resultsList = document.getElementById('aladinResultsList');
             resultsList.innerHTML = '';
+            resultsContainer.style.display = 'none';
 
+            // API 호출
+            const res = await fetch(
+                `/admin/books/aladin-search?keyword=${encodeURIComponent(query)}` +
+                `&page=${page}&size=${pageSize}`,
+                {headers: {'Accept': 'application/json'}}
+            );
+            const data = await res.json();
+            const results = Array.isArray(data) ? data : (data.data || []);
+
+            // 결과 없으면
             if (results.length === 0) {
-                resultsList.innerHTML = '<li>검색 결과가 없습니다.</li>';
-            } else {
-                results.forEach(book => {
-                    const payload = encodeURIComponent(JSON.stringify(book));
-                    const li = document.createElement('li');
-                    li.style.marginBottom = '10px';
-                    li.innerHTML = `
-            <strong>${book.title}</strong><br>
-            저자: ${book.author}, 출판사: ${book.publisher}, ISBN: ${book.isbn}<br>
-            <button
-              type="button"
-              class="admin-btn admin-btn--default"
-              style="margin-top:5px;"
-              onclick="selectAladinBook('${payload}')">
-              선택
-            </button>
-          `;
-                    resultsList.appendChild(li);
-                });
+                alert('✅ 더 이상 검색 결과가 없습니다.');
+                // 빈 상태로 유지
+                resultsList.innerHTML = '';
+                resultsContainer.style.display = 'none';
+                // hasNext = false → 페이지  currentPage / currentPage
+                renderPaginationControls(page, false);
+                return;
             }
+
+            // 결과 렌더링
+            displayAladinSearchResults(results);
+
+            // 다음페이지 여부 판단
+            const hasNext = (results.length === pageSize) && (page < MAX_PAGE);
+            renderPaginationControls(page, hasNext);
+        }
+
+        // 검색 결과 표시
+        function displayAladinSearchResults(results) {
+            const resultsContainer = document.getElementById('aladinSearchResults');
+            const resultsList = document.getElementById('aladinResultsList');
+            resultsList.innerHTML = '';  // 안전하게 클리어
+
+            results.forEach(book => {
+                const payload = encodeURIComponent(JSON.stringify(book));
+                const li = document.createElement('li');
+                li.style.marginBottom = '10px';
+                li.innerHTML = `
+          <strong>${book.title}</strong><br>
+          저자: ${book.author}, 출판사: ${book.publisher}, ISBN: ${book.isbn}<br>
+          <button
+            type="button"
+            class="admin-btn admin-btn--default"
+            style="margin-top:5px;"
+            onclick="selectAladinBook('${payload}')">
+            선택
+          </button>
+        `;
+                resultsList.appendChild(li);
+            });
+
             resultsContainer.style.display = 'block';
         }
 
-        // 2) 선택 버튼 클릭 핸들러
+        // 선택 버튼 클릭 핸들러
         function selectAladinBook(encoded) {
             const book = JSON.parse(decodeURIComponent(encoded));
             document.getElementById('title').value = book.title || '';
             document.getElementById('isbn').value = book.isbn || '';
             document.getElementById('description').value = book.description || '';
             document.getElementById('publishDate').value = book.publishDate || '';
-
         }
 
+        // 페이징 컨트롤 렌더링
         function renderPaginationControls(page, hasNext) {
             const container = document.getElementById('paginationControls');
-            const maxPage = 3;
-            const totalPages = hasNext ? maxPage : page;
-
             const disablePrev = page <= 1;
-            const disableNext = page >= totalPages;
+            const disableNext = !hasNext;
+            // 결과가 한 페이지만 있을 땐 totalPages = page;
+            const totalPages = hasNext ? MAX_PAGE : page;
 
             container.innerHTML = `
-    <button type="button" ${disablePrev ? 'disabled' : ''}
-        onclick="searchAladinBooks(${page - 1})">
-      « 이전
-    </button>
-    <span style="margin:0 1rem;">페이지 ${page} / ${totalPages}</span>
-    <button type="button" ${disableNext ? 'disabled' : ''}
-        onclick="searchAladinBooks(${page + 1})">
-      다음 »
-    </button>
-  `;
+        <button type="button" ${disablePrev ? 'disabled' : ''}
+          onclick="searchAladinBooks(${page - 1})">
+          « 이전
+        </button>
+        <span style="margin:0 1rem;">
+          페이지 ${page} / ${totalPages}
+        </span>
+        <button type="button" ${disableNext ? 'disabled' : ''}
+          onclick="searchAladinBooks(${page + 1})">
+          다음 »
+        </button>
+      `;
         }
 
-
-        // 페이지 로드시 검색 버튼에 바인딩
-        document.querySelector('.admin-btn--primary').addEventListener('click', () => {
-            searchAladinBooks(1);
-        });
+        // 검색 버튼 바인딩
+        document.querySelector('.admin-btn--primary')
+            .addEventListener('click', () => searchAladinBooks(1));
 
         // 페이지가 로드된 직후, 만약 pubPage 쿼리 파라미터가 있으면 팝업을 열어두자
         document.addEventListener('DOMContentLoaded', () => {
