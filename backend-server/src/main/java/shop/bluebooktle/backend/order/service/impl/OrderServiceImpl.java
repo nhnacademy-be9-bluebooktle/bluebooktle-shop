@@ -2,7 +2,6 @@ package shop.bluebooktle.backend.order.service.impl;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -38,7 +37,7 @@ public class OrderServiceImpl implements OrderService {
 	}
 
 	@Override
-	public Order getOrderByOrderKey(UUID orderKey) {
+	public Order getOrderByOrderKey(String orderKey) {
 		return orderRepository.findByOrderKey(orderKey)
 			.orElseThrow(() -> new OrderNotFoundException("주문을 찾을 수 없습니다."));
 	}
