@@ -22,7 +22,6 @@ import shop.bluebooktle.common.dto.common.JsendResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
 import shop.bluebooktle.common.dto.point.request.PointAdjustmentRequest;
 import shop.bluebooktle.common.dto.point.response.PointHistoryResponse;
-import shop.bluebooktle.common.exception.auth.InvalidTokenException;
 import shop.bluebooktle.common.security.Auth;
 import shop.bluebooktle.common.security.UserPrincipal;
 
@@ -41,9 +40,6 @@ public class PointHistoryController {
 		@Parameter(hidden = true) @AuthenticationPrincipal UserPrincipal userPrincipal,
 		@PageableDefault(size = 10, sort = "createdAt") Pageable pageable
 	) {
-		if (userPrincipal == null) {
-			throw new InvalidTokenException();
-		}
 		Page<PointHistoryResponse> pointHistories = pointHistoryService.getPointHistoriesByUserId(
 			userPrincipal.getUserId(), pageable);
 		PaginationData<PointHistoryResponse> paginationData = new PaginationData<>(pointHistories);
@@ -57,9 +53,6 @@ public class PointHistoryController {
 		@Parameter(hidden = true) @AuthenticationPrincipal UserPrincipal userPrincipal,
 		@Valid @RequestBody PointAdjustmentRequest request
 	) {
-		if (userPrincipal == null) {
-			throw new InvalidTokenException();
-		}
 		pointHistoryService.savePointHistory(userPrincipal.getUserId(), request);
 		return ResponseEntity.ok(JsendResponse.success(null));
 	}
