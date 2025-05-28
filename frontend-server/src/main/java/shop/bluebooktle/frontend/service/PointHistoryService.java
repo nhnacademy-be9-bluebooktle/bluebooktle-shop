@@ -13,7 +13,7 @@ import org.springframework.data.domain.Pageable;
 
 import shop.bluebooktle.common.domain.point.PointSourceTypeEnum;
 import shop.bluebooktle.common.dto.common.PaginationData;
-import shop.bluebooktle.common.dto.point.request.PointHistoryCreateRequest;
+import shop.bluebooktle.common.dto.point.request.PointAdjustmentRequest;
 import shop.bluebooktle.common.dto.point.response.PointHistoryResponse;
 
 public interface PointHistoryService {
@@ -29,7 +29,7 @@ public interface PointHistoryService {
 
 	List<PointPolicyResponse> getAllPolicies();
 
-	void createPointHistory(PointHistoryCreateRequest request);
+	void createPointHistory(PointAdjustmentRequest request);
 
 	void createPointHistory(PointSourceTypeEnum sourceType, BigDecimal value);
 

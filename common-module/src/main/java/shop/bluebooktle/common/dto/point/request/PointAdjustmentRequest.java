@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
 
-public record PointHistoryCreateRequest(
+public record PointAdjustmentRequest(
 	@NotNull(message = "포인트 출처 ID는 필수입니다.")
 	Long pointSourceTypeId,
 

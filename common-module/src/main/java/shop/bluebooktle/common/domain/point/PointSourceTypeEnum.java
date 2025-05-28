@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import lombok.Getter;
+import shop.bluebooktle.common.exception.point.PointSourceNotFountException;
 
 @Getter
 public enum PointSourceTypeEnum {
@@ -14,6 +15,8 @@ public enum PointSourceTypeEnum {
 	PAYMENT_EARN(4L, ActionType.EARN, "결제 적립"),
 	PAYMENT_USE(5L, ActionType.USE, "결제 사용");
 
+	private static final Map<Long, PointSourceTypeEnum> BY_ID =
+		Arrays.stream(values()).collect(Collectors.toMap(PointSourceTypeEnum::getId, e -> e));
 	private final Long id;
 	private final ActionType actionType;
 	private final String sourceType;
@@ -24,13 +27,10 @@ public enum PointSourceTypeEnum {
 		this.sourceType = sourceType;
 	}
 
-	private static final Map<Long, PointSourceTypeEnum> BY_ID =
-		Arrays.stream(values()).collect(Collectors.toMap(PointSourceTypeEnum::getId, e -> e));
-
 	public static PointSourceTypeEnum fromId(Long id) {
 		PointSourceTypeEnum type = BY_ID.get(id);
 		if (type == null)
-			throw new IllegalArgumentException("Unknown id: " + id);
+			throw new PointSourceNotFountException();
 		return type;
 	}
 }

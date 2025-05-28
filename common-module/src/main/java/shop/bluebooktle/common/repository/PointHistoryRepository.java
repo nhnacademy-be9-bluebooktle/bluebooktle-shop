@@ -1,11 +1,11 @@
-package shop.bluebooktle.backend.point.repository;
+package shop.bluebooktle.common.repository;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import shop.bluebooktle.backend.point.entity.PointHistory;
 import shop.bluebooktle.common.entity.auth.User;
+import shop.bluebooktle.common.entity.point.PointHistory;
 
 public interface PointHistoryRepository extends JpaRepository<PointHistory, Long> {
 

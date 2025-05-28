@@ -155,4 +155,21 @@ public class User extends BaseEntity {
 	public void updateStatus(UserStatus newStatus) {
 		this.status = newStatus;
 	}
+
+	public void addPoint(BigDecimal pointValue) {
+		if (pointValue == null || pointValue.compareTo(BigDecimal.ZERO) < 0) {
+			throw new IllegalArgumentException("포인트 적립은 양수이어야 합니다.");
+		}
+		this.pointBalance = this.pointBalance.add(pointValue);
+	}
+
+	public void subtractPoint(BigDecimal pointValue) {
+		if (pointValue == null || pointValue.compareTo(BigDecimal.ZERO) < 0) {
+			throw new IllegalArgumentException("포인트 사용은 양수이어야 합니다.");
+		}
+		if (this.pointBalance.compareTo(pointValue) < 0) {
+			throw new IllegalArgumentException("사용할 포인트가 부족합니다.");
+		}
+		this.pointBalance = this.pointBalance.subtract(pointValue);
+	}
 }

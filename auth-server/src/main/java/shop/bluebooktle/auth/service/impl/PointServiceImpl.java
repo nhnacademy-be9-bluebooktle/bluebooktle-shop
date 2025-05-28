@@ -1,0 +1,62 @@
+package shop.bluebooktle.auth.service.impl;
+
+import java.math.BigDecimal;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import lombok.RequiredArgsConstructor;
+import shop.bluebooktle.auth.repository.UserRepository;
+import shop.bluebooktle.auth.service.PointService;
+import shop.bluebooktle.common.domain.point.ActionType;
+import shop.bluebooktle.common.domain.point.PointSourceTypeEnum;
+import shop.bluebooktle.common.entity.auth.User;
+import shop.bluebooktle.common.entity.point.PointHistory;
+import shop.bluebooktle.common.entity.point.PointPolicy;
+import shop.bluebooktle.common.entity.point.PointSourceType;
+import shop.bluebooktle.common.exception.auth.UserNotFoundException;
+import shop.bluebooktle.common.exception.point.PointPolicyNotFoundException;
+import shop.bluebooktle.common.exception.point.PointSourceNotFountException;
+import shop.bluebooktle.common.repository.PointHistoryRepository;
+import shop.bluebooktle.common.repository.PointPolicyRepository;
+import shop.bluebooktle.common.repository.PointSourceTypeRepository;
+
+@Service
+@Transactional
+@RequiredArgsConstructor
+public class PointServiceImpl implements PointService {
+	private final PointHistoryRepository pointHistoryRepository;
+	private final PointPolicyRepository pointPolicyRepository;
+	private final PointSourceTypeRepository pointSourceTypeRepository;
+	private final UserRepository userRepository;
+
+	@Override
+	public void adjustUserPointAndSavePointHistory(Long userId, PointSourceTypeEnum pointSourceTypeEnum) {
+		User user = userRepository.findById(userId)
+			.orElseThrow(UserNotFoundException::new);
+
+		PointSourceType sourceType = pointSourceTypeRepository.findById(pointSourceTypeEnum.getId())
+			.orElseThrow(PointSourceNotFountException::new);
+
+		PointPolicy policy = pointPolicyRepository.findByPointSourceType(sourceType).orElseThrow(
+			PointPolicyNotFoundException::new);
+		
+		BigDecimal pointValue = policy.getValue();
+
+		if (policy.getIsActive() == false) {
+			return;
+		}
+		if (sourceType.getActionType() == ActionType.EARN) {
+			user.addPoint(pointValue);
+		}
+
+		userRepository.save(user);
+
+		PointHistory history = PointHistory.builder()
+			.user(user)
+			.sourceType(pointSourceTypeEnum)
+			.value(pointValue)
+			.build();
+		pointHistoryRepository.save(history);
+	}
+}

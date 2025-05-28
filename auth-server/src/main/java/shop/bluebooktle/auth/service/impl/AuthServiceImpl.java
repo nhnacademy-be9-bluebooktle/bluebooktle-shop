@@ -18,10 +18,12 @@ import shop.bluebooktle.auth.repository.payco.PaycoApiClient;
 import shop.bluebooktle.auth.repository.payco.PaycoAuthClient;
 import shop.bluebooktle.auth.service.AccessTokenService;
 import shop.bluebooktle.auth.service.AuthService;
+import shop.bluebooktle.auth.service.PointService;
 import shop.bluebooktle.auth.service.RefreshTokenService;
 import shop.bluebooktle.common.domain.auth.UserProvider;
 import shop.bluebooktle.common.domain.auth.UserStatus;
 import shop.bluebooktle.common.domain.auth.UserType;
+import shop.bluebooktle.common.domain.point.PointSourceTypeEnum;
 import shop.bluebooktle.common.dto.auth.request.LoginRequest;
 import shop.bluebooktle.common.dto.auth.request.PasswordUpdateRequest;
 import shop.bluebooktle.common.dto.auth.request.PaycoProfileMember;
@@ -57,6 +59,7 @@ public class AuthServiceImpl implements AuthService {
 	private final AccessTokenService accessTokenService;
 	private final PaycoAuthClient paycoAuthClient;
 	private final PaycoApiClient paycoApiClient;
+	private final PointService pointService;
 
 	@Value("${oauth.payco.client-id}")
 	private String paycoClientId;
@@ -93,6 +96,7 @@ public class AuthServiceImpl implements AuthService {
 			.build();
 
 		userRepository.save(user);
+		pointService.adjustUserPointAndSavePointHistory(user.getId(), PointSourceTypeEnum.SIGNUP_EARN);
 	}
 
 	@Override
@@ -119,6 +123,7 @@ public class AuthServiceImpl implements AuthService {
 		}
 
 		user.updateLastLoginAt();
+
 		userRepository.save(user);
 
 		String accessToken = jwtUtil.createAccessToken(user.getId(), user.getNickname(), user.getType());

@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import shop.bluebooktle.common.dto.common.PaginationData;
-import shop.bluebooktle.common.dto.point.request.PointHistoryCreateRequest;
+import shop.bluebooktle.common.dto.point.request.PointAdjustmentRequest;
 import shop.bluebooktle.common.dto.point.response.PointHistoryResponse;
 import shop.bluebooktle.frontend.config.feign.FeignGlobalConfig;
 
@@ -25,7 +25,7 @@ public interface PointHistoryRepository {
 	PaginationData<PointHistoryResponse> getMyPointHistories(Pageable pageable);
 
 	@PostMapping
-	Void createPointHistory(@RequestBody PointHistoryCreateRequest request);
+	Void createPointHistory(@RequestBody PointAdjustmentRequest request);
 
 	@GetMapping("/total")
 	BigDecimal getTotalPoints();

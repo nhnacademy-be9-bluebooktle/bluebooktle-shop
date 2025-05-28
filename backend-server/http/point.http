@@ -154,12 +154,6 @@ Authorization: Bearer {{token}}
   "value": 2500.00
 }
 
-###
-
-### 총 포인트 조회
-GET http://localhost:9012/api/points/total
-Accept: application/json
-Authorization: Bearer {{token}}
 
 ### 포인트 이력 조회 (페이징)
 GET http://localhost:9012/api/points/history?page=0&size=10

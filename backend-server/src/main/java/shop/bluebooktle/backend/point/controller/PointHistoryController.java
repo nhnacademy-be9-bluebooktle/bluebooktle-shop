@@ -1,7 +1,5 @@
 package shop.bluebooktle.backend.point.controller;
 
-import java.math.BigDecimal;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -18,11 +16,11 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import shop.bluebooktle.backend.point.service.PointHistoryService;
+import shop.bluebooktle.backend.point.service.PointService;
 import shop.bluebooktle.common.domain.auth.UserType;
 import shop.bluebooktle.common.dto.common.JsendResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
-import shop.bluebooktle.common.dto.point.request.PointHistoryCreateRequest;
+import shop.bluebooktle.common.dto.point.request.PointAdjustmentRequest;
 import shop.bluebooktle.common.dto.point.response.PointHistoryResponse;
 import shop.bluebooktle.common.exception.auth.InvalidTokenException;
 import shop.bluebooktle.common.security.Auth;
@@ -34,7 +32,7 @@ import shop.bluebooktle.common.security.UserPrincipal;
 @Tag(name = "포인트 API", description = "포인트 이력 및 적립 API")
 public class PointHistoryController {
 
-	private final PointHistoryService pointHistoryService;
+	private final PointService pointHistoryService;
 
 	@Operation(summary = "포인트 이력 조회", description = "로그인한 유저의 포인트 이력을 페이징하여 조회합니다.")
 	@Auth(type = UserType.USER)
@@ -57,25 +55,12 @@ public class PointHistoryController {
 	@PostMapping
 	public ResponseEntity<JsendResponse<Void>> createPointHistory(
 		@Parameter(hidden = true) @AuthenticationPrincipal UserPrincipal userPrincipal,
-		@Valid @RequestBody PointHistoryCreateRequest request
+		@Valid @RequestBody PointAdjustmentRequest request
 	) {
 		if (userPrincipal == null) {
 			throw new InvalidTokenException();
 		}
 		pointHistoryService.savePointHistory(userPrincipal.getUserId(), request);
 		return ResponseEntity.ok(JsendResponse.success(null));
-	}
-
-	@Operation(summary = "총 포인트 조회", description = "누적 포인트 합계를 조회합니다.")
-	@Auth(type = UserType.USER)
-	@GetMapping("/total")
-	public ResponseEntity<JsendResponse<BigDecimal>> getTotalPoints(
-		@Parameter(hidden = true) @AuthenticationPrincipal UserPrincipal userPrincipal
-	) {
-		if (userPrincipal == null) {
-			throw new InvalidTokenException();
-		}
-		BigDecimal totalPoints = pointHistoryService.getTotalPointsByUserId(userPrincipal.getUserId());
-		return ResponseEntity.ok(JsendResponse.success(totalPoints));
 	}
 }
