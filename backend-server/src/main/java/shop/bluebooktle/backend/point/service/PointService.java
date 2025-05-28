@@ -8,8 +8,6 @@ import shop.bluebooktle.common.dto.point.response.PointHistoryResponse;
 
 public interface PointService {
 
-	void adjustUserPointAndSavePointHistory(Long userId, PointAdjustmentRequest request);
-
 	void savePointHistory(Long userId, PointAdjustmentRequest request);
 
 	Page<PointHistoryResponse> getPointHistoriesByUserId(Long userId, Pageable pageable);

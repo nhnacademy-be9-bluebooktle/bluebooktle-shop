@@ -1,6 +1,7 @@
 package shop.bluebooktle.auth.service.impl;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,7 +41,7 @@ public class PointServiceImpl implements PointService {
 
 		PointPolicy policy = pointPolicyRepository.findByPointSourceType(sourceType).orElseThrow(
 			PointPolicyNotFoundException::new);
-		
+
 		BigDecimal pointValue = policy.getValue();
 
 		if (policy.getIsActive() == false) {
@@ -58,5 +59,22 @@ public class PointServiceImpl implements PointService {
 			.value(pointValue)
 			.build();
 		pointHistoryRepository.save(history);
+	}
+
+	@Override
+	public void signUpPoint(Long userId) {
+		adjustUserPointAndSavePointHistory(userId, PointSourceTypeEnum.SIGNUP_EARN);
+	}
+
+	@Override
+	@Transactional
+	public void loginPoint(Long userId) {
+		PointHistory last = pointHistoryRepository
+			.findTopByUserIdAndSourceTypeOrderByCreatedAtDesc(userId, PointSourceTypeEnum.LOGIN_EARN)
+			.orElse(null);
+		
+		if (last == null || !last.getCreatedAt().toLocalDate().equals(LocalDate.now())) {
+			adjustUserPointAndSavePointHistory(userId, PointSourceTypeEnum.LOGIN_EARN);
+		}
 	}
 }

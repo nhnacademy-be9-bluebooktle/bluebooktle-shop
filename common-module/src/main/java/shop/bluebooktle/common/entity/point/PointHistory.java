@@ -33,7 +33,7 @@ import shop.bluebooktle.common.util.PointSourceTypeConverter;
 @EqualsAndHashCode(of = "id", callSuper = false)
 @SQLDelete(sql = "UPDATE point_history SET deleted_at = CURRENT_TIMESTAMP WHERE point_id = ?")
 @SQLRestriction("deleted_at IS NULL")
-@ToString(exclude = {"pointSourceType", "user"})
+@ToString(exclude = "user")
 public class PointHistory extends BaseEntity {
 
 	@Id

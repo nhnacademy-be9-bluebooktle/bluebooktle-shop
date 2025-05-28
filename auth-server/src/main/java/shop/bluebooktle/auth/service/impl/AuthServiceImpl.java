@@ -23,7 +23,6 @@ import shop.bluebooktle.auth.service.RefreshTokenService;
 import shop.bluebooktle.common.domain.auth.UserProvider;
 import shop.bluebooktle.common.domain.auth.UserStatus;
 import shop.bluebooktle.common.domain.auth.UserType;
-import shop.bluebooktle.common.domain.point.PointSourceTypeEnum;
 import shop.bluebooktle.common.dto.auth.request.LoginRequest;
 import shop.bluebooktle.common.dto.auth.request.PasswordUpdateRequest;
 import shop.bluebooktle.common.dto.auth.request.PaycoProfileMember;
@@ -96,7 +95,7 @@ public class AuthServiceImpl implements AuthService {
 			.build();
 
 		userRepository.save(user);
-		pointService.adjustUserPointAndSavePointHistory(user.getId(), PointSourceTypeEnum.SIGNUP_EARN);
+		pointService.signUpPoint(user.getId());
 	}
 
 	@Override
@@ -125,6 +124,7 @@ public class AuthServiceImpl implements AuthService {
 		user.updateLastLoginAt();
 
 		userRepository.save(user);
+		pointService.loginPoint(user.getId());
 
 		String accessToken = jwtUtil.createAccessToken(user.getId(), user.getNickname(), user.getType());
 		String refreshToken = jwtUtil.createRefreshToken(user.getId(), user.getNickname(), user.getType());

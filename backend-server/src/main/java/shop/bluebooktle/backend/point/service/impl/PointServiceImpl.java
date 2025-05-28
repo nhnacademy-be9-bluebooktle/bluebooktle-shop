@@ -36,11 +36,6 @@ public class PointServiceImpl implements PointService {
 	private final PointPolicyRepository policyRepository;
 
 	@Override
-	public void adjustUserPointAndSavePointHistory(Long userId, PointAdjustmentRequest request) {
-
-	}
-
-	@Override
 	@Transactional
 	public void savePointHistory(Long userId, PointAdjustmentRequest request) {
 		User user = userRepository.findById(userId)
