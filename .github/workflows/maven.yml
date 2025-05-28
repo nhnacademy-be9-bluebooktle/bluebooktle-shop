@@ -73,14 +73,15 @@ jobs:
     if: >
       needs.detect_changes.outputs.changed != '' &&
       (
-        github.event_name == 'push' ||
-        (github.event_name == 'pull_request' && (github.event.action != 'closed' || github.event.pull_request.merged == true))
+        (github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/develop'))
+        ||
+        (github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true && (github.event.pull_request.base.ref == 'master' || github.event.pull_request.base.ref == 'develop'))
       )
     runs-on: ubuntu-latest
-    environment: ${{ github.ref_name == 'master' && 'prod' || 'dev' }}
+    environment: ${{ (github.ref == 'refs/heads/master' || github.event.pull_request.base.ref == 'master') && 'prod' || 'dev' }}
     env:
       CONFIG_SERVER_URI: ${{ secrets.CONFIG_SERVER_URI }}
-      SPRING_PROFILES_ACTIVE: ${{ github.ref_name == 'master' && 'prod' || 'dev' }}
+      SPRING_PROFILES_ACTIVE: ${{ (github.ref == 'refs/heads/master' || github.event.pull_request.base.ref == 'master') && 'prod' || 'dev' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
@@ -109,14 +110,15 @@ jobs:
     if: >
       needs.detect_changes.outputs.changed != '' &&
       (
-        github.event_name == 'push' ||
-        (github.event_name == 'pull_request' && (github.event.action != 'closed' || github.event.pull_request.merged == true))
+        (github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/develop'))
+        ||
+        (github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true && (github.event.pull_request.base.ref == 'master' || github.event.pull_request.base.ref == 'develop'))
       )
     runs-on: ubuntu-latest
-    environment: ${{ github.ref_name == 'master' && 'prod' || 'dev' }}
+    environment: ${{ (github.ref == 'refs/heads/master' || github.event.pull_request.base.ref == 'master') && 'prod' || 'dev' }}
     env:
       CONFIG_SERVER_URI: ${{ secrets.CONFIG_SERVER_URI }}
-      SPRING_PROFILES_ACTIVE: ${{ github.ref_name == 'master' && 'prod' || 'dev' }}
+      SPRING_PROFILES_ACTIVE: ${{ (github.ref == 'refs/heads/master' || github.event.pull_request.base.ref == 'master') && 'prod' || 'dev' }}
     steps:
       - uses: actions/download-artifact@v4
         with:
@@ -148,8 +150,13 @@ jobs:
             
             export SPRING_PROFILES_ACTIVE="${{ env.SPRING_PROFILES_ACTIVE }}"
             export CONFIG_SERVER_URI="${{ env.CONFIG_SERVER_URI }}"
-            BR=${{ github.ref_name }}
             
+            if [[ "${{ github.event_name }}" == "push" ]]; then
+              BR="${{ github.ref_name }}"
+            else 
+              BR="${{ github.event.pull_request.base.ref }}"
+            fi
+
             if [ "$BR" = "master" ]; then
               S=prod_startup.sh
             else
