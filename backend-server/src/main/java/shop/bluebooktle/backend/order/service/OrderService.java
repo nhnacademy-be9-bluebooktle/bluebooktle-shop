@@ -2,7 +2,6 @@ package shop.bluebooktle.backend.order.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 
 import org.springframework.data.domain.Pageable;
 
@@ -14,6 +13,6 @@ public interface OrderService {
 
 	List<Order> getUserOrders(User user, OrderStatus status, LocalDateTime start, LocalDateTime end, Pageable pageable);
 
-	Order getOrderByOrderKey(UUID orderKey);
+	Order getOrderByOrderKey(String orderKey);
 
 }

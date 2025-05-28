@@ -3,7 +3,6 @@ package shop.bluebooktle.backend.order.repository;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -33,6 +32,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 	List<Order> findByUser(User user, Pageable pageable);
 
 	// 주문 UUID 키로 단일 주문 조회 (비회원용)
-	Optional<Order> findByOrderKey(UUID orderKey);
+	Optional<Order> findByOrderKey(String orderKey);
 
 }

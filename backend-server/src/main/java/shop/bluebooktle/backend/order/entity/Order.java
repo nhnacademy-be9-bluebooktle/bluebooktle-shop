@@ -1,11 +1,8 @@
 package shop.bluebooktle.backend.order.entity;
 
 import java.math.BigDecimal;
-import java.sql.Types;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
-import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
@@ -24,6 +21,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import shop.bluebooktle.common.entity.BaseEntity;
 import shop.bluebooktle.common.entity.auth.User;
 
 @Entity
@@ -34,7 +32,7 @@ import shop.bluebooktle.common.entity.auth.User;
 @ToString(exclude = {"orderState", "deliveryRule"})
 @SQLDelete(sql = "UPDATE orders SET deleted_at = CURRENT_TIMESTAMP WHERE order_id = ?")
 @SQLRestriction("deleted_at IS NULL")
-public class Order {
+public class Order extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -53,8 +51,8 @@ public class Order {
 	@JoinColumn(name = "user_id", nullable = false)
 	private User user;
 
-	@Column(name = "order_date", nullable = false, updatable = false)
-	private LocalDateTime orderDate;
+	@Column(name = "order_name", nullable = false)
+	private String orderName;
 
 	@Column(name = "requested_delivery_date", nullable = false)
 	private LocalDateTime requestedDeliveryDate;
@@ -89,22 +87,18 @@ public class Order {
 	@Column(name = "tracking_number", nullable = false, length = 14)
 	private String trackingNumber;
 
-	@Column(name = "deleted_at")
-	private LocalDateTime deletedAt;
-
-	@Column(name = "order_key", length = 36)
-	@JdbcTypeCode(Types.VARCHAR)
-	private UUID orderKey;
+	@Column(name = "order_key")
+	private String orderKey;
 
 	@Builder
 	public Order(OrderState orderState, DeliveryRule deliveryRule, User user, LocalDateTime orderDate,
 		LocalDateTime requestedDeliveryDate, LocalDateTime shippedAt, BigDecimal deliveryFee, String ordererName,
 		String ordererPhoneNumber, String receiverName, String receiverPhoneNumber, String address,
-		String detailAddress, String postalCode, String trackingNumber) {
+		String detailAddress, String postalCode, String trackingNumber, String orderName, String orderKey) {
 		this.orderState = orderState;
 		this.deliveryRule = deliveryRule;
 		this.user = user;
-		this.orderDate = orderDate;
+		this.ordererName = orderName;
 		this.requestedDeliveryDate = requestedDeliveryDate;
 		this.shippedAt = shippedAt;
 		this.deliveryFee = deliveryFee;
@@ -116,6 +110,7 @@ public class Order {
 		this.detailAddress = detailAddress;
 		this.postalCode = postalCode;
 		this.trackingNumber = trackingNumber;
+		this.orderKey = orderKey;
 	}
 
 	public void changeOrderState(OrderState newState) {
