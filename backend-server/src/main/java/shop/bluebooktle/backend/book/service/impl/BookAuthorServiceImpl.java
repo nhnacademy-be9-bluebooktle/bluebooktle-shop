@@ -33,12 +33,12 @@ public class BookAuthorServiceImpl implements BookAuthorService {
 	public void registerBookAuthor(Long bookId, Long authorId) {
 
 		Author author = authorRepository.findById(authorId)
-			.orElseThrow(() -> new AuthorNotFoundException(authorId)); // #TODO
+			.orElseThrow(() -> new AuthorNotFoundException(authorId));
 		Book book = bookRepository.findById(bookId)
-			.orElseThrow(() -> new BookNotFoundException()); // #TODO
+			.orElseThrow(() -> new BookNotFoundException());
 
 		if (bookAuthorRepository.existsByBookAndAuthor(book, author)) {
-			throw new BookAuthorAlreadyExistsException(bookId, authorId); // #TODO
+			throw new BookAuthorAlreadyExistsException(bookId, authorId);
 		}
 
 		BookAuthor ba = BookAuthor.builder()
@@ -60,7 +60,7 @@ public class BookAuthorServiceImpl implements BookAuthorService {
 	public List<AuthorResponse> getAuthorByBookId(Long bookId) {
 
 		Book book = bookRepository.findById(bookId)
-			.orElseThrow(() -> new BookNotFoundException()); // #TODO
+			.orElseThrow(() -> new BookNotFoundException());
 
 		return bookAuthorRepository.findAuthorsByBook(book).stream()
 			.map(author -> AuthorResponse.builder()
@@ -76,7 +76,7 @@ public class BookAuthorServiceImpl implements BookAuthorService {
 	public List<BookInfoResponse> getBookByAuthorId(Long authorId) {
 
 		Author author = authorRepository.findById(authorId)
-			.orElseThrow(() -> new AuthorNotFoundException(authorId)); // #TODO
+			.orElseThrow(() -> new AuthorNotFoundException(authorId));
 
 		return bookAuthorRepository.findBooksByAuthor(author).stream()
 			.map(b -> new BookInfoResponse(b.getId()))
@@ -87,12 +87,12 @@ public class BookAuthorServiceImpl implements BookAuthorService {
 	public void deleteBookAuthor(Long bookId, Long authorId) {
 
 		Author author = authorRepository.findById(authorId)
-			.orElseThrow(() -> new AuthorNotFoundException(authorId)); // #TODO
+			.orElseThrow(() -> new AuthorNotFoundException(authorId));
 		Book book = bookRepository.findById(bookId)
-			.orElseThrow(() -> new BookNotFoundException()); // #TODO
+			.orElseThrow(() -> new BookNotFoundException());
 
 		BookAuthor ba = bookAuthorRepository.findByBookAndAuthor(book, author)
-			.orElseThrow(() -> new BookAuthorNotFoundException(bookId, authorId)); // #TODO
+			.orElseThrow(() -> new BookAuthorNotFoundException(bookId, authorId));
 
 		bookAuthorRepository.delete(ba);
 	}
