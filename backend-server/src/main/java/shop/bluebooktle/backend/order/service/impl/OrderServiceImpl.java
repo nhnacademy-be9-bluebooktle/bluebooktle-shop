@@ -26,11 +26,11 @@ public class OrderServiceImpl implements OrderService {
 	public List<Order> getUserOrders(User user, OrderStatus status, LocalDateTime start, LocalDateTime end,
 		Pageable pageable) {
 		if (status == null && start != null && end != null) {
-			return orderRepository.findByUserAndOrderDateBetween(user, start, end, pageable);
+			return orderRepository.findByUserAndCreatedAtBetween(user, start, end, pageable);
 		} else if (status != null && start == null && end == null) {
 			return orderRepository.findByUserAndOrderState_State(user, status, pageable);
 		} else if (status != null && start != null && end != null) {
-			return orderRepository.findByUserAndOrderState_StateAndOrderDateBetween(user, status, start, end, pageable);
+			return orderRepository.findByUserAndOrderState_StateAndCreatedAtBetween(user, status, start, end, pageable);
 		} else {
 			return orderRepository.findByUser(user, pageable); // 기본 전체 조회
 		}
