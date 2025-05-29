@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import shop.bluebooktle.backend.book.entity.Book;
 import shop.bluebooktle.backend.book.entity.BookSaleInfo;
 import shop.bluebooktle.backend.book.repository.BookAuthorRepository;
@@ -37,6 +38,7 @@ import shop.bluebooktle.common.exception.book.BookNotFoundException;
 @Service
 @Transactional
 @RequiredArgsConstructor
+@Slf4j
 public class BookServiceImpl implements BookService {
 
 	private final BookRepository bookRepository;
@@ -186,6 +188,7 @@ public class BookServiceImpl implements BookService {
 			bookPage = bookRepository.findByTitleContainingIgnoreCase(searchKeyword, pageable);
 		} else {
 			bookPage = bookRepository.findAll(pageable);
+			log.info("{}", bookPage);
 		}
 
 		List<BookAllResponse> content = bookPage.getContent().stream()
