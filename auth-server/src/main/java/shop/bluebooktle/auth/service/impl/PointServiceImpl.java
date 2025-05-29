@@ -8,6 +8,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.auth.repository.UserRepository;
+import shop.bluebooktle.auth.repository.point.PointHistoryRepository;
+import shop.bluebooktle.auth.repository.point.PointPolicyRepository;
+import shop.bluebooktle.auth.repository.point.PointSourceTypeRepository;
 import shop.bluebooktle.auth.service.PointService;
 import shop.bluebooktle.common.domain.point.ActionType;
 import shop.bluebooktle.common.domain.point.PointSourceTypeEnum;
@@ -18,9 +21,6 @@ import shop.bluebooktle.common.entity.point.PointSourceType;
 import shop.bluebooktle.common.exception.auth.UserNotFoundException;
 import shop.bluebooktle.common.exception.point.PointPolicyNotFoundException;
 import shop.bluebooktle.common.exception.point.PointSourceNotFountException;
-import shop.bluebooktle.common.repository.PointHistoryRepository;
-import shop.bluebooktle.common.repository.PointPolicyRepository;
-import shop.bluebooktle.common.repository.PointSourceTypeRepository;
 
 @Service
 @Transactional
