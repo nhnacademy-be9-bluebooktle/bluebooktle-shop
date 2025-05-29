@@ -6,13 +6,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import shop.bluebooktle.backend.point.repository.PointSourceTypeRepository;
 import shop.bluebooktle.backend.point.service.PointSourceTypeService;
 import shop.bluebooktle.common.domain.point.ActionType;
 import shop.bluebooktle.common.dto.point.request.PointSourceTypeCreateRequest;
 import shop.bluebooktle.common.dto.point.response.PointSourceTypeResponse;
 import shop.bluebooktle.common.entity.point.PointSourceType;
 import shop.bluebooktle.common.exception.point.PointSourceNotFountException;
-import shop.bluebooktle.common.repository.PointSourceTypeRepository;
 
 @Service
 @Transactional

@@ -7,6 +7,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import shop.bluebooktle.backend.point.repository.PointHistoryRepository;
+import shop.bluebooktle.backend.point.repository.PointPolicyRepository;
+import shop.bluebooktle.backend.point.repository.PointSourceTypeRepository;
 import shop.bluebooktle.backend.point.service.PointService;
 import shop.bluebooktle.backend.user.repository.UserRepository;
 import shop.bluebooktle.common.domain.point.PointSourceTypeEnum;
@@ -20,9 +23,6 @@ import shop.bluebooktle.common.entity.point.PointSourceType;
 import shop.bluebooktle.common.exception.auth.UserNotFoundException;
 import shop.bluebooktle.common.exception.point.PointPolicyNotFoundException;
 import shop.bluebooktle.common.exception.point.PointSourceNotFountException;
-import shop.bluebooktle.common.repository.PointHistoryRepository;
-import shop.bluebooktle.common.repository.PointPolicyRepository;
-import shop.bluebooktle.common.repository.PointSourceTypeRepository;
 
 @Slf4j
 @Service
