@@ -91,14 +91,14 @@ public class Order extends BaseEntity {
 	private String orderKey;
 
 	@Builder
-	public Order(OrderState orderState, DeliveryRule deliveryRule, User user, LocalDateTime orderDate,
+	public Order(OrderState orderState, DeliveryRule deliveryRule, User user,
 		LocalDateTime requestedDeliveryDate, LocalDateTime shippedAt, BigDecimal deliveryFee, String ordererName,
 		String ordererPhoneNumber, String receiverName, String receiverPhoneNumber, String address,
 		String detailAddress, String postalCode, String trackingNumber, String orderName, String orderKey) {
 		this.orderState = orderState;
 		this.deliveryRule = deliveryRule;
 		this.user = user;
-		this.ordererName = orderName;
+		this.orderName = orderName;
 		this.requestedDeliveryDate = requestedDeliveryDate;
 		this.shippedAt = shippedAt;
 		this.deliveryFee = deliveryFee;
