@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 
 import shop.bluebooktle.backend.order.entity.Order;
 import shop.bluebooktle.common.domain.order.OrderStatus;
+import shop.bluebooktle.common.dto.order.response.OrderConfirmDetailResponse;
 import shop.bluebooktle.common.entity.auth.User;
 
 public interface OrderService {
@@ -15,4 +16,5 @@ public interface OrderService {
 
 	Order getOrderByOrderKey(String orderKey);
 
+	OrderConfirmDetailResponse getOrderDetailsForConfirmation(Long orderId, Long userId);
 }

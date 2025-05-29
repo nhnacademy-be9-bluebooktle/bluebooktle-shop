@@ -12,7 +12,7 @@ import shop.bluebooktle.backend.order.entity.Order;
 import shop.bluebooktle.common.domain.order.OrderStatus;
 import shop.bluebooktle.common.entity.auth.User;
 
-public interface OrderRepository extends JpaRepository<Order, Long> {
+public interface OrderRepository extends JpaRepository<Order, Long>, OrderQueryRepository {
 
 	List<Order> findByUserAndCreatedAtBetween(User user, LocalDateTime createdAtAfter, LocalDateTime createdAtBefore,
 		Pageable pageable);
@@ -32,5 +32,12 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
 	// 주문 UUID 키로 단일 주문 조회 (비회원용)
 	Optional<Order> findByOrderKey(String orderKey);
+
+	@EntityGraph(attributePaths = {
+		"bookOrders.book.bookImgs.img",
+		"bookOrders.orderPackagings.packagingOption",
+		"userCouponBookOrders.userCoupon.coupon.couponType"
+	})
+	Optional<Order> findByIdAndUser_Id(Long orderId, Long userId);
 
 }
