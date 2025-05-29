@@ -2,10 +2,14 @@ package shop.bluebooktle.backend.order.entity;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -14,6 +18,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -21,6 +26,9 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import shop.bluebooktle.backend.book_order.entity.BookOrder;
+import shop.bluebooktle.backend.book_order.entity.UserCouponBookOrder;
+import shop.bluebooktle.backend.payment.entity.Payment;
 import shop.bluebooktle.common.entity.BaseEntity;
 import shop.bluebooktle.common.entity.auth.User;
 
@@ -29,7 +37,7 @@ import shop.bluebooktle.common.entity.auth.User;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "orders")
 @EqualsAndHashCode(of = "id", callSuper = false)
-@ToString(exclude = {"orderState", "deliveryRule"})
+@ToString(exclude = {"orderState", "deliveryRule", "user", "bookOrders", "userCouponBookOrders", "payments"})
 @SQLDelete(sql = "UPDATE orders SET deleted_at = CURRENT_TIMESTAMP WHERE order_id = ?")
 @SQLRestriction("deleted_at IS NULL")
 public class Order extends BaseEntity {
@@ -48,7 +56,7 @@ public class Order extends BaseEntity {
 	private DeliveryRule deliveryRule;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "user_id", nullable = false)
+	@JoinColumn(name = "user_id")
 	private User user;
 
 	@Column(name = "order_name", nullable = false)
@@ -84,17 +92,29 @@ public class Order extends BaseEntity {
 	@Column(name = "postal_code", nullable = false, length = 5)
 	private String postalCode;
 
-	@Column(name = "tracking_number", nullable = false, length = 14)
+	@Column(name = "tracking_number", length = 14)
 	private String trackingNumber;
 
 	@Column(name = "order_key")
 	private String orderKey;
 
+	@OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+	@BatchSize(size = 10)
+	private List<BookOrder> bookOrders = new ArrayList<>();
+
+	@OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+	@BatchSize(size = 10)
+	private List<UserCouponBookOrder> userCouponBookOrders = new ArrayList<>();
+
+	@OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+	@BatchSize(size = 10)
+	private List<Payment> payments = new ArrayList<>();
+
 	@Builder
 	public Order(OrderState orderState, DeliveryRule deliveryRule, User user,
-		LocalDateTime requestedDeliveryDate, LocalDateTime shippedAt, BigDecimal deliveryFee, String ordererName,
-		String ordererPhoneNumber, String receiverName, String receiverPhoneNumber, String address,
-		String detailAddress, String postalCode, String trackingNumber, String orderName, String orderKey) {
+		String orderName, LocalDateTime requestedDeliveryDate, LocalDateTime shippedAt, BigDecimal deliveryFee,
+		String ordererName, String ordererPhoneNumber, String receiverName, String receiverPhoneNumber,
+		String address, String detailAddress, String postalCode, String trackingNumber, String orderKey) {
 		this.orderState = orderState;
 		this.deliveryRule = deliveryRule;
 		this.user = user;
