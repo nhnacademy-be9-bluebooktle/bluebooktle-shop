@@ -1,4 +1,4 @@
-package shop.bluebooktle.backend.coupon.batch.birthday;
+package shop.bluebooktle.backend.coupon.batch.direct;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -17,24 +17,23 @@ import shop.bluebooktle.common.entity.auth.User;
 @Configuration
 @RequiredArgsConstructor
 @Slf4j
-public class BirthdayCouponJobConfig {
-
+public class DirectCouponIssueJobConfig {
 	private final JobRepository jobRepository;
 	private final PlatformTransactionManager transactionManager;
-	private final BirthdayUserItemReader reader;
-	private final BirthdayCouponProcessor processor;
-	private final BirthdayCouponWriter writer;
+	private final DirectCouponReader reader;
+	private final DirectCouponProcessor processor;
+	private final DirectCouponWriter writer;
 
 	@Bean
-	public Job birthdayCouponJob() {
-		return new JobBuilder("birthdayCouponJob", jobRepository)
-			.start(birthdayCouponStep())
+	public Job directCouponIssueJob() {
+		return new JobBuilder("couponIssueJob", jobRepository)
+			.start(directCouponIssueStep())
 			.build();
 	}
 
 	@Bean
-	public Step birthdayCouponStep() {
-		return new StepBuilder("birthdayCouponStep", jobRepository)
+	public Step directCouponIssueStep() {
+		return new StepBuilder("couponIssueStep", jobRepository)
 			.<User, CouponIssueMessage>chunk(100, transactionManager)
 			.reader(reader)
 			.processor(processor)
