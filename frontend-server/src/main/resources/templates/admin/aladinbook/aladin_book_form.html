@@ -104,6 +104,27 @@
 
             <form th:action="@{/admin/books/save}" th:object="${bookForm}" method="post" enctype="multipart/form-data">
 
+                <!-- 알라딘 도서 검색 -->
+                <div class="aladin-search-container"
+                     style="margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+                    <input type="text" id="aladinSearchInput" placeholder="알라딘 도서 검색" class="admin-form-control"
+                           style="width: 300px;">
+                    <button type="button" class="admin-btn admin-btn--primary" onclick="searchAladinBooks()">검색</button>
+                </div>
+
+                <div class="admin-panel">
+                    <div class="admin-panel__body">
+
+                        <!-- 알라딘 검색 결과 표시-->
+                        <div id="aladinSearchResults" style="margin-bottom:20px; display:none;">
+                            <h4>검색 결과</h4>
+                            <ul id="aladinResultsList" style="list-style:none; padding:0;"></ul>
+                        </div>
+                        <div id="paginationControls" style="margin-top:10px;"></div>
+                    </div>
+                </div>
+
+
                 <div class="form-section">
                     <h3><i class="fas fa-info-circle"></i> 기본 정보</h3>
                     <div class="row">
@@ -289,14 +310,12 @@
                     </div>
 
                     <div class="admin-form-group">
-                        <label class="admin-form-label">도서 이미지</label>
-                        <input
-                                type="file"
-                                th:field="*{imageFile}"
-                                accept="image/*"
-                                class="admin-form-control"/>
+                        <label for="imageFile" class="admin-form-label">도서 이미지</label>
+                        <input type="file" id="imageFile" th:field="*{imageFile}"
+                               accept="image/*" class="admin-form-control"/>
                     </div>
 
+                    <!-- 업로드 미리보기 -->
                     <div id="uploadedImagePreview" style="margin-top: 10px;"></div>
 
                     <div class="admin-form-actions mt-4 text-end">
@@ -318,23 +337,197 @@
 
 <th:block layout:fragment="page_scripts">
     <script th:inline="javascript">
-
+        const MAX_PAGE = 3;
+        const pageSize = 10;
+        let currentPage = 1;
 
         // CKEditor 인스턴스 전역 저장
-        const pubSize = 10, authSize = 10, tagSize = 10;
-
-        // ② CKEditor 초기화 + pubPage 체크
+        let descriptionEditor;
         document.addEventListener('DOMContentLoaded', () => {
             ClassicEditor
                 .create(document.getElementById('description'))
-                .then(() => console.log('✅ CKEditor ready'))
+                .then(editor => {
+                    descriptionEditor = editor;
+                    console.log('✅ CKEditor ready');
+                })
                 .catch(err => console.error('❌ CKEditor init error:', err));
 
+            // 검색 버튼 바인딩
+            document.querySelector('.admin-btn--primary')
+                .addEventListener('click', () => searchAladinBooks(1));
+        });
+
+        // 알라딘 도서 검색
+        async function searchAladinBooks(page = 1) {
+            // page 1~MAX_PAGE 사이로 제한
+            page = Math.max(1, Math.min(page, MAX_PAGE));
+            currentPage = page;
+
+            const query = document.getElementById('aladinSearchInput').value.trim();
+            if (!query) {
+                alert('검색어를 입력해주세요.');
+                return;
+            }
+
+            // 이전 결과 초기화
+            const resultsContainer = document.getElementById('aladinSearchResults');
+            const resultsList = document.getElementById('aladinResultsList');
+            resultsList.innerHTML = '';
+            resultsContainer.style.display = 'none';
+
+            // API 호출
+            const res = await fetch(
+                `/admin/books/aladin-search?keyword=${encodeURIComponent(query)}` +
+                `&page=${page}&size=${pageSize}`,
+                {headers: {'Accept': 'application/json'}}
+            );
+            const data = await res.json();
+            const results = Array.isArray(data) ? data : (data.data || []);
+
+            // 결과가 없으면
+            if (results.length === 0) {
+                alert('✅ 더 이상 검색 결과가 없습니다.');
+                renderPaginationControls(page, false);
+                return;
+            }
+
+            // 결과 렌더링
+            displayAladinSearchResults(results);
+
+            // 다음 페이지 버튼 활성/비활성
+            const hasNext = (results.length === pageSize) && (page < MAX_PAGE);
+            renderPaginationControls(page, hasNext);
+        }
+
+        // 검색 결과 리스트 뿌리기
+        function displayAladinSearchResults(results) {
+            const resultsContainer = document.getElementById('aladinSearchResults');
+            const resultsList = document.getElementById('aladinResultsList');
+            resultsList.innerHTML = '';
+
+            results.forEach(book => {
+                const payload = encodeURIComponent(JSON.stringify(book));
+                const li = document.createElement('li');
+                li.style.marginBottom = '10px';
+                li.innerHTML = `
+          <strong>${book.title}</strong><br>
+          저자: ${book.author}, 출판사: ${book.publisher}, ISBN: ${book.isbn}<br>
+          <button
+            type="button"
+            class="admin-btn admin-btn--default"
+            style="margin-top:5px;"
+            onclick="selectAladinBook('${payload}')">
+            선택
+          </button>
+        `;
+                resultsList.appendChild(li);
+            });
+
+            resultsContainer.style.display = 'block';
+        }
+
+        // 선택 버튼 클릭 시 폼에 값 채우기
+        function selectAladinBook(encoded) {
+            const book = JSON.parse(decodeURIComponent(encoded));
+            console.log(book);
+
+
+            // 제목, ISBN
+            document.getElementById('title').value = book.title || '';
+            document.getElementById('isbn').value = book.isbn || '';
+
+            // 정가, 판매가
+            document.getElementById('price').value = book.price != null ? book.price : '';
+            document.getElementById('salePrice').value = book.salePrice != null ? book.salePrice : '';
+
+            // 설명
+            if (descriptionEditor) {
+                descriptionEditor.setData(book.description || '');
+            } else {
+                document.getElementById('description').value = book.description || '';
+            }
+
+            // 출판일 처리
+            let dateString = '';
+            const pd = book.publishDate;
+            if (typeof pd === 'string') {
+                // ISO 문자열
+                dateString = pd.split('T')[0];
+            } else if (Array.isArray(pd) && pd.length >= 3) {
+                // [year, month, day, ...]
+                const [y, m, d] = pd;
+                const mm = String(m).padStart(2, '0');
+                const dd = String(d).padStart(2, '0');
+                dateString = `${y}-${mm}-${dd}`;
+            } else if (pd && typeof pd === 'object') {
+                // { year:…, monthValue:…, dayOfMonth:… }
+                const y = pd.year || pd.yearValue || '';
+                const m = pd.monthValue || pd.month || 0;
+                const d = pd.dayOfMonth || pd.day || 0;
+                const mm = String(m).padStart(2, '0');
+                const dd = String(d).padStart(2, '0');
+                dateString = y ? `${y}-${mm}-${dd}` : '';
+            }
+            document.getElementById('publishDate').value = dateString;
+
+            //이미지
+            document.getElementById('imgUrl').value = book.imgUrl || '';
+            document.getElementById('uploadedImageUrl').value = book.imgUrl || '';
+
+            if (book.imgUrl) {
+                document.getElementById('uploadedImagePreview').innerHTML = `
+      <img src="${book.imgUrl}"
+           style="width:180px; border:2px solid #007bff; padding:6px; border-radius:6px;" />
+      <div style="margin-top:5px; font-size:14px; color:green;">
+        외부 이미지 사용
+      </div>
+    `;
+            } else {
+                document.getElementById('uploadedImagePreview').innerHTML = '';
+            }
+
+            // 결과 숨기기
+            document.getElementById('aladinSearchResults').style.display = 'none';
+            document.getElementById('paginationControls').innerHTML = '';
+        }
+
+        // 페이지 네비게이션 렌더링
+        function renderPaginationControls(page, hasNext) {
+            const container = document.getElementById('paginationControls');
+            const disablePrev = page <= 1;
+            const disableNext = !hasNext;
+            const totalPages = hasNext ? MAX_PAGE : page;
+
+            container.innerHTML = `
+        <button type="button" ${disablePrev ? 'disabled' : ''}
+          onclick="searchAladinBooks(${page - 1})">
+          « 이전
+        </button>
+        <span style="margin:0 1rem;">페이지 ${page} / ${totalPages}</span>
+        <button type="button" ${disableNext ? 'disabled' : ''}
+          onclick="searchAladinBooks(${page + 1})">
+          다음 »
+        </button>
+      `;
+        }
+
+        // 검색 버튼 바인딩
+        document.querySelector('.admin-btn--primary')
+            .addEventListener('click', () => searchAladinBooks(1));
+
+        // 페이지가 로드된 직후, 만약 pubPage 쿼리 파라미터가 있으면 팝업을 열어두자
+        document.addEventListener('DOMContentLoaded', () => {
             const params = new URL(location).searchParams;
             if (params.has('pubPage') || params.has('pubKeyword')) {
                 openPopup('publisher');
             }
         });
+
+        //카테고리, 작가, 출판사, 태그
+
+        const pubSize = 10, pubKeyword = '';
+        const authSize = 10, authKeyword = '';
+        const tagSize = 10, tagKeyword = '';
 
         function renderCategoryTree(nodes, container) {
             nodes.forEach(node => {
@@ -526,6 +719,44 @@
             });
         });
 
+        // Presigned URL을 이용한 단일 이미지 업로드
+        async function uploadImageToPresignedUrl() {
+            const fileInput = document.getElementById("bookImage");
+            const file = fileInput.files[0];
+            if (!file) {
+                alert("이미지를 선택하세요.");
+                return;
+            }
+            const presignedUrl = document.getElementById("presignedUploadUrl").value;
+            try {
+                const res = await fetch(presignedUrl, {
+                    method: "PUT",
+                    headers: {"Content-Type": file.type},
+                    body: file
+                });
+                if (!res.ok) throw new Error("Upload failed");
+
+                const imageUrl = presignedUrl.split("?")[0];
+                document.getElementById("uploadedImageUrl").value = imageUrl;
+                document.getElementById("imgUrl").value = imageUrl;
+                console.log("imgUrl: " + imageUrl);
+                document.getElementById("uploadedImagePreview").innerHTML = `
+                    <img src="${imageUrl}"
+                         style="width:180px;
+                                border:2px solid #007bff;
+                                padding:6px;
+                                border-radius:6px;" />
+                    <div style="margin-top:5px;
+                                font-size:14px;
+                                color:green;">
+                        이미지 업로드 완료
+                    </div>`;
+                fileInput.value = "";
+            } catch (err) {
+                console.error(err);
+                alert("업로드 중 오류 발생");
+            }
+        }
     </script>
 </th:block>
 

@@ -33,3 +33,5 @@ oauth:
     client-id: "3RDKLuGWlBifp1UfHtinDmZ"
     redirect-uri: "http://www.localhost:9080/oauth/payco"
 
+minio:
+  endpoint: http://storage.java21.net:8000

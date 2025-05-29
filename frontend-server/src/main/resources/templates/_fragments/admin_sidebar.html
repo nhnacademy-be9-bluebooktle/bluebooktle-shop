@@ -48,6 +48,9 @@
                            th:classappend="${currentURI == '/admin/books'} ? 'active' : ''">도서 목록</a></li>
                     <li><a th:href="@{/admin/books/new}"
                            th:classappend="${currentURI == '/admin/books/new'} ? 'active' : ''">도서 등록</a></li>
+                    <li><a th:href="@{/admin/aladinBooks/new}"
+                           th:classappend="${currentURI == '/admin/aladinBooks/new'} ? 'active' : ''">알라딘 API 도서 등록</a>
+                    </li>
                 </ul>
             </li>
 

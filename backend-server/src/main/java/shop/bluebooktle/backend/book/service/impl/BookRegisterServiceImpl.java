@@ -67,7 +67,9 @@ public class BookRegisterServiceImpl implements BookRegisterService {
 		bookAuthorService.registerBookAuthor(book.getId(), request.getAuthorIdList());
 		bookPublisherService.registerBookPublisher(book.getId(), request.getPublisherIdList());
 		bookCategoryService.registerBookCategory(book.getId(), request.getCategoryIdList());
-		bookTagService.registerBookTag(book.getId(), request.getTagIdList());
+		if (request.getTagIdList() != null || !request.getTagIdList().isEmpty()) {
+			bookTagService.registerBookTag(book.getId(), request.getTagIdList());
+		}
 
 		// 이미지 연결
 		bookImgService.registerBookImg(book.getId(), request.getImgUrl());
