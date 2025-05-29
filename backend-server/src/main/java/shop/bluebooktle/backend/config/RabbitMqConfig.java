@@ -14,8 +14,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import lombok.RequiredArgsConstructor;
-import shop.bluebooktle.backend.coupon.mq.ExchangeProperties;
-import shop.bluebooktle.backend.coupon.mq.QueueProperties;
+import shop.bluebooktle.backend.coupon.mq.properties.ExchangeProperties;
+import shop.bluebooktle.backend.coupon.mq.properties.QueueProperties;
 
 @Configuration
 @RequiredArgsConstructor
@@ -99,6 +99,44 @@ public class RabbitMqConfig {
 		return BindingBuilder.bind(directDlqQueue())
 			.to(directDlxExchange())
 			.with(props.getDirectDlq());
+	}
+
+	// ------- welcome -------
+	@Bean
+	public Queue welcomeQueue() {
+		return QueueBuilder.durable(props.getWelcome())
+			.withArgument("x-dead-letter-exchange", exchange.getWelcomeDlx())
+			.withArgument("x-dead-letter-routing-key", props.getWelcomeDlq())
+			.build();
+	}
+
+	@Bean
+	public DirectExchange welcomeExchange() {
+		return new DirectExchange(exchange.getWelcome());
+	}
+
+	@Bean
+	public Binding welcomeBinding() {
+		return BindingBuilder.bind(welcomeQueue())
+			.to(welcomeExchange())
+			.with(props.getWelcome());
+	}
+
+	@Bean
+	public Queue welcomeDlqQueue() {
+		return new Queue(props.getWelcomeDlq(), true);
+	}
+
+	@Bean
+	public DirectExchange welcomeDlxExchange() {
+		return new DirectExchange(exchange.getWelcomeDlx());
+	}
+
+	@Bean
+	public Binding welcomeDlqBinding() {
+		return BindingBuilder.bind(welcomeDlqQueue())
+			.to(welcomeDlxExchange())
+			.with(props.getWelcomeDlq());
 	}
 
 	//예외 발생 시 Reject
