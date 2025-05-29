@@ -3,8 +3,6 @@ package shop.bluebooktle.frontend.controller;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -26,7 +24,9 @@ import shop.bluebooktle.common.dto.book_order.response.PackagingOptionInfoRespon
 import shop.bluebooktle.common.dto.coupon.response.CouponResponse;
 import shop.bluebooktle.common.dto.payment.request.PaymentConfirmRequest;
 import shop.bluebooktle.common.dto.payment.response.PaymentConfirmResponse;
+import shop.bluebooktle.common.dto.user.response.AddressResponse;
 import shop.bluebooktle.common.dto.user.response.UserResponse;
+import shop.bluebooktle.frontend.service.AddressService;
 import shop.bluebooktle.frontend.service.AdminPackagingOptionService;
 import shop.bluebooktle.frontend.service.PaymentsService;
 import shop.bluebooktle.frontend.service.UserService;
@@ -39,14 +39,43 @@ public class OrderController {
 	private final PaymentsService paymentsService;
 	private final UserService userService;
 	private final AdminPackagingOptionService adminPackagingOptionService;
+	private final AddressService addressService;
 	private final String SUCCESS_URL = "/order/success";
 	private final String FAILURE_URL = "/order/fail";
 	@Value("${toss.client-key}")
 	private String clientKey;
 
-	@GetMapping("/checkout")
+	@GetMapping("/create")
+	public ModelAndView createPage() {
+		ModelAndView mav = new ModelAndView("order/create_form");
+		UserResponse userResponse = userService.getMe();
+
+		List<BookCartOrderResponse> bookItems = createMockBookItems();
+
+		List<AddressResponse> addresses = addressService.getAddresses();
+		mav.addObject("bookItems", bookItems);
+
+		mav.addObject("addresses", addresses);
+
+		Page<PackagingOptionInfoResponse> page = adminPackagingOptionService.getPackagingOptions(0, 20, null);
+		List<PackagingOptionInfoResponse> packagingOptions = page.getContent();
+		mav.addObject("packagingOptions", packagingOptions);
+
+		List<CouponResponse> orderCoupons = createMockOrderCoupons();
+		mav.addObject("coupons", orderCoupons);
+
+		mav.addObject("availablePoints", userResponse.getPointBalance());
+
+		// mav.addObject("checkoutRequest", new CheckoutRequest());
+
+		mav.addObject("user", userResponse);
+
+		return mav;
+	}
+
+	@GetMapping("/{orderId}/checkout")
 	public ModelAndView checkoutPage() {
-		ModelAndView mav = new ModelAndView("order/checkout");
+		ModelAndView mav = new ModelAndView("checkout");
 		UserResponse userResponse = userService.getMe();
 
 		List<BookCartOrderResponse> bookItems = createMockBookItems();
@@ -56,27 +85,13 @@ public class OrderController {
 		Page<PackagingOptionInfoResponse> page = adminPackagingOptionService.getPackagingOptions(0, 20, null);
 		List<PackagingOptionInfoResponse> packagingOptions = page.getContent();
 		mav.addObject("packagingOptions", packagingOptions);
-		mav.addObject("packagingOptions", packagingOptions);
-
-		Map<Long, List<CouponResponse>> itemCoupons = createMockItemCoupons();
-		mav.addObject("itemCoupons", itemCoupons);
 
 		List<CouponResponse> orderCoupons = createMockOrderCoupons();
-		mav.addObject("orderCoupons", orderCoupons);
+		mav.addObject("coupons", orderCoupons);
 
 		mav.addObject("availablePoints", userResponse.getPointBalance());
 
 		// mav.addObject("checkoutRequest", new CheckoutRequest());
-
-		// 토스페이먼츠용 공통값
-		mav.addObject("clientKey", clientKey);
-		mav.addObject("orderId", UUID.randomUUID().toString());
-		mav.addObject("orderName", "테스트 주문");
-		mav.addObject("successUrl", SUCCESS_URL);
-		mav.addObject("failUrl", FAILURE_URL);
-		mav.addObject("customerEmail", userResponse.getEmail());
-		mav.addObject("customerName", userResponse.getName());
-		mav.addObject("amount", 0);
 
 		return mav;
 	}
@@ -114,8 +129,8 @@ public class OrderController {
 	private List<BookCartOrderResponse> createMockBookItems() {
 		return List.of(
 			new BookCartOrderResponse(
-				101L,
-				"코딩 대모험",
+				1L,
+				"ㅇㅅㅇ ㅋㅋ",
 				new BigDecimal("28000"),
 				new BigDecimal("25200"),
 				10,
@@ -126,8 +141,8 @@ public class OrderController {
 				1
 			),
 			new BookCartOrderResponse(
-				102L,
-				"픽셀 아트로 배우는 알고리즘",
+				2L,
+				"ㅋㅋㅋ",
 				new BigDecimal("35000"),
 				new BigDecimal("31500"),
 				5,
@@ -136,45 +151,6 @@ public class OrderController {
 				List.of("교육", "IT"),
 				BookSaleInfoState.AVAILABLE,
 				2
-			)
-		);
-	}
-
-	private Map<Long, List<CouponResponse>> createMockItemCoupons() {
-		return Map.of(
-			101L, List.of(
-				new CouponResponse(
-					1L,
-					"키치코딩 1,000원 할인",          // couponName
-					CouponTypeTarget.BOOK,          // target
-					"금액 할인",                     // couponTypeName
-					BigDecimal.ZERO,                // minimumPayment (제한 없음)
-					LocalDateTime.now().minusDays(10), // createdAt
-					null,                           // categoryName (전체 카테고리)
-					"코딩 대모험"                     // bookName
-				),
-				new CouponResponse(
-					2L,
-					"키치코딩 5% 할인",
-					CouponTypeTarget.BOOK,
-					"퍼센트 할인",
-					BigDecimal.ZERO,
-					LocalDateTime.now().minusDays(8),
-					null,
-					"코딩 대모험"
-				)
-			),
-			102L, List.of(
-				new CouponResponse(
-					3L,
-					"픽셀아트 전용 3,000원 할인",
-					CouponTypeTarget.BOOK,
-					"금액 할인",
-					BigDecimal.ZERO,
-					LocalDateTime.now().minusDays(5),
-					"교육",                         // categoryName: 교육 카테고리 한정
-					"픽셀 아트로 배우는 알고리즘"
-				)
 			)
 		);
 	}
@@ -200,6 +176,36 @@ public class OrderController {
 				LocalDateTime.now().minusDays(15),
 				null,
 				null
+			),
+			new CouponResponse(
+				1L,
+				"키치코딩 1,000원 할인",          // couponName
+				CouponTypeTarget.BOOK,          // target
+				"금액 할인",                     // couponTypeName
+				BigDecimal.ZERO,                // minimumPayment (제한 없음)
+				LocalDateTime.now().minusDays(10), // createdAt
+				null,                           // categoryName (전체 카테고리)
+				"코딩 대모험"                     // bookName
+			),
+			new CouponResponse(
+				2L,
+				"키치코딩 5% 할인",
+				CouponTypeTarget.BOOK,
+				"퍼센트 할인",
+				BigDecimal.ZERO,
+				LocalDateTime.now().minusDays(8),
+				null,
+				"코딩 대모험"
+			),
+			new CouponResponse(
+				3L,
+				"픽셀아트 전용 3,000원 할인",
+				CouponTypeTarget.BOOK,
+				"금액 할인",
+				BigDecimal.ZERO,
+				LocalDateTime.now().minusDays(5),
+				"교육",                         // categoryName: 교육 카테고리 한정
+				"픽셀 아트로 배우는 알고리즘"
 			)
 		);
 	}

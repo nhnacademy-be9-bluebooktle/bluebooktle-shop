@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html layout:decorate="~{_layouts/default_layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>주문서 작성</title>
+    <style>
+        /* 기존 checkout 페이지 스타일 유지 */
+        .checkout-page-header-kitsch {
+            background-color: var(--kitsch-color-5);
+            color: var(--kitsch-text-light);
+            padding: 2rem;
+            text-align: center;
+            border: 5px dashed var(--kitsch-accent-orange);
+            border-radius: 10px 30px 10px 30px;
+            margin-bottom: 2.5rem;
+            transform: rotate(-0.5deg);
+            box-shadow: 5px 5px 0px var(--kitsch-color-2);
+        }
+
+        .checkout-page-header-kitsch .page-main-title-kitsch {
+            font-size: 2.8rem;
+            color: var(--kitsch-bg-alt);
+            text-shadow: 2px 2px 0 var(--kitsch-text-dark);
+        }
+
+        .checkout-container-kitsch {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2.5rem;
+        }
+
+        .checkout-section-kitsch {
+            background-color: var(--kitsch-bg-alt);
+            padding: 1.5rem 2rem;
+            border: 3px solid var(--kitsch-text-dark);
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+
+        .checkout-section-kitsch h3.section-title-kitsch {
+            font-size: 1.5rem;
+            color: var(--kitsch-text-light);
+            background-color: var(--kitsch-color-1);
+            border: 2px solid var(--kitsch-text-dark);
+            border-radius: 5px;
+            padding: 0.4em 0.8em;
+            text-align: left;
+            margin-bottom: 1.5rem;
+            display: inline-block;
+        }
+
+        .checkout-section-kitsch h3.section-title-kitsch i {
+            margin-right: 0.5em;
+        }
+
+        /* 주문 상품 목록 */
+        .ordered-item-kitsch {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem 0;
+            border-bottom: 1px dashed var(--kitsch-color-4);
+            position: relative; /* 개별 쿠폰 적용 버튼 위치 기준 */
+        }
+
+        .ordered-item-kitsch:last-child {
+            border-bottom: none;
+        }
+
+        .ordered-item-kitsch img {
+            width: 140px;
+            height: 210px;
+            object-fit: cover;
+            border: 2px solid var(--kitsch-text-dark);
+            border-radius: 3px;
+        }
+
+        .ordered-item-details-kitsch {
+            flex-grow: 1;
+        }
+
+        /* 상세 정보 영역이 남은 공간 차지 */
+        .ordered-item-details-kitsch .item-title-kitsch {
+            font-family: var(--font-pixel);
+            font-size: 1rem;
+            color: var(--kitsch-color-5);
+            margin-bottom: 0.2rem;
+        }
+
+        .ordered-item-details-kitsch .item-quantity-price-kitsch {
+            font-family: var(--font-handwriting);
+            font-size: 0.9rem;
+            color: var(--kitsch-text-dark);
+        }
+
+        .item-packaging-kitsch {
+            font-size: 0.8rem;
+            margin-top: 0.3rem;
+        }
+
+        .item-packaging-kitsch .select-kitsch {
+            font-size: 0.75rem;
+            padding: 0.4em 1.5em 0.4em 0.6em;
+            width: auto;
+            margin-top: 0.2rem;
+        }
+
+        /* 개별 상품 쿠폰 적용 UI */
+        .item-coupon-apply-kitsch {
+            margin-top: 0.5rem;
+        }
+
+        .item-coupon-apply-kitsch .label-kitsch {
+            font-size: 0.8em !important;
+            margin-bottom: 0.2em !important;
+        }
+
+        .item-coupon-apply-kitsch .select-kitsch {
+            font-size: 0.75rem;
+            padding: 0.4em 1.5em 0.4em 0.6em;
+            width: auto;
+            max-width: 200px; /* 너무 길어지지 않게 */
+        }
+
+        .item-coupon-applied-info {
+            font-size: 0.75rem;
+            color: var(--kitsch-color-3);
+            font-family: var(--font-pixel);
+            margin-top: 0.2em;
+        }
+
+
+        /* 폼 그룹 스타일 (기존 유지) */
+        .form-group-kitsch {
+            margin-bottom: 1.2rem;
+        }
+
+        .form-group-kitsch .input-kitsch, .form-group-kitsch .select-kitsch, .form-group-kitsch .textarea-kitsch {
+            font-size: 0.9rem;
+        }
+
+        .address-btn-group-kitsch {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        /* 결제 금액 요약 */
+        .payment-summary-kitsch {
+            background-color: var(--kitsch-bg-main);
+            padding: 1.5rem 2rem;
+            border: 3px solid var(--kitsch-color-1);
+            border-radius: 8px;
+            box-shadow: 3px 3px 0 var(--kitsch-color-3);
+        }
+
+        .payment-summary-kitsch h3.summary-title-kitsch {
+            font-family: var(--font-display);
+            font-size: 1.6rem;
+            color: var(--kitsch-color-3);
+            margin-bottom: 1.5rem;
+            text-align: center;
+            border-bottom: 3px dashed var(--kitsch-color-5);
+            padding-bottom: 0.8rem;
+        }
+
+        .summary-row-kitsch {
+            display: flex;
+            justify-content: space-between;
+            font-family: var(--font-pixel);
+            font-size: 1rem;
+            margin-bottom: 0.8rem;
+            padding: 0.4em 0;
+        }
+
+        .summary-row-kitsch .label {
+            color: var(--kitsch-text-dark);
+        }
+
+        .summary-row-kitsch .value {
+            color: var(--kitsch-color-5);
+            font-weight: bold;
+        }
+
+        .summary-row-kitsch .value.discount {
+            color: var(--kitsch-accent-orange);
+        }
+
+        .total-summary-kitsch {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 3px solid var(--kitsch-text-dark);
+        }
+
+        .total-summary-kitsch .summary-row-kitsch .label {
+            font-size: 1.3rem;
+            color: var(--kitsch-color-1);
+        }
+
+        .total-summary-kitsch .summary-row-kitsch .value {
+            font-size: 1.5rem;
+            color: var(--kitsch-color-3);
+            font-family: var(--font-display);
+        }
+
+        /* 결제 수단 (기존 유지) */
+        .payment-methods-kitsch {
+            margin-top: 1.5rem;
+        }
+
+        .payment-methods-kitsch .label-kitsch {
+            margin-bottom: 0.8rem;
+            font-size: 1.2em;
+        }
+
+        .payment-option-kitsch {
+            padding: 0.8rem 1rem;
+            border: 2px dashed transparent;
+            border-radius: 5px;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            background-color: var(--kitsch-bg-alt);
+            transition: all 0.2s ease;
+        }
+
+        .payment-option-kitsch:hover {
+            border-color: var(--kitsch-color-2);
+            background-color: var(--kitsch-bg-main);
+        }
+
+        .payment-option-kitsch.selected-payment {
+            border-color: var(--kitsch-color-4);
+            border-style: solid;
+            background-color: var(--kitsch-color-4);
+            color: var(--kitsch-text-light);
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .payment-option-kitsch .pixel-font-kitsch {
+            font-size: 1rem;
+        }
+
+        .payment-option-kitsch i {
+            margin-right: 0.5em;
+            font-size: 1.2em;
+        }
+
+        .checkout-submit-btn-kitsch {
+            width: 100%;
+            font-size: 1.3rem;
+            padding: 1em;
+            margin-top: 1.5rem;
+        }
+
+        @media (max-width: 992px) {
+            .checkout-container-kitsch {
+                grid-template-columns: 1fr;
+            }
+
+            .payment-summary-kitsch {
+                order: -1;
+                margin-bottom: 2rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            /* .ordered-item-kitsch { flex-direction: column; align-items: flex-start;} */
+            /* 기존 스타일 유지 또는 조정 */
+            /* .ordered-item-kitsch img { width: 60px; height: 90px; margin-bottom:0.5rem;} */
+        }
+    </style>
+</head>
+
+<body>
+<div layout:fragment="content">
+    <div class="container-kitsch section-padding-kitsch">
+
+        <div class="checkout-page-header-kitsch">
+            <h1 class="page-main-title-kitsch display-font-kitsch"><i class="fas fa-rocket"></i> 주문 & 결제 <i
+                    class="fas fa-gem"></i></h1>
+        </div>
+
+        <form id="checkoutForm" method="get" th:action="@{/order/process}">
+            <div class="checkout-container-kitsch">
+                <div class="checkout-main-panel-kitsch">
+                    <section class="checkout-section-kitsch">
+                        <h3 class="section-title-kitsch"><i class="fas fa-shopping-basket"></i> 주문 상품 확인</h3>
+                        <div id="orderedItemsList">
+                            <div class="ordered-item-kitsch"
+                                 th:data-item-id="${item.id()}"
+                                 th:data-item-price="${item.price()}"
+                                 th:data-item-salePrice="${item.salePrice()}"
+                                 th:data-item-quantity="${item.quantity()}"
+                                 th:each="item : ${bookItems}">
+                                <img alt="" th:alt="${item.title()}" th:src="${item.thumbnailUrl()}"/>
+                                <div class="ordered-item-details-kitsch">
+                                    <a class="item-title-kitsch" href="#" th:text="${item.title()}"></a>
+                                    <p class="item-quantity-price-kitsch">
+                                        수량: <span class="item-qty" th:text="${item.quantity}"></span>개 / 가격:
+                                        <span class="item-price-per-unit"
+                                              th:text=" ${#strings.toString(item.price())} + '원'"></span>
+                                    </p>
+
+                                    <div class="item-packaging-kitsch">
+                                        <label class="label-kitsch" th:for="${'packaging-' + item.id()}">포장
+                                            선택:</label>
+                                        <select class="select-kitsch item-packaging-select"
+                                                th:id="${'packaging-' + item.id()}"
+                                                th:name="${'itemPackaging[' + item.id() + ']'}">
+                                            <option th:data-packaging-cost="${opt.getPrice()}"
+                                                    th:each="opt : ${packagingOptions}"
+                                                    th:text="${opt.getName()} + ' (+' + ${#strings.toString(opt.getPrice())}  + '원)'"
+                                                    th:value="${opt.getId()}">
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="checkout-section-kitsch">
+                        <h3 class="section-title-kitsch"><i class="fas fa-user-circle"></i> 주문자 정보</h3>
+                        <div class="form-group-kitsch">
+                            <label class="label-kitsch" for="ordererName">이름:</label>
+                            <input class="input-kitsch pixel-font-kitsch" id="ordererName" name="ordererName"
+                                   readonly
+                                   th:value="${user.getName()}" type="text"/>
+                        </div>
+                        <div class="form-group-kitsch">
+                            <label class="label-kitsch" for="ordererEmail">이메일:</label>
+                            <input class="input-kitsch pixel-font-kitsch" id="ordererEmail" name="ordererEmail"
+                                   readonly
+                                   th:value="${user.getEmail()}" type="email"/>
+                        </div>
+                        <div class="form-group-kitsch">
+                            <label class="label-kitsch" for="ordererPhone">연락처:</label>
+                            <input class="input-kitsch pixel-font-kitsch" id="ordererPhone" name="ordererPhone"
+                                   readonly
+                                   th:value="${user.getPhoneNumber()}"
+                                   type="tel"/>
+                        </div>
+                    </section>
+
+                    <section class="checkout-section-kitsch">
+                        <h3 class="section-title-kitsch"><i class="fas fa-truck-loading"></i> 배송지 정보</h3>
+
+
+                        <div class="form-group-kitsch">
+                            <label class="label-kitsch" for="shippingAddressOption">배송지 선택:</label>
+                            <select id="shippingAddressOption" name="shippingAddressOption"
+                                    onchange="toggleNewAddressForm(this.value)">
+                                <option th:each="addr, stat : ${addresses}"
+                                        th:value="${addr.addressId}"
+                                        th:data-name="${addr.alias}"
+                                        th:data-road="${addr.roadAddress}"
+                                        th:data-detail="${addr.detailAddress}"
+                                        th:data-postal-code="${addr.postalCode}"
+                                        th:selected="${stat.index == 0}"
+                                        th:text="${addr.alias}">
+                                </option>
+                                <option value="new">+ 새 주소 입력</option>
+                            </select>
+
+                            <!-- 배송 요청사항 -->
+                            <div class="form-group-kitsch">
+                                <label class="label-kitsch" for="deliveryMessage">배송 요청사항:</label>
+                                <textarea class="textarea-kitsch handwriting-font-kitsch"
+                                          id="deliveryMessage"
+                                          name="deliveryMessage"
+                                          placeholder="예: 문 앞에 놓아주세요. 부재 시 연락주세요."
+                                          rows="3"></textarea>
+                            </div>
+
+                            <!-- 희망 배송일 -->
+                            <div class="form-group-kitsch">
+                                <label class="label-kitsch" for="deliveryDate">희망 배송일 (선택):</label>
+                                <input class="input-kitsch pixel-font-kitsch"
+                                       id="deliveryDate"
+                                       name="deliveryDate"
+                                       type="date"/>
+                            </div>
+
+                        </div>
+
+                        <div class="input-description-kitsch"
+                             id="savedAddressInfo"
+                             style="border:1px dashed var(--kitsch-color-2); padding:0.5rem; margin-bottom:1rem; border-radius:3px;">
+                            <div th:with="addr=${addresses[0]}">
+                                <p><strong>배송지명:</strong> <span th:text="${addr.alias}"/></p>
+                                <p><strong>주소:</strong>
+                                    <span th:text="${addr.roadAddress + ' ' + addr.detailAddress}"></span>
+                                </p>
+                                <p><strong>우편번호:</strong> <span th:text="${addr.postalCode}"/></p>
+                            </div>
+                        </div>
+
+                        <!-- 3) 새 주소 입력 폼 (기본 숨김) -->
+                        <div id="newAddressForm" style="display:none;">
+                            <div class="form-group-kitsch">
+                                <label class="label-kitsch" for="recipientName">받는 분:</label>
+                                <input class="input-kitsch pixel-font-kitsch"
+                                       id="recipientName"
+                                       name="recipientName"
+                                       type="text"/>
+                            </div>
+                            <div class="form-group-kitsch">
+                                <label class="label-kitsch" for="recipientPhone">연락처:</label>
+                                <input class="input-kitsch pixel-font-kitsch"
+                                       id="recipientPhone"
+                                       name="recipientPhone"
+                                       type="tel"/>
+                            </div>
+                            <div class="form-group-kitsch">
+                                <label class="label-kitsch">주소:</label>
+                                <div class="address-group-kitsch" style="margin-bottom: 0.5rem;">
+                                    <input class="input-kitsch pixel-font-kitsch"
+                                           id="shippingPostcode"
+                                           name="shippingPostcode"
+                                           placeholder="우편번호"
+                                           readonly
+                                           type="text"/>
+                                    <button class="btn-kitsch secondary-btn-kitsch color1-kitsch retro-shadow-kitsch-small small-btn-kitsch"
+                                            onclick="execDaumPostcode('shippingPostcode', 'shippingAddress')"
+                                            type="button">
+                                        우편번호 찾기
+                                    </button>
+                                </div>
+                                <input class="input-kitsch pixel-font-kitsch"
+                                       id="shippingAddress"
+                                       name="shippingAddress"
+                                       placeholder="도로명 주소"
+                                       readonly
+                                       style="margin-bottom: 0.5rem;"
+                                       type="text"/>
+                                <input class="input-kitsch pixel-font-kitsch"
+                                       id="shippingDetailAddress"
+                                       name="shippingDetailAddress"
+                                       placeholder="상세주소 입력"
+                                       type="text"/>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+
+                <div class="checkout-sidebar-panel-kitsch">
+                    <section class="checkout-section-kitsch payment-summary-kitsch">
+                        <h3 class="summary-title-kitsch"><i class="fas fa-money-check-alt"></i> 최종 결제 금액</h3>
+                        <div class="summary-row-kitsch">
+                            <span class="label">총 상품 금액:</span>
+                            <span class="value" id="summaryTotalProductPrice">88,200원</span>
+                        </div>
+                        <div class="summary-row-kitsch">
+                            <span class="label">총 포장비:</span>
+                            <span class="value" id="summaryPackagingFee">2,000원</span>
+                        </div>
+                        <div class="summary-row-kitsch">
+                            <span class="label">개별 상품 할인:</span>
+                            <span class="value discount" id="summaryItemCouponDiscount">- 4,000원</span>
+                        </div>
+
+
+                        <div class="form-group-kitsch">
+                            <label class="label-kitsch" for="pointsToUse" style="font-size:1em;">
+                                포인트 사용 (보유: <span th:text="${user.getPointBalance()}">0</span> P):
+                            </label>
+                            <div style="display:flex; gap:0.5rem;">
+                                <input
+                                        class="input-kitsch pixel-font-kitsch"
+                                        id="pointsToUse"
+                                        name="pointsToUse"
+                                        type="number"
+                                        placeholder="사용할 포인트"
+                                        th:attr="data-available-points=${user.pointBalance},max=${user.pointBalance}"
+                                        th:value="${user.pointBalance}"/>
+                                <button
+                                        type="button"
+                                        class="btn-kitsch secondary-btn-kitsch color2-kitsch small-btn-kitsch retro-shadow-kitsch-small"
+                                        onclick="applyMaxPoints()"
+                                        style="min-width: fit-content;">
+                                    전액 사용
+                                </button>
+                            </div>
+
+                        </div>
+                        <div class="summary-row-kitsch">
+                            <span class="label">주문 전체 할인:</span>
+                            <span class="value discount" id="summaryOrderCouponDiscount">- 5,000원</span>
+                        </div>
+                        <div class="summary-row-kitsch">
+                            <span class="label">포인트 할인:</span>
+                            <span class="value discount" id="summaryPointDiscount">- 1,000원</span>
+                        </div>
+                        <div class="summary-row-kitsch">
+                            <span class="label">배송비:</span>
+                            <span class="value" id="summaryDeliveryFee">0원</span>
+                        </div>
+                        <div class="total-summary-kitsch">
+                            <div class="summary-row-kitsch">
+                                <span class="label">최종 결제금액:</span>
+                                <span class="value" id="summaryFinalTotalPrice">80,200원</span>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="checkout-section-kitsch payment-methods-kitsch">
+                        <h3 class="section-title-kitsch"><i class="fas fa-credit-card"></i> 결제 수단 선택</h3>
+                        <div class="payment-option-kitsch" onclick="selectPaymentMethod(this, 'toss_payments')">
+                            <i class="fas fa-shield-alt"></i>
+                            <span class="pixel-font-kitsch">토스페이먼츠 (카드/간편결제)</span>
+                        </div>
+                        <div class="payment-option-kitsch" onclick="selectPaymentMethod(this, 'bank_transfer')">
+                            <i class="fas fa-university"></i>
+                            <span class="pixel-font-kitsch">무통장 입금</span>
+                        </div>
+                        <div id="payment-widget" style="margin-top:1rem;"></div>
+                    </section>
+                    <button class="btn-kitsch primary-btn-kitsch checkout-submit-btn-kitsch retro-shadow-kitsch"
+                            id="payment-button" type="button">
+                        <i class="fas fa-check-circle"></i>
+                        <span th:text="${amount} + '원 결제하기'"></span>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+    const MOCK_AVAILABLE_POINTS = 3500;
+    const MOCK_DELIVERY_THRESHOLD = 30000;
+    const MOCK_DELIVERY_COST = 3000;
+
+    function formatCurrency(amount) {
+        return amount.toLocaleString('ko-KR') + '원';
+    }
+
+    function updateCheckoutSummary() {
+        let subtotal = 0; // (상품 원가 * 수량)의 총합
+        let totalPackagingFee = 0;
+        let totalItemCouponDiscount = 0;
+
+        document.querySelectorAll('.ordered-item-kitsch').forEach(itemEl => {
+            const price = parseFloat(itemEl.dataset.itemPrice);
+            const quantity = parseInt(itemEl.dataset.itemQuantity); // 수량은 현재 Mock 데이터에서 고정
+            subtotal += price * quantity;
+
+            const packagingSelect = itemEl.querySelector('.item-packaging-select');
+            if (packagingSelect) {
+                const selectedPackagingOption = packagingSelect.options[packagingSelect.selectedIndex];
+                totalPackagingFee += (parseFloat(selectedPackagingOption.dataset.packagingCost) || 0) * quantity;
+            }
+
+            const itemCouponSelect = itemEl.querySelector('.item-coupon-select');
+            const itemCouponAppliedInfoEl = itemEl.querySelector('.item-coupon-applied-info');
+            itemCouponAppliedInfoEl.textContent = ''; // 이전 정보 초기화
+
+            if (itemCouponSelect) {
+                const selectedItemCouponOption = itemCouponSelect.options[itemCouponSelect.selectedIndex];
+                const itemDiscountValue = parseFloat(selectedItemCouponOption.dataset.discount) || 0;
+                let currentItemDiscount = 0;
+
+                if (itemDiscountValue > 0) {
+                    const itemSubtotalForCoupon = price * quantity; // 개별 상품의 소계 (수량 적용)
+                    if (selectedItemCouponOption.dataset.discountType === 'percent') {
+                        currentItemDiscount = Math.floor(itemSubtotalForCoupon * (itemDiscountValue / 100));
+                    } else { // amount
+                        currentItemDiscount = Math.min(itemDiscountValue, itemSubtotalForCoupon); // 할인액이 상품가 초과 방지
+                    }
+                    totalItemCouponDiscount += currentItemDiscount;
+                    itemCouponAppliedInfoEl.textContent = `- ${formatCurrency(currentItemDiscount)} 할인 적용됨!`;
+                }
+            }
+        });
+
+        const priceAfterItemDiscounts = subtotal - totalItemCouponDiscount;
+
+        // 주문 전체 쿠폰 적용
+        let orderCouponDiscount = 0;
+        const orderCouponSelect = document.getElementById('orderCoupon');
+        if (orderCouponSelect) {
+            const selectedOrderCouponOption = orderCouponSelect.options[orderCouponSelect.selectedIndex];
+            const orderDiscountValue = parseFloat(selectedOrderCouponOption.dataset.discount) || 0;
+            if (orderDiscountValue > 0) {
+                if (selectedOrderCouponOption.dataset.discountType === 'percent') {
+                    // 주문 전체 쿠폰은 개별 상품 할인이 적용된 후의 금액에 대해 적용
+                    orderCouponDiscount = Math.floor(priceAfterItemDiscounts * (orderDiscountValue / 100));
+                } else { // amount
+                    orderCouponDiscount = Math.min(orderDiscountValue, priceAfterItemDiscounts); // 할인액이 주문가 초과 방지
+                }
+            }
+        }
+
+        const priceAfterOrderCoupon = priceAfterItemDiscounts - orderCouponDiscount;
+
+        // 포인트 사용
+        let pointsUsed = parseInt(document.getElementById('pointsToUse').value) || 0;
+        const availablePoints = parseInt(document.getElementById('pointsToUse').dataset.availablePoints) || 0;
+        if (pointsUsed > availablePoints) pointsUsed = availablePoints;
+        if (pointsUsed < 0) pointsUsed = 0;
+        // 포인트는 (상품가+포장비-모든쿠폰할인) 금액을 초과하여 사용할 수 없음
+        const maxPointsApplicable = Math.max(0, priceAfterOrderCoupon + totalPackagingFee);
+        if (pointsUsed > maxPointsApplicable) pointsUsed = maxPointsApplicable;
+        document.getElementById('pointsToUse').value = pointsUsed;
+
+
+        // 배송비 계산 (모든 할인 적용 후 최종 상품 금액 기준)
+        let deliveryFee = 0;
+        const priceForDeliveryCalc = priceAfterOrderCoupon - pointsUsed;
+        if (priceForDeliveryCalc > 0 && priceForDeliveryCalc < MOCK_DELIVERY_THRESHOLD) {
+            deliveryFee = MOCK_DELIVERY_COST;
+        }
+
+        const finalTotalPrice = priceAfterOrderCoupon + totalPackagingFee - pointsUsed + deliveryFee;
+
+        document.getElementById('summaryTotalProductPrice').textContent = formatCurrency(subtotal);
+        document.getElementById('summaryPackagingFee').textContent = formatCurrency(totalPackagingFee);
+        document.getElementById('summaryItemCouponDiscount').textContent = "- " + formatCurrency(totalItemCouponDiscount);
+        document.getElementById('summaryOrderCouponDiscount').textContent = "- " + formatCurrency(orderCouponDiscount);
+        document.getElementById('summaryPointDiscount').textContent = "- " + formatCurrency(pointsUsed);
+        document.getElementById('summaryDeliveryFee').textContent = formatCurrency(deliveryFee);
+        document.getElementById('summaryFinalTotalPrice').textContent = formatCurrency(Math.max(0, finalTotalPrice));
+
+        document.querySelector('.checkout-submit-btn-kitsch').innerHTML = `<i class="fas fa-check-circle"></i> ${formatCurrency(Math.max(0, finalTotalPrice))} 결제하기`;
+    }
+
+
+    function execDaumPostcode(postcodeId, addressId) {
+        new daum.Postcode({
+            oncomplete: function (data) {
+                document.getElementById(postcodeId).value = data.zonecode;
+                document.getElementById(addressId).value = data.userSelectedType === 'R' ? data.roadAddress : data.jibunAddress;
+                if (addressId === 'shippingAddress') {
+                    document.getElementById('shippingDetailAddress').focus();
+                }
+            }
+        }).open();
+    }
+
+    function applyMaxPoints() {
+        const availablePoints = parseInt(document.getElementById('pointsToUse').dataset.availablePoints) || 0;
+        document.getElementById('pointsToUse').value = availablePoints;
+        updateCheckoutSummary();
+    }
+
+
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.item-packaging-select, .item-coupon-select, #orderCoupon, #pointsToUse').forEach(el => {
+            el.addEventListener('change', updateCheckoutSummary);
+        });
+        document.getElementById('pointsToUse').addEventListener('input', updateCheckoutSummary);
+
+        updateCheckoutSummary();
+        toggleNewAddressForm('default');
+
+        // 각 아이템 쿠폰 적용 정보 초기 표시
+        document.querySelectorAll('.ordered-item-kitsch').forEach(itemEl => {
+            const itemCouponSelect = itemEl.querySelector('.item-coupon-select');
+            if (itemCouponSelect && itemCouponSelect.value) { // 초기에 선택된 쿠폰이 있다면
+                const selectedItemCouponOption = itemCouponSelect.options[itemCouponSelect.selectedIndex];
+                const itemDiscountValue = parseFloat(selectedItemCouponOption.dataset.discount) || 0;
+                let currentItemDiscount = 0;
+                const price = parseFloat(itemEl.dataset.itemPrice);
+                const quantity = parseInt(itemEl.dataset.itemQuantity);
+                const itemSubtotalForCoupon = price * quantity;
+
+                if (itemDiscountValue > 0) {
+                    if (selectedItemCouponOption.dataset.discountType === 'percent') {
+                        currentItemDiscount = Math.floor(itemSubtotalForCoupon * (itemDiscountValue / 100));
+                    } else {
+                        currentItemDiscount = Math.min(itemDiscountValue, itemSubtotalForCoupon);
+                    }
+                    itemEl.querySelector('.item-coupon-applied-info').textContent = `- ${formatCurrency(currentItemDiscount)} 할인 적용됨!`;
+                }
+            }
+        });
+    });
+
+    document.getElementById('checkoutForm').addEventListener('submit', function (event) {
+        event.preventDefault();
+        alert('주문 및 결제 진행 (Mock)! 주문 완료 페이지로 이동합니다.');
+        window.location.href = "/order/complete";
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        toggleNewAddressForm(document.getElementById('shippingAddressOption').value);
+    });
+
+    function toggleNewAddressForm(val) {
+        const saved = document.getElementById('savedAddressInfo');
+        const fresh = document.getElementById('newAddressForm');
+
+        if (val === 'new') {
+            // “새 주소 입력” 폼
+            fresh.style.display = 'block';
+            saved.style.display = 'none';
+        } else {
+            // 저장된 주소 보기 + 내용 갱신
+            fresh.style.display = 'none';
+            saved.style.display = 'block';
+
+            const sel = document.getElementById('shippingAddressOption');
+            const opt = sel.options[sel.selectedIndex];
+
+            saved.innerHTML = `
+                <p><strong>배송지명:</strong> ${opt.dataset.name}</p>
+                <p><strong>주소:</strong> ${opt.dataset.road} ${opt.dataset.detail}</p>
+                <p><strong>우편번호:</strong> ${opt.dataset.postalCode}</p>`;
+        }
+    }
+
+    // 초기화
+    document.addEventListener('DOMContentLoaded', () => {
+        const sel = document.getElementById('shippingAddressOption');
+        sel.addEventListener('change', () => toggleNewAddressForm(sel.value));
+        toggleNewAddressForm(sel.value);
+    });
+</script>
+</body>
+</html>

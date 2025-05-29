@@ -24,12 +24,7 @@ public class MyPageController {
 		System.out.println("Requesting order detail for (Mock): " + orderId);
 		return "mypage/order_detail";
 	}
-
-	@GetMapping("/addresses")
-	public String userAddressesPage() {
-		return "mypage/address_list";
-	}
-
+	
 	@GetMapping("/coupons")
 	public String userCouponsPage() {
 
