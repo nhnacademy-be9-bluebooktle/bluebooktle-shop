@@ -8,16 +8,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestHeader;
 
-import shop.bluebooktle.common.dto.cart.request.GuestCartItemRequest;
-import shop.bluebooktle.common.dto.cart.request.GuestCartRemoveOneRequest;
-import shop.bluebooktle.common.dto.cart.request.GuestCartRemoveSelectedRequest;
-import shop.bluebooktle.common.dto.cart.request.MemberCartItemRequest;
-import shop.bluebooktle.common.dto.cart.request.MemberCartRemoveOneRequest;
-import shop.bluebooktle.common.dto.cart.request.MemberCartRemoveSelectedRequest;
+import shop.bluebooktle.common.dto.cart.request.CartItemRequest;
+import shop.bluebooktle.common.dto.cart.request.CartRemoveOneRequest;
+import shop.bluebooktle.common.dto.cart.request.CartRemoveSelectedRequest;
 import shop.bluebooktle.common.dto.cart.response.CartItemResponse;
 import shop.bluebooktle.frontend.config.feign.FeignGlobalConfig;
+import shop.bluebooktle.frontend.config.retry.RetryWithTokenRefresh;
 
 @FeignClient(
 	url = "${server.gateway-url}",
@@ -27,51 +25,49 @@ import shop.bluebooktle.frontend.config.feign.FeignGlobalConfig;
 )
 public interface CartRepository {
 
-	// === [비회원] ===
+	// ✅ 공통 카트 기능
 
-	@PostMapping("/guest")
-	void addBookToGuestCart(@RequestBody GuestCartItemRequest request);
+	@PostMapping
+	@RetryWithTokenRefresh
+	void addBookToCart(
+		@RequestBody CartItemRequest request,
+		@RequestHeader(name = "GUEST_ID", required = false) String guestId
+	);
 
-	@GetMapping("/guest")
-	List<CartItemResponse> getGuestCartItems(@RequestParam("guestId") String guestId);
+	@GetMapping
+	List<CartItemResponse> getCartItems(
+		@RequestHeader(name = "GUEST_ID", required = false) String guestId
+	);
 
-	@PatchMapping("/guest/increase")
-	void increaseGuestQuantity(@RequestBody GuestCartItemRequest request);
+	@PostMapping("/increase")
+	void increaseQuantity(
+		@RequestBody CartItemRequest request,
+		@RequestHeader(name = "GUEST_ID", required = false) String guestId
+	);
 
-	@PatchMapping("/guest/decrease")
-	void decreaseGuestQuantity(@RequestBody GuestCartItemRequest request);
+	@PostMapping("/decrease")
+	void decreaseQuantity(
+		@RequestBody CartItemRequest request,
+		@RequestHeader(name = "GUEST_ID", required = false) String guestId
+	);
 
-	@DeleteMapping("/guest")
-	void removeBookFromGuestCart(@RequestBody GuestCartRemoveOneRequest request);
+	@DeleteMapping
+	void removeBook(
+		@RequestBody CartRemoveOneRequest request,
+		@RequestHeader(name = "GUEST_ID", required = false) String guestId
+	);
 
-	@DeleteMapping("/guest/selected")
-	void removeSelectedBooksFromGuestCart(@RequestBody GuestCartRemoveSelectedRequest request);
+	@DeleteMapping("/selected")
+	void removeSelectedBooks(
+		@RequestBody CartRemoveSelectedRequest request,
+		@RequestHeader(name = "GUEST_ID", required = false) String guestId
+	);
 
-	// === [회원] ===
-
-	@PostMapping("/member")
-	Void addBookToMemberCart(@RequestBody MemberCartItemRequest request);
-
-	@GetMapping("/member")
-	List<CartItemResponse> getMemberCartItems();
-
-	@PatchMapping("/member/increase")
-	Void increaseMemberQuantity(@RequestBody MemberCartItemRequest request);
-
-	@PatchMapping("/member/decrease")
-	Void decreaseMemberQuantity(@RequestBody MemberCartItemRequest request);
-
-	@DeleteMapping("/member")
-	Void removeBookFromMemberCart(@RequestBody MemberCartRemoveOneRequest request);
-
-	@DeleteMapping("/member/selected")
-	Void removeSelectedBooksFromMemberCart(@RequestBody MemberCartRemoveSelectedRequest request);
-
-	// === [전환 및 병합] ===
+	// ✅ 전환/병합
 
 	@PostMapping("/convert/to-member")
-	Void convertGuestCartToMember(@RequestBody String guestId);
+	void convertGuestCartToMember(@RequestBody String guestId);
 
 	@PatchMapping("/convert/merge")
-	Void mergeGuestCartToMember(@RequestBody String guestId);
+	void mergeGuestCartToMember(@RequestBody String guestId);
 }
