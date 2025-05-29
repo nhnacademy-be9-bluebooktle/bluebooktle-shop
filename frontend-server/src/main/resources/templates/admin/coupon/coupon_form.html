@@ -32,6 +32,12 @@
                 border-color: #1890ff;
             }
 
+            tr.selected {
+                background-color: #e6f7ff !important;
+                border-left: 4px solid #1890ff;
+                font-weight: bold;
+            }
+
             .popup-tree, .popup-tree ul {
                 list-style: none;
                 padding-left: 1rem;
@@ -106,12 +112,6 @@
                 background-color: #eef6ff;
                 cursor: pointer;
             }
-
-            .hidden {
-                display: none;
-            }
-
-
         </style>
     </th:block>
 </head>
@@ -146,8 +146,10 @@
                     <div class="admin-form-group"
                          th:classappend="${#fields.hasErrors('couponTypeId')} ? 'has-error'">
                         <label class="admin-form-label">쿠폰 정책 <span class="text-danger">*</span></label>
+                        <!--                        <div th:each="type : ${couponTypes}" class="selectable-item"-->
+                        <!--                             th:classappend="${coupon.couponTypeId == type.id} ? 'selected'">-->
                         <div th:each="type : ${couponTypes}" class="selectable-item"
-                             th:classappend="${coupon.couponTypeId == type.id} ? 'selected'">
+                             th:classappend="${(coupon.couponTypeId == type.id or couponTypeId == type.id) ? 'selected' : ''}">
                             <span th:text="${type.name}">정책 이름</span>
                             <button type="button" class="admin-btn admin-btn--sm admin-btn--secondary"
                                     th:attr="data-id=${type.id}, data-target=${type.target}"
@@ -157,12 +159,13 @@
                         <div th:if="${#fields.hasErrors('couponTypeId')}" th:errors="*{couponTypeId}"
                              class="invalid-feedback admin-form-text"></div>
                     </div>
-                    <input type="hidden" th:field="*{couponTypeId}"/>
                 </fieldset>
+                <input type="hidden" name="couponTypeId" th:value="${couponTypeId}"/>
+                <input type="hidden" name="couponTypeTarget" th:value="${couponTypeTarget}"/>
+
                 <input type="hidden" id="couponTypeTargetHidden" name="couponTypeTarget" th:value="${couponTypeTarget}">
 
                 <!-- 도서 선택 -->
-                <!-- BOOK 관련 선택 영역 -->
                 <div id="bookCategorySection" style="display: none;">
                     <!-- 탭 메뉴 -->
                     <div class="tab-container">
@@ -176,17 +179,40 @@
                         </button>
                     </div>
 
-                    <!-- 도서 리스트 -->
+                    <!-- 도서 -->
                     <div id="bookListSection">
                         <h4>도서 선택</h4>
-                        <div th:each="book : ${books}" class="selectable-item"
-                             th:classappend="${coupon.bookId == book.id} ? 'selected'">
-                            <span th:text="${book.title}">도서 제목</span>
-                            <button type="button" class="admin-btn admin-btn--sm admin-btn--info"
-                                    th:attr="data-id=${book.id}" onclick="selectBook(this)">선택
-                            </button>
-                        </div>
+
+                        <!-- 도서 리스트 표 -->
+                        <table class="admin-table">
+                            <thead>
+                            <tr>
+                                <th>제목</th>
+                                <th>ISBN</th>
+                                <th>저자</th>
+                                <th>출판사</th>
+                                <th>판매가</th>
+                                <th>선택</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="book : ${books}" th:classappend="${coupon.bookId == book.id} ? 'selected'">
+                                <td th:text="${book.title}">도서 제목</td>
+                                <td th:text="${book.isbn}">ISBN</td>
+                                <td th:text="${book.authors}">저자</td>
+                                <td th:text="${book.publishers}">출판사</td>
+                                <td th:text="${#numbers.formatDecimal(book.salePrice,0,'COMMA',0,'POINT')} + '원'">판매가
+                                </td>
+                                <td>
+                                    <button type="button" class="admin-btn admin-btn--sm admin-btn--info"
+                                            th:attr="data-id=${book.id}" onclick="selectBook(this)">선택
+                                    </button>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
                         <input type="hidden" th:field="*{bookId}"/>
+                        <div id="selectedBookInfo" style="margin-top: 10px; font-size: 14px; color: #0a58ca;"></div>
                         <!-- 도서 페이징 -->
                         <div th:if="${totalPages > 1}" class="pagination-container">
                             <th:block th:replace="~{_fragments/admin_pagination :: commonPagination(
@@ -196,7 +222,6 @@
                             searchKeyword=${searchKeyword})}"/>
                         </div>
                     </div>
-
 
                     <!-- 카테고리 트리 -->
                     <div id="categoryTreeSection" style="display: none;">
@@ -225,10 +250,7 @@
 <th:block layout:fragment="page_scripts">
     <script th:inline="javascript">
         /*<![CDATA[*/
-        // 전역 데이터 (categoryTree, couponTypeTarget)
         const categoryTree = /*[[${categoryTree}]]*/ [];
-        const couponTypeTarget = /*[[${couponTypeTarget != null} ? '"' + couponTypeTarget + '"' : 'null']]*/ null;
-
 
         // 쿠폰 정책 선택
         function selectCouponType(button) {
@@ -267,8 +289,12 @@
             const id = button.dataset.id;
             document.querySelector("input[name='bookId']").value = id;
 
-            document.querySelectorAll("#bookListSection .selectable-item").forEach(item => item.classList.remove("selected"));
-            button.closest(".selectable-item").classList.add("selected");
+            document.querySelectorAll("#bookListSection table tbody tr").forEach(row => row.classList.remove("selected"));
+            button.closest("tr").classList.add("selected");
+            // 도서 정보 표시
+            const title = selectedRow.cells[0].textContent;
+            const isbn = selectedRow.cells[1].textContent;
+            document.getElementById("selectedBookInfo").innerText = `선택한 도서: ${title} (ISBN: ${isbn})`;
         }
 
         // 카테고리 트리 렌더링
@@ -321,16 +347,17 @@
         document.addEventListener('DOMContentLoaded', () => {
             renderCategoryTree(categoryTree, document.getElementById("categoryTree"));
 
-            // 페이지 로딩 시 쿠폰 정책 target이 BOOK이면 보여줌
-            if (couponTypeTarget === 'BOOK') {
-                document.getElementById("bookCategorySection").style.display = 'block';
-                switchBookCategoryTab('book');
+            const selectedPolicyId = document.querySelector("input[name='couponTypeId']").value;
+            if (selectedPolicyId) {
+                document.querySelectorAll(".selectable-item").forEach(item => {
+                    if (item.querySelector("button").dataset.id === selectedPolicyId) {
+                        item.classList.add("selected");
+                    }
+                });
             }
         });
         /*]]>*/
     </script>
 </th:block>
-
-
 </body>
 </html>

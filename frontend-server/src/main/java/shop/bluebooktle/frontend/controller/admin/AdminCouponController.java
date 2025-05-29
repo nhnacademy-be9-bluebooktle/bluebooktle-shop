@@ -81,6 +81,8 @@ public class AdminCouponController {
 	}
 
 	// 쿠폰 등록 페이지
+	// TODO [쿠폰] target 값 유지하기
+	// TODO [쿠폰] 도서 검색 기능 -> 기능 구현 완료 시 적용 예정
 	@GetMapping("/new")
 	public String showCouponForm(Model model, HttpServletRequest request,
 		@RequestParam(value = "page", defaultValue = "0") int page,
@@ -90,7 +92,8 @@ public class AdminCouponController {
 		model.addAttribute("currentURI", request.getRequestURI());
 
 		if (!model.containsAttribute("coupon")) {
-			model.addAttribute("coupon", new CouponRegisterRequest());
+			CouponRegisterRequest couponRequest = new CouponRegisterRequest();
+			model.addAttribute("coupon", couponRequest);
 		}
 
 		// 쿠폰 정책 정보
@@ -98,13 +101,14 @@ public class AdminCouponController {
 		model.addAttribute("couponTypes", couponTypeData.getContent());
 
 		// 도서 정보
-		Page<BookAllResponse> books = adminBookService.getPagedBooks(page, size, null); // TODO 검색 구현
+		Page<BookAllResponse> books = adminBookService.getPagedBooks(page, size, searchKeyword);
 		model.addAttribute("books", books.getContent());
 		model.addAttribute("currentPageZeroBased", books.getNumber());
 		model.addAttribute("totalPages", books.getTotalPages());
 		model.addAttribute("totalElements", books.getTotalElements());
 		model.addAttribute("currentSize", books.getSize());
 
+		// 페이징 URL에 선택 정보 포함
 		UriComponentsBuilder uriBuilder = UriComponentsBuilder
 			.fromPath(request.getRequestURI())
 			.queryParam("size", size);
@@ -114,12 +118,13 @@ public class AdminCouponController {
 		}
 
 		model.addAttribute("baseUrlWithParams", uriBuilder.toUriString());
+
+		// 선택값 View에서 다시 사용할 수 있게 추가
 		model.addAttribute("searchKeyword", searchKeyword);
 
-		//카테고리 정보
+		// 카테고리 정보
 		List<CategoryTreeResponse> categoryTree = adminCategoryService.getCategoryTree();
 		model.addAttribute("categoryTree", categoryTree);
-		log.info("카테고리 size : {}", categoryTree.size()); //TODO [쿠폰] 로그 제거
 
 		return "admin/coupon/coupon_form";
 	}
