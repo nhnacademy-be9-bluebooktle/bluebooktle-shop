@@ -521,16 +521,12 @@
                         <button class="btn-kitsch primary-btn-kitsch retro-shadow-kitsch"><i class="fas fa-bolt"></i>
                             바로구매
                         </button>
-                        <form id="addToCartForm" th:action="@{/cart}" method="post"
-                              onsubmit="return handleAddToCart(event)"
-                              style="display:inline;">
-                            <input type="hidden" name="bookId" th:value="${bookId}"/>
-                            <input type="hidden" name="quantity" id="hiddenDetailQuantity" value="1"/>
-                            <button type="submit"
-                                    class="btn-kitsch secondary-btn-kitsch color2-kitsch retro-shadow-kitsch">
-                                <i class="fas fa-shopping-cart"></i> 장바구니
-                            </button>
-                        </form>
+                        <input type="hidden" id="bookId" th:value="${bookId}">
+                        <button type="button"
+                                onclick="handleAddToCart(event)"
+                                class="btn-kitsch secondary-btn-kitsch color2-kitsch retro-shadow-kitsch">
+                            <i class="fas fa-shopping-cart"></i> 장바구니
+                        </button>
                         <button class="btn-kitsch secondary-btn-kitsch color5-kitsch retro-shadow-kitsch like-btn-kitsch"
                                 onclick="toggleBookLike(this)"><i class="far fa-heart"></i> <span>좋아요</span></button>
                         <button class="btn-kitsch secondary-btn-kitsch color1-kitsch retro-shadow-kitsch"><i
@@ -721,11 +717,14 @@
             event.preventDefault();
             console.debug('✅ handleAddToCart 실행됨');
 
-            const form = event.target;
-            syncQuantityForForm(); // 수량 반영
-            const formData = new FormData(form);
+            const bookId = document.getElementById('bookId').value;
+            const quantity = document.getElementById('detailQuantity').value;
 
-            fetch(form.action, {
+            const formData = new URLSearchParams();
+            formData.append("bookId", bookId);
+            formData.append("quantity", quantity);
+
+            fetch("/cart", {
                 method: 'POST',
                 body: formData
             }).then(response => {
