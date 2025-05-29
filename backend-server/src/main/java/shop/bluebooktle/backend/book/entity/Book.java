@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
@@ -56,12 +57,24 @@ public class Book extends BaseEntity {
 	private String isbn;
 
 	@OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+	@BatchSize(size = 10)
 	private List<CartBook> cartBooks = new ArrayList<>();
+
+	@OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+	@BatchSize(size = 10)
+	private List<BookImg> bookImgs = new ArrayList<>();
 
 	public void addCart(Cart cart, int quantity) {
 		CartBook cartBook = CartBook.builder().book(this).cart(cart).quantity(quantity).build();
 
 		this.cartBooks.add(cartBook);
 		cart.getCartBooks().add(cartBook);
+	}
+
+	public void addBookImg(BookImg bookImg) {
+		this.bookImgs.add(bookImg);
+		if (bookImg.getBook() != this) {
+			bookImg.setBook(this);
+		}
 	}
 }

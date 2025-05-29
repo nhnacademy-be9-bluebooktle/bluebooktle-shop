@@ -155,7 +155,7 @@ class CouponRepositoryTest {
 
 		// then
 		assertThat(result.getContent()).hasSize(1);
-		assertThat(result.getContent().getFirst().getCouponName()).isEqualTo("쿠폰 1");
-		assertThat(result.getContent().getFirst().getCouponTypeName()).isEqualTo("정책 2");
+		assertThat(result.getContent().getFirst().couponName()).isEqualTo("쿠폰 1");
+		assertThat(result.getContent().getFirst().couponTypeName()).isEqualTo("정책 2");
 	}
 }

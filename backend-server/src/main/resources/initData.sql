@@ -75,3 +75,4 @@ VALUES (2, 10000.00, CURRENT_TIMESTAMP);
 -- 웰컴 쿠폰 생성
 INSERT INTO coupon (coupon_id, coupon_type_id, name, created_at)
 VALUES (2, 2, '회원가입 축하 쿠폰', CURRENT_TIMESTAMP);
+
