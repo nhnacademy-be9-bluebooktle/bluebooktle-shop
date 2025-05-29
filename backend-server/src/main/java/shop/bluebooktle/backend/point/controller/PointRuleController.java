@@ -11,7 +11,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import shop.bluebooktle.backend.point.service.PointPolicyService;
-import shop.bluebooktle.backend.point.service.PointSourceTypeService;
 import shop.bluebooktle.common.dto.common.JsendResponse;
 import shop.bluebooktle.common.dto.point.response.PointRuleResponse;
 
@@ -23,7 +22,6 @@ import shop.bluebooktle.common.dto.point.response.PointRuleResponse;
 public class PointRuleController {
 
 	private final PointPolicyService pointPolicyService;
-	private final PointSourceTypeService pointSourceTypeService;
 
 	@GetMapping
 	public ResponseEntity<JsendResponse<List<PointRuleResponse>>> getAllPointRules() {

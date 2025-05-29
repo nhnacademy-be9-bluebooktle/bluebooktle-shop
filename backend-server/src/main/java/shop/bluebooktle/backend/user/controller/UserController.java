@@ -17,6 +17,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import shop.bluebooktle.backend.user.service.UserService;
 import shop.bluebooktle.common.domain.auth.UserType;
 import shop.bluebooktle.common.dto.common.JsendResponse;
@@ -26,11 +27,13 @@ import shop.bluebooktle.common.dto.user.request.UserSearchRequest;
 import shop.bluebooktle.common.dto.user.request.UserUpdateRequest;
 import shop.bluebooktle.common.dto.user.response.AdminUserResponse;
 import shop.bluebooktle.common.dto.user.response.UserResponse;
+import shop.bluebooktle.common.dto.user.response.UserTotalPointResponse;
 import shop.bluebooktle.common.exception.auth.InvalidTokenException;
 import shop.bluebooktle.common.exception.auth.UserNotFoundException;
 import shop.bluebooktle.common.security.Auth;
 import shop.bluebooktle.common.security.UserPrincipal;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
@@ -100,6 +103,21 @@ public class UserController {
 		try {
 			userService.updateUser(id, userUpdateRequest);
 			return ResponseEntity.ok(JsendResponse.success(null));
+		} catch (UserNotFoundException e) {
+			throw new UserNotFoundException();
+		}
+	}
+
+	@Operation(summary = "내 포인트 조회", description = "내 총 포인트를 조회합니다.")
+	@Auth(type = UserType.USER)
+	@GetMapping("/points")
+	public ResponseEntity<JsendResponse<UserTotalPointResponse>> getUserTotalPoints(
+		@Parameter(hidden = true) @AuthenticationPrincipal UserPrincipal userPrincipal
+	) {
+		log.info("getUserTotalPoints userId: {}", userPrincipal.getUserId());
+		try {
+			UserTotalPointResponse userTotalPoints = userService.findUserTotalPoints(userPrincipal.getUserId());
+			return ResponseEntity.ok(JsendResponse.success(userTotalPoints));
 		} catch (UserNotFoundException e) {
 			throw new UserNotFoundException();
 		}

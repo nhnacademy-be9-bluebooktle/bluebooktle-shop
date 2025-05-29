@@ -1,5 +1,6 @@
 package shop.bluebooktle.backend.user.service.impl;
 
+import java.math.BigDecimal;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -16,6 +17,7 @@ import shop.bluebooktle.common.dto.user.request.UserSearchRequest;
 import shop.bluebooktle.common.dto.user.request.UserUpdateRequest;
 import shop.bluebooktle.common.dto.user.response.AdminUserResponse;
 import shop.bluebooktle.common.dto.user.response.UserResponse;
+import shop.bluebooktle.common.dto.user.response.UserTotalPointResponse;
 import shop.bluebooktle.common.entity.auth.MembershipLevel;
 import shop.bluebooktle.common.entity.auth.User;
 import shop.bluebooktle.common.exception.auth.UserNotFoundException;
@@ -104,5 +106,11 @@ public class UserServiceImpl implements UserService {
 		);
 
 		userRepository.save(user);
+	}
+
+	@Override
+	public UserTotalPointResponse findUserTotalPoints(Long userId) {
+		BigDecimal totalPoints = userRepository.findPointBalanceByLoginId(userId).orElse(BigDecimal.ZERO);
+		return new UserTotalPointResponse(totalPoints);
 	}
 }

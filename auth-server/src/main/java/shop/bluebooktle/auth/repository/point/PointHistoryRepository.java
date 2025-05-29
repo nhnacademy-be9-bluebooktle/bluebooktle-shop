@@ -1,4 +1,4 @@
-package shop.bluebooktle.backend.point.repository;
+package shop.bluebooktle.auth.repository.point;
 
 import java.util.Optional;
 

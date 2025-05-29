@@ -1,4 +1,4 @@
-package shop.bluebooktle.backend.point.entity;
+package shop.bluebooktle.common.entity.point;
 
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
@@ -16,7 +16,6 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 import shop.bluebooktle.common.domain.point.ActionType;
 import shop.bluebooktle.common.entity.BaseEntity;
 
@@ -27,7 +26,6 @@ import shop.bluebooktle.common.entity.BaseEntity;
 @EqualsAndHashCode(of = "id", callSuper = false)
 @SQLDelete(sql = "UPDATE point_source_type SET deleted_at = CURRENT_TIMESTAMP WHERE point_source_type_id = ?")
 @SQLRestriction("deleted_at IS NULL")
-@ToString(exclude = {"pointPolicy"})
 public class PointSourceType extends BaseEntity {
 
 	@Id

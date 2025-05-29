@@ -16,6 +16,7 @@ import shop.bluebooktle.common.dto.user.request.UserSearchRequest;
 import shop.bluebooktle.common.dto.user.request.UserUpdateRequest;
 import shop.bluebooktle.common.dto.user.response.AdminUserResponse;
 import shop.bluebooktle.common.dto.user.response.UserResponse;
+import shop.bluebooktle.common.dto.user.response.UserTotalPointResponse;
 import shop.bluebooktle.frontend.repository.UserRepository;
 import shop.bluebooktle.frontend.service.UserService;
 
@@ -69,5 +70,10 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public void updateUser(Long userId, AdminUserUpdateRequest request) {
 		userRepository.updateUser(userId, request);
+	}
+
+	@Override
+	public UserTotalPointResponse getUserTotalPoints() {
+		return userRepository.getUserTotalPoints();
 	}
 }
