@@ -81,26 +81,25 @@ public class AdminCouponController {
 	}
 
 	// 쿠폰 등록 페이지
-	// TODO [쿠폰] target 값 유지하기
-	// TODO [쿠폰] 도서 검색 기능 -> 기능 구현 완료 시 적용 예정
 	@GetMapping("/new")
 	public String showCouponForm(Model model, HttpServletRequest request,
 		@RequestParam(value = "page", defaultValue = "0") int page,
 		@RequestParam(value = "size", defaultValue = "10") int size,
-		@RequestParam(value = "searchKeyword", required = false) String searchKeyword
-	) {
+		@RequestParam(value = "searchKeyword", required = false) String searchKeyword) {
+
+		// 현재 URI (페이징 링크 생성에 사용)
 		model.addAttribute("currentURI", request.getRequestURI());
 
+		// 쿠폰 폼 객체 초기화
 		if (!model.containsAttribute("coupon")) {
-			CouponRegisterRequest couponRequest = new CouponRegisterRequest();
-			model.addAttribute("coupon", couponRequest);
+			model.addAttribute("coupon", new CouponRegisterRequest());
 		}
 
-		// 쿠폰 정책 정보
+		// 쿠폰 정책 목록
 		PaginationData<CouponTypeResponse> couponTypeData = adminCouponService.getAllCouponType();
 		model.addAttribute("couponTypes", couponTypeData.getContent());
 
-		// 도서 정보
+		// 도서 목록 (검색어 포함 가능)
 		Page<BookAllResponse> books = adminBookService.getPagedBooks(page, size, searchKeyword);
 		model.addAttribute("books", books.getContent());
 		model.addAttribute("currentPageZeroBased", books.getNumber());
@@ -108,25 +107,42 @@ public class AdminCouponController {
 		model.addAttribute("totalElements", books.getTotalElements());
 		model.addAttribute("currentSize", books.getSize());
 
-		// 페이징 URL에 선택 정보 포함
+		// 검색 및 페이징 URL 생성
 		UriComponentsBuilder uriBuilder = UriComponentsBuilder
 			.fromPath(request.getRequestURI())
 			.queryParam("size", size);
-
 		if (StringUtils.hasText(searchKeyword)) {
 			uriBuilder.queryParam("searchKeyword", searchKeyword);
 		}
-
 		model.addAttribute("baseUrlWithParams", uriBuilder.toUriString());
 
-		// 선택값 View에서 다시 사용할 수 있게 추가
+		// 검색어 유지
 		model.addAttribute("searchKeyword", searchKeyword);
 
-		// 카테고리 정보
+		// 카테고리 트리 데이터
 		List<CategoryTreeResponse> categoryTree = adminCategoryService.getCategoryTree();
 		model.addAttribute("categoryTree", categoryTree);
 
 		return "admin/coupon/coupon_form";
+	}
+
+	@GetMapping("/book-fragment")
+	public String getBookFragment(Model model,
+		@RequestParam(defaultValue = "0") int page,
+		@RequestParam(defaultValue = "10") int size,
+		@RequestParam(required = false) String searchKeyword) {
+
+		Page<BookAllResponse> books = adminBookService.getPagedBooks(page, size, searchKeyword);
+
+		model.addAttribute("books", books);
+		model.addAttribute("totalPages", books.getTotalPages());
+		model.addAttribute("currentPageZeroBased", books.getNumber());
+		model.addAttribute("searchKeyword", searchKeyword);
+
+		// paging 링크를 위한 baseUrl
+		model.addAttribute("baseUrlWithParams", "/admin/coupons/book-fragment");
+
+		return "admin/coupon/book_list :: bookList";
 	}
 
 	@PostMapping

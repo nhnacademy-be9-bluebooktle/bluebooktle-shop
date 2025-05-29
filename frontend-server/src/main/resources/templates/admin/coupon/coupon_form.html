@@ -112,6 +112,10 @@
                 background-color: #eef6ff;
                 cursor: pointer;
             }
+
+            .hidden {
+                display: none;
+            }
         </style>
     </th:block>
 </head>
@@ -146,10 +150,8 @@
                     <div class="admin-form-group"
                          th:classappend="${#fields.hasErrors('couponTypeId')} ? 'has-error'">
                         <label class="admin-form-label">쿠폰 정책 <span class="text-danger">*</span></label>
-                        <!--                        <div th:each="type : ${couponTypes}" class="selectable-item"-->
-                        <!--                             th:classappend="${coupon.couponTypeId == type.id} ? 'selected'">-->
                         <div th:each="type : ${couponTypes}" class="selectable-item"
-                             th:classappend="${(coupon.couponTypeId == type.id or couponTypeId == type.id) ? 'selected' : ''}">
+                             th:classappend="${coupon.couponTypeId == type.id} ? 'selected'">
                             <span th:text="${type.name}">정책 이름</span>
                             <button type="button" class="admin-btn admin-btn--sm admin-btn--secondary"
                                     th:attr="data-id=${type.id}, data-target=${type.target}"
@@ -181,51 +183,20 @@
 
                     <!-- 도서 -->
                     <div id="bookListSection">
-                        <h4>도서 선택</h4>
-
-                        <!-- 도서 리스트 표 -->
-                        <table class="admin-table">
-                            <thead>
-                            <tr>
-                                <th>제목</th>
-                                <th>ISBN</th>
-                                <th>저자</th>
-                                <th>출판사</th>
-                                <th>판매가</th>
-                                <th>선택</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr th:each="book : ${books}" th:classappend="${coupon.bookId == book.id} ? 'selected'">
-                                <td th:text="${book.title}">도서 제목</td>
-                                <td th:text="${book.isbn}">ISBN</td>
-                                <td th:text="${book.authors}">저자</td>
-                                <td th:text="${book.publishers}">출판사</td>
-                                <td th:text="${#numbers.formatDecimal(book.salePrice,0,'COMMA',0,'POINT')} + '원'">판매가
-                                </td>
-                                <td>
-                                    <button type="button" class="admin-btn admin-btn--sm admin-btn--info"
-                                            th:attr="data-id=${book.id}" onclick="selectBook(this)">선택
-                                    </button>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                        <input type="hidden" th:field="*{bookId}"/>
-                        <div id="selectedBookInfo" style="margin-top: 10px; font-size: 14px; color: #0a58ca;"></div>
-                        <!-- 도서 페이징 -->
-                        <div th:if="${totalPages > 1}" class="pagination-container">
-                            <th:block th:replace="~{_fragments/admin_pagination :: commonPagination(
-                            currentPage=${currentPageZeroBased + 1},
-                            totalPages=${totalPages},
-                            baseUrl=${baseUrlWithParams},
-                            searchKeyword=${searchKeyword})}"/>
+                        <div class="admin-form-group">
+                            <input type="text" id="searchKeywordInput" placeholder="도서 제목 검색"
+                                   class="admin-form-control">
+                            <button type="button" class="admin-btn admin-btn--primary" onclick="fetchBookPage(0)">검색
+                            </button>
+                        </div>
+                        <div id="book-list-container" class="admin-form-group">
+                            <div th:replace="admin/coupon/book_list :: bookList"></div>
                         </div>
                     </div>
 
                     <!-- 카테고리 트리 -->
                     <div id="categoryTreeSection" style="display: none;">
-                        <h4>카테고리 선택</h4>
+                        <h5>파일 모양을 선택하면 하위 카테고리를 열 수 있습니다.</h5>
                         <ul id="categoryTree" class="popup-tree"></ul>
                         <input type="hidden" th:field="*{categoryId}"/>
                     </div>
@@ -268,6 +239,7 @@
             if (target === 'BOOK') {
                 document.getElementById("bookCategorySection").style.display = 'block';
                 switchBookCategoryTab('book');
+                fetchBookPage(0);
             } else {
                 document.getElementById("bookCategorySection").style.display = 'none';
                 document.querySelector("input[name='bookId']").value = '';
@@ -289,8 +261,11 @@
             const id = button.dataset.id;
             document.querySelector("input[name='bookId']").value = id;
 
+            // 선택 시 UI 업데이트
+            const selectedRow = button.closest("tr");
             document.querySelectorAll("#bookListSection table tbody tr").forEach(row => row.classList.remove("selected"));
-            button.closest("tr").classList.add("selected");
+            selectedRow.classList.add("selected");
+
             // 도서 정보 표시
             const title = selectedRow.cells[0].textContent;
             const isbn = selectedRow.cells[1].textContent;
@@ -355,7 +330,54 @@
                     }
                 });
             }
+            const searchInput = document.getElementById("searchKeywordInput");
+            if (searchInput) {
+                searchInput.addEventListener("keydown", function (event) {
+                    if (event.key === "Enter") {
+                        event.preventDefault();
+                    }
+                });
+            }
         });
+
+        function fetchBookPage(page) {
+            const searchKeyword = document.getElementById("searchKeywordInput")?.value || "";
+
+            fetch(`/admin/coupons/book-fragment?page=${page}&searchKeyword=${searchKeyword}`)
+                .then(response => response.text())
+                .then(html => {
+                    const container = document.getElementById("book-list-container");
+                    container.innerHTML = '';
+                    container.insertAdjacentHTML('beforeend', html);
+
+                    hijackPaginationLinks();
+                })
+                .catch(error => {
+                    console.error("도서 페이지 가져오기 실패", error);
+                });
+        }
+
+        function hijackPaginationLinks() {
+            const container = document.getElementById("book-list-container");
+            if (!container) return;
+
+            const links = container.querySelectorAll(".pagination-container a");
+
+            links.forEach(link => {
+                const url = new URL(link.href);
+                const pageParam = url.searchParams.get("page");
+
+                // 링크 클릭 시 fetch로 처리하고 기본 이동 막기
+                link.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    if (pageParam !== null) {
+                        fetchBookPage(parseInt(pageParam));
+                    }
+                });
+            });
+        }
+
+
         /*]]>*/
     </script>
 </th:block>
