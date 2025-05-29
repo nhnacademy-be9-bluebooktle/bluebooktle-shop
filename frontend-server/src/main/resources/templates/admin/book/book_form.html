@@ -161,22 +161,6 @@
                              th:errors="*{description}"
                              class="invalid-feedback"></div>
                     </div>
-
-                    <script>
-                        document.addEventListener('DOMContentLoaded', () => {
-                            const descEl = document.getElementById('description');
-                            if (!descEl) {
-                                return console.error('❌ description textarea not found');
-                            }
-                            if (!window.ClassicEditor) {
-                                return console.error('❌ CKEditor script missing');
-                            }
-                            ClassicEditor
-                                .create(descEl)
-                                .then(editor => console.log('✅ CKEditor ready'))
-                                .catch(err => console.error('❌ CKEditor init error:', err));
-                        });
-                    </script>
                     <div class="admin-form-group">
                         <label for="publishDate" class="admin-form-label">출판일</label>
                         <input type="date" id="publishDate" th:field="*{publishDate}" class="admin-form-control">
@@ -367,9 +351,25 @@
         const pageSize = 10;
         let currentPage = 1;
 
+        // CKEditor 인스턴스 전역 저장
+        let descriptionEditor;
+        document.addEventListener('DOMContentLoaded', () => {
+            ClassicEditor
+                .create(document.getElementById('description'))
+                .then(editor => {
+                    descriptionEditor = editor;
+                    console.log('✅ CKEditor ready');
+                })
+                .catch(err => console.error('❌ CKEditor init error:', err));
+
+            // 검색 버튼 바인딩
+            document.querySelector('.admin-btn--primary')
+                .addEventListener('click', () => searchAladinBooks(1));
+        });
+
         // 알라딘 도서 검색
         async function searchAladinBooks(page = 1) {
-            // 1 ≤ page ≤ MAX_PAGE 고정
+            // page 1~MAX_PAGE 사이로 제한
             page = Math.max(1, Math.min(page, MAX_PAGE));
             currentPage = page;
 
@@ -379,7 +379,7 @@
                 return;
             }
 
-            // 이전 결과 완전 초기화
+            // 이전 결과 초기화
             const resultsContainer = document.getElementById('aladinSearchResults');
             const resultsList = document.getElementById('aladinResultsList');
             resultsList.innerHTML = '';
@@ -394,13 +394,9 @@
             const data = await res.json();
             const results = Array.isArray(data) ? data : (data.data || []);
 
-            // 결과 없으면
+            // 결과가 없으면
             if (results.length === 0) {
                 alert('✅ 더 이상 검색 결과가 없습니다.');
-                // 빈 상태로 유지
-                resultsList.innerHTML = '';
-                resultsContainer.style.display = 'none';
-                // hasNext = false → 페이지  currentPage / currentPage
                 renderPaginationControls(page, false);
                 return;
             }
@@ -408,16 +404,16 @@
             // 결과 렌더링
             displayAladinSearchResults(results);
 
-            // 다음페이지 여부 판단
+            // 다음 페이지 버튼 활성/비활성
             const hasNext = (results.length === pageSize) && (page < MAX_PAGE);
             renderPaginationControls(page, hasNext);
         }
 
-        // 검색 결과 표시
+        // 검색 결과 리스트 뿌리기
         function displayAladinSearchResults(results) {
             const resultsContainer = document.getElementById('aladinSearchResults');
             const resultsList = document.getElementById('aladinResultsList');
-            resultsList.innerHTML = '';  // 안전하게 클리어
+            resultsList.innerHTML = '';
 
             results.forEach(book => {
                 const payload = encodeURIComponent(JSON.stringify(book));
@@ -440,21 +436,76 @@
             resultsContainer.style.display = 'block';
         }
 
-        // 선택 버튼 클릭 핸들러
+        // 선택 버튼 클릭 시 폼에 값 채우기
         function selectAladinBook(encoded) {
             const book = JSON.parse(decodeURIComponent(encoded));
+            console.log(book);
+
+
+            // 제목, ISBN
             document.getElementById('title').value = book.title || '';
             document.getElementById('isbn').value = book.isbn || '';
-            document.getElementById('description').value = book.description || '';
-            document.getElementById('publishDate').value = book.publishDate || '';
+
+            // 정가, 판매가
+            document.getElementById('price').value = book.price != null ? book.price : '';
+            document.getElementById('salePrice').value = book.salePrice != null ? book.salePrice : '';
+
+            // 설명
+            if (descriptionEditor) {
+                descriptionEditor.setData(book.description || '');
+            } else {
+                document.getElementById('description').value = book.description || '';
+            }
+
+            // 출판일 처리
+            let dateString = '';
+            const pd = book.publishDate;
+            if (typeof pd === 'string') {
+                // ISO 문자열
+                dateString = pd.split('T')[0];
+            } else if (Array.isArray(pd) && pd.length >= 3) {
+                // [year, month, day, ...]
+                const [y, m, d] = pd;
+                const mm = String(m).padStart(2, '0');
+                const dd = String(d).padStart(2, '0');
+                dateString = `${y}-${mm}-${dd}`;
+            } else if (pd && typeof pd === 'object') {
+                // { year:…, monthValue:…, dayOfMonth:… }
+                const y = pd.year || pd.yearValue || '';
+                const m = pd.monthValue || pd.month || 0;
+                const d = pd.dayOfMonth || pd.day || 0;
+                const mm = String(m).padStart(2, '0');
+                const dd = String(d).padStart(2, '0');
+                dateString = y ? `${y}-${mm}-${dd}` : '';
+            }
+            document.getElementById('publishDate').value = dateString;
+
+            //이미지
+            document.getElementById('imgUrl').value = book.imgUrl || '';
+            document.getElementById('uploadedImageUrl').value = book.imgUrl || '';
+
+            if (book.imgUrl) {
+                document.getElementById('uploadedImagePreview').innerHTML = `
+      <img src="${book.imgUrl}"
+           style="width:180px; border:2px solid #007bff; padding:6px; border-radius:6px;" />
+      <div style="margin-top:5px; font-size:14px; color:green;">
+        외부 이미지 사용
+      </div>
+    `;
+            } else {
+                document.getElementById('uploadedImagePreview').innerHTML = '';
+            }
+
+            // 결과 숨기기
+            document.getElementById('aladinSearchResults').style.display = 'none';
+            document.getElementById('paginationControls').innerHTML = '';
         }
 
-        // 페이징 컨트롤 렌더링
+        // 페이지 네비게이션 렌더링
         function renderPaginationControls(page, hasNext) {
             const container = document.getElementById('paginationControls');
             const disablePrev = page <= 1;
             const disableNext = !hasNext;
-            // 결과가 한 페이지만 있을 땐 totalPages = page;
             const totalPages = hasNext ? MAX_PAGE : page;
 
             container.innerHTML = `
@@ -462,9 +513,7 @@
           onclick="searchAladinBooks(${page - 1})">
           « 이전
         </button>
-        <span style="margin:0 1rem;">
-          페이지 ${page} / ${totalPages}
-        </span>
+        <span style="margin:0 1rem;">페이지 ${page} / ${totalPages}</span>
         <button type="button" ${disableNext ? 'disabled' : ''}
           onclick="searchAladinBooks(${page + 1})">
           다음 »
