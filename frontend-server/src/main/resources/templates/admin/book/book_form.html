@@ -32,6 +32,18 @@
             padding: 10px;
         }
 
+        /* 트리 전용 */
+        .popup-small-overlay .popup-tree,
+        .popup-small-overlay .popup-tree ul {
+            list-style: none;
+            margin: 0;
+            padding: 0 0 0 1rem;
+        }
+
+        .popup-small-overlay .popup-tree > li {
+            margin: 4px 0;
+        }
+
         /* 체크박스 선택 리스트 */
         .popup-multi-select {
             list-style: none;
@@ -70,6 +82,12 @@
         }
 
     </style>
+    <!-- ② 서버에서 넘긴 카테고리 트리를 JS 변수로 인라인 직렬화 -->
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var categoryTree = /*[[${allCategoriesForMapping}]]*/ [];
+        /*]]>*/
+    </script>
 </head>
 <body>
 <div layout:fragment="admin_content">
@@ -199,6 +217,7 @@
                     <h3><i class="fas fa-search"></i> 카테고리 / 작가 / 출판사 / 태그 선택</h3>
 
                     <!-- 카테고리 선택 -->
+                    <!-- 카테고리 선택 -->
                     <div class="admin-form-group" style="position: relative;">
                         <label class="admin-form-label">카테고리 선택</label>
                         <button type="button" class="admin-form-control btn btn-primary"
@@ -206,13 +225,10 @@
                             카테고리 검색
                         </button>
                         <div id="categoryPopup" class="popup-small-overlay" style="display:none;">
-                            <input type="text" id="categorySearch"
-                                   placeholder="카테고리 검색" class="popup-input"
-                                   onkeydown="if(event.key==='Enter'){ loadCategories(0, catSize, this.value); event.preventDefault(); }"/>
-                            <ul id="categoryResults" class="popup-multi-select"></ul>
-                            <div id="categoryPagination" class="pagination"
-                                 style="text-align:center; margin-top:8px;"></div>
-                            <button type="button" class="popup-save-btn" onclick="saveSelection('category')">
+                            <!-- 검색 입력 제거, 페이지네이션 제거 -->
+                            <ul id="categoryResults" class="popup-tree"></ul>
+                            <button type="button" class="popup-save-btn"
+                                    onclick="saveSelection('category')">
                                 확인
                             </button>
                         </div>
@@ -377,51 +393,34 @@
 
         //카테고리, 작가, 출판사, 태그
 
-        const catSize = 10, catKeyword = '';
         const pubSize = 10, pubKeyword = '';
         const authSize = 10, authKeyword = '';
         const tagSize = 10, tagKeyword = '';
 
-        function loadCategories(page, size, keyword) {
-            fetch(`/admin/categories/search?page=${page}&size=${size}&searchKeyword=${encodeURIComponent(keyword)}`, {
-                headers: {'Accept': 'application/json'}
-            })
-                .then(res => res.json())
-                .then(data => {
-                    const ul = document.getElementById('categoryResults');
-                    ul.innerHTML = data.content.map(c => `
-      <li>
-        <label>
-          <input
-            type="checkbox"
-            name="categoryIdList"
-            value="${c.categoryId}" />
-          ${c.name}
-        </label>
-      </li>
-    `).join('');
-
-                    // 페이징 버튼
-                    const pag = document.getElementById('categoryPagination');
-                    let html = '';
-                    if (data.pageable.pageNumber > 0) {
-                        html += `<button onclick="loadCategories(${data.pageable.pageNumber - 1},${size},'${keyword}')">&laquo;</button>`;
-                    }
-                    for (let i = 0; i < data.totalPages; i++) {
-                        html += `<button class="${i === data.pageable.pageNumber ? 'active' : ''}"
-                    onclick="loadCategories(${i},${size},'${keyword}')">${i + 1}</button>`;
-                    }
-                    if (data.pageable.pageNumber < data.totalPages - 1) {
-                        html += `<button onclick="loadCategories(${data.pageable.pageNumber + 1},${size},'${keyword}')">&raquo;</button>`;
-                    }
-                    pag.innerHTML = html;
-                })
-                .catch(console.error);
+        function renderCategoryTree(nodes, container) {
+            nodes.forEach(node => {
+                const li = document.createElement('li');
+                if (node.children && node.children.length) {
+                    li.textContent = node.name;
+                    const childUl = document.createElement('ul');
+                    renderCategoryTree(node.children, childUl);
+                    li.appendChild(childUl);
+                } else {
+                    const label = document.createElement('label');
+                    const cb = document.createElement('input');
+                    cb.type = 'checkbox';
+                    cb.name = 'categoryIdList';
+                    cb.value = node.id;
+                    label.appendChild(cb);
+                    label.append(` ${node.name}`);
+                    li.appendChild(label);
+                }
+                container.appendChild(li);
+            });
         }
 
-
         function loadPublishers(page, size, keyword) {
-            fetch(`/admin/publishers/search?page=${page}&size=${size}&searchKeyword=${encodeURIComponent(keyword)}`, {
+            fetch(`/admin/chulpansa/search?page=${page}&size=${size}&searchKeyword=${encodeURIComponent(keyword)}`, {
                 headers: {'Accept': 'application/json'}
             })
                 .then(res => res.json())
@@ -521,17 +520,21 @@
         }
 
 
+        // 팝업 열기: 카테고리면 트리 렌더, 나머지는 기존 로딩
         function openPopup(type) {
             closeAllPopups();
-            document.getElementById(type + 'Popup').style.display = 'block';
-            if (type === 'publisher') {
+            const popup = document.getElementById(type + 'Popup');
+            popup.style.display = 'block';
+            if (type === 'category') {
+                const ul = document.getElementById('categoryResults');
+                ul.innerHTML = '';
+                renderCategoryTree(categoryTree, ul);
+            } else if (type === 'publisher') {
                 loadPublishers(0, pubSize, pubKeyword);
             } else if (type === 'author') {
                 loadAuthors(0, authSize, authKeyword);
             } else if (type === 'tag') {
                 loadTags(0, tagSize, tagKeyword);
-            } else if (type === 'category') {
-                loadCategories(0, catSize, catKeyword);
             }
         }
 

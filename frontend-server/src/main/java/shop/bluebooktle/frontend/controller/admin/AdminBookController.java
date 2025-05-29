@@ -26,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 import shop.bluebooktle.common.dto.book.BookSaleInfoState;
 import shop.bluebooktle.common.dto.book.request.BookAllRegisterRequest;
 import shop.bluebooktle.common.dto.book.response.BookAllResponse;
-import shop.bluebooktle.common.dto.book.response.CategoryResponse;
+import shop.bluebooktle.common.dto.book.response.CategoryTreeResponse;
 import shop.bluebooktle.common.dto.book.response.PublisherInfoResponse;
 import shop.bluebooktle.common.dto.book.response.TagInfoResponse;
 import shop.bluebooktle.common.dto.book.response.author.AuthorResponse;
@@ -110,9 +110,8 @@ public class AdminBookController {
 			adminAuthorService.getAuthors(0, Integer.MAX_VALUE, null)
 				.getContent();
 
-		List<CategoryResponse> allCategoriesForMapping =
-			adminCategoryService.getCategories(0, Integer.MAX_VALUE, null)
-				.getContent();
+		List<CategoryTreeResponse> allCategoriesForMapping =
+			adminCategoryService.getCategoryTree();
 
 		List<PublisherInfoResponse> allPublishersForMapping =
 			adminPublisherService.getPublishers(0, Integer.MAX_VALUE, null)
@@ -135,7 +134,7 @@ public class AdminBookController {
 
 			List<Long> categoryIds = allCategoriesForMapping.stream()
 				.filter(c -> resp.getCategories().contains(c.name()))
-				.map(CategoryResponse::categoryId)
+				.map(CategoryTreeResponse::id)
 				.toList();
 
 			List<Long> publisherIds = allPublishersForMapping.stream()

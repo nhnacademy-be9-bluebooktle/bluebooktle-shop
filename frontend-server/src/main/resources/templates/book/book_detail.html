@@ -521,7 +521,8 @@
                         <button class="btn-kitsch primary-btn-kitsch retro-shadow-kitsch"><i class="fas fa-bolt"></i>
                             바로구매
                         </button>
-                        <form th:action="@{/cart}" method="post" onsubmit="syncQuantityForForm()"
+                        <form id="addToCartForm" th:action="@{/cart}" method="post"
+                              onsubmit="return handleAddToCart(event)"
                               style="display:inline;">
                             <input type="hidden" name="bookId" th:value="${bookId}"/>
                             <input type="hidden" name="quantity" id="hiddenDetailQuantity" value="1"/>
@@ -650,6 +651,24 @@
                  style="width:100%; border-radius:5px;">
         </div>
     </div>
+
+    <div class="modal-overlay-kitsch" id="addToCartSuccessModal" onclick="hideKitschModal('addToCartSuccessModal')"
+         style="display:none;">
+        <div class="modal-content-kitsch" onclick="event.stopPropagation();" style="max-width:400px; padding:2rem;">
+            <button class="modal-close-btn-kitsch" onclick="hideKitschModal('addToCartSuccessModal')"><i
+                    class="fas fa-times"></i></button>
+            <h3 style="margin-bottom: 1rem;">장바구니에 담겼습니다 🛒</h3>
+            <div style="display:flex; flex-direction:column; gap:0.5rem;">
+                <button class="btn-kitsch primary-btn-kitsch" onclick="hideKitschModal('addToCartSuccessModal')">
+                    쇼핑 계속하기
+                </button>
+                <a href="/cart" class="btn-kitsch secondary-btn-kitsch color2-kitsch" style="text-align:center;">
+                    장바구니로 이동
+                </a>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 <th:block layout:fragment="page_scripts">
@@ -690,6 +709,38 @@
             }
         }
 
+        function showKitschModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.style.display = 'flex';
+                modal.classList.add('active');
+            }
+        }
+
+        function handleAddToCart(event) {
+            event.preventDefault();
+            console.debug('✅ handleAddToCart 실행됨');
+
+            const form = event.target;
+            syncQuantityForForm(); // 수량 반영
+            const formData = new FormData(form);
+
+            fetch(form.action, {
+                method: 'POST',
+                body: formData
+            }).then(response => {
+                if (response.ok) {
+                    showKitschModal('addToCartSuccessModal');
+                } else {
+                    alert('장바구니 담기에 실패했습니다.');
+                }
+            }).catch(() => {
+                alert('서버 오류가 발생했습니다.');
+            });
+
+            return false;
+        }
+
         // 좋아요 버튼 토글 (상세페이지용)
         function toggleBookLike(buttonElement) {
             const icon = buttonElement.querySelector('i');
@@ -706,23 +757,6 @@
                 // 여기에 실제 '좋아요' 취소 로직 (AJAX 등)
             }
         }
-
-        // 탭 기능 (styles.css의 탭 UI와 연동)
-        const tabButtons = document.querySelectorAll('.tab-kitsch-button');
-        const tabPanes = document.querySelectorAll('.tab-pane-kitsch');
-
-        tabButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                // 모든 버튼과 내용 비활성화
-                tabButtons.forEach(btn => btn.classList.remove('active'));
-                tabPanes.forEach(pane => pane.classList.remove('active'));
-
-                // 클릭된 버튼과 해당 내용 활성화
-                button.classList.add('active');
-                const targetPaneId = button.getAttribute('data-tab-target');
-                document.querySelector(targetPaneId).classList.add('active');
-            });
-        });
 
         function activateTab(tabIdFragment) {
             let targetButton = null;
@@ -761,17 +795,29 @@
             }
             // 리뷰 모달 초기화 JS 제거
 
-            // 장바구니 버튼 작동 수행 시 state에 있는 수량 전달 위한 script
-            const addToCartForm = document.querySelector('form[action="/cart/add"]');
+            // 장바구니 폼 이벤트
+            const addToCartForm = document.getElementById('addToCartForm');
             if (addToCartForm) {
-                addToCartForm.addEventListener('submit', function () {
-                    const quantity = document.getElementById('detailQuantity').value;
-                    const hiddenQtyInput = addToCartForm.querySelector('input[name="quantity"]');
-                    if (hiddenQtyInput) {
-                        hiddenQtyInput.value = quantity;
-                    }
-                });
+                addToCartForm.addEventListener('submit', handleAddToCart);
             }
+
+            // 탭 기능 (styles.css의 탭 UI와 연동)
+            const tabButtons = document.querySelectorAll('.tab-kitsch-button');
+            const tabPanes = document.querySelectorAll('.tab-pane-kitsch');
+
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    // 모든 버튼과 내용 비활성화
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    tabPanes.forEach(pane => pane.classList.remove('active'));
+
+                    // 클릭된 버튼과 해당 내용 활성화
+                    button.classList.add('active');
+                    const targetPaneId = button.getAttribute('data-tab-target');
+                    document.querySelector(targetPaneId).classList.add('active');
+                });
+            });
+
         });
 
         // 리뷰 더보기 Mock 함수 유지

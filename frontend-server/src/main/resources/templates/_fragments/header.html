@@ -30,7 +30,8 @@
                 <a class="btn-kitsch secondary-btn-kitsch color3-kitsch retro-shadow-kitsch-small cart-btn-header-kitsch"
                    href="/cart" th:href="@{/cart}">
                     <i class="fas fa-shopping-cart"></i>
-                    <span class="cart-count-kitsch">3</span> </a>
+                    <span class="cart-count-kitsch" th:if="${cartItemCount > 0}" th:text="${cartItemCount}">0</span>
+                </a>
 
                 <a th:if="${userType == 'ADMIN'}"
                    class="btn-kitsch secondary-btn-kitsch color1-kitsch retro-shadow-kitsch-small"
@@ -127,9 +128,14 @@
                     });
                 }
 
-                // 2) 북 이모티콘 + 텍스트 노드
-                const text = document.createTextNode(` 📖 ${cat.name}`);
-                sum.appendChild(text);
+                // 📖 아이콘 + 링크
+                const link = document.createElement('a');
+                link.href = `/categories/${cat.id}`;            // 실제 카테고리 URL 패턴에 맞게 수정
+                link.innerHTML = `📖 ${cat.name}`;
+                link.classList.add('category-link-kitsch');     // 필요하다면 스타일용 클래스
+                // 클릭해도 details 토글은 막기
+                link.addEventListener('click', e => e.stopPropagation());
+                sum.appendChild(link);
 
                 detail.appendChild(sum);
 
@@ -182,7 +188,8 @@
                 <a class="btn-kitsch secondary-btn-kitsch color3-kitsch retro-shadow-kitsch-small cart-btn-header-kitsch"
                    href="/cart" th:href="@{/cart}">
                     <i class="fas fa-shopping-cart"></i>
-                    <span class="cart-count-kitsch">3</span> </a>
+                    <span class="cart-count-kitsch" th:if="${cartItemCount > 0}" th:text="${cartItemCount}">0</span>
+                </a>
                 <a class="btn-kitsch secondary-btn-kitsch color5-kitsch retro-shadow-kitsch-small" href="/login"
                    th:href="@{/login}"><i class="fas fa-sign-in-alt"></i> 로그인</a>
                 <a class="btn-kitsch primary-btn-kitsch retro-shadow-kitsch-small" href="/signup"

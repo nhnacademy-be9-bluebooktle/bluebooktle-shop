@@ -20,6 +20,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import shop.bluebooktle.backend.payment.entity.Payment;
 import shop.bluebooktle.common.entity.BaseEntity;
+import shop.bluebooktle.common.entity.point.PointHistory;
 
 @Entity
 @Table(name = "payment_point_history")

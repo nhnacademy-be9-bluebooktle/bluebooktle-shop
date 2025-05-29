@@ -7,8 +7,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
-import shop.bluebooktle.backend.point.entity.PointPolicy;
-import shop.bluebooktle.backend.point.entity.PointSourceType;
 import shop.bluebooktle.backend.point.repository.PointPolicyRepository;
 import shop.bluebooktle.backend.point.repository.PointSourceTypeRepository;
 import shop.bluebooktle.backend.point.service.PointPolicyService;
@@ -17,6 +15,8 @@ import shop.bluebooktle.common.dto.point.request.PointPolicyCreateRequest;
 import shop.bluebooktle.common.dto.point.request.PointPolicyUpdateRequest;
 import shop.bluebooktle.common.dto.point.response.PointPolicyResponse;
 import shop.bluebooktle.common.dto.point.response.PointRuleResponse;
+import shop.bluebooktle.common.entity.point.PointPolicy;
+import shop.bluebooktle.common.entity.point.PointSourceType;
 import shop.bluebooktle.common.exception.point.PointPolicyCreationNotAllowedException;
 import shop.bluebooktle.common.exception.point.PointSourceNotFountException;
 

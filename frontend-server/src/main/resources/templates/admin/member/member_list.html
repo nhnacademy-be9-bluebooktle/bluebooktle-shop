@@ -5,9 +5,7 @@
 <head>
     <title th:text="${pageTitle} ?: '회원 관리'"></title>
     <style>
-        /* 기존 페이지네이션 관련 <style> 내용은 삭제합니다. 공통 CSS에서 관리됩니다. */
-
-        /* 테이블 컬럼 너비 (이 부분은 유지하거나 필요에 따라 조정) */
+        /* 테이블 컬럼 너비 */
         .admin-table .col-member-id {
             min-width: 60px;
             text-align: center;
@@ -72,6 +70,11 @@
             <i class="fas fa-users"></i>
             <th:block th:text="${pageTitle} ?: '회원 관리'"></th:block>
         </h1>
+
+        <div th:if="${globalErrorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-triangle"></i> <span th:text="${globalErrorMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
     </div>
 
     <div class="admin-panel filter-form">
@@ -113,7 +116,7 @@
 
     <div class="admin-panel">
         <div class="admin-panel__header">
-            회원 목록
+            회원 목록 (<span th:text="${totalMembers ?: 0}">0</span>건)
         </div>
         <div class="admin-panel__body table-responsive">
             <table class="admin-table admin-table--striped admin-table--hover">
@@ -145,11 +148,11 @@
                     <td class="col-member-email" th:text="${member.email}">user01@example.com</td>
                     <td class="col-member-type" th:text="${member.userType}">USER</td>
                     <td class="col-member-status">
-                        <span th:switch="${member.userStatus}">
-                            <span th:case="'ACTIVE'" class="badge bg-success" style="color:white;">활성</span>
+                        <span th:switch="${member.userStatus.name()}"> <span th:case="'ACTIVE'" class="badge bg-success"
+                                                                             style="color:white;">활성</span>
                             <span th:case="'DORMANT'" class="badge bg-warning text-dark">휴면</span>
                             <span th:case="'WITHDRAWN'" class="badge bg-secondary" style="color:white;">탈퇴</span>
-                            <span th:case="*" th:text="${member.userStatus}"
+                            <span th:case="*" th:text="${member.userStatus.name()}"
                                   class="badge bg-light text-dark"></span>
                         </span>
                     </td>
@@ -179,9 +182,11 @@
 
             <div th:if="${totalPages > 0}" class="pagination-container">
                 <th:block th:replace="~{_fragments/admin_pagination :: commonPagination(
-                            currentPage=${currentPage + 1}, totalPages=${totalPages},
+                            currentPage=${currentPage + 1},
+                            totalPages=${totalPages},
                             baseUrl=${baseUrlWithParams},
-                            searchKeyword=null )}"></th:block>
+                            searchKeyword=${searchKeyword}
+                            )}"></th:block>
             </div>
         </div>
     </div>

@@ -21,7 +21,7 @@
                 <strong th:text="${globalErrorMessage}"></strong>
             </div>
 
-            <form th:action="@{/admin/publishers/save}" th:object="${publisher}" method="post">
+            <form th:action="@{/admin/chulpansa/save}" th:object="${publisher}" method="post">
                 <input type="hidden" th:field="*{id}"/>
                 <div class="admin-form-group">
                     <label for="name" class="admin-form-label">출판사 이름 <span style="color:red;">*</span></label>
@@ -32,7 +32,7 @@
                 </div>
 
                 <div class="admin-form-actions" style="margin-top: 20px; text-align: right;">
-                    <a th:href="@{/admin/publishers}" class="admin-btn admin-btn--default"
+                    <a th:href="@{/admin/chulpansa}" class="admin-btn admin-btn--default"
                        style="margin-right: 8px;">취소</a>
                     <button type="submit" class="admin-btn admin-btn--primary">
                         <i class="fas fa-save"></i>

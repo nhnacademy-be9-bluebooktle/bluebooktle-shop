@@ -22,7 +22,7 @@ public enum ErrorCode {
 	AUTH_AUTHENTICATION_FAILED(HttpStatus.UNAUTHORIZED, "A001", "아이디 또는 비밀번호가 일치하지 않습니다."),
 	AUTH_LOGIN_ID_ALREADY_EXISTS(HttpStatus.CONFLICT, "A002", "이미 사용 중인 아이디입니다."),
 	AUTH_EMAIL_ALREADY_EXISTS(HttpStatus.CONFLICT, "A003", "이미 사용 중인 이메일입니다."),
-	AUTH_INACTIVE_ACCOUNT(HttpStatus.FORBIDDEN, "A004", "비활성화(휴면) 상태 계정입니다. 인증 후 활성화 해주세요."),
+	AUTH_INACTIVE_ACCOUNT(HttpStatus.FORBIDDEN, "A004", "비활성화 상태 계정입니다. 인증 후 활성화 해주세요."),
 	AUTH_INVALID_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "A005", "유효하지 않은 인증정보입니다."),
 	AUTH_USER_NOT_FOUND(HttpStatus.NOT_FOUND, "A006", "사용자를 찾을 수 없습니다."),
 	AUTH_PASSWORD_MISMATCH(HttpStatus.BAD_REQUEST, "A007", "현재 비밀번호가 일치하지 않습니다."),
@@ -36,7 +36,8 @@ public enum ErrorCode {
 	AUTH_MEMBERSHIP_LEVEL_NOT_FOUND(HttpStatus.NOT_FOUND, "A015", "회원 등급 정보를 찾을 수 없습니다."),
 	AUTH_INVALID_USER_ID(HttpStatus.BAD_REQUEST, "A016", "유효하지 않은 계정 ID입니다."),
 	AUTH_TOKEN_REISSUE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "A017", "토큰 재발급에 실패했습니다. "),
-	AUTH_OAUTH_LOGIN_FAILED(HttpStatus.BAD_REQUEST, "A018", "OAUTH 로그인에 실패했습니다."),
+	USER_MEMBERSHIP_NOT_FOUNT(HttpStatus.BAD_REQUEST, "A018", "회원 등급을 찾을 수 없습니다. "),
+	AUTH_OAUTH_LOGIN_FAILED(HttpStatus.BAD_REQUEST, "A019", "OAUTH 로그인에 실패했습니다."),
 
 	// Book Errors (도서 관련 오류) - B
 	BOOK_NOT_FOUND(HttpStatus.NOT_FOUND, "B001", "도서를 찾을 수 없습니다."),
@@ -142,11 +143,14 @@ public enum ErrorCode {
 	POINT_HISTORY_NOT_FOUND(HttpStatus.NOT_FOUND, "P006", "포인트 이력을 찾을 수 없습니다."),
 	POINT_SOURCE_TYPE_NOT_FOUND(HttpStatus.NOT_FOUND, "P007", "포인트 발생/사용 타입을 찾을 수 없습니다."),
 	POINT_POLICY_CREATION_NOT_ALLOWED(HttpStatus.BAD_REQUEST, "P008", "포인트 정책 생성이 허용되지 않습니다."),
-	PAYMENT_INVALID_AMOUNT(HttpStatus.BAD_REQUEST, "P009", "결제 금액이 유효하지 않습니다."),
-	REFUND_NOT_POSSIBLE(HttpStatus.BAD_REQUEST, "P010", "현재 상태에서는 반품/환불이 불가능합니다."),
-	REFUND_ALREADY_PROCESSED(HttpStatus.CONFLICT, "P0011", "이미 처리된 반품/환불 요청입니다."),
-	REFUND_INVALID_REASON(HttpStatus.BAD_REQUEST, "P012", "유효하지 않은 반품 사유입니다."),
-	REFUND_NOT_FOUND(HttpStatus.NOT_FOUND, "P013", "환불 정보를 찾을 수 없습니다."),
+	POINT_POLICY_NOT_ACTIVE(HttpStatus.BAD_REQUEST, "P009", "비활성화된 포인트 정책입니다."),
+	PAYMENT_INVALID_AMOUNT(HttpStatus.BAD_REQUEST, "P010", "결제 금액이 유효하지 않습니다."),
+	POINT_POLICY_NOT_FOUND(HttpStatus.NOT_FOUND, "P011", "포인트 정책을 찾을 수 없습니다."),
+	POINT_POLICY_ALREADY_EXISTS(HttpStatus.CONFLICT, "P012", "이미 존재하는 포인트 정책입니다."),
+	REFUND_NOT_POSSIBLE(HttpStatus.BAD_REQUEST, "P013", "현재 상태에서는 반품/환불이 불가능합니다."),
+	REFUND_ALREADY_PROCESSED(HttpStatus.CONFLICT, "P0014", "이미 처리된 반품/환불 요청입니다."),
+	REFUND_INVALID_REASON(HttpStatus.BAD_REQUEST, "P015", "유효하지 않은 반품 사유입니다."),
+	REFUND_NOT_FOUND(HttpStatus.NOT_FOUND, "P016", "환불 정보를 찾을 수 없습니다."),
 
 	// Coupon Errors (쿠폰 오류) - K (Koopon)
 	K_COUPON_NOT_FOUND(HttpStatus.NOT_FOUND, "K001", "쿠폰을 찾을 수 없습니다."),
