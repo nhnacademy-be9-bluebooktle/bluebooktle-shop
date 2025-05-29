@@ -29,10 +29,13 @@ spring:
       host: localhost
       port: 6379
       database: 0
-#  elasticsearch:
-#    uris: http://localhost:9200
-#  rabbitmq:
-#    host: localhost
+  #  elasticsearch:
+  #    uris: http://localhost:9200
+  rabbitmq:
+    host: s4.java21.net
+    port: 5672
+    username: ${RABBITMQ_USERNAME}
+    password: ${RABBITMQ_PASSWORD}
 
 
 eureka:
@@ -58,3 +61,15 @@ logging:
     org.hibernate.SQL: info
     org.hibernate.orm.jdbc.bind: trace
     org.springframework.transaction.interceptor: trace
+
+mq:
+  queue:
+    birthday: BB.local.birthday.queue
+    birthday-dlq: BB.local.birthday.queue.dlq
+    direct: BB.local.direct.queue
+    direct-dlq: BB.local.direct.queue.dlq
+  exchange:
+    birthday: local.birthday.exchange
+    birthday-dlx: local.birthday.dlx
+    direct: local.direct.exchange
+    direct-dlx: local.direct.dlx

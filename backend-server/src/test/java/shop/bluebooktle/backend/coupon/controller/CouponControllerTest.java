@@ -23,7 +23,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import shop.bluebooktle.backend.coupon.batch.CouponBatchLauncher;
+import shop.bluebooktle.backend.coupon.batch.direct.DirectCouponBatchLauncher;
 import shop.bluebooktle.backend.coupon.service.CouponService;
 import shop.bluebooktle.common.domain.CouponTypeTarget;
 import shop.bluebooktle.common.dto.coupon.request.CouponRegisterRequest;
@@ -43,7 +43,7 @@ class CouponControllerTest {
 	private CouponService couponService;
 
 	@MockitoBean
-	private CouponBatchLauncher couponBatchLauncher;
+	private DirectCouponBatchLauncher directCouponBatchLauncher;
 
 	@Autowired
 	private ObjectMapper objectMapper;
@@ -116,6 +116,6 @@ class CouponControllerTest {
 			.andExpect(status().isCreated())
 			.andExpect(jsonPath("$.status").value("success"));
 
-		verify(couponBatchLauncher).run(any(UserCouponRegisterRequest.class));
+		verify(directCouponBatchLauncher).run(any(UserCouponRegisterRequest.class));
 	}
 }
