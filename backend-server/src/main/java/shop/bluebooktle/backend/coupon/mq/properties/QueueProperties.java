@@ -1,4 +1,4 @@
-package shop.bluebooktle.backend.coupon.mq;
+package shop.bluebooktle.backend.coupon.mq.properties;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
@@ -15,4 +15,6 @@ public class QueueProperties {
 	private String birthdayDlq;
 	private String direct;
 	private String directDlq;
+	private String welcome;
+	private String welcomeDlq;
 }

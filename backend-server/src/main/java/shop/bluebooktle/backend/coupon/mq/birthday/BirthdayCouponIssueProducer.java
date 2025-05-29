@@ -1,4 +1,4 @@
-package shop.bluebooktle.backend.coupon.batch.birthday.mq;
+package shop.bluebooktle.backend.coupon.mq.birthday;
 
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
@@ -6,8 +6,8 @@ import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import shop.bluebooktle.backend.coupon.dto.CouponIssueMessage;
-import shop.bluebooktle.backend.coupon.mq.ExchangeProperties;
-import shop.bluebooktle.backend.coupon.mq.QueueProperties;
+import shop.bluebooktle.backend.coupon.mq.properties.ExchangeProperties;
+import shop.bluebooktle.backend.coupon.mq.properties.QueueProperties;
 
 @Slf4j
 @RequiredArgsConstructor
