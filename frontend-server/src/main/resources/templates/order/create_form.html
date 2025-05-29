@@ -281,17 +281,17 @@
                     class="fas fa-gem"></i></h1>
         </div>
 
-        <form id="checkoutForm" method="post" th:action="@{/order/checkout}">
+        <form id="checkoutForm" method="get" th:action="@{/order/process}">
             <div class="checkout-container-kitsch">
                 <div class="checkout-main-panel-kitsch">
                     <section class="checkout-section-kitsch">
                         <h3 class="section-title-kitsch"><i class="fas fa-shopping-basket"></i> 주문 상품 확인</h3>
                         <div id="orderedItemsList">
                             <div class="ordered-item-kitsch"
-                                 th:data-item-id="${item.bookId()}"
+                                 th:data-item-id="${item.id()}"
                                  th:data-item-price="${item.price()}"
-                                 th:data-item-quantity="${item.quantity()}"
                                  th:data-item-salePrice="${item.salePrice()}"
+                                 th:data-item-quantity="${item.quantity()}"
                                  th:each="item : ${bookItems}">
                                 <img alt="" th:alt="${item.title()}" th:src="${item.thumbnailUrl()}"/>
                                 <div class="ordered-item-details-kitsch">
@@ -300,19 +300,14 @@
                                         수량: <span class="item-qty" th:text="${item.quantity}"></span>개 / 가격:
                                         <span class="item-price-per-unit"
                                               th:text=" ${#strings.toString(item.price())} + '원'"></span>
-                                        <span class="item-sale-price" th:if="${item.salePrice() != null}">
-                                            <span class="item-sale-price"
-                                                  th:text="'/ 할인가: ' + ${#strings.toString(item.salePrice())} + '원'">
-                                            </span>
-                                        </span>
                                     </p>
 
                                     <div class="item-packaging-kitsch">
-                                        <label class="label-kitsch" th:for="${'packaging-' + item.bookId()}">포장
+                                        <label class="label-kitsch" th:for="${'packaging-' + item.id()}">포장
                                             선택:</label>
                                         <select class="select-kitsch item-packaging-select"
-                                                th:id="${'packaging-' + item.bookId()}"
-                                                th:name="${'itemPackaging[' + item.bookId() + ']'}">
+                                                th:id="${'packaging-' + item.id()}"
+                                                th:name="${'itemPackaging[' + item.id() + ']'}">
                                             <option th:data-packaging-cost="${opt.getPrice()}"
                                                     th:each="opt : ${packagingOptions}"
                                                     th:text="${opt.getName()} + ' (+' + ${#strings.toString(opt.getPrice())}  + '원)'"
@@ -354,25 +349,19 @@
 
                         <div class="form-group-kitsch">
                             <label class="label-kitsch" for="shippingAddressOption">배송지 선택:</label>
-                            <select id="shippingAddressOption" name="shippingAddressOption">
-                                <option th:data-detail="${addr.getDetailAddress()}"
-                                        th:data-name="${addr.getAlias()}"
-                                        th:data-postal-code="${addr.getPostalCode()}"
-                                        th:data-road="${addr.getRoadAddress()}"
-                                        th:each="addr, stat : ${addresses}"
+                            <select id="shippingAddressOption" name="shippingAddressOption"
+                                    onchange="toggleNewAddressForm(this.value)">
+                                <option th:each="addr, stat : ${addresses}"
+                                        th:value="${addr.addressId}"
+                                        th:data-name="${addr.alias}"
+                                        th:data-road="${addr.roadAddress}"
+                                        th:data-detail="${addr.detailAddress}"
+                                        th:data-postal-code="${addr.postalCode}"
                                         th:selected="${stat.index == 0}"
-                                        th:text="${addr.getAlias()}"
-                                        th:value="${addr.getAddressId()}">
+                                        th:text="${addr.alias}">
                                 </option>
                                 <option value="new">+ 새 주소 입력</option>
                             </select>
-
-                            <div class="input-description-kitsch" id="savedAddressInfo"
-                                 style="border:1px dashed var(--kitsch-color-2); padding:0.5rem; margin-bottom:1rem; border-radius:3px;">
-                                <p><strong>배송지명:</strong> <span id="savedAlias">정보 없음</span></p>
-                                <p><strong>주소:</strong> <span id="savedRoad">정보 없음</span></p>
-                                <p><strong>상세주소:</strong> <span id="savedDetail">상세주소 없음</span></p>
-                            </div>
 
                             <!-- 배송 요청사항 -->
                             <div class="form-group-kitsch">
@@ -387,16 +376,25 @@
                             <!-- 희망 배송일 -->
                             <div class="form-group-kitsch">
                                 <label class="label-kitsch" for="deliveryDate">희망 배송일 (선택):</label>
-                                <input
-                                        class="input-kitsch pixel-font-kitsch"
-                                        id="deliveryDate"
-                                        name="deliveryDate"
-                                        th:min="${T(java.time.LocalDate).now().plusDays(1)}"
-                                        type="date"
-                                />
+                                <input class="input-kitsch pixel-font-kitsch"
+                                       id="deliveryDate"
+                                       name="deliveryDate"
+                                       type="date"/>
                             </div>
+
                         </div>
 
+                        <div class="input-description-kitsch"
+                             id="savedAddressInfo"
+                             style="border:1px dashed var(--kitsch-color-2); padding:0.5rem; margin-bottom:1rem; border-radius:3px;">
+                            <div th:with="addr=${addresses[0]}">
+                                <p><strong>배송지명:</strong> <span th:text="${addr.alias}"/></p>
+                                <p><strong>주소:</strong>
+                                    <span th:text="${addr.roadAddress + ' ' + addr.detailAddress}"></span>
+                                </p>
+                                <p><strong>우편번호:</strong> <span th:text="${addr.postalCode}"/></p>
+                            </div>
+                        </div>
 
                         <!-- 3) 새 주소 입력 폼 (기본 숨김) -->
                         <div id="newAddressForm" style="display:none;">
@@ -452,15 +450,15 @@
                         <h3 class="summary-title-kitsch"><i class="fas fa-money-check-alt"></i> 최종 결제 금액</h3>
                         <div class="summary-row-kitsch">
                             <span class="label">총 상품 금액:</span>
-                            <span class="value" id="summaryTotalProductPrice">0원</span>
+                            <span class="value" id="summaryTotalProductPrice">88,200원</span>
                         </div>
                         <div class="summary-row-kitsch">
                             <span class="label">총 포장비:</span>
-                            <span class="value" id="summaryPackagingFee">0원</span>
+                            <span class="value" id="summaryPackagingFee">2,000원</span>
                         </div>
                         <div class="summary-row-kitsch">
-                            <span class="label">개별 상품 할인액:</span>
-                            <span class="value discount" id="summaryTotalDiscount">0원</span>
+                            <span class="label">개별 상품 할인:</span>
+                            <span class="value discount" id="summaryItemCouponDiscount">- 4,000원</span>
                         </div>
 
 
@@ -473,35 +471,36 @@
                                         class="input-kitsch pixel-font-kitsch"
                                         id="pointsToUse"
                                         name="pointsToUse"
+                                        type="number"
                                         placeholder="사용할 포인트"
                                         th:attr="data-available-points=${user.pointBalance},max=${user.pointBalance}"
-                                        th:value="${user.pointBalance}"
-                                        type="number"/>
+                                        th:value="${user.pointBalance}"/>
                                 <button
+                                        type="button"
                                         class="btn-kitsch secondary-btn-kitsch color2-kitsch small-btn-kitsch retro-shadow-kitsch-small"
                                         onclick="applyMaxPoints()"
-                                        style="min-width: fit-content;"
-                                        type="button">
+                                        style="min-width: fit-content;">
                                     전액 사용
                                 </button>
                             </div>
+
                         </div>
                         <div class="summary-row-kitsch">
                             <span class="label">주문 전체 할인:</span>
-                            <span class="value discount" id="summaryOrderCouponDiscount">0원</span>
+                            <span class="value discount" id="summaryOrderCouponDiscount">- 5,000원</span>
                         </div>
                         <div class="summary-row-kitsch">
                             <span class="label">포인트 할인:</span>
-                            <span class="value discount" id="summaryPointDiscount">0원</span>
+                            <span class="value discount" id="summaryPointDiscount">- 1,000원</span>
                         </div>
                         <div class="summary-row-kitsch">
                             <span class="label">배송비:</span>
-                            <span id="summaryDeliveryFee" th:value="${deliveryRules[0].deliveryFee()}">0원</span>
+                            <span class="value" id="summaryDeliveryFee">0원</span>
                         </div>
                         <div class="total-summary-kitsch">
                             <div class="summary-row-kitsch">
                                 <span class="label">최종 결제금액:</span>
-                                <span class="value" id="summaryFinalTotalPrice">0원</span>
+                                <span class="value" id="summaryFinalTotalPrice">80,200원</span>
                             </div>
                         </div>
                     </section>
@@ -526,171 +525,197 @@
                 </div>
             </div>
         </form>
-        <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
-        <script>
-            const deliveryRules = /*[[${deliveryRules}]]*/ [];
-
-
-            document.addEventListener('DOMContentLoaded', () => {
-                // 배송지 선택 토글
-                const selectEl = document.getElementById('shippingAddressOption');
-                const infoEl = document.getElementById('savedAddressInfo');
-                const formEl = document.getElementById('newAddressForm');
-                const aliasEl = document.getElementById('savedAlias');
-                const roadEl = document.getElementById('savedRoad');
-                const detailEl = document.getElementById('savedDetail');
-
-                const defaultRule = deliveryRules.find(r =>
-                    r.region === 'ALL'        // 만약 region이 문자열 "ALL" 로 넘어올 때
-                    || (r.region && r.region.name === 'ALL')  // 또는 { name: "ALL", ... } 일 때
-                    || r.region === 'Region.ALL'               // 혹시 "Region.ALL" 로 찍힐 때
-                );
-                console.log('defaultRule:', defaultRule);
-
-                function updateAddress() {
-                    const opt = selectEl.selectedOptions[0];
-                    if (opt.value === 'new') {
-                        infoEl.style.display = 'none';
-                        formEl.style.display = 'block';
-                    } else {
-                        aliasEl.textContent = opt.dataset.name || '정보 없음';
-                        roadEl.textContent = opt.dataset.road || '정보 없음';
-                        detailEl.textContent = opt.dataset.detail || '상세주소 없음';
-                        formEl.style.display = 'none';
-                        infoEl.style.display = 'block';
-                    }
-                }
-
-                selectEl.addEventListener('change', updateAddress);
-                updateAddress();
-
-                // 초기 가격 요약
-                updatePriceSummary();
-
-
-                document.querySelectorAll('.item-packaging-select').forEach(sel => {
-                    sel.addEventListener('change', () => {
-                        updatePackagingFee();
-                        updateDeliveryFee();
-                        updateFinalTotalPrice();
-                    });
-                });
-                const pointsInput = document.getElementById('pointsToUse');
-                pointsInput.addEventListener('input', () => {
-                    updatePointDiscount();
-                    updateFinalTotalPrice();
-                });
-
-                // “전액 사용” 버튼 재정의
-                window.applyMaxPoints = () => {
-                    const avail = parseInt(pointsInput.dataset.availablePoints, 10) || 0;
-                    pointsInput.value = avail;
-                    updatePointDiscount();
-                    updateFinalTotalPrice();
-                };
-
-                // 초기값 계산
-                updatePackagingFee();
-                updatePointDiscount();
-                updateFinalTotalPrice();
-                updateDeliveryFee();
-            });
-
-            // daum postcode
-            function execDaumPostcode(postcodeId, addressId) {
-                new daum.Postcode({
-                    oncomplete: data => {
-                        document.getElementById(postcodeId).value = data.zonecode;
-                        document.getElementById(addressId).value =
-                            data.userSelectedType === 'R' ? data.roadAddress : data.jibunAddress;
-                        if (addressId === 'shippingAddress') {
-                            document.getElementById('shippingDetailAddress').focus();
-                        }
-                    }
-                }).open();
-            }
-
-            // 총 상품가-할인 계산
-            function updatePriceSummary() {
-                let totalOriginal = 0, totalSale = 0;
-                document.querySelectorAll('.ordered-item-kitsch').forEach(itemEl => {
-                    const price = parseFloat(itemEl.dataset.itemPrice) || 0;
-                    const salePrice = parseFloat(itemEl.dataset.itemSaleprice) || 0;
-                    const qty = parseInt(itemEl.dataset.itemQuantity, 10) || 0;
-                    totalOriginal += price * qty;
-                    totalSale += salePrice * qty;
-                });
-                const totalDiscount = totalOriginal - totalSale;
-                document.getElementById('summaryTotalProductPrice')
-                    .textContent = totalOriginal.toLocaleString() + '원';
-                document.getElementById('summaryTotalDiscount')
-                    .textContent = '-' + totalDiscount.toLocaleString() + '원';
-            }
-
-            // 포장비 계산
-            function updatePackagingFee() {
-                let total = 0;
-                document.querySelectorAll('.ordered-item-kitsch').forEach(itemEl => {
-                    const qty = parseInt(itemEl.dataset.itemQuantity, 10) || 0;
-                    const cost = parseFloat(
-                        itemEl.querySelector('.item-packaging-select')
-                            .selectedOptions[0]
-                            .dataset.packagingCost
-                    ) || 0;
-                    total += cost * qty;
-                });
-                document.getElementById('summaryPackagingFee')
-                    .textContent = total.toLocaleString() + '원';
-            }
-
-            // 포인트 할인 계산
-            function updatePointDiscount() {
-                const input = document.getElementById('pointsToUse');
-                let used = parseInt(input.value, 10) || 0;
-                const avail = parseInt(input.dataset.availablePoints, 10) || 0;
-                if (used > avail) used = avail;
-                input.value = used;
-                document.getElementById('summaryPointDiscount')
-                    .textContent = '- ' + used.toLocaleString() + '원';
-            }
-
-            function updateDeliveryFee() {
-                if (!defaultRule) return;
-                const getNum = id => parseInt(
-                    document.getElementById(id).textContent.replace(/[^\d]/g, ''), 10
-                ) || 0;
-                const productTotal = getNum('summaryTotalProductPrice');
-                const freeThreshold = parseInt(defaultRule.freeDeliveryThreshold, 10) || 0;
-                const fee = productTotal >= freeThreshold
-                    ? 0
-                    : (parseInt(defaultRule.deliveryFee, 10) || 0);
-                document.getElementById('summaryDeliveryFee')
-                    .textContent = fee.toLocaleString() + '원';
-            }
-
-
-            // 최종 결제금액 계산
-            function updateFinalTotalPrice() {
-                const getNum = id => parseInt(
-                    document.getElementById(id).textContent.replace(/[^\d]/g, ''), 10
-                ) || 0;
-                const productTotal = getNum('summaryTotalProductPrice');
-                const itemDisc = getNum('summaryTotalDiscount');
-                const orderCoupon = getNum('summaryOrderCouponDiscount');
-                const pointDisc = getNum('summaryPointDiscount');
-                const packaging = getNum('summaryPackagingFee');
-                const delivery = getNum('summaryDeliveryFee');
-                const finalTotal = productTotal
-                    - itemDisc
-                    - orderCoupon
-                    - pointDisc
-                    + packaging
-                    + delivery;
-                document.getElementById('summaryFinalTotalPrice')
-                    .textContent = finalTotal.toLocaleString() + '원';
-            }
-        </script>
     </div>
 </div>
+<script>
+    const MOCK_AVAILABLE_POINTS = 3500;
+    const MOCK_DELIVERY_THRESHOLD = 30000;
+    const MOCK_DELIVERY_COST = 3000;
+
+    function formatCurrency(amount) {
+        return amount.toLocaleString('ko-KR') + '원';
+    }
+
+    function updateCheckoutSummary() {
+        let subtotal = 0; // (상품 원가 * 수량)의 총합
+        let totalPackagingFee = 0;
+        let totalItemCouponDiscount = 0;
+
+        document.querySelectorAll('.ordered-item-kitsch').forEach(itemEl => {
+            const price = parseFloat(itemEl.dataset.itemPrice);
+            const quantity = parseInt(itemEl.dataset.itemQuantity); // 수량은 현재 Mock 데이터에서 고정
+            subtotal += price * quantity;
+
+            const packagingSelect = itemEl.querySelector('.item-packaging-select');
+            if (packagingSelect) {
+                const selectedPackagingOption = packagingSelect.options[packagingSelect.selectedIndex];
+                totalPackagingFee += (parseFloat(selectedPackagingOption.dataset.packagingCost) || 0) * quantity;
+            }
+
+            const itemCouponSelect = itemEl.querySelector('.item-coupon-select');
+            const itemCouponAppliedInfoEl = itemEl.querySelector('.item-coupon-applied-info');
+            itemCouponAppliedInfoEl.textContent = ''; // 이전 정보 초기화
+
+            if (itemCouponSelect) {
+                const selectedItemCouponOption = itemCouponSelect.options[itemCouponSelect.selectedIndex];
+                const itemDiscountValue = parseFloat(selectedItemCouponOption.dataset.discount) || 0;
+                let currentItemDiscount = 0;
+
+                if (itemDiscountValue > 0) {
+                    const itemSubtotalForCoupon = price * quantity; // 개별 상품의 소계 (수량 적용)
+                    if (selectedItemCouponOption.dataset.discountType === 'percent') {
+                        currentItemDiscount = Math.floor(itemSubtotalForCoupon * (itemDiscountValue / 100));
+                    } else { // amount
+                        currentItemDiscount = Math.min(itemDiscountValue, itemSubtotalForCoupon); // 할인액이 상품가 초과 방지
+                    }
+                    totalItemCouponDiscount += currentItemDiscount;
+                    itemCouponAppliedInfoEl.textContent = `- ${formatCurrency(currentItemDiscount)} 할인 적용됨!`;
+                }
+            }
+        });
+
+        const priceAfterItemDiscounts = subtotal - totalItemCouponDiscount;
+
+        // 주문 전체 쿠폰 적용
+        let orderCouponDiscount = 0;
+        const orderCouponSelect = document.getElementById('orderCoupon');
+        if (orderCouponSelect) {
+            const selectedOrderCouponOption = orderCouponSelect.options[orderCouponSelect.selectedIndex];
+            const orderDiscountValue = parseFloat(selectedOrderCouponOption.dataset.discount) || 0;
+            if (orderDiscountValue > 0) {
+                if (selectedOrderCouponOption.dataset.discountType === 'percent') {
+                    // 주문 전체 쿠폰은 개별 상품 할인이 적용된 후의 금액에 대해 적용
+                    orderCouponDiscount = Math.floor(priceAfterItemDiscounts * (orderDiscountValue / 100));
+                } else { // amount
+                    orderCouponDiscount = Math.min(orderDiscountValue, priceAfterItemDiscounts); // 할인액이 주문가 초과 방지
+                }
+            }
+        }
+
+        const priceAfterOrderCoupon = priceAfterItemDiscounts - orderCouponDiscount;
+
+        // 포인트 사용
+        let pointsUsed = parseInt(document.getElementById('pointsToUse').value) || 0;
+        const availablePoints = parseInt(document.getElementById('pointsToUse').dataset.availablePoints) || 0;
+        if (pointsUsed > availablePoints) pointsUsed = availablePoints;
+        if (pointsUsed < 0) pointsUsed = 0;
+        // 포인트는 (상품가+포장비-모든쿠폰할인) 금액을 초과하여 사용할 수 없음
+        const maxPointsApplicable = Math.max(0, priceAfterOrderCoupon + totalPackagingFee);
+        if (pointsUsed > maxPointsApplicable) pointsUsed = maxPointsApplicable;
+        document.getElementById('pointsToUse').value = pointsUsed;
+
+
+        // 배송비 계산 (모든 할인 적용 후 최종 상품 금액 기준)
+        let deliveryFee = 0;
+        const priceForDeliveryCalc = priceAfterOrderCoupon - pointsUsed;
+        if (priceForDeliveryCalc > 0 && priceForDeliveryCalc < MOCK_DELIVERY_THRESHOLD) {
+            deliveryFee = MOCK_DELIVERY_COST;
+        }
+
+        const finalTotalPrice = priceAfterOrderCoupon + totalPackagingFee - pointsUsed + deliveryFee;
+
+        document.getElementById('summaryTotalProductPrice').textContent = formatCurrency(subtotal);
+        document.getElementById('summaryPackagingFee').textContent = formatCurrency(totalPackagingFee);
+        document.getElementById('summaryItemCouponDiscount').textContent = "- " + formatCurrency(totalItemCouponDiscount);
+        document.getElementById('summaryOrderCouponDiscount').textContent = "- " + formatCurrency(orderCouponDiscount);
+        document.getElementById('summaryPointDiscount').textContent = "- " + formatCurrency(pointsUsed);
+        document.getElementById('summaryDeliveryFee').textContent = formatCurrency(deliveryFee);
+        document.getElementById('summaryFinalTotalPrice').textContent = formatCurrency(Math.max(0, finalTotalPrice));
+
+        document.querySelector('.checkout-submit-btn-kitsch').innerHTML = `<i class="fas fa-check-circle"></i> ${formatCurrency(Math.max(0, finalTotalPrice))} 결제하기`;
+    }
+
+
+    function execDaumPostcode(postcodeId, addressId) {
+        new daum.Postcode({
+            oncomplete: function (data) {
+                document.getElementById(postcodeId).value = data.zonecode;
+                document.getElementById(addressId).value = data.userSelectedType === 'R' ? data.roadAddress : data.jibunAddress;
+                if (addressId === 'shippingAddress') {
+                    document.getElementById('shippingDetailAddress').focus();
+                }
+            }
+        }).open();
+    }
+
+    function applyMaxPoints() {
+        const availablePoints = parseInt(document.getElementById('pointsToUse').dataset.availablePoints) || 0;
+        document.getElementById('pointsToUse').value = availablePoints;
+        updateCheckoutSummary();
+    }
+
+
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.item-packaging-select, .item-coupon-select, #orderCoupon, #pointsToUse').forEach(el => {
+            el.addEventListener('change', updateCheckoutSummary);
+        });
+        document.getElementById('pointsToUse').addEventListener('input', updateCheckoutSummary);
+
+        updateCheckoutSummary();
+        toggleNewAddressForm('default');
+
+        // 각 아이템 쿠폰 적용 정보 초기 표시
+        document.querySelectorAll('.ordered-item-kitsch').forEach(itemEl => {
+            const itemCouponSelect = itemEl.querySelector('.item-coupon-select');
+            if (itemCouponSelect && itemCouponSelect.value) { // 초기에 선택된 쿠폰이 있다면
+                const selectedItemCouponOption = itemCouponSelect.options[itemCouponSelect.selectedIndex];
+                const itemDiscountValue = parseFloat(selectedItemCouponOption.dataset.discount) || 0;
+                let currentItemDiscount = 0;
+                const price = parseFloat(itemEl.dataset.itemPrice);
+                const quantity = parseInt(itemEl.dataset.itemQuantity);
+                const itemSubtotalForCoupon = price * quantity;
+
+                if (itemDiscountValue > 0) {
+                    if (selectedItemCouponOption.dataset.discountType === 'percent') {
+                        currentItemDiscount = Math.floor(itemSubtotalForCoupon * (itemDiscountValue / 100));
+                    } else {
+                        currentItemDiscount = Math.min(itemDiscountValue, itemSubtotalForCoupon);
+                    }
+                    itemEl.querySelector('.item-coupon-applied-info').textContent = `- ${formatCurrency(currentItemDiscount)} 할인 적용됨!`;
+                }
+            }
+        });
+    });
+
+    document.getElementById('checkoutForm').addEventListener('submit', function (event) {
+        event.preventDefault();
+        alert('주문 및 결제 진행 (Mock)! 주문 완료 페이지로 이동합니다.');
+        window.location.href = "/order/complete";
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        toggleNewAddressForm(document.getElementById('shippingAddressOption').value);
+    });
+
+    function toggleNewAddressForm(val) {
+        const saved = document.getElementById('savedAddressInfo');
+        const fresh = document.getElementById('newAddressForm');
+
+        if (val === 'new') {
+            // “새 주소 입력” 폼
+            fresh.style.display = 'block';
+            saved.style.display = 'none';
+        } else {
+            // 저장된 주소 보기 + 내용 갱신
+            fresh.style.display = 'none';
+            saved.style.display = 'block';
+
+            const sel = document.getElementById('shippingAddressOption');
+            const opt = sel.options[sel.selectedIndex];
+
+            saved.innerHTML = `
+                <p><strong>배송지명:</strong> ${opt.dataset.name}</p>
+                <p><strong>주소:</strong> ${opt.dataset.road} ${opt.dataset.detail}</p>
+                <p><strong>우편번호:</strong> ${opt.dataset.postalCode}</p>`;
+        }
+    }
+
+    // 초기화
+    document.addEventListener('DOMContentLoaded', () => {
+        const sel = document.getElementById('shippingAddressOption');
+        sel.addEventListener('change', () => toggleNewAddressForm(sel.value));
+        toggleNewAddressForm(sel.value);
+    });
+</script>
 </body>
 </html>

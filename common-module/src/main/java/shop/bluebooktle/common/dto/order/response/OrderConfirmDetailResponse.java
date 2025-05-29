@@ -8,7 +8,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import shop.bluebooktle.common.dto.coupon.response.AppliedCouponResponse;
 
 @Getter
 @Setter
@@ -25,7 +24,7 @@ public class OrderConfirmDetailResponse {
 	private String postalCode;
 	private BigDecimal deliveryFee;
 	private List<OrderItemResponse> orderItems;
-	private List<AppliedCouponResponse> appliedCoupons;
+	private List<UsedCouponResponse> usedCoupons;
 	private BigDecimal userPointBalance;
 	private BigDecimal subTotal;
 	private BigDecimal packagingTotal;

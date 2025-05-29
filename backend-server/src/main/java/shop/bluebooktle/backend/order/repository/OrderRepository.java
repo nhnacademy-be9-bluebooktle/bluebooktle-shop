@@ -14,9 +14,8 @@ import shop.bluebooktle.common.entity.auth.User;
 
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
-	// 사용자 + 기간 조회
-	@EntityGraph(attributePaths = {"orderState"})
-	List<Order> findByUserAndOrderDateBetween(User user, LocalDateTime start, LocalDateTime end, Pageable pageable);
+	List<Order> findByUserAndCreatedAtBetween(User user, LocalDateTime createdAtAfter, LocalDateTime createdAtBefore,
+		Pageable pageable);
 
 	// 사용자 + 상태(enum) 조회
 	@EntityGraph(attributePaths = {"orderState"})
@@ -24,7 +23,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
 	// 사용자 + 상태 + 기간 조회
 	@EntityGraph(attributePaths = {"orderState"})
-	List<Order> findByUserAndOrderState_StateAndOrderDateBetween(User user, OrderStatus state, LocalDateTime start,
+	List<Order> findByUserAndOrderState_StateAndCreatedAtBetween(User user, OrderStatus state, LocalDateTime start,
 		LocalDateTime end, Pageable pageable);
 
 	// 사용자 전체 조회
