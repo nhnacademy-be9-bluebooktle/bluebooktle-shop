@@ -39,12 +39,10 @@ public class OrderController {
 	private final PaymentsService paymentsService;
 	private final UserService userService;
 	private final AdminPackagingOptionService adminPackagingOptionService;
-
-	@Value("${toss.client-key}")
-	private String clientKey;
-
 	private final String SUCCESS_URL = "/order/success";
 	private final String FAILURE_URL = "/order/fail";
+	@Value("${toss.client-key}")
+	private String clientKey;
 
 	@GetMapping("/checkout")
 	public ModelAndView checkoutPage() {
@@ -68,7 +66,7 @@ public class OrderController {
 
 		mav.addObject("availablePoints", userResponse.getPointBalance());
 
-		mav.addObject("checkoutRequest", new CheckoutRequest());
+		// mav.addObject("checkoutRequest", new CheckoutRequest());
 
 		// 토스페이먼츠용 공통값
 		mav.addObject("clientKey", clientKey);
@@ -78,7 +76,7 @@ public class OrderController {
 		mav.addObject("failUrl", FAILURE_URL);
 		mav.addObject("customerEmail", userResponse.getEmail());
 		mav.addObject("customerName", userResponse.getName());
-		mav.addObject("amount", 0); // JS에서 계산 후 동적으로 세팅
+		mav.addObject("amount", 0);
 
 		return mav;
 	}
