@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Pageable;
@@ -34,7 +35,6 @@ import shop.bluebooktle.common.dto.order.response.OrderConfirmDetailResponse;
 import shop.bluebooktle.common.dto.order.response.OrderItemResponse;
 import shop.bluebooktle.common.dto.order.response.OrderPackagingResponse;
 import shop.bluebooktle.common.entity.auth.User;
-import shop.bluebooktle.common.exception.auth.UserNotFoundException;
 import shop.bluebooktle.common.exception.order.OrderNotFoundException;
 
 @Slf4j
@@ -69,18 +69,14 @@ public class OrderServiceImpl implements OrderService {
 
 	@Override
 	public OrderConfirmDetailResponse getOrderDetailsForConfirmation(Long orderId, Long userId) {
-		log.debug("주문 확인 상세 정보 조회 시작. Order ID: {}, User ID: {}", orderId, userId);
 
-		Order order = orderRepository.findFullOrderDetailsByIdAndUserId(orderId, userId)
-			.orElseThrow(() -> {
-				log.warn("주문을 찾을 수 없거나 접근 권한이 없습니다. Order ID: {}, User ID: {}", orderId, userId);
-				return new OrderNotFoundException("주문을 찾을 수 없거나 접근 권한이 없습니다.");
-			});
+		Order order = orderRepository.findFullOrderDetailsById(orderId)
+			.orElseThrow(() -> new OrderNotFoundException("주문을 찾을 수 없거나 접근 권한이 없습니다."));
 
+		// 비회원 주문인 경우 userId가 null일 수 있음
 		User user = order.getUser();
-		if (user == null && order.getUser() == null) {
-			user = userRepository.findById(userId)
-				.orElseThrow(() -> new UserNotFoundException("사용자 정보를 찾을 수 없습니다. User ID: " + userId));
+		if ((user == null && userId != null) || (user != null && !Objects.equals(user.getId(), userId))) {
+			throw new OrderNotFoundException("주문을 찾을 수 없거나 접근 권한이 없습니다.");
 		}
 
 		List<OrderItemResponse> orderItems = (order.getBookOrders() == null) ? Collections.emptyList() :
@@ -150,7 +146,7 @@ public class OrderServiceImpl implements OrderService {
 			.deliveryFee(deliveryFee)
 			.orderItems(orderItems)
 			.appliedCoupons(usedCoupons)
-			.userPointBalance(user.getPointBalance())
+			.userPointBalance(user != null ? user.getPointBalance() : BigDecimal.ZERO)
 			.subTotal(subTotal)
 			.packagingTotal(packagingTotal)
 			.couponDiscountTotal(couponDiscountTotal)
