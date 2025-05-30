@@ -1,0 +1,127 @@
+package shop.bluebooktle.backend.config;
+
+import org.springframework.amqp.core.Binding;
+import org.springframework.amqp.core.BindingBuilder;
+import org.springframework.amqp.core.DirectExchange;
+import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.core.QueueBuilder;
+import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.amqp.support.converter.MessageConverter;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import lombok.RequiredArgsConstructor;
+import shop.bluebooktle.backend.coupon.mq.ExchangeProperties;
+import shop.bluebooktle.backend.coupon.mq.QueueProperties;
+
+@Configuration
+@RequiredArgsConstructor
+public class RabbitMqConfig {
+
+	private final QueueProperties props;
+	private final ExchangeProperties exchange;
+
+	// ---------birthday
+	@Bean
+	public Queue birthdayQueue() {
+		return QueueBuilder.durable(props.getBirthday())
+			.withArgument("x-dead-letter-exchange", exchange.getBirthdayDlx())
+			.withArgument("x-dead-letter-routing-key", props.getBirthdayDlq())
+			.build();
+	}
+
+	@Bean
+	public DirectExchange birthdayExchange() {
+		return new DirectExchange(exchange.getBirthday());
+	}
+
+	@Bean
+	public Binding birthdayBinding() {
+		return BindingBuilder
+			.bind(birthdayQueue())
+			.to(birthdayExchange())
+			.with(props.getBirthday());
+	}
+
+	@Bean
+	public Queue birthdayDlqQueue() {
+		return new Queue(props.getBirthdayDlq(), true);
+	}
+
+	@Bean
+	public DirectExchange birthdayDlxExchange() {
+		return new DirectExchange(exchange.getBirthdayDlx());
+	}
+
+	@Bean
+	public Binding birthdayDlqBinding() {
+		return BindingBuilder.bind(birthdayDlqQueue())
+			.to(birthdayDlxExchange())
+			.with(props.getBirthdayDlq());
+	}
+
+	// ------- Direct -------
+	@Bean
+	public Queue directQueue() {
+		return QueueBuilder.durable(props.getDirect())
+			.withArgument("x-dead-letter-exchange", exchange.getDirectDlx())
+			.withArgument("x-dead-letter-routing-key", props.getDirectDlq())
+			.build();
+	}
+
+	@Bean
+	public DirectExchange directExchange() {
+		return new DirectExchange(exchange.getDirect());
+	}
+
+	@Bean
+	public Binding directBinding() {
+		return BindingBuilder.bind(directQueue())
+			.to(directExchange())
+			.with(props.getDirect());
+	}
+
+	@Bean
+	public Queue directDlqQueue() {
+		return new Queue(props.getDirectDlq(), true);
+	}
+
+	@Bean
+	public DirectExchange directDlxExchange() {
+		return new DirectExchange(exchange.getDirectDlx());
+	}
+
+	@Bean
+	public Binding directDlqBinding() {
+		return BindingBuilder.bind(directDlqQueue())
+			.to(directDlxExchange())
+			.with(props.getDirectDlq());
+	}
+
+	//예외 발생 시 Reject
+	@Bean
+	public SimpleRabbitListenerContainerFactory rabbitListenerContainerFactory(ConnectionFactory connectionFactory,
+		MessageConverter messageConverter) {
+		SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
+		factory.setConnectionFactory(connectionFactory);
+		factory.setMessageConverter(messageConverter);
+		factory.setDefaultRequeueRejected(false);
+		return factory;
+	}
+
+	// JSON 컨버터
+	@Bean
+	public MessageConverter jsonMessageConverter() {
+		return new Jackson2JsonMessageConverter();
+	}
+
+	@Bean
+	public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
+		RabbitTemplate template = new RabbitTemplate(connectionFactory);
+		template.setMessageConverter(jsonMessageConverter());
+		return template;
+	}
+}

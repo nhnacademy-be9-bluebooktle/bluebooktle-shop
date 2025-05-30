@@ -15,7 +15,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import shop.bluebooktle.backend.coupon.batch.CouponBatchLauncher;
+import shop.bluebooktle.backend.coupon.batch.direct.DirectCouponBatchLauncher;
 import shop.bluebooktle.backend.coupon.service.CouponService;
 import shop.bluebooktle.common.dto.common.JsendResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
@@ -30,7 +30,7 @@ import shop.bluebooktle.common.dto.coupon.response.CouponResponse;
 public class CouponController {
 
 	private final CouponService couponService;
-	private final CouponBatchLauncher couponBatchLauncher;
+	private final DirectCouponBatchLauncher directCouponBatchLauncher;
 
 	@Operation(summary = "쿠폰 등록", description = "새로운 쿠폰을 등록합니다.")
 	@PostMapping
@@ -53,7 +53,7 @@ public class CouponController {
 	@PostMapping("/issue")
 	public ResponseEntity<JsendResponse<Void>> registerUserCoupon(
 		@RequestBody @Valid UserCouponRegisterRequest request) {
-		couponBatchLauncher.run(request);
+		directCouponBatchLauncher.run(request);
 		return ResponseEntity.status(HttpStatus.CREATED).body(JsendResponse.success());
 	}
 }
