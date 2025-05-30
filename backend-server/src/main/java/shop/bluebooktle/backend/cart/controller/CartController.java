@@ -23,6 +23,7 @@ import shop.bluebooktle.common.dto.cart.response.CartItemResponse;
 import shop.bluebooktle.common.dto.common.JsendResponse;
 import shop.bluebooktle.common.entity.auth.User;
 import shop.bluebooktle.common.exception.auth.UserNotFoundException;
+import shop.bluebooktle.common.exception.cart.GuestUserNotFoundException;
 import shop.bluebooktle.common.security.UserPrincipal;
 
 @Slf4j
@@ -42,7 +43,7 @@ public class CartController {
 
 	private String validateGuestId(String guestId) {
 		if (guestId == null || guestId.isBlank()) {
-			throw new IllegalArgumentException("유효하지 않은 비회원 식별자입니다.");
+			throw new GuestUserNotFoundException();
 		}
 		return guestId;
 	}
@@ -143,25 +144,14 @@ public class CartController {
 		return ResponseEntity.ok(JsendResponse.success());
 	}
 
-	/** 전환: 회원가입 직후 */
-	@PostMapping("/convert/to-member")
-	public ResponseEntity<JsendResponse<Void>> convertGuestToMemberCart(
-		@AuthenticationPrincipal UserPrincipal principal,
-		@RequestBody String guestId
-	) {
-		User user = getAuthenticatedUser(principal);
-		cartService.convertGuestCartToMemberCart(guestId, user);
-		return ResponseEntity.ok(JsendResponse.success());
-	}
-
-	/** 병합: 로그인 직후 */
+	/** 전환 또는 병합: 회원가입 또는 로그인 직후 */
 	@PostMapping("/convert/merge")
-	public ResponseEntity<JsendResponse<Void>> mergeGuestToMemberCart(
+	public ResponseEntity<JsendResponse<Void>> mergeOrConvertGuestCart(
 		@AuthenticationPrincipal UserPrincipal principal,
 		@RequestBody String guestId
 	) {
 		User user = getAuthenticatedUser(principal);
-		cartService.mergeGuestCartToMemberCart(guestId, user);
+		cartService.mergeOrConvertGuestCartToMemberCart(guestId, user);
 		return ResponseEntity.ok(JsendResponse.success());
 	}
 }

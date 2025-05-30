@@ -62,11 +62,7 @@ public interface CartRepository {
 		@RequestHeader(name = "GUEST_ID", required = false) String guestId
 	);
 
-	// ✅ 전환/병합
-
-	@PostMapping("/convert/to-member")
-	void convertGuestCartToMember(@RequestBody String guestId);
-
+	//  전환/병합
 	@PostMapping("/convert/merge")
-	void mergeGuestCartToMember(@RequestBody String guestId);
+	void mergeOrConvertGuestCartToMember(@RequestBody String guestId);
 }

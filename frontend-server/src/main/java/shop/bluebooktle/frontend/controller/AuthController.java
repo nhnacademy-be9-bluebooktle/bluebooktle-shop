@@ -26,7 +26,6 @@ import shop.bluebooktle.common.dto.auth.request.SignupRequest;
 import shop.bluebooktle.common.exception.ApplicationException;
 import shop.bluebooktle.common.exception.ErrorCode;
 import shop.bluebooktle.frontend.service.AuthService;
-import shop.bluebooktle.frontend.service.CartService;
 import shop.bluebooktle.frontend.util.CookieTokenUtil;
 
 @Slf4j
@@ -42,7 +41,6 @@ public class AuthController {
 	private String paycoRedirectUri;
 
 	private final AuthService authService;
-	private final CartService cartService;
 	private final CookieTokenUtil cookieTokenUtil;
 
 	@GetMapping("/login")
@@ -66,11 +64,9 @@ public class AuthController {
 
 	@PostMapping("/login")
 	public String login(@ModelAttribute LoginRequest loginRequest,
-		@CookieValue(value = "GUEST_ID", required = false) String guestId,
 		HttpServletResponse response) {
 		authService.login(response, loginRequest);
-		cartService.mergeGuestCartToMember(guestId);
-		return "redirect:/";
+		return "redirect:/merge";
 
 	}
 
@@ -95,7 +91,6 @@ public class AuthController {
 
 	@PostMapping("/signup")
 	public String signup(@Valid @ModelAttribute("signupRequest") SignupRequest signupRequest,
-		@CookieValue(value = "GUEST_ID", required = false) String guestId,
 		BindingResult bindingResult,
 		RedirectAttributes redirectAttributes) {
 
@@ -108,7 +103,6 @@ public class AuthController {
 
 		try {
 			authService.signup(signupRequest);
-			cartService.convertGuestCartToMember(guestId);
 			redirectAttributes.addFlashAttribute("globalSuccessMessage", "회원가입이 성공적으로 완료되었습니다. 로그인해주세요.");
 			redirectAttributes.addFlashAttribute("globalSuccessTitle", "회원가입 성공!");
 			return "redirect:/login";
@@ -164,9 +158,8 @@ public class AuthController {
 
 		try {
 			authService.paycoLogin(response, code);
-			cartService.convertGuestCartToMember(guestId);
 			log.info("PAYCO 로그인 성공");
-			return "redirect:/";
+			return "redirect:/merge";
 
 		} catch (ApplicationException e) {
 			log.error("PAYCO 로그인 처리 중 오류 발생 (ApplicationException): {}", e.getMessage());

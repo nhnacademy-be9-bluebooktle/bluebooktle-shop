@@ -52,12 +52,7 @@ public class CartServiceImpl implements CartService {
 	}
 
 	@Override
-	public void convertGuestCartToMember(String guestId) {
-		cartRepository.convertGuestCartToMember(guestId);
-	}
-
-	@Override
-	public void mergeGuestCartToMember(String guestId) {
-		cartRepository.mergeGuestCartToMember(guestId);
+	public void mergeOrConvertGuestCart(String guestId) {
+		cartRepository.mergeOrConvertGuestCartToMember(guestId);
 	}
 }

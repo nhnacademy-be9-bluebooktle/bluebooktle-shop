@@ -1,7 +1,9 @@
 package shop.bluebooktle.backend.cart.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -177,53 +179,49 @@ public class CartServiceImpl implements CartService {
 
 	@Override
 	@Transactional
-	public void convertGuestCartToMemberCart(String guestId, User user) {
+	public void mergeOrConvertGuestCartToMemberCart(String guestId, User user) {
 		Map<Long, Integer> guestCart = guestCartRepository.getCart(guestId);
 		if (guestCart.isEmpty()) {
+			return;
 		}
 
-		Cart cart = cartRepository.save(Cart.builder().user(user).build());
+		Cart cart = cartRepository.findByUser(user).orElse(null);
 
-		List<CartBook> cartBooks = guestCart.entrySet().stream()
-			.map(entry -> {
+		// 장바구니 없으면 → 생성 후 전환 (convert)
+		if (cart == null) {
+			cart = cartRepository.save(Cart.builder().user(user).build());
+
+			List<CartBook> cartBooks = new ArrayList<>();
+			for (Map.Entry<Long, Integer> entry : guestCart.entrySet()) {
 				Long bookId = entry.getKey();
 				int quantity = entry.getValue();
 				Book book = bookRepository.findById(bookId)
 					.orElseThrow(BookNotFoundException::new);
-				return CartBook.of(book, cart, quantity);
-			})
-			.toList();
-
-		cartBookRepository.saveAll(cartBooks);
-
-		// Redis 장바구니 제거 (옵션)
-		guestCartRepository.removeSelectedBooks(guestId, guestCart.keySet().stream().toList());
-	}
-
-	@Override
-	@Transactional
-	public void mergeGuestCartToMemberCart(String guestId, User user) {
-		Map<Long, Integer> guestCart = guestCartRepository.getCart(guestId);
-		if (guestCart.isEmpty()) {
+				cartBooks.add(CartBook.of(book, cart, quantity));
+			}
+			cartBookRepository.saveAll(cartBooks);
 		}
 
-		Cart cart = getOrCreateCart(user);
+		// 장바구니 있으면 → 병합 (merge)
+		else {
+			for (Map.Entry<Long, Integer> entry : guestCart.entrySet()) {
+				Long bookId = entry.getKey();
+				int guestQuantity = entry.getValue();
+				Book book = bookRepository.findById(bookId)
+					.orElseThrow(BookNotFoundException::new);
 
-		for (Map.Entry<Long, Integer> entry : guestCart.entrySet()) {
-			Long bookId = entry.getKey();
-			int guestQuantity = entry.getValue();
-			Book book = bookRepository.findById(bookId)
-				.orElseThrow(BookNotFoundException::new);
-
-			cartBookRepository.findByCartAndBook(cart, book)
-				.ifPresentOrElse(
-					existing -> existing.increaseQuantity(guestQuantity),
-					() -> cartBookRepository.save(CartBook.of(book, cart, guestQuantity))
-				);
+				Optional<CartBook> optionalCartBook = cartBookRepository.findByCartAndBook(cart, book);
+				if (optionalCartBook.isPresent()) {
+					CartBook existing = optionalCartBook.get();
+					existing.increaseQuantity(guestQuantity);
+				} else {
+					cartBookRepository.save(CartBook.of(book, cart, guestQuantity));
+				}
+			}
 		}
 
-		// Redis 비우기
-		guestCartRepository.removeSelectedBooks(guestId, guestCart.keySet().stream().toList());
+		// Redis 비우기 (공통 처리)
+		guestCartRepository.removeSelectedBooks(guestId, new ArrayList<>(guestCart.keySet()));
 	}
 
 }
