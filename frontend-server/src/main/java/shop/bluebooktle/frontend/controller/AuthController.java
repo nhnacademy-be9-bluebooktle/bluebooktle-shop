@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -25,6 +26,7 @@ import shop.bluebooktle.common.dto.auth.request.SignupRequest;
 import shop.bluebooktle.common.exception.ApplicationException;
 import shop.bluebooktle.common.exception.ErrorCode;
 import shop.bluebooktle.frontend.service.AuthService;
+import shop.bluebooktle.frontend.service.CartService;
 import shop.bluebooktle.frontend.util.CookieTokenUtil;
 
 @Slf4j
@@ -40,6 +42,7 @@ public class AuthController {
 	private String paycoRedirectUri;
 
 	private final AuthService authService;
+	private final CartService cartService;
 	private final CookieTokenUtil cookieTokenUtil;
 
 	@GetMapping("/login")
@@ -63,8 +66,10 @@ public class AuthController {
 
 	@PostMapping("/login")
 	public String login(@ModelAttribute LoginRequest loginRequest,
+		@CookieValue(value = "GUEST_ID", required = false) String guestId,
 		HttpServletResponse response) {
 		authService.login(response, loginRequest);
+		cartService.mergeGuestCartToMember(guestId);
 		return "redirect:/";
 
 	}
@@ -90,6 +95,7 @@ public class AuthController {
 
 	@PostMapping("/signup")
 	public String signup(@Valid @ModelAttribute("signupRequest") SignupRequest signupRequest,
+		@CookieValue(value = "GUEST_ID", required = false) String guestId,
 		BindingResult bindingResult,
 		RedirectAttributes redirectAttributes) {
 
@@ -102,6 +108,7 @@ public class AuthController {
 
 		try {
 			authService.signup(signupRequest);
+			cartService.convertGuestCartToMember(guestId);
 			redirectAttributes.addFlashAttribute("globalSuccessMessage", "회원가입이 성공적으로 완료되었습니다. 로그인해주세요.");
 			redirectAttributes.addFlashAttribute("globalSuccessTitle", "회원가입 성공!");
 			return "redirect:/login";
