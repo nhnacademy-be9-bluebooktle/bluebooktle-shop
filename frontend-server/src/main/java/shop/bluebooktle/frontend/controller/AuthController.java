@@ -156,6 +156,7 @@ public class AuthController {
 		@RequestParam("state") String state,
 		@RequestParam(value = "error", required = false) String error,
 		@RequestParam(value = "error_description", required = false) String errorDescription,
+		@CookieValue(value = "GUEST_ID", required = false) String guestId,
 		HttpServletResponse response,
 		RedirectAttributes redirectAttributes) {
 
@@ -163,6 +164,7 @@ public class AuthController {
 
 		try {
 			authService.paycoLogin(response, code);
+			cartService.convertGuestCartToMember(guestId);
 			log.info("PAYCO 로그인 성공");
 			return "redirect:/";
 
