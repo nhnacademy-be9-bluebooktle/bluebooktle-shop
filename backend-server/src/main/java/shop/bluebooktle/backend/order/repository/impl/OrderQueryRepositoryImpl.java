@@ -23,15 +23,14 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
 	private final JPAQueryFactory queryFactory;
 
 	@Override
-	public Optional<Order> findFullOrderDetailsByIdAndUserId(Long orderId, Long userId) {
+	public Optional<Order> findFullOrderDetailsById(Long orderId) {
 		Order foundOrder = queryFactory
 			.selectFrom(order)
 			.leftJoin(order.user, user).fetchJoin()
 			.leftJoin(order.orderState, orderState).fetchJoin()
 			.leftJoin(order.deliveryRule, deliveryRule).fetchJoin()
 			.leftJoin(order.bookOrders, bookOrder).fetchJoin()
-			// .leftJoin(order.userCouponBookOrders, userCouponBookOrder).fetchJoin()
-			.where(order.id.eq(orderId).and(order.user.id.eq(userId)))
+			.where(order.id.eq(orderId))
 			.fetchOne();
 		return Optional.ofNullable(foundOrder);
 	}
