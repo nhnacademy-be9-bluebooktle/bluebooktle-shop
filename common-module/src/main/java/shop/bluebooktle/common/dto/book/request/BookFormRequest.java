@@ -15,11 +15,13 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import shop.bluebooktle.common.dto.book.BookSaleInfoState;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
+@Setter
 public class BookFormRequest {
 	@NotBlank(message = "도서 제목은 필수 값입니다.")
 	String title;

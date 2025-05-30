@@ -280,6 +280,7 @@ public class AdminBookController {
 		log.info(bookFormRequest.toString());
 
 		if (bindingResult.hasErrors()) {
+			log.warn("도서 저장 폼 유효성 검증 에러: {}", bindingResult.getAllErrors());
 			redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.bookFormRequest",
 				bindingResult);
 			redirectAttributes.addFlashAttribute("bookForm", bookFormRequest);
