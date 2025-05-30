@@ -2,7 +2,6 @@ package shop.bluebooktle.backend.cart.service.impl;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,7 +38,7 @@ public class CartServiceImpl implements CartService {
 	private final UserRepository userRepository;
 
 	@PersistenceContext
-	private EntityManager em;
+	private EntityManager entityManager;
 
 	// ----------------- 회원용 -----------------
 
@@ -102,24 +101,16 @@ public class CartServiceImpl implements CartService {
 	}
 
 	@Override
-	@Transactional
 	public void removeBookFromUserCart(User user, Long bookId) {
-		// Cart cart = cartRepository.findByUser(user)
-		// 	.orElseThrow(CartNotFoundException::new);
-		// Book book = bookRepository.findById(bookId)
-		// 	.orElseThrow(BookNotFoundException::new);
+		Cart cart = cartRepository.findByUser(user)
+			.orElseThrow(CartNotFoundException::new);
+		Book book = bookRepository.findById(bookId)
+			.orElseThrow(BookNotFoundException::new);
 
-		// CartBook cartBook = cartBookRepository.findByCartAndBook(cart, book);
-		// if (cartBook != null) {
-		// 	CartBook managed = cartBookRepository.findById(cartBook.getId())
-		// 		.orElseThrow(() -> new RuntimeException("CartBook not found"));
-		// 	cartBookRepository.delete(managed);
-		// }
-		Long cartBookId = 25L; // ← 반드시 L 붙이기 (Long 리터럴)
-		CartBook cartBook = cartBookRepository.findById(cartBookId)
+		CartBook cartBook = cartBookRepository.findByCartAndBook(cart, book)
 			.orElseThrow(() -> new RuntimeException("CartBook not found"));
 
-		cartBookRepository.delete(cartBook);
+		cartBook.setDeletedAt();
 	}
 
 	@Override
@@ -128,16 +119,9 @@ public class CartServiceImpl implements CartService {
 		Cart cart = cartRepository.findByUser(user)
 			.orElseThrow(CartNotFoundException::new);
 
-		List<CartBook> nonManaged = cartBookRepository.findAllByCartAndBookIdIn(cart, bookIds);
+		List<CartBook> cartBooks = cartBookRepository.findAllByCartAndBookIdIn(cart, bookIds);
 
-		List<CartBook> managedList = nonManaged.stream()
-			.map(CartBook::getId)
-			.map(cartBookRepository::findById)
-			.filter(Optional::isPresent)
-			.map(Optional::get)
-			.toList();
-
-		cartBookRepository.deleteAll(managedList);
+		cartBooks.forEach(CartBook::setDeletedAt);
 	}
 
 	// ----------------- 비회원용 -----------------
