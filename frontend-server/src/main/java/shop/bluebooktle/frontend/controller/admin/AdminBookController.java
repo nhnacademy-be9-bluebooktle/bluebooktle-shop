@@ -283,13 +283,14 @@ public class AdminBookController {
 			redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.bookFormRequest",
 				bindingResult);
 			redirectAttributes.addFlashAttribute("bookForm", bookFormRequest);
+			redirectAttributes.addFlashAttribute("globalErrorMessage", "입력값을 확인해주세요.");
 			log.info("에러 로그");
 			return "redirect:/admin/books/new";
 		}
 		try {
 			adminBookService.registerBook(bookFormRequest);
 		} catch (Exception e) {
-			redirectAttributes.addFlashAttribute("globalErrorMessage", "카테고리 수정 중 오류 발생: " + e.getMessage());
+			redirectAttributes.addFlashAttribute("globalErrorMessage", "책 등록 중 오류 발생: " + e.getMessage());
 			redirectAttributes.addAttribute("bookForm", bookFormRequest);
 			return "redirect:/admin/books/new";
 
