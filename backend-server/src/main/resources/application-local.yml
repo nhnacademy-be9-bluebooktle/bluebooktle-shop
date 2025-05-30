@@ -46,8 +46,8 @@ eureka:
 # 이미지저장서버 minio
 minio:
   endpoint: http://storage.java21.net:8000
-  access-key: CWgqLifvei5RJjvU8ryr
-  secret-key: 4xFvjHC5TCUIljLbDaviFfEhkbk8NKXjYgRfCE8e
+  access-key: ${MINIO_ACCESS_KEY}
+  secret-key: ${MINIO_SECRET_KEY}
   bucket: bluebooktle-bookimage
 
 jwt:

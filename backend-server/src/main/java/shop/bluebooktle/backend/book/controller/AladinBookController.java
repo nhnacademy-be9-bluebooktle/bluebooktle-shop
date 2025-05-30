@@ -22,7 +22,7 @@ import shop.bluebooktle.common.exception.book.AladinBookNotFoundException;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/aladin/books") //수정필요
+@RequestMapping("/api/aladin/books")
 public class AladinBookController {
 
 	private final AladinBookService aladinBookService;
