@@ -8,6 +8,8 @@ public interface AladinBookService {
 
 	List<AladinBookResponse> searchBooks(String query);
 
+	List<AladinBookResponse> searchBooks(String query, int page, int size);
+
 	AladinBookResponse getBookByIsbn(String isbn);
 
 	// AladinBookItemBySearch searchBookByIsbn(String isbn);
