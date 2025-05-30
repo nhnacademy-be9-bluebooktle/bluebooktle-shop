@@ -150,14 +150,40 @@
                     <div class="admin-form-group"
                          th:classappend="${#fields.hasErrors('couponTypeId')} ? 'has-error'">
                         <label class="admin-form-label">쿠폰 정책 <span class="text-danger">*</span></label>
-                        <div th:each="type : ${couponTypes}" class="selectable-item"
-                             th:classappend="${coupon.couponTypeId == type.id} ? 'selected'">
-                            <span th:text="${type.name}">정책 이름</span>
-                            <button type="button" class="admin-btn admin-btn--sm admin-btn--secondary"
-                                    th:attr="data-id=${type.id}, data-target=${type.target}"
-                                    onclick="selectCouponType(this)">선택하기
-                            </button>
-                        </div>
+
+                        <table class="admin-table">
+                            <thead>
+                            <tr>
+                                <th>정책 이름</th>
+                                <th>대상</th>
+                                <th>최소 결제 금액</th>
+                                <th>할인 금액</th>
+                                <th>할인율</th>
+                                <th>최대 할인 금액</th>
+                                <th>선택</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="type : ${couponTypes}"
+                                th:classappend="${coupon.couponTypeId == type.id} ? 'selected'">
+                                <td th:text="${type.name}">정책 이름</td>
+                                <td th:text="${type.target}">대상</td>
+                                <td th:text="${type.minimumPayment}">0</td>
+                                <td th:text="${type.discountPrice != null ? type.discountPrice.intValue() : '-'}">-</td>
+                                <td th:text="${type.discountPercent != null ? type.discountPercent + '%' : '-'}">-</td>
+                                <td th:text="${type.maximumDiscountPrice != null ? type.maximumDiscountPrice.intValue() : '-'}">
+                                    -
+                                </td>
+                                <td>
+                                    <button type="button" class="admin-btn admin-btn--sm admin-btn--secondary"
+                                            th:attr="data-id=${type.id}, data-target=${type.target}"
+                                            onclick="selectCouponType(this)">선택하기
+                                    </button>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+
                         <div th:if="${#fields.hasErrors('couponTypeId')}" th:errors="*{couponTypeId}"
                              class="invalid-feedback admin-form-text"></div>
                     </div>

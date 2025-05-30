@@ -87,7 +87,7 @@ public class AdminCouponController {
 		@RequestParam(value = "size", defaultValue = "10") int size,
 		@RequestParam(value = "searchKeyword", required = false) String searchKeyword) {
 
-		// 현재 URI (페이징 링크 생성에 사용)
+		// 현재 URI
 		model.addAttribute("currentURI", request.getRequestURI());
 
 		// 쿠폰 폼 객체 초기화
@@ -99,7 +99,7 @@ public class AdminCouponController {
 		PaginationData<CouponTypeResponse> couponTypeData = adminCouponService.getAllCouponType();
 		model.addAttribute("couponTypes", couponTypeData.getContent());
 
-		// 도서 목록 (검색어 포함 가능)
+		// 도서 목록
 		Page<BookAllResponse> books = adminBookService.getPagedBooks(page, size, searchKeyword);
 		model.addAttribute("books", books.getContent());
 		model.addAttribute("currentPageZeroBased", books.getNumber());
@@ -138,8 +138,6 @@ public class AdminCouponController {
 		model.addAttribute("totalPages", books.getTotalPages());
 		model.addAttribute("currentPageZeroBased", books.getNumber());
 		model.addAttribute("searchKeyword", searchKeyword);
-
-		// paging 링크를 위한 baseUrl
 		model.addAttribute("baseUrlWithParams", "/admin/coupons/book-fragment");
 
 		return "admin/coupon/book_list :: bookList";
