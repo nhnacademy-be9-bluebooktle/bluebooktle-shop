@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import shop.bluebooktle.backend.cart.service.CartService;
 import shop.bluebooktle.common.dto.cart.request.CartItemRequest;
 import shop.bluebooktle.common.dto.cart.request.CartRemoveOneRequest;
@@ -25,6 +26,7 @@ import shop.bluebooktle.common.entity.auth.User;
 import shop.bluebooktle.common.exception.auth.UserNotFoundException;
 import shop.bluebooktle.common.security.UserPrincipal;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/cart")
 @RequiredArgsConstructor
@@ -116,6 +118,7 @@ public class CartController {
 		@RequestHeader(value = "GUEST_ID", required = false) String guestId,
 		@RequestBody CartRemoveOneRequest request
 	) {
+		log.info("delete mapping start");
 		if (principal == null) {
 			cartService.removeBookFromGuestCart(validateGuestId(guestId), request.bookId());
 		} else {

@@ -2,11 +2,15 @@ package shop.bluebooktle.backend.cart.service.impl;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import shop.bluebooktle.backend.book.entity.Book;
 import shop.bluebooktle.backend.book.repository.BookRepository;
 import shop.bluebooktle.backend.cart.entity.Cart;
@@ -19,8 +23,10 @@ import shop.bluebooktle.backend.user.repository.UserRepository;
 import shop.bluebooktle.common.dto.cart.response.CartItemResponse;
 import shop.bluebooktle.common.entity.auth.User;
 import shop.bluebooktle.common.exception.auth.UserNotFoundException;
+import shop.bluebooktle.common.exception.book.BookNotFoundException;
 import shop.bluebooktle.common.exception.cart.CartNotFoundException;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -31,6 +37,9 @@ public class CartServiceImpl implements CartService {
 	private final BookRepository bookRepository;
 	private final GuestCartRepository guestCartRepository;
 	private final UserRepository userRepository;
+
+	@PersistenceContext
+	private EntityManager em;
 
 	// ----------------- 회원용 -----------------
 
@@ -45,7 +54,8 @@ public class CartServiceImpl implements CartService {
 	@Transactional
 	public void addBookToUserCart(User user, Long bookId, int quantity) {
 		Cart cart = getOrCreateCart(user);
-		Book book = bookRepository.getReferenceById(bookId);
+		Book book = bookRepository.findById(bookId)
+			.orElseThrow(BookNotFoundException::new);
 
 		cartBookRepository.findByCartAndBook(cart, book)
 			.ifPresentOrElse(
@@ -70,7 +80,8 @@ public class CartServiceImpl implements CartService {
 	public void increaseUserQuantity(User user, Long bookId, int quantity) {
 		Cart cart = cartRepository.findByUser(user)
 			.orElseGet(() -> cartRepository.save(new Cart(user)));
-		Book book = bookRepository.getReferenceById(bookId);
+		Book book = bookRepository.findById(bookId)
+			.orElseThrow(BookNotFoundException::new);
 
 		cartBookRepository.findByCartAndBook(cart, book)
 			.ifPresentOrElse(
@@ -83,21 +94,32 @@ public class CartServiceImpl implements CartService {
 	public void decreaseUserQuantity(User user, Long bookId, int quantity) {
 		Cart cart = cartRepository.findByUser(user)
 			.orElseThrow(CartNotFoundException::new);
-		Book book = bookRepository.getReferenceById(bookId);
+		Book book = bookRepository.findById(bookId)
+			.orElseThrow(BookNotFoundException::new);
 
 		cartBookRepository.findByCartAndBook(cart, book)
-			.ifPresent(cartBook -> cartBook.decreaseQuantity(quantity)); // ✔️ 수량 감소 (최소 1)
+			.ifPresent(cartBook -> cartBook.decreaseQuantity(quantity));
 	}
 
 	@Override
 	@Transactional
 	public void removeBookFromUserCart(User user, Long bookId) {
-		Cart cart = cartRepository.findByUser(user)
-			.orElseThrow(CartNotFoundException::new);
-		Book book = bookRepository.getReferenceById(bookId);
+		// Cart cart = cartRepository.findByUser(user)
+		// 	.orElseThrow(CartNotFoundException::new);
+		// Book book = bookRepository.findById(bookId)
+		// 	.orElseThrow(BookNotFoundException::new);
 
-		cartBookRepository.findByCartAndBook(cart, book)
-			.ifPresent(cartBookRepository::delete);
+		// CartBook cartBook = cartBookRepository.findByCartAndBook(cart, book);
+		// if (cartBook != null) {
+		// 	CartBook managed = cartBookRepository.findById(cartBook.getId())
+		// 		.orElseThrow(() -> new RuntimeException("CartBook not found"));
+		// 	cartBookRepository.delete(managed);
+		// }
+		Long cartBookId = 25L; // ← 반드시 L 붙이기 (Long 리터럴)
+		CartBook cartBook = cartBookRepository.findById(cartBookId)
+			.orElseThrow(() -> new RuntimeException("CartBook not found"));
+
+		cartBookRepository.delete(cartBook);
 	}
 
 	@Override
@@ -105,8 +127,17 @@ public class CartServiceImpl implements CartService {
 	public void removeSelectedBooksFromUserCart(User user, List<Long> bookIds) {
 		Cart cart = cartRepository.findByUser(user)
 			.orElseThrow(CartNotFoundException::new);
-		List<CartBook> cartBooks = cartBookRepository.findAllByCartAndBookIdIn(cart, bookIds);
-		cartBookRepository.deleteAll(cartBooks);
+
+		List<CartBook> nonManaged = cartBookRepository.findAllByCartAndBookIdIn(cart, bookIds);
+
+		List<CartBook> managedList = nonManaged.stream()
+			.map(CartBook::getId)
+			.map(cartBookRepository::findById)
+			.filter(Optional::isPresent)
+			.map(Optional::get)
+			.toList();
+
+		cartBookRepository.deleteAll(managedList);
 	}
 
 	// ----------------- 비회원용 -----------------
@@ -173,7 +204,8 @@ public class CartServiceImpl implements CartService {
 			.map(entry -> {
 				Long bookId = entry.getKey();
 				int quantity = entry.getValue();
-				Book book = bookRepository.getReferenceById(bookId);
+				Book book = bookRepository.findById(bookId)
+					.orElseThrow(BookNotFoundException::new);
 				return CartBook.of(book, cart, quantity);
 			})
 			.toList();
@@ -196,7 +228,8 @@ public class CartServiceImpl implements CartService {
 		for (Map.Entry<Long, Integer> entry : guestCart.entrySet()) {
 			Long bookId = entry.getKey();
 			int guestQuantity = entry.getValue();
-			Book book = bookRepository.getReferenceById(bookId);
+			Book book = bookRepository.findById(bookId)
+				.orElseThrow(BookNotFoundException::new);
 
 			cartBookRepository.findByCartAndBook(cart, book)
 				.ifPresentOrElse(

@@ -588,28 +588,6 @@
             document.getElementById("selectedDeleteForm").submit();
         }
 
-        function deleteCartItem(buttonElement) {
-            const cartItem = buttonElement.closest('.cart-item-kitsch');
-            if (cartItem) {
-                cartItem.remove();
-                updateCartSummary();
-                alert("선택한 상품이 삭제되었습니다. (Mock)");
-            }
-        }
-
-        function deleteSelectedCartItems() {
-            const selectedItems = document.querySelectorAll('.cart-item-select:checked');
-            if (selectedItems.length === 0) {
-                alert("삭제할 상품을 선택해주세요. (Mock)");
-                return;
-            }
-            selectedItems.forEach(checkbox => {
-                checkbox.closest('.cart-item-kitsch').remove();
-            });
-            updateCartSummary();
-            alert(selectedItems.length + "개 상품이 삭제되었습니다. (Mock)");
-        }
-
         function toggleEmptyCartMessage() {
             const cartItemsPanel = document.querySelector('.cart-items-panel-kitsch');
             const summaryPanel = document.querySelector('.cart-summary-panel-kitsch');
