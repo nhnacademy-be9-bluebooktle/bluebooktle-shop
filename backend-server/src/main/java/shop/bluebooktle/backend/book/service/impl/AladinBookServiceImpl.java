@@ -11,6 +11,7 @@ import shop.bluebooktle.backend.book.adapter.AladinAdaptor;
 import shop.bluebooktle.backend.book.service.AladinBookService;
 import shop.bluebooktle.common.dto.book.response.AladinApiResponse;
 import shop.bluebooktle.common.dto.book.response.AladinBookResponse;
+import shop.bluebooktle.common.exception.book.AladinBookNotFoundException;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +24,10 @@ public class AladinBookServiceImpl implements AladinBookService {
 	@Override
 	public List<AladinBookResponse> searchBooks(String query) {
 		AladinApiResponse response = aladinAdaptor.searchBooks(query);
+
+		if (response == null) {
+			throw new AladinBookNotFoundException("알라딘에서의 응답이 null입니다.");
+		}
 
 		return response.getItem().stream()
 			.map(AladinBookResponse::from)
