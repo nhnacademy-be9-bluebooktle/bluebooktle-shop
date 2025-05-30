@@ -4,12 +4,14 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
@@ -18,16 +20,18 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.common.domain.CouponTypeTarget;
-import shop.bluebooktle.common.dto.book.BookSaleInfoState;
 import shop.bluebooktle.common.dto.book.response.BookCartOrderResponse;
 import shop.bluebooktle.common.dto.book_order.response.PackagingOptionInfoResponse;
 import shop.bluebooktle.common.dto.coupon.response.CouponResponse;
+import shop.bluebooktle.common.dto.order.response.DeliveryRuleResponse;
 import shop.bluebooktle.common.dto.payment.request.PaymentConfirmRequest;
 import shop.bluebooktle.common.dto.payment.response.PaymentConfirmResponse;
 import shop.bluebooktle.common.dto.user.response.AddressResponse;
 import shop.bluebooktle.common.dto.user.response.UserResponse;
 import shop.bluebooktle.frontend.service.AddressService;
 import shop.bluebooktle.frontend.service.AdminPackagingOptionService;
+import shop.bluebooktle.frontend.service.DeliveryRuleService;
+import shop.bluebooktle.frontend.service.OrderService;
 import shop.bluebooktle.frontend.service.PaymentsService;
 import shop.bluebooktle.frontend.service.UserService;
 
@@ -40,15 +44,15 @@ public class OrderController {
 	private final UserService userService;
 	private final AdminPackagingOptionService adminPackagingOptionService;
 	private final AddressService addressService;
-	private final String SUCCESS_URL = "/order/success";
-	private final String FAILURE_URL = "/order/fail";
-	@Value("${toss.client-key}")
-	private String clientKey;
+	private final DeliveryRuleService deliveryRuleService;
+	private final OrderService orderService;
 
 	@GetMapping("/create")
-	public ModelAndView createPage() {
-		ModelAndView mav = new ModelAndView("order/create_form");
+	public ModelAndView createPage(
+		@CookieValue(value = "GUEST_ID", required = false) String guestId
+	) {
 		UserResponse userResponse = userService.getMe();
+		ModelAndView mav = new ModelAndView("order/create_form");
 
 		List<BookCartOrderResponse> bookItems = createMockBookItems();
 
@@ -66,34 +70,18 @@ public class OrderController {
 
 		mav.addObject("availablePoints", userResponse.getPointBalance());
 
-		// mav.addObject("checkoutRequest", new CheckoutRequest());
-
 		mav.addObject("user", userResponse);
+
+		List<DeliveryRuleResponse> deliveryRules = deliveryRuleService.getDeliveryRules();
+		mav.addObject("deliveryRules", deliveryRules);
 
 		return mav;
 	}
 
 	@GetMapping("/{orderId}/checkout")
-	public ModelAndView checkoutPage() {
-		ModelAndView mav = new ModelAndView("checkout");
-		UserResponse userResponse = userService.getMe();
-
-		List<BookCartOrderResponse> bookItems = createMockBookItems();
-
-		mav.addObject("bookItems", bookItems);
-
-		Page<PackagingOptionInfoResponse> page = adminPackagingOptionService.getPackagingOptions(0, 20, null);
-		List<PackagingOptionInfoResponse> packagingOptions = page.getContent();
-		mav.addObject("packagingOptions", packagingOptions);
-
-		List<CouponResponse> orderCoupons = createMockOrderCoupons();
-		mav.addObject("coupons", orderCoupons);
-
-		mav.addObject("availablePoints", userResponse.getPointBalance());
-
-		// mav.addObject("checkoutRequest", new CheckoutRequest());
-
-		return mav;
+	public String checkoutPage(@PathVariable String orderIdStr, Model model
+	) {
+		return "order/checkout";
 	}
 
 	@GetMapping("/process")
@@ -133,24 +121,18 @@ public class OrderController {
 				"ㅇㅅㅇ ㅋㅋ",
 				new BigDecimal("28000"),
 				new BigDecimal("25200"),
-				10,
-				new BigDecimal("10"),
 				"https://picsum.photos/70/105?random=101",
 				List.of("판타지", "어드벤처"),
-				BookSaleInfoState.AVAILABLE,
-				1
+				2
 			),
 			new BookCartOrderResponse(
 				2L,
 				"ㅋㅋㅋ",
 				new BigDecimal("35000"),
 				new BigDecimal("31500"),
-				5,
-				new BigDecimal("10"),
 				"https://picsum.photos/70/105?random=102",
 				List.of("교육", "IT"),
-				BookSaleInfoState.AVAILABLE,
-				2
+				1
 			)
 		);
 	}

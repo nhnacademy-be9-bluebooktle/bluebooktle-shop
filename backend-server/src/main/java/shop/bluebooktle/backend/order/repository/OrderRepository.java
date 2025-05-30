@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -33,11 +34,12 @@ public interface OrderRepository extends JpaRepository<Order, Long>, OrderQueryR
 	// 주문 UUID 키로 단일 주문 조회 (비회원용)
 	Optional<Order> findByOrderKey(String orderKey);
 
+	@NotNull
 	@EntityGraph(attributePaths = {
 		"bookOrders.book.bookImgs.img",
 		"bookOrders.orderPackagings.packagingOption",
 		"userCouponBookOrders.userCoupon.coupon.couponType"
 	})
-	Optional<Order> findByIdAndUser_Id(Long orderId, Long userId);
+	Optional<Order> findById(@NotNull Long orderId);
 
 }
