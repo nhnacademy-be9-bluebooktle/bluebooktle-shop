@@ -1,4 +1,4 @@
-package shop.bluebooktle.backend.point.entity;
+package shop.bluebooktle.common.entity.point;
 
 import java.math.BigDecimal;
 

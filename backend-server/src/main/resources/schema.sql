@@ -131,7 +131,7 @@ CREATE TABLE `point_source_type`
 CREATE TABLE `point_policy`
 (
     `point_policy_id`      bigint                       NOT NULL AUTO_INCREMENT,
-    `point_source_type_id` bigint                       NOT NULL,
+    `point_source_type_id` bigint                       NOT NULL unique,
     `policy_type`          ENUM ('AMOUNT','PERCENTAGE') NOT NULL,
     `value`                decimal(10, 2)               NOT NULL,
     `is_active`            boolean                      NOT NULL DEFAULT true,

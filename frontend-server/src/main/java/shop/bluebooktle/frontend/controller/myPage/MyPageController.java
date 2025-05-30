@@ -13,7 +13,7 @@ public class MyPageController {
 	public String myPageDefault() {
 		return "redirect:/mypage/profile";
 	}
-	
+
 	@GetMapping("/orders")
 	public String userOrdersPage() {
 		return "mypage/order_list";
@@ -28,11 +28,6 @@ public class MyPageController {
 	@GetMapping("/addresses")
 	public String userAddressesPage() {
 		return "mypage/address_list";
-	}
-
-	@GetMapping("/points")
-	public String userPointsPage() {
-		return "mypage/point_log";
 	}
 
 	@GetMapping("/coupons")

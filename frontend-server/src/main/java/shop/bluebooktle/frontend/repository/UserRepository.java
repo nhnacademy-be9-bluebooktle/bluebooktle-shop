@@ -12,6 +12,7 @@ import shop.bluebooktle.common.dto.user.request.AdminUserUpdateRequest;
 import shop.bluebooktle.common.dto.user.request.UserUpdateRequest;
 import shop.bluebooktle.common.dto.user.response.AdminUserResponse;
 import shop.bluebooktle.common.dto.user.response.UserResponse;
+import shop.bluebooktle.common.dto.user.response.UserTotalPointResponse;
 import shop.bluebooktle.frontend.config.feign.FeignGlobalConfig;
 import shop.bluebooktle.frontend.config.retry.RetryWithTokenRefresh;
 
@@ -47,4 +48,8 @@ public interface UserRepository {
 		@PathVariable("userId") Long userId,
 		@RequestBody AdminUserUpdateRequest request
 	);
+
+	@GetMapping("/points")
+	UserTotalPointResponse getUserTotalPoints();
+
 }

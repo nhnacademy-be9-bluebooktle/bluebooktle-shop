@@ -5,17 +5,22 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
-import shop.bluebooktle.backend.coupon.entity.UserCoupon;
-import shop.bluebooktle.backend.coupon.repository.UserCouponRepository;
+import lombok.extern.slf4j.Slf4j;
+import shop.bluebooktle.backend.coupon.batch.birthday.mq.BirthdayCouponIssueProducer;
+import shop.bluebooktle.backend.coupon.dto.CouponIssueMessage;
 
 @Component
 @RequiredArgsConstructor
-public class BirthdayCouponWriter implements ItemWriter<UserCoupon> {
+@Slf4j
+public class BirthdayCouponWriter implements ItemWriter<CouponIssueMessage> {
 
-	private final UserCouponRepository userCouponRepository;
+	private final BirthdayCouponIssueProducer birthdayCouponIssueProducer;
 
 	@Override
-	public void write(Chunk<? extends UserCoupon> chunk) {
-		userCouponRepository.saveAll(chunk.getItems());
+	public void write(Chunk<? extends CouponIssueMessage> chunk) {
+		for (CouponIssueMessage message : chunk) {
+			birthdayCouponIssueProducer.send(message);
+		}
+		log.info("MQ로 {}개의 쿠폰 발급 메세지 전송", chunk.size());
 	}
 }

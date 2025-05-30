@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,6 +25,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import shop.bluebooktle.common.dto.book.response.BookAllResponse;
+import shop.bluebooktle.common.dto.book.response.CategoryTreeResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
 import shop.bluebooktle.common.dto.coupon.request.CouponRegisterRequest;
 import shop.bluebooktle.common.dto.coupon.request.CouponTypeRegisterRequest;
@@ -31,6 +34,8 @@ import shop.bluebooktle.common.dto.coupon.request.UserCouponRegisterRequest;
 import shop.bluebooktle.common.dto.coupon.response.CouponResponse;
 import shop.bluebooktle.common.dto.coupon.response.CouponTypeResponse;
 import shop.bluebooktle.common.exception.ApplicationException;
+import shop.bluebooktle.frontend.service.AdminBookService;
+import shop.bluebooktle.frontend.service.AdminCategoryService;
 import shop.bluebooktle.frontend.service.AdminCouponService;
 
 @Slf4j
@@ -40,6 +45,8 @@ import shop.bluebooktle.frontend.service.AdminCouponService;
 public class AdminCouponController {
 
 	private final AdminCouponService adminCouponService;
+	private final AdminCategoryService adminCategoryService;
+	private final AdminBookService adminBookService;
 
 	@GetMapping("/type/new")
 	public String showCouponTypeForm(Model model, HttpServletRequest request) {
@@ -73,17 +80,67 @@ public class AdminCouponController {
 		return "redirect:/admin/coupons";
 	}
 
+	// 쿠폰 등록 페이지
 	@GetMapping("/new")
-	public String showCouponForm(Model model, HttpServletRequest request) {
+	public String showCouponForm(Model model, HttpServletRequest request,
+		@RequestParam(value = "page", defaultValue = "0") int page,
+		@RequestParam(value = "size", defaultValue = "10") int size,
+		@RequestParam(value = "searchKeyword", required = false) String searchKeyword) {
+
+		// 현재 URI
 		model.addAttribute("currentURI", request.getRequestURI());
 
+		// 쿠폰 폼 객체 초기화
 		if (!model.containsAttribute("coupon")) {
 			model.addAttribute("coupon", new CouponRegisterRequest());
 		}
 
+		// 쿠폰 정책 목록
 		PaginationData<CouponTypeResponse> couponTypeData = adminCouponService.getAllCouponType();
 		model.addAttribute("couponTypes", couponTypeData.getContent());
+
+		// 도서 목록
+		Page<BookAllResponse> books = adminBookService.getPagedBooks(page, size, searchKeyword);
+		model.addAttribute("books", books.getContent());
+		model.addAttribute("currentPageZeroBased", books.getNumber());
+		model.addAttribute("totalPages", books.getTotalPages());
+		model.addAttribute("totalElements", books.getTotalElements());
+		model.addAttribute("currentSize", books.getSize());
+
+		// 검색 및 페이징 URL 생성
+		UriComponentsBuilder uriBuilder = UriComponentsBuilder
+			.fromPath(request.getRequestURI())
+			.queryParam("size", size);
+		if (StringUtils.hasText(searchKeyword)) {
+			uriBuilder.queryParam("searchKeyword", searchKeyword);
+		}
+		model.addAttribute("baseUrlWithParams", uriBuilder.toUriString());
+
+		// 검색어 유지
+		model.addAttribute("searchKeyword", searchKeyword);
+
+		// 카테고리 트리 데이터
+		List<CategoryTreeResponse> categoryTree = adminCategoryService.getCategoryTree();
+		model.addAttribute("categoryTree", categoryTree);
+
 		return "admin/coupon/coupon_form";
+	}
+
+	@GetMapping("/book-fragment")
+	public String getBookFragment(Model model,
+		@RequestParam(defaultValue = "0") int page,
+		@RequestParam(defaultValue = "10") int size,
+		@RequestParam(required = false) String searchKeyword) {
+
+		Page<BookAllResponse> books = adminBookService.getPagedBooks(page, size, searchKeyword);
+
+		model.addAttribute("books", books);
+		model.addAttribute("totalPages", books.getTotalPages());
+		model.addAttribute("currentPageZeroBased", books.getNumber());
+		model.addAttribute("searchKeyword", searchKeyword);
+		model.addAttribute("baseUrlWithParams", "/admin/coupons/book-fragment");
+
+		return "admin/coupon/book_list :: bookList";
 	}
 
 	@PostMapping

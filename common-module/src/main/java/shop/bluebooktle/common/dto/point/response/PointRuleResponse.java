@@ -7,11 +7,12 @@ import jakarta.validation.constraints.NotNull;
 import shop.bluebooktle.common.domain.point.PolicyType;
 
 public record PointRuleResponse(
-	@NotNull(message = "pointSourceTypeId 값은 반드시 존재해야 합니다.")
-	Long pointSourceTypeId,
 
 	@NotNull(message = "pointPolicyId 값은 반드시 존재해야 합니다.")
 	Long pointPolicyId,
+
+	@NotNull(message = "pointSourceTypeId 값은 반드시 존재해야 합니다.")
+	Long pointSourceTypeId,
 
 	@NotNull(message = "소스 타입은 반드시 존재해야 합니다.")
 	String sourceType,

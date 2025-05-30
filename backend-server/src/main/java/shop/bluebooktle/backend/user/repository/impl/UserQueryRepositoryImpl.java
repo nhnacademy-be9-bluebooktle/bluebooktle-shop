@@ -41,7 +41,8 @@ public class UserQueryRepositoryImpl implements UserQueryRepository {
 
 		BooleanBuilder builder = new BooleanBuilder();
 
-		builder.and(Expressions.stringTemplate("substring({0}, 5, 2)", user.birth).eq(month));
+		builder.and(Expressions.stringTemplate("substring({0}, 5, 2)", user.birth).eq(month))
+			.and(user.status.eq(UserStatus.ACTIVE));
 
 		List<User> users = queryFactory
 			.selectFrom(user)

@@ -11,7 +11,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import shop.bluebooktle.backend.coupon.entity.UserCoupon;
+import shop.bluebooktle.backend.coupon.dto.CouponIssueMessage;
 import shop.bluebooktle.common.entity.auth.User;
 
 @Configuration
@@ -35,7 +35,7 @@ public class BirthdayCouponJobConfig {
 	@Bean
 	public Step birthdayCouponStep() {
 		return new StepBuilder("birthdayCouponStep", jobRepository)
-			.<User, UserCoupon>chunk(100, transactionManager)
+			.<User, CouponIssueMessage>chunk(100, transactionManager)
 			.reader(reader)
 			.processor(processor)
 			.writer(writer)
