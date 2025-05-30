@@ -27,7 +27,7 @@ public class ImgServiceImpl implements ImgService {
 		if (imgRegisterRequest.getImgUrl() == null || imgRegisterRequest.getImgUrl().trim().isEmpty()) {
 			throw new ImgUrlEmptyException();
 		}
-		if (!imgRepository.findByImgUrl(imgRegisterRequest.getImgUrl()).isEmpty()) {
+		if (imgRepository.findByImgUrl(imgRegisterRequest.getImgUrl()).isPresent()) {
 			throw new ImgAlreadyExistsException(imgRegisterRequest.getImgUrl());
 		}
 
