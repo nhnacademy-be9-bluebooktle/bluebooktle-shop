@@ -13,13 +13,13 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import shop.bluebooktle.common.dto.book.BookSaleInfoState;
 
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
 public class BookFormRequest {
 	@NotBlank(message = "도서 제목은 필수 값입니다.")
 	String title;
@@ -32,18 +32,21 @@ public class BookFormRequest {
 	String description;
 
 	String index;
-	
+
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	@NotNull
 	LocalDate publishDate;
 
 	@NotNull(message = "판매 가격은 필수 값입니다.")
+	@Positive(message = "판매 가격은 양수값이어야 합니다.")
 	BigDecimal price;
 
 	@NotNull(message = "할인 가격은 필수 값입니다.")
+	@Positive(message = "할인 가격은 양수값이어야 합니다.")
 	BigDecimal salePrice;
 
 	@NotNull(message = "재고 수는 필수 값입니다.")
+	@Positive(message = "재고는 양수값이어야 합니다.")
 	Integer stock;
 
 	Boolean isPackable;

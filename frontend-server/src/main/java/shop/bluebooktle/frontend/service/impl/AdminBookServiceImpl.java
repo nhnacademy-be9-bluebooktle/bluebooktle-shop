@@ -38,8 +38,6 @@ public class AdminBookServiceImpl implements AdminBookService {
 	private final AdminImgService adminImgService;
 	private final AdminImgUploadRepository adminImgUploadRepository;
 
-	private final String BUCKET_NAME = "bluebooktle-bookimage";
-
 	@Override
 	public Page<BookAllResponse> getPagedBooks(int page, int size, String searchKeyword) {
 		Pageable pageable = PageRequest.of(page, size);

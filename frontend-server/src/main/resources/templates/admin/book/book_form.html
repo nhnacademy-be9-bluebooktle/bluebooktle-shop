@@ -341,7 +341,6 @@
                 previewStyle: 'vertical',
                 initialValue: hiddenTextarea?.value || ''
             });
-            console.log("에디터 확인123")
 
             // 에디터의 내용 → 숨겨진 textarea로 복사 (form 전송 시 필요)
             const form = document.getElementById('bookForm');
@@ -351,7 +350,6 @@
                 return;
             }
 
-            console.log("에디터 확인")
             form.addEventListener('submit', () => {
                 hiddenTextarea.value = editor.getHTML();  // 또는 getMarkdown()
                 console.log("editor value: " + editor.getHTML())
@@ -555,32 +553,6 @@
                 });
             });
         });
-
-
-        /*// 이미지 미리보기 처리
-        document.getElementById('imageFile').addEventListener('change', function (event) {
-            const file = event.target.files[0];
-            const preview = document.getElementById('uploadedImagePreview');
-
-            if (!file) {
-                preview.innerHTML = '';
-                return;
-            }
-
-            // 이미지인지 확인
-            if (!file.type.startsWith('image/')) {
-                preview.innerHTML = '<p style="color: red;">이미지 파일만 선택 가능합니다.</p>';
-                return;
-            }
-
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                preview.innerHTML = `
-            <img src="${e.target.result}" alt="미리보기" style="max-width: 250px; max-height: 250px; border: 1px solid #ccc; padding: 5px; border-radius: 4px;">
-        `;
-            };
-            reader.readAsDataURL(file);
-        });*/
 
     </script>
 </th:block>
