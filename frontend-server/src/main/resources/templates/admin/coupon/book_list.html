@@ -1,0 +1,45 @@
+<!-- book_list.html -->
+<div th:fragment="bookList" class="book-list-fragment">
+
+    <div class="admin-form-group">
+        <table class="admin-table">
+            <thead>
+            <tr>
+                <th>제목</th>
+                <th>ISBN</th>
+                <th>저자</th>
+                <th>출판사</th>
+                <th>판매가</th>
+                <th>선택</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="book : ${books}" th:classappend="${coupon != null and coupon.bookId == book.id} ? 'selected'">
+                <td th:text="${book.title}">도서 제목</td>
+                <td th:text="${book.isbn}">ISBN</td>
+                <td th:text="${book.authors}">저자</td>
+                <td th:text="${book.publishers}">출판사</td>
+                <td th:text="${#numbers.formatDecimal(book.salePrice,0,'COMMA',0,'POINT')} + '원'">판매가</td>
+                <td>
+                    <button type="button" class="admin-btn admin-btn--sm admin-btn--info"
+                            th:attr="data-id=${book.id}" onclick="selectBook(this)">선택
+                    </button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <input type="hidden" name="bookId" th:value="${coupon != null ? coupon.bookId : ''}"/>
+
+        <div id="selectedBookInfo" style="margin-top: 10px; font-size: 14px; color: #0a58ca;"></div>
+    </div>
+
+    <div th:if="${totalPages > 1}" class="pagination-container">
+        <th:block th:replace="~{_fragments/admin_pagination :: commonPagination(
+            currentPage=${currentPageZeroBased + 1},
+            totalPages=${totalPages},
+            baseUrl=${baseUrlWithParams},
+            searchKeyword=${searchKeyword})}"/>
+    </div>
+
+</div>
