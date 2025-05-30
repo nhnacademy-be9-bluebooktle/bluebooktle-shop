@@ -2,6 +2,7 @@ package shop.bluebooktle.frontend.controller.admin;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -123,7 +124,7 @@ public class AdminBookController {
 		List<TagInfoResponse> allTagsForMapping =
 			adminTagService.getTags(0, Integer.MAX_VALUE, null)
 				.getContent();
-		
+
 		String pageTitle;
 
 		pageTitle = "새 도서 등록";
@@ -131,7 +132,21 @@ public class AdminBookController {
 		model.addAttribute("pageTitle", pageTitle);
 
 		if (!model.containsAttribute("bookForm")) {
-			model.addAttribute("bookForm", BookFormRequest.builder().build());
+			model.addAttribute("bookForm", new BookFormRequest("",
+				"",
+				"",
+				"",
+				LocalDate.now(),
+				BigDecimal.ZERO,
+				BigDecimal.ZERO,
+				0,
+				false,
+				BookSaleInfoState.AVAILABLE,
+				new ArrayList<>(),
+				new ArrayList<>(),
+				new ArrayList<>(),
+				new ArrayList<>(),
+				null));
 		}
 		model.addAttribute("allCategoriesForMapping", allCategoriesForMapping);
 		model.addAttribute("allAuthorsForMapping", allAuthorsForMapping);

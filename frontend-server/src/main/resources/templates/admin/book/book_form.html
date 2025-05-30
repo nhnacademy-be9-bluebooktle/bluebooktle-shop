@@ -3,7 +3,12 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       xmlns:th="http://www.thymeleaf.org">
 <head>
-    <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
+
+    <!-- 위즈윅 에디터 -->
+    <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css"/>
+    <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+
+
     <title th:text="${pageTitle} ?: '도서 폼'"></title>
     <style>
         .form-section {
@@ -79,6 +84,11 @@
             background-color: #0056b3;
         }
 
+        #descriptionEditor {
+            border: 1px solid #ccc;
+            min-height: 300px;
+        }
+
     </style>
     <!-- ② 서버에서 넘긴 카테고리 트리를 JS 변수로 인라인 직렬화 -->
     <script th:inline="javascript">
@@ -102,7 +112,8 @@
                 <strong th:text="${globalErrorMessage}"></strong>
             </div>
 
-            <form th:action="@{/admin/books/save}" th:object="${bookForm}" method="post" enctype="multipart/form-data">
+            <form id="bookForm" th:action="@{/admin/books/save}" th:object="${bookForm}" method="post"
+                  enctype="multipart/form-data">
 
                 <div class="form-section">
                     <h3><i class="fas fa-info-circle"></i> 기본 정보</h3>
@@ -131,9 +142,10 @@
                             상세 설명 <span class="text-danger">*</span>
                         </label>
                         <textarea id="description"
+                                  name="description"
                                   th:field="*{description}"
-                                  class="admin-form-control"
-                                  rows="10"></textarea>
+                                  style="display: none;"></textarea>
+                        <div id="descriptionEditor"></div>
                         <div th:if="${#fields.hasErrors('description')}"
                              th:errors="*{description}"
                              class="invalid-feedback"></div>
@@ -316,23 +328,42 @@
 </div>
 
 <th:block layout:fragment="page_scripts">
-    <script th:inline="javascript">
+    <script th:inline="none">
 
-
-        // CKEditor 인스턴스 전역 저장
         const pubSize = 10, authSize = 10, tagSize = 10;
 
-        // ② CKEditor 초기화 + pubPage 체크
         document.addEventListener('DOMContentLoaded', () => {
-            ClassicEditor
-                .create(document.getElementById('description'))
-                .then(() => console.log('✅ CKEditor ready'))
-                .catch(err => console.error('❌ CKEditor init error:', err));
+            const hiddenTextarea = document.getElementById('description');
+            const editor = new toastui.Editor({
+                el: document.querySelector('#descriptionEditor'),
+                height: '400px',
+                initialEditType: 'wysiwyg',
+                previewStyle: 'vertical',
+                initialValue: hiddenTextarea?.value || ''
+            });
+            console.log("에디터 확인123")
+
+            // 에디터의 내용 → 숨겨진 textarea로 복사 (form 전송 시 필요)
+            const form = document.getElementById('bookForm');
+
+            if (!form || !hiddenTextarea) {
+                console.error('폼이나 textarea를 찾을 수 없습니다.');
+                return;
+            }
+
+            console.log("에디터 확인")
+            form.addEventListener('submit', () => {
+                hiddenTextarea.value = editor.getHTML();  // 또는 getMarkdown()
+                console.log("editor value: " + editor.getHTML())
+                console.log("text: " + hiddenTextarea.value)
+
+            });
 
             const params = new URL(location).searchParams;
             if (params.has('pubPage') || params.has('pubKeyword')) {
                 openPopup('publisher');
             }
+
         });
 
         function renderCategoryTree(nodes, container) {
@@ -516,7 +547,7 @@
         }
 
 
-        ['category', 'author', 'publisher'].forEach(type => {
+        ['author', 'publisher', 'tag'].forEach(type => {
             document.getElementById(type + 'Search').addEventListener('input', () => {
                 const q = document.getElementById(type + 'Search').value.toLowerCase();
                 document.querySelectorAll(`#${type}Results li`).forEach(li => {
@@ -524,6 +555,32 @@
                 });
             });
         });
+
+
+        /*// 이미지 미리보기 처리
+        document.getElementById('imageFile').addEventListener('change', function (event) {
+            const file = event.target.files[0];
+            const preview = document.getElementById('uploadedImagePreview');
+
+            if (!file) {
+                preview.innerHTML = '';
+                return;
+            }
+
+            // 이미지인지 확인
+            if (!file.type.startsWith('image/')) {
+                preview.innerHTML = '<p style="color: red;">이미지 파일만 선택 가능합니다.</p>';
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                preview.innerHTML = `
+            <img src="${e.target.result}" alt="미리보기" style="max-width: 250px; max-height: 250px; border: 1px solid #ccc; padding: 5px; border-radius: 4px;">
+        `;
+            };
+            reader.readAsDataURL(file);
+        });*/
 
     </script>
 </th:block>

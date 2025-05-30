@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.validation.constraints.NotBlank;
@@ -11,12 +12,14 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
-import lombok.Builder;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import shop.bluebooktle.common.dto.book.BookSaleInfoState;
 
 @Data
-@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class BookFormRequest {
 	@NotBlank(message = "도서 제목은 필수 값입니다.")
 	String title;
@@ -29,7 +32,8 @@ public class BookFormRequest {
 	String description;
 
 	String index;
-
+	
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	@NotNull
 	LocalDate publishDate;
 
