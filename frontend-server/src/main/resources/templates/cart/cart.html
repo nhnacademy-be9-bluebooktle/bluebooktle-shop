@@ -408,15 +408,16 @@
                     </div>
 
                     <div class="cart-item-info-kitsch">
-                        <!-- 썸네일: 아직 없으므로 더미 이미지로 -->
                         <a th:href="@{/books/{id}(id=${item.bookId})}">
-                            <img alt="임시 썸네일" src="https://via.placeholder.com/80x120?text=준비중">
+                            <img alt="도서 썸네일"
+                                 th:src="${item.thumbnailUrl != null} ? ${item.thumbnailUrl} : 'https://via.placeholder.com/80x120?text=No+Image'"/>
                         </a>
                         <div class="cart-item-details-kitsch">
-                            <!-- 제목, 저자: 개발중 문구로 대체 -->
                             <a class="item-title-kitsch" th:href="@{/books/{id}(id=${item.bookId})}"
-                               th:text="'[도서 ' + ${item.bookId} + ']'"></a>
-                            <p class="item-author-kitsch">정보 제공 준비중</p>
+                               th:text="${item.title}"></a>
+                            <p class="item-author-kitsch"
+                               th:if="${item.categories != null}"
+                               th:text="${#strings.arrayJoin(item.categories.toArray(), ', ')}">카테고리</p>
                         </div>
                     </div>
 
@@ -425,7 +426,7 @@
                             -
                         </button>
                         <input class="quantity-value-kitsch"
-                               data-price="10000"
+                               th:data-price="${item.salePrice != null ? item.salePrice.intValue() : item.price.intValue()}"
                                min="1"
                                onchange="updateCartItemSubtotal(this)"
                                type="number"
@@ -435,7 +436,10 @@
                         </button>
                     </div>
 
-                    <div class="cart-item-price-kitsch item-unit-price">10,000원</div> <!-- 임시 단가 -->
+                    <div class="cart-item-price-kitsch item-unit-price"
+                         th:text="${#numbers.formatInteger(item.salePrice != null ? item.salePrice.intValue() : item.price.intValue(), 3, 'COMMA') + '원'}">
+                        가격
+                    </div>
                     <div class="cart-item-delete-kitsch">
                         <form th:action="@{/cart}" method="post" th:object="${item}">
                             <input type="hidden" name="_method" value="delete"/>

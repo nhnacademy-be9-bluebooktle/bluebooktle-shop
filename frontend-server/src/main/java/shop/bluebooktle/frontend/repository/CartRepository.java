@@ -9,10 +9,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 
+import shop.bluebooktle.common.dto.book.response.BookCartOrderResponse;
 import shop.bluebooktle.common.dto.cart.request.CartItemRequest;
 import shop.bluebooktle.common.dto.cart.request.CartRemoveOneRequest;
 import shop.bluebooktle.common.dto.cart.request.CartRemoveSelectedRequest;
-import shop.bluebooktle.common.dto.cart.response.CartItemResponse;
 import shop.bluebooktle.frontend.config.feign.FeignGlobalConfig;
 import shop.bluebooktle.frontend.config.retry.RetryWithTokenRefresh;
 
@@ -34,7 +34,7 @@ public interface CartRepository {
 	);
 
 	@GetMapping
-	List<CartItemResponse> getCartItems(
+	List<BookCartOrderResponse> getCartItems(
 		@RequestHeader(name = "GUEST_ID", required = false) String guestId
 	);
 

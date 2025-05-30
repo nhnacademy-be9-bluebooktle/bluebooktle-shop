@@ -16,10 +16,10 @@ import org.springframework.web.bind.annotation.RestController;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import shop.bluebooktle.backend.cart.service.CartService;
+import shop.bluebooktle.common.dto.book.response.BookCartOrderResponse;
 import shop.bluebooktle.common.dto.cart.request.CartItemRequest;
 import shop.bluebooktle.common.dto.cart.request.CartRemoveOneRequest;
 import shop.bluebooktle.common.dto.cart.request.CartRemoveSelectedRequest;
-import shop.bluebooktle.common.dto.cart.response.CartItemResponse;
 import shop.bluebooktle.common.dto.common.JsendResponse;
 import shop.bluebooktle.common.entity.auth.User;
 import shop.bluebooktle.common.exception.auth.UserNotFoundException;
@@ -66,12 +66,12 @@ public class CartController {
 
 	/** 공통: 장바구니 조회 */
 	@GetMapping
-	public ResponseEntity<JsendResponse<List<CartItemResponse>>> getCartItems(
+	public ResponseEntity<JsendResponse<List<BookCartOrderResponse>>> getCartItems(
 		@AuthenticationPrincipal UserPrincipal principal,
 		@RequestHeader(value = "GUEST_ID", required = false) String guestId
 	) {
 		if (principal == null) {
-			List<CartItemResponse> items = cartService.getGuestCartItems(validateGuestId(guestId));
+			List<BookCartOrderResponse> items = cartService.getGuestCartItems(validateGuestId(guestId));
 			return ResponseEntity.ok(JsendResponse.success(items));
 		} else {
 			User user = getAuthenticatedUser(principal);

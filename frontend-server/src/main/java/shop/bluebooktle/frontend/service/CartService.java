@@ -2,7 +2,7 @@ package shop.bluebooktle.frontend.service;
 
 import java.util.List;
 
-import shop.bluebooktle.common.dto.cart.response.CartItemResponse;
+import shop.bluebooktle.common.dto.book.response.BookCartOrderResponse;
 
 public interface CartService {
 
@@ -10,7 +10,7 @@ public interface CartService {
 	void addToCart(String guestId, Long bookId, int quantity);
 
 	// 공통: 장바구니 조회
-	List<CartItemResponse> getCartItems(String guestId);
+	List<BookCartOrderResponse> getCartItems(String guestId);
 
 	// 공통: 수량 증가
 	void increaseQuantity(String guestId, Long bookId);
