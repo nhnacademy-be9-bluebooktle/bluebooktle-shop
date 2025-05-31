@@ -26,8 +26,7 @@ import shop.bluebooktle.common.dto.coupon.response.CouponResponse;
 import shop.bluebooktle.common.dto.order.response.DeliveryRuleResponse;
 import shop.bluebooktle.common.dto.payment.request.PaymentConfirmRequest;
 import shop.bluebooktle.common.dto.payment.response.PaymentConfirmResponse;
-import shop.bluebooktle.common.dto.user.response.AddressResponse;
-import shop.bluebooktle.common.dto.user.response.UserResponse;
+import shop.bluebooktle.common.dto.user.response.UserWithAddressResponse;
 import shop.bluebooktle.frontend.service.AddressService;
 import shop.bluebooktle.frontend.service.AdminPackagingOptionService;
 import shop.bluebooktle.frontend.service.DeliveryRuleService;
@@ -51,15 +50,13 @@ public class OrderController {
 	public ModelAndView createPage(
 		@CookieValue(value = "GUEST_ID", required = false) String guestId
 	) {
-		UserResponse userResponse = userService.getMe();
 		ModelAndView mav = new ModelAndView("order/create_form");
 
+		UserWithAddressResponse user = userService.getUserWithAddresses();
+		mav.addObject("user", user);
+
 		List<BookCartOrderResponse> bookItems = createMockBookItems();
-
-		List<AddressResponse> addresses = addressService.getAddresses();
 		mav.addObject("bookItems", bookItems);
-
-		mav.addObject("addresses", addresses);
 
 		Page<PackagingOptionInfoResponse> page = adminPackagingOptionService.getPackagingOptions(0, 20, null);
 		List<PackagingOptionInfoResponse> packagingOptions = page.getContent();
@@ -68,12 +65,8 @@ public class OrderController {
 		List<CouponResponse> orderCoupons = createMockOrderCoupons();
 		mav.addObject("coupons", orderCoupons);
 
-		mav.addObject("availablePoints", userResponse.getPointBalance());
-
-		mav.addObject("user", userResponse);
-
-		List<DeliveryRuleResponse> deliveryRules = deliveryRuleService.getDeliveryRules();
-		mav.addObject("deliveryRules", deliveryRules);
+		DeliveryRuleResponse deliveryRule = deliveryRuleService.getDefaultDeliveryRule();
+		mav.addObject("deliveryRule", deliveryRule);
 
 		return mav;
 	}
@@ -119,17 +112,17 @@ public class OrderController {
 			new BookCartOrderResponse(
 				1L,
 				"ㅇㅅㅇ ㅋㅋ",
-				new BigDecimal("28000"),
-				new BigDecimal("25200"),
+				new BigDecimal("3000"),
+				new BigDecimal("200"),
 				"https://picsum.photos/70/105?random=101",
 				List.of("판타지", "어드벤처"),
 				2
 			),
 			new BookCartOrderResponse(
-				2L,
+				1L,
 				"ㅋㅋㅋ",
-				new BigDecimal("35000"),
-				new BigDecimal("31500"),
+				new BigDecimal("3000"),
+				new BigDecimal("200"),
 				"https://picsum.photos/70/105?random=102",
 				List.of("교육", "IT"),
 				1

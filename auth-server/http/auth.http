@@ -84,8 +84,8 @@ POST {{baseUrl}}/login
 Content-Type: application/json
 
 {
-  "loginId": "{{validLoginId}}",
-  "password": "{{validPassword}}"
+  "loginId": "qqqq",
+  "password": "qqqq1111"
 }
 
 > {%

@@ -18,6 +18,11 @@ VALUES (4, 'RETURNED', now(), null);
 INSERT INTO order_state
 VALUES (5, 'CANCELED', now(), null);
 
+INSERT INTO packaging_option
+VALUES (1, '프리미엄 포장', 3000, now(), null);
+
+INSERT INTO packaging_option
+VALUES (2, '반짝이 포장', 1000, now(), null);
 
 
 INSERT INTO point_source_type

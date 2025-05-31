@@ -19,4 +19,9 @@ public class DeliveryRuleServiceImpl implements DeliveryRuleService {
 	public List<DeliveryRuleResponse> getDeliveryRules() {
 		return deliveryRuleRepository.getDeliveryRules();
 	}
+
+	@Override
+	public DeliveryRuleResponse getDefaultDeliveryRule() {
+		return deliveryRuleRepository.getDefaultDeliveryRule();
+	}
 }

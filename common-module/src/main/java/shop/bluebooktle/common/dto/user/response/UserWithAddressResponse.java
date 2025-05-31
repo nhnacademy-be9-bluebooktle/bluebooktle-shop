@@ -1,17 +1,14 @@
 package shop.bluebooktle.common.dto.user.response;
 
 import java.math.BigDecimal;
+import java.util.List;
 
-public record UserOrderResponse(
+public record UserWithAddressResponse(
 	Long userId,
 	String name,
 	String email,
 	String phoneNumber,
 	BigDecimal pointBalance,
-	Long addressId,
-	String alias,
-	String roadAddress,
-	String detailAddress,
-	String postalCode
+	List<AddressResponse> addresses
 ) {
 }
