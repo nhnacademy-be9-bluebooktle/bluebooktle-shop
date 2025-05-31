@@ -1,4 +1,4 @@
-package shop.bluebooktle.backend.coupon.batch.direct.mq;
+package shop.bluebooktle.backend.coupon.mq.direct;
 
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
@@ -23,7 +23,6 @@ public class DirectCouponIssueListener {
 	private final CouponRepository couponRepository;
 	private final UserCouponRepository userCouponRepository;
 
-	// @RabbitListener(queues = RabbitQueueNames.DIRECT)
 	@RabbitListener(queues = "#{queueProperties.direct}")
 	public void handleCouponIssue(CouponIssueMessage message) {
 		log.info("쿠폰 발급 message: {}", message);

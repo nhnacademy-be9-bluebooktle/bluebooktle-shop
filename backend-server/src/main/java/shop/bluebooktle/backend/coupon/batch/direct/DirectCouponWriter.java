@@ -7,8 +7,8 @@ import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import shop.bluebooktle.backend.coupon.batch.direct.mq.DirectCouponIssueProducer;
 import shop.bluebooktle.backend.coupon.dto.CouponIssueMessage;
+import shop.bluebooktle.backend.coupon.mq.direct.DirectCouponIssueProducer;
 
 @Component
 @StepScope
