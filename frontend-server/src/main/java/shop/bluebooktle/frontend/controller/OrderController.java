@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.common.domain.CouponTypeTarget;
@@ -24,10 +26,10 @@ import shop.bluebooktle.common.dto.book.response.BookCartOrderResponse;
 import shop.bluebooktle.common.dto.book_order.response.PackagingOptionInfoResponse;
 import shop.bluebooktle.common.dto.coupon.response.CouponResponse;
 import shop.bluebooktle.common.dto.order.response.DeliveryRuleResponse;
+import shop.bluebooktle.common.dto.order.response.OrderConfirmDetailResponse;
 import shop.bluebooktle.common.dto.payment.request.PaymentConfirmRequest;
 import shop.bluebooktle.common.dto.payment.response.PaymentConfirmResponse;
 import shop.bluebooktle.common.dto.user.response.UserWithAddressResponse;
-import shop.bluebooktle.frontend.service.AddressService;
 import shop.bluebooktle.frontend.service.AdminPackagingOptionService;
 import shop.bluebooktle.frontend.service.BookService;
 import shop.bluebooktle.frontend.service.CartService;
@@ -41,10 +43,12 @@ import shop.bluebooktle.frontend.service.UserService;
 @RequestMapping("/order")
 public class OrderController {
 
+	@Value("{toss.client-key}")
+	private String tossPaymentClientKey;
+
 	private final PaymentsService paymentsService;
 	private final UserService userService;
 	private final AdminPackagingOptionService adminPackagingOptionService;
-	private final AddressService addressService;
 	private final DeliveryRuleService deliveryRuleService;
 	private final OrderService orderService;
 	private final BookService bookService;
@@ -85,8 +89,34 @@ public class OrderController {
 	}
 
 	@GetMapping("/{orderId}/checkout")
-	public String checkoutPage(@PathVariable String orderId, Model model
+	public String finalConfirmationAndCheckoutPage(
+		@PathVariable Long orderId,
+		Model model,
+		HttpServletRequest request
 	) {
+		OrderConfirmDetailResponse orderDetails = orderService.getOrderConfirmDetail(orderId);
+		model.addAttribute("order", orderDetails);
+
+		UserWithAddressResponse currentUser = userService.getUserWithAddresses();
+		model.addAttribute("currentUser", currentUser);
+		model.addAttribute("userPointBalance", orderDetails.getUserPointBalance());
+
+		model.addAttribute("tossClientKey", tossPaymentClientKey);
+		model.addAttribute("orderIdForPayment", orderDetails.getOrderId().toString());
+		model.addAttribute("orderNameForPayment", orderDetails.getOrderName());
+
+		model.addAttribute("customerNameForPayment", orderDetails.getOrdererName());
+
+		String baseUrl = String.format("%s://%s:%d", request.getScheme(), request.getServerName(),
+			request.getServerPort());
+		model.addAttribute("successUrl", baseUrl + "/order/process");
+		model.addAttribute("failUrl", baseUrl + "/order/fail");
+
+		model.addAttribute("initialSubTotal", orderDetails.getSubTotal());
+		model.addAttribute("initialPackagingTotal", orderDetails.getPackagingTotal());
+		model.addAttribute("initialCouponDiscountTotal", orderDetails.getCouponDiscountTotal());
+		model.addAttribute("initialDeliveryFee", orderDetails.getDeliveryFee());
+
 		return "order/checkout";
 	}
 
@@ -97,7 +127,6 @@ public class OrderController {
 		@RequestParam Integer amount,
 		RedirectAttributes redirectAttributes
 	) {
-
 		PaymentConfirmRequest req = new PaymentConfirmRequest(paymentKey, orderId, amount);
 		PaymentConfirmResponse resp = paymentsService.confirm(req);
 		redirectAttributes.addFlashAttribute("orderData", resp);
@@ -118,29 +147,6 @@ public class OrderController {
 	public String orderFailPage() {
 
 		return "order/fail";
-	}
-
-	private List<BookCartOrderResponse> createMockBookItems() {
-		return List.of(
-			new BookCartOrderResponse(
-				1L,
-				"ㅇㅅㅇ ㅋㅋ",
-				new BigDecimal("3000"),
-				new BigDecimal("200"),
-				"https://picsum.photos/70/105?random=101",
-				List.of("판타지", "어드벤처"),
-				2
-			),
-			new BookCartOrderResponse(
-				1L,
-				"ㅋㅋㅋ",
-				new BigDecimal("3000"),
-				new BigDecimal("200"),
-				"https://picsum.photos/70/105?random=102",
-				List.of("교육", "IT"),
-				1
-			)
-		);
 	}
 
 	private List<CouponResponse> createMockOrderCoupons() {

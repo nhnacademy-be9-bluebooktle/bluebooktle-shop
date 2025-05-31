@@ -1,6 +1,5 @@
--- 이미 존재한다고 명시된 데이터는 INSERT하지 않습니다.
--- (delivery_rule, order_state, point_source_type, point_policy, membership_level, 특정 coupon_type 및 coupon)
--- user_id = 1 사용자는 이미 존재한다고 가정합니다.
+-- 기존 데이터 INSERT 문들은 여기에 그대로 위치합니다 (1번부터 9번까지) --
+-- ... (생략) ...
 
 -- 1. 테스트용 도서 (Books) - ID (101, 102) 사용 (기존과 동일)
 INSERT INTO `book` (`book_id`, `title`, `description`, `isbn`, `publish_date`, `created_at`)
@@ -39,37 +38,33 @@ ON DUPLICATE KEY UPDATE name=VALUES(name);
 
 -- 5. 새로운 BOOK 타겟 정률(비율) 할인 쿠폰 추가 (ID 105 사용)
 INSERT INTO `coupon_type` (`coupon_type_id`, `name`, `target`, `minimum_payment`, `created_at`)
-VALUES (105, 'HTTP 완벽가이드 특별 20% 할인', 'BOOK', 30000.00, NOW()) -- 새로운 쿠폰 타입
+VALUES (105, 'HTTP 완벽가이드 특별 20% 할인', 'BOOK', 30000.00, NOW())
 ON DUPLICATE KEY UPDATE name=VALUES(name);
 INSERT INTO `relative_coupon` (`coupon_type_id`, `maximum_discount_price`, `discount_percent`, `created_at`)
-VALUES (105, 10000.00, 20, NOW()) -- 위 쿠폰 타입에 대한 정률 할인 (20%, 최대 10000원)
+VALUES (105, 10000.00, 20, NOW())
 ON DUPLICATE KEY UPDATE maximum_discount_price=VALUES(maximum_discount_price),
                         discount_percent=VALUES(discount_percent);
 INSERT INTO `coupon` (`coupon_id`, `coupon_type_id`, `name`, `created_at`)
-VALUES (105, 105, 'HTTP 완벽가이드 정독 응원', NOW()) -- 새로운 쿠폰
+VALUES (105, 105, 'HTTP 완벽가이드 정독 응원', NOW())
 ON DUPLICATE KEY UPDATE name=VALUES(name);
 
 
 -- 6. 사용자 쿠폰 할당 (UserCoupons)
--- user_id=1 에게 기존 생일쿠폰(coupon_id=1) 할당 (user_coupon_id=101)
 INSERT INTO `user_coupon` (`user_coupon_id`, `coupon_id`, `user_id`, `available_start_at`, `available_end_at`,
                            `created_at`, `used_at`, `deleted_at`)
 VALUES (101, 1, 1, NOW(), DATE_ADD(NOW(), INTERVAL 30 DAY), NOW(), NULL, NULL)
 ON DUPLICATE KEY UPDATE coupon_id=VALUES(coupon_id),
                         user_id=VALUES(user_id);
--- user_id=1 에게 BOOK 타겟 정액 쿠폰(coupon_id=103) 할당 (user_coupon_id=102)
 INSERT INTO `user_coupon` (`user_coupon_id`, `coupon_id`, `user_id`, `available_start_at`, `available_end_at`,
                            `created_at`, `used_at`, `deleted_at`)
 VALUES (102, 103, 1, NOW(), DATE_ADD(NOW(), INTERVAL 30 DAY), NOW(), NULL, NULL)
 ON DUPLICATE KEY UPDATE coupon_id=VALUES(coupon_id),
                         user_id=VALUES(user_id);
--- user_id=1 에게 ORDER 타겟 정률 쿠폰(coupon_id=104) 할당 (user_coupon_id=103) - 이 주문에는 사용 X
 INSERT INTO `user_coupon` (`user_coupon_id`, `coupon_id`, `user_id`, `available_start_at`, `available_end_at`,
                            `created_at`, `used_at`, `deleted_at`)
 VALUES (103, 104, 1, NOW(), DATE_ADD(NOW(), INTERVAL 60 DAY), NOW(), NULL, NULL)
 ON DUPLICATE KEY UPDATE coupon_id=VALUES(coupon_id),
                         user_id=VALUES(user_id);
--- user_id=1 에게 새로 추가한 BOOK 타겟 정률 할인 쿠폰(coupon_id=105) 할당 (user_coupon_id=104)
 INSERT INTO `user_coupon` (`user_coupon_id`, `coupon_id`, `user_id`, `available_start_at`, `available_end_at`,
                            `created_at`, `used_at`, `deleted_at`)
 VALUES (104, 105, 1, NOW(), DATE_ADD(NOW(), INTERVAL 45 DAY), NOW(), NULL, NULL)
@@ -77,7 +72,7 @@ ON DUPLICATE KEY UPDATE coupon_id=VALUES(coupon_id),
                         user_id=VALUES(user_id);
 
 
--- 7. 주문 생성 (Order) - order_id (101) 사용 (기존과 동일)
+-- 7. 주문 생성 (Order) - order_id (101) 사용
 INSERT INTO `orders` (`order_id`, `user_id`, `order_state_id`, `delivery_rule_id`, `order_name`,
                       `requested_delivery_date`, `delivery_fee`, `orderer_name`, `orderer_phone_number`,
                       `receiver_name`, `receiver_phone_number`, `address`, `detail_address`, `postal_code`,
@@ -88,34 +83,33 @@ VALUES (101, 1, 1, 1, '코어 자바스크립트 Deep Dive 외 1건',
         'TEMPTRACK12345', NOW(), NULL, UUID())
 ON DUPLICATE KEY UPDATE order_name=VALUES(order_name);
 
--- 8. 주문 상품 목록 (BookOrder) - book_order_id (101, 102) 사용 (기존과 동일)
+-- 8. 주문 상품 목록 (BookOrder) - book_order_id (101, 102) 사용
 INSERT INTO `book_order` (`book_order_id`, `order_id`, `book_id`, `quantity`, `price`, `created_at`, `deleted_at`)
-VALUES (101, 101, 101, 1, 32000.00, NOW(), NULL), -- 코어 자바스크립트
-       (102, 101, 102, 2, 45000.00, NOW(), NULL)  -- HTTP 완벽 가이드
+VALUES (101, 101, 101, 1, 32000.00, NOW(), NULL),
+       (102, 101, 102, 2, 45000.00, NOW(), NULL)
 ON DUPLICATE KEY UPDATE quantity=VALUES(quantity);
 
--- 9. 포장 주문 내역 (OrderPackaging) - 수정된 시나리오 반영 (기존과 동일: HTTP 완벽 가이드 1권만 포장)
+-- 9. 포장 주문 내역 (OrderPackaging)
 INSERT INTO `order_packaging` (`order_packaging_id`, `book_order_id`, `package_id`, `quantity`, `created_at`,
                                `deleted_at`)
-VALUES (101, 101, 101, 1, NOW(), NULL), -- 코어JS 포장
-       (102, 102, 102, 1, NOW(), NULL)  -- HTTP 완벽가이드 2권 중 1권만 포장
+VALUES (101, 101, 101, 1, NOW(), NULL),
+       (102, 102, 102, 1, NOW(), NULL)
 ON DUPLICATE KEY UPDATE quantity=VALUES(quantity);
 
 -- 10. 쿠폰 사용 내역 (UserCouponBookOrder) - 수정된 시나리오 반영
--- '생일 축하 쿠폰'(user_coupon_id=101, ORDER 타겟)을 전체 주문(order_id=101)에 적용 (book_order_id=101에 연결)
--- 이것이 이 주문의 유일한 "주문 할인"임.
+-- '생일 축하 쿠폰'(user_coupon_id=101, ORDER 타겟)을 전체 주문(order_id=101)에 적용 (book_order_id는 NULL로 설정)
 INSERT INTO `user_coupon_book_order` (`user_coupon_book_order_id`, `user_coupon_id`, `book_order_id`, `order_id`,
                                       `user_id`)
-VALUES (101, 101, 101, 101, 1)
-ON DUPLICATE KEY UPDATE user_coupon_id=VALUES(user_coupon_id);
+VALUES (101, 101, NULL, 101, 1) -- << 여기! book_order_id를 NULL로 변경했습니다.
+ON DUPLICATE KEY UPDATE user_coupon_id=VALUES(user_coupon_id),
+                        book_order_id=VALUES(book_order_id);
+-- ON DUPLICATE 절에도 반영
 
 -- '코어 자바스크립트 특별 할인 쿠폰'(user_coupon_id=102, BOOK 타겟 정액)을 book_order_id=101에 적용
 INSERT INTO `user_coupon_book_order` (`user_coupon_book_order_id`, `user_coupon_id`, `book_order_id`, `order_id`,
                                       `user_id`)
 VALUES (102, 102, 101, 101, 1)
 ON DUPLICATE KEY UPDATE user_coupon_id=VALUES(user_coupon_id);
-
--- (제거) 이전 스크립트의 'VIP 고객님께 드리는 15% 주문 할인 쿠폰'(user_coupon_id=103) 적용 내역은 제거함. (규칙: 주문 할인은 하나만)
 
 -- 새로 추가한 'HTTP 완벽가이드 정독 응원 쿠폰'(user_coupon_id=104, BOOK 타겟 정률)을
 -- 'HTTP 완벽 가이드 초판'(book_order_id=102)에 적용 (user_coupon_book_order_id=104 사용)

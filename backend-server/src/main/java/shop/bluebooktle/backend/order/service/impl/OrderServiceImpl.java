@@ -27,7 +27,6 @@ import shop.bluebooktle.backend.coupon.service.CouponCalculationService;
 import shop.bluebooktle.backend.order.entity.Order;
 import shop.bluebooktle.backend.order.repository.OrderRepository;
 import shop.bluebooktle.backend.order.service.OrderService;
-import shop.bluebooktle.backend.user.repository.UserRepository;
 import shop.bluebooktle.common.domain.order.OrderStatus;
 import shop.bluebooktle.common.dto.coupon.CalculatedDiscountDetails;
 import shop.bluebooktle.common.dto.coupon.response.AppliedCouponResponse;
@@ -44,7 +43,6 @@ import shop.bluebooktle.common.exception.order.OrderNotFoundException;
 public class OrderServiceImpl implements OrderService {
 
 	private final OrderRepository orderRepository;
-	private final UserRepository userRepository;
 	private final CouponCalculationService couponCalculationService;
 
 	@Override
@@ -73,26 +71,22 @@ public class OrderServiceImpl implements OrderService {
 		Order order = orderRepository.findFullOrderDetailsById(orderId)
 			.orElseThrow(() -> new OrderNotFoundException("주문을 찾을 수 없거나 접근 권한이 없습니다."));
 
-		// 비회원 주문인 경우 userId가 null일 수 있음
 		User user = order.getUser();
 		if ((user == null && userId != null) || (user != null && !Objects.equals(user.getId(), userId))) {
 			throw new OrderNotFoundException("주문을 찾을 수 없거나 접근 권한이 없습니다.");
 		}
 
+		List<UserCouponBookOrder> allUserCouponBookOrdersInOrder = order.getUserCouponBookOrders() == null ?
+			Collections.emptyList() : order.getUserCouponBookOrders();
+
 		List<OrderItemResponse> orderItems = (order.getBookOrders() == null) ? Collections.emptyList() :
 			order.getBookOrders().stream()
-				.map(this::mapToOrderItemResponse)
+				.map(bookOrder -> mapToOrderItemResponse(bookOrder, allUserCouponBookOrdersInOrder))
 				.collect(Collectors.toList());
 
-		List<UserCouponBookOrder> appliedCouponEntities = order.getUserCouponBookOrders();
-		if (appliedCouponEntities == null) {
-			appliedCouponEntities = Collections.emptyList();
-		}
-
-		List<AppliedCouponResponse> usedCoupons = appliedCouponEntities.stream()
+		List<AppliedCouponResponse> AppliedCoupons = allUserCouponBookOrdersInOrder.stream()
 			.map(ucbo -> {
 				CalculatedDiscountDetails discountDetails = couponCalculationService.calculateDiscountDetails(ucbo);
-
 				UserCoupon userCoupon = ucbo.getUserCoupon();
 				Coupon coupon = userCoupon.getCoupon();
 				CouponType couponType = coupon.getCouponType();
@@ -124,7 +118,7 @@ public class OrderServiceImpl implements OrderService {
 			.map(pkg -> pkg.getPrice().multiply(BigDecimal.valueOf(pkg.getQuantity())))
 			.reduce(BigDecimal.ZERO, BigDecimal::add);
 
-		BigDecimal couponDiscountTotal = usedCoupons.stream()
+		BigDecimal couponDiscountTotal = AppliedCoupons.stream()
 			.map(AppliedCouponResponse::getAppliedDiscountAmount)
 			.filter(java.util.Objects::nonNull)
 			.reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -140,12 +134,14 @@ public class OrderServiceImpl implements OrderService {
 			.orderName(order.getOrderName())
 			.receiverName(order.getReceiverName())
 			.receiverPhoneNumber(order.getReceiverPhoneNumber())
+			.ordererName(order.getOrdererName())
+			.ordererPhoneNumber(order.getOrdererPhoneNumber())
 			.address(order.getAddress())
 			.detailAddress(order.getDetailAddress())
 			.postalCode(order.getPostalCode())
 			.deliveryFee(deliveryFee)
 			.orderItems(orderItems)
-			.appliedCoupons(usedCoupons)
+			.appliedCoupons(AppliedCoupons)
 			.userPointBalance(user != null ? user.getPointBalance() : BigDecimal.ZERO)
 			.subTotal(subTotal)
 			.packagingTotal(packagingTotal)
@@ -154,7 +150,8 @@ public class OrderServiceImpl implements OrderService {
 			.build();
 	}
 
-	private OrderItemResponse mapToOrderItemResponse(BookOrder bookOrder) {
+	private OrderItemResponse mapToOrderItemResponse(BookOrder bookOrder,
+		List<UserCouponBookOrder> allUserCouponBookOrdersInOrder) {
 		Book book = bookOrder.getBook();
 		if (book == null) {
 			log.warn("BookOrder ID {} 에 연결된 Book 정보가 없습니다.", bookOrder.getId());
@@ -163,6 +160,7 @@ public class OrderServiceImpl implements OrderService {
 				.quantity(bookOrder.getQuantity())
 				.price(bookOrder.getPrice())
 				.packagingOptions(Collections.emptyList())
+				.appliedItemCoupons(Collections.emptyList()) // 빈 리스트로 초기화
 				.bookTitle("알 수 없는 상품")
 				.build();
 		}
@@ -181,6 +179,29 @@ public class OrderServiceImpl implements OrderService {
 					.map(this::mapToOrderPackagingResponse)
 					.collect(Collectors.toList());
 
+		List<AppliedCouponResponse> itemSpecificCoupons = allUserCouponBookOrdersInOrder.stream()
+			.filter(ucbo -> ucbo.getBookOrder() != null && ucbo.getBookOrder().getId().equals(bookOrder.getId()))
+			.map(ucbo -> {
+				CalculatedDiscountDetails discountDetails = couponCalculationService.calculateDiscountDetails(ucbo);
+				UserCoupon userCoupon = ucbo.getUserCoupon();
+				Coupon coupon = userCoupon.getCoupon();
+				CouponType couponType = coupon.getCouponType();
+
+				return AppliedCouponResponse.builder()
+					.userCouponId(userCoupon.getId())
+					.availableStartAt(userCoupon.getAvailableStartAt())
+					.availableEndAt(userCoupon.getAvailableEndAt())
+					.couponName(coupon.getCouponName())
+					.couponTypeName(couponType.getName())
+					.target(couponType.getTarget())
+					.policyTypeDescription(discountDetails.getPolicyTypeDescription())
+					.originalDiscountValue(discountDetails.getOriginalDiscountValue())
+					.maxDiscountAmountForPercentage(discountDetails.getMaxDiscountAmountForPercentage())
+					.appliedDiscountAmount(discountDetails.getAppliedDiscountAmount())
+					.build();
+			})
+			.collect(Collectors.toList());
+
 		return OrderItemResponse.builder()
 			.bookOrderId(bookOrder.getId())
 			.bookId(book.getId())
@@ -189,6 +210,7 @@ public class OrderServiceImpl implements OrderService {
 			.quantity(bookOrder.getQuantity())
 			.price(bookOrder.getPrice())
 			.packagingOptions(packagingOptions)
+			.appliedItemCoupons(itemSpecificCoupons)
 			.build();
 	}
 
@@ -205,5 +227,4 @@ public class OrderServiceImpl implements OrderService {
 			.quantity(orderPackaging.getQuantity())
 			.build();
 	}
-
 }

@@ -609,8 +609,8 @@ CREATE TABLE `user_coupon_book_order`
 (
     `user_coupon_book_order_id` bigint NOT NULL AUTO_INCREMENT,
     `user_coupon_id`            bigint NOT NULL,
-    `book_order_id`             bigint NOT NULL,
-    `order_id`                  bigint NOT NULL,
+    `book_order_id`             bigint NULL,
+    `order_id`                  bigint NULL,
     `user_id`                   bigint NOT NULL,
 
     CONSTRAINT `PK_USER_COUPON_BOOK_ORDER` PRIMARY KEY (`user_coupon_book_order_id`),

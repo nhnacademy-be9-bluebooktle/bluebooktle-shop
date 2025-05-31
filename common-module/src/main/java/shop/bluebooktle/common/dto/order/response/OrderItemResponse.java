@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import shop.bluebooktle.common.dto.coupon.response.AppliedCouponResponse;
 
 @Getter
 @Setter
@@ -22,4 +23,5 @@ public class OrderItemResponse {
 	private int quantity;
 	private BigDecimal price;
 	private List<OrderPackagingResponse> packagingOptions;
+	private List<AppliedCouponResponse> appliedItemCoupons; // <<< 이 필드가 추가되었습니다.
 }
