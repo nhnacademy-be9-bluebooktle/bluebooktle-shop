@@ -2,6 +2,7 @@ package shop.bluebooktle.frontend.controller.admin;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -25,6 +27,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import shop.bluebooktle.common.dto.book.BookSaleInfoState;
 import shop.bluebooktle.common.dto.book.request.BookAllRegisterRequest;
+import shop.bluebooktle.common.dto.book.request.BookFormRequest;
+import shop.bluebooktle.common.dto.book.response.AladinBookResponse;
 import shop.bluebooktle.common.dto.book.response.BookAllResponse;
 import shop.bluebooktle.common.dto.book.response.CategoryTreeResponse;
 import shop.bluebooktle.common.dto.book.response.PublisherInfoResponse;
@@ -96,7 +100,7 @@ public class AdminBookController {
 		return "admin/book/book_list";
 	}
 
-	@GetMapping({"/new", "/{bookId}/edit"})
+	@GetMapping({"/new"})
 	public String bookForm(
 		@PathVariable(value = "bookId", required = false) Long bookId,
 		HttpServletRequest request,
@@ -105,6 +109,67 @@ public class AdminBookController {
 		model.addAttribute("currentURI", request.getRequestURI());
 
 		// 카테고리, 작가, 출판사, 태그
+
+		List<AuthorResponse> allAuthorsForMapping =
+			adminAuthorService.getAuthors(0, Integer.MAX_VALUE, null)
+				.getContent();
+
+		List<CategoryTreeResponse> allCategoriesForMapping =
+			adminCategoryService.getCategoryTree();
+
+		List<PublisherInfoResponse> allPublishersForMapping =
+			adminPublisherService.getPublishers(0, Integer.MAX_VALUE, null)
+				.getContent();
+
+		List<TagInfoResponse> allTagsForMapping =
+			adminTagService.getTags(0, Integer.MAX_VALUE, null)
+				.getContent();
+
+		String pageTitle;
+
+		pageTitle = "새 도서 등록";
+
+		model.addAttribute("pageTitle", pageTitle);
+
+		if (!model.containsAttribute("bookForm")) {
+			model.addAttribute("bookForm", new BookFormRequest("",
+				"",
+				"",
+				"",
+				LocalDate.now(),
+				BigDecimal.ZERO,
+				BigDecimal.ZERO,
+				0,
+				false,
+				BookSaleInfoState.AVAILABLE,
+				new ArrayList<>(),
+				new ArrayList<>(),
+				new ArrayList<>(),
+				new ArrayList<>(),
+				null));
+		}
+		model.addAttribute("allCategoriesForMapping", allCategoriesForMapping);
+		model.addAttribute("allAuthorsForMapping", allAuthorsForMapping);
+		model.addAttribute("allPublishers", allPublishersForMapping);
+		model.addAttribute("allTagsForMapping", allTagsForMapping);
+
+		model.addAttribute("stateOptions", Arrays.asList(
+			BookSaleInfoState.AVAILABLE.name(),
+			BookSaleInfoState.LOW_STOCK.name(),
+			BookSaleInfoState.SALE_ENDED.name(),
+			BookSaleInfoState.DELETED.name()
+		));
+
+		return "admin/book/book_form";
+	}
+
+	@GetMapping({"/{bookId}/edit"})
+	public String bookEditForm(
+		@PathVariable(value = "bookId", required = false) Long bookId,
+		HttpServletRequest request,
+		Model model) {
+		log.info("어드민 도서 폼 페이지 요청. URI: {}, bookId: {}", request.getRequestURI(), bookId);
+		model.addAttribute("currentURI", request.getRequestURI());
 
 		List<AuthorResponse> allAuthorsForMapping =
 			adminAuthorService.getAuthors(0, Integer.MAX_VALUE, null)
@@ -186,9 +251,7 @@ public class AdminBookController {
 		}
 
 		model.addAttribute("pageTitle", pageTitle);
-
 		model.addAttribute("book", formDto);
-
 		model.addAttribute("allCategoriesForMapping", allCategoriesForMapping);
 		model.addAttribute("allAuthorsForMapping", allAuthorsForMapping);
 		model.addAttribute("allPublishers", allPublishersForMapping);
@@ -208,50 +271,34 @@ public class AdminBookController {
 
 	@PostMapping("/save")
 	public String saveBook(
-		@Valid @ModelAttribute("book") BookAllRegisterRequest bookForm,
+		@Valid @ModelAttribute BookFormRequest bookFormRequest,
 		BindingResult bindingResult,
-		RedirectAttributes redirectAttrs,
+		RedirectAttributes redirectAttributes,
 		HttpServletRequest request,
 		Model model
 	) {
-		log.info("도서 저장 요청: {}", bookForm);
-
-		if (bookForm.getTitle().isBlank()) {
-			bindingResult.rejectValue("title", "NotEmpty", "도서 제목은 필수입니다.");
-		}
-		if (bookForm.getIsbn().isBlank()) {
-			bindingResult.rejectValue("isbn", "NotEmpty", "ISBN은 필수입니다.");
-		}
+		log.info(bookFormRequest.toString());
 
 		if (bindingResult.hasErrors()) {
-			log.warn("도서 저장 폼 검증 에러: {}", bindingResult.getAllErrors());
+			log.warn("도서 저장 폼 유효성 검증 에러: {}", bindingResult.getAllErrors());
+			redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.bookFormRequest",
+				bindingResult);
+			redirectAttributes.addFlashAttribute("bookForm", bookFormRequest);
+			redirectAttributes.addFlashAttribute("globalErrorMessage", "입력값을 확인해주세요.");
+			log.info("에러 로그");
+			return "redirect:/admin/books/new";
+		}
+		try {
+			adminBookService.registerBook(bookFormRequest);
+		} catch (Exception e) {
+			redirectAttributes.addFlashAttribute("globalErrorMessage", "책 등록 중 오류 발생: " + e.getMessage());
+			redirectAttributes.addAttribute("bookForm", bookFormRequest);
+			return "redirect:/admin/books/new";
 
-			model.addAttribute("currentURI", request.getRequestURI());
-			model.addAttribute("pageTitle", "새 도서 등록");
-			model.addAttribute("book", bookForm);
-			model.addAttribute("allAuthorsForMapping",
-				adminAuthorService.getAuthors(0, Integer.MAX_VALUE, null).getContent());
-			model.addAttribute("allCategoriesForMapping",
-				adminCategoryService.getCategories(0, Integer.MAX_VALUE, null).getContent());
-			model.addAttribute("allPublishers",
-				adminPublisherService.getPublishers(0, Integer.MAX_VALUE, null).getContent());
-			model.addAttribute("allTagsForMapping",
-				adminTagService.getTags(0, Integer.MAX_VALUE, null).getContent());
-			model.addAttribute("stateOptions", List.of(
-				BookSaleInfoState.AVAILABLE.name(),
-				BookSaleInfoState.LOW_STOCK.name(),
-				BookSaleInfoState.SALE_ENDED.name(),
-				BookSaleInfoState.DELETED.name()
-			));
-			model.addAttribute("presignedUploadUrl", imgService.getPresignedUploadUrl());
-			model.addAttribute("globalErrorMessage", "입력값을 확인해주세요.");
-
-			return "admin/book/book_form";
 		}
 
-		adminBookService.registerBook(bookForm);
-		redirectAttrs.addFlashAttribute("globalSuccessMessage",
-			"도서 '" + bookForm.getTitle() + "' 이(가) 성공적으로 등록되었습니다.");
+		redirectAttributes.addFlashAttribute("globalSuccessMessage",
+			"도서 '" + bookFormRequest.getTitle() + "' 이(가) 성공적으로 등록되었습니다.");
 
 		return "redirect:/admin/books";
 	}
@@ -263,4 +310,15 @@ public class AdminBookController {
 		redirectAttributes.addFlashAttribute("globalSuccessMessage", "도서(ID:" + bookId + ")가 비활성화되었습니다.");
 		return "redirect:/admin/books";
 	}
+
+	@GetMapping("/aladin-search")
+	@ResponseBody
+	public List<AladinBookResponse> aladinSearch(
+		@RequestParam("keyword") String keyword,
+		@RequestParam(value = "page", defaultValue = "1") int page,
+		@RequestParam(value = "size", defaultValue = "10") int size
+	) {
+		return adminBookService.searchAladin(keyword, page, size);
+	}
+
 }
