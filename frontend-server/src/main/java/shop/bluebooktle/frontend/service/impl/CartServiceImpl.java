@@ -6,10 +6,10 @@ import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import shop.bluebooktle.common.dto.book.response.BookCartOrderResponse;
 import shop.bluebooktle.common.dto.cart.request.CartItemRequest;
 import shop.bluebooktle.common.dto.cart.request.CartRemoveOneRequest;
 import shop.bluebooktle.common.dto.cart.request.CartRemoveSelectedRequest;
-import shop.bluebooktle.common.dto.cart.response.CartItemResponse;
 import shop.bluebooktle.frontend.repository.CartRepository;
 import shop.bluebooktle.frontend.service.CartService;
 
@@ -27,7 +27,7 @@ public class CartServiceImpl implements CartService {
 	}
 
 	@Override
-	public List<CartItemResponse> getCartItems(String guestId) {
+	public List<BookCartOrderResponse> getCartItems(String guestId) {
 		return cartRepository.getCartItems(guestId);
 	}
 
@@ -52,12 +52,7 @@ public class CartServiceImpl implements CartService {
 	}
 
 	@Override
-	public void convertGuestCartToMember(String guestId) {
-		cartRepository.convertGuestCartToMember(guestId);
-	}
-
-	@Override
-	public void mergeGuestCartToMember(String guestId) {
-		cartRepository.mergeGuestCartToMember(guestId);
+	public void mergeOrConvertGuestCart(String guestId) {
+		cartRepository.mergeOrConvertGuestCartToMember(guestId);
 	}
 }

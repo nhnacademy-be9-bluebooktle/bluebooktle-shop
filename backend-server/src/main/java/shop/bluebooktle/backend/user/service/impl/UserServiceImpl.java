@@ -1,6 +1,7 @@
 package shop.bluebooktle.backend.user.service.impl;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -15,9 +16,11 @@ import shop.bluebooktle.backend.user.service.UserService;
 import shop.bluebooktle.common.dto.user.request.AdminUserUpdateRequest;
 import shop.bluebooktle.common.dto.user.request.UserSearchRequest;
 import shop.bluebooktle.common.dto.user.request.UserUpdateRequest;
+import shop.bluebooktle.common.dto.user.response.AddressResponse;
 import shop.bluebooktle.common.dto.user.response.AdminUserResponse;
 import shop.bluebooktle.common.dto.user.response.UserResponse;
 import shop.bluebooktle.common.dto.user.response.UserTotalPointResponse;
+import shop.bluebooktle.common.dto.user.response.UserWithAddressResponse;
 import shop.bluebooktle.common.entity.auth.MembershipLevel;
 import shop.bluebooktle.common.entity.auth.User;
 import shop.bluebooktle.common.exception.auth.UserNotFoundException;
@@ -114,4 +117,29 @@ public class UserServiceImpl implements UserService {
 		BigDecimal totalPoints = userRepository.findPointBalanceByLoginId(userId).orElse(BigDecimal.ZERO);
 		return new UserTotalPointResponse(totalPoints);
 	}
+
+	@Override
+	public UserWithAddressResponse findUserWithAddress(Long userId) {
+		User user = userRepository.findUserWithAddresses(userId)
+			.orElseThrow(UserNotFoundException::new);
+		
+		List<AddressResponse> addresses = user.getAddresses().stream()
+			.map(a -> new AddressResponse(
+				a.getId(),
+				a.getAlias(),
+				a.getRoadAddress(),
+				a.getDetailAddress(),
+				a.getPostalCode()
+			)).toList();
+
+		return new UserWithAddressResponse(
+			user.getId(),
+			user.getName(),
+			user.getEmail(),
+			user.getPhoneNumber(),
+			user.getPointBalance(),
+			addresses
+		);
+	}
+
 }

@@ -26,4 +26,9 @@ public class DeliveryRuleController {
 		log.info("getDeliveryRules : {}", rules);
 		return ResponseEntity.ok(JsendResponse.success(rules));
 	}
+
+	@GetMapping("/default")
+	public ResponseEntity<JsendResponse<DeliveryRuleResponse>> getDefaultDeliveryRule() {
+		return ResponseEntity.ok(JsendResponse.success(deliveryRuleService.getDefaultRule()));
+	}
 }

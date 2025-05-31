@@ -1,0 +1,6 @@
+@token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwidXNlck5pY2tuYW1lIjoicXFxcSIsInVzZXJUeXBlIjoiVVNFUiIsImlhdCI6MTc0ODY5NzU4MCwiZXhwIjoxNzQ4Njk5MzgwfQ.-WAHdsJ_yfwjd7BNCcFpFdBJVpNSTyEpj3purFndB8c
+
+### 유저 정보 및 주소
+GET http://localhost:9012/api/users/addresses
+Content-Type: application/json
+Authorization: Bearer {{token}}

@@ -1,5 +1,7 @@
 package shop.bluebooktle.backend.book.controller;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -14,12 +16,16 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import shop.bluebooktle.backend.book.service.AladinBookService;
 import shop.bluebooktle.backend.book.service.BookRegisterService;
 import shop.bluebooktle.backend.book.service.BookService;
 import shop.bluebooktle.common.dto.book.request.BookAllRegisterRequest;
 import shop.bluebooktle.common.dto.book.request.BookRegisterRequest;
 import shop.bluebooktle.common.dto.book.request.BookUpdateRequest;
+import shop.bluebooktle.common.dto.book.response.AladinBookResponse;
 import shop.bluebooktle.common.dto.book.response.BookAllResponse;
+import shop.bluebooktle.common.dto.book.response.BookCartOrderResponse;
 import shop.bluebooktle.common.dto.book.response.BookRegisterResponse;
 import shop.bluebooktle.common.dto.book.response.BookResponse;
 import shop.bluebooktle.common.dto.book.response.BookUpdateResponse;
@@ -29,10 +35,12 @@ import shop.bluebooktle.common.dto.common.PaginationData;
 @RestController
 @RequestMapping("/api/books")
 @RequiredArgsConstructor
+@Slf4j
 public class BookController {
 
 	private final BookService bookService;
 	private final BookRegisterService bookRegisterService;
+	private final AladinBookService aladinBookService;
 
 	//도서 정보 등록
 	@PostMapping("/only-book-table")
@@ -84,7 +92,21 @@ public class BookController {
 		return ResponseEntity.ok(JsendResponse.success(data));
 	}
 
+	@GetMapping("/order/{bookId}")
+	public ResponseEntity<JsendResponse<BookCartOrderResponse>> getBookCartOrders(
+		@PathVariable Long bookId,
+		@RequestParam("quantity") int quantity
+	) {
+		BookCartOrderResponse response = bookService.getBookCartOrder(bookId, quantity);
+		return ResponseEntity.ok(JsendResponse.success(response));
+	}
+
 	// TODO 관리자페이지 먼저 하고나서 수정
+	// @GetMapping("cart/{bookId}")
+	// public ResponseEntity<JsendResponse<List<BookCartOrderResponse>>> getBookCartOrders(@PathVariable Long bookId) {
+	// 	List<BookCartOrderResponse> bookCartOrderResponse = bookService.getBookCartOrders(bookId);
+	// 	return ResponseEntity.ok(JsendResponse.success(bookCartOrderResponse));
+	// }
 
 	// //메인페이지에 표시될 정보(id, title, author, price, salePrice, imgUrl) 조회
 	// @GetMapping("/main/{bookId}")

@@ -6,4 +6,6 @@ import shop.bluebooktle.common.dto.order.response.DeliveryRuleResponse;
 
 public interface DeliveryRuleService {
 	List<DeliveryRuleResponse> getDeliveryRules();
+
+	DeliveryRuleResponse getDefaultDeliveryRule();
 }

@@ -5,15 +5,14 @@ import java.util.List;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 
+import shop.bluebooktle.common.dto.book.response.BookCartOrderResponse;
 import shop.bluebooktle.common.dto.cart.request.CartItemRequest;
 import shop.bluebooktle.common.dto.cart.request.CartRemoveOneRequest;
 import shop.bluebooktle.common.dto.cart.request.CartRemoveSelectedRequest;
-import shop.bluebooktle.common.dto.cart.response.CartItemResponse;
 import shop.bluebooktle.frontend.config.feign.FeignGlobalConfig;
 import shop.bluebooktle.frontend.config.retry.RetryWithTokenRefresh;
 
@@ -35,7 +34,7 @@ public interface CartRepository {
 	);
 
 	@GetMapping
-	List<CartItemResponse> getCartItems(
+	List<BookCartOrderResponse> getCartItems(
 		@RequestHeader(name = "GUEST_ID", required = false) String guestId
 	);
 
@@ -63,11 +62,7 @@ public interface CartRepository {
 		@RequestHeader(name = "GUEST_ID", required = false) String guestId
 	);
 
-	// ✅ 전환/병합
-
-	@PostMapping("/convert/to-member")
-	void convertGuestCartToMember(@RequestBody String guestId);
-
-	@PatchMapping("/convert/merge")
-	void mergeGuestCartToMember(@RequestBody String guestId);
+	//  전환/병합
+	@PostMapping("/convert/merge")
+	void mergeOrConvertGuestCartToMember(@RequestBody String guestId);
 }

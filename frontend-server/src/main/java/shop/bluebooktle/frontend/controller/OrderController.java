@@ -26,10 +26,11 @@ import shop.bluebooktle.common.dto.coupon.response.CouponResponse;
 import shop.bluebooktle.common.dto.order.response.DeliveryRuleResponse;
 import shop.bluebooktle.common.dto.payment.request.PaymentConfirmRequest;
 import shop.bluebooktle.common.dto.payment.response.PaymentConfirmResponse;
-import shop.bluebooktle.common.dto.user.response.AddressResponse;
-import shop.bluebooktle.common.dto.user.response.UserResponse;
+import shop.bluebooktle.common.dto.user.response.UserWithAddressResponse;
 import shop.bluebooktle.frontend.service.AddressService;
 import shop.bluebooktle.frontend.service.AdminPackagingOptionService;
+import shop.bluebooktle.frontend.service.BookService;
+import shop.bluebooktle.frontend.service.CartService;
 import shop.bluebooktle.frontend.service.DeliveryRuleService;
 import shop.bluebooktle.frontend.service.OrderService;
 import shop.bluebooktle.frontend.service.PaymentsService;
@@ -46,20 +47,29 @@ public class OrderController {
 	private final AddressService addressService;
 	private final DeliveryRuleService deliveryRuleService;
 	private final OrderService orderService;
+	private final BookService bookService;
+	private final CartService cartService;
 
 	@GetMapping("/create")
 	public ModelAndView createPage(
+		@RequestParam Long bookId,
+		@RequestParam(defaultValue = "1") Integer quantity,
 		@CookieValue(value = "GUEST_ID", required = false) String guestId
 	) {
-		UserResponse userResponse = userService.getMe();
 		ModelAndView mav = new ModelAndView("order/create_form");
 
-		List<BookCartOrderResponse> bookItems = createMockBookItems();
+		UserWithAddressResponse user = userService.getUserWithAddresses();
+		mav.addObject("user", user);
 
-		List<AddressResponse> addresses = addressService.getAddresses();
+		List<BookCartOrderResponse> bookItems;
+		if (bookId != null) {
+			BookCartOrderResponse bookInfo = bookService.getBookCartOrder(bookId, quantity);
+			bookItems = List.of(bookInfo);
+		} else {
+			//cart서비스에서 조회
+			bookItems = cartService.getCartItems(guestId);
+		}
 		mav.addObject("bookItems", bookItems);
-
-		mav.addObject("addresses", addresses);
 
 		Page<PackagingOptionInfoResponse> page = adminPackagingOptionService.getPackagingOptions(0, 20, null);
 		List<PackagingOptionInfoResponse> packagingOptions = page.getContent();
@@ -68,18 +78,14 @@ public class OrderController {
 		List<CouponResponse> orderCoupons = createMockOrderCoupons();
 		mav.addObject("coupons", orderCoupons);
 
-		mav.addObject("availablePoints", userResponse.getPointBalance());
-
-		mav.addObject("user", userResponse);
-
-		List<DeliveryRuleResponse> deliveryRules = deliveryRuleService.getDeliveryRules();
-		mav.addObject("deliveryRules", deliveryRules);
+		DeliveryRuleResponse deliveryRule = deliveryRuleService.getDefaultDeliveryRule();
+		mav.addObject("deliveryRule", deliveryRule);
 
 		return mav;
 	}
 
 	@GetMapping("/{orderId}/checkout")
-	public String checkoutPage(@PathVariable String orderIdStr, Model model
+	public String checkoutPage(@PathVariable String orderId, Model model
 	) {
 		return "order/checkout";
 	}
@@ -119,17 +125,17 @@ public class OrderController {
 			new BookCartOrderResponse(
 				1L,
 				"ㅇㅅㅇ ㅋㅋ",
-				new BigDecimal("28000"),
-				new BigDecimal("25200"),
+				new BigDecimal("3000"),
+				new BigDecimal("200"),
 				"https://picsum.photos/70/105?random=101",
 				List.of("판타지", "어드벤처"),
 				2
 			),
 			new BookCartOrderResponse(
-				2L,
+				1L,
 				"ㅋㅋㅋ",
-				new BigDecimal("35000"),
-				new BigDecimal("31500"),
+				new BigDecimal("3000"),
+				new BigDecimal("200"),
 				"https://picsum.photos/70/105?random=102",
 				List.of("교육", "IT"),
 				1

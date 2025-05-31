@@ -208,6 +208,7 @@ public class AuthServiceImpl implements AuthService {
 		}
 		user.updateLastLoginAt();
 		userRepository.save(user);
+		pointService.loginPoint(user.getId());
 
 		String accessToken = jwtUtil.createAccessToken(user.getId(), user.getNickname(), user.getType());
 		String refreshToken = jwtUtil.createRefreshToken(user.getId(), user.getNickname(), user.getType());
@@ -254,7 +255,9 @@ public class AuthServiceImpl implements AuthService {
 			.membershipLevel(defaultLevel)
 			.build();
 
-		return userRepository.save(newUser);
+		User user = userRepository.save(newUser);
+		pointService.signUpPoint(user.getId());
+		return user;
 	}
 
 	private String normalizePhoneNumber(String paycoMobile) {
