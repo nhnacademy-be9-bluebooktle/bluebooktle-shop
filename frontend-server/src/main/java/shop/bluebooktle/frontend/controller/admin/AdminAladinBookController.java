@@ -116,11 +116,12 @@ public class AdminAladinBookController {
 			redirectAttributes.addFlashAttribute("globalErrorMessage", "입력값을 확인해주세요.");
 			return "redirect:/admin/aladin/books/new";
 		}
-
 		try {
-			adminBookService.
+			adminBookService.registerBookByAladin(aladinBookFormRequest);
+		} catch (Exception e) {
+			redirectAttributes.addFlashAttribute("globalErrorMessage", "알라딘 API 도서 등록 중 오류 발생: " + e.getMessage());
+			return "redirect:/admin/aladin/books/new";
 		}
-
 		redirectAttributes.addFlashAttribute("globalSuccessMessage",
 			"알라딘 도서 isbn : '" + aladinBookFormRequest.getIsbn() + "' 이(가) 성공적으로 등록되었습니다.");
 		return "redirect:/admin/books";
