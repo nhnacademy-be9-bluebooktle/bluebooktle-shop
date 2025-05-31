@@ -85,7 +85,7 @@ public class OrderController {
 	}
 
 	@GetMapping("/{orderId}/checkout")
-	public String checkoutPage(@PathVariable String orderIdStr, Model model
+	public String checkoutPage(@PathVariable String orderId, Model model
 	) {
 		return "order/checkout";
 	}
