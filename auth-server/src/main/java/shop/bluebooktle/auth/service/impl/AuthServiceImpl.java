@@ -95,7 +95,7 @@ public class AuthServiceImpl implements AuthService {
 			.build();
 
 		userRepository.save(user);
-		pointService.signUpPoint(user.getId());
+		// pointService.signUpPoint(user.getId());
 	}
 
 	@Override
@@ -156,7 +156,9 @@ public class AuthServiceImpl implements AuthService {
 			throw new InvalidRefreshTokenException();
 		}
 		User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-		if (user.getStatus() != UserStatus.ACTIVE) { /* ... 기존 예외 처리 ... */ }
+		if (user.getStatus() != UserStatus.ACTIVE) {
+			throw new DormantAccountException();
+		}
 		String newAccessToken = jwtUtil.createAccessToken(userId, user.getNickname(), user.getType());
 		String newRefreshToken = jwtUtil.createRefreshToken(userId, user.getNickname(), user.getType());
 		refreshTokenService.save(user.getId(), newRefreshToken, jwtUtil.getRefreshTokenExpirationMillis());
@@ -208,6 +210,7 @@ public class AuthServiceImpl implements AuthService {
 		}
 		user.updateLastLoginAt();
 		userRepository.save(user);
+		pointService.loginPoint(user.getId());
 
 		String accessToken = jwtUtil.createAccessToken(user.getId(), user.getNickname(), user.getType());
 		String refreshToken = jwtUtil.createRefreshToken(user.getId(), user.getNickname(), user.getType());
@@ -254,7 +257,9 @@ public class AuthServiceImpl implements AuthService {
 			.membershipLevel(defaultLevel)
 			.build();
 
-		return userRepository.save(newUser);
+		User user = userRepository.save(newUser);
+		pointService.signUpPoint(user.getId());
+		return user;
 	}
 
 	private String normalizePhoneNumber(String paycoMobile) {

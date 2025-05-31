@@ -59,6 +59,13 @@ public class Address extends BaseEntity {
 		this.postalCode = postalCode;
 	}
 
+	public void update(String alias, String roadAddress, String detailAddress, String postalCode) {
+		this.alias = alias;
+		this.roadAddress = roadAddress;
+		this.detailAddress = detailAddress;
+		this.postalCode = postalCode;
+	}
+
 	void assignUser(User user) {
 		this.user = user;
 	}

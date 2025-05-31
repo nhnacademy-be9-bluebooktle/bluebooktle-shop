@@ -463,7 +463,7 @@ CREATE TABLE `orders`
     `order_state_id`          bigint         NOT NULL,
     `delivery_rule_id`        bigint         NOT NULL,
     `user_id`                 bigint         NULL,
-    `order_date`              timestamp      NOT NULL,
+    `order_name`              VARCHAR(255)   NOT NULL,
     `requested_delivery_date` timestamp      NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `shipped_at`              timestamp      NULL,
     `delivery_fee`            decimal(10, 2) NOT NULL,
@@ -475,8 +475,9 @@ CREATE TABLE `orders`
     `detail_address`          varchar(255)   NOT NULL,
     `postal_code`             varchar(5)     NOT NULL,
     `tracking_number`         varchar(14)    NOT NULL,
+    `created_at`              timestamp      NOT NULL,
     `deleted_at`              timestamp      NULL,
-    `order_key`               varchar(36)    NULL COMMENT '비회원이 주문을 확인하기 위해 사용하는 비밀번호입니다.',
+    `order_key`               varchar(255)   NULL COMMENT '비회원이 주문을 확인하기 위해 사용하는 비밀번호입니다.',
 
     CONSTRAINT `PK_ORDERS` PRIMARY KEY (`order_id`),
     CONSTRAINT `FK_order_order_state_id_order_state`
@@ -608,8 +609,8 @@ CREATE TABLE `user_coupon_book_order`
 (
     `user_coupon_book_order_id` bigint NOT NULL AUTO_INCREMENT,
     `user_coupon_id`            bigint NOT NULL,
-    `book_order_id`             bigint NOT NULL,
-    `order_id`                  bigint NOT NULL,
+    `book_order_id`             bigint NULL,
+    `order_id`                  bigint NULL,
     `user_id`                   bigint NOT NULL,
 
     CONSTRAINT `PK_USER_COUPON_BOOK_ORDER` PRIMARY KEY (`user_coupon_book_order_id`),

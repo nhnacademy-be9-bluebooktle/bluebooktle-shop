@@ -35,6 +35,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		throws IOException {
 
 		String jwt = null;
+
 		try {
 			jwt = extractJwtFromRequest(request);
 

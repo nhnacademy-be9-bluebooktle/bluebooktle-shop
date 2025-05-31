@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
@@ -23,7 +24,7 @@ import shop.bluebooktle.common.exception.point.PointPolicyNotFoundException;
 import shop.bluebooktle.common.exception.point.PointSourceNotFountException;
 
 @Service
-@Transactional
+
 @RequiredArgsConstructor
 public class PointServiceImpl implements PointService {
 	private final PointHistoryRepository pointHistoryRepository;
@@ -32,6 +33,7 @@ public class PointServiceImpl implements PointService {
 	private final UserRepository userRepository;
 
 	@Override
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void adjustUserPointAndSavePointHistory(Long userId, PointSourceTypeEnum pointSourceTypeEnum) {
 		User user = userRepository.findById(userId)
 			.orElseThrow(UserNotFoundException::new);
@@ -62,12 +64,13 @@ public class PointServiceImpl implements PointService {
 	}
 
 	@Override
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void signUpPoint(Long userId) {
 		adjustUserPointAndSavePointHistory(userId, PointSourceTypeEnum.SIGNUP_EARN);
 	}
 
 	@Override
-	@Transactional
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void loginPoint(Long userId) {
 		PointHistory last = pointHistoryRepository
 			.findTopByUserIdAndSourceTypeOrderByCreatedAtDesc(userId, PointSourceTypeEnum.LOGIN_EARN)

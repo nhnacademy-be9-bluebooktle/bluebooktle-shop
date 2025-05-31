@@ -1,5 +1,11 @@
 INSERT INTO delivery_rule
-VALUES (1, '기본 배송 정책', 30000.00, 5000.00, 'ALL', true, now(), null);
+VALUES (1, '기본 배송', 30000.00, 5000, 'ALL', true, now(), null);
+
+INSERT INTO delivery_rule
+VALUES (2, '제주도', null, 6000, 'JEJU', true, now(), null);
+
+INSERT INTO delivery_rule
+VALUES (3, '도서산간', null, 10000, 'MOUNTAINOUS_AREA', true, now(), null);
 
 INSERT INTO order_state
 VALUES (1, 'PENDING', now(), null);
@@ -12,6 +18,11 @@ VALUES (4, 'RETURNED', now(), null);
 INSERT INTO order_state
 VALUES (5, 'CANCELED', now(), null);
 
+INSERT INTO packaging_option
+VALUES (1, '프리미엄 포장', 3000, now(), null);
+
+INSERT INTO packaging_option
+VALUES (2, '반짝이 포장', 1000, now(), null);
 
 
 INSERT INTO point_source_type

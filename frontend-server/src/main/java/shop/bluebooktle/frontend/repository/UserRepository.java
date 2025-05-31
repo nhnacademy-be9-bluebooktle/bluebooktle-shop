@@ -13,6 +13,7 @@ import shop.bluebooktle.common.dto.user.request.UserUpdateRequest;
 import shop.bluebooktle.common.dto.user.response.AdminUserResponse;
 import shop.bluebooktle.common.dto.user.response.UserResponse;
 import shop.bluebooktle.common.dto.user.response.UserTotalPointResponse;
+import shop.bluebooktle.common.dto.user.response.UserWithAddressResponse;
 import shop.bluebooktle.frontend.config.feign.FeignGlobalConfig;
 import shop.bluebooktle.frontend.config.retry.RetryWithTokenRefresh;
 
@@ -51,5 +52,8 @@ public interface UserRepository {
 
 	@GetMapping("/points")
 	UserTotalPointResponse getUserTotalPoints();
+
+	@GetMapping("/addresses")
+	UserWithAddressResponse getUserWithAddresses();
 
 }

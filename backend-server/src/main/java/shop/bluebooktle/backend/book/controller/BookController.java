@@ -25,6 +25,7 @@ import shop.bluebooktle.common.dto.book.request.BookRegisterRequest;
 import shop.bluebooktle.common.dto.book.request.BookUpdateRequest;
 import shop.bluebooktle.common.dto.book.response.AladinBookResponse;
 import shop.bluebooktle.common.dto.book.response.BookAllResponse;
+import shop.bluebooktle.common.dto.book.response.BookCartOrderResponse;
 import shop.bluebooktle.common.dto.book.response.BookRegisterResponse;
 import shop.bluebooktle.common.dto.book.response.BookResponse;
 import shop.bluebooktle.common.dto.book.response.BookUpdateResponse;
@@ -91,15 +92,13 @@ public class BookController {
 		return ResponseEntity.ok(JsendResponse.success(data));
 	}
 
-	// 알라딘 API 도서 검색
-	@GetMapping("/aladin-search")
-	public ResponseEntity<JsendResponse<List<AladinBookResponse>>> searchBooks(
-		@RequestParam("keyword") String keyword,
-		@RequestParam(value = "page", defaultValue = "1") int page,
-		@RequestParam(value = "size", defaultValue = "10") int size
+	@GetMapping("/order/{bookId}")
+	public ResponseEntity<JsendResponse<BookCartOrderResponse>> getBookCartOrders(
+		@PathVariable Long bookId,
+		@RequestParam("quantity") int quantity
 	) {
-		List<AladinBookResponse> result = aladinBookService.searchBooks(keyword, page, size);
-		return ResponseEntity.ok(JsendResponse.success(result));
+		BookCartOrderResponse response = bookService.getBookCartOrder(bookId, quantity);
+		return ResponseEntity.ok(JsendResponse.success(response));
 	}
 
 	// TODO 관리자페이지 먼저 하고나서 수정

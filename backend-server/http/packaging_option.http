@@ -1,4 +1,4 @@
-@baseUrl = http://localhost:9002
+@baseUrl = http://localhost:9012
 
 ### 포장 옵션 등록 1
 POST {{baseUrl}}/api/options

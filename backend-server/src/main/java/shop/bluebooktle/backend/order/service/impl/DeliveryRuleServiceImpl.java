@@ -1,6 +1,6 @@
 package shop.bluebooktle.backend.order.service.impl;
 
-import java.math.BigDecimal;
+import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -74,9 +74,11 @@ public class DeliveryRuleServiceImpl implements DeliveryRuleService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public Page<DeliveryRuleResponse> getAllByIsActive(Pageable pageable) {
-		return repository.findAllByIsActiveTrue(pageable)
-			.map(this::toResponse);
+	public List<DeliveryRuleResponse> getAllByIsActive() {
+		return repository.findAllByIsActiveTrue()
+			.stream()
+			.map(this::toResponse)
+			.toList();
 	}
 
 	@Override
@@ -87,19 +89,6 @@ public class DeliveryRuleServiceImpl implements DeliveryRuleService {
 			throw new CannotDeleteDefaultPolicyException();
 		}
 		repository.delete(rule);
-	}
-
-	@Override
-	@Transactional(readOnly = true)
-	public BigDecimal calculateDeliveryFee(BigDecimal orderAmount, Region region) {
-		DeliveryRule defaultRule = repository.findByRegionAndIsActiveTrue(DEFAULT_REGION)
-			.orElseThrow(DefaultDeliveryRuleNotFoundException::new);
-		BigDecimal fee = orderAmount.compareTo(defaultRule.getFreeDeliveryThreshold()) >= 0
-			? BigDecimal.ZERO
-			: defaultRule.getDeliveryFee();
-		return repository.findByRegionAndIsActiveTrue(region)
-			.map(r -> fee.add(r.getDeliveryFee()))
-			.orElse(fee);
 	}
 
 	@Override
