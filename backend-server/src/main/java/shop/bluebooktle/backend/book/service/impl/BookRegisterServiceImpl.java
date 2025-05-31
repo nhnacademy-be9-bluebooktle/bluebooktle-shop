@@ -121,8 +121,7 @@ public class BookRegisterServiceImpl implements BookRegisterService {
 		// 도서에 출판사 등록 (출판사 없으면 출판사 테이블에 등록)
 		PublisherInfoResponse publisher = publisherService.registerPublisherByName(aladinBook.getPublisher());
 		bookPublisherService.registerBookPublisher(book.getId(), publisher.getId());
-
-		// TODO 이미지 파일 이미지 서버(MINIO)에 저장 로직 구현
+		
 		bookImgService.registerBookImg(book.getId(), aladinBook.getImgUrl());
 
 		for (Long categoryId : request.getCategoryIdList()) {

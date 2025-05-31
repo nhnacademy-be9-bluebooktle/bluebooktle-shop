@@ -20,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import shop.bluebooktle.common.dto.book.request.BookAllRegisterByAladinRequest;
 import shop.bluebooktle.common.dto.book.request.BookAllRegisterRequest;
 import shop.bluebooktle.common.dto.book.request.BookFormRequest;
 import shop.bluebooktle.common.dto.book.response.AladinBookResponse;
@@ -115,6 +116,11 @@ public class AdminBookServiceImpl implements AdminBookService {
 	@Override
 	public void deleteBook(Long bookId) {
 		adminBookRepository.deleteBook(bookId);
+	}
+
+	@Override
+	public void registerBookByAladin(BookAllRegisterByAladinRequest request) {
+		
 	}
 
 	@Override
