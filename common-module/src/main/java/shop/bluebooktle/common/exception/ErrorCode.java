@@ -123,6 +123,7 @@ public enum ErrorCode {
 	CART_BOOK_ADD_FAILED(HttpStatus.BAD_REQUEST, "T003", "장바구니에 담을 수 없는 도서입니다."), // 판매 상태 등
 	CART_INVALID_QUANTITY(HttpStatus.BAD_REQUEST, "T004", "장바구니 수량이 유효하지 않습니다."),
 	CART_IS_EMPTY(HttpStatus.BAD_REQUEST, "T005", "장바구니가 비어있습니다."),
+	GUEST_USER_NOT_FOUND(HttpStatus.NOT_FOUND, "T006", "GUEST-ID가 유효하지 않습니다."),
 
 	// Order Errors (주문 오류) - O
 	ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "O001", "주문을 찾을 수 없습니다."),

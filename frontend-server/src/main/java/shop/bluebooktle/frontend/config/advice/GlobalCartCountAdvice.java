@@ -8,7 +8,7 @@ import org.springframework.web.util.WebUtils;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import shop.bluebooktle.common.dto.cart.response.CartItemResponse;
+import shop.bluebooktle.common.dto.book.response.BookCartOrderResponse;
 import shop.bluebooktle.frontend.service.CartService;
 
 @ControllerAdvice
@@ -26,7 +26,7 @@ public class GlobalCartCountAdvice {
 		}
 
 		try {
-			List<CartItemResponse> cartItems = cartService.getCartItems(guestId); // backend에서 로그인 여부 판단
+			List<BookCartOrderResponse> cartItems = cartService.getCartItems(guestId); // backend에서 로그인 여부 판단
 			return cartItems.size();
 		} catch (Exception e) {
 			return 0;

@@ -7,7 +7,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -15,16 +14,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import shop.bluebooktle.backend.cart.service.CartService;
+import shop.bluebooktle.common.dto.book.response.BookCartOrderResponse;
 import shop.bluebooktle.common.dto.cart.request.CartItemRequest;
 import shop.bluebooktle.common.dto.cart.request.CartRemoveOneRequest;
 import shop.bluebooktle.common.dto.cart.request.CartRemoveSelectedRequest;
-import shop.bluebooktle.common.dto.cart.response.CartItemResponse;
 import shop.bluebooktle.common.dto.common.JsendResponse;
 import shop.bluebooktle.common.entity.auth.User;
 import shop.bluebooktle.common.exception.auth.UserNotFoundException;
+import shop.bluebooktle.common.exception.cart.GuestUserNotFoundException;
 import shop.bluebooktle.common.security.UserPrincipal;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/cart")
 @RequiredArgsConstructor
@@ -41,7 +43,7 @@ public class CartController {
 
 	private String validateGuestId(String guestId) {
 		if (guestId == null || guestId.isBlank()) {
-			throw new IllegalArgumentException("유효하지 않은 비회원 식별자입니다.");
+			throw new GuestUserNotFoundException();
 		}
 		return guestId;
 	}
@@ -64,12 +66,12 @@ public class CartController {
 
 	/** 공통: 장바구니 조회 */
 	@GetMapping
-	public ResponseEntity<JsendResponse<List<CartItemResponse>>> getCartItems(
+	public ResponseEntity<JsendResponse<List<BookCartOrderResponse>>> getCartItems(
 		@AuthenticationPrincipal UserPrincipal principal,
 		@RequestHeader(value = "GUEST_ID", required = false) String guestId
 	) {
 		if (principal == null) {
-			List<CartItemResponse> items = cartService.getGuestCartItems(validateGuestId(guestId));
+			List<BookCartOrderResponse> items = cartService.getGuestCartItems(validateGuestId(guestId));
 			return ResponseEntity.ok(JsendResponse.success(items));
 		} else {
 			User user = getAuthenticatedUser(principal);
@@ -116,6 +118,7 @@ public class CartController {
 		@RequestHeader(value = "GUEST_ID", required = false) String guestId,
 		@RequestBody CartRemoveOneRequest request
 	) {
+		log.info("delete mapping start");
 		if (principal == null) {
 			cartService.removeBookFromGuestCart(validateGuestId(guestId), request.bookId());
 		} else {
@@ -141,25 +144,14 @@ public class CartController {
 		return ResponseEntity.ok(JsendResponse.success());
 	}
 
-	/** 전환: 회원가입 직후 */
-	@PostMapping("/convert/to-member")
-	public ResponseEntity<JsendResponse<Void>> convertGuestToMemberCart(
+	/** 전환 또는 병합: 회원가입 또는 로그인 직후 */
+	@PostMapping("/convert/merge")
+	public ResponseEntity<JsendResponse<Void>> mergeOrConvertGuestCart(
 		@AuthenticationPrincipal UserPrincipal principal,
 		@RequestBody String guestId
 	) {
 		User user = getAuthenticatedUser(principal);
-		cartService.convertGuestCartToMemberCart(guestId, user);
-		return ResponseEntity.ok(JsendResponse.success());
-	}
-
-	/** 병합: 로그인 직후 */
-	@PatchMapping("/convert/merge")
-	public ResponseEntity<JsendResponse<Void>> mergeGuestToMemberCart(
-		@AuthenticationPrincipal UserPrincipal principal,
-		@RequestBody String guestId
-	) {
-		User user = getAuthenticatedUser(principal);
-		cartService.mergeGuestCartToMemberCart(guestId, user);
+		cartService.mergeOrConvertGuestCartToMemberCart(guestId, user);
 		return ResponseEntity.ok(JsendResponse.success());
 	}
 }

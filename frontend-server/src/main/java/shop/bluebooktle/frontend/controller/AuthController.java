@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -65,7 +66,7 @@ public class AuthController {
 	public String login(@ModelAttribute LoginRequest loginRequest,
 		HttpServletResponse response) {
 		authService.login(response, loginRequest);
-		return "redirect:/";
+		return "redirect:/merge";
 
 	}
 
@@ -149,6 +150,7 @@ public class AuthController {
 		@RequestParam("state") String state,
 		@RequestParam(value = "error", required = false) String error,
 		@RequestParam(value = "error_description", required = false) String errorDescription,
+		@CookieValue(value = "GUEST_ID", required = false) String guestId,
 		HttpServletResponse response,
 		RedirectAttributes redirectAttributes) {
 
@@ -157,7 +159,7 @@ public class AuthController {
 		try {
 			authService.paycoLogin(response, code);
 			log.info("PAYCO 로그인 성공");
-			return "redirect:/";
+			return "redirect:/merge";
 
 		} catch (ApplicationException e) {
 			log.error("PAYCO 로그인 처리 중 오류 발생 (ApplicationException): {}", e.getMessage());
