@@ -9,11 +9,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import shop.bluebooktle.common.dto.book.request.BookAllRegisterRequest;
+import shop.bluebooktle.common.dto.book.response.AladinBookResponse;
 import shop.bluebooktle.common.dto.book.response.BookAllResponse;
+import shop.bluebooktle.common.dto.book.response.BookCartOrderResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
 import shop.bluebooktle.frontend.config.feign.FeignGlobalConfig;
 
-@FeignClient(url = "${server.gateway-url}", name = "adminBookRepository", path = "/api/books", configuration = FeignGlobalConfig.class)
+@FeignClient(url = "${server.gateway-url}", name = "BookRepository", path = "/api/books", configuration = FeignGlobalConfig.class)
 public interface AdminBookRepository {
 
 	@GetMapping
@@ -26,9 +28,19 @@ public interface AdminBookRepository {
 	@GetMapping("/{bookId}")
 	BookAllResponse getBook(@PathVariable("bookId") Long bookId);
 
-	@PostMapping
+	@PostMapping()
 	void registerBook(@RequestBody BookAllRegisterRequest bookAllRegisterRequest);
 
 	@DeleteMapping("/{bookId}")
 	void deleteBook(@PathVariable("bookId") Long bookId);
+
+	@GetMapping("/order/{bookId}")
+	BookCartOrderResponse getBookCartOrder(@PathVariable("bookId") Long bookId, @RequestParam int quantity);
+
+	@GetMapping("/aladin-search")
+	List<AladinBookResponse> searchAladinBooks(
+		@RequestParam("keyword") String keyword,
+		@RequestParam("page") int page,
+		@RequestParam("size") int size
+	);
 }

@@ -29,6 +29,8 @@ import shop.bluebooktle.common.dto.payment.response.PaymentConfirmResponse;
 import shop.bluebooktle.common.dto.user.response.UserWithAddressResponse;
 import shop.bluebooktle.frontend.service.AddressService;
 import shop.bluebooktle.frontend.service.AdminPackagingOptionService;
+import shop.bluebooktle.frontend.service.BookService;
+import shop.bluebooktle.frontend.service.CartService;
 import shop.bluebooktle.frontend.service.DeliveryRuleService;
 import shop.bluebooktle.frontend.service.OrderService;
 import shop.bluebooktle.frontend.service.PaymentsService;
@@ -45,9 +47,13 @@ public class OrderController {
 	private final AddressService addressService;
 	private final DeliveryRuleService deliveryRuleService;
 	private final OrderService orderService;
+	private final BookService bookService;
+	private final CartService cartService;
 
 	@GetMapping("/create")
 	public ModelAndView createPage(
+		@RequestParam Long bookId,
+		@RequestParam(defaultValue = "1") Integer quantity,
 		@CookieValue(value = "GUEST_ID", required = false) String guestId
 	) {
 		ModelAndView mav = new ModelAndView("order/create_form");
@@ -55,7 +61,14 @@ public class OrderController {
 		UserWithAddressResponse user = userService.getUserWithAddresses();
 		mav.addObject("user", user);
 
-		List<BookCartOrderResponse> bookItems = createMockBookItems();
+		List<BookCartOrderResponse> bookItems;
+		if (bookId != null) {
+			BookCartOrderResponse bookInfo = bookService.getBookCartOrder(bookId, quantity);
+			bookItems = List.of(bookInfo);
+		} else {
+			//cart서비스에서 조회
+			bookItems = cartService.getCartItems(guestId);
+		}
 		mav.addObject("bookItems", bookItems);
 
 		Page<PackagingOptionInfoResponse> page = adminPackagingOptionService.getPackagingOptions(0, 20, null);
