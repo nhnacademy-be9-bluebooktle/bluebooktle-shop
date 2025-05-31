@@ -15,7 +15,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import shop.bluebooktle.common.dto.cart.response.CartItemResponse;
+import shop.bluebooktle.common.dto.book.response.BookCartOrderResponse;
 import shop.bluebooktle.frontend.service.CartService;
 
 @Slf4j
@@ -47,7 +47,7 @@ public class CartController {
 		Model model) {
 
 		validateGuestId(guestId, response);
-		List<CartItemResponse> cartItems = cartService.getCartItems(guestId);
+		List<BookCartOrderResponse> cartItems = cartService.getCartItems(guestId);
 		model.addAttribute("cartItems", cartItems);
 		return "cart/cart";
 	}
