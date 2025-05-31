@@ -18,4 +18,7 @@ public interface DeliveryRuleRepository {
 
 	@GetMapping
 	List<DeliveryRuleResponse> getDeliveryRules();
+
+	@GetMapping("/default")
+	DeliveryRuleResponse getDefaultDeliveryRule();
 }

@@ -9,6 +9,7 @@ import shop.bluebooktle.common.dto.user.request.UserUpdateRequest;
 import shop.bluebooktle.common.dto.user.response.AdminUserResponse;
 import shop.bluebooktle.common.dto.user.response.UserResponse;
 import shop.bluebooktle.common.dto.user.response.UserTotalPointResponse;
+import shop.bluebooktle.common.dto.user.response.UserWithAddressResponse;
 
 public interface UserService {
 	public UserResponse getMe();
@@ -23,4 +24,5 @@ public interface UserService {
 
 	UserTotalPointResponse getUserTotalPoints();
 
+	UserWithAddressResponse getUserWithAddresses();
 }
