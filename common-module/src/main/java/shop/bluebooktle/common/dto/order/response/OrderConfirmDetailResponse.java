@@ -18,8 +18,13 @@ import shop.bluebooktle.common.dto.coupon.response.AppliedCouponResponse;
 public class OrderConfirmDetailResponse {
 	private Long orderId;
 	private String orderName;
+
 	private String receiverName;
 	private String receiverPhoneNumber;
+
+	private String ordererName;
+	private String ordererPhoneNumber;
+
 	private String address;
 	private String detailAddress;
 	private String postalCode;

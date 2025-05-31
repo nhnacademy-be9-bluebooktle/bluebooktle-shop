@@ -1,7 +1,7 @@
 ### 주문 확인 및 결제 정보 조회 API 테스트
 @host = http://localhost:9012
 @orderId = 101
-@accessToken = eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwidXNlck5pY2tuYW1lIjoicGF5Y29fODY4Mzk0YTAtODZmMS0xMWU3LWEwYTAtMDA1MDU2YWMxMjliIiwidXNlclR5cGUiOiJVU0VSIiwiaWF0IjoxNzQ4NTM3NzkyLCJleHAiOjE3NDg1Mzk1OTJ9.G-ohlfWdGF6Mm8UTOItnCbyMeIdEc8VpdNd5nHOho88
+@accessToken = eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwidXNlck5pY2tuYW1lIjoi7YWM7Iqk7Yq464uJ64Sk7J6EIiwidXNlclR5cGUiOiJVU0VSIiwiaWF0IjoxNzQ4NzI0NDkxLCJleHAiOjE3NDg3MjYyOTF9.b9e9uceFpfet-I4ZxYhDAFr8_3UkVwtzMfj7ZBC8V88
 
 ### 주문 상세 정보 조회 요청
 GET {{host}}/api/orders/{{orderId}}/confirmation
