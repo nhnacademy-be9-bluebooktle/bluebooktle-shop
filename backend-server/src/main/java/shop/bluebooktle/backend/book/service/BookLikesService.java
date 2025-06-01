@@ -2,7 +2,9 @@ package shop.bluebooktle.backend.book.service;
 
 import java.util.List;
 
+import shop.bluebooktle.common.dto.book.response.BookLikesListResponse;
 import shop.bluebooktle.common.dto.book.response.BookLikesResponse;
+import shop.bluebooktle.common.security.UserPrincipal;
 
 public interface BookLikesService {
 	// 사용자가 도서 좋아요 누르기
@@ -18,5 +20,5 @@ public interface BookLikesService {
 	BookLikesResponse countLikes(Long bookId);
 
 	// 좋아요 누른 도서 조회
-	List<BookLikesResponse> getBooksLikedByUser(Long userId);
+	List<BookLikesListResponse> getBooksLikedByUser(UserPrincipal userPrincipal);
 }

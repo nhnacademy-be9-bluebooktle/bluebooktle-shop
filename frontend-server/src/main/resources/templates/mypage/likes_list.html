@@ -99,7 +99,7 @@
 
         .wishlist-item-kitsch .book-info-kitsch {
             text-align: center;
-            margin-bottom: 0.8rem;
+            margin-bottom: 0.3rem;
             flex-grow: 1;
             display: flex;
             flex-direction: column;
@@ -107,9 +107,9 @@
         }
 
         .wishlist-item-kitsch .book-title-kitsch {
-            font-size: 1.15rem; /* 폰트 크기 약간 조정 */
+            font-size: 1.6rem; /* 폰트 크기 약간 조정 */
             color: var(--kitsch-color-5);
-            margin-bottom: 0.2em;
+            margin-bottom: 0.1em;
             line-height: 1.3;
             /* === 제목 여러 줄 처리 (예: 최대 2줄) === */
             display: -webkit-box;
@@ -133,7 +133,7 @@
         }
 
         .wishlist-item-kitsch .book-price-kitsch {
-            font-size: 1rem;
+            font-size: 0.8rem;
             color: var(--kitsch-color-3);
             margin-top: 0.5rem; /* 저자명과의 간격 */
         }
@@ -207,6 +207,7 @@
         <div class="mypage-layout-kitsch">
             <div th:replace="~{_fragments/mypage_sidebar :: mypageSidebarFragment(activeMenu='likes')}"></div>
 
+            <!-- 컨트롤 바 -->
             <main class="mypage-content-kitsch">
                 <div class="wishlist-controls-kitsch">
                     <div class="selection-info-kitsch">
@@ -230,119 +231,77 @@
                     </div>
                 </div>
 
-                <div class="wishlist-grid-kitsch" id="wishlistGrid">
-                    <div class="wishlist-item-kitsch" data-item-id="wish001">
-                        <div class="wishlist-item-checkbox-kitsch">
-                            <label class="checkbox-kitsch">
-                                <input class="wishlist-item-select" onchange="updateSelectedWishlistCount()"
-                                       type="checkbox">
-                                <span class="checkbox-custom-kitsch"></span>
-                            </label>
-                        </div>
-                        <a th:href="@{/books/101}">
-                            <div class="book-cover-wrap-kitsch">
-                                <img alt="코딩 대모험" class="book-cover-kitsch"
-                                     src="https://picsum.photos/200/300?random=101">
-                            </div>
-                            <div class="book-info-kitsch">
-                                <h3 class="book-title-kitsch display-font-kitsch">코딩 대모험</h3>
-                                <p class="book-author-kitsch handwriting-font-kitsch">저자: 고냥이 개발자</p>
-                                <div class="book-price-kitsch">25,200원</div>
-                            </div>
-                        </a>
-                        <div class="wishlist-item-actions-kitsch">
-                            <button class="btn-kitsch primary-btn-kitsch retro-shadow-kitsch-small"
-                                    onclick="alert('Mock: [코딩 대모험] 장바구니 담기')">
-                                <i class="fas fa-shopping-basket"></i> 장바구니
-                            </button>
-                            <button class="btn-kitsch secondary-btn-kitsch color5-kitsch retro-shadow-kitsch-small"
-                                    onclick="removeWishlistItem('wish001')">
-                                <i class="fas fa-heart-broken"></i> 찜 해제
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="wishlist-item-kitsch" data-item-id="wish002">
-                        <div class="wishlist-item-checkbox-kitsch">
-                            <label class="checkbox-kitsch">
-                                <input class="wishlist-item-select" onchange="updateSelectedWishlistCount()"
-                                       type="checkbox">
-                                <span class="checkbox-custom-kitsch"></span>
-                            </label>
-                        </div>
-                        <a th:href="@{/books/104}">
-                            <div class="book-cover-wrap-kitsch">
-                                <img alt="글리치 아트 코딩" class="book-cover-kitsch"
-                                     src="https://picsum.photos/200/300?random=104">
-                            </div>
-                            <div class="book-info-kitsch">
-                                <h3 class="book-title-kitsch display-font-kitsch">글리치 아트 코딩</h3>
-                                <p class="book-author-kitsch handwriting-font-kitsch">노이즈 마스터</p>
-                                <div class="book-price-kitsch">22,000원</div>
-                            </div>
-                        </a>
-                        <div class="wishlist-item-actions-kitsch">
-                            <button class="btn-kitsch primary-btn-kitsch retro-shadow-kitsch-small"
-                                    onclick="alert('Mock: [글리치 아트 코딩] 장바구니 담기')">
-                                <i class="fas fa-shopping-basket"></i> 장바구니
-                            </button>
-                            <button class="btn-kitsch secondary-btn-kitsch color5-kitsch retro-shadow-kitsch-small"
-                                    onclick="removeWishlistItem('wish002')">
-                                <i class="fas fa-heart-broken"></i> 찜 해제
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="wishlist-item-kitsch" data-item-id="wish003">
-                        <div class="wishlist-item-checkbox-kitsch">
-                            <label class="checkbox-kitsch">
-                                <input class="wishlist-item-select" onchange="updateSelectedWishlistCount()"
-                                       type="checkbox">
-                                <span class="checkbox-custom-kitsch"></span>
-                            </label>
-                        </div>
-                        <a th:href="@{/books/105}">
-                            <div class="book-cover-wrap-kitsch">
-                                <img alt="게임보이 개발 비급" class="book-cover-kitsch"
-                                     src="https://picsum.photos/200/300?random=105">
-                            </div>
-                            <div class="book-info-kitsch">
-                                <h3 class="book-title-kitsch display-font-kitsch">게임보이 개발 비급</h3>
-                                <p class="book-author-kitsch handwriting-font-kitsch">레트로 장인</p>
-                                <div class="book-price-kitsch">33,300원</div>
-                            </div>
-                        </a>
-                        <div class="wishlist-item-actions-kitsch">
-                            <button class="btn-kitsch primary-btn-kitsch retro-shadow-kitsch-small"
-                                    onclick="alert('Mock: [게임보이 개발 비급] 장바구니 담기')">
-                                <i class="fas fa-shopping-basket"></i> 장바구니
-                            </button>
-                            <button class="btn-kitsch secondary-btn-kitsch color5-kitsch retro-shadow-kitsch-small"
-                                    onclick="removeWishlistItem('wish003')">
-                                <i class="fas fa-heart-broken"></i> 찜 해제
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="no-wishlist-items-kitsch" id="noWishlistItemsMessage" style="display:none;">
-                        <i class="fas fa-heart-crack"></i>
-                        <p>아직 찜한 상품이 없네요!</p>
-                        <p class="handwriting-font-kitsch" style="font-size:1.1rem; margin-top:0.5rem;">마음에 드는 책에 하트를
-                            눌러보세요!</p>
-                    </div>
+                <!-- 찜 목록 없을 때 -->
+                <div class="no-wishlist-items-kitsch" th:if="${#lists.isEmpty(likes)}">
+                    <i class="fas fa-heart-crack"></i>
+                    <p>아직 찜한 상품이 없네요!</p>
+                    <p class="handwriting-font-kitsch" style="font-size:1.1rem; margin-top:0.5rem;">
+                        마음에 드는 책에 하트를 눌러보세요!
+                    </p>
                 </div>
 
-                <nav aria-label="Page navigation" class="pagination-kitsch" style="margin-top: 2.5rem;">
-                    <a class="page-btn-kitsch prev-kitsch retro-shadow-kitsch-small disabled" href="#"><i
-                            class="fas fa-angle-left"></i> 이전</a>
-                    <a class="page-btn-kitsch num-kitsch active-kitsch retro-shadow-kitsch-small" href="#">1</a>
-                    <a class="page-btn-kitsch next-kitsch retro-shadow-kitsch-small" href="#">다음 <i
-                            class="fas fa-angle-right"></i></a>
-                </nav>
+                <!-- 찜 목록 그리드 -->
+                <div class="wishlist-grid-kitsch"
+                     th:if="${!#lists.isEmpty(likes)}"
+                     id="wishlistGrid">
+                    <div class="wishlist-item-kitsch"
+                         th:each="item : ${likes}"
+                         th:attr="data-book-id=${item.bookId}">
+                        <label class="checkbox-kitsch wishlist-item-checkbox-kitsch">
+                            <input class="wishlist-item-select"
+                                   onchange="updateSelectedWishlistCount()"
+                                   type="checkbox">
+                            <span class="checkbox-custom-kitsch"></span>
+                        </label>
+
+                        <!-- 클릭 시 도서 상세로 이동 -->
+                        <a th:href="@{/books/{id}(id=${item.bookId})}">
+                            <div class="book-cover-wrap-kitsch">
+                                <img class="book-cover-kitsch"
+                                     th:src="${item.imgUrl}"
+                                     th:alt="${item.bookName}"/>
+                            </div>
+                            <div class="book-info-kitsch">
+                                <h3 class="book-title-kitsch display-font-kitsch"
+                                    th:text="${item.bookName}"></h3>
+                                <p class="book-author-kitsch"
+                                   th:text="'작가: ' + ${item.authorName[0]}"></p>
+                                <p class="book-price-kitsch"
+                                   th:text="${T(java.lang.String).format('%,d원', item.price.longValue())}">
+                                </p>
+                            </div>
+                        </a>
+
+                        <!-- 카드 하단 버튼: 장바구니 담기 / 찜 해제 -->
+                        <div class="wishlist-item-actions-kitsch">
+                            <button type="button"
+                                    class="btn-kitsch primary-btn-kitsch retro-shadow-kitsch-small"
+                                    th:onclick="|addToCart(${item.bookId})|">
+                                <i class="fas fa-shopping-basket"></i> 장바구니 담기
+                            </button>
+                            <form th:action="@{/mypage/likes/{bookId}/delete(bookId=${item.bookId})}"
+                                  method="post">
+                                <button type="submit"
+                                        class="btn-kitsch secondary-btn-kitsch color5-kitsch retro-shadow-kitsch-small">
+                                    <i class="fas fa-heart-broken"></i> 찜 해제
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
             </main>
         </div>
+
+        <nav aria-label="Page navigation" class="pagination-kitsch" style="margin-top: 2.5rem;">
+            <a class="page-btn-kitsch prev-kitsch retro-shadow-kitsch-small disabled" href="#"><i
+                    class="fas fa-angle-left"></i> 이전</a>
+            <a class="page-btn-kitsch num-kitsch active-kitsch retro-shadow-kitsch-small" href="#">1</a>
+            <a class="page-btn-kitsch next-kitsch retro-shadow-kitsch-small" href="#">다음 <i
+                    class="fas fa-angle-right"></i></a>
+        </nav>
     </div>
 </div>
+
 
 <th:block layout:fragment="page_scripts">
     <script>
@@ -408,19 +367,6 @@
             }
         }
 
-        function removeWishlistItem(itemId) {
-            if (confirm("이 상품을 찜 목록에서 삭제하시겠습니까? (Mock)")) {
-                const itemToRemove = document.querySelector(`.wishlist-item-kitsch[data-item-id="${itemId}"]`);
-                if (itemToRemove) {
-                    itemToRemove.remove();
-                    alert("상품이 찜 목록에서 삭제되었습니다. (Mock - 화면만 변경)");
-                    updateTotalWishlistCount();
-                    updateSelectedWishlistCount();
-                    toggleNoWishlistMessage();
-                }
-            }
-        }
-
         function toggleNoWishlistMessage() {
             const wishlistGrid = document.getElementById('wishlistGrid');
             const noItemsMsg = document.getElementById('noWishlistItemsMessage');
@@ -439,3 +385,4 @@
 </th:block>
 </body>
 </html>
+
