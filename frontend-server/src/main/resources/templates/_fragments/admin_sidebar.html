@@ -40,7 +40,7 @@
             </li>
 
             <li class="admin-sidebar__nav-item has-submenu"
-                th:classappend="${#strings.startsWith(currentURI, '/admin/books')} ? 'open active-parent' : ''">
+                th:classappend="${#strings.startsWith(currentURI, '/admin/books')  or #strings.startsWith(currentURI, '/admin/aladin/books') } ? 'open active-parent' : ''">
                 <a href="#"> <i class="fas fa-book"></i> 도서 관리 <i class="fas fa-angle-down submenu-toggle-icon"></i>
                 </a>
                 <ul class="admin-sidebar__nav-submenu">
