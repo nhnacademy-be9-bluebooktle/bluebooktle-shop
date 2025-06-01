@@ -95,7 +95,7 @@ public class AuthServiceImpl implements AuthService {
 			.build();
 
 		userRepository.save(user);
-		pointService.signUpPoint(user.getId());
+		// pointService.signUpPoint(user.getId());
 	}
 
 	@Override

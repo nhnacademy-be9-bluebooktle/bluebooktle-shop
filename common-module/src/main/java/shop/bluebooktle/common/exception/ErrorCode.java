@@ -18,6 +18,11 @@ public enum ErrorCode {
 	MEDIA_TYPE_NOT_SUPPORTED(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "C008", "지원되지 않는 미디어 타입입니다."),
 	BAD_GATEWAY(HttpStatus.BAD_GATEWAY, "C009", "외부 서비스 연동 중 오류가 발생했습니다."),
 
+	CRYPTO_INITIALIZATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "S001", "암호화 모듈 초기화에 실패했습니다. 설정(키)을 확인해주세요."),
+	CRYPTO_ENCRYPTION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "S002", "데이터 암호화 중 오류가 발생했습니다."),
+	CRYPTO_DECRYPTION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "S003", "데이터 복호화 중 일반 오류가 발생했습니다."),
+	CRYPTO_INVALID_DATA_FOR_DECRYPTION(HttpStatus.BAD_REQUEST, "S004", "잘못된 암호문 데이터 형식 또는 인증 태그 불일치로 인해 복호화에 실패했습니다."),
+
 	// Auth & User Errors (인증/회원 오류) - A
 	AUTH_AUTHENTICATION_FAILED(HttpStatus.UNAUTHORIZED, "A001", "아이디 또는 비밀번호가 일치하지 않습니다."),
 	AUTH_LOGIN_ID_ALREADY_EXISTS(HttpStatus.CONFLICT, "A002", "이미 사용 중인 아이디입니다."),

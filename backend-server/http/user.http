@@ -1,6 +1,11 @@
-@token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwidXNlck5pY2tuYW1lIjoicXFxcSIsInVzZXJUeXBlIjoiVVNFUiIsImlhdCI6MTc0ODY5NzU4MCwiZXhwIjoxNzQ4Njk5MzgwfQ.-WAHdsJ_yfwjd7BNCcFpFdBJVpNSTyEpj3purFndB8c
+@token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyIiwidXNlck5pY2tuYW1lIjoi7YWM7Iqk7Yq464uJ64Sk7J6EIiwidXNlclR5cGUiOiJVU0VSIiwiaWF0IjoxNzQ4ODA2MTQwLCJleHAiOjE3NDg4MDc5NDB9.qsqLlIpNhVe4GhgsOY8RkGenkTiHV9DfRk_fwavx6o8
 
 ### 유저 정보 및 주소
 GET http://localhost:9012/api/users/addresses
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+### 유저 정보 조회
+GET http://127.0.0.1:9012/api/users/me
 Content-Type: application/json
 Authorization: Bearer {{token}}
