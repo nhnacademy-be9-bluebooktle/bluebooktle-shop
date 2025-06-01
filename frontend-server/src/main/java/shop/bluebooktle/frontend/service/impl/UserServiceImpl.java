@@ -76,4 +76,9 @@ public class UserServiceImpl implements UserService {
 	public UserTotalPointResponse getUserTotalPoints() {
 		return userRepository.getUserTotalPoints();
 	}
+
+	@Override
+	public void withdrawAccount() {
+		userRepository.withdrawMyAccount();
+	}
 }

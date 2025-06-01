@@ -23,4 +23,5 @@ public interface UserService {
 
 	UserTotalPointResponse getUserTotalPoints();
 
+	void withdrawAccount();
 }

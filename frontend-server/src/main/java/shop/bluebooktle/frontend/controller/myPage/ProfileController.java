@@ -145,4 +145,21 @@ public class ProfileController {
 			return "redirect:/mypage/profile#passwordChangeSection";
 		}
 	}
+
+	@PostMapping("/withdraw")
+	public String withdrawAccount(RedirectAttributes redirectAttributes) {
+		try {
+			userService.withdrawAccount();
+			redirectAttributes.addFlashAttribute("globalSuccessMessage",
+				"회원 탈퇴가 정상적으로 처리되었습니다. 그동안 블루북틀을 이용해주셔서 감사합니다.");
+			return "redirect:/logout";
+		} catch (ApplicationException e) {
+			redirectAttributes.addFlashAttribute("globalErrorMessage", e.getErrorCode().getMessage());
+			redirectAttributes.addFlashAttribute("globalErrorTitle", e.getErrorCode().getCode());
+			return "redirect:/mypage/profile";
+		} catch (Exception e) {
+			redirectAttributes.addFlashAttribute("globalErrorMessage", "회원 탈퇴 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+			return "redirect:/mypage/profile";
+		}
+	}
 }

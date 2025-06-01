@@ -1,6 +1,7 @@
 package shop.bluebooktle.frontend.repository;
 
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -52,4 +53,7 @@ public interface UserRepository {
 	@GetMapping("/points")
 	UserTotalPointResponse getUserTotalPoints();
 
+	@DeleteMapping("/me")
+	@RetryWithTokenRefresh
+	void withdrawMyAccount();
 }
