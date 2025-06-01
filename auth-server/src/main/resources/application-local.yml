@@ -48,3 +48,6 @@ oauth:
     redirect-uri: "http://www.localhost:9080/oauth/payco"
     auth-url: "https://id.payco.com"
     api-url: "https://apis-payco.krp.toastoven.net"
+
+encrypt:
+  key: WpqWJ+qndIaLgP1udQD7lUUuaeARZEvOzHefTNS23hA=

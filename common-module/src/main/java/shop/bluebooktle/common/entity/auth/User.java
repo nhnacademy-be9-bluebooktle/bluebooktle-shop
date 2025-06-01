@@ -10,6 +10,7 @@ import org.hibernate.annotations.SQLRestriction;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -28,6 +29,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import shop.bluebooktle.common.converter.ProfileAwareStringCryptoConverter;
 import shop.bluebooktle.common.domain.auth.UserProvider;
 import shop.bluebooktle.common.domain.auth.UserStatus;
 import shop.bluebooktle.common.domain.auth.UserType;
@@ -37,7 +39,7 @@ import shop.bluebooktle.common.entity.BaseEntity;
 @Table(name = "users")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@ToString(exclude = {"addresses", "membershipLevel"})
+@ToString(exclude = {"addresses", "membershipLevel", "email", "name", "phoneNumber", "birth"})
 @EqualsAndHashCode(of = "id", callSuper = false)
 @SQLDelete(sql = "UPDATE `users` SET deleted_at = CURRENT_TIMESTAMP WHERE user_id = ?")
 @SQLRestriction("deleted_at IS NULL AND status <> 'WITHDRAWN'")
@@ -59,18 +61,22 @@ public class User extends BaseEntity {
 	@Column(name = "password", nullable = false, length = 255)
 	private String password;
 
+	@Convert(converter = ProfileAwareStringCryptoConverter.class)
 	@Column(name = "name", nullable = false, length = 20)
 	private String name;
 
+	@Convert(converter = ProfileAwareStringCryptoConverter.class)
 	@Column(name = "email", unique = true, length = 50)
 	private String email;
 
 	@Column(name = "nickname", nullable = false, unique = true, length = 50)
 	private String nickname;
 
+	@Convert(converter = ProfileAwareStringCryptoConverter.class)
 	@Column(name = "birth", nullable = false)
 	private String birth;
 
+	@Convert(converter = ProfileAwareStringCryptoConverter.class)
 	@Column(name = "phone_number", nullable = false, length = 11)
 	private String phoneNumber;
 

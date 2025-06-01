@@ -73,3 +73,6 @@ mq:
     birthday-dlx: local.birthday.dlx
     direct: local.direct.exchange
     direct-dlx: local.direct.dlx
+
+encrypt:
+  key: WpqWJ+qndIaLgP1udQD7lUUuaeARZEvOzHefTNS23hA=
