@@ -294,8 +294,9 @@
                 const payload = encodeURIComponent(JSON.stringify(book));
                 const li = document.createElement('li');
                 li.style.marginBottom = '10px';
-                li.style.cursor = 'pointer'; // 마우스 커서 변경
-                li.setAttribute('onclick', `selectAladinBook('${payload}')`);
+                li.style.cursor = 'pointer';
+                li.dataset.payload = JSON.stringify(book);
+                // li.setAttribute('onclick', `selectAladinBook('${payload}')`);
                 li.innerHTML = `
                     <div class="book-search-list" style="border: 1px solid #ddd; border-radius: 5px; padding: 10px; display: flex; gap: 1rem; transition: background-color 0.3s;">
                         <img src="${book.imgUrl}" alt="표지" style="height: 150px; width: auto; border: 1px solid #ccc; border-radius: 4px; object-fit: contain;">
@@ -312,6 +313,9 @@
                         </div>
                     </div>
                 `;
+                li.addEventListener('click', function () {
+                    selectAladinBook(this.dataset.payload); // 👈 이 방식으로 호출
+                });
                 resultsList.appendChild(li);
             });
 

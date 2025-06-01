@@ -13,7 +13,7 @@ import shop.bluebooktle.common.dto.book.response.BookAllResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
 import shop.bluebooktle.frontend.config.feign.FeignGlobalConfig;
 
-@FeignClient(url = "${server.gateway-url}", name = "BookRepository", path = "/api/books", configuration = FeignGlobalConfig.class)
+@FeignClient(url = "${server.gateway-url}", name = "adminBookRepository", path = "/api/books", configuration = FeignGlobalConfig.class)
 public interface AdminBookRepository {
 
 	@GetMapping

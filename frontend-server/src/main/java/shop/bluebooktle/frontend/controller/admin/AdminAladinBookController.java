@@ -1,7 +1,5 @@
 package shop.bluebooktle.frontend.controller.admin;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -24,7 +22,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import shop.bluebooktle.common.dto.book.BookSaleInfoState;
 import shop.bluebooktle.common.dto.book.request.BookAllRegisterByAladinRequest;
-import shop.bluebooktle.common.dto.book.request.BookFormRequest;
 import shop.bluebooktle.common.dto.book.response.AladinBookResponse;
 import shop.bluebooktle.common.dto.book.response.CategoryTreeResponse;
 import shop.bluebooktle.common.dto.book.response.TagInfoResponse;
@@ -70,22 +67,10 @@ public class AdminAladinBookController {
 		pageTitle = "알라딘 API 도서 등록";
 		model.addAttribute("pageTitle", pageTitle);
 
-		if (!model.containsAttribute("bookForm")) {
-			model.addAttribute("bookForm", new BookFormRequest("",
-				"",
-				"",
-				"",
-				LocalDate.now(),
-				BigDecimal.ZERO,
-				BigDecimal.ZERO,
-				0,
-				false,
-				BookSaleInfoState.AVAILABLE,
-				new ArrayList<>(),
-				new ArrayList<>(),
-				new ArrayList<>(),
-				new ArrayList<>(),
-				null));
+		if (!model.containsAttribute("aladinBookForm")) {
+			model.addAttribute("aladinBookForm",
+				new BookAllRegisterByAladinRequest("", "", 0, true, BookSaleInfoState.AVAILABLE, new ArrayList<>(),
+					new ArrayList<>()));
 		}
 		model.addAttribute("allCategoriesForMapping", allCategoriesForMapping);
 		model.addAttribute("allTagsForMapping", allTagsForMapping);
@@ -112,7 +97,7 @@ public class AdminAladinBookController {
 			log.warn("도서 저장 폼 유효성 검증 에러: {}", bindingResult.getAllErrors());
 			redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.bookFormRequest",
 				bindingResult);
-			redirectAttributes.addFlashAttribute("bookForm", aladinBookFormRequest);
+			redirectAttributes.addFlashAttribute("aladinBookForm", aladinBookFormRequest);
 			redirectAttributes.addFlashAttribute("globalErrorMessage", "입력값을 확인해주세요.");
 			return "redirect:/admin/aladin/books/new";
 		}

@@ -109,6 +109,7 @@ public class BookRegisterServiceImpl implements BookRegisterService {
 			.description(aladinBook.getDescription())
 			.isbn(aladinBook.getIsbn())
 			.publishDate(aladinBook.getPublishDate().toLocalDate().atStartOfDay())
+			.index(request.getIndex())
 			.build();
 		bookRepository.save(book);
 
@@ -121,7 +122,7 @@ public class BookRegisterServiceImpl implements BookRegisterService {
 		// 도서에 출판사 등록 (출판사 없으면 출판사 테이블에 등록)
 		PublisherInfoResponse publisher = publisherService.registerPublisherByName(aladinBook.getPublisher());
 		bookPublisherService.registerBookPublisher(book.getId(), publisher.getId());
-		
+
 		bookImgService.registerBookImg(book.getId(), aladinBook.getImgUrl());
 
 		for (Long categoryId : request.getCategoryIdList()) {

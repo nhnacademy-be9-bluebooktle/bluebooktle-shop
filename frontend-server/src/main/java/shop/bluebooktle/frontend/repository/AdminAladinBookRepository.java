@@ -11,10 +11,10 @@ import shop.bluebooktle.common.dto.book.request.BookAllRegisterByAladinRequest;
 import shop.bluebooktle.common.dto.book.response.AladinBookResponse;
 import shop.bluebooktle.frontend.config.feign.FeignGlobalConfig;
 
-@FeignClient(url = "${server.gateway-url}", name = "BookRepository", path = "/api/aladin/books", configuration = FeignGlobalConfig.class)
+@FeignClient(url = "${server.gateway-url}", name = "adminAladinBookRepository", path = "/api/aladin/books", configuration = FeignGlobalConfig.class)
 public interface AdminAladinBookRepository {
 
-	@GetMapping
+	@GetMapping("/aladin-search")
 	List<AladinBookResponse> searchBooks(
 		@RequestParam("keyword") String keyword,
 		@RequestParam("page") int page,
