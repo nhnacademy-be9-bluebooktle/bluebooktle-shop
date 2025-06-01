@@ -49,7 +49,6 @@ public class AladinBookController {
 		return ResponseEntity.ok(JsendResponse.success(book));
 	}
 
-	// TODO : BookController에 알라딘 도서 검색 front에서 리팩토링
 	// 알라딘 api로 도서 등록
 	@PostMapping
 	public ResponseEntity<JsendResponse<Void>> registerAladinBook(
