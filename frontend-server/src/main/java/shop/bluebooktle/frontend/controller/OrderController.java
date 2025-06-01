@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
@@ -21,10 +22,12 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import shop.bluebooktle.common.domain.CouponTypeTarget;
 import shop.bluebooktle.common.dto.book.response.BookCartOrderResponse;
 import shop.bluebooktle.common.dto.book_order.response.PackagingOptionInfoResponse;
 import shop.bluebooktle.common.dto.coupon.response.CouponResponse;
+import shop.bluebooktle.common.dto.order.request.OrderCreateRequest;
 import shop.bluebooktle.common.dto.order.response.DeliveryRuleResponse;
 import shop.bluebooktle.common.dto.order.response.OrderConfirmDetailResponse;
 import shop.bluebooktle.common.dto.payment.request.PaymentConfirmRequest;
@@ -38,6 +41,7 @@ import shop.bluebooktle.frontend.service.OrderService;
 import shop.bluebooktle.frontend.service.PaymentsService;
 import shop.bluebooktle.frontend.service.UserService;
 
+@Slf4j
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/order")
@@ -70,10 +74,20 @@ public class OrderController {
 			BookCartOrderResponse bookInfo = bookService.getBookCartOrder(bookId, quantity);
 			bookItems = List.of(bookInfo);
 		} else {
-			//cart서비스에서 조회
 			bookItems = cartService.getCartItems(guestId);
 		}
 		mav.addObject("bookItems", bookItems);
+
+		String defaultOrderName;
+		if (bookItems.size() == 1) {
+			defaultOrderName = bookItems.getFirst().title();
+		} else {
+			defaultOrderName = bookItems.getFirst().title()
+				+ " 외 "
+				+ (bookItems.size() - 1)
+				+ "권";
+		}
+		mav.addObject("defaultOrderName", defaultOrderName);
 
 		Page<PackagingOptionInfoResponse> page = adminPackagingOptionService.getPackagingOptions(0, 20, null);
 		List<PackagingOptionInfoResponse> packagingOptions = page.getContent();
@@ -86,6 +100,13 @@ public class OrderController {
 		mav.addObject("deliveryRule", deliveryRule);
 
 		return mav;
+	}
+
+	@PostMapping("/create")
+	public String createOrder(@ModelAttribute OrderCreateRequest request) {
+		Long orderId = orderService.createOrder(request);
+		log.info("주문 생성 :{}", orderId);
+		return "redirect:/order/" + orderId + "/checkout";
 	}
 
 	@GetMapping("/{orderId}/checkout")

@@ -62,7 +62,7 @@ public class Order extends BaseEntity {
 	@Column(name = "order_name", nullable = false)
 	private String orderName;
 
-	@Column(name = "requested_delivery_date", nullable = false)
+	@Column(name = "requested_delivery_date")
 	private LocalDateTime requestedDeliveryDate;
 
 	@Column(name = "shipped_at")
@@ -74,11 +74,17 @@ public class Order extends BaseEntity {
 	@Column(name = "orderer_name", nullable = false, length = 20)
 	private String ordererName;
 
+	@Column(name = "orderer_email", nullable = false, length = 50)
+	private String ordererEmail;
+
 	@Column(name = "orderer_phone_number", nullable = false, length = 11)
 	private String ordererPhoneNumber;
 
 	@Column(name = "receiver_name", nullable = false, length = 20)
 	private String receiverName;
+
+	@Column(name = "receiver_email", nullable = false, length = 50)
+	private String receiverEmail;
 
 	@Column(name = "receiver_phone_number", nullable = false, length = 11)
 	private String receiverPhoneNumber;
@@ -114,7 +120,8 @@ public class Order extends BaseEntity {
 	public Order(OrderState orderState, DeliveryRule deliveryRule, User user,
 		String orderName, LocalDateTime requestedDeliveryDate, LocalDateTime shippedAt, BigDecimal deliveryFee,
 		String ordererName, String ordererPhoneNumber, String receiverName, String receiverPhoneNumber,
-		String address, String detailAddress, String postalCode, String trackingNumber, String orderKey) {
+		String address, String detailAddress, String postalCode, String trackingNumber, String orderKey,
+		String ordererEmail, String receiverEmail) {
 		this.orderState = orderState;
 		this.deliveryRule = deliveryRule;
 		this.user = user;
@@ -131,6 +138,8 @@ public class Order extends BaseEntity {
 		this.postalCode = postalCode;
 		this.trackingNumber = trackingNumber;
 		this.orderKey = orderKey;
+		this.ordererEmail = ordererEmail;
+		this.receiverEmail = receiverEmail;
 	}
 
 	public void changeOrderState(OrderState newState) {

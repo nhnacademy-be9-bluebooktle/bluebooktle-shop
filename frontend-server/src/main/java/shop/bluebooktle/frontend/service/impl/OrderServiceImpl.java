@@ -3,6 +3,7 @@ package shop.bluebooktle.frontend.service.impl;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
+import shop.bluebooktle.common.dto.order.request.OrderCreateRequest;
 import shop.bluebooktle.common.dto.order.response.OrderConfirmDetailResponse;
 import shop.bluebooktle.frontend.repository.OrderRepository;
 import shop.bluebooktle.frontend.service.OrderService;
@@ -14,5 +15,10 @@ public class OrderServiceImpl implements OrderService {
 
 	public OrderConfirmDetailResponse getOrderConfirmDetail(Long orderId) {
 		return orderRepository.getOrderConfirmDetail(orderId);
+	}
+
+	@Override
+	public Long createOrder(OrderCreateRequest orderCreateRequest) {
+		return orderRepository.createOrder(orderCreateRequest);
 	}
 }

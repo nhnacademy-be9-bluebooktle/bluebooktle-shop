@@ -96,6 +96,7 @@ public class CartServiceImpl implements CartService {
 					.salePrice(saleInfo.getSalePrice())
 					.thumbnailUrl(getThumbnailUrlByBookId(book.getId()))
 					.categories(getCategoriesByBookId(book.getId()))
+					.isPackable(saleInfo.isPackable())
 					.quantity(cartBook.getQuantity())
 					.build();
 			})
