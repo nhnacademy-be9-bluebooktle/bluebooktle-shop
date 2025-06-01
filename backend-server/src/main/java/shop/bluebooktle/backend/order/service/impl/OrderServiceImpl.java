@@ -1,7 +1,6 @@
 package shop.bluebooktle.backend.order.service.impl;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -35,6 +34,8 @@ import shop.bluebooktle.backend.order.repository.DeliveryRuleRepository;
 import shop.bluebooktle.backend.order.repository.OrderRepository;
 import shop.bluebooktle.backend.order.repository.OrderStateRepository;
 import shop.bluebooktle.backend.order.service.OrderService;
+import shop.bluebooktle.backend.payment.entity.Payment;
+import shop.bluebooktle.backend.payment.repository.PaymentRepository;
 import shop.bluebooktle.backend.user.repository.UserRepository;
 import shop.bluebooktle.common.domain.order.OrderStatus;
 import shop.bluebooktle.common.dto.coupon.CalculatedDiscountDetails;
@@ -67,60 +68,33 @@ public class OrderServiceImpl implements OrderService {
 	private final BookRepository bookRepository;
 	private final BookOrderRepository bookOrderRepository;
 	private final PackagingOptionRepository packagingOptionRepository;
+	private final PaymentRepository paymentRepository;
 
 	@Override
 	public Page<OrderHistoryResponse> getUserOrders(
-		User user,
+		Long userId,
 		OrderStatus status,
-		LocalDateTime start,
-		LocalDateTime end,
 		Pageable pageable
 	) {
-		if (status == null && start != null && end != null) {
-			return orderRepository
-				.findByUserAndCreatedAtBetween(user, start, end, pageable)
-				.map(o -> new OrderHistoryResponse(
-					o.getId(),
-					o.getCreatedAt(),
-					o.getOrderName(),
-					o.(),
-					o.getOrderKey(),
-					o.getOrderState().getState()
-				));
-		} else if (status != null && start == null && end == null) {
-			return orderRepository
-				.findByUserAndOrderState_State(user, status, pageable)
-				.map(o -> new OrderHistoryResponse(
-					o.getId(),
-					o.getCreatedAt(),
-					o.getOrderName(),
-					o.getFinalTotalPrice(),
-					o.getOrderKey(),
-					o.getOrderState().getState()
-				));
-		} else if (status != null && start != null && end != null) {
-			return orderRepository
-				.findByUserAndOrderState_StateAndCreatedAtBetween(user, status, start, end, pageable)
-				.map(o -> new OrderHistoryResponse(
-					o.getId(),
-					o.getCreatedAt(),
-					o.getOrderName(),
-					o.getFinalTotalPrice(),
-					o.getOrderKey(),
-					o.getOrderState().getState()
-				));
+		User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+		Page<Payment> paymentPage;
+		if (status == null) {
+			paymentPage = paymentRepository.findByOrder_User(user, pageable);
 		} else {
-			return orderRepository
-				.findByUser(user, pageable)
-				.map(o -> new OrderHistoryResponse(
-					o.getId(),
-					o.getCreatedAt(),
-					o.getOrderName(),
-					o.getFinalTotalPrice(),
-					o.getOrderKey(),
-					o.getOrderState().getState()
-				));
+			paymentPage = paymentRepository.findByOrder_UserAndOrder_OrderState_State(user, status, pageable);
 		}
+		return paymentPage.map(p -> {
+			Order o = p.getOrder();
+			BigDecimal paidAmount = p.getPrice(); // Payment 엔티티의 실제 결제 금액 필드
+			return new OrderHistoryResponse(
+				o.getId(),                     // orderId
+				o.getCreatedAt(),              // createAt
+				o.getOrderName(),              // orderName
+				paidAmount,                    // totalPrice
+				o.getOrderKey(),               // orderKey
+				o.getOrderState().getState()   // orderStatus
+			);
+		});
 	}
 
 	@Override

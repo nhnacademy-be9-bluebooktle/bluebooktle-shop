@@ -1,5 +1,8 @@
 package shop.bluebooktle.backend.order.controller;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -7,6 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -17,9 +21,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import shop.bluebooktle.backend.order.service.OrderService;
 import shop.bluebooktle.common.domain.auth.UserType;
+import shop.bluebooktle.common.domain.order.OrderStatus;
 import shop.bluebooktle.common.dto.common.JsendResponse;
+import shop.bluebooktle.common.dto.common.PaginationData;
 import shop.bluebooktle.common.dto.order.request.OrderCreateRequest;
 import shop.bluebooktle.common.dto.order.response.OrderConfirmDetailResponse;
+import shop.bluebooktle.common.dto.order.response.OrderHistoryResponse;
 import shop.bluebooktle.common.exception.auth.InvalidTokenException;
 import shop.bluebooktle.common.security.Auth;
 import shop.bluebooktle.common.security.UserPrincipal;
@@ -69,18 +76,22 @@ public class OrderController {
 		return ResponseEntity.ok(JsendResponse.success(createdOrderId));
 	}
 
-	@Operation(summary = "내 주문 전체 조회", description = "주문을 전체 조회.")
-	@PostMapping
+	@Operation(summary = "내 주문 전체 조회", description = "로그인한 사용자의 모든 결제 완료 주문 내역을 페이징 조회합니다.")
+	@GetMapping("/history")
 	@Auth(type = UserType.USER)
-	public ResponseEntity<JsendResponse<Long>> getOrderHistory(
-		@Valid @RequestBody OrderCreateRequest request,
-		@Parameter(hidden = true) @AuthenticationPrincipal UserPrincipal userPrincipal
+	public ResponseEntity<JsendResponse<PaginationData<OrderHistoryResponse>>> getOrderHistory(
+		@Parameter(hidden = true) @AuthenticationPrincipal UserPrincipal userPrincipal,
+		@RequestParam(value = "status", required = false) OrderStatus status,
+		@PageableDefault(sort = "createdAt") Pageable pageable
 	) {
 		checkPrincipal(userPrincipal);
-		if (!userPrincipal.getUserId().equals(request.userId())) {
-			throw new InvalidTokenException();
-		}
-		Long createdOrderId = orderService.getUserOrders()
-		return ResponseEntity.ok(JsendResponse.success(createdOrderId));
+		Page<OrderHistoryResponse> page = orderService.getUserOrders(
+			userPrincipal.getUserId(),
+			status,
+			pageable
+		);
+		PaginationData<OrderHistoryResponse> paginationData = new PaginationData<>(page);
+		return ResponseEntity
+			.ok(JsendResponse.success(paginationData));
 	}
 }
