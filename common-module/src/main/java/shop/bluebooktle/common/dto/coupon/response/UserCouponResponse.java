@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 import com.querydsl.core.annotations.QueryProjection;
 
 import lombok.Value;
-import shop.bluebooktle.common.domain.CouponTypeTarget;
+import shop.bluebooktle.common.domain.coupon.CouponTypeTarget;
 
 @Value
 public class UserCouponResponse {

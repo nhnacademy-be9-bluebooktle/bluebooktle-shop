@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import shop.bluebooktle.backend.coupon.entity.Coupon;
 import shop.bluebooktle.backend.coupon.repository.CouponRepository;
+import shop.bluebooktle.common.domain.coupon.PredefinedCoupon;
 import shop.bluebooktle.common.exception.coupon.CouponNotFoundException;
 
 @Service
@@ -26,7 +27,7 @@ public class BirthdayCouponLauncher {
 	private final CouponRepository couponRepository;
 
 	public void run() {
-		Coupon birthdayCoupon = couponRepository.findByCouponName("생일 축하 쿠폰")
+		Coupon birthdayCoupon = couponRepository.findById(PredefinedCoupon.BIRTHDAY.getId())
 			.orElseThrow(CouponNotFoundException::new);
 
 		LocalDate now = LocalDate.now();

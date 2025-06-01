@@ -25,6 +25,7 @@ import shop.bluebooktle.auth.service.RefreshTokenService;
 import shop.bluebooktle.common.domain.auth.UserProvider;
 import shop.bluebooktle.common.domain.auth.UserStatus;
 import shop.bluebooktle.common.domain.auth.UserType;
+import shop.bluebooktle.common.domain.coupon.PredefinedCoupon;
 import shop.bluebooktle.common.dto.auth.request.LoginRequest;
 import shop.bluebooktle.common.dto.auth.request.PasswordUpdateRequest;
 import shop.bluebooktle.common.dto.auth.request.PaycoProfileMember;
@@ -103,7 +104,7 @@ public class AuthServiceImpl implements AuthService {
 
 		welcomeCouponIssueProducer.send(WelcomeCouponIssueMessage.builder()
 			.userId(user.getId())
-			.couponId(2L)
+			.couponId(PredefinedCoupon.WELCOME.getId())
 			.availableStartAt(LocalDateTime.now())
 			.availableEndAt(LocalDateTime.now().plusDays(30))
 			.build());
