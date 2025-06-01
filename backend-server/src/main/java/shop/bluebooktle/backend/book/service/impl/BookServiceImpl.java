@@ -229,8 +229,15 @@ public class BookServiceImpl implements BookService {
 		Book book = bookRepository.findById(bookId).orElseThrow(BookNotFoundException::new);
 		BookSaleInfo saleInfo = getBookSaleInfoByBookId(book.getId());
 
-		return new BookCartOrderResponse(bookId, book.getTitle(), saleInfo.getPrice(), saleInfo.getSalePrice(),
-			getThumbnailUrlByBookId(bookId), getCategoriesByBookId(book.getId()), quantity);
+		return new BookCartOrderResponse(
+			bookId,
+			book.getTitle(),
+			saleInfo.getPrice(),
+			saleInfo.getSalePrice(),
+			getThumbnailUrlByBookId(bookId),
+			getCategoriesByBookId(book.getId()),
+			saleInfo.isPackable(),
+			quantity);
 	}
 
 	// //메인페이지에 표시될 정보(id, title, author, price, salePrice, imgUrl) 조회

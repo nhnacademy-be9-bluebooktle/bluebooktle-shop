@@ -1,5 +1,5 @@
 ### 쿠폰 정책 등록 - 1 (주문 관련 쿠폰)
-POST localhost:9002/api/admin/coupons/type
+POST localhost:9012/api/admin/coupons/type
 Content-Type: application/json
 
 {
@@ -12,7 +12,7 @@ Content-Type: application/json
 }
 
 ### 쿠폰 정책 조회 (주문 관련 쿠폰)
-GET localhost:9002/api/admin/coupons/type
+GET localhost:9012/api/admin/coupons/type
 
 ### 쿠폰 등록 - 1 (주문 관련 쿠폰)
 POST localhost:9002/api/admin/coupons
@@ -44,7 +44,7 @@ DELETE localhost:9002/api/admin/coupons/1
 
 
 ### 쿠폰 정책 등록 - 2 (특정 도서 관련 쿠폰)
-POST localhost:9002/api/admin/coupons/type
+POST localhost:9012/api/admin/coupons/type
 Content-Type: application/json
 
 {
@@ -57,7 +57,7 @@ Content-Type: application/json
 }
 
 ### 특정 도서 쿠폰 등록
-POST localhost:9002/api/admin/coupons
+POST localhost:9012/api/admin/coupons
 Content-Type: application/json
 
 {

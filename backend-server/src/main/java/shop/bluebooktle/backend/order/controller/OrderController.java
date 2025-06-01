@@ -4,17 +4,21 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import shop.bluebooktle.backend.order.service.OrderService;
 import shop.bluebooktle.common.domain.auth.UserType;
 import shop.bluebooktle.common.dto.common.JsendResponse;
+import shop.bluebooktle.common.dto.order.request.OrderCreateRequest;
 import shop.bluebooktle.common.dto.order.response.OrderConfirmDetailResponse;
 import shop.bluebooktle.common.exception.auth.InvalidTokenException;
 import shop.bluebooktle.common.security.Auth;
@@ -49,4 +53,34 @@ public class OrderController {
 		return ResponseEntity.ok(JsendResponse.success(responseDto));
 	}
 
+	@Operation(summary = "주문 생성", description = "새 주문을 생성합니다.")
+	@PostMapping
+	@Auth(type = UserType.USER)
+	public ResponseEntity<JsendResponse<Long>> createOrder(
+		@Valid @RequestBody OrderCreateRequest request,
+		@Parameter(hidden = true) @AuthenticationPrincipal UserPrincipal userPrincipal
+	) {
+		checkPrincipal(userPrincipal);
+		log.info("Request to create order : {}", request);
+		if (!userPrincipal.getUserId().equals(request.userId())) {
+			throw new InvalidTokenException();
+		}
+		Long createdOrderId = orderService.createOrder(request);
+		return ResponseEntity.ok(JsendResponse.success(createdOrderId));
+	}
+
+	@Operation(summary = "내 주문 전체 조회", description = "주문을 전체 조회.")
+	@PostMapping
+	@Auth(type = UserType.USER)
+	public ResponseEntity<JsendResponse<Long>> getOrderHistory(
+		@Valid @RequestBody OrderCreateRequest request,
+		@Parameter(hidden = true) @AuthenticationPrincipal UserPrincipal userPrincipal
+	) {
+		checkPrincipal(userPrincipal);
+		if (!userPrincipal.getUserId().equals(request.userId())) {
+			throw new InvalidTokenException();
+		}
+		Long createdOrderId = orderService.getUserOrders()
+		return ResponseEntity.ok(JsendResponse.success(createdOrderId));
+	}
 }

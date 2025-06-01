@@ -124,3 +124,8 @@ Content-Type: application/json
 
 ### 도서 테이블 삭제
 DELETE http://localhost:9012/api/books/1
+
+
+### 도서 bookcartorder
+GET http://localhost:9012/api/books/order/1?quantity=2
+Content-Type: application/json

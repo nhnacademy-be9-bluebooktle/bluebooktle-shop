@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,25 +17,41 @@ import lombok.extern.slf4j.Slf4j;
 import shop.bluebooktle.backend.book.entity.Book;
 import shop.bluebooktle.backend.book.entity.BookImg;
 import shop.bluebooktle.backend.book.entity.Img;
+import shop.bluebooktle.backend.book.repository.BookRepository;
 import shop.bluebooktle.backend.book_order.entity.BookOrder;
 import shop.bluebooktle.backend.book_order.entity.OrderPackaging;
 import shop.bluebooktle.backend.book_order.entity.PackagingOption;
 import shop.bluebooktle.backend.book_order.entity.UserCouponBookOrder;
+import shop.bluebooktle.backend.book_order.jpa.BookOrderRepository;
+import shop.bluebooktle.backend.book_order.jpa.PackagingOptionRepository;
 import shop.bluebooktle.backend.coupon.entity.Coupon;
 import shop.bluebooktle.backend.coupon.entity.CouponType;
 import shop.bluebooktle.backend.coupon.entity.UserCoupon;
 import shop.bluebooktle.backend.coupon.service.CouponCalculationService;
+import shop.bluebooktle.backend.order.entity.DeliveryRule;
 import shop.bluebooktle.backend.order.entity.Order;
+import shop.bluebooktle.backend.order.entity.OrderState;
+import shop.bluebooktle.backend.order.repository.DeliveryRuleRepository;
 import shop.bluebooktle.backend.order.repository.OrderRepository;
+import shop.bluebooktle.backend.order.repository.OrderStateRepository;
 import shop.bluebooktle.backend.order.service.OrderService;
+import shop.bluebooktle.backend.user.repository.UserRepository;
 import shop.bluebooktle.common.domain.order.OrderStatus;
 import shop.bluebooktle.common.dto.coupon.CalculatedDiscountDetails;
 import shop.bluebooktle.common.dto.coupon.response.AppliedCouponResponse;
+import shop.bluebooktle.common.dto.order.request.OrderCreateRequest;
+import shop.bluebooktle.common.dto.order.request.OrderItemRequest;
 import shop.bluebooktle.common.dto.order.response.OrderConfirmDetailResponse;
+import shop.bluebooktle.common.dto.order.response.OrderHistoryResponse;
 import shop.bluebooktle.common.dto.order.response.OrderItemResponse;
 import shop.bluebooktle.common.dto.order.response.OrderPackagingResponse;
 import shop.bluebooktle.common.entity.auth.User;
+import shop.bluebooktle.common.exception.auth.UserNotFoundException;
+import shop.bluebooktle.common.exception.book.BookNotFoundException;
+import shop.bluebooktle.common.exception.book_order.PackagingOptionNotFoundException;
 import shop.bluebooktle.common.exception.order.OrderNotFoundException;
+import shop.bluebooktle.common.exception.order.delivery_rule.DeliveryRuleNotFoundException;
+import shop.bluebooktle.common.exception.order.order_state.OrderStateNotFoundException;
 
 @Slf4j
 @Service
@@ -43,26 +60,145 @@ import shop.bluebooktle.common.exception.order.OrderNotFoundException;
 public class OrderServiceImpl implements OrderService {
 
 	private final OrderRepository orderRepository;
+	private final DeliveryRuleRepository deliveryRuleRepository;
 	private final CouponCalculationService couponCalculationService;
+	private final UserRepository userRepository;
+	private final OrderStateRepository orderStateRepository;
+	private final BookRepository bookRepository;
+	private final BookOrderRepository bookOrderRepository;
+	private final PackagingOptionRepository packagingOptionRepository;
 
 	@Override
-	public List<Order> getUserOrders(User user, OrderStatus status, LocalDateTime start, LocalDateTime end,
-		Pageable pageable) {
+	public Page<OrderHistoryResponse> getUserOrders(
+		User user,
+		OrderStatus status,
+		LocalDateTime start,
+		LocalDateTime end,
+		Pageable pageable
+	) {
 		if (status == null && start != null && end != null) {
-			return orderRepository.findByUserAndCreatedAtBetween(user, start, end, pageable);
+			return orderRepository
+				.findByUserAndCreatedAtBetween(user, start, end, pageable)
+				.map(o -> new OrderHistoryResponse(
+					o.getId(),
+					o.getCreatedAt(),
+					o.getOrderName(),
+					o.(),
+					o.getOrderKey(),
+					o.getOrderState().getState()
+				));
 		} else if (status != null && start == null && end == null) {
-			return orderRepository.findByUserAndOrderState_State(user, status, pageable);
+			return orderRepository
+				.findByUserAndOrderState_State(user, status, pageable)
+				.map(o -> new OrderHistoryResponse(
+					o.getId(),
+					o.getCreatedAt(),
+					o.getOrderName(),
+					o.getFinalTotalPrice(),
+					o.getOrderKey(),
+					o.getOrderState().getState()
+				));
 		} else if (status != null && start != null && end != null) {
-			return orderRepository.findByUserAndOrderState_StateAndCreatedAtBetween(user, status, start, end, pageable);
+			return orderRepository
+				.findByUserAndOrderState_StateAndCreatedAtBetween(user, status, start, end, pageable)
+				.map(o -> new OrderHistoryResponse(
+					o.getId(),
+					o.getCreatedAt(),
+					o.getOrderName(),
+					o.getFinalTotalPrice(),
+					o.getOrderKey(),
+					o.getOrderState().getState()
+				));
 		} else {
-			return orderRepository.findByUser(user, pageable);
+			return orderRepository
+				.findByUser(user, pageable)
+				.map(o -> new OrderHistoryResponse(
+					o.getId(),
+					o.getCreatedAt(),
+					o.getOrderName(),
+					o.getFinalTotalPrice(),
+					o.getOrderKey(),
+					o.getOrderState().getState()
+				));
 		}
 	}
 
 	@Override
 	public Order getOrderByOrderKey(String orderKey) {
 		return orderRepository.findByOrderKey(orderKey)
-			.orElseThrow(() -> new OrderNotFoundException("주문을 찾을 수 없습니다."));
+			.orElseThrow(OrderNotFoundException::new);
+	}
+
+	@Transactional
+	public Long createOrder(OrderCreateRequest request) {
+
+		OrderState initialState = orderStateRepository.findByState(OrderStatus.PENDING).orElseThrow(
+			OrderStateNotFoundException::new);
+
+		DeliveryRule deliveryRule = deliveryRuleRepository.findById(request.deliveryRuleId()).orElseThrow(
+			DeliveryRuleNotFoundException::new);
+
+		User user = userRepository.findById(request.userId())
+			.orElseThrow(UserNotFoundException::new);
+
+		Order order = Order.builder()
+			.orderState(initialState)
+			.deliveryRule(deliveryRule)
+			.user(user)
+			.orderName(request.orderName())
+			.requestedDeliveryDate(
+				request.requestedDeliveryDate() != null ? request.requestedDeliveryDate().atStartOfDay() : null)
+			.shippedAt(null)
+			.deliveryFee(request.deliveryFee())
+			.ordererName(request.ordererName())
+			.ordererEmail(request.ordererEmail())
+			.ordererPhoneNumber(request.ordererPhoneNumber())
+			.receiverName(request.receiverName())
+			.receiverEmail(request.receiverEmail())
+			.receiverPhoneNumber(request.receiverPhoneNumber())
+			.postalCode(request.postalCode())
+			.address(request.address())
+			.detailAddress(request.detailAddress())
+			.trackingNumber(null)
+			.orderKey(null)
+			.build();
+
+		Order saved = orderRepository.save(order);
+
+		for (OrderItemRequest itemReq : request.orderItems()) {
+			createSingleBookOrder(saved, itemReq);
+		}
+
+		return saved.getId();
+	}
+
+	private void createSingleBookOrder(Order order, OrderItemRequest item) {
+		Book book = bookRepository.findById(item.bookId())
+			.orElseThrow(BookNotFoundException::new);
+
+		BookOrder bookOrder = BookOrder.builder()
+			.order(order)
+			.book(book)
+			.quantity(item.bookQuantity())
+			.price(item.salePrice())
+			.build();
+
+		bookOrderRepository.save(bookOrder);
+
+		if (item.packagingOptionId() != null) {
+			PackagingOption packOpt = packagingOptionRepository.findById(item.packagingOptionId())
+				.orElseThrow(PackagingOptionNotFoundException::new);
+
+			OrderPackaging packaging = OrderPackaging.builder()
+				.packagingOption(packOpt)
+				.bookOrder(bookOrder)
+				.quantity(item.packagingQuantity())
+				.build();
+
+			bookOrder.getOrderPackagings().add(packaging);
+
+			bookOrderRepository.save(bookOrder);
+		}
 	}
 
 	@Override

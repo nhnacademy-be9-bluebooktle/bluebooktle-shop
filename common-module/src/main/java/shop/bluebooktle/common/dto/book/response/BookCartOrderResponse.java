@@ -13,6 +13,7 @@ public record BookCartOrderResponse(
 	BigDecimal salePrice,
 	String thumbnailUrl,
 	List<String> categories,
+	boolean isPackable,
 	int quantity
 ) {
 }
