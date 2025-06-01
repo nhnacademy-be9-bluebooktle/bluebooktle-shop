@@ -58,7 +58,7 @@ public class User extends BaseEntity {
 	@Column(name = "login_id", nullable = false, unique = true, length = 50)
 	private String loginId;
 
-	@Column(name = "password", nullable = false, length = 255)
+	@Column(name = "password", nullable = false)
 	private String password;
 
 	@Convert(converter = ProfileAwareStringCryptoConverter.class)
