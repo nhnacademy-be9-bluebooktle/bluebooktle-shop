@@ -316,8 +316,8 @@
         </div>
 
         <form id="checkoutForm"
-              th:action="@{/order/create}"
-              method="post">
+              method="post"
+              th:action="@{/order/create}">
 
             <div class="checkout-container-kitsch">
                 <div class="checkout-main-panel-kitsch">
@@ -325,40 +325,40 @@
                         <h3 class="section-title-kitsch"><i class="fas fa-shopping-basket"></i> 주문 상품 확인</h3>
                         <div id="orderedItemsList">
                             <div class="ordered-item-kitsch"
-                                 th:each="item, idx : ${bookItems}"
                                  th:data-item-id="${item.bookId}"
                                  th:data-item-price="${item.price}"
                                  th:data-item-quantity="${item.quantity}"
-                                 th:data-item-sale-price="${item.salePrice}">
+                                 th:data-item-sale-price="${item.salePrice}"
+                                 th:each="item, idx : ${bookItems}">
 
-                                <input type="hidden"
-                                       th:name="${'orderItems[' + idx.index + '].bookId'}"
-                                       th:value="${item.bookId}"/>
+                                <input th:name="${'orderItems[' + idx.index + '].bookId'}"
+                                       th:value="${item.bookId}"
+                                       type="hidden"/>
                                 <input
-                                        type="hidden"
                                         th:id="${'hiddenBookQuantity-' + idx.index}"
                                         th:name="${'orderItems[' + idx.index + '].bookQuantity'}"
                                         th:value="${item.quantity}"
+                                        type="hidden"
                                 />
-                                <input type="hidden"
+                                <input th:id="${'hiddenPackagingOptionId-' + idx.index}"
                                        th:name="${'orderItems[' + idx.index + '].packagingOptionId'}"
-                                       th:id="${'hiddenPackagingOptionId-' + idx.index}"
+                                       type="hidden"
                                        value=""/>
-                                <input type="hidden"
+                                <input th:id="${'hiddenPackagingQuantity-' + idx.index}"
                                        th:name="${'orderItems[' + idx.index + '].packagingQuantity'}"
-                                       th:id="${'hiddenPackagingQuantity-' + idx.index}"
+                                       type="hidden"
                                        value="0"/>
-                                <input type="hidden"
+                                <input th:id="${'hiddenItemCoupon-' + idx.index}"
                                        th:name="${'orderItems[' + idx.index + '].itemCouponCode'}"
-                                       th:id="${'hiddenItemCoupon-' + idx.index}"
+                                       type="hidden"
                                        value=""/>
-                                <input type="hidden"
-                                       th:name="${'orderItems[' + idx.index + '].salePrice'}"
-                                       th:value="${item.salePrice}"/>
+                                <input th:name="${'orderItems[' + idx.index + '].salePrice'}"
+                                       th:value="${item.salePrice}"
+                                       type="hidden"/>
 
-                                <input type="hidden"
-                                       name="orderName"
-                                       th:value="${defaultOrderName}"/>
+                                <input name="orderName"
+                                       th:value="${defaultOrderName}"
+                                       type="hidden"/>
 
 
                                 <img alt="" th:alt="${item.title}" th:src="${item.thumbnailUrl}"/>
@@ -366,9 +366,9 @@
                                     <a class="item-title-kitsch" href="#" th:text="${item.title}"></a>
                                     <p class="item-quantity-price-kitsch">
                                         수량:
-                                        <button type="button" class="btn-kitsch qty-button qty-decrease">−</button>
+                                        <button class="btn-kitsch qty-button qty-decrease" type="button">−</button>
                                         <span class="item-qty-display" th:text="${item.quantity}">1</span>개
-                                        <button type="button" class="btn-kitsch qty-button qty-increase">+</button>
+                                        <button class="btn-kitsch qty-button qty-increase" type="button">+</button>
                                         / 가격:
                                         <span class="item-price-per-unit"
                                               th:text="${#strings.toString(item.price)} + '원'"></span>
@@ -389,10 +389,10 @@
                                             <option data-packaging-cost="0" value="">
                                                 포장 선택 안함 (+0원)
                                             </option>
-                                            <option th:each="opt : ${packagingOptions}"
-                                                    th:data-packaging-cost="${opt.price}"
-                                                    th:value="${opt.id}"
-                                                    th:text="${opt.name} + ' (+' + ${#strings.toString(opt.price)} + '원)'">
+                                            <option th:data-packaging-cost="${opt.price}"
+                                                    th:each="opt : ${packagingOptions}"
+                                                    th:text="${opt.name} + ' (+' + ${#strings.toString(opt.price)} + '원)'"
+                                                    th:value="${opt.id}">
                                             </option>
                                         </select>
                                     </div>
@@ -400,14 +400,14 @@
                                     <!-- ④ 포장 수량 조절 -->
                                     <div class="item-pack-quantity-kitsch" style="display: none; margin-top: 0.5rem;">
                                         <label class="label-kitsch">포장 수량:</label>
-                                        <button type="button"
+                                        <button aria-label="포장 수량 감소"
                                                 class="btn-kitsch qty-button pack-qty-decrease"
-                                                aria-label="포장 수량 감소">−
+                                                type="button">−
                                         </button>
                                         <span class="item-pack-qty-display">0</span>개
-                                        <button type="button"
+                                        <button aria-label="포장 수량 증가"
                                                 class="btn-kitsch qty-button pack-qty-increase"
-                                                aria-label="포장 수량 증가">+
+                                                type="button">+
                                         </button>
                                     </div>
                                 </div>
@@ -419,7 +419,7 @@
                         <h3 class="section-title-kitsch"><i class="fas fa-user-circle"></i> 주문자 정보</h3>
 
                         <!-- 주문자 ID(필요 시) -->
-                        <input type="hidden" name="userId" th:value="${user.userId}"/>
+                        <input name="userId" th:value="${user.userId}" type="hidden"/>
 
                         <!-- 주문자 이름 -->
                         <div class="form-group-kitsch">
@@ -464,23 +464,23 @@
                         <h3 class="section-title-kitsch"><i class="fas fa-truck-loading"></i> 배송지 정보</h3>
 
                         <!-- 1) 숨겨진 필드: OrderCreateRequest 바인딩용 -->
-                        <input type="hidden" name="receiverName" id="hiddenReceiverName" value=""/>
-                        <input type="hidden" name="receiverPhoneNumber" id="hiddenReceiverPhoneNumber" value=""/>
-                        <input type="hidden" name="postalCode" id="hiddenPostalCode" value=""/>
-                        <input type="hidden" name="address" id="hiddenAddress" value=""/>
-                        <input type="hidden" name="detailAddress" id="hiddenDetailAddress" value=""/>
-                        <input type="hidden" name="receiverEmail" id="hiddenReceiverEmail" value=""/>
+                        <input id="hiddenReceiverName" name="receiverName" type="hidden" value=""/>
+                        <input id="hiddenReceiverPhoneNumber" name="receiverPhoneNumber" type="hidden" value=""/>
+                        <input id="hiddenPostalCode" name="postalCode" type="hidden" value=""/>
+                        <input id="hiddenAddress" name="address" type="hidden" value=""/>
+                        <input id="hiddenDetailAddress" name="detailAddress" type="hidden" value=""/>
+                        <input id="hiddenReceiverEmail" name="receiverEmail" type="hidden" value=""/>
 
                         <div class="form-group-kitsch">
                             <label class="label-kitsch" for="shippingAddressOption">배송지 선택:</label>
                             <select id="shippingAddressOption" name="shippingAddressOption">
-                                <option th:each="addr, stat : ${user.addresses}"
-                                        th:data-detail="${addr.detailAddress}"
+                                <option th:data-detail="${addr.detailAddress}"
+                                        th:data-email="${user.email}"
                                         th:data-name="${addr.alias}"
+                                        th:data-phone="${user.phoneNumber}"
                                         th:data-postal-code="${addr.postalCode}"
                                         th:data-road="${addr.roadAddress}"
-                                        th:data-email="${user.email}"
-                                        th:data-phone="${user.phoneNumber}"
+                                        th:each="addr, stat : ${user.addresses}"
                                         th:selected="${stat.index == 0}"
                                         th:text="${addr.alias}"
                                         th:value="${addr.addressId}">
@@ -514,10 +514,11 @@
                                 <input
                                         class="input-kitsch pixel-font-kitsch"
                                         id="recipientName"
-                                        name="recipientName"
-                                        type="text"
                                         maxlength="20"
+                                        name="recipientName"
                                         placeholder="최대 20자"
+                                        required
+                                        type="text"
                                 />
                             </div>
                             <div class="form-group-kitsch">
@@ -525,10 +526,11 @@
                                 <input
                                         class="input-kitsch pixel-font-kitsch"
                                         id="recipientEmail"
-                                        name="recipientEmail"
-                                        type="email"
                                         maxlength="50"
+                                        name="recipientEmail"
                                         placeholder="최대 50자"
+                                        required
+                                        type="email"
                                 />
                             </div>
                             <div class="form-group-kitsch">
@@ -536,10 +538,12 @@
                                 <input
                                         class="input-kitsch pixel-font-kitsch"
                                         id="recipientPhone"
-                                        name="recipientPhone"
-                                        type="tel"
                                         maxlength="11"
+                                        name="recipientPhone"
+                                        pattern="^[0-9]{10,11}$"
                                         placeholder="최대 11자 (숫자만)"
+                                        required
+                                        type="tel"
                                 />
                             </div>
                             <div class="form-group-kitsch">
@@ -551,6 +555,7 @@
                                             name="shippingPostcode"
                                             placeholder="우편번호"
                                             readonly
+                                            required
                                             type="text"
                                     />
                                     <button
@@ -567,6 +572,7 @@
                                         name="shippingAddress"
                                         placeholder="도로명 주소"
                                         readonly
+                                        required
                                         style="margin-bottom: 0.5rem;"
                                         type="text"
                                 />
@@ -575,6 +581,7 @@
                                         id="shippingDetailAddress"
                                         name="shippingDetailAddress"
                                         placeholder="상세주소 입력"
+                                        required
                                         type="text"
                                 />
                             </div>
@@ -613,9 +620,9 @@
 
                             <span class="value" id="summaryDeliveryFee">0원</span>
 
-                            <input type="hidden" name="deliveryFee" id="hiddenDeliveryFee" value="0"/>
-                            <input type="hidden" name="deliveryRuleId" id="hiddenDeliveryRuleId"
-                                   th:value="${deliveryRule.id}"/>
+                            <input id="hiddenDeliveryFee" name="deliveryFee" type="hidden" value="0"/>
+                            <input id="hiddenDeliveryRuleId" name="deliveryRuleId" th:value="${deliveryRule.id}"
+                                   type="hidden"/>
                         </div>
 
                         <div style="margin-top: 0.25rem;">
@@ -842,14 +849,15 @@
                     });
                 });
 
-
+                
                 // -------------------------------------------------
                 // 7) 결제하기 버튼 클릭 시 모든 hidden 필드 동기화 후 폼 제출
                 document.getElementById('payment-button').addEventListener('click', () => {
                     syncAddressFields();
                     syncDeliveryFee();
                     // 필요 시 orderCouponId, deliveryRuleId 등 hidden 동기화 추가
-                    document.getElementById('checkoutForm').submit();
+                    // document.getElementById('checkoutForm').submit();
+
                 });
 
                 // -------------------------------------------------
