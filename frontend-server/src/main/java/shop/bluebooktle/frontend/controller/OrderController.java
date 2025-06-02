@@ -23,7 +23,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import shop.bluebooktle.common.domain.CouponTypeTarget;
+import shop.bluebooktle.common.domain.coupon.CouponTypeTarget;
 import shop.bluebooktle.common.dto.book.response.BookCartOrderResponse;
 import shop.bluebooktle.common.dto.book_order.response.PackagingOptionInfoResponse;
 import shop.bluebooktle.common.dto.coupon.response.CouponResponse;
@@ -57,7 +57,6 @@ public class OrderController {
 	private final OrderService orderService;
 	private final BookService bookService;
 	private final CartService cartService;
-
 
 	@GetMapping("/create")
 	public ModelAndView createPage(

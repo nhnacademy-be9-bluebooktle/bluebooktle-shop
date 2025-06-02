@@ -19,7 +19,7 @@ import shop.bluebooktle.backend.coupon.repository.AbsoluteCouponRepository;
 import shop.bluebooktle.backend.coupon.repository.RelativeCouponRepository;
 import shop.bluebooktle.backend.coupon.service.CouponCalculationService;
 import shop.bluebooktle.backend.order.entity.Order;
-import shop.bluebooktle.common.domain.CouponTypeTarget;
+import shop.bluebooktle.common.domain.coupon.CouponTypeTarget;
 import shop.bluebooktle.common.dto.coupon.CalculatedDiscountDetails;
 
 @Slf4j
