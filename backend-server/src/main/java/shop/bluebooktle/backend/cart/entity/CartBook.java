@@ -66,9 +66,11 @@ public class CartBook extends BaseEntity {
 		this.quantity = Math.max(1, this.quantity - amount);
 	}
 
+	// BaseEntity 변수 값 Setter 사용하기 위해 선언
 	@Column(name = "deleted_at")
 	private LocalDateTime deletedAt;
 
+	// SQLDelete 안되서 Setter로 직접 변경
 	public void setDeletedAt() {
 		this.deletedAt = LocalDateTime.now();
 	}

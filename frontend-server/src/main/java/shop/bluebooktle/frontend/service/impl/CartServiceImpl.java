@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import shop.bluebooktle.common.dto.book.response.BookCartOrderResponse;
+import shop.bluebooktle.common.dto.cart.request.BookIdListRequest;
 import shop.bluebooktle.common.dto.cart.request.CartItemRequest;
 import shop.bluebooktle.common.dto.cart.request.CartRemoveOneRequest;
 import shop.bluebooktle.common.dto.cart.request.CartRemoveSelectedRequest;
@@ -49,6 +50,12 @@ public class CartServiceImpl implements CartService {
 	@Override
 	public void removeSelected(String guestId, List<Long> bookIds) {
 		cartRepository.removeSelectedBooks(new CartRemoveSelectedRequest(guestId, bookIds), guestId);
+	}
+
+	@Override
+	public List<BookCartOrderResponse> getSelectedCartItemsForOrder(String guestId, List<Long> bookIds) {
+		BookIdListRequest request = new BookIdListRequest(bookIds);
+		return cartRepository.getSelectedCartItemsForOrder(request, guestId);
 	}
 
 	@Override
