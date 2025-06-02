@@ -26,7 +26,7 @@ import shop.bluebooktle.common.dto.coupon.response.CouponResponse;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/admin/coupons")
-@Tag(name = "쿠폰 API", description = "관리자 쿠폰 CRUD API")
+@Tag(name = "관리자 쿠폰 API", description = "관리자 쿠폰 CRUD API")
 public class CouponController {
 
 	private final CouponService couponService;

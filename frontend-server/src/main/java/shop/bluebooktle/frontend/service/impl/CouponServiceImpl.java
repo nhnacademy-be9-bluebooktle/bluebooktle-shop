@@ -1,9 +1,11 @@
 package shop.bluebooktle.frontend.service.impl;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import shop.bluebooktle.common.domain.UserCouponFilterType;
 import shop.bluebooktle.common.dto.common.PaginationData;
 import shop.bluebooktle.common.dto.coupon.response.UserCouponResponse;
 import shop.bluebooktle.frontend.repository.CouponRepository;
@@ -17,28 +19,8 @@ public class CouponServiceImpl implements CouponService {
 	public final CouponRepository couponRepository;
 
 	@Override
-	public PaginationData<UserCouponResponse> getAllCoupons() {
-		return couponRepository.getAllCoupon();
+	public PaginationData<UserCouponResponse> getAllCoupons(String filter, Pageable pageable) {
+		UserCouponFilterType filterType = UserCouponFilterType.valueOf(filter.toUpperCase());
+		return couponRepository.getAllCoupons(filterType, pageable);
 	}
-
-	@Override
-	public PaginationData<UserCouponResponse> getUsableCoupons() {
-		return couponRepository.getAllCouponUsable();
-	}
-
-	@Override
-	public PaginationData<UserCouponResponse> getUsedCoupons() {
-		return couponRepository.getAllCouponUsed();
-	}
-
-	@Override
-	public PaginationData<UserCouponResponse> getExpiredCoupons() {
-		return couponRepository.getExpiredCoupon();
-	}
-
-	@Override
-	public void deleteUserCoupon(Long userCouponId) {
-		couponRepository.deleteUserCoupon(userCouponId);
-	}
-
 }
