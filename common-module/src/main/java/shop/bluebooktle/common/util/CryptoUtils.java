@@ -10,8 +10,6 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -22,8 +20,6 @@ import shop.bluebooktle.common.exception.ErrorCode;
 @Component
 public class CryptoUtils {
 
-	private static final Logger logger = LoggerFactory.getLogger(CryptoUtils.class);
-
 	private static final String ALGORITHM = "AES";
 	private static final String TRANSFORMATION = "AES/GCM/NoPadding";
 	private static final int IV_LENGTH_BYTES = 12;
@@ -32,7 +28,6 @@ public class CryptoUtils {
 	@Value("${encrypt.key}")
 	private String base64EncodedSecretKey;
 
-	private byte[] secretKeyBytes;
 	private SecretKeySpec secretKeySpec;
 
 	@PostConstruct
@@ -42,13 +37,13 @@ public class CryptoUtils {
 				"'encrypt.key' 프로퍼티가 설정되지 않았거나 비어있습니다.");
 		}
 		try {
-			this.secretKeyBytes = Base64.getDecoder().decode(base64EncodedSecretKey);
-			if (this.secretKeyBytes.length != 16 && this.secretKeyBytes.length != 24
-				&& this.secretKeyBytes.length != 32) {
+			byte[] secretKeyBytes = Base64.getDecoder().decode(base64EncodedSecretKey);
+			if (secretKeyBytes.length != 16 && secretKeyBytes.length != 24
+				&& secretKeyBytes.length != 32) {
 				throw new ApplicationException(ErrorCode.CRYPTO_INITIALIZATION_FAILED,
 					"잘못된 AES 키 길이입니다. Base64 디코딩 후 16, 24, 또는 32 바이트여야 합니다.");
 			}
-			this.secretKeySpec = new SecretKeySpec(this.secretKeyBytes, ALGORITHM);
+			this.secretKeySpec = new SecretKeySpec(secretKeyBytes, ALGORITHM);
 		} catch (IllegalArgumentException e) {
 			throw new ApplicationException(ErrorCode.CRYPTO_INITIALIZATION_FAILED, "잘못된 Base64 인코딩 키입니다", e);
 		}

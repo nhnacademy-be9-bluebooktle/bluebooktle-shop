@@ -95,6 +95,7 @@ public class AuthServiceImpl implements AuthService {
 			.build();
 
 		userRepository.save(user);
+		// TODO: Transaction 분리
 		pointService.signUpPoint(user.getId());
 	}
 
@@ -210,7 +211,6 @@ public class AuthServiceImpl implements AuthService {
 		}
 		user.updateLastLoginAt();
 		userRepository.save(user);
-		pointService.loginPoint(user.getId());
 
 		String accessToken = jwtUtil.createAccessToken(user.getId(), user.getNickname(), user.getType());
 		String refreshToken = jwtUtil.createRefreshToken(user.getId(), user.getNickname(), user.getType());
@@ -257,9 +257,7 @@ public class AuthServiceImpl implements AuthService {
 			.membershipLevel(defaultLevel)
 			.build();
 
-		User user = userRepository.save(newUser);
-		pointService.signUpPoint(user.getId());
-		return user;
+		return userRepository.save(newUser);
 	}
 
 	private String normalizePhoneNumber(String paycoMobile) {

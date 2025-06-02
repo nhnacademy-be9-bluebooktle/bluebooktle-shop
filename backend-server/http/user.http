@@ -6,6 +6,4 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 ### 유저 정보 조회
-GET http://127.0.0.1:9012/api/users/me
 Content-Type: application/json
-Authorization: Bearer {{token}}
