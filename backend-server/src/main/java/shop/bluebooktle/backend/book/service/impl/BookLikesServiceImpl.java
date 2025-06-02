@@ -1,22 +1,35 @@
 package shop.bluebooktle.backend.book.service.impl;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import shop.bluebooktle.backend.book.entity.Author;
 import shop.bluebooktle.backend.book.entity.Book;
 import shop.bluebooktle.backend.book.entity.BookLikes;
+import shop.bluebooktle.backend.book.entity.BookSaleInfo;
+import shop.bluebooktle.backend.book.entity.Img;
+import shop.bluebooktle.backend.book.repository.AuthorRepository;
+import shop.bluebooktle.backend.book.repository.BookAuthorRepository;
+import shop.bluebooktle.backend.book.repository.BookImgRepository;
 import shop.bluebooktle.backend.book.repository.BookLikesRepository;
 import shop.bluebooktle.backend.book.repository.BookRepository;
+import shop.bluebooktle.backend.book.repository.BookSaleInfoRepository;
+import shop.bluebooktle.backend.book.repository.ImgRepository;
 import shop.bluebooktle.backend.book.service.BookLikesService;
 import shop.bluebooktle.backend.user.repository.UserRepository;
+import shop.bluebooktle.common.dto.book.response.BookLikesListResponse;
 import shop.bluebooktle.common.dto.book.response.BookLikesResponse;
 import shop.bluebooktle.common.entity.auth.User;
 import shop.bluebooktle.common.exception.auth.UserNotFoundException;
 import shop.bluebooktle.common.exception.book.BookLikesAlreadyChecked;
 import shop.bluebooktle.common.exception.book.BookNotFoundException;
+import shop.bluebooktle.common.exception.book.BookSaleInfoNotFoundException;
+import shop.bluebooktle.common.exception.book.ImgNotFoundException;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +38,11 @@ public class BookLikesServiceImpl implements BookLikesService {
 	private final BookLikesRepository bookLikesRepository;
 	private final BookRepository bookRepository;
 	private final UserRepository userRepository;
+	private final BookImgRepository bookImgRepository;
+	private final ImgRepository imgRepository;
+	private final AuthorRepository authorRepository;
+	private final BookAuthorRepository bookAuthorRepository;
+	private final BookSaleInfoRepository bookSaleInfoRepository;
 
 	/** 사용자가 도서 좋아요 누르기 */
 	@Override
@@ -77,15 +95,46 @@ public class BookLikesServiceImpl implements BookLikesService {
 	/** 좋아요 누른 도서 조회 */
 	@Override
 	@Transactional(readOnly = true)
-	public List<BookLikesResponse> getBooksLikedByUser(Long userId) {
+	public List<BookLikesListResponse> getBooksLikedByUser(Long userId) {
+		// 유저가 좋아요 누른 BookLikes 리스트 조회
 		List<BookLikes> likedBooks = bookLikesRepository.findAllByUser_Id(userId);
-		return likedBooks.stream()
-			.map(bl -> BookLikesResponse.builder()
-				.bookId(bl.getBook().getId())
-				.isLiked(true)
-				.countLikes((int)bookLikesRepository.countByBook_Id(bl.getBook().getId()))
-				.build())
-			.filter(BookLikesResponse::isLiked) // 좋아요 누른 도서만 조회
-			.toList();
+
+		List<BookLikesListResponse> result = new ArrayList<>(likedBooks.size());
+		for (BookLikes bl : likedBooks) {
+			Book book = bl.getBook();
+			Long bookId = bl.getBook().getId();
+
+			// 모든 저자 가져오기
+			List<String> authorName = bookAuthorRepository
+				.findAuthorsByBook(book)
+				.stream()
+				.map(Author::getName)
+				.toList();
+
+			// 썸네일 가져오기
+			String imgUrl = bookImgRepository
+				.findFirstByBookIdAndIsThumbnailTrueOrderByIdAsc(bookId)
+				.flatMap(bookImg -> imgRepository.findById(bookImg.getImg().getId()))
+				.map(Img::getImgUrl)
+				.orElseThrow(ImgNotFoundException::new);
+
+			// 도서 가격 가져오기
+			BigDecimal price = bookSaleInfoRepository
+				.findByBookId(bookId)
+				.map(BookSaleInfo::getPrice)
+				.orElseThrow(BookSaleInfoNotFoundException::new);
+
+			// DTO 생성
+			BookLikesListResponse dto = BookLikesListResponse.builder()
+				.bookId(bookId)
+				.bookName(book.getTitle())
+				.authorName(authorName)
+				.imgUrl(imgUrl)
+				.price(price)
+				.build();
+
+			result.add(dto);
+		}
+		return result;
 	}
 }
