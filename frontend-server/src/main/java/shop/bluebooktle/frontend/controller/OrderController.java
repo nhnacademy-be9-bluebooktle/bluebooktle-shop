@@ -47,6 +47,9 @@ import shop.bluebooktle.frontend.service.UserService;
 @RequestMapping("/order")
 public class OrderController {
 
+	@Value("{toss.client-key}")
+	private String tossPaymentClientKey;
+
 	private final PaymentsService paymentsService;
 	private final UserService userService;
 	private final AdminPackagingOptionService adminPackagingOptionService;
@@ -54,8 +57,7 @@ public class OrderController {
 	private final OrderService orderService;
 	private final BookService bookService;
 	private final CartService cartService;
-	@Value("{toss.client-key}")
-	private String tossPaymentClientKey;
+
 
 	@GetMapping("/create")
 	public ModelAndView createPage(
@@ -160,7 +162,7 @@ public class OrderController {
 		if (bindingResult.hasErrors()) {
 			return "order/fail";
 		}
-		// 여기서 주문, 도서 주문 테이블 생성
+
 		return "order/complete";
 	}
 
