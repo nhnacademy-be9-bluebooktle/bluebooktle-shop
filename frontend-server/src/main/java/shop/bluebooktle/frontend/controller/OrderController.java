@@ -47,9 +47,6 @@ import shop.bluebooktle.frontend.service.UserService;
 @RequestMapping("/order")
 public class OrderController {
 
-	@Value("{toss.client-key}")
-	private String tossPaymentClientKey;
-
 	private final PaymentsService paymentsService;
 	private final UserService userService;
 	private final AdminPackagingOptionService adminPackagingOptionService;
@@ -57,11 +54,14 @@ public class OrderController {
 	private final OrderService orderService;
 	private final BookService bookService;
 	private final CartService cartService;
+	@Value("{toss.client-key}")
+	private String tossPaymentClientKey;
 
 	@GetMapping("/create")
 	public ModelAndView createPage(
-		@RequestParam Long bookId,
-		@RequestParam(defaultValue = "1") Integer quantity,
+		@RequestParam(required = false) Long bookId,
+		@RequestParam(defaultValue = "1", required = false) Integer quantity,
+		@RequestParam(required = false) List<Long> bookIds,
 		@CookieValue(value = "GUEST_ID", required = false) String guestId
 	) {
 		ModelAndView mav = new ModelAndView("order/create_form");
@@ -74,7 +74,7 @@ public class OrderController {
 			BookCartOrderResponse bookInfo = bookService.getBookCartOrder(bookId, quantity);
 			bookItems = List.of(bookInfo);
 		} else {
-			bookItems = cartService.getCartItems(guestId);
+			bookItems = cartService.getSelectedCartItemsForOrder(guestId, bookIds);
 		}
 		mav.addObject("bookItems", bookItems);
 
