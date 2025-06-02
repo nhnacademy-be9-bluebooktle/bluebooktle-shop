@@ -71,21 +71,25 @@ public class OrderServiceImpl implements OrderService {
 	private final PaymentRepository paymentRepository;
 
 	@Override
+	@Transactional(readOnly = true)
 	public Page<OrderHistoryResponse> getUserOrders(
 		Long userId,
 		OrderStatus status,
-		Pageable pageable
-	) {
-		User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-		Page<Payment> paymentPage;
+		Pageable pageable) {
+
+		User user = userRepository.findById(userId)
+			.orElseThrow(UserNotFoundException::new);
+
+		Page<Order> orderPage;
 		if (status == null) {
-			paymentPage = paymentRepository.findByOrder_User(user, pageable);
+			orderPage = orderRepository.findByUser(user, pageable);
 		} else {
-			paymentPage = paymentRepository.findByOrder_UserAndOrder_OrderState_State(user, status, pageable);
+			orderPage = orderRepository.findByUserAndOrderState_State(user, status, pageable);
 		}
-		return paymentPage.map(p -> {
-			Order o = p.getOrder();
-			BigDecimal paidAmount = p.getPrice(); // Payment 엔티티의 실제 결제 금액 필드
+
+		return orderPage.map(o -> {
+			Payment payment = paymentRepository.findByOrder(o).orElse(null);
+			BigDecimal paidAmount = payment == null ? null : payment.getPrice();
 			return new OrderHistoryResponse(
 				o.getId(),                     // orderId
 				o.getCreatedAt(),              // createAt

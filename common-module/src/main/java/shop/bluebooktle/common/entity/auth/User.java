@@ -73,7 +73,7 @@ public class User extends BaseEntity {
 	private String nickname;
 
 	@Convert(converter = ProfileAwareStringCryptoConverter.class)
-	@Column(name = "birth", nullable = false)
+	@Column(name = "birth", nullable = false, length = 8)
 	private String birth;
 
 	@Convert(converter = ProfileAwareStringCryptoConverter.class)
