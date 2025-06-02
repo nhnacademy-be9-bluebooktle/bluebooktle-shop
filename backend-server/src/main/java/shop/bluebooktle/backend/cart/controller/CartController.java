@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import shop.bluebooktle.backend.cart.service.CartService;
 import shop.bluebooktle.common.dto.book.response.BookCartOrderResponse;
+import shop.bluebooktle.common.dto.cart.request.BookIdListRequest;
 import shop.bluebooktle.common.dto.cart.request.CartItemRequest;
 import shop.bluebooktle.common.dto.cart.request.CartRemoveOneRequest;
 import shop.bluebooktle.common.dto.cart.request.CartRemoveSelectedRequest;
@@ -142,6 +143,24 @@ public class CartController {
 			cartService.removeSelectedBooksFromUserCart(user, request.bookIds());
 		}
 		return ResponseEntity.ok(JsendResponse.success());
+	}
+
+	/** 공통: 주문용 선택된 장바구니 도서 조회 */
+	@PostMapping("/order")
+	public ResponseEntity<JsendResponse<List<BookCartOrderResponse>>> getSelectedCartItemsForOrder(
+		@AuthenticationPrincipal UserPrincipal principal,
+		@RequestHeader(value = "GUEST_ID", required = false) String guestId,
+		@RequestBody BookIdListRequest request
+	) {
+		if (principal == null) {
+			List<BookCartOrderResponse> items =
+				cartService.sendSelectedGuestCartItemsToOrder(validateGuestId(guestId), request.bookIds());
+			return ResponseEntity.ok(JsendResponse.success(items));
+		} else {
+			User user = getAuthenticatedUser(principal);
+			List<BookCartOrderResponse> items = cartService.sendSelectedCartItemsToOrder(user, request.bookIds());
+			return ResponseEntity.ok(JsendResponse.success(items));
+		}
 	}
 
 	/** 전환 또는 병합: 회원가입 또는 로그인 직후 */

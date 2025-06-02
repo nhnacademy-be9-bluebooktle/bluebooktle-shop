@@ -46,6 +46,7 @@ public class CartServiceImpl implements CartService {
 
 	// ----------------- 회원용 -----------------
 
+	// 전달받은 UserId로 User 객체로 반환하기 위한 메서드
 	@Override
 	@Transactional
 	public User findUserEntityById(Long userId) {
@@ -53,6 +54,7 @@ public class CartServiceImpl implements CartService {
 			.orElseThrow(UserNotFoundException::new);
 	}
 
+	// User 카트로 Book과 Quantity 정보 담기
 	@Override
 	@Transactional
 	public void addBookToUserCart(User user, Long bookId, int quantity) {
@@ -67,17 +69,7 @@ public class CartServiceImpl implements CartService {
 			);
 	}
 
-	// @Override
-	// @Transactional(readOnly = true)
-	// public List<CartItemResponse> getUserCartItems(User user) {
-	// 	Cart cart = cartRepository.findByUser(user)
-	// 		.orElseThrow(UserNotFoundException::new);
-	//
-	// 	return cart.getCartBooks().stream()
-	// 		.map(cb -> new CartItemResponse(cb.getBook().getId(), cb.getQuantity()))
-	// 		.toList();
-	// }
-
+	// User의 카트에 있는 모든 책의 정보를 반환 (View에 필요한 모든 정보를 담은 DTO로 반환)
 	@Override
 	@Transactional(readOnly = true)
 	public List<BookCartOrderResponse> getUserCartItems(User user) {
@@ -103,6 +95,7 @@ public class CartServiceImpl implements CartService {
 			.toList();
 	}
 
+	// 책의 수량 증가하는 메서드
 	@Override
 	@Transactional
 	public void increaseUserQuantity(User user, Long bookId, int quantity) {
@@ -118,6 +111,7 @@ public class CartServiceImpl implements CartService {
 			);
 	}
 
+	// 책의 수량 감소하는 메서드
 	@Override
 	public void decreaseUserQuantity(User user, Long bookId, int quantity) {
 		Cart cart = cartRepository.findByUser(user)
@@ -129,6 +123,7 @@ public class CartServiceImpl implements CartService {
 			.ifPresent(cartBook -> cartBook.decreaseQuantity(quantity));
 	}
 
+	// User 카트에서 단일 책 삭제
 	@Override
 	public void removeBookFromUserCart(User user, Long bookId) {
 		Cart cart = cartRepository.findByUser(user)
@@ -142,6 +137,7 @@ public class CartServiceImpl implements CartService {
 		cartBook.setDeletedAt();
 	}
 
+	// User 카트에서 요청된 List에 담겨있는 책들 삭제
 	@Override
 	@Transactional
 	public void removeSelectedBooksFromUserCart(User user, List<Long> bookIds) {
@@ -153,22 +149,42 @@ public class CartServiceImpl implements CartService {
 		cartBooks.forEach(CartBook::setDeletedAt);
 	}
 
+	// 선택된 도서 주문으로 넘기기 메서드
+	@Override
+	@Transactional(readOnly = true)
+	public List<BookCartOrderResponse> sendSelectedCartItemsToOrder(User user, List<Long> bookIds) {
+		Cart cart = cartRepository.findByUser(user)
+			.orElseThrow(UserNotFoundException::new);
+
+		return cart.getCartBooks().stream()
+			.filter(cartBook -> bookIds.contains(cartBook.getBook().getId()))
+			.map(cartBook -> {
+				Book book = cartBook.getBook();
+				BookSaleInfo saleInfo = getBookSaleInfoByBookId(book.getId());
+
+				return BookCartOrderResponse.builder()
+					.bookId(book.getId())
+					.title(book.getTitle())
+					.price(saleInfo.getPrice())
+					.salePrice(saleInfo.getSalePrice())
+					.thumbnailUrl(getThumbnailUrlByBookId(book.getId()))
+					.categories(getCategoriesByBookId(book.getId()))
+					.quantity(cartBook.getQuantity())
+					.build();
+			})
+			.toList();
+	}
+
 	// ----------------- 비회원용 -----------------
 
+	// 비회원 카트에 책 담기
 	@Override
 	@Transactional
 	public void addBookToGuestCart(String guestId, Long bookId, int quantity) {
 		guestCartRepository.addBook(guestId, bookId, quantity);
 	}
 
-	// @Override
-	// @Transactional(readOnly = true)
-	// public List<CartItemResponse> getGuestCartItems(String guestId) {
-	// 	return guestCartRepository.getCart(guestId).entrySet().stream()
-	// 		.map(entry -> new CartItemResponse(entry.getKey(), entry.getValue()))
-	// 		.toList();
-	// }
-
+	// 비회원 카트에 담겨있는 모든 책 정보 반환 (View에 필요한 모든 정보 담은 dto로 반환)
 	@Override
 	@Transactional(readOnly = true)
 	public List<BookCartOrderResponse> getGuestCartItems(String guestId) {
@@ -196,32 +212,65 @@ public class CartServiceImpl implements CartService {
 			.toList();
 	}
 
+	// 책 수량 증가 메서드
 	@Override
 	@Transactional
 	public void increaseGuestQuantity(String guestId, Long bookId, int quantity) {
 		guestCartRepository.increaseQuantity(guestId, bookId, quantity);
 	}
 
+	// 책 수량 감소 메서드
 	@Override
 	@Transactional
 	public void decreaseGuestQuantity(String guestId, Long bookId, int quantity) {
 		guestCartRepository.decreaseQuantity(guestId, bookId, quantity);
 	}
 
+	// 카트에서 단일 책 삭제 메서드
 	@Override
 	@Transactional
 	public void removeBookFromGuestCart(String guestId, Long bookId) {
 		guestCartRepository.removeBook(guestId, bookId);
 	}
 
+	// 카트에서 요청된 List에 있는 책들 삭제
 	@Override
 	@Transactional
 	public void removeSelectedBooksFromGuestCart(String guestId, List<Long> bookIds) {
 		guestCartRepository.removeSelectedBooks(guestId, bookIds);
 	}
 
+	// 선택된 도서 주문으로 넘기기 메서드
+	@Override
+	@Transactional(readOnly = true)
+	public List<BookCartOrderResponse> sendSelectedGuestCartItemsToOrder(String guestId, List<Long> bookIds) {
+		Map<Long, Integer> guestCart = guestCartRepository.getCart(guestId);
+
+		return guestCart.entrySet().stream()
+			.filter(entry -> bookIds.contains(entry.getKey()))
+			.map(entry -> {
+				Long bookId = entry.getKey();
+				int quantity = entry.getValue();
+				Book book = bookRepository.findById(bookId)
+					.orElseThrow(BookNotFoundException::new);
+				BookSaleInfo saleInfo = getBookSaleInfoByBookId(bookId);
+
+				return BookCartOrderResponse.builder()
+					.bookId(bookId)
+					.title(book.getTitle())
+					.price(saleInfo.getPrice())
+					.salePrice(saleInfo.getSalePrice())
+					.thumbnailUrl(getThumbnailUrlByBookId(bookId))
+					.categories(getCategoriesByBookId(bookId))
+					.quantity(quantity)
+					.build();
+			})
+			.toList();
+	}
+
 	// ----------------- 공통 -----------------
 
+	// User의 카트가 존재하면 Cart반환, 없으면 생성
 	private Cart getOrCreateCart(User user) {
 		return cartRepository.findByUser(user)
 			.orElseGet(() -> cartRepository.save(
@@ -231,6 +280,7 @@ public class CartServiceImpl implements CartService {
 			));
 	}
 
+	// 비회원 카트에서 회원카트로 정보 이전 메서드
 	@Override
 	@Transactional
 	public void mergeOrConvertGuestCartToMemberCart(String guestId, User user) {
@@ -241,7 +291,7 @@ public class CartServiceImpl implements CartService {
 
 		Cart cart = cartRepository.findByUser(user).orElse(null);
 
-		// 장바구니 없으면 → 생성 후 전환 (convert)
+		// 장바구니 없으면 -> 생성 후 전환 (convert)
 		if (cart == null) {
 			cart = cartRepository.save(Cart.builder().user(user).build());
 
@@ -256,7 +306,7 @@ public class CartServiceImpl implements CartService {
 			cartBookRepository.saveAll(cartBooks);
 		}
 
-		// 장바구니 있으면 → 병합 (merge)
+		// 장바구니 있으면 -> 병합 (merge)
 		else {
 			for (Map.Entry<Long, Integer> entry : guestCart.entrySet()) {
 				Long bookId = entry.getKey();
@@ -278,6 +328,7 @@ public class CartServiceImpl implements CartService {
 		guestCartRepository.removeSelectedBooks(guestId, new ArrayList<>(guestCart.keySet()));
 	}
 
+	// 책의 카테고리 정보 가져오기 메서드
 	private List<String> getCategoriesByBookId(Long bookId) {
 		return bookCategoryRepository.findByBook_Id(bookId)
 			.stream()
@@ -285,6 +336,7 @@ public class CartServiceImpl implements CartService {
 			.toList();
 	}
 
+	// 책의 썸네일 주소 가져오기 메서드
 	private String getThumbnailUrlByBookId(Long bookId) {
 		return bookImgRepository.findByBookId(bookId)
 			.stream()
@@ -293,6 +345,7 @@ public class CartServiceImpl implements CartService {
 			.orElse("기본 썸네일url"); // 없으면 기본 썸네일 URL 반환
 	}
 
+	// 책의 판매정보 객체를 가져오는 메서드
 	private BookSaleInfo getBookSaleInfoByBookId(Long bookId) {
 		return bookSaleInfoRepository.findByBookId(bookId)
 			.orElseThrow(BookNotFoundException::new);

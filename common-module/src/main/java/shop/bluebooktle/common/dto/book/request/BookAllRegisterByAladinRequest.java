@@ -23,13 +23,15 @@ public class BookAllRegisterByAladinRequest {
 	@Size(min = 13, max = 13, message = "isbn은 13자여야 합니다")
 	String isbn;
 
+	String index;
+
 	@NotNull(message = "재고를 입력해주세요")
 	@Min(value = 0, message = "재고는 0 이상이어야 합니다.")
 	Integer stock;
 
 	Boolean isPackable;
 
-	@NotBlank(message = "판매 상태를 입력해주세요.")
+	@NotNull(message = "판매 상태를 입력해주세요.")
 	BookSaleInfoState state;
 
 	@NotEmpty(message = "카테고리는 최소 1개 이상 필요합니다.")

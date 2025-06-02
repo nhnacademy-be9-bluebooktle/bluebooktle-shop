@@ -58,10 +58,12 @@ public class OrderController {
 	private final BookService bookService;
 	private final CartService cartService;
 
+
 	@GetMapping("/create")
 	public ModelAndView createPage(
-		@RequestParam Long bookId,
-		@RequestParam(defaultValue = "1") Integer quantity,
+		@RequestParam(required = false) Long bookId,
+		@RequestParam(defaultValue = "1", required = false) Integer quantity,
+		@RequestParam(required = false) List<Long> bookIds,
 		@CookieValue(value = "GUEST_ID", required = false) String guestId
 	) {
 		ModelAndView mav = new ModelAndView("order/create_form");
@@ -74,7 +76,7 @@ public class OrderController {
 			BookCartOrderResponse bookInfo = bookService.getBookCartOrder(bookId, quantity);
 			bookItems = List.of(bookInfo);
 		} else {
-			bookItems = cartService.getCartItems(guestId);
+			bookItems = cartService.getSelectedCartItemsForOrder(guestId, bookIds);
 		}
 		mav.addObject("bookItems", bookItems);
 
@@ -160,7 +162,7 @@ public class OrderController {
 		if (bindingResult.hasErrors()) {
 			return "order/fail";
 		}
-		// 여기서 주문, 도서 주문 테이블 생성
+
 		return "order/complete";
 	}
 
