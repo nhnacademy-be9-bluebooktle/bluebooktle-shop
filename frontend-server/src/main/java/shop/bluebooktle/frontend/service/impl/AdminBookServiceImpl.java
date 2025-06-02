@@ -20,11 +20,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import shop.bluebooktle.common.dto.book.request.BookAllRegisterByAladinRequest;
 import shop.bluebooktle.common.dto.book.request.BookAllRegisterRequest;
 import shop.bluebooktle.common.dto.book.request.BookFormRequest;
 import shop.bluebooktle.common.dto.book.response.AladinBookResponse;
 import shop.bluebooktle.common.dto.book.response.BookAllResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
+import shop.bluebooktle.frontend.repository.AdminAladinBookRepository;
 import shop.bluebooktle.frontend.repository.AdminBookRepository;
 import shop.bluebooktle.frontend.repository.AdminImgUploadRepository;
 import shop.bluebooktle.frontend.service.AdminBookService;
@@ -37,6 +39,7 @@ public class AdminBookServiceImpl implements AdminBookService {
 	private final AdminBookRepository adminBookRepository;
 	private final AdminImgService adminImgService;
 	private final AdminImgUploadRepository adminImgUploadRepository;
+	private final AdminAladinBookRepository adminAladinBookRepository;
 
 	@Override
 	public Page<BookAllResponse> getPagedBooks(int page, int size, String searchKeyword) {
@@ -118,7 +121,12 @@ public class AdminBookServiceImpl implements AdminBookService {
 	}
 
 	@Override
+	public void registerBookByAladin(BookAllRegisterByAladinRequest request) {
+		adminAladinBookRepository.registerAladinBook(request);
+	}
+
+	@Override
 	public List<AladinBookResponse> searchAladin(String keyword, int page, int size) {
-		return adminBookRepository.searchAladinBooks(keyword, page, size);
+		return adminAladinBookRepository.searchBooks(keyword, page, size);
 	}
 }

@@ -67,7 +67,7 @@ public class BookRegisterServiceImpl implements BookRegisterService {
 		bookAuthorService.registerBookAuthor(book.getId(), request.getAuthorIdList());
 		bookPublisherService.registerBookPublisher(book.getId(), request.getPublisherIdList());
 		bookCategoryService.registerBookCategory(book.getId(), request.getCategoryIdList());
-		if (request.getTagIdList() != null || !request.getTagIdList().isEmpty()) {
+		if (request.getTagIdList() != null && !request.getTagIdList().isEmpty()) {
 			bookTagService.registerBookTag(book.getId(), request.getTagIdList());
 		}
 
@@ -109,6 +109,7 @@ public class BookRegisterServiceImpl implements BookRegisterService {
 			.description(aladinBook.getDescription())
 			.isbn(aladinBook.getIsbn())
 			.publishDate(aladinBook.getPublishDate().toLocalDate().atStartOfDay())
+			.index(request.getIndex())
 			.build();
 		bookRepository.save(book);
 
@@ -122,15 +123,16 @@ public class BookRegisterServiceImpl implements BookRegisterService {
 		PublisherInfoResponse publisher = publisherService.registerPublisherByName(aladinBook.getPublisher());
 		bookPublisherService.registerBookPublisher(book.getId(), publisher.getId());
 
-		// TODO 이미지 파일 이미지 서버(MINIO)에 저장 로직 구현
 		bookImgService.registerBookImg(book.getId(), aladinBook.getImgUrl());
 
 		for (Long categoryId : request.getCategoryIdList()) {
 			bookCategoryService.registerBookCategory(book.getId(), categoryId);
 		}
 
-		for (Long tagId : request.getTagIdList()) {
-			bookTagService.registerBookTag(book.getId(), tagId);
+		if (request.getTagIdList() != null && !request.getTagIdList().isEmpty()) {
+			for (Long tagId : request.getTagIdList()) {
+				bookTagService.registerBookTag(book.getId(), tagId);
+			}
 		}
 
 		BookSaleInfo saleInfo = BookSaleInfo.builder()
