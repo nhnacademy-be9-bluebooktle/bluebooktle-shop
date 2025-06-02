@@ -24,6 +24,9 @@ public class UserPrincipal implements UserDetails {
 	private UserStatus userStatus;
 	private Collection<? extends GrantedAuthority> authorities;
 
+	public UserPrincipal() {
+	}
+
 	public UserPrincipal(UserDto userDto) {
 		this.userId = userDto.getId();
 		this.loginId = userDto.getLoginId();

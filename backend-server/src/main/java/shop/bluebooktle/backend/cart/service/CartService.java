@@ -22,6 +22,8 @@ public interface CartService {
 
 	void removeSelectedBooksFromUserCart(User user, List<Long> bookIds);
 
+	List<BookCartOrderResponse> sendSelectedCartItemsToOrder(User user, List<Long> bookIds);
+
 	// 비회원용
 	void addBookToGuestCart(String guestId, Long bookId, int quantity);
 
@@ -35,14 +37,10 @@ public interface CartService {
 
 	void removeSelectedBooksFromGuestCart(String guestId, List<Long> bookIds);
 
+	List<BookCartOrderResponse> sendSelectedGuestCartItemsToOrder(String guestId, List<Long> bookIds);
+
 	// ----------------- 전환용 -----------------
 
-	// // 회원가입 직후: Redis → DB로 옮기기 (기존 장바구니 없음)
-	// void convertGuestCartToMemberCart(String guestId, User user);
-	//
-	// // 로그인 시점: Redis → DB로 병합 (기존 장바구니 있음)
-	// void mergeGuestCartToMemberCart(String guestId, User user);
-
-	public void mergeOrConvertGuestCartToMemberCart(String guestId, User user);
+	void mergeOrConvertGuestCartToMemberCart(String guestId, User user);
 }
 

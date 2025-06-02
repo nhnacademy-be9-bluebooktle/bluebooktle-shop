@@ -24,5 +24,7 @@ public interface CartService {
 	// 공통: 선택 도서 여러 개 삭제
 	void removeSelected(String guestId, List<Long> bookIds);
 
+	List<BookCartOrderResponse> getSelectedCartItemsForOrder(String guestId, List<Long> bookIds);
+
 	public void mergeOrConvertGuestCart(String guestId);
 }

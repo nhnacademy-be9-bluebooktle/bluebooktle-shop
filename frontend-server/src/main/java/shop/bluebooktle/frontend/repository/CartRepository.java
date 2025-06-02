@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 
 import shop.bluebooktle.common.dto.book.response.BookCartOrderResponse;
+import shop.bluebooktle.common.dto.cart.request.BookIdListRequest;
 import shop.bluebooktle.common.dto.cart.request.CartItemRequest;
 import shop.bluebooktle.common.dto.cart.request.CartRemoveOneRequest;
 import shop.bluebooktle.common.dto.cart.request.CartRemoveSelectedRequest;
@@ -59,6 +60,12 @@ public interface CartRepository {
 	@DeleteMapping("/selected")
 	void removeSelectedBooks(
 		@RequestBody CartRemoveSelectedRequest request,
+		@RequestHeader(name = "GUEST_ID", required = false) String guestId
+	);
+
+	@PostMapping("/order")
+	List<BookCartOrderResponse> getSelectedCartItemsForOrder(
+		@RequestBody BookIdListRequest request,
 		@RequestHeader(name = "GUEST_ID", required = false) String guestId
 	);
 

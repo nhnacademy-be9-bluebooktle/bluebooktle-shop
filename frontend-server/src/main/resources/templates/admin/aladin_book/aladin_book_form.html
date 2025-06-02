@@ -3,9 +3,6 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       xmlns:th="http://www.thymeleaf.org">
 <head>
-    <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
-
-
     <title th:text="${pageTitle} ?: '도서 폼'"></title>
     <style>
         .form-section {
@@ -81,6 +78,10 @@
             background-color: #0056b3;
         }
 
+        .book-search-list:hover {
+            background-color: #f1f9ff;
+        }
+
     </style>
     <!-- ② 서버에서 넘긴 카테고리 트리를 JS 변수로 인라인 직렬화 -->
     <script th:inline="javascript">
@@ -104,7 +105,8 @@
                 <strong th:text="${globalErrorMessage}"></strong>
             </div>
 
-            <form th:action="@{/admin/books/save}" th:object="${bookForm}" method="post" enctype="multipart/form-data">
+            <form th:action="@{/admin/aladin/books/save}" th:object="${aladinBookForm}" method="post"
+                  enctype="multipart/form-data">
 
                 <!-- 알라딘 도서 검색 -->
                 <div class="aladin-search-container"
@@ -126,66 +128,24 @@
                     </div>
                 </div>
 
+                <div id="selectedBookPreview" style="margin-top: 20px;"></div>
+
+                <div id="aladinHiddenInputs">
+                    <input type="hidden" name="isbn" id="isbnHidden">
+                </div>
+
 
                 <div class="form-section">
                     <h3><i class="fas fa-info-circle"></i> 기본 정보</h3>
-                    <div class="row">
-                        <div class="col-md-8 admin-form-group">
-                            <label for="title" class="admin-form-label">도서 제목 <span class="text-danger">*</span></label>
-                            <input type="text" id="title" th:field="*{title}" class="admin-form-control"
-                                   th:errorclass="is-invalid">
-                            <div th:if="${#fields.hasErrors('title')}" th:errors="*{title}"
-                                 class="invalid-feedback"></div>
-                        </div>
-                        <div class="col-md-4 admin-form-group">
-                            <label for="isbn" class="admin-form-label">ISBN <span class="text-danger">*</span></label>
-                            <input type="text" id="isbn" th:field="*{isbn}" class="admin-form-control"
-                                   th:errorclass="is-invalid" placeholder="13자리 숫자">
-                            <div th:if="${#fields.hasErrors('isbn')}" th:errors="*{isbn}"
-                                 class="invalid-feedback"></div>
-                        </div>
-                    </div>
                     <div class="admin-form-group">
                         <label for="bookIndex" class="admin-form-label">목차</label>
                         <textarea id="bookIndex" th:field="*{index}" class="admin-form-control" rows="5"></textarea>
-                    </div>
-                    <div class="admin-form-group">
-                        <label for="description" class="admin-form-label">
-                            상세 설명 <span class="text-danger">*</span>
-                        </label>
-                        <textarea id="description"
-                                  th:field="*{description}"
-                                  class="admin-form-control"
-                                  rows="10"></textarea>
-                        <div th:if="${#fields.hasErrors('description')}"
-                             th:errors="*{description}"
-                             class="invalid-feedback"></div>
-                    </div>
-                    <div class="admin-form-group">
-                        <label for="publishDate" class="admin-form-label">출판일</label>
-                        <input type="date" id="publishDate" th:field="*{publishDate}" class="admin-form-control">
                     </div>
                 </div>
 
                 <div class="form-section">
                     <h3><i class="fas fa-dollar-sign"></i> 판매 정보</h3>
                     <div class="row">
-                        <div class="col-md-4 admin-form-group">
-                            <label for="price" class="admin-form-label">정가 <span
-                                    class="text-danger">*</span></label>
-                            <input type="number" id="price" th:field="*{price}" class="admin-form-control"
-                                   th:errorclass="is-invalid">
-                            <div th:if="${#fields.hasErrors('price')}" th:errors="*{price}"
-                                 class="invalid-feedback"></div>
-                        </div>
-                        <div class="col-md-4 admin-form-group">
-                            <label for="salePrice" class="admin-form-label">판매가 <span
-                                    class="text-danger">*</span></label>
-                            <input type="number" id="salePrice" th:field="*{salePrice}" class="admin-form-control"
-                                   th:errorclass="is-invalid">
-                            <div th:if="${#fields.hasErrors('salePrice')}" th:errors="*{salePrice}"
-                                 class="invalid-feedback"></div>
-                        </div>
                         <div class="col-md-4 admin-form-group">
                             <label for="stock" class="admin-form-label">재고 수량 <span class="text-danger">*</span></label>
                             <input type="number" id="stock" th:field="*{stock}" class="admin-form-control"
@@ -215,9 +175,8 @@
                 </div>
 
                 <div class="form-section">
-                    <h3><i class="fas fa-search"></i> 카테고리 / 작가 / 출판사 / 태그 선택</h3>
+                    <h3><i class="fas fa-search"></i> 카테고리 / 태그 선택</h3>
 
-                    <!-- 카테고리 선택 -->
                     <!-- 카테고리 선택 -->
                     <div class="admin-form-group" style="position: relative;">
                         <label class="admin-form-label">카테고리 선택</label>
@@ -237,58 +196,6 @@
                     <div id="categorySelectionDisplay"
                          style="margin-top:10px; font-size:14px; color:#333;">
                     </div>
-
-
-                    <!-- 작가 선택 -->
-                    <div class="admin-form-group" style="position: relative;">
-                        <label class="admin-form-label">작가 선택</label>
-                        <button type="button" class="admin-form-control btn btn-primary"
-                                onclick="openPopup('author')">
-                            작가 검색
-                        </button>
-                        <div id="authorPopup" class="popup-small-overlay" style="display:none;">
-                            <input type="text" id="authorSearch"
-                                   placeholder="작가 검색" class="popup-input"
-                                   onkeydown="if(event.key==='Enter'){ loadAuthors(0, authSize, this.value); event.preventDefault(); }"/>
-                            <ul id="authorResults" class="popup-multi-select"></ul>
-                            <div id="authorPagination" class="pagination"
-                                 style="text-align:center; margin-top:8px;"></div>
-                            <button type="button" class="popup-save-btn" onclick="saveSelection('author')">
-                                확인
-                            </button>
-                        </div>
-                    </div>
-                    <div id="authorSelectionDisplay"
-                         style="margin-top:10px; font-size:14px; color:#333;">
-                    </div>
-
-                    <!-- 출판사 선택 -->
-                    <div class="admin-form-group" style="position: relative;">
-                        <label class="admin-form-label">출판사 선택</label>
-                        <button type="button"
-                                class="admin-form-control btn btn-primary"
-                                onclick="openPopup('publisher')">
-                            출판사 검색
-                        </button>
-
-                        <div id="publisherPopup" class="popup-small-overlay" style="display:none;">
-                            <input type="text" id="publisherSearch"
-                                   placeholder="출판사 검색"
-                                   class="popup-input"
-                                   onkeydown="if(event.key==='Enter'){ loadPublishers(0,pubSize,this.value); event.preventDefault(); }"/>
-                            <ul id="publisherResults" class="popup-multi-select"></ul>
-                            <div id="publisherPagination" class="pagination"
-                                 style="text-align:center; margin-top:8px;"></div>
-                            <button type="button" class="popup-save-btn" onclick="saveSelection('publisher')">
-                                확인
-                            </button>
-                        </div>
-                    </div>
-
-                    <div id="publisherSelectionDisplay"
-                         style="margin-top:10px; font-size:14px; color:#333;">
-                    </div>
-
 
                     <!-- 태그 선택 -->
                     <div class="admin-form-group" style="position: relative;">
@@ -311,14 +218,6 @@
                     <div id="tagSelectionDisplay" style="margin-top:10px; font-size:14px; color:#333;">
                     </div>
 
-                    <div class="admin-form-group">
-                        <label for="imageFile" class="admin-form-label">도서 이미지</label>
-                        <input type="file" id="imageFile" th:field="*{imageFile}"
-                               accept="image/*" class="admin-form-control"/>
-                    </div>
-
-                    <!-- 업로드 미리보기 -->
-                    <div id="uploadedImagePreview" style="margin-top: 10px;"></div>
 
                     <div class="admin-form-actions mt-4 text-end">
                         <a th:href="@{/admin/books}"
@@ -340,27 +239,11 @@
 <th:block layout:fragment="page_scripts">
     <script th:inline="javascript">
         const MAX_PAGE = 3;
-        const pageSize = 10;
-        let currentPage = 1;
-
-        // CKEditor 인스턴스 전역 저장
-        let descriptionEditor;
-        document.addEventListener('DOMContentLoaded', () => {
-            ClassicEditor
-                .create(document.getElementById('description'))
-                .then(editor => {
-                    descriptionEditor = editor;
-                    console.log('✅ CKEditor ready');
-                })
-                .catch(err => console.error('❌ CKEditor init error:', err));
-
-            // 검색 버튼 바인딩
-            document.querySelector('.admin-btn--primary')
-                .addEventListener('click', () => searchAladinBooks(1));
-        });
+        const pageSize = 5;
+        let currentPage = 0;
 
         // 알라딘 도서 검색
-        async function searchAladinBooks(page = 1) {
+        async function searchAladinBooks(page = 0) {
             // page 1~MAX_PAGE 사이로 제한
             page = Math.max(1, Math.min(page, MAX_PAGE));
             currentPage = page;
@@ -379,7 +262,7 @@
 
             // API 호출
             const res = await fetch(
-                `/admin/books/aladin-search?keyword=${encodeURIComponent(query)}` +
+                `/admin/aladin/books/aladin-search?keyword=${encodeURIComponent(query)}` +
                 `&page=${page}&size=${pageSize}`,
                 {headers: {'Accept': 'application/json'}}
             );
@@ -411,17 +294,28 @@
                 const payload = encodeURIComponent(JSON.stringify(book));
                 const li = document.createElement('li');
                 li.style.marginBottom = '10px';
+                li.style.cursor = 'pointer';
+                li.dataset.payload = JSON.stringify(book);
+                // li.setAttribute('onclick', `selectAladinBook('${payload}')`);
                 li.innerHTML = `
-          <strong>${book.title}</strong><br>
-          저자: ${book.author}, 출판사: ${book.publisher}, ISBN: ${book.isbn}<br>
-          <button
-            type="button"
-            class="admin-btn admin-btn--default"
-            style="margin-top:5px;"
-            onclick="selectAladinBook('${payload}')">
-            선택
-          </button>
-        `;
+                    <div class="book-search-list" style="border: 1px solid #ddd; border-radius: 5px; padding: 10px; display: flex; gap: 1rem; transition: background-color 0.3s;">
+                        <img src="${book.imgUrl}" alt="표지" style="height: 150px; width: auto; border: 1px solid #ccc; border-radius: 4px; object-fit: contain;">
+                        <div style="flex: 1;">
+                              <h4 style="margin: 0 0 5px;">${book.title}</h4>
+                              <p style="margin: 0;">저자: ${book.author}</p>
+                              <p style="margin: 0;">출판사: ${book.publisher}</p>
+                              <p style="margin: 0;">출판일: ${book.publishDate}</p>
+                              <p style="margin: 0;">ISBN: ${book.isbn}</p>
+                              <p style="margin: 0;">카테고리: ${book.categoryName}</p>
+                              <p style="margin: 0;">정가: ₩${book.price?.toLocaleString?.() ?? book.price}</p>
+                              <p style="margin: 0;">판매가: ₩${book.salePrice?.toLocaleString?.() ?? book.salePrice} (${book.salePercentage}% 할인)</p>
+                              <p style="margin: 0.5rem 0;">설명: ${book.description?.slice(0, 100) ?? ''}...</p>
+                        </div>
+                    </div>
+                `;
+                li.addEventListener('click', function () {
+                    selectAladinBook(this.dataset.payload); // 👈 이 방식으로 호출
+                });
                 resultsList.appendChild(li);
             });
 
@@ -432,65 +326,40 @@
         function selectAladinBook(encoded) {
             const book = JSON.parse(decodeURIComponent(encoded));
             console.log(book);
+            // ISBN 값 채우기
+            document.getElementById('isbnHidden').value = book.isbn || '';
 
+            // 선택된 도서 정보 미리보기 영역에 표시
+            const preview = document.getElementById('selectedBookPreview');
+            preview.innerHTML = `
+                    <div style="border: 2px solid #007bff; padding: 15px; border-radius: 8px; display: flex; gap: 1rem; background: #f9f9f9;">
+                        <img src="${book.imgUrl}" alt="표지" style="height: 150px; border-radius: 4px; object-fit: contain;">
+                        <div style="flex: 1;">
+                            <h4 style="margin: 0 0 5px;">✅ 선택된 도서: ${book.title}</h4>
+                            <p style="margin: 0;">저자: ${book.author}</p>
+                            <p style="margin: 0;">출판사: ${book.publisher}</p>
+                            <p style="margin: 0;">출판일: ${book.publishDate}</p>
+                            <p style="margin: 0;">ISBN: ${book.isbn}</p>
+                            <p style="margin: 0;">카테고리: ${book.categoryName}</p>
+                            <p style="margin: 0;">정가: ₩${book.price}</p>
+                            <p style="margin: 0;">판매가: ₩${book.salePrice} (${book.salePercentage}% 할인)</p>
+                            <p style="margin: 0.5rem 0;">설명: ${book.description?.slice(0, 100)}...</p>
+                        </div>
+                    </div>
+            `;
+            highlightSelectedCard(book.isbn);
+        }
 
-            // 제목, ISBN
-            document.getElementById('title').value = book.title || '';
-            document.getElementById('isbn').value = book.isbn || '';
-
-            // 정가, 판매가
-            document.getElementById('price').value = book.price != null ? book.price : '';
-            document.getElementById('salePrice').value = book.salePrice != null ? book.salePrice : '';
-
-            // 설명
-            if (descriptionEditor) {
-                descriptionEditor.setData(book.description || '');
-            } else {
-                document.getElementById('description').value = book.description || '';
-            }
-
-            // 출판일 처리
-            let dateString = '';
-            const pd = book.publishDate;
-            if (typeof pd === 'string') {
-                // ISO 문자열
-                dateString = pd.split('T')[0];
-            } else if (Array.isArray(pd) && pd.length >= 3) {
-                // [year, month, day, ...]
-                const [y, m, d] = pd;
-                const mm = String(m).padStart(2, '0');
-                const dd = String(d).padStart(2, '0');
-                dateString = `${y}-${mm}-${dd}`;
-            } else if (pd && typeof pd === 'object') {
-                // { year:…, monthValue:…, dayOfMonth:… }
-                const y = pd.year || pd.yearValue || '';
-                const m = pd.monthValue || pd.month || 0;
-                const d = pd.dayOfMonth || pd.day || 0;
-                const mm = String(m).padStart(2, '0');
-                const dd = String(d).padStart(2, '0');
-                dateString = y ? `${y}-${mm}-${dd}` : '';
-            }
-            document.getElementById('publishDate').value = dateString;
-
-            //이미지
-            document.getElementById('imgUrl').value = book.imgUrl || '';
-            document.getElementById('uploadedImageUrl').value = book.imgUrl || '';
-
-            if (book.imgUrl) {
-                document.getElementById('uploadedImagePreview').innerHTML = `
-      <img src="${book.imgUrl}"
-           style="width:180px; border:2px solid #007bff; padding:6px; border-radius:6px;" />
-      <div style="margin-top:5px; font-size:14px; color:green;">
-        외부 이미지 사용
-      </div>
-    `;
-            } else {
-                document.getElementById('uploadedImagePreview').innerHTML = '';
-            }
-
-            // 결과 숨기기
-            document.getElementById('aladinSearchResults').style.display = 'none';
-            document.getElementById('paginationControls').innerHTML = '';
+        function highlightSelectedCard(isbn) {
+            document.querySelectorAll('#aladinResultsList li').forEach(li => {
+                if (li.innerHTML.includes(isbn)) {
+                    li.style.border = '2px solid #007bff';
+                    li.style.backgroundColor = '#e9f5ff';
+                } else {
+                    li.style.border = 'none';
+                    li.style.backgroundColor = 'transparent';
+                }
+            });
         }
 
         // 페이지 네비게이션 렌더링
@@ -517,18 +386,8 @@
         document.querySelector('.admin-btn--primary')
             .addEventListener('click', () => searchAladinBooks(1));
 
-        // 페이지가 로드된 직후, 만약 pubPage 쿼리 파라미터가 있으면 팝업을 열어두자
-        document.addEventListener('DOMContentLoaded', () => {
-            const params = new URL(location).searchParams;
-            if (params.has('pubPage') || params.has('pubKeyword')) {
-                openPopup('publisher');
-            }
-        });
 
-        //카테고리, 작가, 출판사, 태그
-
-        const pubSize = 10, pubKeyword = '';
-        const authSize = 10, authKeyword = '';
+        //카테고리, 태그
         const tagSize = 10, tagKeyword = '';
 
         function renderCategoryTree(nodes, container) {
@@ -551,73 +410,6 @@
                 }
                 container.appendChild(li);
             });
-        }
-
-        function loadPublishers(page, size, keyword) {
-            fetch(`/admin/chulpansa/search?page=${page}&size=${size}&searchKeyword=${encodeURIComponent(keyword)}`, {
-                headers: {'Accept': 'application/json'}
-            })
-                .then(res => res.json())
-                .then(data => {
-                    // 체크박스 리스트 갱신…
-                    const ul = document.getElementById('publisherResults');
-                    ul.innerHTML = data.content.map(pub => `
-  <li>
-    <label>
-      <input type="checkbox" name="publisherIdList" value="${pub.id}"/>
-      ${pub.name}
-    </label>
-  </li>
-`).join('');
-
-
-                    // 페이징 UI 갱신…
-                    const pag = document.getElementById('publisherPagination');
-                    let html = '';
-                    if (data.pageable.pageNumber > 0) {
-                        html += `<button type="button" onclick="loadPublishers(${data.pageable.pageNumber - 1},${size},'${keyword}')">&laquo; 이전</button>`;
-                    }
-                    for (let i = 0; i < data.totalPages; i++) {
-                        html += `<button type="button" class="${i === data.pageable.pageNumber ? 'active' : ''}"
-                    onclick="loadPublishers(${i},${size},'${keyword}')">${i + 1}</button>`;
-                    }
-                    if (data.pageable.pageNumber < data.totalPages - 1) {
-                        html += `<button type="button" onclick="loadPublishers(${data.pageable.pageNumber + 1},${size},'${keyword}')">다음 &raquo;</button>`;
-                    }
-                    pag.innerHTML = html;
-                });
-        }
-
-        function loadAuthors(page, size, keyword) {
-            fetch(`/admin/authors/search?page=${page}&size=${size}&searchKeyword=${encodeURIComponent(keyword)}`, {
-                headers: {'Accept': 'application/json'}
-            })
-                .then(res => res.json())
-                .then(data => {
-                    const ul = document.getElementById('authorResults');
-                    ul.innerHTML = data.content.map(a => `
-  <li>
-    <label>
-      <input type="checkbox" name="authorIdList" value="${a.id}"/>
-      ${a.name}
-    </label>
-  </li>
-      `).join('');
-                    // 페이징 버튼
-                    const pag = document.getElementById('authorPagination');
-                    let html = '';
-                    if (data.pageable.pageNumber > 0) {
-                        html += `<button onclick="loadAuthors(${data.pageable.pageNumber - 1},${size},'${keyword}')">&laquo;</button>`;
-                    }
-                    for (let i = 0; i < data.totalPages; i++) {
-                        html += `<button class="${i === data.pageable.pageNumber ? 'active' : ''}"
-                    onclick="loadAuthors(${i},${size},'${keyword}')">${i + 1}</button>`;
-                    }
-                    if (data.pageable.pageNumber < data.totalPages - 1) {
-                        html += `<button onclick="loadAuthors(${data.pageable.pageNumber + 1},${size},'${keyword}')">&raquo;</button>`;
-                    }
-                    pag.innerHTML = html;
-                })
         }
 
         function loadTags(page, size, keyword) {
@@ -712,7 +504,7 @@
         }
 
 
-        ['category', 'author', 'publisher'].forEach(type => {
+        ['category'].forEach(type => {
             document.getElementById(type + 'Search').addEventListener('input', () => {
                 const q = document.getElementById(type + 'Search').value.toLowerCase();
                 document.querySelectorAll(`#${type}Results li`).forEach(li => {
@@ -721,44 +513,6 @@
             });
         });
 
-        // Presigned URL을 이용한 단일 이미지 업로드
-        async function uploadImageToPresignedUrl() {
-            const fileInput = document.getElementById("bookImage");
-            const file = fileInput.files[0];
-            if (!file) {
-                alert("이미지를 선택하세요.");
-                return;
-            }
-            const presignedUrl = document.getElementById("presignedUploadUrl").value;
-            try {
-                const res = await fetch(presignedUrl, {
-                    method: "PUT",
-                    headers: {"Content-Type": file.type},
-                    body: file
-                });
-                if (!res.ok) throw new Error("Upload failed");
-
-                const imageUrl = presignedUrl.split("?")[0];
-                document.getElementById("uploadedImageUrl").value = imageUrl;
-                document.getElementById("imgUrl").value = imageUrl;
-                console.log("imgUrl: " + imageUrl);
-                document.getElementById("uploadedImagePreview").innerHTML = `
-                    <img src="${imageUrl}"
-                         style="width:180px;
-                                border:2px solid #007bff;
-                                padding:6px;
-                                border-radius:6px;" />
-                    <div style="margin-top:5px;
-                                font-size:14px;
-                                color:green;">
-                        이미지 업로드 완료
-                    </div>`;
-                fileInput.value = "";
-            } catch (err) {
-                console.error(err);
-                alert("업로드 중 오류 발생");
-            }
-        }
     </script>
 </th:block>
 

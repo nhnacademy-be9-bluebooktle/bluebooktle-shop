@@ -40,7 +40,7 @@
             </li>
 
             <li class="admin-sidebar__nav-item has-submenu"
-                th:classappend="${#strings.startsWith(currentURI, '/admin/books')} ? 'open active-parent' : ''">
+                th:classappend="${#strings.startsWith(currentURI, '/admin/books')  or #strings.startsWith(currentURI, '/admin/aladin/books') } ? 'open active-parent' : ''">
                 <a href="#"> <i class="fas fa-book"></i> 도서 관리 <i class="fas fa-angle-down submenu-toggle-icon"></i>
                 </a>
                 <ul class="admin-sidebar__nav-submenu">
@@ -48,8 +48,8 @@
                            th:classappend="${currentURI == '/admin/books'} ? 'active' : ''">도서 목록</a></li>
                     <li><a th:href="@{/admin/books/new}"
                            th:classappend="${currentURI == '/admin/books/new'} ? 'active' : ''">도서 등록</a></li>
-                    <li><a th:href="@{/admin/aladinBooks/new}"
-                           th:classappend="${currentURI == '/admin/aladinBooks/new'} ? 'active' : ''">알라딘 API 도서 등록</a>
+                    <li><a th:href="@{/admin/aladin/books/new}"
+                           th:classappend="${currentURI == '/admin/aladin/books/new'} ? 'active' : ''">알라딘 API 도서 등록</a>
                     </li>
                 </ul>
             </li>
