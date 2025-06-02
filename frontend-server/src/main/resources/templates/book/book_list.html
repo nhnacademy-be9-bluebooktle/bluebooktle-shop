@@ -65,9 +65,6 @@
             background-color: var(--kitsch-color-1);
         }
 
-        /* book-grid-kitsch는 styles.css에 정의된 것을 사용 */
-        /* book-item-kitsch는 styles.css에 정의된 것을 사용 */
-
         .book-item-kitsch .add-to-cart-btn-kitsch {
             display: block;
             width: calc(100% - 1.6rem); /* 패딩 고려 */
@@ -75,7 +72,14 @@
             font-size: 0.9rem;
         }
 
-        /* 페이지네이션은 styles.css의 .pagination-kitsch 사용 */
+        .book-grid-kitsch.list-page-grid-kitsch {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 2rem;
+            justify-content: center;
+            max-width: 1200px; /* 💡 너무 넓지 않게 제한 */
+            margin: 0 auto; /* 💡 가운데 정렬 */
+        }
 
     </style>
 </head>

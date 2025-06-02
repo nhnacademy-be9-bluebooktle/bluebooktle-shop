@@ -8,7 +8,7 @@ import shop.bluebooktle.common.dto.book.response.BookAllResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
 import shop.bluebooktle.frontend.config.feign.FeignGlobalConfig;
 
-@FeignClient(name = "backend-server", contextId = "BookRepository", path = "/api/books", configuration = FeignGlobalConfig.class)
+@FeignClient(name = "backend-server", contextId = "bookRepository", path = "/api/books", configuration = FeignGlobalConfig.class)
 public interface BookRepository {
 
 	@GetMapping
