@@ -23,7 +23,7 @@ import shop.bluebooktle.backend.coupon.repository.CouponRepository;
 import shop.bluebooktle.backend.user.repository.MembershipLevelRepository;
 import shop.bluebooktle.backend.user.repository.UserRepository;
 import shop.bluebooktle.common.converter.ProfileAwareStringCryptoConverter;
-import shop.bluebooktle.common.domain.CouponTypeTarget;
+import shop.bluebooktle.common.domain.coupon.CouponTypeTarget;
 import shop.bluebooktle.common.dto.coupon.response.CouponResponse;
 import shop.bluebooktle.common.dto.coupon.response.CouponTypeResponse;
 import shop.bluebooktle.common.util.CryptoUtils;
