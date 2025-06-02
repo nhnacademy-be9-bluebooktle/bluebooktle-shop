@@ -1,13 +1,14 @@
 package shop.bluebooktle.backend.user.service.impl;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.user.repository.MembershipLevelRepository;
 import shop.bluebooktle.backend.user.repository.UserRepository;
@@ -15,9 +16,11 @@ import shop.bluebooktle.backend.user.service.UserService;
 import shop.bluebooktle.common.dto.user.request.AdminUserUpdateRequest;
 import shop.bluebooktle.common.dto.user.request.UserSearchRequest;
 import shop.bluebooktle.common.dto.user.request.UserUpdateRequest;
+import shop.bluebooktle.common.dto.user.response.AddressResponse;
 import shop.bluebooktle.common.dto.user.response.AdminUserResponse;
 import shop.bluebooktle.common.dto.user.response.UserResponse;
 import shop.bluebooktle.common.dto.user.response.UserTotalPointResponse;
+import shop.bluebooktle.common.dto.user.response.UserWithAddressResponse;
 import shop.bluebooktle.common.entity.auth.MembershipLevel;
 import shop.bluebooktle.common.entity.auth.User;
 import shop.bluebooktle.common.exception.auth.UserNotFoundException;
@@ -26,12 +29,13 @@ import shop.bluebooktle.common.exception.user.InvalidUserIdException;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class UserServiceImpl implements UserService {
 	private final UserRepository userRepository;
 	private final MembershipLevelRepository membershipLevelRepository;
 
 	@Override
-	@Transactional
+	@Transactional(readOnly = true)
 	public UserResponse findByUserId(Long userId) {
 		if (userId == null) {
 			throw new InvalidUserIdException();
@@ -68,14 +72,14 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(readOnly = true)
 	public Page<AdminUserResponse> findUsers(UserSearchRequest request, Pageable pageable) {
 		Page<User> userPage = userRepository.findUsersBySearchRequest(request, pageable);
 		return userPage.map(AdminUserResponse::fromEntity);
 	}
 
 	@Override
-	@Transactional
+	@Transactional(readOnly = true)
 	public AdminUserResponse findUserByIdAdmin(Long userId) {
 		User user = userRepository.findById(userId)
 			.orElseThrow(UserNotFoundException::new);
@@ -83,7 +87,6 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	@Transactional
 	public void updateUserAdmin(Long userId, AdminUserUpdateRequest request) {
 		User user = userRepository.findById(userId)
 			.orElseThrow(UserNotFoundException::new);
@@ -109,8 +112,34 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public UserTotalPointResponse findUserTotalPoints(Long userId) {
 		BigDecimal totalPoints = userRepository.findPointBalanceByLoginId(userId).orElse(BigDecimal.ZERO);
 		return new UserTotalPointResponse(totalPoints);
 	}
+
+	@Override
+	public UserWithAddressResponse findUserWithAddress(Long userId) {
+		User user = userRepository.findUserWithAddresses(userId)
+			.orElseThrow(UserNotFoundException::new);
+		
+		List<AddressResponse> addresses = user.getAddresses().stream()
+			.map(a -> new AddressResponse(
+				a.getId(),
+				a.getAlias(),
+				a.getRoadAddress(),
+				a.getDetailAddress(),
+				a.getPostalCode()
+			)).toList();
+
+		return new UserWithAddressResponse(
+			user.getId(),
+			user.getName(),
+			user.getEmail(),
+			user.getPhoneNumber(),
+			user.getPointBalance(),
+			addresses
+		);
+	}
+
 }

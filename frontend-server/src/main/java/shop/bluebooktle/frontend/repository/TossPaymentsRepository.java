@@ -15,8 +15,6 @@ import shop.bluebooktle.frontend.config.feign.TossFeignConfig;
 	configuration = TossFeignConfig.class
 )
 public interface TossPaymentsRepository {
-
 	@PostMapping(value = "/payments/confirm", consumes = MediaType.APPLICATION_JSON_VALUE)
 	PaymentConfirmResponse confirmPayment(@RequestBody PaymentConfirmRequest request);
-
 }

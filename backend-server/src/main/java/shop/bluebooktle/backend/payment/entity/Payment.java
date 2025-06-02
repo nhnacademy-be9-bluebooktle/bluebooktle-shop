@@ -20,6 +20,7 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 import shop.bluebooktle.backend.order.entity.Order;
 import shop.bluebooktle.common.entity.BaseEntity;
@@ -41,6 +42,7 @@ public class Payment extends BaseEntity {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "order_id", nullable = false)
+	@Setter
 	private Order order;
 
 	@OneToOne(fetch = FetchType.LAZY)

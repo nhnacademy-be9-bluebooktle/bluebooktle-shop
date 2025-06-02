@@ -1,5 +1,7 @@
 package shop.bluebooktle.backend.book.controller;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -21,7 +23,9 @@ import shop.bluebooktle.backend.book.service.BookService;
 import shop.bluebooktle.common.dto.book.request.BookAllRegisterRequest;
 import shop.bluebooktle.common.dto.book.request.BookRegisterRequest;
 import shop.bluebooktle.common.dto.book.request.BookUpdateRequest;
+import shop.bluebooktle.common.dto.book.response.AladinBookResponse;
 import shop.bluebooktle.common.dto.book.response.BookAllResponse;
+import shop.bluebooktle.common.dto.book.response.BookCartOrderResponse;
 import shop.bluebooktle.common.dto.book.response.BookRegisterResponse;
 import shop.bluebooktle.common.dto.book.response.BookResponse;
 import shop.bluebooktle.common.dto.book.response.BookUpdateResponse;
@@ -86,6 +90,15 @@ public class BookController {
 	) {
 		PaginationData<BookAllResponse> data = bookService.findAllBooks(page, size, searchKeyword);
 		return ResponseEntity.ok(JsendResponse.success(data));
+	}
+
+	@GetMapping("/order/{bookId}")
+	public ResponseEntity<JsendResponse<BookCartOrderResponse>> getBookCartOrders(
+		@PathVariable Long bookId,
+		@RequestParam("quantity") int quantity
+	) {
+		BookCartOrderResponse response = bookService.getBookCartOrder(bookId, quantity);
+		return ResponseEntity.ok(JsendResponse.success(response));
 	}
 
 	// TODO 관리자페이지 먼저 하고나서 수정

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>배송지 선택 테스트</title>
+    <style>
+        #savedAddressInfo, #newAddressForm {
+            border: 1px dashed #888;
+            padding: 8px;
+            margin: 8px 0;
+        }
+    </style>
+</head>
+<body>
+<h2>배송지 선택 테스트</h2>
+<select id="shippingAddressOption">
+    <option data-detail="101호" data-name="홍길동 집" data-road="서울 종로구 삼청로 1" value="1">홍길동 집</option>
+    <option data-detail="2층" data-name="김철수 회사" data-road="서울 강남구 테헤란로 2" value="2">김철수 회사</option>
+    <option value="new">+ 새 주소 입력</option>
+</select>
+
+<div id="savedAddressInfo">
+    <p><strong>배송지명:</strong> <span id="savedAlias">—</span></p>
+    <p><strong>주소:</strong> <span id="savedRoad">—</span></p>
+    <p><strong>상세주소:</strong> <span id="savedDetail">—</span></p>
+</div>
+
+<div id="newAddressForm" style="display:none;">
+    <p>여기가 새 주소 입력 폼입니다.</p>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const selectEl = document.getElementById('shippingAddressOption');
+        const infoEl = document.getElementById('savedAddressInfo');
+        const formEl = document.getElementById('newAddressForm');
+        const aliasEl = document.getElementById('savedAlias');
+        const roadEl = document.getElementById('savedRoad');
+        const detailEl = document.getElementById('savedDetail');
+
+        function update() {
+            const opt = selectEl.selectedOptions[0];
+            console.log('[DEBUG] selected:', opt.value, opt.dataset);
+            if (opt.value === 'new') {
+                infoEl.style.display = 'none';
+                formEl.style.display = 'block';
+            } else {
+                aliasEl.textContent = opt.dataset.name || '정보 없음';
+                roadEl.textContent = opt.dataset.road || '정보 없음';
+                detailEl.textContent = opt.dataset.detail || '상세주소 없음';
+                formEl.style.display = 'none';
+                infoEl.style.display = 'block';
+            }
+        }
+
+        selectEl.addEventListener('change', update);
+        update(); // 초기 표시
+    });
+</script>
+</body>
+</html>

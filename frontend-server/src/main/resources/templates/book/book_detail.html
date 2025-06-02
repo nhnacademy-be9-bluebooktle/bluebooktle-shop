@@ -518,13 +518,14 @@
                         <button class="quantity-btn-kitsch plus-btn-kitsch" onclick="changeDetailQuantity(1)">+</button>
                     </div>
                     <div class="action-buttons-kitsch">
-                        <button class="btn-kitsch primary-btn-kitsch retro-shadow-kitsch"><i class="fas fa-bolt"></i>
+                        <button class="btn-kitsch primary-btn-kitsch retro-shadow-kitsch"
+                                onclick="handleGoToOrder(event)"><i class="fas fa-bolt"></i>
                             바로구매
                         </button>
-                        <input type="hidden" id="bookId" th:value="${bookId}">
-                        <button type="button"
+                        <input id="bookId" th:value="${bookId}" type="hidden">
+                        <button class="btn-kitsch secondary-btn-kitsch color2-kitsch retro-shadow-kitsch"
                                 onclick="handleAddToCart(event)"
-                                class="btn-kitsch secondary-btn-kitsch color2-kitsch retro-shadow-kitsch">
+                                type="button">
                             <i class="fas fa-shopping-cart"></i> 장바구니
                         </button>
                         <button class="btn-kitsch secondary-btn-kitsch color5-kitsch retro-shadow-kitsch like-btn-kitsch"
@@ -658,7 +659,7 @@
                 <button class="btn-kitsch primary-btn-kitsch" onclick="hideKitschModal('addToCartSuccessModal')">
                     쇼핑 계속하기
                 </button>
-                <a href="/cart" class="btn-kitsch secondary-btn-kitsch color2-kitsch" style="text-align:center;">
+                <a class="btn-kitsch secondary-btn-kitsch color2-kitsch" href="/cart" style="text-align:center;">
                     장바구니로 이동
                 </a>
             </div>
@@ -738,6 +739,18 @@
             });
 
             return false;
+        }
+
+        function handleGoToOrder(event) {
+            event.preventDefault();
+            console.debug('✅ handleAddToCart 실행됨');
+
+            const bookId = document.getElementById('bookId').value;
+            const quantity = document.getElementById('detailQuantity').value;
+
+            const params = new URLSearchParams({bookId, quantity});
+
+            window.location.href = `/order/create?${params.toString()}`;
         }
 
         // 좋아요 버튼 토글 (상세페이지용)

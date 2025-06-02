@@ -26,6 +26,7 @@ import shop.bluebooktle.backend.book.service.BookService;
 import shop.bluebooktle.common.dto.book.request.BookRegisterRequest;
 import shop.bluebooktle.common.dto.book.request.BookUpdateRequest;
 import shop.bluebooktle.common.dto.book.response.BookAllResponse;
+import shop.bluebooktle.common.dto.book.response.BookCartOrderResponse;
 import shop.bluebooktle.common.dto.book.response.BookRegisterResponse;
 import shop.bluebooktle.common.dto.book.response.BookResponse;
 import shop.bluebooktle.common.dto.book.response.BookUpdateResponse;
@@ -220,6 +221,23 @@ public class BookServiceImpl implements BookService {
 		Page<BookAllResponse> dtoPage = new PageImpl<>(content, pageable, bookPage.getTotalElements());
 
 		return new PaginationData<>(dtoPage);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public BookCartOrderResponse getBookCartOrder(Long bookId, int quantity) {
+		Book book = bookRepository.findById(bookId).orElseThrow(BookNotFoundException::new);
+		BookSaleInfo saleInfo = getBookSaleInfoByBookId(book.getId());
+
+		return new BookCartOrderResponse(
+			bookId,
+			book.getTitle(),
+			saleInfo.getPrice(),
+			saleInfo.getSalePrice(),
+			getThumbnailUrlByBookId(bookId),
+			getCategoriesByBookId(book.getId()),
+			saleInfo.isPackable(),
+			quantity);
 	}
 
 	// //메인페이지에 표시될 정보(id, title, author, price, salePrice, imgUrl) 조회
