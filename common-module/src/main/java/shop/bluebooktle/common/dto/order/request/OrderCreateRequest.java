@@ -57,6 +57,23 @@ public record OrderCreateRequest(
 	String address,
 
 	@NotBlank(message = "상세 주소는 필수입니다.")
-	String detailAddress
+	String detailAddress,
+
+	@DecimalMin(value = "0", inclusive = true, message = "쿠폰 할인액은 0원 이상이어야 합니다.")
+	BigDecimal couponDiscountAmount,
+
+	@DecimalMin(value = "0", inclusive = true, message = "포인트 사용액 0원 이상이어야 합니다.")
+	BigDecimal pointUseAmount,
+
+	@DecimalMin(value = "0", inclusive = true, message = "책기본할인금액은 0원 이상이어야 합니다.")
+	BigDecimal saleDiscountAmount,
+
+	@DecimalMin(value = "0", inclusive = true, message = "결제 원금은 0원 이상이어야 합니다.")
+	BigDecimal originalAmount,
+
+	@NotNull(message = "주문 키는 필수입니다.")
+	@NotBlank(message = "주문 키는 비어있을 수 없습니다.")
+	String orderKey
+
 ) {
 }

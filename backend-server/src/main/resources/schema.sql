@@ -479,9 +479,14 @@ CREATE TABLE `orders`
     `detail_address`          varchar(255)   NOT NULL,
     `postal_code`             varchar(5)     NOT NULL,
     `tracking_number`         varchar(14)    NULL,
+    `order_key`               varchar(255)   NOT NULL COMMENT '비회원이 주문을 확인하기 위해 사용하는 비밀번호입니다.',
+    `coupon_discount_amount`  decimal(10, 2) NULL COMMENT '쿠폰 할인 금액',
+    `point_discount_amount`   decimal(10, 2) NULL COMMENT '포인트 사용 금액',
+    `sale_discount_amount`    decimal(10, 2) NULL COMMENT '세일 할인 금액',
+    `original_amount`         decimal(10, 2) NOT NULL COMMENT '결제원금',
     `created_at`              timestamp      NOT NULL,
     `deleted_at`              timestamp      NULL,
-    `order_key`               varchar(255)   NULL COMMENT '비회원이 주문을 확인하기 위해 사용하는 비밀번호입니다.',
+
 
     CONSTRAINT `PK_ORDERS` PRIMARY KEY (`order_id`),
     CONSTRAINT `FK_order_order_state_id_order_state`
@@ -518,7 +523,7 @@ CREATE TABLE `payment`
     `payment_id`        bigint         NOT NULL AUTO_INCREMENT,
     `order_id`          bigint         NOT NULL,
     `payment_detail_id` bigint         NOT NULL,
-    `price`             decimal(10, 2) NOT NULL,
+    `paid_amount`       decimal(10, 2) NOT NULL,
     `created_at`        timestamp      NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `deleted_at`        timestamp      NULL,
 

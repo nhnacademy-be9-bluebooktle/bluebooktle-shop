@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
@@ -34,8 +35,6 @@ import shop.bluebooktle.backend.order.repository.DeliveryRuleRepository;
 import shop.bluebooktle.backend.order.repository.OrderRepository;
 import shop.bluebooktle.backend.order.repository.OrderStateRepository;
 import shop.bluebooktle.backend.order.service.OrderService;
-import shop.bluebooktle.backend.payment.entity.Payment;
-import shop.bluebooktle.backend.payment.repository.PaymentRepository;
 import shop.bluebooktle.backend.user.repository.UserRepository;
 import shop.bluebooktle.common.domain.order.OrderStatus;
 import shop.bluebooktle.common.dto.coupon.CalculatedDiscountDetails;
@@ -68,7 +67,6 @@ public class OrderServiceImpl implements OrderService {
 	private final BookRepository bookRepository;
 	private final BookOrderRepository bookOrderRepository;
 	private final PackagingOptionRepository packagingOptionRepository;
-	private final PaymentRepository paymentRepository;
 
 	@Override
 	@Transactional(readOnly = true)
@@ -88,8 +86,11 @@ public class OrderServiceImpl implements OrderService {
 		}
 
 		return orderPage.map(o -> {
-			Payment payment = paymentRepository.findByOrder(o).orElse(null);
-			BigDecimal paidAmount = payment == null ? null : payment.getPrice();
+			BigDecimal paidAmount = o.getOriginalAmount()
+				.subtract(Optional.ofNullable(o.getCouponDiscountAmount())
+					.orElse(BigDecimal.ZERO))
+				.subtract(Optional.ofNullable(o.getPointUseAmount())
+					.orElse(BigDecimal.ZERO));
 			return new OrderHistoryResponse(
 				o.getId(),                     // orderId
 				o.getCreatedAt(),              // createAt
@@ -137,8 +138,12 @@ public class OrderServiceImpl implements OrderService {
 			.postalCode(request.postalCode())
 			.address(request.address())
 			.detailAddress(request.detailAddress())
+			.couponDiscountAmount(request.couponDiscountAmount())
+			.pointUseAmount(request.pointUseAmount())
+			.saleDiscountAmount(request.saleDiscountAmount())
+			.originalAmount(request.originalAmount())
 			.trackingNumber(null)
-			.orderKey(null)
+			.orderKey(request.orderKey())
 			.build();
 
 		Order saved = orderRepository.save(order);

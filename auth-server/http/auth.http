@@ -3,11 +3,11 @@
 @baseUrl = http://localhost:9011/auth
 
 # 변수 설정 (필요에 따라 수정)
-@validLoginId = testuser123
-@validPassword = password123!
-@validNickname = 테스트닉네임
-@validName = 테스트사용자
-@validEmail = testuser@example.com
+@validLoginId = qqqq
+@validPassword = qqqq1111
+@validNickname = q
+@validName = q
+@validEmail = q@q
 @validBirth = 19900101
 @validPhoneNumber = 01012345678
 

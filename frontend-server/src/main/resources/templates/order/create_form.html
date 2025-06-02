@@ -360,6 +360,10 @@
                                        th:value="${defaultOrderName}"
                                        type="hidden"/>
 
+                                <input name="orderKey"
+                                       th:value="${orderKey}"
+                                       type="hidden"/>
+
 
                                 <img alt="" th:alt="${item.title}" th:src="${item.thumbnailUrl}"/>
                                 <div class="ordered-item-details-kitsch">
@@ -470,6 +474,9 @@
                         <input id="hiddenAddress" name="address" type="hidden" value=""/>
                         <input id="hiddenDetailAddress" name="detailAddress" type="hidden" value=""/>
                         <input id="hiddenReceiverEmail" name="receiverEmail" type="hidden" value=""/>
+                        <input id="hiddenOriginalAmount" name="originalAmount" type="hidden" value="0"/>
+                        <input id="hiddenSaleDiscountAmount" name="saleDiscountAmount" type="hidden" value="0"/>
+                        <input id="hiddenPointUseAmount" name="pointUseAmount" type="hidden" value="0"/>
 
                         <div class="form-group-kitsch">
                             <label class="label-kitsch" for="shippingAddressOption">배송지 선택:</label>
@@ -609,10 +616,37 @@
                             <span class="value discount" id="summaryTotalDiscount">0원</span>
                         </div>
 
+                        <div class="form-group-kitsch">
+                            <label class="label-kitsch" for="pointsToUse" style="font-size:1em;">
+                                포인트 사용 (보유: <span th:text="${user.pointBalance}">0</span> P):
+                            </label>
+                            <div style="display:flex; gap:0.5rem;">
+                                <input
+                                        class="input-kitsch pixel-font-kitsch"
+                                        id="pointsToUse"
+                                        name="pointsToUse"
+                                        placeholder="사용할 포인트"
+                                        th:attr="data-available-points=${user.pointBalance},max=${user.pointBalance}"
+                                        th:value="0"
+                                        type="number"/>
+                                <button
+                                        class="btn-kitsch secondary-btn-kitsch color2-kitsch small-btn-kitsch retro-shadow-kitsch-small"
+                                        onclick="applyMaxPoints()"
+                                        style="min-width: fit-content;"
+                                        type="button">
+                                    전액 사용
+                                </button>
+                            </div>
+                        </div>
 
                         <div class="summary-row-kitsch">
                             <span class="label">주문 전체 할인:</span>
                             <span class="value discount" id="summaryOrderCouponDiscount">0원</span>
+                        </div>
+
+                        <div class="summary-row-kitsch">
+                            <span class="label">포인트 할인:</span>
+                            <span class="value discount" id="summaryPointDiscount">0원</span>
                         </div>
 
                         <div class="summary-row-kitsch">
@@ -637,8 +671,6 @@
                             </div>
                         </div>
                     </section>
-
-
                     <button
                             class="btn-kitsch primary-btn-kitsch checkout-submit-btn-kitsch retro-shadow-kitsch"
                             id="payment-button"
@@ -651,12 +683,10 @@
         </form>
         <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
         <script th:inline="javascript">
-            // 전역: 백엔드에서 내려오는 단일 deliveryRule 객체
+
             const deliveryRule = /*[[${deliveryRule}]]*/ null;
 
             document.addEventListener('DOMContentLoaded', () => {
-                // -------------------------------------------------
-                // 1) 배송지 선택 토글 처리 및 hidden 필드 동기화
                 const selectEl = document.getElementById('shippingAddressOption');
                 const infoEl = document.getElementById('savedAddressInfo');
                 const formEl = document.getElementById('newAddressForm');
@@ -678,7 +708,10 @@
                     }
                     syncAddressFields();
                     updateDeliveryFee();
-                    updateFinalTotalPrice();
+                    updatePriceSummary();               // 총 상품 금액·할인액 계산
+                    updatePackagingFee();
+                    updatePointDiscount();              // 포인트 제한값 재계산
+                    updateFinalTotalPrice();            // 최종 결제 금액 계산
                 }
 
                 selectEl.addEventListener('change', updateAddress);
@@ -687,18 +720,12 @@
                 function syncAddressFields() {
                     const opt = selectEl.selectedOptions[0];
                     if (opt.value === 'new') {
-                        document.getElementById('hiddenReceiverName').value =
-                            document.getElementById('recipientName').value;
-                        document.getElementById('hiddenReceiverPhoneNumber').value =
-                            document.getElementById('recipientPhone').value;
-                        document.getElementById('hiddenPostalCode').value =
-                            document.getElementById('shippingPostcode').value;
-                        document.getElementById('hiddenAddress').value =
-                            document.getElementById('shippingAddress').value;
-                        document.getElementById('hiddenDetailAddress').value =
-                            document.getElementById('shippingDetailAddress').value;
-                        document.getElementById('hiddenReceiverEmail').value =
-                            document.getElementById('recipientEmail').value;
+                        document.getElementById('hiddenReceiverName').value = document.getElementById('recipientName').value || '';
+                        document.getElementById('hiddenReceiverPhoneNumber').value = document.getElementById('recipientPhone').value || '';
+                        document.getElementById('hiddenPostalCode').value = document.getElementById('shippingPostcode').value || '';
+                        document.getElementById('hiddenAddress').value = document.getElementById('shippingAddress').value || '';
+                        document.getElementById('hiddenDetailAddress').value = document.getElementById('shippingDetailAddress').value || '';
+                        document.getElementById('hiddenReceiverEmail').value = document.getElementById('recipientEmail').value || '';
                     } else {
                         document.getElementById('hiddenReceiverName').value = opt.dataset.name || '';
                         document.getElementById('hiddenReceiverPhoneNumber').value = opt.dataset.phone || '';
@@ -710,7 +737,7 @@
                 }
 
                 // -------------------------------------------------
-                // 2) 수량 조절 버튼: 책 수량 증가/감소
+                // 2) 수량 조절 버튼: 책 수량 증가/감소 및 hidden 동기화
                 document.querySelectorAll('.qty-decrease').forEach(btn => {
                     btn.addEventListener('click', () => {
                         const itemEl = btn.closest('.ordered-item-kitsch');
@@ -720,31 +747,29 @@
                             qty -= 1;
                             qtySpan.textContent = qty;
                         }
-                        const idx = Array.from(document.querySelectorAll('.ordered-item-kitsch'))
-                            .indexOf(itemEl);
-                        // 책 수량이 줄어들면 포장 수량이 초과하지 않도록 보정
+                        const idx = Array.from(document.querySelectorAll('.ordered-item-kitsch')).indexOf(itemEl);
+
+                        // 책 수량 줄어들면 포장 수량 보정
                         const packQtySpan = itemEl.querySelector('.item-pack-qty-display');
                         let packQty = parseInt(packQtySpan.textContent, 10) || 0;
                         if (packQty > qty) {
-                            packQty = qty;
-                            packQtySpan.textContent = packQty;
-                            const idx = Array.from(document.querySelectorAll('.ordered-item-kitsch')).indexOf(itemEl);
-                            document.getElementById(`hiddenPackagingQuantity-${idx}`).value = packQty;
+                            packQtySpan.textContent = qty;
+                            document.getElementById(`hiddenPackagingQuantity-${idx}`).value = qty;
                         }
 
+                        // hidden: 책 수량 동기화
                         const hiddenQtyInput = document.getElementById(`hiddenBookQuantity-${idx}`);
                         if (hiddenQtyInput) {
                             hiddenQtyInput.value = qty;
                         }
 
-
                         updatePriceSummary();
                         updatePackagingFee();
                         updateDeliveryFee();
+                        updatePointDiscount();
                         updateFinalTotalPrice();
                     });
                 });
-
                 document.querySelectorAll('.qty-increase').forEach(btn => {
                     btn.addEventListener('click', () => {
                         const itemEl = btn.closest('.ordered-item-kitsch');
@@ -753,44 +778,42 @@
                         qty += 1;
                         qtySpan.textContent = qty;
 
-                        const idx = Array.from(document.querySelectorAll('.ordered-item-kitsch'))
-                            .indexOf(itemEl);
-
+                        const idx = Array.from(document.querySelectorAll('.ordered-item-kitsch')).indexOf(itemEl);
+                        // hidden: 책 수량 동기화
                         const hiddenQtyInput = document.getElementById(`hiddenBookQuantity-${idx}`);
                         if (hiddenQtyInput) {
                             hiddenQtyInput.value = qty;
                         }
 
-
                         updatePriceSummary();
                         updatePackagingFee();
                         updateDeliveryFee();
+                        updatePointDiscount();
                         updateFinalTotalPrice();
                     });
                 });
 
                 // -------------------------------------------------
-                // 3) 포장 옵션 선택 시 → “포장 수량” UI 표시/초기화 및 hidden 필드 동기화
+                // 3) 포장 옵션 선택 시 → “포장 수량” UI 표시/초기화 및 hidden 동기화
                 document.querySelectorAll('.item-packaging-select').forEach((sel, idx) => {
                     sel.addEventListener('change', () => {
                         const itemEl = sel.closest('.ordered-item-kitsch');
                         const packQtyContainer = itemEl.querySelector('.item-pack-quantity-kitsch');
                         const packQtySpan = itemEl.querySelector('.item-pack-qty-display');
 
-                        // 책 수량 읽어와서 maxQty로 사용
+                        // 현재 책 수량을 읽어 maxQty로 사용
                         const qtySpan = itemEl.querySelector('.item-qty-display');
                         const maxQty = qtySpan ? (parseInt(qtySpan.textContent, 10) || 0) : 0;
 
                         if (sel.value === "") {
-                            // 포장 선택 안함
+                            // 포장 선택 안 함
                             packQtyContainer.style.display = 'none';
                             packQtySpan.textContent = '0';
                             document.getElementById(`hiddenPackagingQuantity-${idx}`).value = 0;
                             document.getElementById(`hiddenPackagingOptionId-${idx}`).value = '';
                         } else {
-                            // 포장 옵션 선택하면
+                            // 포장 옵션 선택 시
                             packQtyContainer.style.display = 'flex';
-                            // 초기값은 책 수량
                             const initialPackQty = maxQty > 0 ? maxQty : 1;
                             packQtySpan.textContent = initialPackQty;
                             document.getElementById(`hiddenPackagingQuantity-${idx}`).value = initialPackQty;
@@ -799,6 +822,7 @@
 
                         updatePackagingFee();
                         updateDeliveryFee();
+                        updatePointDiscount();
                         updateFinalTotalPrice();
                     });
                 });
@@ -822,12 +846,10 @@
 
                         updatePackagingFee();
                         updateDeliveryFee();
+                        updatePointDiscount();
                         updateFinalTotalPrice();
                     });
                 });
-
-                // -------------------------------------------------
-                // 5) 포장 수량 증가 버튼 (책 수량 이하로만 늘리기) 및 hidden 동기화
                 document.querySelectorAll('.pack-qty-increase').forEach(btn => {
                     btn.addEventListener('click', () => {
                         const itemEl = btn.closest('.ordered-item-kitsch');
@@ -845,37 +867,54 @@
 
                         updatePackagingFee();
                         updateDeliveryFee();
+                        updatePointDiscount();
                         updateFinalTotalPrice();
                     });
                 });
 
-                
                 // -------------------------------------------------
-                // 7) 결제하기 버튼 클릭 시 모든 hidden 필드 동기화 후 폼 제출
+                // 5) 포인트 입력값 변경 시 재계산 및 hidden 동기화
+                const pointsInput = document.getElementById('pointsToUse');
+                pointsInput.addEventListener('input', () => {
+                    updatePointDiscount();
+                    updateFinalTotalPrice();
+                });
+
+                window.applyMaxPoints = () => {
+                    const avail = parseInt(pointsInput.dataset.availablePoints, 10) || 0;
+                    pointsInput.value = avail;
+                    updatePointDiscount();
+                    updateFinalTotalPrice();
+                };
+
+                // -------------------------------------------------
+                // 6) 결제하기 버튼 클릭 시 모든 hidden 필드 동기화 후 폼 제출
                 document.getElementById('payment-button').addEventListener('click', () => {
                     syncAddressFields();
                     syncDeliveryFee();
-                    // 필요 시 orderCouponId, deliveryRuleId 등 hidden 동기화 추가
-                    // document.getElementById('checkoutForm').submit();
-
+                    // ★ 포인트 사용량 hidden 동기화 ★
+                    document.getElementById('hiddenPointUseAmount').value = document.getElementById('pointsToUse').value || 0;
+                    // (주문 전체 쿠폰은 아직 로직에 들어가지 않으므로 생략)
+                    // form 제출은 버튼이 type="submit"이므로 자동으로 전송됨
                 });
 
                 // -------------------------------------------------
                 // 초기 로드 시 계산 및 hidden 초기값 설정
                 syncAddressFields();
-                document.querySelectorAll('.item-packaging-select').forEach((sel, idx) => {
+                document.querySelectorAll('.item-packaging-select').forEach((_, idx) => {
                     document.getElementById(`hiddenPackagingOptionId-${idx}`).value = '';
                     document.getElementById(`hiddenPackagingQuantity-${idx}`).value = 0;
                 });
                 syncDeliveryFee();
                 updatePriceSummary();
                 updatePackagingFee();
+                updatePointDiscount();
                 updateDeliveryFee();
                 updateFinalTotalPrice();
             });
 
             // ================================================
-            // 1) 총 상품가-할인 계산 (책 수량 기준)
+            // 1) 총 상품가·할인 계산 (책 수량 기준) → hiddenOriginalAmount, hiddenSaleDiscountAmount 업데이트
             function updatePriceSummary() {
                 let totalOriginal = 0, totalSale = 0;
                 document.querySelectorAll('.ordered-item-kitsch').forEach(itemEl => {
@@ -886,15 +925,27 @@
                     totalOriginal += price * qty;
                     totalSale += salePrice * qty;
                 });
+
                 const totalDiscount = totalOriginal - totalSale;
+
+                // 화면에 표시
                 document.getElementById('summaryTotalProductPrice')
                     .textContent = totalOriginal.toLocaleString() + '원';
                 document.getElementById('summaryTotalDiscount')
                     .textContent = '-' + totalDiscount.toLocaleString() + '원';
+
+                // 현재 배송비 (문자열에서 숫자만 추출)
+                const deliveryFee = parseInt(
+                    document.getElementById('summaryDeliveryFee')
+                        .textContent.replace(/[^\d]/g, ''), 10
+                ) || 0;
+
+                document.getElementById('hiddenOriginalAmount').value = totalOriginal + deliveryFee;
+                document.getElementById('hiddenSaleDiscountAmount').value = totalDiscount;
             }
 
             // ================================================
-            // 2) 포장비 계산 (포장 수량 기준)
+            // 2) 포장비 계산 (기존 로직, 변경 없음)
             function updatePackagingFee() {
                 let total = 0;
                 document.querySelectorAll('.ordered-item-kitsch').forEach(itemEl => {
@@ -914,8 +965,37 @@
                     .textContent = total.toLocaleString() + '원';
             }
 
-            // ================================================
-            // 4) 배송비 계산 및 hidden 동기화
+            function updatePointDiscount() {
+                const input = document.getElementById('pointsToUse');
+                let used = parseInt(input.value, 10) || 0;
+                const avail = parseInt(input.dataset.availablePoints, 10) || 0;
+                if (used > avail) {
+                    used = avail;
+                }
+
+                // “포인트 공제 전” 금액 계산
+                const getNum = id => parseInt(
+                    document.getElementById(id).textContent.replace(/[^\d]/g, ''), 10
+                ) || 0;
+
+                const productTotal = getNum('summaryTotalProductPrice');
+                const itemDisc = getNum('summaryTotalDiscount');
+                const orderCouponDisc = getNum('summaryOrderCouponDiscount');
+                const packagingFee = getNum('summaryPackagingFee');
+                const deliveryFee = getNum('summaryDeliveryFee');
+
+                const grossBeforePoints = productTotal - itemDisc - orderCouponDisc + packagingFee + deliveryFee;
+                const maxPointUsage = grossBeforePoints > 0 ? grossBeforePoints : 0;
+
+                if (used > maxPointUsage) {
+                    used = maxPointUsage;
+                }
+
+                input.value = used;
+                document.getElementById('summaryPointDiscount')
+                    .textContent = '- ' + used.toLocaleString() + '원';
+            }
+
             function updateDeliveryFee() {
                 if (!deliveryRule) {
                     document.getElementById('summaryDeliveryFee').textContent = '0원';
@@ -940,7 +1020,7 @@
             }
 
             // ================================================
-            // 5) 최종 결제금액 계산
+            // 5) 최종 결제금액 계산 (포인트 반영 + 음수 방지) → 변경 없음
             function updateFinalTotalPrice() {
                 const getNum = id => parseInt(
                     document.getElementById(id).textContent.replace(/[^\d]/g, ''), 10
@@ -949,12 +1029,14 @@
                 const productTotal = getNum('summaryTotalProductPrice');
                 const itemDisc = getNum('summaryTotalDiscount');
                 const orderCouponDisc = getNum('summaryOrderCouponDiscount');
+                const pointDisc = getNum('summaryPointDiscount');
                 const packagingFee = getNum('summaryPackagingFee');
                 const deliveryFee = getNum('summaryDeliveryFee');
 
                 let finalTotal = productTotal
                     - itemDisc
                     - orderCouponDisc
+                    - pointDisc
                     + packagingFee
                     + deliveryFee;
 
@@ -969,7 +1051,7 @@
                 new daum.Postcode({
                     oncomplete: function (data) {
                         document.getElementById(postcodeId).value = data.zonecode;
-                        var fullAddr = (data.userSelectedType === 'R') ? data.roadAddress : data.jibunAddress;
+                        const fullAddr = (data.userSelectedType === 'R') ? data.roadAddress : data.jibunAddress;
                         document.getElementById(addressId).value = fullAddr;
                         document.getElementById('shippingDetailAddress').focus();
                     }

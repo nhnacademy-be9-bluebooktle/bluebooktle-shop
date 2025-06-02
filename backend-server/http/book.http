@@ -82,7 +82,7 @@ POST http://localhost:{{port}}/api/books
 Content-Type: application/json
 
 {
-  "title": "테스트 제목2",
+  "title": "테스트 제목",
   "authorIdList": [
     1
   ],
