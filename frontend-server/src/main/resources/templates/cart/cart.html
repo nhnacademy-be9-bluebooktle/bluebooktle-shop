@@ -385,11 +385,11 @@
                         <button class="text-btn-kitsch" onclick="selectAllCartItems(true)"><i
                                 class="fas fa-check-double"></i> 전체선택
                         </button>
-                        <form id="selectedDeleteForm" th:action="@{/cart/selected}" method="post"
-                              style="display:inline;">
-                            <input type="hidden" name="_method" value="delete"/>
-                            <input type="hidden" name="bookIds" id="bookIdsInput"/>
-                            <button type="button" class="text-btn-kitsch" onclick="submitSelectedDeleteForm()">
+                        <form id="selectedDeleteForm" method="post" style="display:inline;"
+                              th:action="@{/cart/selected}">
+                            <input name="_method" type="hidden" value="delete"/>
+                            <input id="bookIdsInput" name="bookIds" type="hidden"/>
+                            <button class="text-btn-kitsch" onclick="submitSelectedDeleteForm()" type="button">
                                 <i class="fas fa-trash-alt"></i> 선택삭제
                             </button>
                         </form>
@@ -400,8 +400,8 @@
                     <div class="cart-item-checkbox-kitsch">
                         <label class="checkbox-kitsch">
                             <input checked class="cart-item-select"
-                                   th:value="${item.bookId}"
                                    onchange="updateCartSummary()"
+                                   th:value="${item.bookId}"
                                    type="checkbox">
                             <span class="checkbox-custom-kitsch"></span>
                         </label>
@@ -426,11 +426,11 @@
                             -
                         </button>
                         <input class="quantity-value-kitsch"
-                               th:data-price="${item.salePrice != null ? item.salePrice.intValue() : item.price.intValue()}"
                                min="1"
                                onchange="updateCartItemSubtotal(this)"
-                               type="number"
-                               th:value="${item.quantity}"/>
+                               th:data-price="${item.salePrice != null ? item.salePrice.intValue() : item.price.intValue()}"
+                               th:value="${item.quantity}"
+                               type="number"/>
                         <button class="quantity-btn-kitsch plus-btn-kitsch" onclick="changeCartItemQuantity(this, 1)">
                             +
                         </button>
@@ -441,10 +441,10 @@
                         가격
                     </div>
                     <div class="cart-item-delete-kitsch">
-                        <form th:action="@{/cart}" method="post" th:object="${item}">
-                            <input type="hidden" name="_method" value="delete"/>
-                            <input type="hidden" name="bookId" th:value="${item.bookId}"/>
-                            <button type="submit" class="text-btn-kitsch">
+                        <form method="post" th:action="@{/cart}" th:object="${item}">
+                            <input name="_method" type="hidden" value="delete"/>
+                            <input name="bookId" th:value="${item.bookId}" type="hidden"/>
+                            <button class="text-btn-kitsch" type="submit">
                                 <i class="fas fa-times-circle"></i>
                             </button>
                         </form>
@@ -618,13 +618,14 @@
             }
 
             const bookIds = Array.from(selectedItems).map(cb => cb.value);
-            const formData = new URLSearchParams();
-            bookIds.forEach(id => formData.append('bookIds', id));
+            const params = new URLSearchParams();
 
-            fetch('/order/create', {
-                method: 'POST',
-                body: formData
+            bookIds.forEach(id => params.append('bookIds', id));
+
+            fetch(`/order/create?${params.toString()}`, {
+                method: 'GET'
             })
+
                 .then(response => {
                     if (!response.ok) throw new Error("주문 페이지 요청 실패");
                     return response.text(); // HTML 반환 받음

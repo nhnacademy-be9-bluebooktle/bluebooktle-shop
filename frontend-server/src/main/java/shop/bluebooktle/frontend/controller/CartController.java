@@ -106,8 +106,7 @@ public class CartController {
 	// 	Model model
 	// ) {
 	// 	List<BookCartOrderResponse> selectedItems = cartService.getSelectedCartItemsForOrder(guestId, bookIds);
-	// 	model.addAttribute("selectedItems", selectedItems);
-	// 	return "order/create";
+	// 	return "redirect:order/create";
 	// }
 
 	// === 보조 메서드 ===
