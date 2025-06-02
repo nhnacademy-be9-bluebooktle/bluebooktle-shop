@@ -154,6 +154,7 @@
                         <table class="admin-table">
                             <thead>
                             <tr>
+                                <th>ID</th>
                                 <th>정책 이름</th>
                                 <th>대상</th>
                                 <th>최소 결제 금액</th>
@@ -166,6 +167,7 @@
                             <tbody>
                             <tr th:each="type : ${couponTypes}"
                                 th:classappend="${coupon.couponTypeId == type.id} ? 'selected'">
+                                <td th:text="${type.id}">ID</td>
                                 <td th:text="${type.name}">정책 이름</td>
                                 <td th:text="${type.target}">대상</td>
                                 <td th:text="${type.minimumPayment}">0</td>
@@ -259,8 +261,8 @@
             // 선택한 정책 target 값을 hidden input에 저장
             document.querySelector("#couponTypeTargetHidden").value = target;
 
-            document.querySelectorAll(".selectable-item").forEach(item => item.classList.remove("selected"));
-            button.closest(".selectable-item").classList.add("selected");
+            document.querySelectorAll("tr.selected").forEach(row => row.classList.remove("selected"));
+            button.closest("tr").classList.add("selected");
 
             if (target === 'BOOK') {
                 document.getElementById("bookCategorySection").style.display = 'block';
