@@ -468,7 +468,7 @@ CREATE TABLE `orders`
     `shipped_at`              timestamp      NULL,
     `delivery_fee`            decimal(10, 2) NOT NULL,
     `orderer_name`            varchar(20)    NOT NULL,
-    `orderer_email`           varchar(50)    NOT NULL,
+    `orderer_email`           varchar(50)    NULL,
     `orderer_phone_number`    varchar(11)    NOT NULL,
     `receiver_name`           varchar(20)    NOT NULL,
     `receiver_email`          varchar(50)    NULL,
