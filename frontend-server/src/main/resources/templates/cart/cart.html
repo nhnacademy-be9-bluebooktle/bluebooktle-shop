@@ -437,7 +437,7 @@
                     </div>
 
                     <div class="cart-item-price-kitsch item-unit-price"
-                         th:text="${#numbers.formatInteger(item.salePrice != null ? item.salePrice.intValue() : item.price.intValue(), 3, 'COMMA') + '원'}">
+                         th:text="${#numbers.formatInteger(((item.salePrice != null ? item.salePrice.intValue() : item.price.intValue()) * item.quantity), 3, 'COMMA') + '원'}">
                         가격
                     </div>
                     <div class="cart-item-delete-kitsch">
@@ -461,14 +461,6 @@
                 <div class="summary-row-kitsch">
                     <span class="label">배송비:</span>
                     <span class="value" id="deliveryFee">0원</span>
-                </div>
-                <div class="summary-row-kitsch">
-                    <span class="label">포장비:</span>
-                    <span class="value" id="packagingFee">2,000원</span>
-                </div>
-                <div class="summary-row-kitsch">
-                    <span class="label">할인 금액:</span>
-                    <span class="value discount" id="discountAmount">- 5,000원</span>
                 </div>
                 <div class="total-summary-kitsch">
                     <div class="summary-row-kitsch">
@@ -506,8 +498,18 @@
         }
 
         function updateCartItemSubtotal(quantityInput) {
-            // 수량 변경 시 해당 아이템의 소계는 직접 업데이트하지 않고, 전체 요약 업데이트 함수 호출
-            updateCartSummary();
+            const cartItem = quantityInput.closest('.cart-item-kitsch');
+            const pricePerItem = parseInt(quantityInput.dataset.price);
+            const quantity = parseInt(quantityInput.value);
+            const subtotal = pricePerItem * quantity;
+
+            // ✅ 소계 표시 영역 찾아서 텍스트 변경
+            const subtotalDisplay = cartItem.querySelector('.cart-item-price-kitsch');
+            if (subtotalDisplay) {
+                subtotalDisplay.textContent = formatCurrency(subtotal);
+            }
+
+            updateCartSummary(); // 전체 요약도 갱신
         }
 
         function changeCartItemQuantity(buttonElement, amount) {
@@ -526,6 +528,7 @@
                 .then(response => {
                     if (!response.ok) throw new Error("수량 변경 실패");
                     quantityInput.value = newQuantity;
+                    updateCartItemSubtotal(quantityInput);
                     updateCartSummary();
                 })
                 .catch(err => {
@@ -536,10 +539,8 @@
 
         function updateCartSummary() {
             let totalProductPrice = 0;
-            let packagingFee = 0; // Mock 포장비 (선택된 아이템 기준)
             const MOCK_DELIVERY_FEE_THRESHOLD = 30000; // Mock 무료배송 기준액
             const MOCK_DELIVERY_COST = 3000;       // Mock 기본 배송비
-            const MOCK_DISCOUNT_AMOUNT = 5000;      // Mock 할인 금액
 
             const selectedItems = document.querySelectorAll('.cart-item-select:checked');
             selectedItems.forEach(itemCheckbox => {
@@ -549,10 +550,6 @@
                 const quantity = parseInt(quantityInput.value);
                 totalProductPrice += pricePerItem * quantity;
 
-                // Mock 포장 옵션 (첫번째 아이템만 포장했다고 가정)
-                if (itemCheckbox.value === "101") { // '코딩 대모험'의 value
-                    packagingFee += 2000 * quantity; // 수량만큼 포장비
-                }
             });
 
             let deliveryFee = 0;
@@ -560,12 +557,10 @@
                 deliveryFee = MOCK_DELIVERY_COST;
             }
 
-            const finalTotalPrice = totalProductPrice + deliveryFee + packagingFee - MOCK_DISCOUNT_AMOUNT;
+            const finalTotalPrice = totalProductPrice + deliveryFee;
 
             document.getElementById('totalProductPrice').textContent = formatCurrency(totalProductPrice);
             document.getElementById('deliveryFee').textContent = formatCurrency(deliveryFee);
-            document.getElementById('packagingFee').textContent = formatCurrency(packagingFee);
-            document.getElementById('discountAmount').textContent = "- " + formatCurrency(MOCK_DISCOUNT_AMOUNT);
             document.getElementById('finalTotalPrice').textContent = formatCurrency(Math.max(0, finalTotalPrice)); // 최종금액이 음수가 되지 않도록
 
             // 장바구니 아이템 유무에 따른 메시지 토글
@@ -618,14 +613,33 @@
         function proceedToCheckout() {
             const selectedItems = document.querySelectorAll('.cart-item-select:checked');
             if (selectedItems.length === 0) {
-                alert("주문할 상품을 선택해주세요. (Mock)");
+                alert("주문할 상품을 선택해주세요.");
                 return;
             }
-            // 선택된 상품 정보를 가지고 주문서 작성 페이지로 이동
-            console.log(selectedItems.length + "개 상품 주문 진행 (Mock)");
-            window.location.href = "/order/checkout"; // 주문서 작성 페이지 URL (가상)
-        }
 
+            const bookIds = Array.from(selectedItems).map(cb => cb.value);
+            const formData = new URLSearchParams();
+            bookIds.forEach(id => formData.append('bookIds', id));
+
+            fetch('/order/create', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => {
+                    if (!response.ok) throw new Error("주문 페이지 요청 실패");
+                    return response.text(); // HTML 반환 받음
+                })
+                .then(html => {
+                    // 현재 페이지를 주문 페이지 HTML로 대체
+                    document.open();
+                    document.write(html);
+                    document.close();
+                })
+                .catch(err => {
+                    alert("주문 페이지로 이동에 실패했습니다.");
+                    console.error(err);
+                });
+        }
 
         // 페이지 로드 시 초기 요약 업데이트
         document.addEventListener('DOMContentLoaded', function () {
