@@ -73,8 +73,7 @@ public class CartServiceImpl implements CartService {
 	@Override
 	@Transactional(readOnly = true)
 	public List<BookCartOrderResponse> getUserCartItems(User user) {
-		Cart cart = cartRepository.findByUser(user)
-			.orElseThrow(UserNotFoundException::new);
+		Cart cart = getOrCreateCart(user);
 
 		return cart.getCartBooks().stream()
 			.map(cartBook -> {
