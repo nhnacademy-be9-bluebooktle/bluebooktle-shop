@@ -20,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -34,6 +35,7 @@ import shop.bluebooktle.common.util.JwtUtil;
 
 @WebMvcTest(controllers = CouponTypeController.class)
 @AutoConfigureMockMvc(addFilters = false) //Security 필터 비활성화
+@ActiveProfiles("test")
 class CouponTypeControllerTest {
 
 	@Autowired

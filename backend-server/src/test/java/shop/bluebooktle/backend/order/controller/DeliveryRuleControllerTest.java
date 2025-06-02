@@ -17,6 +17,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -30,6 +31,7 @@ import shop.bluebooktle.common.security.AuthUserLoader;
 import shop.bluebooktle.common.util.JwtUtil;
 
 @WebMvcTest(controllers = DeliveryRuleController.class)
+@ActiveProfiles("test")
 class DeliveryRuleControllerTest {
 
 	@Autowired
@@ -43,7 +45,7 @@ class DeliveryRuleControllerTest {
 
 	@MockitoBean
 	private JwtUtil jwtUtil;
-	
+
 	@MockitoBean
 	private AuthUserLoader authUserLoader;
 
