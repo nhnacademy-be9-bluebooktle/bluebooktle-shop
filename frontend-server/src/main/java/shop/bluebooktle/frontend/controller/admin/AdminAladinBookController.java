@@ -9,7 +9,6 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -48,10 +47,9 @@ public class AdminAladinBookController {
 
 	@GetMapping({"/new"})
 	public String bookForm(
-		@PathVariable(value = "bookId", required = false) Long bookId,
 		HttpServletRequest request,
 		Model model) {
-		log.info("어드민 도서 폼 페이지 요청. URI: {}, bookId: {}", request.getRequestURI(), bookId);
+		log.info("어드민 도서 폼 페이지 요청. URI: {}", request.getRequestURI());
 		model.addAttribute("currentURI", request.getRequestURI());
 
 		// 카테고리, 태그
