@@ -22,10 +22,13 @@ import shop.bluebooktle.backend.book.entity.Category;
 import shop.bluebooktle.backend.book.repository.CategoryRepository;
 import shop.bluebooktle.backend.config.JpaAuditingConfiguration;
 import shop.bluebooktle.backend.config.QueryDslConfig;
+import shop.bluebooktle.common.converter.ProfileAwareStringCryptoConverter;
+import shop.bluebooktle.common.util.CryptoUtils;
 
 @DataJpaTest
 @ActiveProfiles("test")
-@Import({QueryDslConfig.class, JpaAuditingConfiguration.class})
+@Import({QueryDslConfig.class, JpaAuditingConfiguration.class, CryptoUtils.class,
+	ProfileAwareStringCryptoConverter.class})
 public class CategoryRepositoryTest {
 
 	@Autowired

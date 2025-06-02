@@ -95,6 +95,7 @@ public class AuthServiceImpl implements AuthService {
 			.build();
 
 		userRepository.save(user);
+		// TODO: Transaction 분리
 		pointService.signUpPoint(user.getId());
 	}
 
@@ -156,7 +157,9 @@ public class AuthServiceImpl implements AuthService {
 			throw new InvalidRefreshTokenException();
 		}
 		User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-		if (user.getStatus() != UserStatus.ACTIVE) { /* ... 기존 예외 처리 ... */ }
+		if (user.getStatus() != UserStatus.ACTIVE) {
+			throw new ApplicationException(ErrorCode.AUTH_INACTIVE_ACCOUNT);
+		}
 		String newAccessToken = jwtUtil.createAccessToken(userId, user.getNickname(), user.getType());
 		String newRefreshToken = jwtUtil.createRefreshToken(userId, user.getNickname(), user.getType());
 		refreshTokenService.save(user.getId(), newRefreshToken, jwtUtil.getRefreshTokenExpirationMillis());
