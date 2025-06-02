@@ -62,22 +62,22 @@ public class User extends BaseEntity {
 	private String password;
 
 	@Convert(converter = ProfileAwareStringCryptoConverter.class)
-	@Column(name = "name", nullable = false, length = 20)
+	@Column(name = "name", nullable = false, length = 150)
 	private String name;
 
 	@Convert(converter = ProfileAwareStringCryptoConverter.class)
-	@Column(name = "email", unique = true, length = 50)
+	@Column(name = "email", unique = true, length = 255)
 	private String email;
 
 	@Column(name = "nickname", nullable = false, unique = true, length = 50)
 	private String nickname;
 
 	@Convert(converter = ProfileAwareStringCryptoConverter.class)
-	@Column(name = "birth", nullable = false)
+	@Column(name = "birth", nullable = false, length = 100)
 	private String birth;
 
 	@Convert(converter = ProfileAwareStringCryptoConverter.class)
-	@Column(name = "phone_number", nullable = false, length = 11)
+	@Column(name = "phone_number", nullable = false, length = 100)
 	private String phoneNumber;
 
 	@Enumerated(EnumType.STRING)
