@@ -12,8 +12,12 @@ import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.common.dto.book.response.BookCartOrderResponse;
 import shop.bluebooktle.frontend.repository.AdminBookRepository;
 import shop.bluebooktle.common.dto.book.response.BookAllResponse;
+import shop.bluebooktle.common.dto.book.response.BookInfoResponse;
+import shop.bluebooktle.common.dto.book.response.CategoryResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
+import shop.bluebooktle.frontend.repository.BookCategoryRepository;
 import shop.bluebooktle.frontend.repository.BookRepository;
+import shop.bluebooktle.frontend.repository.CategoryRepository;
 import shop.bluebooktle.frontend.service.BookService;
 
 @Service
@@ -22,6 +26,8 @@ public class BookServiceImpl implements BookService {
 
 	private final AdminBookRepository adminBookRepository;
 	private final BookRepository bookRepository;
+	private final BookCategoryRepository bookCategoryRepository;
+	private final CategoryRepository categoryRepository;
 
 	@Override
 	public BookCartOrderResponse getBookCartOrder(Long bookId, int quantity) {
@@ -40,4 +46,19 @@ public class BookServiceImpl implements BookService {
 		List<BookAllResponse> books = response.getContent();
 		return new PageImpl<>(books, pageable, response.getTotalElements());
 	}
+
+	@Override
+	public Page<BookInfoResponse> getPagedBooksByCategoryId(int page, int size, Long categoryId) {
+		Pageable pageable = PageRequest.of(page, size);
+
+		PaginationData<BookInfoResponse> response = bookCategoryRepository.getBooksByCategory(page, size, categoryId);
+		List<BookInfoResponse> books = response.getContent();
+		return new PageImpl<>(books, pageable, response.getTotalElements());
+	}
+
+	@Override
+	public CategoryResponse getCategoryById(Long categoryId) {
+		return categoryRepository.getCategory(categoryId);
+	}
+
 }

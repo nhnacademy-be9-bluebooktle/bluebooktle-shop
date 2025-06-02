@@ -78,9 +78,10 @@ public class BookAuthorServiceImpl implements BookAuthorService {
 		Author author = authorRepository.findById(authorId)
 			.orElseThrow(() -> new AuthorNotFoundException(authorId));
 
-		return bookAuthorRepository.findBooksByAuthor(author).stream()
+		/*return bookAuthorRepository.findBooksByAuthor(author).stream()
 			.map(b -> new BookInfoResponse(b.getId()))
-			.toList();
+			.toList();*/
+		return null;
 	}
 
 	@Override

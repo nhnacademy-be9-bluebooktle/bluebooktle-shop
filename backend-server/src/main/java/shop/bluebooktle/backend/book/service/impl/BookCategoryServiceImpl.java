@@ -4,16 +4,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import shop.bluebooktle.backend.book.entity.Author;
 import shop.bluebooktle.backend.book.entity.Book;
 import shop.bluebooktle.backend.book.entity.BookCategory;
+import shop.bluebooktle.backend.book.entity.BookSaleInfo;
 import shop.bluebooktle.backend.book.entity.Category;
+import shop.bluebooktle.backend.book.repository.BookAuthorRepository;
 import shop.bluebooktle.backend.book.repository.BookCategoryRepository;
+import shop.bluebooktle.backend.book.repository.BookImgRepository;
 import shop.bluebooktle.backend.book.repository.BookRepository;
+import shop.bluebooktle.backend.book.repository.BookSaleInfoRepository;
 import shop.bluebooktle.backend.book.repository.CategoryRepository;
 import shop.bluebooktle.backend.book.service.BookCategoryService;
 import shop.bluebooktle.common.dto.book.request.BookInfoRequest;
@@ -34,6 +40,9 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 	private final BookRepository bookRepository;
 	private final CategoryRepository categoryRepository;
 	private final BookCategoryRepository bookCategoryRepository;
+	private final BookAuthorRepository bookAuthorRepository;
+	private final BookSaleInfoRepository bookSaleInfoRepository;
+	private final BookImgRepository bookImgRepository;
 
 	@Override
 	public void registerBookCategory(Long bookId, Long categoryId) {
@@ -123,9 +132,29 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 	@Transactional(readOnly = true)
 	public Page<BookInfoResponse> searchBooksByCategory(Long categoryId, Pageable pageable) {
 		Category category = requireCategory(categoryId);
+		Page<Book> bookPage = bookCategoryRepository.findBookUnderCategory(categoryId, pageable);
+		List<BookInfoResponse> responseList = bookPage.getContent().stream()
+			.map(book -> {
+				List<String> authorNameList = bookAuthorRepository.findAuthorsByBook(book).stream()
+					.map(Author::getName)
+					.toList();
 
-		Page<BookCategory> bookCategories = bookCategoryRepository.findAllByCategory(category, pageable);
-		return bookCategories.map(bc -> new BookInfoResponse(bc.getBook().getId()));
+				BookSaleInfo bookSaleInfo = bookSaleInfoRepository.findByBook(book)
+					.orElseThrow(BookNotFoundException::new);
+				String imgUrl = bookImgRepository.findByBook(book).getImg().getImgUrl();
+				return new BookInfoResponse(
+					book.getId(),
+					book.getTitle(),
+					authorNameList,
+					bookSaleInfo.getSalePrice(),
+					bookSaleInfo.getPrice(),
+					imgUrl,
+					book.getCreatedAt()
+				);
+			})
+			.toList();
+
+		return new PageImpl<>(responseList, pageable, bookPage.getTotalElements());
 	}
 
 	@Transactional(readOnly = true)

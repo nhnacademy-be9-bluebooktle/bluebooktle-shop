@@ -55,7 +55,7 @@ public class BookCategoryController {
 		@PathVariable Long categoryId,
 		@PageableDefault(size = 10, sort = "id") Pageable pageable
 	) {
-		// TODO + title, image 등 보여줘야 함
+		// TODO : 별점 반환,,,
 		Page<BookInfoResponse> responses = bookCategoryService.searchBooksByCategory(categoryId, pageable);
 		PaginationData<BookInfoResponse> paginationData = new PaginationData<>(responses);
 		return ResponseEntity.ok(JsendResponse.success(paginationData));
