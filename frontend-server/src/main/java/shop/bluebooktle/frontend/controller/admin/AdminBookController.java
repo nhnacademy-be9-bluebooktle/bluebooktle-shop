@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -28,7 +27,6 @@ import lombok.extern.slf4j.Slf4j;
 import shop.bluebooktle.common.dto.book.BookSaleInfoState;
 import shop.bluebooktle.common.dto.book.request.BookAllRegisterRequest;
 import shop.bluebooktle.common.dto.book.request.BookFormRequest;
-import shop.bluebooktle.common.dto.book.response.AladinBookResponse;
 import shop.bluebooktle.common.dto.book.response.BookAllResponse;
 import shop.bluebooktle.common.dto.book.response.CategoryTreeResponse;
 import shop.bluebooktle.common.dto.book.response.PublisherInfoResponse;
@@ -108,8 +106,7 @@ public class AdminBookController {
 		log.info("어드민 도서 폼 페이지 요청. URI: {}, bookId: {}", request.getRequestURI(), bookId);
 		model.addAttribute("currentURI", request.getRequestURI());
 
-		// 카테고리, 작가, 출판사, 태그
-
+		// 카테고리, 작가, 출판사, 태그 모든 리스트 불러오기 : 수정 예정
 		List<AuthorResponse> allAuthorsForMapping =
 			adminAuthorService.getAuthors(0, Integer.MAX_VALUE, null)
 				.getContent();
@@ -285,7 +282,6 @@ public class AdminBookController {
 				bindingResult);
 			redirectAttributes.addFlashAttribute("bookForm", bookFormRequest);
 			redirectAttributes.addFlashAttribute("globalErrorMessage", "입력값을 확인해주세요.");
-			log.info("에러 로그");
 			return "redirect:/admin/books/new";
 		}
 		try {
@@ -296,7 +292,6 @@ public class AdminBookController {
 			return "redirect:/admin/books/new";
 
 		}
-
 		redirectAttributes.addFlashAttribute("globalSuccessMessage",
 			"도서 '" + bookFormRequest.getTitle() + "' 이(가) 성공적으로 등록되었습니다.");
 
@@ -309,16 +304,6 @@ public class AdminBookController {
 		adminBookService.deleteBook(bookId);
 		redirectAttributes.addFlashAttribute("globalSuccessMessage", "도서(ID:" + bookId + ")가 비활성화되었습니다.");
 		return "redirect:/admin/books";
-	}
-
-	@GetMapping("/aladin-search")
-	@ResponseBody
-	public List<AladinBookResponse> aladinSearch(
-		@RequestParam("keyword") String keyword,
-		@RequestParam(value = "page", defaultValue = "1") int page,
-		@RequestParam(value = "size", defaultValue = "10") int size
-	) {
-		return adminBookService.searchAladin(keyword, page, size);
 	}
 
 }
