@@ -28,5 +28,4 @@ public class BookController {
 		System.out.println("요청된 도서 ID: " + bookId);
 		return "book/book_detail";
 	}
-
 }

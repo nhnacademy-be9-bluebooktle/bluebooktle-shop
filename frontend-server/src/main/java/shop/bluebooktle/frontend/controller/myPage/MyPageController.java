@@ -56,10 +56,4 @@ public class MyPageController {
 
 		return "mypage/review_list";
 	}
-
-	@GetMapping("/likes")
-	public String userWishlistPage() {
-
-		return "mypage/likes_list";
-	}
 }
