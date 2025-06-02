@@ -1,4 +1,4 @@
-package shop.bluebooktle.backend.coupon.batch.birthday.mq;
+package shop.bluebooktle.backend.coupon.mq.birthday;
 
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;

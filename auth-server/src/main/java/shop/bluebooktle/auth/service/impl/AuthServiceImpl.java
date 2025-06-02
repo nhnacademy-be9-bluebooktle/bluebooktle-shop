@@ -1,5 +1,6 @@
 package shop.bluebooktle.auth.service.impl;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -12,6 +13,7 @@ import org.springframework.util.StringUtils;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import shop.bluebooktle.auth.mq.producer.WelcomeCouponIssueProducer;
 import shop.bluebooktle.auth.repository.MembershipLevelRepository;
 import shop.bluebooktle.auth.repository.UserRepository;
 import shop.bluebooktle.auth.repository.payco.PaycoApiClient;
@@ -23,6 +25,7 @@ import shop.bluebooktle.auth.service.RefreshTokenService;
 import shop.bluebooktle.common.domain.auth.UserProvider;
 import shop.bluebooktle.common.domain.auth.UserStatus;
 import shop.bluebooktle.common.domain.auth.UserType;
+import shop.bluebooktle.common.domain.coupon.PredefinedCoupon;
 import shop.bluebooktle.common.dto.auth.request.LoginRequest;
 import shop.bluebooktle.common.dto.auth.request.PasswordUpdateRequest;
 import shop.bluebooktle.common.dto.auth.request.PaycoProfileMember;
@@ -31,6 +34,7 @@ import shop.bluebooktle.common.dto.auth.request.PaycoTokenResponse;
 import shop.bluebooktle.common.dto.auth.request.SignupRequest;
 import shop.bluebooktle.common.dto.auth.request.TokenRefreshRequest;
 import shop.bluebooktle.common.dto.auth.response.TokenResponse;
+import shop.bluebooktle.common.dto.coupon.request.WelcomeCouponIssueMessage;
 import shop.bluebooktle.common.entity.auth.MembershipLevel;
 import shop.bluebooktle.common.entity.auth.User;
 import shop.bluebooktle.common.exception.ApplicationException;
@@ -59,6 +63,7 @@ public class AuthServiceImpl implements AuthService {
 	private final PaycoAuthClient paycoAuthClient;
 	private final PaycoApiClient paycoApiClient;
 	private final PointService pointService;
+	private final WelcomeCouponIssueProducer welcomeCouponIssueProducer;
 
 	@Value("${oauth.payco.client-id}")
 	private String paycoClientId;
@@ -97,6 +102,13 @@ public class AuthServiceImpl implements AuthService {
 		userRepository.save(user);
 		// TODO: Transaction 분리
 		pointService.signUpPoint(user.getId());
+
+		welcomeCouponIssueProducer.send(WelcomeCouponIssueMessage.builder()
+			.userId(user.getId())
+			.couponId(PredefinedCoupon.WELCOME.getId())
+			.availableStartAt(LocalDateTime.now())
+			.availableEndAt(LocalDateTime.now().plusDays(30))
+			.build());
 	}
 
 	@Override

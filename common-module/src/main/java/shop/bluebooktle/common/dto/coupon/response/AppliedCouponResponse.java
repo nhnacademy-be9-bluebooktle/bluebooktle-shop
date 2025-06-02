@@ -8,7 +8,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import shop.bluebooktle.common.domain.CouponTypeTarget;
+import shop.bluebooktle.common.domain.coupon.CouponTypeTarget;
 
 @Getter
 @Setter

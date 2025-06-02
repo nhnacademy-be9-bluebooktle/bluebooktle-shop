@@ -26,7 +26,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import shop.bluebooktle.backend.coupon.service.CouponTypeService;
-import shop.bluebooktle.common.domain.CouponTypeTarget;
+import shop.bluebooktle.common.domain.coupon.CouponTypeTarget;
 import shop.bluebooktle.common.dto.coupon.request.CouponTypeRegisterRequest;
 import shop.bluebooktle.common.dto.coupon.response.CouponTypeResponse;
 import shop.bluebooktle.common.security.AuthUserLoader;

@@ -30,6 +30,12 @@ spring:
       port: 6379
       database: 0
 
+  rabbitmq:
+    host: s4.java21.net
+    port: 5672
+    username: ${RABBITMQ_USERNAME}
+    password: ${RABBITMQ_PASSWORD}
+
 eureka:
   client:
     service-url:
@@ -48,6 +54,12 @@ oauth:
     redirect-uri: "http://www.localhost:9080/oauth/payco"
     auth-url: "https://id.payco.com"
     api-url: "https://apis-payco.krp.toastoven.net"
+
+mq:
+  queue:
+    welcome: BB.local.welcome.queue
+  exchange:
+    welcome: local.welcome.exchange
 
 encrypt:
   key: WpqWJ+qndIaLgP1udQD7lUUuaeARZEvOzHefTNS23hA=

@@ -68,11 +68,15 @@ mq:
     birthday-dlq: BB.local.birthday.queue.dlq
     direct: BB.local.direct.queue
     direct-dlq: BB.local.direct.queue.dlq
+    welcome: BB.local.welcome.queue
+    welcome-dlq: BB.local.welcome.queue.dlq
   exchange:
     birthday: local.birthday.exchange
     birthday-dlx: local.birthday.dlx
     direct: local.direct.exchange
     direct-dlx: local.direct.dlx
+    welcome: local.welcome.exchange
+    welcome-dlx: local.welcome.dlx
 
 encrypt:
   key: WpqWJ+qndIaLgP1udQD7lUUuaeARZEvOzHefTNS23hA=

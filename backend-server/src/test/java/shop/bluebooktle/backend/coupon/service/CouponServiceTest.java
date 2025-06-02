@@ -33,7 +33,7 @@ import shop.bluebooktle.backend.coupon.repository.CategoryCouponRepository;
 import shop.bluebooktle.backend.coupon.repository.CouponRepository;
 import shop.bluebooktle.backend.coupon.repository.CouponTypeRepository;
 import shop.bluebooktle.backend.coupon.service.impl.CouponServiceImpl;
-import shop.bluebooktle.common.domain.CouponTypeTarget;
+import shop.bluebooktle.common.domain.coupon.CouponTypeTarget;
 import shop.bluebooktle.common.dto.coupon.request.CouponRegisterRequest;
 import shop.bluebooktle.common.dto.coupon.response.CouponResponse;
 import shop.bluebooktle.common.exception.coupon.CouponTypeNotFoundException;

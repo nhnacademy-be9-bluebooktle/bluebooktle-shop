@@ -23,7 +23,7 @@ import shop.bluebooktle.backend.coupon.repository.AbsoluteCouponRepository;
 import shop.bluebooktle.backend.coupon.repository.CouponTypeRepository;
 import shop.bluebooktle.backend.coupon.repository.RelativeCouponRepository;
 import shop.bluebooktle.backend.coupon.service.impl.CouponTypeServiceImpl;
-import shop.bluebooktle.common.domain.CouponTypeTarget;
+import shop.bluebooktle.common.domain.coupon.CouponTypeTarget;
 import shop.bluebooktle.common.dto.coupon.request.CouponTypeRegisterRequest;
 import shop.bluebooktle.common.dto.coupon.response.CouponTypeResponse;
 import shop.bluebooktle.common.exception.InvalidInputValueException;
