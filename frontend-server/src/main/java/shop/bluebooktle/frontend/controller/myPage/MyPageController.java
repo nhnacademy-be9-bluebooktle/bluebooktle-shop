@@ -74,7 +74,6 @@ public class MyPageController {
 		model.addAttribute("coupons", coupons.getContent());
 		model.addAttribute("selectedFilter", filter);
 
-		//사용가능 쿠폰 개수
 		List<UserCouponResponse> couponList = coupons.getContent();
 
 		LocalDateTime now = LocalDateTime.now();
