@@ -12,3 +12,7 @@ springdoc:
   swagger-ui:
     path: /api-docs.html
 
+# 테스트용 키
+encrypt:
+  key: WpqWJ+qndIaLgP1udQD7lUUuaeARZEvOzHefTNS23hA=
+

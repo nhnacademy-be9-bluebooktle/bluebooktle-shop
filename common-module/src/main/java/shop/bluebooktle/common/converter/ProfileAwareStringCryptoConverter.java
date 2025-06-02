@@ -6,6 +6,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.core.env.Profiles;
 import org.springframework.stereotype.Component;
 
+import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.common.util.CryptoUtils;
@@ -13,7 +14,7 @@ import shop.bluebooktle.common.util.CryptoUtils;
 @Converter
 @Component
 @RequiredArgsConstructor()
-public class ProfileAwareStringCryptoConverter implements StringAttributeCryptoConverter {
+public class ProfileAwareStringCryptoConverter implements AttributeConverter<String, String> {
 
 	private final Environment environment;
 	private final CryptoUtils cryptoUtils;

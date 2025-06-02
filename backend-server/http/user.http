@@ -1,0 +1,6 @@
+@baseUrl = http://localhost:9012/api/users
+@accessToken = eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzIiwidXNlck5pY2tuYW1lIjoi7YWM7Iqk7Yq464uJ64Sk7J6EIiwidXNlclR5cGUiOiJVU0VSIiwiaWF0IjoxNzQ4ODI4OTQ0LCJleHAiOjE3NDg4MzA3NDR9.iVM-oomkzMtGBtSxO1H6oCEKWDCGwgp9J0vzQ_fbne0
+### 유저 정보 조회
+GET {{baseUrl}}/me
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
