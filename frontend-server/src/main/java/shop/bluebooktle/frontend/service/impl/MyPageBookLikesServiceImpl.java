@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.common.dto.book.response.BookLikesListResponse;
+import shop.bluebooktle.common.dto.common.PaginationData;
 import shop.bluebooktle.frontend.repository.MyPageBookLikesRepository;
 import shop.bluebooktle.frontend.service.MyPageBookLikesService;
 
@@ -19,17 +20,21 @@ public class MyPageBookLikesServiceImpl implements MyPageBookLikesService {
 	private final MyPageBookLikesRepository myPageBookLikesRepository;
 
 	@Override
-	public Page<BookLikesListResponse> getMyPageBookLikes(int page, int size) {
+	public PaginationData<BookLikesListResponse> getMyPageBookLikes(int page, int size) {
 		// 전체 좋아요 목록 조회
 		List<BookLikesListResponse> likesList = myPageBookLikesRepository.getMyPageBookLikes();
 
 		// 페이지 처리
 		Pageable pageable = PageRequest.of(page, size);
+
+		// List 전체에서 부분 리스트를 잘라서 PageImpl
 		int start = (int)pageable.getOffset();
 		int end = Math.min(start + pageable.getPageSize(), likesList.size());
 		List<BookLikesListResponse> content = (start < end) ? likesList.subList(start, end) : List.of();
 
-		return new PageImpl<>(content, pageable, likesList.size());
+		Page<BookLikesListResponse> pageImpl = new PageImpl<>(content, pageable, likesList.size());
+
+		return new PaginationData<>(pageImpl);
 	}
 
 	@Override

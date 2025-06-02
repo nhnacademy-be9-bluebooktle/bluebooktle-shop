@@ -20,7 +20,7 @@ import shop.bluebooktle.backend.user.repository.UserRepository;
 @ExtendWith(MockitoExtension.class)
 @Slf4j
 public class BookLikesServiceTest {
-
+	//TODO 서비스 테스트 구현
 	@InjectMocks
 	private BookLikesServiceImpl bookLikesService;
 

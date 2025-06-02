@@ -72,7 +72,7 @@ public class BookLikesController {
 	@GetMapping("/likes")
 	public ResponseEntity<JsendResponse<List<BookLikesListResponse>>> getBooksLiked(
 		@Parameter(hidden = true) @AuthenticationPrincipal UserPrincipal userPrincipal) {
-		List<BookLikesListResponse> response = bookLikesService.getBooksLikedByUser(userPrincipal);
+		List<BookLikesListResponse> response = bookLikesService.getBooksLikedByUser(userPrincipal.getUserId());
 		return ResponseEntity.ok(JsendResponse.success(response));
 	}
 }

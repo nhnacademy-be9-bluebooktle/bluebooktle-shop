@@ -1,6 +1,5 @@
 package shop.bluebooktle.frontend.controller.myPage;
 
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,6 +12,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import shop.bluebooktle.common.dto.book.response.BookLikesListResponse;
+import shop.bluebooktle.common.dto.common.PaginationData;
 import shop.bluebooktle.frontend.service.MyPageBookLikesService;
 
 @Controller
@@ -30,14 +30,11 @@ public class MyPageBookLikesController {
 		log.info("도서 좋아요 목록 조회 경로");
 
 		// 서비스 호출
-		Page<BookLikesListResponse> likesPage = myPageBookLikesService.getMyPageBookLikes(page, size);
+		PaginationData<BookLikesListResponse> likesPage = myPageBookLikesService.getMyPageBookLikes(page, size);
 
 		// 모델에 넣기
 		model.addAttribute("likes", likesPage.getContent());
-		model.addAttribute("currentPage", likesPage.getNumber());
-		model.addAttribute("totalPages", likesPage.getTotalPages());
-		model.addAttribute("totalElements", likesPage.getTotalElements());
-		model.addAttribute("size", likesPage.getSize());
+		model.addAttribute("pagination", likesPage.getPagination());
 		return "mypage/likes_list";
 	}
 

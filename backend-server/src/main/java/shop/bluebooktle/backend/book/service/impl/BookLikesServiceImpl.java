@@ -30,7 +30,6 @@ import shop.bluebooktle.common.exception.book.BookLikesAlreadyChecked;
 import shop.bluebooktle.common.exception.book.BookNotFoundException;
 import shop.bluebooktle.common.exception.book.BookSaleInfoNotFoundException;
 import shop.bluebooktle.common.exception.book.ImgNotFoundException;
-import shop.bluebooktle.common.security.UserPrincipal;
 
 @Service
 @RequiredArgsConstructor
@@ -96,9 +95,7 @@ public class BookLikesServiceImpl implements BookLikesService {
 	/** 좋아요 누른 도서 조회 */
 	@Override
 	@Transactional(readOnly = true)
-	public List<BookLikesListResponse> getBooksLikedByUser(UserPrincipal userPrincipal) {
-		Long userId = userPrincipal.getUserId();
-
+	public List<BookLikesListResponse> getBooksLikedByUser(Long userId) {
 		// 유저가 좋아요 누른 BookLikes 리스트 조회
 		List<BookLikes> likedBooks = bookLikesRepository.findAllByUser_Id(userId);
 

@@ -4,6 +4,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 
 @WebMvcTest(BookLikesController.class)
 public class BookLikesControllerTest {
+	//TODO 컨트롤러 테스트 구현
 	//
 	// @Autowired
 	// private MockMvc mockMvc;

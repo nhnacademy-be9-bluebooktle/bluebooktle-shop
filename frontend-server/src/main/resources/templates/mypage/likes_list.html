@@ -205,7 +205,6 @@
             <h1 class="page-main-title-kitsch display-font-kitsch"><i class="fas fa-heartbeat"></i> 나의 찜 목록 <i
                     class="fas fa-grin-hearts"></i></h1>
         </div>
-
         <div class="mypage-layout-kitsch">
             <div th:replace="~{_fragments/mypage_sidebar :: mypageSidebarFragment(activeMenu='likes')}"></div>
 
@@ -271,13 +270,31 @@
             </main>
         </div>
 
+        <!-- PaginationData를 기준으로 동적으로 바꾸기 -->
         <nav aria-label="Page navigation" class="pagination-kitsch" style="margin-top: 2.5rem;">
-            <a class="page-btn-kitsch prev-kitsch retro-shadow-kitsch-small disabled" href="#"><i
-                    class="fas fa-angle-left"></i> 이전</a>
-            <a class="page-btn-kitsch num-kitsch active-kitsch retro-shadow-kitsch-small" href="#">1</a>
-            <a class="page-btn-kitsch next-kitsch retro-shadow-kitsch-small" href="#">다음 <i
-                    class="fas fa-angle-right"></i></a>
+            <!-- 이전 버튼: currentPage가 0이면 disabled -->
+            <a class="page-btn-kitsch prev-kitsch retro-shadow-kitsch-small"
+               th:classappend="${pagination.currentPage == 0} ? ' disabled' : ''"
+               th:href="@{/mypage/likes(page=${pagination.currentPage - 1}, size=${pagination.pageSize})}">
+                <i class="fas fa-angle-left"></i> 이전
+            </a>
+
+            <!-- 페이지 번호: 1 ~ totalPages -->
+            <th:block th:each="i : ${#numbers.sequence(0, pagination.totalPages - 1)}">
+                <a class="page-btn-kitsch num-kitsch retro-shadow-kitsch-small"
+                   th:classappend="${i == pagination.currentPage} ? ' active-kitsch' : ''"
+                   th:href="@{/mypage/likes(page=${i}, size=${pagination.pageSize})}"
+                   th:text="${i + 1}"></a>
+            </th:block>
+
+            <!-- 다음 버튼: 마지막 페이지면 disabled -->
+            <a class="page-btn-kitsch next-kitsch retro-shadow-kitsch-small"
+               th:classappend="${pagination.currentPage + 1 >= pagination.totalPages} ? ' disabled' : ''"
+               th:href="@{/mypage/likes(page=${pagination.currentPage + 1}, size=${pagination.pageSize})}">
+                다음 <i class="fas fa-angle-right"></i>
+            </a>
         </nav>
+
     </div>
 </div>
 
