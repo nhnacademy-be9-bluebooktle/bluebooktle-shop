@@ -16,11 +16,10 @@ public class ReviewResponse {
 	private Long reviewId;
 	private Long userId;
 	private Long bookOrderId;
-	private Long imgId;
+	private String imgUrl;
 	private Integer star;
 	private String reviewContent;
 	private Integer likes;
 	private LocalDateTime createdAt;
-	
 }
 

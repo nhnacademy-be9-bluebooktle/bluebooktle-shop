@@ -6,7 +6,6 @@
 <head>
     <title>마이페이지 - 내가 쓴 리뷰</title>
     <style>
-        /* 페이지별 헤더, 리뷰 카드, 리뷰 작성 가능 상품 목록 등 기존 스타일 유지 */
         .mypage-page-specific-header-kitsch {
             background-color: var(--kitsch-color-1);
             color: var(--kitsch-text-light);
@@ -22,17 +21,6 @@
             font-size: 2.6rem;
             color: var(--kitsch-bg-main);
             text-shadow: 2px 2px 0 var(--kitsch-text-dark);
-        }
-
-        .review-list-controls-kitsch {
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            margin-bottom: 1.5rem;
-            padding: 0.8rem;
-            background-color: var(--kitsch-bg-alt);
-            border: 2px dashed var(--kitsch-color-5);
-            border-radius: 5px;
         }
 
         .review-card-kitsch {
@@ -54,24 +42,10 @@
             border-bottom: 2px dotted var(--kitsch-color-4);
         }
 
-        .review-product-info-kitsch {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .review-product-info-kitsch img {
-            width: 60px;
-            height: 90px;
-            object-fit: cover;
-            border: 2px solid var(--kitsch-text-dark);
-            border-radius: 3px;
-        }
-
-        .review-product-info-kitsch .product-title-kitsch {
+        .review-info-kitsch {
             font-family: var(--font-pixel);
-            font-size: 1.1rem;
-            color: var(--kitsch-color-5);
+            font-size: 0.95rem;
+            color: var(--kitsch-text-dark);
         }
 
         .review-stars-date-kitsch {
@@ -91,6 +65,19 @@
             opacity: 0.7;
         }
 
+        .review-image-kitsch {
+            margin: 1rem 0;
+            text-align: center;
+        }
+
+        .review-image-kitsch img {
+            max-width: 200px;
+            max-height: 200px;
+            object-fit: cover;
+            border: 2px solid var(--kitsch-text-dark);
+            border-radius: 4px;
+        }
+
         .review-content-kitsch {
             font-family: var(--font-handwriting);
             font-size: 1.15rem;
@@ -102,29 +89,19 @@
             border-left: 3px solid var(--kitsch-color-2);
         }
 
-        .review-images-kitsch {
-            display: flex;
-            gap: 0.5rem;
-            margin-top: 0.8rem;
-            margin-bottom: 1rem;
-        }
-
-        .review-images-kitsch img {
-            width: 80px;
-            height: 80px;
-            object-fit: cover;
-            border: 2px solid var(--kitsch-color-4);
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
         .review-card-actions-kitsch {
             text-align: right;
+            margin-top: 1rem;
         }
 
         .review-card-actions-kitsch .text-btn-kitsch {
-            margin-left: 0.8rem;
             font-size: 0.95em;
+            padding: 0.5em 1em;
+            border: none;
+            background-color: var(--kitsch-color-3);
+            color: var(--kitsch-text-light);
+            border-radius: 4px;
+            cursor: pointer;
         }
 
         .no-reviews-kitsch {
@@ -136,6 +113,7 @@
             background-color: var(--kitsch-bg-alt);
             border: 2px dashed var(--kitsch-color-2);
             border-radius: 5px;
+            margin-bottom: 2rem;
         }
 
         .no-reviews-kitsch i {
@@ -145,143 +123,27 @@
             color: var(--kitsch-color-4);
         }
 
-        .reviewable-items-section-kitsch {
-            background-color: var(--kitsch-bg-alt);
-            padding: 1.5rem 2rem;
-            border: 3px dashed var(--kitsch-color-1);
-            border-radius: 8px;
-            margin-top: 2.5rem;
-        }
-
-        .reviewable-items-section-kitsch h4 {
-            font-family: var(--font-display);
-            font-size: 1.3rem;
-            color: var(--kitsch-color-3);
-            margin-bottom: 1rem;
-            text-align: center;
-        }
-
-        .reviewable-item-kitsch {
+        .pagination-kitsch {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.8rem 0;
-            border-bottom: 1px dotted var(--kitsch-text-dark);
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 2rem;
         }
 
-        .reviewable-item-kitsch:last-child {
-            border-bottom: none;
-        }
-
-        .reviewable-item-info-kitsch {
-            display: flex;
-            align-items: center;
-            gap: 0.8rem;
-        }
-
-        .reviewable-item-info-kitsch img {
-            width: 40px;
-            height: 60px;
-            border-radius: 2px;
-        }
-
-        .reviewable-item-info-kitsch .item-name-kitsch {
+        .pagination-kitsch a,
+        .pagination-kitsch span {
+            padding: 0.5rem 0.8rem;
+            border: 1px solid var(--kitsch-color-4);
+            border-radius: 4px;
+            text-decoration: none;
+            color: var(--kitsch-text-dark);
             font-family: var(--font-pixel);
-            font-size: 0.9rem;
         }
 
-
-        /* 리뷰 작성/수정 모달 특화 스타일 */
-        .review-form-modal-content { /* styles.css의 .modal-content-kitsch 확장 */
-            max-width: 600px !important; /* 리뷰폼 모달은 약간 더 넓게 */
-            text-align: left;
-        }
-
-        .review-form-modal-content .modal-title-kitsch { /* styles.css .modal-title-kitsch 확장 */
-            text-align: center;
-            font-size: 1.8rem !important;
-        }
-
-        .review-form-modal-content .form-group-kitsch {
-            margin-bottom: 1rem;
-        }
-
-        /* 기존보다 간격 약간 줄임 */
-        .star-rating-input-kitsch { /* styles.css 에서 가져오거나 여기서 정의 */
-            display: inline-block; /* 별점 옆에 텍스트 오도록 */
-        }
-
-        .star-rating-input-kitsch .stars {
-            font-size: 2rem; /* 별 크기 키움 */
-            color: #ccc; /* 기본 빈 별 색상 */
-            cursor: pointer;
-        }
-
-        .star-rating-input-kitsch .stars i:hover,
-        .star-rating-input-kitsch .stars i.selected { /* 마우스 올리거나 선택된 별 */
-            color: var(--kitsch-accent-orange);
-        }
-
-        .selected-rating-text-kitsch {
-            font-family: var(--font-pixel);
-            font-size: 1rem;
-            margin-left: 0.5em;
-            color: var(--kitsch-color-5);
-        }
-
-        .review-form-modal-content .textarea-kitsch {
-            min-height: 120px;
-        }
-
-        /* styles.css .textarea-kitsch 확장 */
-        .review-form-modal-content .file-input-kitsch-wrapper {
-            margin-top: 0.5rem;
-        }
-
-        /* styles.css 와 유사 */
-        .review-form-modal-content .file-input-kitsch {
-            font-size: 0.9rem;
-        }
-
-        .review-form-modal-content .modal-actions-kitsch { /* styles.css 와 유사하게 */
-            margin-top: 1.5rem;
-            display: flex;
-            justify-content: flex-end;
-            gap: 0.8rem;
-        }
-
-        @media (max-width: 768px) {
-            .review-card-header-kitsch {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 0.5rem;
-            }
-
-            .review-stars-date-kitsch {
-                text-align: left;
-                width: 100%;
-            }
-
-            .review-card-actions-kitsch {
-                text-align: left;
-                margin-top: 0.5rem;
-            }
-
-            .review-card-actions-kitsch .text-btn-kitsch {
-                margin-left: 0;
-                margin-right: 0.8rem;
-            }
-
-            .reviewable-item-kitsch {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 0.5rem;
-            }
-
-            .reviewable-item-kitsch .btn-kitsch {
-                width: 100%;
-                margin-top: 0.3rem;
-            }
+        .pagination-kitsch .active-kitsch {
+            background-color: var(--kitsch-color-3);
+            color: var(--kitsch-text-light);
+            border-color: var(--kitsch-color-3);
         }
     </style>
 </head>
@@ -290,195 +152,135 @@
 <div layout:fragment="content">
     <div class="container-kitsch section-padding-kitsch">
 
-
+        <!-- 헤더 영역 -->
         <div class="mypage-page-specific-header-kitsch">
-            <h1 class="page-main-title-kitsch display-font-kitsch"><i class="fas fa-feather-alt"></i> 내가 쓴 리뷰 <i
-                    class="fas fa-comments"></i></h1>
+            <h1 class="page-main-title-kitsch display-font-kitsch">
+                <i class="fas fa-feather-alt"></i> 내가 쓴 리뷰 <i class="fas fa-comments"></i>
+            </h1>
         </div>
 
         <div class="mypage-layout-kitsch">
+            <!-- 사이드바 (activeMenu='reviews' 로 표시) -->
             <div th:replace="~{_fragments/mypage_sidebar :: mypageSidebarFragment(activeMenu='reviews')}"></div>
 
-
+            <!-- 콘텐츠 영역 -->
             <main class="mypage-content-kitsch">
 
-
-                <div id="myReviewListContainer">
-                    <div class="review-card-kitsch">
-                        <div class="review-card-header-kitsch">
-                            <div class="review-product-info-kitsch">
-                                <a href="#"><img alt="코딩 대모험" src="https://picsum.photos/60/90?random=101"></a>
-                                <div>
-                                    <a class="product-title-kitsch" href="#">코딩 대모험</a>
-                                    <span class="order-info-for-review pixel-font-kitsch"
-                                          style="font-size:0.75rem; color: var(--kitsch-text-dark); opacity:0.7;">(2025-05-01 구매)</span>
-                                </div>
-                            </div>
-                            <div class="review-stars-date-kitsch">
-                                <div class="review-stars-kitsch">
-                                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
-                                        class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
-                                </div>
-                                <span class="review-date-kitsch">2025년 05월 10일 작성</span>
-                            </div>
-                        </div>
-                        <div class="review-content-kitsch">
-                            이 책 완전 대박! 시간 가는 줄 모르고 읽었어요. 주인공 '비트'의 모험이 너무 흥미진진하고, 곳곳에 숨겨진 개발자 유머 코드들이 빵빵 터집니다. 픽셀 아트 삽화도
-                            너무 귀여워서 소장가치 200%!! 강추합니다. #내돈내산 #개발자필독서 #키치월드
-                        </div>
-                        <div class="review-images-kitsch">
-                            <img alt="리뷰이미지1" onclick="showKitschModal('reviewImageModal')"
-                                 src="https://picsum.photos/80/80?random=401">
-                            <img alt="리뷰이미지2" onclick="showKitschModal('reviewImageModal')"
-                                 src="https://picsum.photos/80/80?random=402">
-                        </div>
-                        <div class="review-card-actions-kitsch">
-                            <button class="text-btn-kitsch" onclick="editReview('rev002')"><i class="fas fa-edit"></i>
-                                수정
-                            </button>
-                            <button class="text-btn-kitsch" onclick="deleteReview('rev002')"><i
-                                    class="fas fa-trash-alt"></i> 삭제
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="review-card-kitsch">
-                        <div class="review-card-header-kitsch">
-                            <div class="review-product-info-kitsch">
-                                <a href="#"><img alt="게임보이 개발 비급" src="https://picsum.photos/60/90?random=105"></a>
-                                <div>
-                                    <a class="product-title-kitsch" href="#">게임보이 개발 비급</a>
-                                    <span class="order-info-for-review pixel-font-kitsch"
-                                          style="font-size:0.75rem; color: var(--kitsch-text-dark); opacity:0.7;">(2025-03-15 구매)</span>
-                                </div>
-                            </div>
-                            <div class="review-stars-date-kitsch">
-                                <div class="review-stars-kitsch">
-                                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
-                                        class="far fa-star"></i><i class="far fa-star"></i>
-                                </div>
-                                <span class="review-date-kitsch">2025년 03월 20일 작성</span>
-                            </div>
-                        </div>
-                        <div class="review-content-kitsch">
-                            레트로 게임 개발에 관심 있어서 구매했어요. 내용은 좋은데 초보자가 보기엔 조금 어려운 부분도 있네요. 그래도 자료는 충실한 편입니다. 예제 코드가 좀 더 다양했으면
-                            좋겠어요!
-                        </div>
-                        <div class="review-card-actions-kitsch">
-                            <button class="text-btn-kitsch" onclick="editReview('rev002')"><i class="fas fa-edit"></i>
-                                수정
-                            </button>
-                            <button class="text-btn-kitsch" onclick="deleteReview('rev002')"><i
-                                    class="fas fa-trash-alt"></i> 삭제
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="no-reviews-kitsch" id="noReviewsMessage" style="display:none;">
-                        <i class="fas fa-comment-slash"></i>
-                        <p>아직 작성한 리뷰가 없어요!</p>
-                        <p class="handwriting-font-kitsch" style="font-size:1.1rem; margin-top:0.5rem;">구매한 상품에 대한 소중한
-                            의견을 남겨주세요!</p>
-                    </div>
+                <!-- 리뷰가 하나도 없을 때 -->
+                <div th:if="${#lists.isEmpty(reviewsPage.content)}" class="no-reviews-kitsch">
+                    <i class="fas fa-comment-slash"></i>
+                    <p>아직 작성한 리뷰가 없어요!</p>
+                    <p class="handwriting-font-kitsch" style="font-size:1.1rem; margin-top:0.5rem;">
+                        구매한 상품에 대한 소중한 의견을 남겨주세요!
+                    </p>
                 </div>
 
-                <nav aria-label="Page navigation" class="pagination-kitsch" style="margin-top: 2.5rem;">
-                    <a class="page-btn-kitsch prev-kitsch retro-shadow-kitsch-small disabled" href="#"><i
-                            class="fas fa-angle-left"></i> 이전</a>
-                    <a class="page-btn-kitsch num-kitsch active-kitsch retro-shadow-kitsch-small" href="#">1</a>
-                    <a class="page-btn-kitsch next-kitsch retro-shadow-kitsch-small" href="#">다음 <i
-                            class="fas fa-angle-right"></i></a>
+                <!-- 리뷰 카드 목록 -->
+                <div id="myReviewListContainer"
+                     th:unless="${#lists.isEmpty(reviewsPage.content)}">
+
+                    <!-- 반복문 시작 -->
+                    <div th:each="review : ${reviewsPage.content}"
+                         th:attr="data-review-id=${review.reviewId}"
+                         class="review-card-kitsch">
+
+                        <!-- 카드 상단: 주문번호 / 별점 / 작성일자 -->
+                        <div class="review-card-header-kitsch">
+                            <!-- 좌측: 주문번호 -->
+                            <div class="review-info-kitsch">
+                                <span>도서주문번호:&nbsp;</span>
+                                <span th:text="${review.bookOrderId}">BOOK_ORDER_ID</span>
+                            </div>
+
+                            <!-- 우측: 별점 + 작성일자 -->
+                            <div class="review-stars-date-kitsch">
+                                <!-- 별점 -->
+                                <div class="review-stars-kitsch">
+                                    <span th:each="i : ${#numbers.sequence(1, 5)}">
+                                        <i th:class="${i <= review.star} ? 'fas fa-star' : 'far fa-star'"></i>
+                                    </span>
+                                </div>
+                                <!-- 작성일자 -->
+                                <span class="review-date-kitsch"
+                                      th:text="${#temporals.format(review.createdAt, 'yyyy년 MM월 dd일')} + ' 작성'">
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- 리뷰 이미지: imgUrl 이 있으면 보여 줌 -->
+                        <div class="review-image-kitsch"
+                             th:if="${review.imgUrl != null and review.imgUrl != ''}">
+                            <img th:src="${review.imgUrl}"
+                                 alt="리뷰 이미지"/>
+                        </div>
+
+                        <!-- 리뷰 내용 -->
+                        <div class="review-content-kitsch"
+                             th:text="${review.reviewContent}">
+                        </div>
+
+                        <!-- 수정 버튼 (아직 구현되지 않아 알림만) -->
+                        <div class="review-card-actions-kitsch">
+                            <button type="button"
+                                    class="text-btn-kitsch"
+                                    onclick="alert('추가예정!')">
+                                <i class="fas fa-edit"></i> 수정
+                            </button>
+                        </div>
+
+                    </div>
+                    <!-- 반복문 끝 -->
+
+                </div>
+
+                <!-- 페이지 네비게이션 -->
+                <nav aria-label="Page navigation" class="pagination-kitsch">
+                    <a th:if="${!reviewsPage.first}"
+                       th:href="@{/mypage/reviews(page=${reviewsPage.number - 1}, size=${reviewsPage.size})}">
+                        <i class="fas fa-angle-left"></i> 이전
+                    </a>
+                    <span th:if="${reviewsPage.first}" style="color: #ccc;">
+                        <i class="fas fa-angle-left"></i> 이전
+                    </span>
+
+                    <!-- 페이지 번호 반복 -->
+                    <span th:each="i : ${#numbers.sequence(0, reviewsPage.totalPages - 1)}"
+                          th:classappend="${i == reviewsPage.number} ? 'active-kitsch'">
+                        <a th:href="@{/mypage/reviews(page=${i}, size=${reviewsPage.size})}"
+                           th:text="${i + 1}">1</a>
+                    </span>
+
+                    <a th:if="${!reviewsPage.last}"
+                       th:href="@{/mypage/reviews(page=${reviewsPage.number + 1}, size=${reviewsPage.size})}">
+                        다음 <i class="fas fa-angle-right"></i>
+                    </a>
+                    <span th:if="${reviewsPage.last}" style="color: #ccc;">
+                        다음 <i class="fas fa-angle-right"></i>
+                    </span>
                 </nav>
 
             </main>
         </div>
     </div>
-
-    <div class="modal-overlay-kitsch" id="reviewFormModal">
-        <div class="modal-content-kitsch review-form-modal-content">
-            <button class="modal-close-btn-kitsch" onclick="hideKitschModal('reviewFormModal')"><i
-                    class="fas fa-times"></i></button>
-            <h2 class="modal-title-kitsch display-font-kitsch" id="reviewModalTitle"><i class="fas fa-pencil-alt"></i>
-                리뷰 작성</h2>
-            <p class="pixel-font-kitsch" id="reviewModalProductInfo"
-               style="text-align:center; margin-bottom:1rem; font-size:0.9em;"></p>
-
-            <form id="reviewForm" onsubmit="handleReviewFormSubmit(event)">
-                <input id="reviewIdInput" name="reviewId" type="hidden">
-                <input id="productIdInput" name="productId" type="hidden"> <!-- 실제로는 상품 ID -->
-                <div class="form-group-kitsch">
-                    <label class="label-kitsch handwriting-font-kitsch">별점:</label>
-                    <div class="star-rating-input-kitsch" id="modalStarRating">
-                        <span class="stars">
-                            <i class="far fa-star" data-value="1"></i>
-                            <i class="far fa-star" data-value="2"></i>
-                            <i class="far fa-star" data-value="3"></i>
-                            <i class="far fa-star" data-value="4"></i>
-                            <i class="far fa-star" data-value="5"></i>
-                        </span>
-                        <span class="selected-rating-text-kitsch" id="modalSelectedRatingText">별점을 선택하세요!</span>
-                        <input id="ratingInput" name="rating" required type="hidden">
-                    </div>
-                </div>
-
-                <div class="form-group-kitsch">
-                    <label class="label-kitsch handwriting-font-kitsch" for="reviewContentInput">리뷰 내용:</label>
-                    <textarea class="textarea-kitsch handwriting-font-kitsch" id="reviewContentInput" minlength="20"
-                              name="content" placeholder="이 상품에 대한 솔직한 리뷰를 남겨주세요! (최소 20자 이상)" required
-                              rows="5"></textarea>
-                </div>
-
-                <div class="form-group-kitsch">
-                    <label class="label-kitsch handwriting-font-kitsch">사진 첨부 (최대 3장, Mock):</label>
-                    <div class="file-input-kitsch-wrapper">
-                        <input accept="image/*" class="file-input-kitsch" id="reviewImagesInput" multiple
-                               name="reviewImages"
-                               type="file">
-                        <p class="input-description-kitsch pixel-font-kitsch" style="font-size:0.75em;">첫 번째 이미지가 대표
-                            이미지로 사용됩니다.</p>
-                    </div>
-                    <div id="reviewImagePreviewContainer" style="margin-top:0.5rem; display:flex; gap:0.5rem;">
-                    </div>
-                </div>
-
-                <div class="modal-actions-kitsch">
-                    <button class="btn-kitsch secondary-btn-kitsch color5-kitsch retro-shadow-kitsch-small"
-                            onclick="hideKitschModal('reviewFormModal')"
-                            type="button">취소
-                    </button>
-                    <button class="btn-kitsch primary-btn-kitsch retro-shadow-kitsch" type="submit">리뷰 등록/수정</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <div class="modal-overlay-kitsch" id="reviewImageModal" onclick="hideKitschModal('reviewImageModal')">
-        <div class="modal-content-kitsch" onclick="event.stopPropagation();" style="max-width:600px; padding:1rem;">
-            <button class="modal-close-btn-kitsch" onclick="hideKitschModal('reviewImageModal')"><i
-                    class="fas fa-times"></i></button>
-            <img alt="리뷰 이미지 크게 보기" id="modalImageSrc" src="https://picsum.photos/500/300?random=401"
-                 style="width:100%; border-radius:5px;">
-        </div>
-    </div>
-
 </div>
 
+<!-- 페이지 전용 스크립트 -->
 <th:block layout:fragment="page_scripts">
     <script>
-        // 현재 URL 기준으로 활성 메뉴 표시
         document.addEventListener('DOMContentLoaded', function () {
+            // 사이드바 활성 메뉴 표시
             const currentPath = window.location.pathname;
-            const sidebarLinks = document.querySelectorAll('.mypage-sidebar-kitsch .sidebar-menu-kitsch li a');
-            sidebarLinks.forEach(link => {
-                link.classList.remove('active');
-                if (link.getAttribute('href') === currentPath) {
-                    link.classList.add('active');
-                }
-            });
+            document.querySelectorAll('.mypage-sidebar-kitsch .sidebar-menu-kitsch li a')
+                .forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href') === currentPath) {
+                        link.classList.add('active');
+                    }
+                });
 
-            // (Mock) 리뷰 유무에 따른 메시지 표시
+            // 리뷰가 없을 때 안내 메시지 처리 (JS로 선택적으로 유지해도 무방)
             const reviewCards = document.querySelectorAll('#myReviewListContainer .review-card-kitsch');
-            const noReviewsMsg = document.getElementById('noReviewsMessage');
+            const noReviewsMsg = document.querySelector('.no-reviews-kitsch');
             const pagination = document.querySelector('.pagination-kitsch');
 
             if (reviewCards.length === 0 && noReviewsMsg) {
@@ -487,214 +289,6 @@
             } else if (noReviewsMsg) {
                 noReviewsMsg.style.display = 'none';
                 if (pagination) pagination.style.display = 'flex';
-            }
-
-            // 리뷰 이미지 클릭 시 모달 이미지 변경 (단순 예시)
-            const reviewImages = document.querySelectorAll('.review-images-kitsch img');
-            const modalImage = document.getElementById('modalImageSrc');
-            reviewImages.forEach(img => {
-                img.addEventListener('click', function () {
-                    if (modalImage) {
-                        modalImage.src = this.src.replace('80/80', '500/300'); // 큰 이미지로 변경 (picsum URL 규칙 활용)
-                    }
-                });
-            });
-
-            initializeStarRating('modalStarRating', 'ratingInput', 'modalSelectedRatingText');
-
-            // Mock 리뷰 데이터로 수정 버튼에 필요한 데이터 설정
-            document.querySelectorAll('.review-card-kitsch').forEach(card => {
-                const editButton = card.querySelector('button[onclick^="editReview"]');
-                if (editButton) {
-                    const reviewId = card.dataset.reviewId;
-                    const productName = card.dataset.productName;
-                    const rating = parseFloat(card.dataset.rating);
-                    const content = card.dataset.content;
-                    const images = card.dataset.images ? card.dataset.images.split(',') : [];
-                    editButton.onclick = function () {
-                        openReviewFormModal(reviewId, '리뷰 수정', productName, rating, content, images);
-                    };
-                }
-            });
-        });
-
-        // 별점 입력 UI 초기화 함수
-        function initializeStarRating(containerId, hiddenInputId, displayTextId) {
-            const starContainer = document.getElementById(containerId);
-            if (!starContainer) return;
-            const stars = starContainer.querySelectorAll('.stars i');
-            const hiddenInput = document.getElementById(hiddenInputId);
-            const displayText = document.getElementById(displayTextId);
-            let currentRating = 0;
-
-            stars.forEach(star => {
-                star.addEventListener('mouseover', function () {
-                    resetStars();
-                    const rating = parseInt(this.dataset.value);
-                    highlightStars(rating);
-                });
-
-                star.addEventListener('mouseout', function () {
-                    resetStars();
-                    highlightStars(currentRating);
-                });
-
-                star.addEventListener('click', function () {
-                    currentRating = parseInt(this.dataset.value);
-                    hiddenInput.value = currentRating;
-                    highlightStars(currentRating);
-                    if (displayText) displayText.textContent = `${currentRating}점 선택됨!`;
-                });
-            });
-
-            function highlightStars(rating) {
-                for (let i = 0; i < rating; i++) {
-                    stars[i].classList.remove('far');
-                    stars[i].classList.add('fas', 'selected');
-                }
-            }
-
-            function resetStars() {
-                stars.forEach(s => {
-                    s.classList.remove('fas', 'selected');
-                    s.classList.add('far');
-                });
-            }
-
-            // 초기 별점 설정 (수정 시)
-            if (hiddenInput && hiddenInput.value) {
-                currentRating = parseInt(hiddenInput.value);
-                highlightStars(currentRating);
-                if (displayText) displayText.textContent = `${currentRating}점 선택됨!`;
-            }
-        }
-
-
-        // 리뷰 작성/수정 모달 열기
-        function openReviewFormModal(reviewId, title, productName, rating, content, images) {
-            const modalTitle = document.getElementById('reviewModalTitle');
-            const modalProductInfo = document.getElementById('reviewModalProductInfo');
-            const form = document.getElementById('reviewForm');
-            form.reset(); // 폼 초기화
-            document.getElementById('reviewImagePreviewContainer').innerHTML = ''; // 이미지 미리보기 초기화
-
-
-            modalTitle.innerHTML = `<i class="fas fa-pencil-alt"></i> ${title}`;
-            if (productName) {
-                modalProductInfo.textContent = `상품명: ${productName}`;
-            } else {
-                modalProductInfo.textContent = '';
-            }
-            document.getElementById('reviewIdInput').value = reviewId || '';
-            // document.getElementById('productIdInput').value = productId || ''; // 실제 상품 ID
-
-            const ratingInput = document.getElementById('ratingInput');
-            const ratingDisplayText = document.getElementById('modalSelectedRatingText');
-            const starIcons = document.querySelectorAll('#modalStarRating .stars i');
-
-            // 별점 초기화
-            starIcons.forEach(s => {
-                s.classList.remove('fas', 'selected');
-                s.classList.add('far');
-            });
-            ratingInput.value = '';
-            if (ratingDisplayText) ratingDisplayText.textContent = '별점을 선택하세요!';
-
-            if (reviewId) { // 수정 모드
-                if (rating) {
-                    ratingInput.value = rating;
-                    for (let i = 0; i < rating; i++) {
-                        if (starIcons[i]) {
-                            starIcons[i].classList.remove('far');
-                            starIcons[i].classList.add('fas', 'selected');
-                        }
-                    }
-                    if (ratingDisplayText) ratingDisplayText.textContent = `${rating}점 선택됨!`;
-                }
-                document.getElementById('reviewContentInput').value = content || '';
-                // 이미지 미리보기 (Mock, 실제로는 파일 객체 다뤄야 함)
-                if (images && images.length > 0) {
-                    const previewContainer = document.getElementById('reviewImagePreviewContainer');
-                    images.forEach(imgUrl => {
-                        if (imgUrl) { // 빈 URL이 아닐 경우
-                            const imgEl = document.createElement('img');
-                            imgEl.src = imgUrl;
-                            imgEl.style.width = '50px';
-                            imgEl.style.height = '50px';
-                            imgEl.style.objectFit = 'cover';
-                            previewContainer.appendChild(imgEl);
-                        }
-                    });
-                }
-            }
-            showKitschModal('reviewFormModal');
-        }
-
-        // (Mock) 리뷰 폼 제출 처리
-        function handleReviewFormSubmit(event) {
-            event.preventDefault();
-            const reviewId = document.getElementById('reviewIdInput').value;
-            const rating = document.getElementById('ratingInput').value;
-            const content = document.getElementById('reviewContentInput').value;
-
-            if (!rating || parseInt(rating) < 1) {
-                alert('별점을 선택해주세요. (Mock)');
-                return;
-            }
-            if (content.length < 20) {
-                alert('리뷰 내용을 20자 이상 입력해주세요. (Mock)');
-                return;
-            }
-
-            if (reviewId) {
-                alert(`Mock: 리뷰(ID: ${reviewId})가 수정되었습니다! (내용: ${content.substring(0, 20)}..., 별점: ${rating}점)`);
-            } else {
-                alert(`Mock: 새 리뷰가 등록되었습니다! (내용: ${content.substring(0, 20)}..., 별점: ${rating}점)`);
-            }
-            hideKitschModal('reviewFormModal');
-            // 실제로는 여기서 서버로 폼 데이터를 전송하고, 성공 시 리뷰 목록을 AJAX로 갱신하거나 페이지를 리로드합니다.
-            // 현재는 화면 변경 없음.
-        }
-
-        // (Mock) 리뷰 삭제
-        function deleteReview(reviewId) {
-            if (confirm(`Mock: 리뷰(ID: ${reviewId})를 정말 삭제하시겠습니까?`)) {
-                alert(`Mock: 리뷰(ID: ${reviewId})가 삭제되었습니다! (화면 변경 없음)`);
-                // 실제로는 서버에 삭제 요청 후, 성공 시 해당 리뷰 카드를 DOM에서 제거하거나 목록을 새로고침.
-            }
-        }
-
-        // (Mock) 이미지 모달에 이미지 표시
-        function showImageInModal(src) {
-            const modalImage = document.getElementById('modalImageSrc');
-            if (modalImage) {
-                modalImage.src = src.replace('80/80', '500/300'); // 큰 이미지로 변경 (picsum URL 규칙 활용)
-                showKitschModal('reviewImageModal');
-            }
-        }
-
-        // 파일 입력 시 미리보기 (간단 버전)
-        document.getElementById('reviewImagesInput')?.addEventListener('change', function (event) {
-            const previewContainer = document.getElementById('reviewImagePreviewContainer');
-            previewContainer.innerHTML = ''; // 기존 미리보기 초기화
-            const files = event.target.files;
-            if (files.length > 3) {
-                alert('사진은 최대 3장까지만 첨부 가능합니다. (Mock)');
-                // 실제로는 파일 선택을 제한하거나, 3개만 처리
-            }
-            for (let i = 0; i < Math.min(files.length, 3); i++) {
-                const file = files[i];
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    const imgEl = document.createElement('img');
-                    imgEl.src = e.target.result;
-                    imgEl.style.width = '50px';
-                    imgEl.style.height = '50px';
-                    imgEl.style.objectFit = 'cover';
-                    imgEl.style.marginRight = '5px';
-                    previewContainer.appendChild(imgEl);
-                }
-                reader.readAsDataURL(file);
             }
         });
     </script>

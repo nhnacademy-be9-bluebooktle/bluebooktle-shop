@@ -1,6 +1,7 @@
 package shop.bluebooktle.backend.book.controller;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -23,18 +24,13 @@ import shop.bluebooktle.common.security.UserPrincipal;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/books/{bookOrderId}/reviews")
+@RequestMapping("/api/orders/reviews")
 public class ReviewController {
 
 	private final ReviewService reviewService;
 
-	/**
-	 * 리뷰 작성
-	 * @param bookOrderId   PathVariable로 받은 주문 ID
-	 * @param userPrincipal @AuthenticationPrincipal로 주입된 UserPrincipal (userId 포함)
-	 * @param reviewRequest RequestBody로 받은 ReviewRequest DTO
-	 */
-	@PostMapping
+	//리뷰작성
+	@PostMapping("{bookOrderId}")
 	public ResponseEntity<JsendResponse<ReviewResponse>> addReview(
 		@PathVariable Long bookOrderId,
 		@AuthenticationPrincipal UserPrincipal userPrincipal,
@@ -45,20 +41,18 @@ public class ReviewController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(JsendResponse.success(created));
 	}
 
-	/**
-	 * 특정 주문(bookOrderId)에 달린 리뷰를 페이징해서 조회
-	 * @param bookOrderId   PathVariable로 받은 주문 ID
-	 * @param page          쿼리 파라미터로 받은 페이지 번호 (기본값 0)
-	 * @param size          쿼리 파라미터로 받은 페이지 크기 (기본값 10)
-	 */
+	//내가쓴 리뷰 목록조회
 	@GetMapping
-	public ResponseEntity<JsendResponse<PaginationData<ReviewResponse>>> getReviews(
-		@PathVariable Long bookOrderId,
-		@RequestParam(defaultValue = "0") int page,
-		@RequestParam(defaultValue = "10") int size
+	public ResponseEntity<JsendResponse<PaginationData<ReviewResponse>>> getMyReviews(
+		@AuthenticationPrincipal UserPrincipal userPrincipal,
+		@RequestParam(value = "page", defaultValue = "0") int page,
+		@RequestParam(value = "size", defaultValue = "10") int size
 	) {
-		Page<ReviewResponse> reviews = reviewService.getReviews(bookOrderId, page, size);
-		PaginationData<ReviewResponse> paginationData = new PaginationData<>(reviews);
+		Long userId = userPrincipal.getUserId();
+
+		Page<ReviewResponse> pageResult = reviewService.getMyReviews(userId, PageRequest.of(page, size));
+		PaginationData<ReviewResponse> paginationData = new PaginationData<>(pageResult);
 		return ResponseEntity.ok(JsendResponse.success(paginationData));
 	}
+
 }
