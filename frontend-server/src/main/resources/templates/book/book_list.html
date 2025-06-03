@@ -89,7 +89,9 @@
     <div class="container-kitsch section-padding-kitsch">
 
         <div class="page-header-kitsch book-list-header">
-            <h1 class="page-main-title-kitsch display-font-kitsch">✨ "전체보기" 검색 결과 ✨</h1>
+            <h1 class="page-main-title-kitsch display-font-kitsch"
+                th:text="'✨ ' + (${category} == null ? '전체보기' : ${category.name()}+' 카테고리') + ' 검색 결과 ✨'">
+            </h1>
             <p class="page-subtitle-kitsch handwriting-font-kitsch"
                th:text="'(총 ' + ${pagedBooks.totalElements} + '권의 멋진 책을 찾았어요!)'">
             </p>
@@ -118,7 +120,7 @@
                  class="book-item-kitsch"
                  th:classappend="${stat.index % 2 == 0} ? ' tilt-left-kitsch' : ' tilt-right-kitsch'">
 
-                <a th:href="@{/books/{id}(id=${book.id})}" class="book-item-link-kitsch">
+                <a th:href="@{/books/{id}(id=${book.bookId})}" class="book-item-link-kitsch">
                     <div class="book-cover-wrap-kitsch">
                         <img th:src="${book.imgUrl}" th:alt="${book.title}" class="book-cover-kitsch"/>
                         <!-- SALE Badge -->
@@ -144,24 +146,42 @@
                             th:text="${book.title}">제목</h3>
 
                         <p class="book-author-kitsch handwriting-font-kitsch">
-              <span th:each="au, iStat : ${book.authors}"
-                    th:text="${au} + (${iStat.last} ? '' : ', ')">저자</span>
+                            <span th:each="au, iStat : ${book.authors}"
+                                  th:text="${au} + (${iStat.last} ? '' : ', ')">저자</span>
                         </p>
 
                         <div class="book-price-kitsch">
-                            <span th:text="${#numbers.formatDecimal(book.salePrice, 0, 'COMMA', 0, 'NONE')} + '원'">0원</span>
+                            <span
+                                    th:text="${#numbers.formatDecimal(book.salePrice, 0, 'COMMA', 0, 'NONE')} + '원'">0원</span>
+
                             <span th:if="${book.salePrice < book.price}"
                                   class="original-price-kitsch"
-                                  th:text="${#numbers.formatDecimal(book.price, 0, 'COMMA', 0, 'NONE')} + '원'">
-                0원
-              </span>
+                                  th:text="${#numbers.formatDecimal(book.price, 0, 'COMMA', 0, 'NONE')} + '원'">0원</span>
                         </div>
 
-                        <div class="rating-kitsch">
-                            <!-- 간단히 하드코딩 별표, 실무 땐 book.rating 만큼 루프 -->
-                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
-                            (<span th:text="${book.reviewCount}">0</span>)
+                        <div class="rating-kitsch"
+                             th:with="
+                                 rawStar=${book.star != null ? book.star.setScale(1, T(java.math.RoundingMode).DOWN) : 0},
+                                 starDouble=${rawStar.doubleValue()},
+                                 fullStars=${T(java.lang.Math).floor(starDouble).intValue()},
+                                 halfStar=${(starDouble % 1.0) >= 0.5 ? 1 : 0},
+                                 emptyStars=${5 - fullStars - halfStar}">
+
+                            <!-- 꽉 찬 별 출력 -->
+                            <span th:each="i : ${#numbers.sequence(1, fullStars)}">
+                                <i class="ll"></i>
+                            </span>
+
+                            <!-- 반쪽 별 출력 -->
+                            <i class="fas fa-star-half-alt" th:if="${halfStar == 1}"></i>
+
+                            <!-- 빈 별 출력 -->
+                            <span th:each="i : ${#numbers.sequence(1, emptyStars)}">
+                                <i class="far fa-star"></i>
+                            </span>
+
+                            <!-- 숫자 평점 출력 -->
+                            (<span th:text="${book.star}">0.0</span>)
                         </div>
                     </div>
                 </a>

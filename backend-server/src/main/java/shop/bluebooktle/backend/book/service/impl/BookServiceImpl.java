@@ -14,6 +14,7 @@ import org.springframework.util.StringUtils;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import shop.bluebooktle.backend.book.entity.Author;
 import shop.bluebooktle.backend.book.entity.Book;
 import shop.bluebooktle.backend.book.entity.BookSaleInfo;
 import shop.bluebooktle.backend.book.repository.BookAuthorRepository;
@@ -27,11 +28,11 @@ import shop.bluebooktle.backend.book.service.BookService;
 import shop.bluebooktle.common.dto.book.request.BookRegisterRequest;
 import shop.bluebooktle.common.dto.book.request.BookUpdateRequest;
 import shop.bluebooktle.common.dto.book.response.BookAllResponse;
+import shop.bluebooktle.common.dto.book.response.BookInfoResponse;
 import shop.bluebooktle.common.dto.book.response.BookCartOrderResponse;
 import shop.bluebooktle.common.dto.book.response.BookRegisterResponse;
 import shop.bluebooktle.common.dto.book.response.BookResponse;
 import shop.bluebooktle.common.dto.book.response.BookUpdateResponse;
-import shop.bluebooktle.common.dto.common.PaginationData;
 import shop.bluebooktle.common.exception.book.BookAlreadyExistsException;
 import shop.bluebooktle.common.exception.book.BookNotFoundException;
 
@@ -180,7 +181,7 @@ public class BookServiceImpl implements BookService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public PaginationData<BookAllResponse> findAllBooks(int page, int size, String searchKeyword) {
+	public Page<BookInfoResponse> findAllBooks(int page, int size, String searchKeyword) {
 		Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
 		Page<Book> bookPage;
 
@@ -191,39 +192,32 @@ public class BookServiceImpl implements BookService {
 			log.info("{}", bookPage);
 		}
 
-		List<BookAllResponse> content = bookPage.getContent().stream()
-			.filter(book ->
-				bookSaleInfoRepository.existsByBookId(book.getId())
-			)
+		List<BookInfoResponse> content = bookPage.getContent().stream()
 			.map(book -> {
-				BookSaleInfo saleInfo = getBookSaleInfoByBookId(book.getId());
-				return BookAllResponse.builder()
-					.id(book.getId())                             // 책 ID
-					.title(book.getTitle())                       // 책 제목
-					.description(book.getDescription())           // 책 설명
-					.index(book.getIndex())
-					.isbn(book.getIsbn())                         // ISBN
-					.price(saleInfo.getPrice())                   // 정가
-					.salePrice(saleInfo.getSalePrice())           // 할인가
-					.stock(saleInfo.getStock())                   // 재고
-					.salePercentage(saleInfo.getSalePercentage()) // 할인율
-					.imgUrl(getThumbnailUrlByBookId(book.getId()))    // 썸네일 URL
-					.authors(getAuthorsByBookId(book.getId()))               // 저자 리스트
-					.publishers(getPublisherByBookId(book.getId()))           // 출판사 이름
-					.categories(getCategoriesByBookId(book.getId()))         // 카테고리 리스트
-					.tags(getTagsByBookId(book.getId()))                     // 태그 리스트
-					.bookSaleInfoState(saleInfo.getBookSaleInfoState())
-					.viewCount(saleInfo.getViewCount())                      // 조회수
-					.searchCount(saleInfo.getSearchCount())
-					.createdAt(book.getCreatedAt())
-					.deletedAt(book.getDeletedAt())
-					.build();
+				BookSaleInfo bookSaleInfo = bookSaleInfoRepository.findByBook(book)
+					.orElseThrow(BookNotFoundException::new);
+
+				List<String> authorNameList = bookAuthorRepository.findAuthorsByBook(book).stream()
+					.map(Author::getName)
+					.toList();
+
+				String imgUrl = bookImgRepository.findByBook(book).getImg().getImgUrl();
+				return new BookInfoResponse(
+					book.getId(),
+					book.getTitle(),
+					authorNameList,
+					bookSaleInfo.getSalePrice(),
+					bookSaleInfo.getPrice(),
+					imgUrl,
+					book.getCreatedAt(),
+					bookSaleInfo.getStar(),
+					bookSaleInfo.getReviewCount(),
+					bookSaleInfo.getViewCount()
+				);
 			})
 			.toList();
 
-		Page<BookAllResponse> dtoPage = new PageImpl<>(content, pageable, bookPage.getTotalElements());
-
-		return new PaginationData<>(dtoPage);
+		return new PageImpl<>(content, pageable, bookPage.getTotalElements());
 	}
 
 	@Override

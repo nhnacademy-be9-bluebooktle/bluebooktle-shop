@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import shop.bluebooktle.common.dto.book.response.BookAllResponse;
 import shop.bluebooktle.common.dto.book.response.BookInfoResponse;
 import shop.bluebooktle.common.dto.book.response.CategoryResponse;
 import shop.bluebooktle.frontend.service.BookService;
@@ -31,7 +30,7 @@ public class BookController {
 		@RequestParam(value = "size", defaultValue = "15") int size,
 		@RequestParam(value = "searchKeyword", required = false) String searchKeyword) {
 
-		Page<BookAllResponse> pagedBooks = bookService.getPagedBooks(page, size, searchKeyword);
+		Page<BookInfoResponse> pagedBooks = bookService.getPagedBooks(page, size, searchKeyword);
 		log.info("pagedBooks: {}", pagedBooks);
 		log.info("pagedBooks: {}", pagedBooks.getNumber());
 		log.info("pagedBooks: {}", pagedBooks.getTotalElements());
@@ -63,7 +62,7 @@ public class BookController {
 		model.addAttribute("size", size);
 		model.addAttribute("pagedBooks", pagedBooksByCategory);
 
-		return "book/book_list_category";
+		return "book/book_list";
 	}
 
 	@GetMapping("/books/{bookId}")

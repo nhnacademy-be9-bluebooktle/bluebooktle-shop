@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.common.dto.book.response.BookCartOrderResponse;
 import shop.bluebooktle.frontend.repository.AdminBookRepository;
 import shop.bluebooktle.common.dto.book.response.BookAllResponse;
+import shop.bluebooktle.common.dto.book.response.BookCartOrderResponse;
 import shop.bluebooktle.common.dto.book.response.BookInfoResponse;
 import shop.bluebooktle.common.dto.book.response.CategoryResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
@@ -33,8 +34,8 @@ public class BookServiceImpl implements BookService {
 	public BookCartOrderResponse getBookCartOrder(Long bookId, int quantity) {
 		return adminBookRepository.getBookCartOrder(bookId, quantity);
 	}
-
-	public Page<BookAllResponse> getPagedBooks(int page, int size, String searchKeyword) {
+	@Override
+	public Page<BookInfoResponse> getPagedBooks(int page, int size, String searchKeyword) {
 		Pageable pageable = PageRequest.of(page, size);
 
 		String keyword = null;
@@ -42,8 +43,8 @@ public class BookServiceImpl implements BookService {
 			keyword = searchKeyword;
 		}
 
-		PaginationData<BookAllResponse> response = bookRepository.searchBooks(page, size, searchKeyword);
-		List<BookAllResponse> books = response.getContent();
+		PaginationData<BookInfoResponse> response = bookRepository.searchBooks(page, size, searchKeyword);
+		List<BookInfoResponse> books = response.getContent();
 		return new PageImpl<>(books, pageable, response.getTotalElements());
 	}
 

@@ -135,12 +135,12 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 		Page<Book> bookPage = bookCategoryRepository.findBookUnderCategory(categoryId, pageable);
 		List<BookInfoResponse> responseList = bookPage.getContent().stream()
 			.map(book -> {
+				BookSaleInfo bookSaleInfo = bookSaleInfoRepository.findByBook(book)
+					.orElseThrow(BookNotFoundException::new);
 				List<String> authorNameList = bookAuthorRepository.findAuthorsByBook(book).stream()
 					.map(Author::getName)
 					.toList();
 
-				BookSaleInfo bookSaleInfo = bookSaleInfoRepository.findByBook(book)
-					.orElseThrow(BookNotFoundException::new);
 				String imgUrl = bookImgRepository.findByBook(book).getImg().getImgUrl();
 				return new BookInfoResponse(
 					book.getId(),
