@@ -280,161 +280,168 @@
     <div class="container-kitsch section-padding-kitsch">
 
         <div class="mypage-header-kitsch">
-            <h1 class="page-main-title-kitsch display-font-kitsch"><i class="fas fa-receipt"></i> 나의 주문 내역 <i
-                    class="fas fa-history"></i></h1>
-            <div class="mypage-user-summary-kitsch">
-                <span>회원등급: <strong class="highlight-yellow-kitsch">골드</strong></span> |
-                <span>포인트: <strong class="highlight-pink-kitsch">3,500 P</strong></span> |
-                <span>사용가능 쿠폰: <strong class="highlight-cyan-kitsch">5 장</strong></span>
-            </div>
+            <h1 class="page-main-title-kitsch display-font-kitsch">
+                <i class="fas fa-receipt"></i> 나의 주문 내역 <i class="fas fa-history"></i>
+            </h1>
         </div>
 
         <div class="mypage-layout-kitsch">
             <div th:replace="~{_fragments/mypage_sidebar :: mypageSidebarFragment(activeMenu='orders')}"></div>
 
-
             <main class="mypage-content-kitsch">
-                <div class="order-history-controls-kitsch">
-                    <div class="control-group-kitsch">
-                        <label class="label-kitsch handwriting-font-kitsch" for="orderPeriod">조회 기간:</label>
-                        <select class="select-kitsch" id="orderPeriod" name="period">
-                            <option selected value="3m">최근 3개월</option>
-                            <option value="6m">최근 6개월</option>
-                            <option value="1y">최근 1년</option>
-                            <option value="all">전체 기간</option>
-                        </select>
-                        <input class="input-kitsch" id="startDate" name="startDate" type="date">
-                        <span class="pixel-font-kitsch">~</span>
-                        <input class="input-kitsch" id="endDate" name="endDate" type="date">
-                    </div>
+                <!-- 검색/필터 UI (필요하다면 form 태그로 감싸서 GET 파라미터 전송) -->
+                <form th:action="@{/mypage/orders}" method="get" class="order-history-controls-kitsch">
                     <div class="control-group-kitsch">
                         <label class="label-kitsch handwriting-font-kitsch" for="orderStatusFilter">주문 상태:</label>
                         <select class="select-kitsch" id="orderStatusFilter" name="status">
-                            <option selected value="all">전체 상태</option>
-                            <option value="pending">입금대기</option>
-                            <option value="paid">결제완료</option>
-                            <option value="preparing">배송준비중</option>
-                            <option value="shipping">배송중</option>
-                            <option value="delivered">배송완료</option>
-                            <option value="confirmed">구매확정</option>
-                            <option value="cancelled">주문취소</option>
-                            <option value="returned">반품</option>
+                            <option th:value="all"
+                                    th:selected="${status == null or status == 'all'}">전체 상태
+                            </option>
+                            <option th:value="PENDING"
+                                    th:selected="${status == T(shop.bluebooktle.common.domain.order.OrderStatus).PENDING}">
+                                입금대기
+                            </option>
+                            <option th:value="SHIPPING"
+                                    th:selected="${status == T(shop.bluebooktle.common.domain.order.OrderStatus).SHIPPING}">
+                                배송중
+                            </option>
+                            <option th:value="COMPLETED"
+                                    th:selected="${status == T(shop.bluebooktle.common.domain.order.OrderStatus).COMPLETED}">
+                                배송완료
+                            </option>
+                            <option th:value="RETURNED"
+                                    th:selected="${status == T(shop.bluebooktle.common.domain.order.OrderStatus).RETURNED}">
+                                반품
+                            </option>
+                            <option th:value="CANCELED"
+                                    th:selected="${status == T(shop.bluebooktle.common.domain.order.OrderStatus).CANCELED}">
+                                주문취소
+                            </option>
                         </select>
-                        <button class="btn-kitsch primary-btn-kitsch small-btn-kitsch retro-shadow-kitsch-small"
-                                onclick="searchOrders()">
+                        <button type="submit"
+                                class="btn-kitsch primary-btn-kitsch small-btn-kitsch retro-shadow-kitsch-small">
                             <i class="fas fa-search"></i> 조회
                         </button>
                     </div>
-                </div>
+                </form>
 
+                <!-- 주문 목록 -->
                 <div class="order-list-kitsch">
-                    <div class="order-item-card-kitsch" data-order-id="BKTTL-20250501-001">
-                        <div class="order-item-header-kitsch">
-                            <span class="order-date">주문일자: 2025-05-01</span>
-                            <span class="order-id">주문번호: BKTTL-20250501-001</span>
-                        </div>
-                        <div class="order-item-body-kitsch">
-                            <div class="product-image-kitsch">
-                                <img alt="주문상품1" src="https://picsum.photos/80/120?random=301">
-                            </div>
-                            <div class="order-product-summary-kitsch">
-                                <a class="product-names-kitsch" href="#">
-                                    <span class="대표상품명">초절정 판타지 대모험 DX</span> <span class="추가상품개수">외 1건</span>
-                                </a>
-                                <div class="order-status-kitsch status-delivered">배송완료</div>
-                            </div>
-                            <div class="order-item-summary-actions-kitsch">
-                                <span class="order-total-price-kitsch">48,700원</span>
-                                <div class="order-item-actions-kitsch">
-                                    <a class="btn-kitsch secondary-btn-kitsch color4-kitsch retro-shadow-kitsch-small"
-                                       th:href="@{/mypage/orders/BKTTL-20250501-001}">상세보기</a>
-                                    <button class="btn-kitsch secondary-btn-kitsch color2-kitsch retro-shadow-kitsch-small"
-                                            onclick="confirmPurchase('BKTTL-20250501-001')">구매확정
-                                    </button>
-
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="order-item-card-kitsch" data-order-id="BKTTL-20250420-003">
-                        <div class="order-item-header-kitsch">
-                            <span class="order-date">주문일자: 2025-04-20</span>
-                            <span class="order-id">주문번호: BKTTL-20250420-003</span>
-                        </div>
-                        <div class="order-item-body-kitsch">
-                            <div class="product-image-kitsch">
-                                <img alt="주문상품2" src="https://picsum.photos/80/120?random=302">
-                            </div>
-                            <div class="order-product-summary-kitsch">
-                                <a class="product-names-kitsch" href="#">
-                                    <span class="대표상품명">픽셀 아트로 배우는 알고리즘</span>
-                                </a>
-                                <div class="order-status-kitsch status-shipping">배송중</div>
-                            </div>
-                            <div class="order-item-summary-actions-kitsch">
-                                <span class="order-total-price-kitsch">31,500원</span>
-                                <div class="order-item-actions-kitsch">
-                                    <a class="btn-kitsch secondary-btn-kitsch color4-kitsch retro-shadow-kitsch-small"
-                                       th:href="@{/mypage/orders/BKTTL-20250420-003}">상세보기</a>
-                                    <button class="btn-kitsch secondary-btn-kitsch color5-kitsch retro-shadow-kitsch-small"
-                                            onclick="trackDelivery('LOGISTICS_ID_123')">배송조회
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="order-item-card-kitsch" data-order-id="BKTTL-20250310-015">
-                        <div class="order-item-header-kitsch">
-                            <span class="order-date">주문일자: 2025-03-10</span>
-                            <span class="order-id">주문번호: BKTTL-20250310-015</span>
-                        </div>
-                        <div class="order-item-body-kitsch">
-                            <div class="product-image-kitsch">
-                                <img alt="주문상품3" src="https://picsum.photos/80/120?random=303">
-                            </div>
-                            <div class="order-product-summary-kitsch">
-                                <a class="product-names-kitsch" href="#">
-                                    <span class="대표상품명">게임보이 개발 비급</span>
-                                </a>
-                                <div class="order-status-kitsch status-pending">입금대기</div>
-                            </div>
-                            <div class="order-item-summary-actions-kitsch">
-                                <span class="order-total-price-kitsch">33,300원</span>
-                                <div class="order-item-actions-kitsch">
-                                    <a class="btn-kitsch secondary-btn-kitsch color4-kitsch retro-shadow-kitsch-small"
-                                       th:href="@{/mypage/orders/BKTTL-20250310-015}">상세보기</a>
-                                    <button class="btn-kitsch secondary-btn-kitsch color3-kitsch retro-shadow-kitsch-small"
-                                            onclick="cancelOrder('BKTTL-20250310-015')">주문취소
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="no-orders-kitsch" id="noOrdersMessage" style="display:none;">
+                    <!-- 1) 주문이 하나도 없을 때 메시지 -->
+                    <div class="no-orders-kitsch"
+                         th:if="${ordersPage.content.isEmpty()}">
                         <i class="fas fa-empty-set"></i>
                         <p>아직 주문 내역이 없어요!</p>
-                        <p class="handwriting-font-kitsch" style="font-size:1.1rem; margin-top:0.5rem;">마음에 드는 책을 찾아
-                            주문해보세요!</p>
+                        <p class="handwriting-font-kitsch" style="font-size:1.1rem; margin-top:0.5rem;">
+                            마음에 드는 책을 찾아 주문해보세요!
+                        </p>
                     </div>
 
+                    <!-- 2) 주문이 있을 때, each로 순회 -->
+                    <div th:each="orderResp : ${ordersPage.content}"
+                         class="order-item-card-kitsch"
+                         th:attr="data-order-id=${orderResp.orderKey}">
+                        <!-- 카드 헤더 -->
+                        <div class="order-item-header-kitsch">
+                            <span class="order-date"
+                                  th:text="${#temporals.format(orderResp.createAt, 'yyyy-MM-dd')}">
+                            </span>
+                            <span class="order-id"
+                                  th:text="'주문번호: ' + ${orderResp.orderKey}">
+                            </span>
+                        </div>
+
+                        <!-- 카드 바디 -->
+                        <div class="order-item-body-kitsch">
+                            <div class="product-image-kitsch">
+                                <img alt="상품이미지"
+                                     th:src="@{'https://picsum.photos/80/120?random=' + ${orderResp.orderId}}"/>
+                            </div>
+
+                            <div class="order-product-summary-kitsch">
+                                <a class="product-names-kitsch"
+                                   th:href="@{/mypage/orders/{orderKey}(orderKey=${orderResp.orderKey})}">
+                                    <span class="대표상품명"
+                                          th:text="${orderResp.orderName}"></span>
+                                </a>
+                                <div class="order-status-kitsch"
+                                     th:text="${orderResp.orderStatus}"
+                                     th:classappend="' status-' + ${orderResp.orderStatus.name().toLowerCase()}">
+                                    배송완료
+                                </div>
+                            </div>
+
+                            <div class="order-item-summary-actions-kitsch">
+                                <span class="order-total-price-kitsch"
+                                      th:text="${#numbers.formatInteger(orderResp.totalPrice)} + '원'">
+                                </span>
+                                <div class="order-item-actions-kitsch">
+                                    <a class="btn-kitsch secondary-btn-kitsch color4-kitsch retro-shadow-kitsch-small"
+                                       th:href="@{/mypage/orders/{orderKey}(orderKey=${orderResp.orderKey})}">
+                                        상세보기
+                                    </a>
+
+                                    <!-- 상태에 따라 버튼 예시 (예: 입금대기일 때는 결제하기 버튼, 배송중일 때는 배송조회 버튼 등) -->
+                                    <button th:if="${orderResp.orderStatus.name() == 'PENDING'}"
+                                            class="btn-kitsch secondary-btn-kitsch color3-kitsch retro-shadow-kitsch-small"
+                                            th:onclick="'location.href=\'/payment/continue/' + ${orderResp.orderKey} + '\';'">
+                                        결제하기
+                                    </button>
+                                    <button th:if="${orderResp.orderStatus.name() == 'SHIPPING'}"
+                                            class="btn-kitsch secondary-btn-kitsch color5-kitsch retro-shadow-kitsch-small"
+                                            th:onclick="'trackDelivery(\'' + ${orderResp.orderKey} + '\');'">
+                                        배송조회
+                                    </button>
+                                    <button th:if="${orderResp.orderStatus.name() == 'COMPLETED'}"
+                                            class="btn-kitsch secondary-btn-kitsch color2-kitsch retro-shadow-kitsch-small"
+                                            th:onclick="'confirmPurchase(\'' + ${orderResp.orderKey} + '\');'">
+                                        구매확정
+                                    </button>
+                                    <button th:if="${orderResp.orderStatus.name() == 'CANCELED' or orderResp.orderStatus.name() == 'RETURNED'}"
+                                            class="btn-kitsch secondary-btn-kitsch color6-kitsch retro-shadow-kitsch-small"
+                                            disabled>
+                                        완료
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <nav aria-label="Page navigation" class="pagination-kitsch" style="margin-top: 2.5rem;">
-                    <a class="page-btn-kitsch prev-kitsch retro-shadow-kitsch-small disabled" href="#"><i
-                            class="fas fa-angle-left"></i> 이전</a>
-                    <a class="page-btn-kitsch num-kitsch active-kitsch retro-shadow-kitsch-small" href="#">1</a>
-                    <a class="page-btn-kitsch num-kitsch retro-shadow-kitsch-small" href="#">2</a>
-                    <a class="page-btn-kitsch next-kitsch retro-shadow-kitsch-small" href="#">다음 <i
-                            class="fas fa-angle-right"></i></a>
+
+                <!-- 3) 페이지 네비게이션 -->
+                <nav th:if="${ordersPage.pagination.totalPages > 1}"
+                     aria-label="Page navigation"
+                     class="pagination-kitsch"
+                     style="margin-top: 2.5rem;">
+                    <ul class="pagination">
+                        <!-- 이전 버튼 -->
+                        <li th:classappend="${ordersPage.pagination.isFirst} ? 'disabled'">
+                            <a th:href="@{|/mypage/orders?page=${ordersPage.pagination.currentPage - 1}&size=${ordersPage.pagination.pageSize}&status=${status}|}"
+                               aria-label="Previous">
+                                <span aria-hidden="true"><i class="fas fa-angle-left"></i> 이전</span>
+                            </a>
+                        </li>
+
+                        <!-- 페이지 번호 -->
+                        <li th:each="idx : ${#numbers.sequence(0, ordersPage.pagination.totalPages - 1)}"
+                            th:classappend="${idx == ordersPage.pagination.currentPage} ? 'active-kitsch'">
+                            <a th:href="@{|/mypage/orders?page=${idx}&size=${ordersPage.pagination.pageSize}&status=${status}|}"
+                               th:text="${idx + 1}">1</a>
+                        </li>
+
+                        <!-- 다음 버튼 -->
+                        <li th:classappend="${ordersPage.pagination.isLast} ? 'disabled'">
+                            <a th:href="@{|/mypage/orders?page=${ordersPage.pagination.currentPage + 1}&size=${ordersPage.pagination.pageSize}&status=${status}|}"
+                               aria-label="Next">
+                                <span aria-hidden="true">다음 <i class="fas fa-angle-right"></i></span>
+                            </a>
+                        </li>
+                    </ul>
                 </nav>
 
             </main>
         </div>
     </div>
-
-
 </div>
 
 <th:block layout:fragment="page_scripts">

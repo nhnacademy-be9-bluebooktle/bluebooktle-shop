@@ -9,6 +9,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.dsl.CaseBuilder;
+import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
@@ -24,13 +26,13 @@ import shop.bluebooktle.backend.coupon.entity.QCouponType;
 import shop.bluebooktle.backend.coupon.entity.QRelativeCoupon;
 import shop.bluebooktle.backend.coupon.entity.QUserCoupon;
 import shop.bluebooktle.backend.coupon.repository.CouponQueryRepository;
+import shop.bluebooktle.common.domain.UserCouponFilterType;
 import shop.bluebooktle.common.dto.coupon.response.CouponResponse;
 import shop.bluebooktle.common.dto.coupon.response.CouponTypeResponse;
 import shop.bluebooktle.common.dto.coupon.response.QCouponResponse;
 import shop.bluebooktle.common.dto.coupon.response.QCouponTypeResponse;
 import shop.bluebooktle.common.dto.coupon.response.QUserCouponResponse;
 import shop.bluebooktle.common.dto.coupon.response.UserCouponResponse;
-import shop.bluebooktle.common.entity.auth.User;
 
 @Slf4j
 @Repository
@@ -94,7 +96,7 @@ public class CouponQueryRepositoryImpl implements CouponQueryRepository {
 		return new PageImpl<>(content, pageable, total != null ? total : 0);
 	}
 
-	//쿠폰 정책 전체 조회
+	// 관리자 쿠폰 정책 전체 조회
 	@Override
 	public Page<CouponTypeResponse> findAllByCouponType(Pageable pageable) {
 		QCouponType couponType = QCouponType.couponType;
@@ -129,57 +131,44 @@ public class CouponQueryRepositoryImpl implements CouponQueryRepository {
 		return new PageImpl<>(content, pageable, total != null ? total : 0);
 	}
 
-	//유저 별 쿠폰 전체 조회
+	//유저 쿠폰 조회
 	@Override
-	public Page<UserCouponResponse> findAllByUserCoupon(User user, Pageable pageable) {
+	public Page<UserCouponResponse> findAllByUserCoupon(Long userId, UserCouponFilterType filterType,
+		Pageable pageable) {
 		QUserCoupon userCoupon = QUserCoupon.userCoupon;
-
-		BooleanBuilder builder = new BooleanBuilder();
-		builder.and(userCoupon.user.eq(user));
-		return findUserCoupon(builder, pageable);
-	}
-
-	//유저 별 사용 가능 쿠폰 전체 조회
-	@Override
-	public Page<UserCouponResponse> findAllByUsableUserCoupon(User user, Pageable pageable) {
-		QUserCoupon userCoupon = QUserCoupon.userCoupon;
-
-		LocalDateTime now = LocalDateTime.now();
-		BooleanBuilder builder = new BooleanBuilder();
-		builder.and(userCoupon.user.eq(user))
-			.and(userCoupon.availableStartAt.loe(now))
-			.and(userCoupon.availableEndAt.goe(now));
-		return findUserCoupon(builder, pageable);
-	}
-
-	// 유저 별 사용 완료 쿠폰 전체 조회
-	@Override
-	public Page<UserCouponResponse> findAllByUsedUserCoupon(User user, Pageable pageable) {
-		QUserCoupon userCoupon = QUserCoupon.userCoupon;
-
-		BooleanBuilder builder = new BooleanBuilder();
-		builder.and(userCoupon.user.eq(user)).and(userCoupon.usedAt.isNotNull());
-		return findUserCoupon(builder, pageable);
-	}
-
-	// 유저 별 (사용 못함 && 기간 만료) 쿠폰 전체 조회
-	@Override
-	public Page<UserCouponResponse> findAllByExpiredUserCoupon(User user, Pageable pageable) {
-		QUserCoupon userCoupon = QUserCoupon.userCoupon;
-
-		LocalDateTime now = LocalDateTime.now();
-		BooleanBuilder builder = new BooleanBuilder();
-		builder.and(userCoupon.user.eq(user)).and(userCoupon.usedAt.isNull()).and(userCoupon.availableEndAt.lt(now));
-		return findUserCoupon(builder, pageable);
-	}
-
-	//유저 별 쿠폰 조회 공통
-	private Page<UserCouponResponse> findUserCoupon(BooleanBuilder builder, Pageable pageable) {
 		QCoupon coupon = QCoupon.coupon;
-		QUserCoupon userCoupon = QUserCoupon.userCoupon;
 		QCouponType couponType = QCouponType.couponType;
+		QBookCoupon bookCoupon = QBookCoupon.bookCoupon;
+		QCategoryCoupon categoryCoupon = QCategoryCoupon.categoryCoupon;
+		QBook book = QBook.book;
+		QCategory category = QCategory.category;
 
-		List<UserCouponResponse> content = queryFactory.select(new QUserCouponResponse(
+		LocalDateTime now = LocalDateTime.now();
+
+		BooleanBuilder builder = new BooleanBuilder();
+		builder.and(userCoupon.user.id.eq(userId));
+
+		// 조회 필터
+		switch (filterType) {
+			case USABLE -> builder
+				.and(userCoupon.availableStartAt.loe(now))
+				.and(userCoupon.availableEndAt.goe(now))
+				.and(userCoupon.usedAt.isNull());
+			case USED -> builder.and(userCoupon.usedAt.isNotNull());
+			case EXPIRED -> builder
+				.and(userCoupon.usedAt.isNull())
+				.and(userCoupon.availableEndAt.lt(now));
+			case ALL -> {
+			}
+		}
+		//정렬
+		NumberExpression<Integer> priority = new CaseBuilder()
+			.when(userCoupon.usedAt.isNull().and(userCoupon.availableEndAt.goe(now))).then(0) // 사용 가능
+			.when(userCoupon.usedAt.isNotNull()).then(1) // 사용 완료
+			.otherwise(2); // 기간 만료
+
+		List<UserCouponResponse> content = queryFactory
+			.select(new QUserCouponResponse(
 				userCoupon.id,
 				userCoupon.createdAt,
 				coupon.couponName,
@@ -187,20 +176,36 @@ public class CouponQueryRepositoryImpl implements CouponQueryRepository {
 				couponType.target,
 				userCoupon.availableStartAt,
 				userCoupon.availableEndAt,
-				userCoupon.usedAt
+				userCoupon.usedAt,
+
+				book.title,
+				category.name
 			))
 			.from(userCoupon)
 			.join(userCoupon.coupon, coupon)
 			.join(coupon.couponType, couponType)
+			.leftJoin(bookCoupon).on(bookCoupon.coupon.eq(coupon))
+			.leftJoin(book).on(bookCoupon.book.eq(book))
+			.leftJoin(categoryCoupon).on(categoryCoupon.coupon.eq(coupon))
+			.leftJoin(category).on(categoryCoupon.category.eq(category))
 			.where(builder)
+			.orderBy(
+				priority.asc(),
+				userCoupon.availableEndAt.asc().nullsLast(),
+				userCoupon.usedAt.desc().nullsLast()
+			)
 			.offset(pageable.getOffset())
 			.limit(pageable.getPageSize())
 			.fetch();
+
 		Long total = queryFactory
 			.select(userCoupon.count())
 			.from(userCoupon)
+			.join(userCoupon.coupon, coupon)
+			.join(coupon.couponType, couponType)
 			.where(builder)
 			.fetchOne();
+
 		return new PageImpl<>(content, pageable, total != null ? total : 0);
 	}
 

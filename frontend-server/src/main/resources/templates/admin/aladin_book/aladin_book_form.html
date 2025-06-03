@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html layout:decorate="~{_layouts/admin_layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${pageTitle} ?: '도서 폼'"></title>
+    <style>
+        .form-section {
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .form-section h3 {
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+            color: var(--admin-color-primary);
+        }
+
+        /* 팝업 */
+        .popup-small-overlay {
+            position: absolute;
+            z-index: 1000;
+            width: 250px;
+            background: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            padding: 10px;
+        }
+
+        /* 트리 전용 */
+        .popup-small-overlay .popup-tree,
+        .popup-small-overlay .popup-tree ul {
+            list-style: none;
+            margin: 0;
+            padding: 0 0 0 1rem;
+        }
+
+        .popup-small-overlay .popup-tree > li {
+            margin: 4px 0;
+        }
+
+        /* 체크박스 선택 리스트 */
+        .popup-multi-select {
+            list-style: none;
+            padding: 0;
+            max-height: 200px;
+            overflow-y: auto;
+            background-color: #f9f9f9;
+            border: 1px solid #e6e6e6;
+            border-radius: 4px;
+        }
+
+        .popup-multi-select li {
+            margin: 5px 0;
+        }
+
+        .popup-multi-select input[type="checkbox"] {
+            margin-right: 10px;
+        }
+
+        /* 저장 버튼 */
+        .popup-save-btn {
+            display: block;
+            width: 100%;
+            margin-top: 10px;
+            background-color: #007bff;
+            color: #ffffff;
+            border: none;
+            padding: 8px 12px;
+            font-size: 14px;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .popup-save-btn:hover {
+            background-color: #0056b3;
+        }
+
+        .book-search-list:hover {
+            background-color: #f1f9ff;
+        }
+
+    </style>
+    <!-- ② 서버에서 넘긴 카테고리 트리를 JS 변수로 인라인 직렬화 -->
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var categoryTree = /*[[${allCategoriesForMapping}]]*/ [];
+        /*]]>*/
+    </script>
+</head>
+<body>
+<div layout:fragment="admin_content">
+    <div class="admin-page-header">
+        <h1 class="admin-page-title">
+            <i class="fas fa-book-medical"></i>
+            <th:block th:text="${pageTitle}"></th:block>
+        </h1>
+    </div>
+
+    <div class="admin-panel">
+        <div class="admin-panel__body">
+            <div th:if="${globalErrorMessage}" class="alert alert-danger admin-alert">
+                <strong th:text="${globalErrorMessage}"></strong>
+            </div>
+
+            <form th:action="@{/admin/aladin/books/save}" th:object="${aladinBookForm}" method="post"
+                  enctype="multipart/form-data">
+
+                <!-- 알라딘 도서 검색 -->
+                <div class="aladin-search-container"
+                     style="margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+                    <input type="text" id="aladinSearchInput" placeholder="알라딘 도서 검색" class="admin-form-control"
+                           style="width: 300px;">
+                    <button type="button" class="admin-btn admin-btn--primary" onclick="searchAladinBooks()">검색</button>
+                </div>
+
+                <div class="admin-panel">
+                    <div class="admin-panel__body">
+
+                        <!-- 알라딘 검색 결과 표시-->
+                        <div id="aladinSearchResults" style="margin-bottom:20px; display:none;">
+                            <h4>검색 결과</h4>
+                            <ul id="aladinResultsList" style="list-style:none; padding:0;"></ul>
+                        </div>
+                        <div id="paginationControls" style="margin-top:10px;"></div>
+                    </div>
+                </div>
+
+                <div id="selectedBookPreview" style="margin-top: 20px;"></div>
+
+                <div id="aladinHiddenInputs">
+                    <input type="hidden" name="isbn" id="isbnHidden">
+                </div>
+
+
+                <div class="form-section">
+                    <h3><i class="fas fa-info-circle"></i> 기본 정보</h3>
+                    <div class="admin-form-group">
+                        <label for="bookIndex" class="admin-form-label">목차</label>
+                        <textarea id="bookIndex" th:field="*{index}" class="admin-form-control" rows="5"></textarea>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3><i class="fas fa-dollar-sign"></i> 판매 정보</h3>
+                    <div class="row">
+                        <div class="col-md-4 admin-form-group">
+                            <label for="stock" class="admin-form-label">재고 수량 <span class="text-danger">*</span></label>
+                            <input type="number" id="stock" th:field="*{stock}" class="admin-form-control"
+                                   th:errorclass="is-invalid">
+                            <div th:if="${#fields.hasErrors('stock')}" th:errors="*{stock}"
+                                 class="invalid-feedback"></div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 admin-form-group">
+                            <label for="saleState" class="admin-form-label">판매 상태 <span
+                                    class="text-danger">*</span></label>
+                            <select id="saleState" th:field="*{state}" class="admin-form-control">
+                                <option th:each="stateOpt : ${stateOptions}" th:value="${stateOpt}"
+                                        th:text="${stateOpt}"></option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 admin-form-group">
+                            <label class="admin-form-label">포장 가능 여부</label>
+                            <div>
+                                <input type="checkbox" id="isPackable" th:field="*{isPackable}"
+                                       class="admin-form-check-input">
+                                <label for="isPackable" class="admin-form-check-label">포장 가능</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3><i class="fas fa-search"></i> 카테고리 / 태그 선택</h3>
+
+                    <!-- 카테고리 선택 -->
+                    <div class="admin-form-group" style="position: relative;">
+                        <label class="admin-form-label">카테고리 선택</label>
+                        <button type="button" class="admin-form-control btn btn-primary"
+                                onclick="openPopup('category')">
+                            카테고리 검색
+                        </button>
+                        <div id="categoryPopup" class="popup-small-overlay" style="display:none;">
+                            <!-- 검색 입력 제거, 페이지네이션 제거 -->
+                            <ul id="categoryResults" class="popup-tree"></ul>
+                            <button type="button" class="popup-save-btn"
+                                    onclick="saveSelection('category')">
+                                확인
+                            </button>
+                        </div>
+                    </div>
+                    <div id="categorySelectionDisplay"
+                         style="margin-top:10px; font-size:14px; color:#333;">
+                    </div>
+
+                    <!-- 태그 선택 -->
+                    <div class="admin-form-group" style="position: relative;">
+                        <label class="admin-form-label">태그 선택</label>
+                        <button type="button" class="admin-form-control btn btn-primary"
+                                onclick="openPopup('tag')">
+                            태그 검색
+                        </button>
+                        <div id="tagPopup" class="popup-small-overlay" style="display:none;">
+                            <input type="text" id="tagSearch"
+                                   placeholder="태그 검색" class="popup-input"
+                                   onkeydown="if(event.key==='Enter'){ loadTags(0, tagSize, this.value); event.preventDefault(); }"/>
+                            <ul id="tagResults" class="popup-multi-select"></ul>
+                            <div id="tagPagination" class="pagination" style="text-align:center; margin-top:8px;"></div>
+                            <button type="button" class="popup-save-btn" onclick="saveSelection('tag')">
+                                확인
+                            </button>
+                        </div>
+                    </div>
+                    <div id="tagSelectionDisplay" style="margin-top:10px; font-size:14px; color:#333;">
+                    </div>
+
+
+                    <div class="admin-form-actions mt-4 text-end">
+                        <a th:href="@{/admin/books}"
+                           class="admin-btn admin-btn--default"
+                           style="margin-right:8px;">
+                            취소
+                        </a>
+                        <button type="submit" class="admin-btn admin-btn--primary">
+                            <i class="fas fa-save"></i>
+                            도서 등록
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<th:block layout:fragment="page_scripts">
+    <script th:inline="javascript">
+        const MAX_PAGE = 3;
+        const pageSize = 5;
+        let currentPage = 0;
+
+        // 알라딘 도서 검색
+        async function searchAladinBooks(page = 0) {
+            // page 1~MAX_PAGE 사이로 제한
+            page = Math.max(1, Math.min(page, MAX_PAGE));
+            currentPage = page;
+
+            const query = document.getElementById('aladinSearchInput').value.trim();
+            if (!query) {
+                alert('검색어를 입력해주세요.');
+                return;
+            }
+
+            // 이전 결과 초기화
+            const resultsContainer = document.getElementById('aladinSearchResults');
+            const resultsList = document.getElementById('aladinResultsList');
+            resultsList.innerHTML = '';
+            resultsContainer.style.display = 'none';
+
+            // API 호출
+            const res = await fetch(
+                `/admin/aladin/books/aladin-search?keyword=${encodeURIComponent(query)}` +
+                `&page=${page}&size=${pageSize}`,
+                {headers: {'Accept': 'application/json'}}
+            );
+            const data = await res.json();
+            const results = Array.isArray(data) ? data : (data.data || []);
+
+            // 결과가 없으면
+            if (results.length === 0) {
+                alert('✅ 더 이상 검색 결과가 없습니다.');
+                renderPaginationControls(page, false);
+                return;
+            }
+
+            // 결과 렌더링
+            displayAladinSearchResults(results);
+
+            // 다음 페이지 버튼 활성/비활성
+            const hasNext = (results.length === pageSize) && (page < MAX_PAGE);
+            renderPaginationControls(page, hasNext);
+        }
+
+        // 검색 결과 리스트 뿌리기
+        function displayAladinSearchResults(results) {
+            const resultsContainer = document.getElementById('aladinSearchResults');
+            const resultsList = document.getElementById('aladinResultsList');
+            resultsList.innerHTML = '';
+
+            results.forEach(book => {
+                const payload = encodeURIComponent(JSON.stringify(book));
+                const li = document.createElement('li');
+                li.style.marginBottom = '10px';
+                li.style.cursor = 'pointer';
+                li.dataset.payload = JSON.stringify(book);
+                // li.setAttribute('onclick', `selectAladinBook('${payload}')`);
+                li.innerHTML = `
+                    <div class="book-search-list" style="border: 1px solid #ddd; border-radius: 5px; padding: 10px; display: flex; gap: 1rem; transition: background-color 0.3s;">
+                        <img src="${book.imgUrl}" alt="표지" style="height: 150px; width: auto; border: 1px solid #ccc; border-radius: 4px; object-fit: contain;">
+                        <div style="flex: 1;">
+                              <h4 style="margin: 0 0 5px;">${book.title}</h4>
+                              <p style="margin: 0;">저자: ${book.author}</p>
+                              <p style="margin: 0;">출판사: ${book.publisher}</p>
+                              <p style="margin: 0;">출판일: ${book.publishDate}</p>
+                              <p style="margin: 0;">ISBN: ${book.isbn}</p>
+                              <p style="margin: 0;">카테고리: ${book.categoryName}</p>
+                              <p style="margin: 0;">정가: ₩${book.price?.toLocaleString?.() ?? book.price}</p>
+                              <p style="margin: 0;">판매가: ₩${book.salePrice?.toLocaleString?.() ?? book.salePrice} (${book.salePercentage}% 할인)</p>
+                              <p style="margin: 0.5rem 0;">설명: ${book.description?.slice(0, 100) ?? ''}...</p>
+                        </div>
+                    </div>
+                `;
+                li.addEventListener('click', function () {
+                    selectAladinBook(this.dataset.payload); // 👈 이 방식으로 호출
+                });
+                resultsList.appendChild(li);
+            });
+
+            resultsContainer.style.display = 'block';
+        }
+
+        // 선택 버튼 클릭 시 폼에 값 채우기
+        function selectAladinBook(encoded) {
+            const book = JSON.parse(decodeURIComponent(encoded));
+            console.log(book);
+            // ISBN 값 채우기
+            document.getElementById('isbnHidden').value = book.isbn || '';
+
+            // 선택된 도서 정보 미리보기 영역에 표시
+            const preview = document.getElementById('selectedBookPreview');
+            preview.innerHTML = `
+                    <div style="border: 2px solid #007bff; padding: 15px; border-radius: 8px; display: flex; gap: 1rem; background: #f9f9f9;">
+                        <img src="${book.imgUrl}" alt="표지" style="height: 150px; border-radius: 4px; object-fit: contain;">
+                        <div style="flex: 1;">
+                            <h4 style="margin: 0 0 5px;">✅ 선택된 도서: ${book.title}</h4>
+                            <p style="margin: 0;">저자: ${book.author}</p>
+                            <p style="margin: 0;">출판사: ${book.publisher}</p>
+                            <p style="margin: 0;">출판일: ${book.publishDate}</p>
+                            <p style="margin: 0;">ISBN: ${book.isbn}</p>
+                            <p style="margin: 0;">카테고리: ${book.categoryName}</p>
+                            <p style="margin: 0;">정가: ₩${book.price}</p>
+                            <p style="margin: 0;">판매가: ₩${book.salePrice} (${book.salePercentage}% 할인)</p>
+                            <p style="margin: 0.5rem 0;">설명: ${book.description?.slice(0, 100)}...</p>
+                        </div>
+                    </div>
+            `;
+            highlightSelectedCard(book.isbn);
+        }
+
+        function highlightSelectedCard(isbn) {
+            document.querySelectorAll('#aladinResultsList li').forEach(li => {
+                if (li.innerHTML.includes(isbn)) {
+                    li.style.border = '2px solid #007bff';
+                    li.style.backgroundColor = '#e9f5ff';
+                } else {
+                    li.style.border = 'none';
+                    li.style.backgroundColor = 'transparent';
+                }
+            });
+        }
+
+        // 페이지 네비게이션 렌더링
+        function renderPaginationControls(page, hasNext) {
+            const container = document.getElementById('paginationControls');
+            const disablePrev = page <= 1;
+            const disableNext = !hasNext;
+            const totalPages = hasNext ? MAX_PAGE : page;
+
+            container.innerHTML = `
+        <button type="button" ${disablePrev ? 'disabled' : ''}
+          onclick="searchAladinBooks(${page - 1})">
+          « 이전
+        </button>
+        <span style="margin:0 1rem;">페이지 ${page} / ${totalPages}</span>
+        <button type="button" ${disableNext ? 'disabled' : ''}
+          onclick="searchAladinBooks(${page + 1})">
+          다음 »
+        </button>
+      `;
+        }
+
+        // 검색 버튼 바인딩
+        document.querySelector('.admin-btn--primary')
+            .addEventListener('click', () => searchAladinBooks(1));
+
+
+        //카테고리, 태그
+        const tagSize = 10, tagKeyword = '';
+
+        function renderCategoryTree(nodes, container) {
+            nodes.forEach(node => {
+                const li = document.createElement('li');
+                if (node.children && node.children.length) {
+                    li.textContent = node.name;
+                    const childUl = document.createElement('ul');
+                    renderCategoryTree(node.children, childUl);
+                    li.appendChild(childUl);
+                } else {
+                    const label = document.createElement('label');
+                    const cb = document.createElement('input');
+                    cb.type = 'checkbox';
+                    cb.name = 'categoryIdList';
+                    cb.value = node.id;
+                    label.appendChild(cb);
+                    label.append(` ${node.name}`);
+                    li.appendChild(label);
+                }
+                container.appendChild(li);
+            });
+        }
+
+        function loadTags(page, size, keyword) {
+            fetch(`/admin/tags/search?page=${page}&size=${size}&searchKeyword=${encodeURIComponent(keyword)}`, {
+                headers: {'Accept': 'application/json'}
+            })
+                .then(res => res.json())
+                .then(data => {
+                    const ul = document.getElementById('tagResults');
+                    ul.innerHTML = data.content.map(t => `
+  <li>
+    <label>
+     <input type="checkbox" name="tagIdList" value="${t.id}"/>
+      ${t.name}
+    </label>
+  </li>
+      `).join('');
+                    // 페이징
+                    const pag = document.getElementById('tagPagination');
+                    let html = '';
+                    if (data.pageable.pageNumber > 0) {
+                        html += `<button onclick="loadTags(${data.pageable.pageNumber - 1},${size},'${keyword}')">&laquo;</button>`;
+                    }
+                    for (let i = 0; i < data.totalPages; i++) {
+                        html += `<button class="${i === data.pageable.pageNumber ? 'active' : ''}"
+                    onclick="loadTags(${i},${size},'${keyword}')">${i + 1}</button>`;
+                    }
+                    if (data.pageable.pageNumber < data.totalPages - 1) {
+                        html += `<button onclick="loadTags(${data.pageable.pageNumber + 1},${size},'${keyword}')">&raquo;</button>`;
+                    }
+                    pag.innerHTML = html;
+                })
+                .catch(console.error);
+        }
+
+
+        // 팝업 열기: 카테고리면 트리 렌더, 나머지는 기존 로딩
+        function openPopup(type) {
+            closeAllPopups();
+            const popup = document.getElementById(type + 'Popup');
+            popup.style.display = 'block';
+            if (type === 'category') {
+                const ul = document.getElementById('categoryResults');
+                ul.innerHTML = '';
+                renderCategoryTree(categoryTree, ul);
+            } else if (type === 'publisher') {
+                loadPublishers(0, pubSize, pubKeyword);
+            } else if (type === 'author') {
+                loadAuthors(0, authSize, authKeyword);
+            } else if (type === 'tag') {
+                loadTags(0, tagSize, tagKeyword);
+            }
+        }
+
+        function closeAllPopups() {
+            document.querySelectorAll('.popup-small-overlay').forEach(p => p.style.display = 'none');
+        }
+
+        document.addEventListener('click', e => {
+            if (!e.target.closest('.popup-small-overlay, .btn')) closeAllPopups();
+        });
+
+        function saveSelection(type) {
+            const popup = document.getElementById(type + 'Popup');
+            const checked = popup.querySelectorAll('input[type="checkbox"]:checked');
+
+            // hidden inputs 재생성
+            let hiddenContainer = document.getElementById(type + 'HiddenInputs');
+
+            if (!hiddenContainer) {
+                hiddenContainer = document.createElement('div');
+                hiddenContainer.id = type + 'HiddenInputs';
+                document.querySelector('form').appendChild(hiddenContainer);
+            }
+            hiddenContainer.innerHTML = '';
+            checked.forEach(cb => {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = type + 'IdList';
+                input.value = cb.value;
+                hiddenContainer.appendChild(input);
+            });
+
+            // 선택된 이름 표시
+            const texts = Array.from(checked).map(cb => cb.parentNode.textContent.trim());
+            document.getElementById(type + 'SelectionDisplay').innerHTML =
+                texts.length
+                    ? `<strong>선택된 ${type}:</strong> ${texts.join(', ')}`
+                    : `<strong>선택된 ${type}:</strong> 없음`;
+
+            closeAllPopups();
+        }
+
+
+        ['category'].forEach(type => {
+            document.getElementById(type + 'Search').addEventListener('input', () => {
+                const q = document.getElementById(type + 'Search').value.toLowerCase();
+                document.querySelectorAll(`#${type}Results li`).forEach(li => {
+                    li.style.display = li.textContent.toLowerCase().includes(q) ? 'block' : 'none';
+                });
+            });
+        });
+
+    </script>
+</th:block>
+
+
+</body>
+</html>

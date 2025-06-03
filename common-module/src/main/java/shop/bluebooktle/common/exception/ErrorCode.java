@@ -18,6 +18,11 @@ public enum ErrorCode {
 	MEDIA_TYPE_NOT_SUPPORTED(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "C008", "지원되지 않는 미디어 타입입니다."),
 	BAD_GATEWAY(HttpStatus.BAD_GATEWAY, "C009", "외부 서비스 연동 중 오류가 발생했습니다."),
 
+	CRYPTO_INITIALIZATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "S001", "암호화 모듈 초기화에 실패했습니다. 설정(키)을 확인해주세요."),
+	CRYPTO_ENCRYPTION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "S002", "데이터 암호화 중 오류가 발생했습니다."),
+	CRYPTO_DECRYPTION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "S003", "데이터 복호화 중 일반 오류가 발생했습니다."),
+	CRYPTO_INVALID_DATA_FOR_DECRYPTION(HttpStatus.BAD_REQUEST, "S004", "잘못된 암호문 데이터 형식 또는 인증 태그 불일치로 인해 복호화에 실패했습니다."),
+
 	// Auth & User Errors (인증/회원 오류) - A
 	AUTH_AUTHENTICATION_FAILED(HttpStatus.UNAUTHORIZED, "A001", "아이디 또는 비밀번호가 일치하지 않습니다."),
 	AUTH_LOGIN_ID_ALREADY_EXISTS(HttpStatus.CONFLICT, "A002", "이미 사용 중인 아이디입니다."),
@@ -32,12 +37,13 @@ public enum ErrorCode {
 	AUTH_ACCOUNT_WITHDRAWN(HttpStatus.FORBIDDEN, "A011", "탈퇴한 계정입니다."),
 	AUTH_NOT_DORMANT_ACCOUNT(HttpStatus.BAD_REQUEST, "A012", "휴면 상태가 아닌 계정입니다."),
 	AUTH_ADDRESS_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "A013", "주소는 최대 10개까지 등록할 수 있습니다."),
-	AUTH_INVALID_ADDRESS(HttpStatus.BAD_REQUEST, "A014", "유효하지 않은 주소 정보입니다."),
-	AUTH_MEMBERSHIP_LEVEL_NOT_FOUND(HttpStatus.NOT_FOUND, "A015", "회원 등급 정보를 찾을 수 없습니다."),
-	AUTH_INVALID_USER_ID(HttpStatus.BAD_REQUEST, "A016", "유효하지 않은 계정 ID입니다."),
-	AUTH_TOKEN_REISSUE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "A017", "토큰 재발급에 실패했습니다. "),
-	USER_MEMBERSHIP_NOT_FOUNT(HttpStatus.BAD_REQUEST, "A018", "회원 등급을 찾을 수 없습니다. "),
-	AUTH_OAUTH_LOGIN_FAILED(HttpStatus.BAD_REQUEST, "A019", "OAUTH 로그인에 실패했습니다."),
+	AUTH_ADDRESS_NOT_FOUND(HttpStatus.BAD_REQUEST, "A014", "삭제할 주소를 찾을 수 없거나 권한이 없습니다."),
+	AUTH_INVALID_ADDRESS(HttpStatus.BAD_REQUEST, "A015", "유효하지 않은 주소 정보입니다."),
+	AUTH_MEMBERSHIP_LEVEL_NOT_FOUND(HttpStatus.NOT_FOUND, "A016", "회원 등급 정보를 찾을 수 없습니다."),
+	AUTH_INVALID_USER_ID(HttpStatus.BAD_REQUEST, "A017", "유효하지 않은 계정 ID입니다."),
+	AUTH_TOKEN_REISSUE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "A018", "토큰 재발급에 실패했습니다. "),
+	USER_MEMBERSHIP_NOT_FOUNT(HttpStatus.BAD_REQUEST, "A019", "회원 등급을 찾을 수 없습니다. "),
+	AUTH_OAUTH_LOGIN_FAILED(HttpStatus.BAD_REQUEST, "A020", "OAUTH 로그인에 실패했습니다."),
 
 	// Book Errors (도서 관련 오류) - B
 	BOOK_NOT_FOUND(HttpStatus.NOT_FOUND, "B001", "도서를 찾을 수 없습니다."),

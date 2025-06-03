@@ -35,6 +35,7 @@ import shop.bluebooktle.common.dto.user.request.UserUpdateRequest;
 import shop.bluebooktle.common.dto.user.response.AdminUserResponse;
 import shop.bluebooktle.common.dto.user.response.UserResponse;
 import shop.bluebooktle.common.dto.user.response.UserTotalPointResponse;
+import shop.bluebooktle.common.dto.user.response.UserWithAddressResponse;
 import shop.bluebooktle.common.exception.auth.InvalidTokenException;
 import shop.bluebooktle.common.exception.auth.UserNotFoundException;
 import shop.bluebooktle.common.security.Auth;
@@ -75,8 +76,8 @@ public class UserController {
 	public ResponseEntity<JsendResponse<Void>> updateUser(
 		@PathVariable Long userId,
 		@Valid @RequestBody AdminUserUpdateRequest request) {
-		userService.updateUserAdmin(userId, request);
 
+		userService.updateUserAdmin(userId, request);
 		return ResponseEntity.ok(JsendResponse.success(null));
 	}
 
@@ -123,6 +124,21 @@ public class UserController {
 		try {
 			UserTotalPointResponse userTotalPoints = userService.findUserTotalPoints(userPrincipal.getUserId());
 			return ResponseEntity.ok(JsendResponse.success(userTotalPoints));
+		} catch (UserNotFoundException e) {
+			throw new UserNotFoundException();
+		}
+	}
+
+	@Operation(summary = "내 정보 및 주소 조회", description = "내 정보 및 주소 ")
+	@Auth(type = UserType.USER)
+	@GetMapping("/addresses")
+	public ResponseEntity<JsendResponse<UserWithAddressResponse>> getUserWithAddresses(
+		@Parameter(hidden = true) @AuthenticationPrincipal UserPrincipal userPrincipal
+	) {
+		try {
+			UserWithAddressResponse userWithAddress = userService.findUserWithAddress(userPrincipal.getUserId());
+			log.info("getUserWithAddresses: {}", userWithAddress);
+			return ResponseEntity.ok(JsendResponse.success(userWithAddress));
 		} catch (UserNotFoundException e) {
 			throw new UserNotFoundException();
 		}

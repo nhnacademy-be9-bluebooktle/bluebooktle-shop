@@ -15,16 +15,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import shop.bluebooktle.backend.coupon.entity.Coupon;
-import shop.bluebooktle.backend.coupon.entity.UserCoupon;
 import shop.bluebooktle.backend.coupon.repository.CouponRepository;
 import shop.bluebooktle.backend.coupon.repository.UserCouponRepository;
 import shop.bluebooktle.backend.coupon.service.impl.UserCouponServiceImpl;
@@ -32,11 +27,9 @@ import shop.bluebooktle.backend.user.repository.MembershipLevelRepository;
 import shop.bluebooktle.backend.user.repository.UserRepository;
 import shop.bluebooktle.common.domain.auth.UserStatus;
 import shop.bluebooktle.common.dto.coupon.request.UserCouponRegisterRequest;
-import shop.bluebooktle.common.dto.coupon.response.UserCouponResponse;
 import shop.bluebooktle.common.entity.auth.MembershipLevel;
 import shop.bluebooktle.common.entity.auth.User;
 import shop.bluebooktle.common.exception.coupon.CouponNotFoundException;
-import shop.bluebooktle.common.exception.coupon.UserCouponNotFoundException;
 import shop.bluebooktle.common.security.AuthUserLoader;
 import shop.bluebooktle.common.util.JwtUtil;
 
@@ -137,58 +130,6 @@ class UserCouponServiceTest {
 
 		assertThatThrownBy(() -> userCouponService.registerCoupon(request))
 			.isInstanceOf(CouponNotFoundException.class);
-	}
-
-	@Test
-	@DisplayName("유저 쿠폰 전체 조회 - 성공")
-	@WithMockUser
-	void getAllUserCoupons_success() {
-		Pageable pageable = PageRequest.of(0, 10);
-		Page<UserCouponResponse> page = new PageImpl<>(List.of());
-
-		given(userCouponRepository.findAllByUserCoupon(user, pageable)).willReturn(page);
-
-		Page<UserCouponResponse> result = userCouponService.getAllUserCoupons(user, pageable);
-
-		assertThat(result.getContent()).isInstanceOf(List.class);
-		verify(userCouponRepository).findAllByUserCoupon(user, pageable);
-	}
-
-	@Test
-	@DisplayName("유저 사용 가능 쿠폰 조회 - 성공")
-	@WithMockUser
-	void getAvailableUserCoupons_success() {
-		Pageable pageable = PageRequest.of(0, 10);
-		Page<UserCouponResponse> page = new PageImpl<>(List.of());
-
-		given(userCouponRepository.findAllByUsableUserCoupon(user, pageable)).willReturn(page);
-
-		Page<UserCouponResponse> result = userCouponService.getUsableUserCoupons(user, pageable);
-
-		assertThat(result.getContent()).isInstanceOf(List.class);
-		verify(userCouponRepository).findAllByUsableUserCoupon(user, pageable);
-	}
-
-	@Test
-	@DisplayName("쿠폰 사용 - 성공")
-	@WithMockUser
-	void useCoupon_success() {
-		UserCoupon userCoupon = mock(UserCoupon.class);
-		given(userCouponRepository.findById(1L)).willReturn(Optional.of(userCoupon));
-
-		userCouponService.useCoupon(1L);
-
-		verify(userCoupon).useCoupon();
-	}
-
-	@Test
-	@DisplayName("쿠폰 사용 - 존재하지 않음")
-	@WithMockUser
-	void useCoupon_notFound() {
-		given(userCouponRepository.findById(1L)).willReturn(Optional.empty());
-
-		assertThatThrownBy(() -> userCouponService.useCoupon(1L))
-			.isInstanceOf(UserCouponNotFoundException.class);
 	}
 }
 

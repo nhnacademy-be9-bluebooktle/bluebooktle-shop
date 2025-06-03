@@ -10,6 +10,7 @@ import org.hibernate.annotations.SQLRestriction;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -28,6 +29,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import shop.bluebooktle.common.converter.ProfileAwareStringCryptoConverter;
 import shop.bluebooktle.common.domain.auth.UserProvider;
 import shop.bluebooktle.common.domain.auth.UserStatus;
 import shop.bluebooktle.common.domain.auth.UserType;
@@ -37,7 +39,7 @@ import shop.bluebooktle.common.entity.BaseEntity;
 @Table(name = "users")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@ToString(exclude = {"addresses", "membershipLevel"})
+@ToString(exclude = {"addresses", "membershipLevel", "email", "name", "phoneNumber", "birth"})
 @EqualsAndHashCode(of = "id", callSuper = false)
 @SQLDelete(sql = "UPDATE `users` SET deleted_at = CURRENT_TIMESTAMP, status = 'WITHDRAWN' WHERE user_id = ?")
 @SQLRestriction("deleted_at IS NULL AND status <> 'WITHDRAWN'")
@@ -56,22 +58,26 @@ public class User extends BaseEntity {
 	@Column(name = "login_id", nullable = false, unique = true, length = 50)
 	private String loginId;
 
-	@Column(name = "password", nullable = false, length = 255)
+	@Column(name = "password", nullable = false)
 	private String password;
 
-	@Column(name = "name", nullable = false, length = 20)
+	@Convert(converter = ProfileAwareStringCryptoConverter.class)
+	@Column(name = "name", nullable = false, length = 150)
 	private String name;
 
-	@Column(name = "email", unique = true, length = 50)
+	@Convert(converter = ProfileAwareStringCryptoConverter.class)
+	@Column(name = "email", unique = true, length = 255)
 	private String email;
 
 	@Column(name = "nickname", nullable = false, unique = true, length = 50)
 	private String nickname;
 
-	@Column(name = "birth", nullable = false)
+	@Convert(converter = ProfileAwareStringCryptoConverter.class)
+	@Column(name = "birth", nullable = false, length = 100)
 	private String birth;
 
-	@Column(name = "phone_number", nullable = false, length = 11)
+	@Convert(converter = ProfileAwareStringCryptoConverter.class)
+	@Column(name = "phone_number", nullable = false, length = 100)
 	private String phoneNumber;
 
 	@Enumerated(EnumType.STRING)

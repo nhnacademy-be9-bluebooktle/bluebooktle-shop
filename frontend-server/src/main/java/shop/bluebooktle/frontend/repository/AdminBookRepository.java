@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import shop.bluebooktle.common.dto.book.request.BookAllRegisterRequest;
 import shop.bluebooktle.common.dto.book.response.AladinBookResponse;
 import shop.bluebooktle.common.dto.book.response.BookAllResponse;
+import shop.bluebooktle.common.dto.book.response.BookCartOrderResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
 import shop.bluebooktle.frontend.config.feign.FeignGlobalConfig;
 
@@ -34,6 +35,9 @@ public interface AdminBookRepository {
 
 	@DeleteMapping("/{bookId}")
 	void deleteBook(@PathVariable("bookId") Long bookId);
+
+	@GetMapping("/order/{bookId}")
+	BookCartOrderResponse getBookCartOrder(@PathVariable("bookId") Long bookId, @RequestParam int quantity);
 
 	@GetMapping("/aladin-search")
 	List<AladinBookResponse> searchAladinBooks(

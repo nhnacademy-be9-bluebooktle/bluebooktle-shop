@@ -2,7 +2,6 @@ package shop.bluebooktle.frontend.config.feign;
 
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -18,7 +17,6 @@ import shop.bluebooktle.frontend.service.AuthService;
 import shop.bluebooktle.frontend.util.CookieTokenUtil;
 
 @RequiredArgsConstructor
-@Configuration
 public class FeignGlobalConfig {
 
 	private final ObjectMapper feignObjectMapperInstance;
