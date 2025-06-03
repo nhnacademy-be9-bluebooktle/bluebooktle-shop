@@ -59,10 +59,4 @@ public class MyPageController {
 
 		return "mypage/coupon_list";
 	}
-
-	@GetMapping("/reviews")
-	public String userReviewsPage() {
-
-		return "mypage/review_list";
-	}
 }
