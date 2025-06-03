@@ -13,6 +13,7 @@ import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.Builder;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
@@ -45,6 +46,7 @@ public class BookCategory {
 	@JoinColumn(name = "book_id", nullable = false)
 	private Book book;
 
+	@Builder
 	public BookCategory(Book book, Category category) {
 		this.book = book;
 		this.category = category;

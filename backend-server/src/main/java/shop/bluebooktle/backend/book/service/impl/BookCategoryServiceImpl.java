@@ -92,6 +92,12 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 		BookCategory bookCategory = bookCategoryRepository.findById(bookCategoryId)
 			.orElseThrow(BookCategoryNotFoundException::new);
 		Category updatedCategory = requireCategory(updatedCategoryId);
+
+		// updatedCategory와 도서가 이미 관계가 있을 시 예외 처리
+		if (bookCategoryRepository.existsByBookAndCategory(bookCategory.getBook(), updatedCategory)) {
+			throw new BookCategoryAlreadyExistsException(bookCategory.getBook().getId(), updatedCategory.getId());
+		}
+
 		bookCategory.setCategory(updatedCategory);
 	}
 
