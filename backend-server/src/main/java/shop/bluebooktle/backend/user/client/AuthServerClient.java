@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 
 import shop.bluebooktle.common.dto.common.JsendResponse;
 
-@FeignClient(name = "auth-server-client", url = "${server.gateway-url}")
+@FeignClient(name = "authServerClient", url = "${server.gateway-url}")
 public interface AuthServerClient {
 
 	@PostMapping("/auth/logout")

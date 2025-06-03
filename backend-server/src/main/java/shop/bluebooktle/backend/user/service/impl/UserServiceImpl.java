@@ -12,6 +12,8 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import shop.bluebooktle.backend.user.client.AuthServerClient;
+import shop.bluebooktle.backend.user.client.VerificationMessageClient;
+import shop.bluebooktle.backend.user.dto.DoorayMessagePayload;
 import shop.bluebooktle.backend.user.repository.MembershipLevelRepository;
 import shop.bluebooktle.backend.user.repository.UserRepository;
 import shop.bluebooktle.backend.user.service.DormantAuthCodeService;
@@ -43,6 +45,7 @@ public class UserServiceImpl implements UserService {
 	private final MembershipLevelRepository membershipLevelRepository;
 	private final AuthServerClient authServerClient;
 	private final DormantAuthCodeService dormantAuthCodeService;
+	private final VerificationMessageClient verificationMessageClient;
 
 	@Override
 	@Transactional(readOnly = true)
@@ -154,7 +157,6 @@ public class UserServiceImpl implements UserService {
 		);
 	}
 
-
 	@Override
 	@Transactional
 	public void withdrawUser(Long userId, String accessTokenForAuthLogout) {
@@ -215,6 +217,9 @@ public class UserServiceImpl implements UserService {
 		}
 
 		String authCode = dormantAuthCodeService.generateAndSaveAuthCode(user.getId());
-		// TODO: Dooray Message Sender를 통해 사용자에게 authCode 발송 로직 추가
+		DoorayMessagePayload messagePayload = new DoorayMessagePayload();
+		messagePayload.setBotName("인증 코드 전송");
+		messagePayload.setText(loginId + ": " + authCode);
+		verificationMessageClient.sendMessage(messagePayload);
 	}
 }

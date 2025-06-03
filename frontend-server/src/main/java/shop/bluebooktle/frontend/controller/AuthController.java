@@ -23,9 +23,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import shop.bluebooktle.common.dto.auth.request.LoginRequest;
 import shop.bluebooktle.common.dto.auth.request.SignupRequest;
+import shop.bluebooktle.common.dto.user.request.IssueDormantAuthCodeRequest;
+import shop.bluebooktle.common.dto.user.request.ReactivateDormantUserRequest;
 import shop.bluebooktle.common.exception.ApplicationException;
 import shop.bluebooktle.common.exception.ErrorCode;
 import shop.bluebooktle.frontend.service.AuthService;
+import shop.bluebooktle.frontend.service.UserService;
 import shop.bluebooktle.frontend.util.CookieTokenUtil;
 
 @Slf4j
@@ -34,6 +37,7 @@ import shop.bluebooktle.frontend.util.CookieTokenUtil;
 @RequiredArgsConstructor
 public class AuthController {
 
+	private final UserService userService;
 	@Value("${oauth.payco.client-id}")
 	private String paycoClientIdFromConfig;
 
@@ -73,6 +77,9 @@ public class AuthController {
 	@ExceptionHandler(ApplicationException.class)
 	public String handleApplicationException(ApplicationException ex, RedirectAttributes redirectAttributes) {
 		ErrorCode errorCode = ex.getErrorCode();
+		if (errorCode.getCode().equals(ErrorCode.AUTH_INACTIVE_ACCOUNT.getCode())) {
+			return "redirect:/auth/reactive";
+		}
 
 		redirectAttributes.addFlashAttribute("error", "true");
 		redirectAttributes.addFlashAttribute("errorCode", errorCode.getCode());
@@ -173,5 +180,51 @@ public class AuthController {
 			redirectAttributes.addFlashAttribute("errorMessage", "PAYCO 로그인 중 오류가 발생했습니다. 다시 시도해주세요.");
 			return "redirect:/login";
 		}
+	}
+
+	@GetMapping("/auth/reactive")
+	public String reactiveDormantUserForm() {
+		return "auth/reactive_form";
+	}
+
+	@PostMapping("/auth/dormant/issue-code")
+	public String handleIssueDormantCodeForm(@ModelAttribute IssueDormantAuthCodeRequest request,
+		RedirectAttributes redirectAttributes) {
+		try {
+			userService.requestDormantCode(request);
+			redirectAttributes.addFlashAttribute("globalSuccessMessage",
+				"인증코드가 발송되었습니다. 입력된 아이디로 등록된 연락처(이메일/SMS)를 확인해주세요.");
+		} catch (ApplicationException e) {
+			redirectAttributes.addFlashAttribute("formErrorSource", "issueCodeForm"); // 어떤 폼에서 에러가 발생했는지 구분
+			redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+			redirectAttributes.addFlashAttribute("errorCode", e.getErrorCode().getCode());
+		} catch (Exception e) {
+			redirectAttributes.addFlashAttribute("formErrorSource", "issueCodeForm");
+			redirectAttributes.addFlashAttribute("errorMessage", "인증 코드 발급 중 서버 내부 오류가 발생했습니다.");
+			redirectAttributes.addFlashAttribute("errorCode", ErrorCode.INTERNAL_SERVER_ERROR.getCode());
+		}
+		return "redirect:/auth/reactive";
+	}
+
+	@PostMapping("/auth/reactivate-account")
+	public String handleReactivateDormantUserForm(@ModelAttribute ReactivateDormantUserRequest request,
+		RedirectAttributes redirectAttributes) {
+		try {
+			userService.processReactivateDormant(request);
+			redirectAttributes.addFlashAttribute("globalSuccessMessage", "계정이 성공적으로 활성화되었습니다. 다시 로그인해주세요.");
+			return "redirect:/login";
+		} catch (ApplicationException e) {
+			log.warn("Frontend AuthController: 휴면 계정 활성화 요청 실패 (form): loginId={}, errorCode={}, errorMessage={}",
+				request.getLoginId(), e.getErrorCode().getCode(), e.getMessage());
+			redirectAttributes.addFlashAttribute("formErrorSource", "reactivateForm");
+			redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+			redirectAttributes.addFlashAttribute("errorCode", e.getErrorCode().getCode());
+		} catch (Exception e) {
+			log.error("Frontend AuthController: 휴면 계정 활성화 요청 중 예상치 못한 오류 (form): loginId={}", request.getLoginId(), e);
+			redirectAttributes.addFlashAttribute("formErrorSource", "reactivateForm");
+			redirectAttributes.addFlashAttribute("errorMessage", "계정 활성화 중 서버 내부 오류가 발생했습니다.");
+			redirectAttributes.addFlashAttribute("errorCode", ErrorCode.INTERNAL_SERVER_ERROR.getCode());
+		}
+		return "redirect:/auth/reactive";
 	}
 }

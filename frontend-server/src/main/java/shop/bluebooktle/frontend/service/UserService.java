@@ -4,6 +4,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import shop.bluebooktle.common.dto.user.request.AdminUserUpdateRequest;
+import shop.bluebooktle.common.dto.user.request.IssueDormantAuthCodeRequest;
+import shop.bluebooktle.common.dto.user.request.ReactivateDormantUserRequest;
 import shop.bluebooktle.common.dto.user.request.UserSearchRequest;
 import shop.bluebooktle.common.dto.user.request.UserUpdateRequest;
 import shop.bluebooktle.common.dto.user.response.AdminUserResponse;
@@ -25,5 +27,10 @@ public interface UserService {
 	UserTotalPointResponse getUserTotalPoints();
 
 	UserWithAddressResponse getUserWithAddresses();
+
 	void withdrawAccount();
+
+	void requestDormantCode(IssueDormantAuthCodeRequest request);
+
+	void processReactivateDormant(ReactivateDormantUserRequest request);
 }

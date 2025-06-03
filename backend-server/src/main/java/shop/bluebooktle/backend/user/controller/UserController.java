@@ -162,7 +162,7 @@ public class UserController {
 	}
 
 	@Operation(summary = "휴면 계정 활성화", description = "인증 코드를 사용하여 휴면 상태의 계정을 활성화합니다. 성공 시 사용자는 별도로 다시 로그인해야 합니다.")
-	@PostMapping("/reactivate")
+	@PostMapping("/dormant/reactivate")
 	public ResponseEntity<JsendResponse<Void>> reactivateDormantUser(
 		@Valid @RequestBody ReactivateDormantUserRequest request) {
 		userService.reactivateDormantUser(request);
