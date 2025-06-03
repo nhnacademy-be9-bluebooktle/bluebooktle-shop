@@ -14,9 +14,9 @@ import shop.bluebooktle.common.dto.user.response.UserTotalPointResponse;
 import shop.bluebooktle.common.dto.user.response.UserWithAddressResponse;
 
 public interface UserService {
-	public UserResponse getMe();
+	UserResponse getMe();
 
-	public void updateUser(long id, UserUpdateRequest userUpdateRequest);
+	void updateUser(long id, UserUpdateRequest userUpdateRequest);
 
 	Page<AdminUserResponse> listUsers(UserSearchRequest request, Pageable pageable);
 

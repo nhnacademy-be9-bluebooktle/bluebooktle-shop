@@ -16,9 +16,4 @@ public class ReactivateDormantUserRequest {
 
 	@NotBlank(message = "인증 코드를 입력해주세요.")
 	private String authCode;
-
-	public ReactivateDormantUserRequest(String loginId, String authCode) {
-		this.loginId = loginId;
-		this.authCode = authCode;
-	}
 }
