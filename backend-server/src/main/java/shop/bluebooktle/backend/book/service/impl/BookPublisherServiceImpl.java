@@ -54,6 +54,15 @@ public class BookPublisherServiceImpl implements BookPublisherService {
 	}
 
 	@Override
+	public void updateBookPublisher(Long bookId, List<Long> publisherIdList) {
+		// 도서에 등록되었던 기존 출판사 삭제
+		List<BookPublisher> bookPublisherList = bookPublisherRepository.findByBookId(bookId);
+		bookPublisherRepository.deleteAll(bookPublisherList);
+		// 다시 새롭게 등록
+		registerBookPublisher(bookId, publisherIdList);
+	}
+
+	@Override
 	public void deleteBookPublisher(Long bookId, Long publisherId) {
 		Book book = findBookOrThrow(bookId);
 		Publisher publisher = findPublisherOrThrow(publisherId);

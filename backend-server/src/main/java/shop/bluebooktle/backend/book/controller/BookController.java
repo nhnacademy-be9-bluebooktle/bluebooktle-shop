@@ -1,7 +1,5 @@
 package shop.bluebooktle.backend.book.controller;
 
-import java.util.List;
-
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,17 +16,13 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import shop.bluebooktle.backend.book.service.AladinBookService;
 import shop.bluebooktle.backend.book.service.BookRegisterService;
 import shop.bluebooktle.backend.book.service.BookService;
 import shop.bluebooktle.common.dto.book.request.BookAllRegisterRequest;
-import shop.bluebooktle.common.dto.book.request.BookRegisterRequest;
 import shop.bluebooktle.common.dto.book.request.BookUpdateRequest;
-import shop.bluebooktle.common.dto.book.response.BookInfoResponse;
+import shop.bluebooktle.common.dto.book.response.BookAllResponse;
 import shop.bluebooktle.common.dto.book.response.BookCartOrderResponse;
-import shop.bluebooktle.common.dto.book.response.BookRegisterResponse;
-import shop.bluebooktle.common.dto.book.response.BookResponse;
-import shop.bluebooktle.common.dto.book.response.BookUpdateResponse;
+import shop.bluebooktle.common.dto.book.response.BookInfoResponse;
 import shop.bluebooktle.common.dto.common.JsendResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
 
@@ -40,15 +34,6 @@ public class BookController {
 
 	private final BookService bookService;
 	private final BookRegisterService bookRegisterService;
-	private final AladinBookService aladinBookService;
-
-	//도서 정보 등록
-	@PostMapping("/only-book-table")
-	public ResponseEntity<JsendResponse<BookRegisterResponse>> registerBook(
-		@Valid @RequestBody BookRegisterRequest request) {
-		BookRegisterResponse response = bookService.registerBook(request);
-		return ResponseEntity.status(HttpStatus.CREATED).body(JsendResponse.success(response));
-	}
 
 	//도서 등록
 	@PostMapping
@@ -60,19 +45,18 @@ public class BookController {
 
 	//도서 정보 조회
 	@GetMapping("/{bookId}")
-	public ResponseEntity<JsendResponse<BookResponse>> getBook(@PathVariable Long bookId) {
-		BookResponse bookResponse = bookService.findBookById(bookId);
+	public ResponseEntity<JsendResponse<BookAllResponse>> getBook(@PathVariable Long bookId) {
+		BookAllResponse bookResponse = bookService.findBookAllById(bookId);
 		return ResponseEntity.ok(JsendResponse.success(bookResponse));
 	}
 
 	//도서 정보 수정
 	@PutMapping("/{bookId}")
-	public ResponseEntity<JsendResponse<BookUpdateResponse>> updateBook(
+	public ResponseEntity<JsendResponse<Void>> updateBook(
 		@PathVariable Long bookId,
 		@Valid @RequestBody BookUpdateRequest request) {
-
-		BookUpdateResponse response = bookService.updateBook(bookId, request);
-		return ResponseEntity.ok(JsendResponse.success(response));
+		bookService.updateBook(bookId, request);
+		return ResponseEntity.ok(JsendResponse.success());
 	}
 
 	//도서 정보 삭제

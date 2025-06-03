@@ -23,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import shop.bluebooktle.common.dto.book.request.BookAllRegisterByAladinRequest;
 import shop.bluebooktle.common.dto.book.request.BookAllRegisterRequest;
 import shop.bluebooktle.common.dto.book.request.BookFormRequest;
+import shop.bluebooktle.common.dto.book.request.BookUpdateRequest;
 import shop.bluebooktle.common.dto.book.response.AladinBookResponse;
 import shop.bluebooktle.common.dto.book.response.BookAllResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
@@ -118,6 +119,11 @@ public class AdminBookServiceImpl implements AdminBookService {
 	@Override
 	public void deleteBook(Long bookId) {
 		adminBookRepository.deleteBook(bookId);
+	}
+
+	@Override
+	public void updateBook(Long bookId, BookUpdateRequest bookUpdateRequest) {
+		adminBookRepository.updateBook(bookId, bookUpdateRequest);
 	}
 
 	@Override

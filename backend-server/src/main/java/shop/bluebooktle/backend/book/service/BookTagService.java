@@ -14,6 +14,8 @@ public interface BookTagService {
 
 	void registerBookTag(Long bookId, List<Long> tagIdList);
 
+	void updateBookTag(Long bookId, List<Long> tagIdList);
+
 	// 도서 태그 삭제
 	void deleteBookTag(Long tagId, Long bookId);
 

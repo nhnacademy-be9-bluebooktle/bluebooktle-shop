@@ -1,5 +1,6 @@
 package shop.bluebooktle.backend.book.service.impl;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -14,7 +15,6 @@ import org.springframework.util.StringUtils;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import shop.bluebooktle.backend.book.entity.Author;
 import shop.bluebooktle.backend.book.entity.Book;
 import shop.bluebooktle.backend.book.entity.BookSaleInfo;
 import shop.bluebooktle.backend.book.repository.BookAuthorRepository;
@@ -24,16 +24,19 @@ import shop.bluebooktle.backend.book.repository.BookPublisherRepository;
 import shop.bluebooktle.backend.book.repository.BookRepository;
 import shop.bluebooktle.backend.book.repository.BookSaleInfoRepository;
 import shop.bluebooktle.backend.book.repository.BookTagRepository;
+import shop.bluebooktle.backend.book.service.AuthorService;
+import shop.bluebooktle.backend.book.service.BookAuthorService;
+import shop.bluebooktle.backend.book.service.BookCategoryService;
+import shop.bluebooktle.backend.book.service.BookPublisherService;
 import shop.bluebooktle.backend.book.service.BookService;
+import shop.bluebooktle.backend.book.service.BookTagService;
+import shop.bluebooktle.backend.book.service.PublisherService;
 import shop.bluebooktle.common.dto.book.request.BookRegisterRequest;
 import shop.bluebooktle.common.dto.book.request.BookUpdateRequest;
 import shop.bluebooktle.common.dto.book.response.BookAllResponse;
-import shop.bluebooktle.common.dto.book.response.BookInfoResponse;
 import shop.bluebooktle.common.dto.book.response.BookCartOrderResponse;
-import shop.bluebooktle.common.dto.book.response.BookRegisterResponse;
+import shop.bluebooktle.common.dto.book.response.BookInfoResponse;
 import shop.bluebooktle.common.dto.book.response.BookResponse;
-import shop.bluebooktle.common.dto.book.response.BookUpdateResponse;
-import shop.bluebooktle.common.exception.book.BookAlreadyExistsException;
 import shop.bluebooktle.common.exception.book.BookNotFoundException;
 
 @Service
@@ -50,22 +53,12 @@ public class BookServiceImpl implements BookService {
 	private final BookTagRepository bookTagRepository;
 	private final BookImgRepository bookImgRepository;
 
-	@Override
-	public BookRegisterResponse registerBook(BookRegisterRequest request) {
-		if (bookRepository.existsByIsbn(request.getIsbn())) {
-			throw new BookAlreadyExistsException();
-		}
-		Book book = toEntity(request);
-		bookRepository.save(book);
-
-		return BookRegisterResponse.builder()
-			.title(request.getTitle())
-			.index(request.getIndex())
-			.description(request.getDescription())
-			.publishDate(request.getPublishDate())
-			.isbn(request.getIsbn())
-			.build();
-	}
+	private final BookPublisherService bookPublisherService;
+	private final BookCategoryService bookCategoryService;
+	private final BookAuthorService bookAuthorService;
+	private final AuthorService authorService;
+	private final PublisherService publisherService;
+	private final BookTagService bookTagService;
 
 	@Override
 	@Transactional(readOnly = true)
@@ -83,24 +76,48 @@ public class BookServiceImpl implements BookService {
 	}
 
 	@Override
-	public BookUpdateResponse updateBook(Long bookId, BookUpdateRequest request) {
+	public void updateBook(Long bookId, BookUpdateRequest request) {
+
 		Book book = bookRepository.findById(bookId)
 			.orElseThrow(BookNotFoundException::new);
 
+		BigDecimal salePercentage = request.getPrice().subtract(request.getSalePrice())
+			.divide(request.getPrice(), 2, BigDecimal.ROUND_HALF_UP)
+			.multiply(BigDecimal.valueOf(100));
+
 		Book updatedBook = Book.builder()
-			.id(book.getId()) // ID는 기존 데이터 유지
-			.title(request.getTitle()) // 수정된 값
-			.description(request.getDescription()) // 수정된 값
-			.publishDate(book.getPublishDate()) // 기존 데이터 유지
-			.isbn(book.getIsbn()) // 기존 데이터 유지
+			.id(book.getId())
+			.title(request.getTitle())
+			.description(request.getDescription())
+			.publishDate(request.getPublishDate() != null ?
+				request.getPublishDate().atStartOfDay() : null)
+			.isbn(book.getIsbn()) // isbn은 수정 불가
 			.build();
 
 		bookRepository.save(updatedBook);
 
-		return BookUpdateResponse.builder()
-			.title(updatedBook.getTitle())
-			.description(updatedBook.getDescription())
+		BookSaleInfo bookSaleInfo = bookSaleInfoRepository.findByBook(book).orElseThrow(BookNotFoundException::new);
+		BookSaleInfo updatedBookSaleInfo = BookSaleInfo.builder()
+			.id(bookSaleInfo.getId())
+			.book(updatedBook)
+			.price(request.getPrice())
+			.salePrice(request.getSalePrice())
+			.stock(request.getStock())
+			.isPackable(request.getIsPackable())
+			.salePercentage(salePercentage)
+			.bookSaleInfoState(request.getState())
+			.viewCount(bookSaleInfo.getViewCount())
+			.searchCount(bookSaleInfo.getSearchCount())
+			.star(bookSaleInfo.getStar())
+			.reviewCount(bookSaleInfo.getReviewCount())
 			.build();
+		bookSaleInfoRepository.save(updatedBookSaleInfo);
+
+		bookAuthorService.updateBookAuthor(bookId, request.getAuthorIdList()); // 작가
+		bookPublisherService.updateBookPublisher(bookId, request.getPublisherIdList()); // 출판사
+		bookCategoryService.updateBookCategory(bookId, request.getCategoryIdList()); // 카테고리
+		bookTagService.updateBookTag(bookId, request.getTagIdList()); // 태그
+
 	}
 
 	@Override
@@ -197,8 +214,8 @@ public class BookServiceImpl implements BookService {
 				BookSaleInfo bookSaleInfo = bookSaleInfoRepository.findByBook(book)
 					.orElseThrow(BookNotFoundException::new);
 
-				List<String> authorNameList = bookAuthorRepository.findAuthorsByBook(book).stream()
-					.map(Author::getName)
+				List<String> authorNameList = bookAuthorRepository.findByBookId(book.getId()).stream()
+					.map(bookAuthor -> bookAuthor.getAuthor().getName())
 					.toList();
 
 				String imgUrl = bookImgRepository.findByBook(book).getImg().getImgUrl();

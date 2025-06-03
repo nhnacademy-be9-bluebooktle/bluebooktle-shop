@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import shop.bluebooktle.common.dto.book.request.BookAllRegisterRequest;
+import shop.bluebooktle.common.dto.book.request.BookUpdateRequest;
 import shop.bluebooktle.common.dto.book.response.AladinBookResponse;
 import shop.bluebooktle.common.dto.book.response.BookAllResponse;
 import shop.bluebooktle.common.dto.book.response.BookCartOrderResponse;
@@ -29,6 +30,12 @@ public interface AdminBookRepository {
 
 	@GetMapping("/{bookId}")
 	BookAllResponse getBook(@PathVariable("bookId") Long bookId);
+
+	@PostMapping("/{bookId}")
+	void updateBook(
+		@PathVariable Long bookId,
+		@RequestBody BookUpdateRequest bookUpdateRequest
+	);
 
 	@PostMapping()
 	void registerBook(@RequestBody BookAllRegisterRequest bookAllRegisterRequest);

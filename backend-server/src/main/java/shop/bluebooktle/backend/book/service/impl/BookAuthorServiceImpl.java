@@ -55,6 +55,15 @@ public class BookAuthorServiceImpl implements BookAuthorService {
 		}
 	}
 
+	@Override
+	public void updateBookAuthor(Long bookId, List<Long> authorIdList) {
+		// 도서에 등록되었던 기존 작가 삭제
+		List<BookAuthor> bookAuthorList = bookAuthorRepository.findByBookId(bookId);
+		bookAuthorRepository.deleteAll(bookAuthorList);
+		// 다시 새롭게 등록
+		registerBookAuthor(bookId, authorIdList);
+	}
+
 	@Transactional(readOnly = true)
 	@Override
 	public List<AuthorResponse> getAuthorByBookId(Long bookId) {
@@ -62,11 +71,11 @@ public class BookAuthorServiceImpl implements BookAuthorService {
 		Book book = bookRepository.findById(bookId)
 			.orElseThrow(() -> new BookNotFoundException());
 
-		return bookAuthorRepository.findAuthorsByBook(book).stream()
-			.map(author -> AuthorResponse.builder()
-				.id(author.getId())
-				.name(author.getName())
-				.createdAt(author.getCreatedAt())
+		return bookAuthorRepository.findByBookId(book.getId()).stream()
+			.map(bookAuthor -> AuthorResponse.builder()
+				.id(bookAuthor.getAuthor().getId())
+				.name(bookAuthor.getAuthor().getName())
+				.createdAt(bookAuthor.getAuthor().getCreatedAt())
 				.build())
 			.toList();
 	}

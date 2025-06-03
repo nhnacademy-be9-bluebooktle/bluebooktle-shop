@@ -44,9 +44,6 @@ public class BookAllRegisterRequest {
 	@NotNull(message = "재고 수는 필수 값입니다.")
 	Integer stock;
 
-	// @NotNull(message = "할인율은 필수 값입니다.")
-	// BigDecimal salePercentage;
-
 	Boolean isPackable;
 
 	@NotNull(message = "판매상태는 필수 값입니다.")
