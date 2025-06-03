@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import shop.bluebooktle.common.domain.UserCouponFilterType;
+import shop.bluebooktle.common.domain.coupon.UserCouponFilterType;
 import shop.bluebooktle.common.dto.common.PaginationData;
 import shop.bluebooktle.common.dto.coupon.response.UsableUserCouponMapResponse;
 import shop.bluebooktle.common.dto.coupon.response.UserCouponResponse;
