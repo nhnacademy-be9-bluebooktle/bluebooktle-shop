@@ -1,5 +1,6 @@
 package shop.bluebooktle.frontend.service.impl;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
@@ -23,16 +24,16 @@ public class AdminCouponServiceImpl implements AdminCouponService {
 		adminCouponRepository.registerCouponType(request);
 	}
 
-	public PaginationData<CouponTypeResponse> getAllCouponType() {
-		return adminCouponRepository.getAllCouponType();
+	public PaginationData<CouponTypeResponse> getAllCouponType(Pageable pageable) {
+		return adminCouponRepository.getAllCouponType(pageable.getPageNumber(), pageable.getPageSize());
 	}
 
 	public void registerCoupon(CouponRegisterRequest request) {
 		adminCouponRepository.registerCoupon(request);
 	}
 
-	public PaginationData<CouponResponse> getAllCoupon() {
-		return adminCouponRepository.getAllCoupon();
+	public PaginationData<CouponResponse> getAllCoupon(Pageable pageable, String couponName) {
+		return adminCouponRepository.getAllCoupon(pageable.getPageNumber(), pageable.getPageSize(), couponName);
 	}
 
 	public void issueCoupon(UserCouponRegisterRequest request) {

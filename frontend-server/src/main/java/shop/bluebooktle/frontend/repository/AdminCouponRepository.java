@@ -4,6 +4,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import shop.bluebooktle.common.dto.common.PaginationData;
 import shop.bluebooktle.common.dto.coupon.request.CouponRegisterRequest;
@@ -21,7 +22,10 @@ public interface AdminCouponRepository {
 
 	//쿠폰 정책 전체 조회
 	@GetMapping("/type")
-	PaginationData<CouponTypeResponse> getAllCouponType();
+	PaginationData<CouponTypeResponse> getAllCouponType(
+		@RequestParam("page") int page,
+		@RequestParam("size") int size
+	);
 
 	//쿠폰 등록
 	@PostMapping
@@ -29,7 +33,11 @@ public interface AdminCouponRepository {
 
 	//전체 쿠폰 조회
 	@GetMapping
-	PaginationData<CouponResponse> getAllCoupon();
+	PaginationData<CouponResponse> getAllCoupon(
+		@RequestParam("page") int page,
+		@RequestParam("size") int size,
+		@RequestParam(value = "couponName", required = false) String couponName
+	);
 
 	//쿠폰 발급
 	@PostMapping("/issue")
