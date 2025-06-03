@@ -280,6 +280,11 @@
             margin-top: 1.5rem;
         }
 
+        .disabled-option {
+            color: #999;
+            text-decoration: line-through;
+        }
+
         @media (max-width: 992px) {
             .checkout-container-kitsch {
                 grid-template-columns: 1fr;
@@ -414,21 +419,33 @@
 
                                     <!-- ⑤ 쿠폰 선택 -->
                                     <div class="item-coupon-apply-kitsch"
-                                         th:if="${item.couponList != null and !item.couponList.isEmpty()}">
+                                         th:if="${coupons.usableUserCouponMap[__${item.bookId}__] != null and !coupons.usableUserCouponMap[__${item.bookId}__].isEmpty()}">
                                         <label class="label-kitsch" th:for="${'couponSelect-' + idx.index}">사용할
                                             쿠폰:</label>
                                         <select class="select-kitsch item-coupon-select"
                                                 th:id="${'couponSelect-' + idx.index}"
                                                 th:data-idx="${idx.index}">
                                             <option value="">쿠폰 선택 안함</option>
-                                            <option th:each="coupon : ${item.couponList}"
+
+                                            <option
+                                                    th:each="coupon : ${coupons.usableUserCouponMap[__${item.bookId}__]}"
                                                     th:value="${coupon.userCouponId}"
-                                                    th:text="${coupon.couponName + ' (-' + coupon.discountPrice + '원)'}">
+                                                    th:data-type="${coupon.discountPrice != null ? 'FIXED' : 'PERCENT'}"
+                                                    th:data-discount-price="${coupon.discountPrice}"
+                                                    th:data-discount-percent="${coupon.discountPercent}"
+                                                    th:data-maximum-discount-price="${coupon.maximumDiscountPrice}"
+                                                    th:data-minimum-payment="${coupon.minimumPayment}"
+                                                    th:text="${coupon.discountPrice != null
+                                                        ? coupon.couponName + ' (-' + #numbers.formatInteger(coupon.discountPrice, 0) + '원)'
+                                                        : coupon.couponName + ' (' + coupon.discountPercent + '% 할인, 최대 ' + #numbers.formatInteger(coupon.maximumDiscountPrice, 0) + '원)'}">
                                             </option>
+
+
                                         </select>
+
                                         <p class="item-coupon-applied-info" th:id="${'couponInfo-' + idx.index}"
                                            style="display:none;">
-                                            쿠폰이 적용되었습니다.
+                                            쿠폰을 적용했습니다.
                                         </p>
                                     </div>
                                 </div>
@@ -637,7 +654,7 @@
                                 <option th:each="coupon : ${coupons.usableUserCouponMap[-1]}"
                                         th:value="${coupon.userCouponId}"
                                         th:data-discount="${coupon.discountPrice}"
-                                        th:text="${coupon.couponName + ' (-' + coupon.discountPrice + '원)'}">
+                                        th:text="${coupon.couponName + ' (-' + #numbers.formatInteger(coupon.discountPrice, 0) + '원)'}">
                                 </option>
                             </select>
                             <input type="hidden" name="orderCouponCode" id="hiddenOrderCouponCode" value=""/>
@@ -903,7 +920,25 @@
                         const infoEl = document.getElementById(`couponInfo-${idx}`);
                         document.getElementById(`hiddenItemCoupon-${idx}`).value = selectedCouponId;
 
+                        // 할인 정보 계산 및 표시
+                        const selected = sel.selectedOptions[0];
+                        const itemWrapper = sel.closest('.ordered-item-kitsch');
+                        const salePrice = parseInt(itemWrapper.dataset.itemSalePrice, 10);
+                        let discountText = '';
+
                         if (selectedCouponId) {
+                            const type = selected.dataset.type;
+                            if (type === 'FIXED') {
+                                const discountPrice = parseInt(selected.dataset.discountPrice || 0, 10);
+                                discountText = `할인 적용: -${discountPrice.toLocaleString()}원`;
+                            } else if (type === 'PERCENT') {
+                                const percent = parseFloat(selected.dataset.discountPercent || 0);
+                                const max = parseInt(selected.dataset.maximumDiscountPrice || 0, 10);
+                                let discount = Math.floor(salePrice * (percent / 100));
+                                if (max && discount > max) discount = max;
+                                discountText = `할인 적용: -${discount.toLocaleString()}원`;
+                            }
+                            infoEl.textContent = discountText;
                             infoEl.style.display = 'block';
                         } else {
                             infoEl.style.display = 'none';
@@ -1011,11 +1046,19 @@
                 document.querySelectorAll('.item-coupon-select').forEach(sel => {
                     const selected = sel.selectedOptions[0];
                     if (selected && selected.value) {
-                        const text = selected.textContent;
-                        const match = text.match(/-(\d+(,\d+)?)/);
-                        if (match) {
-                            const discountValue = parseInt(match[1].replace(/,/g, ''), 10);
-                            totalDiscount += discountValue;
+                        const itemWrapper = sel.closest('.ordered-item-kitsch');
+                        const salePrice = parseInt(itemWrapper.dataset.itemSalePrice, 10);
+
+                        const type = selected.dataset.type;
+                        if (type === 'FIXED') {
+                            const discountPrice = parseInt(selected.dataset.discountPrice || 0, 10);
+                            totalDiscount += discountPrice;
+                        } else if (type === 'PERCENT') {
+                            const percent = parseFloat(selected.dataset.discountPercent || 0);
+                            const max = parseInt(selected.dataset.maximumDiscountPrice || 0, 10);
+                            let discount = Math.floor(salePrice * (percent / 100));
+                            if (max && discount > max) discount = max;
+                            totalDiscount += discount;
                         }
                     }
                 });

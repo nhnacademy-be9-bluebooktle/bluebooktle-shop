@@ -97,9 +97,11 @@ public class OrderController {
 		List<PackagingOptionInfoResponse> packagingOptions = page.getContent();
 		mav.addObject("packagingOptions", packagingOptions);
 
-		// List<CouponResponse> orderCoupons = createMockOrderCoupons();
-		UsableUserCouponMapResponse orderCoupons = couponService.getUsableCouponsForOrder(bookIds);
+		List<Long> bookIdsForCoupon = bookItems.stream()
+			.map(BookCartOrderResponse::bookId)
+			.toList();
 
+		UsableUserCouponMapResponse orderCoupons = couponService.getUsableCouponsForOrder(bookIdsForCoupon);
 		mav.addObject("coupons", orderCoupons);
 
 		DeliveryRuleResponse deliveryRule = deliveryRuleService.getDefaultDeliveryRule();

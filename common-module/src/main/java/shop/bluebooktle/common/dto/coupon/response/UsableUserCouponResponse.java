@@ -19,13 +19,13 @@ public class UsableUserCouponResponse {
 	BigDecimal maximumDiscountPrice;
 	Integer discountPercent;
 
-	String categoryName;
 	String bookName;
+	String categoryName;
 
 	@QueryProjection
 	public UsableUserCouponResponse(Long userCouponId, Long couponId, String couponName, String couponTypeName,
 		BigDecimal minimumPayment, BigDecimal discountPrice, BigDecimal maximumDiscountPrice, Integer discountPercent,
-		String categoryName, String bookName) {
+		String bookName, String categoryName) {
 		this.userCouponId = userCouponId;
 		this.couponId = couponId;
 		this.couponName = couponName;
@@ -34,7 +34,7 @@ public class UsableUserCouponResponse {
 		this.discountPrice = discountPrice;
 		this.maximumDiscountPrice = maximumDiscountPrice;
 		this.discountPercent = discountPercent;
-		this.categoryName = categoryName;
 		this.bookName = bookName;
+		this.categoryName = categoryName;
 	}
 }
