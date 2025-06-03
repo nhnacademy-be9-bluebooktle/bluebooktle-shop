@@ -27,6 +27,7 @@ import shop.bluebooktle.common.domain.coupon.CouponTypeTarget;
 import shop.bluebooktle.common.dto.book.response.BookCartOrderResponse;
 import shop.bluebooktle.common.dto.book_order.response.PackagingOptionInfoResponse;
 import shop.bluebooktle.common.dto.coupon.response.CouponResponse;
+import shop.bluebooktle.common.dto.coupon.response.UsableUserCouponMapResponse;
 import shop.bluebooktle.common.dto.order.request.OrderCreateRequest;
 import shop.bluebooktle.common.dto.order.response.DeliveryRuleResponse;
 import shop.bluebooktle.common.dto.order.response.OrderConfirmDetailResponse;
@@ -36,6 +37,7 @@ import shop.bluebooktle.common.dto.user.response.UserWithAddressResponse;
 import shop.bluebooktle.frontend.service.AdminPackagingOptionService;
 import shop.bluebooktle.frontend.service.BookService;
 import shop.bluebooktle.frontend.service.CartService;
+import shop.bluebooktle.frontend.service.CouponService;
 import shop.bluebooktle.frontend.service.DeliveryRuleService;
 import shop.bluebooktle.frontend.service.OrderService;
 import shop.bluebooktle.frontend.service.PaymentsService;
@@ -57,6 +59,7 @@ public class OrderController {
 	private final OrderService orderService;
 	private final BookService bookService;
 	private final CartService cartService;
+	private final CouponService couponService;
 
 	@GetMapping("/create")
 	public ModelAndView createPage(
@@ -94,7 +97,9 @@ public class OrderController {
 		List<PackagingOptionInfoResponse> packagingOptions = page.getContent();
 		mav.addObject("packagingOptions", packagingOptions);
 
-		List<CouponResponse> orderCoupons = createMockOrderCoupons();
+		// List<CouponResponse> orderCoupons = createMockOrderCoupons();
+		UsableUserCouponMapResponse orderCoupons = couponService.getUsableCouponsForOrder(bookIds);
+
 		mav.addObject("coupons", orderCoupons);
 
 		DeliveryRuleResponse deliveryRule = deliveryRuleService.getDefaultDeliveryRule();

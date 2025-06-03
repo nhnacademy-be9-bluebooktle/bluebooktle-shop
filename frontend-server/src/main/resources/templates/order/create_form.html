@@ -4,6 +4,7 @@
       xmlns:th="http://www.thymeleaf.org">
 
 <head>
+    <meta charset="UTF-8">
     <title>주문서 작성</title>
     <style>
         /* 기존 checkout 페이지 스타일 유지 */
@@ -410,6 +411,26 @@
                                                 type="button">+
                                         </button>
                                     </div>
+
+                                    <!-- ⑤ 쿠폰 선택 -->
+                                    <div class="item-coupon-apply-kitsch"
+                                         th:if="${item.couponList != null and !item.couponList.isEmpty()}">
+                                        <label class="label-kitsch" th:for="${'couponSelect-' + idx.index}">사용할
+                                            쿠폰:</label>
+                                        <select class="select-kitsch item-coupon-select"
+                                                th:id="${'couponSelect-' + idx.index}"
+                                                th:data-idx="${idx.index}">
+                                            <option value="">쿠폰 선택 안함</option>
+                                            <option th:each="coupon : ${item.couponList}"
+                                                    th:value="${coupon.userCouponId}"
+                                                    th:text="${coupon.couponName + ' (-' + coupon.discountPrice + '원)'}">
+                                            </option>
+                                        </select>
+                                        <p class="item-coupon-applied-info" th:id="${'couponInfo-' + idx.index}"
+                                           style="display:none;">
+                                            쿠폰이 적용되었습니다.
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -609,6 +630,18 @@
                             <span class="value discount" id="summaryTotalDiscount">0원</span>
                         </div>
 
+                        <div class="summary-row-kitsch">
+                            <label for="orderCouponSelect" class="label">주문 쿠폰 선택:</label>
+                            <select id="orderCouponSelect" class="select-kitsch" style="max-width: 200px;">
+                                <option value="">선택 안 함</option>
+                                <option th:each="coupon : ${coupons.usableUserCouponMap[-1]}"
+                                        th:value="${coupon.userCouponId}"
+                                        th:data-discount="${coupon.discountPrice}"
+                                        th:text="${coupon.couponName + ' (-' + coupon.discountPrice + '원)'}">
+                                </option>
+                            </select>
+                            <input type="hidden" name="orderCouponCode" id="hiddenOrderCouponCode" value=""/>
+                        </div>
 
                         <div class="summary-row-kitsch">
                             <span class="label">주문 전체 할인:</span>
@@ -663,6 +696,18 @@
                 const aliasEl = document.getElementById('savedAlias');
                 const roadEl = document.getElementById('savedRoad');
                 const detailEl = document.getElementById('savedDetail');
+                const orderCouponSelect = document.getElementById('orderCouponSelect');
+                const orderCouponHidden = document.getElementById('hiddenOrderCouponCode')
+
+                orderCouponSelect.addEventListener('change', () => {
+                    const selected = orderCouponSelect.selectedOptions[0];
+                    const discount = selected.dataset.discount ? parseInt(selected.dataset.discount.replace(/[^\d]/g, ''), 10) : 0;
+
+                    orderCouponHidden.value = selected.value || '';
+                    document.getElementById('summaryOrderCouponDiscount').textContent = '-' + discount.toLocaleString() + '원';
+
+                    updateFinalTotalPrice();
+                });
 
                 function updateAddress() {
                     const opt = selectEl.selectedOptions[0];
@@ -849,7 +894,26 @@
                     });
                 });
 
-                
+                // -------------------------------------------------
+                // 6) 쿠폰 선택 변화 감지 및 hidden 필드 갱신 + 결제 금액 갱신
+                document.querySelectorAll('.item-coupon-select').forEach(sel => {
+                    sel.addEventListener('change', () => {
+                        const idx = sel.dataset.idx;
+                        const selectedCouponId = sel.value;
+                        const infoEl = document.getElementById(`couponInfo-${idx}`);
+                        document.getElementById(`hiddenItemCoupon-${idx}`).value = selectedCouponId;
+
+                        if (selectedCouponId) {
+                            infoEl.style.display = 'block';
+                        } else {
+                            infoEl.style.display = 'none';
+                        }
+
+                        updateOrderCouponDiscount();
+                        updateFinalTotalPrice();
+                    });
+                });
+
                 // -------------------------------------------------
                 // 7) 결제하기 버튼 클릭 시 모든 hidden 필드 동기화 후 폼 제출
                 document.getElementById('payment-button').addEventListener('click', () => {
@@ -940,7 +1004,27 @@
             }
 
             // ================================================
-            // 5) 최종 결제금액 계산
+            // 5) 쿠폰 할인 총합
+            function updateOrderCouponDiscount() {
+                let totalDiscount = 0;
+
+                document.querySelectorAll('.item-coupon-select').forEach(sel => {
+                    const selected = sel.selectedOptions[0];
+                    if (selected && selected.value) {
+                        const text = selected.textContent;
+                        const match = text.match(/-(\d+(,\d+)?)/);
+                        if (match) {
+                            const discountValue = parseInt(match[1].replace(/,/g, ''), 10);
+                            totalDiscount += discountValue;
+                        }
+                    }
+                });
+
+                document.getElementById('summaryOrderCouponDiscount').textContent = '-' + totalDiscount.toLocaleString() + '원';
+            }
+
+            // ================================================
+            // 6) 최종 결제금액 계산
             function updateFinalTotalPrice() {
                 const getNum = id => parseInt(
                     document.getElementById(id).textContent.replace(/[^\d]/g, ''), 10
