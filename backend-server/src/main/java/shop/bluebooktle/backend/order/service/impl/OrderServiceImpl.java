@@ -93,13 +93,27 @@ public class OrderServiceImpl implements OrderService {
 					.orElse(BigDecimal.ZERO))
 				.add(Optional.ofNullable(o.getDeliveryFee())
 					.orElse(BigDecimal.ZERO));
+
+			String thumbnailUrl = o.getBookOrders().stream()
+				.findFirst() // 대표 BookOrder 하나를 가져온 뒤
+				.flatMap(bookOrder -> {
+					Book book = bookOrder.getBook();
+					if (book == null)
+						return Optional.<BookImg>empty();
+					return book.getBookImgs().stream().findFirst();
+				})
+				.map(BookImg::getImg)       // BookImg 에서 Img 엔티티 꺼내고
+				.map(Img::getImgUrl)      // Img 엔티티에서 URL 꺼내기
+				.orElse("");               // 없으면 빈 문자열 혹은 기본 URL
+
 			return new OrderHistoryResponse(
-				o.getId(),                     // orderId
-				o.getCreatedAt(),              // createAt
-				o.getOrderName(),              // orderName
-				paidAmount,                    // totalPrice
-				o.getOrderKey(),               // orderKey
-				o.getOrderState().getState()   // orderStatus
+				o.getId(),
+				o.getCreatedAt(),
+				o.getOrderName(),
+				paidAmount,
+				o.getOrderKey(),
+				o.getOrderState().getState(),
+				thumbnailUrl
 			);
 		});
 	}

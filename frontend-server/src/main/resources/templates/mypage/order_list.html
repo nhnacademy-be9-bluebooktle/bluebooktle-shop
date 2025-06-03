@@ -294,28 +294,29 @@
                     <div class="control-group-kitsch">
                         <label class="label-kitsch handwriting-font-kitsch" for="orderStatusFilter">주문 상태:</label>
                         <select class="select-kitsch" id="orderStatusFilter" name="status">
-                            <option th:selected="${status == null or status == 'all'}"
-                                    th:value="all">전체 상태
+                            <option th:selected="${status == null}"
+                                    th:value="${null}">
+                                전체 상태
                             </option>
                             <option th:selected="${status == T(shop.bluebooktle.common.domain.order.OrderStatus).PENDING}"
+                                    th:text="${T(shop.bluebooktle.common.domain.order.OrderStatus).PENDING.getDescription()}"
                                     th:value="PENDING">
-                                입금대기
                             </option>
                             <option th:selected="${status == T(shop.bluebooktle.common.domain.order.OrderStatus).SHIPPING}"
+                                    th:text="${T(shop.bluebooktle.common.domain.order.OrderStatus).SHIPPING.getDescription()}"
                                     th:value="SHIPPING">
-                                배송중
                             </option>
                             <option th:selected="${status == T(shop.bluebooktle.common.domain.order.OrderStatus).COMPLETED}"
+                                    th:text="${T(shop.bluebooktle.common.domain.order.OrderStatus).COMPLETED.getDescription()}"
                                     th:value="COMPLETED">
-                                배송완료
                             </option>
                             <option th:selected="${status == T(shop.bluebooktle.common.domain.order.OrderStatus).RETURNED}"
+                                    th:text="${T(shop.bluebooktle.common.domain.order.OrderStatus).RETURNED.getDescription()}"
                                     th:value="RETURNED">
-                                반품
                             </option>
                             <option th:selected="${status == T(shop.bluebooktle.common.domain.order.OrderStatus).CANCELED}"
+                                    th:text="${T(shop.bluebooktle.common.domain.order.OrderStatus).CANCELED.getDescription()}"
                                     th:value="CANCELED">
-                                주문취소
                             </option>
                         </select>
                         <button class="btn-kitsch primary-btn-kitsch small-btn-kitsch retro-shadow-kitsch-small"
@@ -355,7 +356,7 @@
                         <div class="order-item-body-kitsch">
                             <div class="product-image-kitsch">
                                 <img alt="상품이미지"
-                                     th:src="@{'https://picsum.photos/80/120?random=' + ${orderResp.orderId}}"/>
+                                     th:src="${orderResp.thumbnailUrl}"/>
                             </div>
 
                             <div class="order-product-summary-kitsch">
@@ -382,9 +383,10 @@
                                     </a>
 
                                     <!-- 상태에 따라 버튼 예시 (예: 입금대기일 때는 결제하기 버튼, 배송중일 때는 배송조회 버튼 등) -->
-                                    <button class="btn-kitsch secondary-btn-kitsch color3-kitsch retro-shadow-kitsch-small"
+                                    <button
+                                            class="btn-kitsch secondary-btn-kitsch color3-kitsch retro-shadow-kitsch-small"
                                             th:if="${orderResp.orderStatus.name() == 'PENDING'}"
-                                            th:onclick="'location.href=\'/payment/continue/' + ${orderResp.orderKey} + '\';'"
+                                            th:attr="onclick=|location.href='/payment/continue/${orderResp.orderKey}'|"
                                             th:text="결제하기">
                                     </button>
                                     <button class="btn-kitsch secondary-btn-kitsch color2-kitsch retro-shadow-kitsch-small"
@@ -437,65 +439,6 @@
 <th:block layout:fragment="page_scripts">
     <script>
 
-
-        // 주문 검색 (Mock)
-        function searchOrders() {
-            const period = document.getElementById('orderPeriod').value;
-            const startDate = document.getElementById('startDate').value;
-            const endDate = document.getElementById('endDate').value;
-            const status = document.getElementById('orderStatusFilter').value;
-            console.log("Search Orders (Mock):", {period, startDate, endDate, status});
-            alert("주문 내역을 조회합니다. (Mock)");
-        }
-
-        // 구매 확정 (Mock)
-        function confirmPurchase(orderId) {
-            console.log("Confirm Purchase (Mock):", orderId);
-            if (confirm(orderId + " 주문에 대해 구매를 확정하시겠습니까? (Mock)")) {
-                alert("구매가 확정되었습니다. 리뷰를 작성해주세요! (Mock)");
-                const orderCard = Array.from(document.querySelectorAll('.order-item-card-kitsch')).find(card => {
-                    const orderIdElement = card.querySelector('.order-id');
-                    return orderIdElement && orderIdElement.textContent.includes(orderId);
-                });
-
-                if (orderCard) {
-                    const statusElement = orderCard.querySelector('.order-status-kitsch');
-                    if (statusElement) {
-                        statusElement.textContent = "구매확정";
-                        statusElement.className = "order-status-kitsch status-confirmed"; // status-confirmed CSS 정의 필요
-                    }
-                    const confirmButton = orderCard.querySelector('button[onclick*="confirmPurchase"]');
-                    if (confirmButton) confirmButton.style.display = 'none';
-                }
-            }
-        }
-
-        // 배송 조회 (Mock)
-        function trackDelivery(logisticsId) {
-            console.log("Track Delivery (Mock):", logisticsId);
-            alert(logisticsId + " 배송 조회를 시작합니다. (Mock)");
-        }
-
-        // 주문 취소 (Mock)
-        function cancelOrder(orderId) {
-            console.log("Cancel Order (Mock):", orderId);
-            if (confirm(orderId + " 주문을 취소하시겠습니까? (Mock)")) {
-                alert("주문이 취소되었습니다. (Mock)");
-                const orderCard = Array.from(document.querySelectorAll('.order-item-card-kitsch')).find(card => {
-                    const orderIdElement = card.querySelector('.order-id');
-                    return orderIdElement && orderIdElement.textContent.includes(orderId);
-                });
-                if (orderCard) {
-                    const statusElement = orderCard.querySelector('.order-status-kitsch');
-                    if (statusElement) {
-                        statusElement.textContent = "주문취소";
-                        statusElement.className = "order-status-kitsch status-cancelled";
-                    }
-                    const cancelButton = orderCard.querySelector('button[onclick*="cancelOrder"]');
-                    if (cancelButton) cancelButton.style.display = 'none';
-                }
-            }
-        }
 
         // 주문 내역 없을 때 메시지 토글
         function toggleNoOrdersMessage() {
