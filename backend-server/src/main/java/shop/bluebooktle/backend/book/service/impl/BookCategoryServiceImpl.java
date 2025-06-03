@@ -149,7 +149,10 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 					bookSaleInfo.getSalePrice(),
 					bookSaleInfo.getPrice(),
 					imgUrl,
-					book.getCreatedAt()
+					book.getCreatedAt(),
+					bookSaleInfo.getStar(),
+					bookSaleInfo.getReviewCount(),
+					bookSaleInfo.getViewCount()
 				);
 			})
 			.toList();

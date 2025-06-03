@@ -11,7 +11,9 @@ public record BookInfoResponse(
 	BigDecimal salePrice,
 	BigDecimal price,
 	String imgUrl,
-	LocalDateTime createdAt
-	// 평점 필요함
+	LocalDateTime createdAt,
+	BigDecimal star,
+	Long reviewCount,
+	Long viewCount
 ) {
 }

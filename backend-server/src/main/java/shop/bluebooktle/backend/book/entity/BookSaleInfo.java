@@ -73,4 +73,12 @@ public class BookSaleInfo extends BaseEntity {
 	@Builder.Default
 	@Column(name = "search_count", nullable = false, columnDefinition = "BIGINT DEFAULT 0")
 	private Long searchCount = 0L;
+
+	@Builder.Default
+	@Column(name = "star", nullable = false, columnDefinition = "DECIMAL(2,1) DEFAULT 0.0")
+	private BigDecimal star = BigDecimal.valueOf(0.0);
+
+	@Builder.Default
+	@Column(name = "review_count", nullable = false, columnDefinition = "BIGINT DEFAULT 0")
+	private Long reviewCount = 0L;
 }

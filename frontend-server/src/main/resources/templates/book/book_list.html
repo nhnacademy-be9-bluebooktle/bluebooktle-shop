@@ -89,8 +89,10 @@
     <div class="container-kitsch section-padding-kitsch">
 
         <div class="page-header-kitsch book-list-header">
-            <h1 class="page-main-title-kitsch display-font-kitsch">✨ "프로그래밍" 검색 결과 ✨</h1>
-            <p class="page-subtitle-kitsch handwriting-font-kitsch">(총 500권의 멋진 책을 찾았어요!)</p>
+            <h1 class="page-main-title-kitsch display-font-kitsch">✨ "전체보기" 검색 결과 ✨</h1>
+            <p class="page-subtitle-kitsch handwriting-font-kitsch"
+               th:text="'(총 ' + ${pagedBooks.totalElements} + '권의 멋진 책을 찾았어요!)'">
+            </p>
         </div>
 
         <div class="list-controls-kitsch">
@@ -159,7 +161,7 @@
                             <!-- 간단히 하드코딩 별표, 실무 땐 book.rating 만큼 루프 -->
                             <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
                             <i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
-                            (<span th:text="${book.viewCount}">0</span>)
+                            (<span th:text="${book.reviewCount}">0</span>)
                         </div>
                     </div>
                 </a>
