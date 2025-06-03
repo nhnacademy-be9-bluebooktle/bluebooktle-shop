@@ -10,7 +10,9 @@ import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.Builder;
 
+@Builder(toBuilder = true)
 public record OrderCreateRequest(
 	@NotNull(message = "사용자 ID는 필수입니다.")
 	Long userId,
@@ -71,8 +73,6 @@ public record OrderCreateRequest(
 	@DecimalMin(value = "0", inclusive = true, message = "결제 원금은 0원 이상이어야 합니다.")
 	BigDecimal originalAmount,
 
-	@NotNull(message = "주문 키는 필수입니다.")
-	@NotBlank(message = "주문 키는 비어있을 수 없습니다.")
 	String orderKey
 
 ) {

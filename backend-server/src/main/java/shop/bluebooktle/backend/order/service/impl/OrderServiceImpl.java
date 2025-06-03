@@ -90,6 +90,8 @@ public class OrderServiceImpl implements OrderService {
 				.subtract(Optional.ofNullable(o.getCouponDiscountAmount())
 					.orElse(BigDecimal.ZERO))
 				.subtract(Optional.ofNullable(o.getPointUseAmount())
+					.orElse(BigDecimal.ZERO))
+				.add(Optional.ofNullable(o.getDeliveryFee())
 					.orElse(BigDecimal.ZERO));
 			return new OrderHistoryResponse(
 				o.getId(),                     // orderId

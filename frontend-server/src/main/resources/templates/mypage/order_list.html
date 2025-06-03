@@ -367,13 +367,13 @@
                                 <div class="order-status-kitsch"
                                      th:classappend="' status-' + ${orderResp.orderStatus.name().toLowerCase()}"
                                      th:text="${orderResp.orderStatus.getDescription()}">
-                                    배송완료
                                 </div>
                             </div>
 
                             <div class="order-item-summary-actions-kitsch">
                                 <span class="order-total-price-kitsch"
-                                      th:text="${#numbers.formatInteger(orderResp.totalPrice().longValue()) + '원'}">
+                                      th:if="${orderResp.totalPrice}"
+                                      th:text="${orderResp.totalPrice() + '원'}">
                                 </span>
                                 <div class="order-item-actions-kitsch">
                                     <a class="btn-kitsch secondary-btn-kitsch color4-kitsch retro-shadow-kitsch-small"
@@ -384,23 +384,13 @@
                                     <!-- 상태에 따라 버튼 예시 (예: 입금대기일 때는 결제하기 버튼, 배송중일 때는 배송조회 버튼 등) -->
                                     <button class="btn-kitsch secondary-btn-kitsch color3-kitsch retro-shadow-kitsch-small"
                                             th:if="${orderResp.orderStatus.name() == 'PENDING'}"
-                                            th:onclick="'location.href=\'/payment/continue/' + ${orderResp.orderKey} + '\';'">
-                                        결제하기
-                                    </button>
-                                    <button class="btn-kitsch secondary-btn-kitsch color5-kitsch retro-shadow-kitsch-small"
-                                            th:if="${orderResp.orderStatus.name() == 'SHIPPING'}"
-                                            th:onclick="'trackDelivery(\'' + ${orderResp.orderKey} + '\');'">
-                                        배송조회
+                                            th:onclick="'location.href=\'/payment/continue/' + ${orderResp.orderKey} + '\';'"
+                                            th:text="결제하기">
                                     </button>
                                     <button class="btn-kitsch secondary-btn-kitsch color2-kitsch retro-shadow-kitsch-small"
-                                            th:if="${orderResp.orderStatus.name() == 'COMPLETED'}"
-                                            th:onclick="'confirmPurchase(\'' + ${orderResp.orderKey} + '\');'">
-                                        구매확정
-                                    </button>
-                                    <button class="btn-kitsch secondary-btn-kitsch color6-kitsch retro-shadow-kitsch-small"
                                             disabled
-                                            th:if="${orderResp.orderStatus.name() == 'CANCELED' or orderResp.orderStatus.name() == 'RETURNED'}">
-                                        완료
+                                            th:if="${orderResp.orderStatus.name() == 'COMPLETED'}"
+                                            th:text="리뷰작성">
                                     </button>
                                 </div>
                             </div>

@@ -479,7 +479,7 @@ CREATE TABLE `orders`
     `detail_address`          varchar(255)   NOT NULL,
     `postal_code`             varchar(5)     NOT NULL,
     `tracking_number`         varchar(14)    NULL,
-    `order_key`               varchar(255)   NOT NULL COMMENT '비회원이 주문을 확인하기 위해 사용하는 비밀번호입니다.',
+    `order_key`               varchar(255)   NOT NULL UNIQUE COMMENT '비회원이 주문을 확인하기 위해 사용하는 비밀번호입니다.',
     `coupon_discount_amount`  decimal(10, 2) NULL COMMENT '쿠폰 할인 금액',
     `point_discount_amount`   decimal(10, 2) NULL COMMENT '포인트 사용 금액',
     `sale_discount_amount`    decimal(10, 2) NULL COMMENT '세일 할인 금액',

@@ -106,7 +106,11 @@ public class OrderController {
 
 	@PostMapping("/create")
 	public String createOrder(@ModelAttribute OrderCreateRequest request) {
-		Long orderId = orderService.createOrder(request);
+		String orderKey = java.util.UUID.randomUUID().toString();
+		OrderCreateRequest updatedRequest = request.toBuilder()
+			.orderKey(orderKey)
+			.build();
+		Long orderId = orderService.createOrder(updatedRequest);
 		log.info("주문 생성 :{}", orderId);
 		return "redirect:/order/" + orderId + "/checkout";
 	}

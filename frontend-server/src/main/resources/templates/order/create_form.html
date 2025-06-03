@@ -360,10 +360,6 @@
                                        th:value="${defaultOrderName}"
                                        type="hidden"/>
 
-                                <input name="orderKey"
-                                       th:value="${orderKey}"
-                                       type="hidden"/>
-
 
                                 <img alt="" th:alt="${item.title}" th:src="${item.thumbnailUrl}"/>
                                 <div class="ordered-item-details-kitsch">
@@ -694,17 +690,27 @@
                 const roadEl = document.getElementById('savedRoad');
                 const detailEl = document.getElementById('savedDetail');
 
+                function getAllInputs(container) {
+                    return container.querySelectorAll('input, select, textarea');
+                }
+
                 function updateAddress() {
                     const opt = selectEl.selectedOptions[0];
                     if (opt.value === 'new') {
                         infoEl.style.display = 'none';
                         formEl.style.display = 'block';
+                        getAllInputs(formEl).forEach(el => {
+                            el.removeAttribute('disabled');
+                        });
                     } else {
                         aliasEl.textContent = opt.dataset.name || '정보 없음';
                         roadEl.textContent = opt.dataset.road || '정보 없음';
                         detailEl.textContent = opt.dataset.detail || '상세주소 없음';
                         formEl.style.display = 'none';
                         infoEl.style.display = 'block';
+                        getAllInputs(formEl).forEach(el => {
+                            el.setAttribute('disabled', 'true');
+                        });
                     }
                     syncAddressFields();
                     updateDeliveryFee();

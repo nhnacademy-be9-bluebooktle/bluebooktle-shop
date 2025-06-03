@@ -101,7 +101,7 @@ public class Order extends BaseEntity {
 	@Column(name = "tracking_number", length = 14)
 	private String trackingNumber;
 
-	@Column(name = "order_key")
+	@Column(name = "order_key", unique = true, nullable = false)
 	private String orderKey;
 
 	@Column(name = "coupon_discount_amount", precision = 10, scale = 2)
