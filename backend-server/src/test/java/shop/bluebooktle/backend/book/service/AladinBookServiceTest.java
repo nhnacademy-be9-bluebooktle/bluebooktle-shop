@@ -1,6 +1,3 @@
-// TODO
-// 서비스 로직 변경으로 인한 주석 처리
-
 // package shop.bluebooktle.backend.book.service;
 //
 // import static org.assertj.core.api.Assertions.*;
@@ -24,7 +21,6 @@
 // import shop.bluebooktle.common.dto.book.response.AladinBookResponse;
 // import shop.bluebooktle.common.exception.book.AladinBookNotFoundException;
 //
-
 // @ExtendWith(MockitoExtension.class)
 // public class AladinBookServiceTest {
 //
