@@ -1057,7 +1057,7 @@
                 new daum.Postcode({
                     oncomplete: function (data) {
                         document.getElementById(postcodeId).value = data.zonecode;
-                        const fullAddr = (data.userSelectedType === 'R') ? data.roadAddress : data.jibunAddress;
+                        const fullAddr = data.roadAddress;
                         document.getElementById(addressId).value = fullAddr;
                         document.getElementById('shippingDetailAddress').focus();
                     }
