@@ -206,6 +206,8 @@ CREATE TABLE `book_sale_info`
     `state`             ENUM ('AVAILABLE' , 'LOW_STOCK', 'SALE_ENDED', 'DELETED') NOT NULL DEFAULT 'AVAILABLE',
     `view_count`        bigint                                                    NOT NULL DEFAULT 0,
     `search_count`      bigint                                                    NOT NULL DEFAULT 0,
+    `star`              decimal(2, 1)                                             NOT NULL DEFAULT 0.0,
+    `review_count`      bigint                                                    NOT NULL DEFAULT 0,
     `created_at`        timestamp                                                 NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `deleted_at`        timestamp                                                 NULL,
 

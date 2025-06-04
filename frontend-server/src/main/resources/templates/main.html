@@ -213,18 +213,28 @@
                     'retro-shadow-kitsch-small',
                     colorClasses[idx % colorClasses.length]
                 ].join(' ');
-
-                // <i> 아이콘 생성
+                
                 const i = document.createElement('i');
                 i.className = `fas ${iconClasses[idx % iconClasses.length]}`;
                 a.appendChild(i);
-
-                // 텍스트 노드로 카테고리명 추가
                 a.appendChild(document.createTextNode(' ' + cat.name));
 
-                // 컨테이너에 붙이기
                 container.appendChild(a);
             });
+
+            const a = document.createElement('a');
+            a.href = '/books';
+            a.className = [
+                'category-bubble-kitsch',
+                'pixel-font-kitsch',
+                'retro-shadow-kitsch-small',
+                'color4-kitsch'
+            ].join(' ');
+            const i = document.createElement('i');
+            i.className = `fas fa-globe`;
+            a.appendChild(i);
+            a.appendChild(document.createTextNode(' 전체 보기'));
+            container.appendChild(a);
         });
 
     </script>

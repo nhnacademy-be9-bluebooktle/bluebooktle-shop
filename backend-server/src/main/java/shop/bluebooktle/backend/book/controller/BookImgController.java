@@ -22,8 +22,6 @@ import shop.bluebooktle.common.dto.book.response.BookInfoResponse;
 import shop.bluebooktle.common.dto.book.response.img.ImgResponse;
 import shop.bluebooktle.common.dto.common.JsendResponse;
 
-// 수정 필요
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping

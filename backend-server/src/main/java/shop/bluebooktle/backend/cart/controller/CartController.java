@@ -167,7 +167,7 @@ public class CartController {
 	@PostMapping("/convert/merge")
 	public ResponseEntity<JsendResponse<Void>> mergeOrConvertGuestCart(
 		@AuthenticationPrincipal UserPrincipal principal,
-		@RequestBody String guestId
+		@RequestHeader("GUEST_ID") String guestId
 	) {
 		User user = getAuthenticatedUser(principal);
 		cartService.mergeOrConvertGuestCartToMemberCart(guestId, user);
