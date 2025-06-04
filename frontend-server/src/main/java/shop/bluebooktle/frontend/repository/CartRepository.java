@@ -71,5 +71,7 @@ public interface CartRepository {
 
 	//  전환/병합
 	@PostMapping("/convert/merge")
-	void mergeOrConvertGuestCartToMember(@RequestBody String guestId);
+	void mergeOrConvertGuestCartToMember(
+		@RequestHeader(name = "GUEST_ID", required = false) String guestId
+	);
 }
