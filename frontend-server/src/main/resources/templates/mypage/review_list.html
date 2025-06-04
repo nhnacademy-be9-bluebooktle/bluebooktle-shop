@@ -184,12 +184,10 @@
                          th:attr="data-review-id=${review.reviewId}"
                          class="review-card-kitsch">
 
-                        <!-- 카드 상단: 주문번호 / 별점 / 작성일자 -->
+                        <!-- 카드 상단: 제목 / 별점 / 작성일자 -->
                         <div class="review-card-header-kitsch">
-                            <!-- 좌측: 주문번호 -->
+                            <!-- 좌측: 제목 -->
                             <div class="review-info-kitsch">
-                                <span>도서주문번호:&nbsp;</span>
-                                <span th:text="${review.bookOrderId}">BOOK_ORDER_ID</span>
                                 <span>제목: </span>
                                 <span th:text="${review.bookTitle}">BOOK_TITLE</span>
                             </div>
@@ -219,15 +217,6 @@
                         <!-- 리뷰 내용 -->
                         <div class="review-content-kitsch"
                              th:text="${review.reviewContent}">
-                        </div>
-
-                        <!-- 수정 버튼 (아직 구현되지 않아 알림만) -->
-                        <div class="review-card-actions-kitsch">
-                            <button type="button"
-                                    class="text-btn-kitsch"
-                                    onclick="alert('추가예정!')">
-                                <i class="fas fa-edit"></i> 수정
-                            </button>
                         </div>
 
                     </div>
