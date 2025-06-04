@@ -19,7 +19,10 @@ public interface OrderRepository extends JpaRepository<Order, Long>, OrderQueryR
 		Pageable pageable);
 
 	// 사용자 + 상태(enum) 조회
-	@EntityGraph(attributePaths = {"orderState"})
+	@EntityGraph(attributePaths = {
+		"orderState",
+		"bookOrders.book.bookImgs.img"
+	})
 	Page<Order> findByUserAndOrderState_State(User user, OrderStatus state, Pageable pageable);
 
 	// 사용자 + 상태 + 기간 조회
@@ -28,10 +31,16 @@ public interface OrderRepository extends JpaRepository<Order, Long>, OrderQueryR
 		LocalDateTime end, Pageable pageable);
 
 	// 사용자 전체 조회
-	@EntityGraph(attributePaths = {"orderState"})
+	@EntityGraph(attributePaths = {
+		"orderState",
+		"bookOrders.book.bookImgs.img"
+	})
 	Page<Order> findByUser(User user, Pageable pageable);
 
-	// 주문 UUID 키로 단일 주문 조회 (비회원용)
+	@EntityGraph(attributePaths = {
+		"orderState",
+		"bookOrders.book.bookImgs.img"
+	})
 	Optional<Order> findByOrderKey(String orderKey);
 
 	@NotNull

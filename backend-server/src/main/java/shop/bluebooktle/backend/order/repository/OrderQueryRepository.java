@@ -6,4 +6,5 @@ import shop.bluebooktle.backend.order.entity.Order;
 
 public interface OrderQueryRepository {
 	Optional<Order> findFullOrderDetailsById(Long orderId);
+
 }

@@ -101,8 +101,20 @@ public class Order extends BaseEntity {
 	@Column(name = "tracking_number", length = 14)
 	private String trackingNumber;
 
-	@Column(name = "order_key")
+	@Column(name = "order_key", unique = true, nullable = false)
 	private String orderKey;
+
+	@Column(name = "coupon_discount_amount", precision = 10, scale = 2)
+	private BigDecimal couponDiscountAmount;
+
+	@Column(name = "point_discount_amount", precision = 10, scale = 2)
+	private BigDecimal pointUseAmount;
+
+	@Column(name = "original_amount", precision = 10, scale = 2, nullable = false)
+	private BigDecimal originalAmount;
+
+	@Column(name = "sale_discount_amount", precision = 10, scale = 2)
+	private BigDecimal saleDiscountAmount;
 
 	@OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
 	@BatchSize(size = 10)
@@ -121,7 +133,8 @@ public class Order extends BaseEntity {
 		String orderName, LocalDateTime requestedDeliveryDate, LocalDateTime shippedAt, BigDecimal deliveryFee,
 		String ordererName, String ordererPhoneNumber, String receiverName, String receiverPhoneNumber,
 		String address, String detailAddress, String postalCode, String trackingNumber, String orderKey,
-		String ordererEmail, String receiverEmail) {
+		String ordererEmail, String receiverEmail, BigDecimal couponDiscountAmount, BigDecimal pointUseAmount,
+		BigDecimal originalAmount, BigDecimal saleDiscountAmount) {
 		this.orderState = orderState;
 		this.deliveryRule = deliveryRule;
 		this.user = user;
@@ -140,6 +153,10 @@ public class Order extends BaseEntity {
 		this.orderKey = orderKey;
 		this.ordererEmail = ordererEmail;
 		this.receiverEmail = receiverEmail;
+		this.couponDiscountAmount = couponDiscountAmount;
+		this.pointUseAmount = pointUseAmount;
+		this.originalAmount = originalAmount;
+		this.saleDiscountAmount = saleDiscountAmount;
 	}
 
 	public void changeOrderState(OrderState newState) {
