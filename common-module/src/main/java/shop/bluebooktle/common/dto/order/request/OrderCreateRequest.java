@@ -14,7 +14,6 @@ import lombok.Builder;
 
 @Builder(toBuilder = true)
 public record OrderCreateRequest(
-	@NotNull(message = "사용자 ID는 필수입니다.")
 	Long userId,
 
 	@FutureOrPresent(message = "요청 배송일은 현재 시각 이후여야 합니다.")
