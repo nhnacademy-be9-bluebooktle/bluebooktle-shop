@@ -103,14 +103,19 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 
 	@Override
 	public void updateBookCategory(Long updatedCategoryId, Long categoryId, Long bookId) {
+
 		Category category = requireCategory(categoryId);
 		Book book = requireBook(bookId);
-		if (!bookCategoryRepository.existsByBookAndCategory(book, category)) {
-			throw new BookCategoryNotFoundException(book.getId(), category.getId());
-		}
-		Category updatedCategory = requireCategory(updatedCategoryId);
+
 		BookCategory bookCategory = bookCategoryRepository.findByBookAndCategory(book, category)
-			.orElseThrow(BookCategoryNotFoundException::new);
+			.orElseThrow(() -> new BookCategoryNotFoundException(bookId, categoryId));
+
+		Category updatedCategory = requireCategory(updatedCategoryId);
+
+		if (bookCategoryRepository.existsByBookAndCategory(book, updatedCategory)) {
+			throw new BookCategoryAlreadyExistsException(book.getId(), updatedCategory.getId());
+		}
+
 		bookCategory.setCategory(updatedCategory);
 	}
 
