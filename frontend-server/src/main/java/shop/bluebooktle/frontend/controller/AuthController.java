@@ -8,7 +8,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -157,7 +156,6 @@ public class AuthController {
 		@RequestParam("state") String state,
 		@RequestParam(value = "error", required = false) String error,
 		@RequestParam(value = "error_description", required = false) String errorDescription,
-		@CookieValue(value = "GUEST_ID", required = false) String guestId,
 		HttpServletResponse response,
 		RedirectAttributes redirectAttributes) {
 
@@ -193,9 +191,9 @@ public class AuthController {
 		try {
 			userService.requestDormantCode(request);
 			redirectAttributes.addFlashAttribute("globalSuccessMessage",
-				"인증코드가 발송되었습니다. 입력된 아이디로 등록된 연락처(이메일/SMS)를 확인해주세요.");
+				"인증코드가 발송되었습니다. 인증코드의 유효기간은 5분입니다. ");
 		} catch (ApplicationException e) {
-			redirectAttributes.addFlashAttribute("formErrorSource", "issueCodeForm"); // 어떤 폼에서 에러가 발생했는지 구분
+			redirectAttributes.addFlashAttribute("formErrorSource", "issueCodeForm");
 			redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
 			redirectAttributes.addFlashAttribute("errorCode", e.getErrorCode().getCode());
 		} catch (Exception e) {

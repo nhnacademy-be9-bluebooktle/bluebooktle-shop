@@ -1,4 +1,4 @@
-package shop.bluebooktle.backend.user.service.impl; // RefreshTokenService 구현체와 동일한 패키지 또는 적절히 조정
+package shop.bluebooktle.backend.user.service.impl;
 
 import java.time.Duration;
 import java.util.Objects;
