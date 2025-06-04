@@ -727,8 +727,11 @@
 
             fetch("/cart", {
                 method: 'POST',
-                body: formData
+                body: formData,
             }).then(response => {
+                console.log("response check")
+                console.log("response :" + response)
+                console.log("response :" + response.body)
                 if (response.ok) {
                     showKitschModal('addToCartSuccessModal');
                 } else {
@@ -804,13 +807,6 @@
             if (firstThumbnail && !document.querySelector('.book-thumbnails-kitsch img.active-thumbnail-kitsch')) {
                 const mainImageSrc = document.getElementById('mainBookImage').src;
                 changeMainImage(mainImageSrc, Array.from(document.querySelectorAll('.book-thumbnails-kitsch img')).find(thumb => thumb.getAttribute('onclick').includes(mainImageSrc)) || firstThumbnail);
-            }
-            // 리뷰 모달 초기화 JS 제거
-
-            // 장바구니 폼 이벤트
-            const addToCartForm = document.getElementById('addToCartForm');
-            if (addToCartForm) {
-                addToCartForm.addEventListener('submit', handleAddToCart);
             }
 
             // 탭 기능 (styles.css의 탭 UI와 연동)

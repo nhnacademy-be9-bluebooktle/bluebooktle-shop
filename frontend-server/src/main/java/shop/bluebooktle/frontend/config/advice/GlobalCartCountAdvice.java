@@ -9,6 +9,7 @@
 // import jakarta.servlet.http.HttpServletRequest;
 // import lombok.RequiredArgsConstructor;
 // import shop.bluebooktle.common.dto.book.response.BookCartOrderResponse;
+// import shop.bluebooktle.common.exception.cart.CartNotFoundException;
 // import shop.bluebooktle.frontend.service.CartService;
 //
 // @ControllerAdvice
@@ -28,7 +29,7 @@
 // 		try {
 // 			List<BookCartOrderResponse> cartItems = cartService.getCartItems(guestId); // backend에서 로그인 여부 판단
 // 			return cartItems.size();
-// 		} catch (Exception e) {
+// 		} catch (CartNotFoundException e) {
 // 			return 0;
 // 		}
 // 	}

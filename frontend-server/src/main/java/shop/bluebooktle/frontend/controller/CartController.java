@@ -2,6 +2,7 @@ package shop.bluebooktle.frontend.controller;
 
 import java.util.List;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CookieValue;
@@ -29,16 +30,20 @@ public class CartController {
 
 	// === 장바구니 담기 ===
 	@PostMapping
-	public String addToCart(@RequestParam Long bookId,
+	public ResponseEntity<String> addToCart(@RequestParam Long bookId,
 		@RequestParam int quantity,
 		@CookieValue(value = "GUEST_ID", required = false) String guestId,
 		HttpServletResponse response,
 		RedirectAttributes redirectAttributes) {
-
+		log.info("start 지점");
 		validateGuestId(guestId, response);
+		log.info("validate");
+		log.info("cart service start 지점");
 		cartService.addToCart(guestId, bookId, quantity);
-		redirectAttributes.addFlashAttribute("showCartSuccess", true);
-		return "redirect:/cart";
+		log.info("cart service 끝 지점");
+		log.info("redirect start");
+		log.info("redirect 끄");
+		return ResponseEntity.ok("ok");
 	}
 
 	// === 장바구니 목록 조회 ===
