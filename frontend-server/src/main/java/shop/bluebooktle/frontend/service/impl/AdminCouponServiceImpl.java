@@ -32,8 +32,8 @@ public class AdminCouponServiceImpl implements AdminCouponService {
 		adminCouponRepository.registerCoupon(request);
 	}
 
-	public PaginationData<CouponResponse> getAllCoupon(Pageable pageable, String couponName) {
-		return adminCouponRepository.getAllCoupon(pageable.getPageNumber(), pageable.getPageSize(), couponName);
+	public PaginationData<CouponResponse> getAllCoupon(Pageable pageable, String searchCouponName) {
+		return adminCouponRepository.getAllCoupon(pageable.getPageNumber(), pageable.getPageSize(), searchCouponName);
 	}
 
 	public void issueCoupon(UserCouponRegisterRequest request) {

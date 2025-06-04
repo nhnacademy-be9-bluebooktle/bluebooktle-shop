@@ -71,8 +71,8 @@ public class CouponServiceImpl implements CouponService {
 	// 전체 Coupon 조회
 	@Override
 	@Transactional(readOnly = true)
-	public Page<CouponResponse> getAllCoupons(String couponName, Pageable pageable) {
-		return couponRepository.findAllByCoupon(couponName, pageable);
+	public Page<CouponResponse> getAllCoupons(String searchCouponName, Pageable pageable) {
+		return couponRepository.findAllByCoupon(searchCouponName, pageable);
 	}
 
 	// 공통 유효성 검사

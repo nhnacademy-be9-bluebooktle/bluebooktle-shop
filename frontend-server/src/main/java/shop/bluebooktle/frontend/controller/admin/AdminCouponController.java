@@ -186,7 +186,7 @@ public class AdminCouponController {
 		Pageable pageable = PageRequest.of(page, size);
 
 		PaginationData<CouponResponse> coupons = adminCouponService.getAllCoupon(pageable, searchKeyword);
-		model.addAttribute("coupons", coupons); // ✅ 전체 PaginationData 넘김
+		model.addAttribute("coupons", coupons);
 
 		if (issueCouponId != null) {
 			model.addAttribute("couponId", issueCouponId);

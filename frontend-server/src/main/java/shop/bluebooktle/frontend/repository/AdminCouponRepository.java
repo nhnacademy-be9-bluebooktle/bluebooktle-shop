@@ -36,7 +36,7 @@ public interface AdminCouponRepository {
 	PaginationData<CouponResponse> getAllCoupon(
 		@RequestParam("page") int page,
 		@RequestParam("size") int size,
-		@RequestParam(value = "couponName", required = false) String couponName
+		@RequestParam(value = "searchCouponName", required = false) String searchCouponName
 	);
 
 	//쿠폰 발급

@@ -11,5 +11,5 @@ public interface CouponService {
 	void registerCoupon(CouponRegisterRequest request);
 
 	// 전체 조회
-	Page<CouponResponse> getAllCoupons(String couponName, Pageable pageable);
+	Page<CouponResponse> getAllCoupons(String searchCouponName, Pageable pageable);
 }

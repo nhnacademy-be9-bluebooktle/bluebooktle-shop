@@ -43,9 +43,9 @@ public class CouponController {
 	@Operation(summary = "쿠폰 전체 조회", description = "등록된 쿠폰 전체를 조회합니다.")
 	@GetMapping
 	public ResponseEntity<JsendResponse<PaginationData<CouponResponse>>> getAllCoupons(
-		@RequestParam(value = "couponName", required = false) String couponName,
+		@RequestParam(value = "searchCouponName", required = false) String searchCouponName,
 		@PageableDefault(size = 10) Pageable pageable) {
-		Page<CouponResponse> couponPage = couponService.getAllCoupons(couponName, pageable);
+		Page<CouponResponse> couponPage = couponService.getAllCoupons(searchCouponName, pageable);
 		PaginationData<CouponResponse> paginationData = new PaginationData<>(couponPage);
 		return ResponseEntity.ok(JsendResponse.success(paginationData));
 	}

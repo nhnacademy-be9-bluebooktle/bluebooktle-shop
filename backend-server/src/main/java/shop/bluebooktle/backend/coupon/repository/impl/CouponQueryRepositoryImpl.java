@@ -43,7 +43,7 @@ public class CouponQueryRepositoryImpl implements CouponQueryRepository {
 
 	//관리자 쿠폰 전체 조회
 	@Override
-	public Page<CouponResponse> findAllByCoupon(String couponName, Pageable pageable) {
+	public Page<CouponResponse> findAllByCoupon(String searchCouponName, Pageable pageable) {
 		QCoupon coupon = QCoupon.coupon;
 		QCouponType couponType = QCouponType.couponType;
 		QBookCoupon bookCoupon = QBookCoupon.bookCoupon;
@@ -54,8 +54,8 @@ public class CouponQueryRepositoryImpl implements CouponQueryRepository {
 
 		BooleanBuilder builder = new BooleanBuilder();
 
-		if (StringUtils.hasText(couponName)) {
-			builder.and(coupon.couponName.containsIgnoreCase(couponName));
+		if (StringUtils.hasText(searchCouponName)) {
+			builder.and(coupon.couponName.containsIgnoreCase(searchCouponName));
 		}
 
 		List<CouponResponse> content = queryFactory

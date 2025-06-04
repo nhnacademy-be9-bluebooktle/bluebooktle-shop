@@ -16,7 +16,7 @@ public interface AdminCouponService {
 
 	void registerCoupon(CouponRegisterRequest request);
 
-	PaginationData<CouponResponse> getAllCoupon(Pageable pageable, String couponName);
+	PaginationData<CouponResponse> getAllCoupon(Pageable pageable, String searchCouponName);
 
 	void issueCoupon(UserCouponRegisterRequest request);
 }
