@@ -1,7 +1,5 @@
 package shop.bluebooktle.backend.book.controller;
 
-import java.util.List;
-
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,10 +22,10 @@ import shop.bluebooktle.backend.book.service.BookService;
 import shop.bluebooktle.common.dto.book.request.BookAllRegisterRequest;
 import shop.bluebooktle.common.dto.book.request.BookRegisterRequest;
 import shop.bluebooktle.common.dto.book.request.BookUpdateRequest;
-import shop.bluebooktle.common.dto.book.response.BookInfoResponse;
 import shop.bluebooktle.common.dto.book.response.BookCartOrderResponse;
+import shop.bluebooktle.common.dto.book.response.BookDetailResponse;
+import shop.bluebooktle.common.dto.book.response.BookInfoResponse;
 import shop.bluebooktle.common.dto.book.response.BookRegisterResponse;
-import shop.bluebooktle.common.dto.book.response.BookResponse;
 import shop.bluebooktle.common.dto.book.response.BookUpdateResponse;
 import shop.bluebooktle.common.dto.common.JsendResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
@@ -60,8 +58,8 @@ public class BookController {
 
 	//도서 정보 조회
 	@GetMapping("/{bookId}")
-	public ResponseEntity<JsendResponse<BookResponse>> getBook(@PathVariable Long bookId) {
-		BookResponse bookResponse = bookService.findBookById(bookId);
+	public ResponseEntity<JsendResponse<BookDetailResponse>> getBook(@PathVariable Long bookId) {
+		BookDetailResponse bookResponse = bookService.findBookById(bookId);
 		return ResponseEntity.ok(JsendResponse.success(bookResponse));
 	}
 

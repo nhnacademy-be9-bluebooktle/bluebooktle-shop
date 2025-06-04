@@ -2,8 +2,10 @@ package shop.bluebooktle.frontend.repository;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import shop.bluebooktle.common.dto.book.response.BookDetailResponse;
 import shop.bluebooktle.common.dto.book.response.BookInfoResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
 import shop.bluebooktle.frontend.config.feign.FeignGlobalConfig;
@@ -18,4 +20,7 @@ public interface BookRepository {
 		@RequestParam(value = "searchKeyword", required = false) String searchKeyword
 	);
 
+	// 도서 상세 조회
+	@GetMapping("/{bookId}")
+	BookDetailResponse getBookDetail(@PathVariable("bookId") Long bookId);
 }

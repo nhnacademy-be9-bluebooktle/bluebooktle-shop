@@ -1,6 +1,5 @@
 package shop.bluebooktle.backend.book.service.impl;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -16,6 +15,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import shop.bluebooktle.backend.book.entity.Author;
 import shop.bluebooktle.backend.book.entity.Book;
+import shop.bluebooktle.backend.book.entity.BookAuthor;
+import shop.bluebooktle.backend.book.entity.BookPublisher;
 import shop.bluebooktle.backend.book.entity.BookSaleInfo;
 import shop.bluebooktle.backend.book.repository.BookAuthorRepository;
 import shop.bluebooktle.backend.book.repository.BookCategoryRepository;
@@ -28,10 +29,10 @@ import shop.bluebooktle.backend.book.service.BookService;
 import shop.bluebooktle.common.dto.book.request.BookRegisterRequest;
 import shop.bluebooktle.common.dto.book.request.BookUpdateRequest;
 import shop.bluebooktle.common.dto.book.response.BookAllResponse;
-import shop.bluebooktle.common.dto.book.response.BookInfoResponse;
 import shop.bluebooktle.common.dto.book.response.BookCartOrderResponse;
+import shop.bluebooktle.common.dto.book.response.BookDetailResponse;
+import shop.bluebooktle.common.dto.book.response.BookInfoResponse;
 import shop.bluebooktle.common.dto.book.response.BookRegisterResponse;
-import shop.bluebooktle.common.dto.book.response.BookResponse;
 import shop.bluebooktle.common.dto.book.response.BookUpdateResponse;
 import shop.bluebooktle.common.exception.book.BookAlreadyExistsException;
 import shop.bluebooktle.common.exception.book.BookNotFoundException;
@@ -67,18 +68,36 @@ public class BookServiceImpl implements BookService {
 			.build();
 	}
 
+	// 도서 상세 조회를 위한 메소드
 	@Override
 	@Transactional(readOnly = true)
-	public BookResponse findBookById(Long bookId) {
+	public BookDetailResponse findBookById(Long bookId) {
 		Book book = bookRepository.findById(bookId)
 			.orElseThrow(BookNotFoundException::new);
 
-		return BookResponse.builder()
+		BookSaleInfo saleInfo = bookSaleInfoRepository.findByBook(book)
+			.orElseThrow(BookNotFoundException::new);
+
+		List<BookAuthor> bookAuthors = bookAuthorRepository.findByBook_Id(bookId);
+		List<BookPublisher> bookPublishers = bookPublisherRepository.findByBook_Id(bookId);
+
+		List<String> authors = bookAuthors.stream()
+			.map(bookAuthor -> bookAuthor.getAuthor().getName())
+			.toList();
+
+		List<String> publisher = bookPublishers.stream()
+			.map(bookPublisher -> bookPublisher.getPublisher().getName())
+			.toList();
+
+		return BookDetailResponse.builder()
+			.isbn(book.getIsbn())
 			.title(book.getTitle())
+			.authors(authors)
+			.publishers(publisher)
+			.price(saleInfo.getPrice())
+			.salePrice(saleInfo.getPrice())
 			.description(book.getDescription())
 			.index(book.getIndex())
-			.publishDate(LocalDate.from(book.getPublishDate()))
-			.isbn(book.getIsbn())
 			.build();
 	}
 

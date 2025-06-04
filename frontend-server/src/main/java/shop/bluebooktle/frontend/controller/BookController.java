@@ -7,9 +7,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import shop.bluebooktle.common.dto.book.response.BookDetailResponse;
 import shop.bluebooktle.common.dto.book.response.BookInfoResponse;
 import shop.bluebooktle.common.dto.book.response.CategoryResponse;
 import shop.bluebooktle.frontend.service.BookService;
@@ -65,9 +67,21 @@ public class BookController {
 		return "book/book_list";
 	}
 
+	// 도서 상세 페이지
 	@GetMapping("/books/{bookId}")
-	public String bookDetailPage(@PathVariable Long bookId) {
-		System.out.println("요청된 도서 ID: " + bookId);
-		return "book/book_detail";
+	public String bookDetailPage(@PathVariable Long bookId,
+		Model model,
+		RedirectAttributes redirectAttributes) {
+		log.info("도서 상세 조회 요청");
+		try {
+			BookDetailResponse book = bookService.getBookDetail(bookId);
+			model.addAttribute("book", book);
+			model.addAttribute("bookId", bookId);
+			return "book/book_detail";
+		} catch (Exception e) {
+			log.error("도서 상세 조회 실패");
+			redirectAttributes.addFlashAttribute("globalErrorMessage", "도서 정보 조회에 실패했습니다: " + e.getMessage());
+			return "redirect:/books";
+		}
 	}
 }

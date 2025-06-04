@@ -21,6 +21,12 @@ public interface BookAuthorRepository extends JpaRepository<BookAuthor, Long> {
 	@Query("SELECT ba.author FROM BookAuthor ba WHERE ba.book = :book")
 	List<Author> findAuthorsByBook(@Param("book") Book book);
 
+	// 특정 도서와 연결된 BookAuthor 엔티티 전체 조회
+	List<BookAuthor> findByBook(Book book);
+
+	// 도서 ID로 BookAuthor 엔티티 리스트 조회
+	List<BookAuthor> findByBook_Id(Long bookId);
+
 	// 특정 작가의 특정 도서 존재 유무 조회 (존재 시 true)
 	boolean existsByBookAndAuthor(Book book, Author author);
 
