@@ -132,10 +132,13 @@ public class OrderServiceImpl implements OrderService {
 
 		DeliveryRule deliveryRule = deliveryRuleRepository.findById(request.deliveryRuleId()).orElseThrow(
 			DeliveryRuleNotFoundException::new);
-
-		User user = userRepository.findById(request.userId())
-			.orElseThrow(UserNotFoundException::new);
-
+		User user;
+		if (request.userId() != null) {
+			user = userRepository.findById(request.userId())
+				.orElseThrow(UserNotFoundException::new);
+		} else {
+			user = null;
+		}
 		Order order = Order.builder()
 			.orderState(initialState)
 			.deliveryRule(deliveryRule)
