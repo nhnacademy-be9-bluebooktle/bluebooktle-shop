@@ -575,8 +575,11 @@
 
                     <div class="tab-pane-kitsch" id="toc-content">
                         <h3 class="tab-pane-title-kitsch"><i class="fas fa-map-signs"></i> 목차</h3>
-                        <p th:text="${book.index}">도서 목차 텍스트</p>
+                        <p th:if="${book.index != null}" th:text="${book.index}">도서 목차 텍스트</p>
+                        <p th:if="${book.index == null}" style="font-style: italic; color: gray;">※ 목차 정보가 제공되지
+                            않았습니다.</p>
                     </div>
+
                 </div>
                 <!--TODO 리뷰 구현 예정 -->
                 <div class="tab-pane-kitsch" id="reviews-content">

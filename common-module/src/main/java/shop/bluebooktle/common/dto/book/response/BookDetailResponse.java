@@ -6,10 +6,12 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor(force = true) // 모든 필드를 강제로 초기화해서 기본 생성자 생성
 public class BookDetailResponse {
 	String isbn;
 	String title; // 책 제목
