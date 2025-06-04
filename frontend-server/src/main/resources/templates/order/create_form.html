@@ -279,6 +279,11 @@
             margin-top: 1.5rem;
         }
 
+        .disabled-option {
+            color: #999;
+            text-decoration: line-through;
+        }
+
         @media (max-width: 992px) {
             .checkout-container-kitsch {
                 grid-template-columns: 1fr;
@@ -409,6 +414,40 @@
                                                 class="btn-kitsch qty-button pack-qty-increase"
                                                 type="button">+
                                         </button>
+                                    </div>
+
+                                    <!-- ⑤ 쿠폰 선택 -->
+                                    <div class="item-coupon-apply-kitsch"
+                                         th:if="${coupons.usableUserCouponMap[__${item.bookId}__] != null and !coupons.usableUserCouponMap[__${item.bookId}__].isEmpty()}">
+                                        <label class="label-kitsch" th:for="${'couponSelect-' + idx.index}">사용할
+                                            쿠폰:</label>
+                                        <select class="select-kitsch item-coupon-select"
+                                                th:id="${'couponSelect-' + idx.index}"
+                                                th:data-idx="${idx.index}">
+                                            <option value="">쿠폰 선택 안함</option>
+
+                                            <option
+                                                    th:each="coupon : ${coupons.usableUserCouponMap[__${item.bookId}__]}"
+                                                    th:value="${coupon.userCouponId}"
+                                                    th:data-type="${coupon.discountPrice != null ? 'FIXED' : 'PERCENT'}"
+                                                    th:data-discount-price="${coupon.discountPrice}"
+                                                    th:data-discount-percent="${coupon.discountPercent}"
+                                                    th:data-maximum-discount-price="${coupon.maximumDiscountPrice}"
+                                                    th:data-minimum-payment="${coupon.minimumPayment}"
+                                                    th:disabled="${item.salePrice.doubleValue() < coupon.minimumPayment.doubleValue()}"
+                                                    th:classappend="${item.salePrice.doubleValue() < coupon.minimumPayment.doubleValue()} ? 'disabled-option' : ''"
+                                                    th:title="${item.salePrice.doubleValue() < coupon.minimumPayment.doubleValue()}
+        ? '도서가 최소 결제 금액보다 낮아 사용할 수 없습니다.' : ''"
+                                                    th:text="${coupon.discountPrice != null
+                                                        ? coupon.couponName + ' (-' + #numbers.formatInteger(coupon.discountPrice, 0) + '원)'
+                                                        : coupon.couponName + ' (' + coupon.discountPercent + '% 할인, 최대 ' + #numbers.formatInteger(coupon.maximumDiscountPrice, 0) + '원)'}">
+                                            </option>
+                                        </select>
+
+                                        <p class="item-coupon-applied-info" th:id="${'couponInfo-' + idx.index}"
+                                           style="display:none;">
+                                            쿠폰을 적용했습니다.
+                                        </p>
                                     </div>
                                 </div>
                             </div>
@@ -658,8 +697,27 @@
                         </div>
 
                         <div class="summary-row-kitsch">
-                            <span class="label">주문 전체 할인:</span>
-                            <span class="value discount" id="summaryOrderCouponDiscount">0원</span>
+                            <label for="orderCouponSelect" class="label">주문 쿠폰 선택:</label>
+                            <select id="orderCouponSelect" class="select-kitsch" style="max-width: 200px;">
+                                <option value="">선택 안 함</option>
+                                <option th:each="coupon : ${coupons.usableUserCouponMap[-1]}"
+                                        th:value="${coupon.userCouponId}"
+                                        th:data-type="${coupon.discountPrice != null ? 'FIXED' : 'PERCENT'}"
+                                        th:data-discount-price="${coupon.discountPrice}"
+                                        th:data-discount-percent="${coupon.discountPercent}"
+                                        th:data-maximum-discount-price="${coupon.maximumDiscountPrice}"
+                                        th:data-minimum-payment="${coupon.minimumPayment}"
+                                        th:text="${coupon.discountPrice != null
+            ? coupon.couponName + ' (-' + #numbers.formatInteger(coupon.discountPrice, 0) + '원)'
+            : coupon.couponName + ' (' + coupon.discountPercent + '% 할인, 최대 ' + #numbers.formatInteger(coupon.maximumDiscountPrice, 0) + '원)'}">
+                                </option>
+                            </select>
+                            <input type="hidden" name="orderCouponCode" id="hiddenOrderCouponCode" value=""/>
+                        </div>
+
+                        <div class="summary-row-kitsch">
+                            <span class="label">쿠폰 전체 할인액:</span>
+                            <span class="value discount" id="summaryCouponDiscount">0원</span>
                         </div>
 
                         <div class="summary-row-kitsch" th:if="${user != null}">
@@ -929,6 +987,19 @@
                 const aliasEl = document.getElementById('savedAlias');
                 const roadEl = document.getElementById('savedRoad');
                 const detailEl = document.getElementById('savedDetail');
+                const orderCouponSelect = document.getElementById('orderCouponSelect');
+                const orderCouponHidden = document.getElementById('hiddenOrderCouponCode')
+
+                orderCouponSelect.addEventListener('change', () => {
+                    const selected = orderCouponSelect.selectedOptions[0];
+                    const discount = selected.dataset.discount ? parseInt(selected.dataset.discount.replace(/[^\d]/g, ''), 10) : 0;
+
+                    orderCouponHidden.value = selected.value || '';
+                    document.getElementById('summaryCouponDiscount').textContent = '-' + discount.toLocaleString() + '원';
+
+                    updateFinalTotalPrice();
+                    updateOrderCouponDisabling();
+                });
 
                 if (!selectEl) return;
                 const opt = selectEl.selectedOptions[0];
@@ -1112,6 +1183,42 @@
                     fullPriceRecalculation();
                 };
 
+                // -------------------------------------------------
+                // 6) 쿠폰 선택 변화 감지 및 hidden 필드 갱신 + 결제 금액 갱신
+                document.querySelectorAll('.item-coupon-select').forEach(sel => {
+                    sel.addEventListener('change', () => {
+                        const idx = sel.dataset.idx;
+                        const selectedCouponId = sel.value;
+                        const infoEl = document.getElementById(`couponInfo-${idx}`);
+                        document.getElementById(`hiddenItemCoupon-${idx}`).value = selectedCouponId;
+
+                        // 할인 정보 계산 및 표시
+                        const selected = sel.selectedOptions[0];
+                        const itemWrapper = sel.closest('.ordered-item-kitsch');
+                        const salePrice = parseInt(itemWrapper.dataset.itemSalePrice, 10);
+                        let discountText = '';
+
+                        if (selectedCouponId) {
+                            const type = selected.dataset.type;
+                            if (type === 'FIXED') {
+                                const discountPrice = parseFloat(selected.dataset.discountPrice || 0);
+                                discountText = `할인 적용: -${discountPrice.toLocaleString()}원`;
+                            } else if (type === 'PERCENT') {
+                                const percent = parseFloat(selected.dataset.discountPercent || 0);
+                                const max = parseFloat(selected.dataset.maximumDiscountPrice || 0);
+                                let discount = Math.floor(salePrice * (percent / 100));
+                                if (!isNaN(max) && discount > max) discount = max;
+                                discountText = `할인 적용: -${discount.toLocaleString()}원`;
+                            }
+                            infoEl.textContent = discountText;
+                            infoEl.style.display = 'block';
+                        } else {
+                            infoEl.style.display = 'none';
+                        }
+                        updateFinalTotalPrice();
+                    });
+                });
+
                 // Form Submission
                 const checkoutForm = document.getElementById('checkoutForm');
                 if (checkoutForm) {
@@ -1144,6 +1251,59 @@
                     });
                 }
             });
+
+            function getNum(id) {
+                return parseInt(document.getElementById(id).textContent.replace(/[^\d]/g, ''), 10) || 0;
+            }
+
+            function updateCouponDiscount() {
+                let totalDiscount = 0;
+
+                // 도서 쿠폰 할인 합계
+                document.querySelectorAll('.item-coupon-select').forEach(sel => {
+                    const selected = sel.selectedOptions[0];
+                    if (selected && selected.value) {
+                        const itemWrapper = sel.closest('.ordered-item-kitsch');
+                        const salePrice = parseFloat(itemWrapper.dataset.itemSalePrice) || 0;
+
+                        const type = selected.dataset.type;
+                        if (type === 'FIXED') {
+                            totalDiscount += parseFloat(selected.dataset.discountPrice || 0);
+                        } else if (type === 'PERCENT') {
+                            const percent = parseFloat(selected.dataset.discountPercent || 0);
+                            const max = parseFloat(selected.dataset.maximumDiscountPrice || 0);
+                            let discount = Math.floor(salePrice * (percent / 100));
+                            if (!isNaN(max) && discount > max) discount = max;
+                            totalDiscount += discount;
+                        }
+                    }
+                });
+
+                // 주문 쿠폰 할인
+                const orderCouponSelect = document.getElementById('orderCouponSelect');
+                const selectedOrder = orderCouponSelect?.selectedOptions?.[0];
+                const adjustedTotal = getBookTotalAfterItemDiscountAndBookCoupons();
+
+                if (selectedOrder && selectedOrder.value) {
+                    const type = selectedOrder.dataset.type;
+                    const minPayment = parseFloat(selectedOrder.dataset.minimumPayment || 0);
+
+                    if (adjustedTotal >= minPayment) {
+                        if (type === 'FIXED') {
+                            totalDiscount += parseFloat(selectedOrder.dataset.discountPrice || 0);
+                        } else if (type === 'PERCENT') {
+                            const percent = parseFloat(selectedOrder.dataset.discountPercent || 0);
+                            const max = parseFloat(selectedOrder.dataset.maximumDiscountPrice || 0);
+                            let discount = Math.floor(adjustedTotal * (percent / 100));
+                            if (!isNaN(max) && discount > max) discount = max;
+                            totalDiscount += discount;
+                        }
+                    }
+                }
+
+
+                document.getElementById('summaryCouponDiscount').textContent = '-' + Math.floor(totalDiscount).toLocaleString() + '원';
+            }
 
             function execDaumPostcode(postcodeId, addressId) {
                 new daum.Postcode({
