@@ -368,12 +368,28 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <tr th:each="orderItem : ${orderItems}">
+                        <tr>
+                            <td data-label="상품 정보">
+                                <div class="product-info-cell-kitsch">
+                                    <img src="https://via.placeholder.com/60x90?text=Book" alt="상품 썸네일"/>
+                                    <div>
+                                        <div class="product-title-kitsch">하드코딩된 책 제목</div>
+                                        <div class="product-option-kitsch">포장: 레트로 선물 포장</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td data-label="수량" style="text-align:center;">1</td>
+                            <td data-label="상품 금액" class="price-kitsch">35,000원</td>
+                            <td data-label="할인/포장">
+                                <span class="discount-kitsch">- 3,500원 (할인)</span><br>
+                                <span>+ 1,500원 (포장)</span>
+                            </td>
+                            <td data-label="주문 금액" class="price-kitsch">33,000원</td>
                             <td data-label="리뷰" style="text-align:center;">
                                 <button
                                         type="button"
                                         class="btn-kitsch primary-btn-kitsch retro-shadow-kitsch-small"
-                                        th:onclick="|openOrderReviewModal(${orderItem.bookOrderId}, '${orderItem.bookTitle}', event)|">
+                                        onclick="openOrderReviewModal(123, '하드코딩된 책 제목', event)">
                                     <i class="fas fa-pencil-alt"></i> 작성
                                 </button>
                             </td>
