@@ -2,6 +2,7 @@ package shop.bluebooktle.backend.book.controller;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -23,8 +24,7 @@ import shop.bluebooktle.backend.book.service.BookService;
 import shop.bluebooktle.common.dto.book.request.BookAllRegisterRequest;
 import shop.bluebooktle.common.dto.book.request.BookRegisterRequest;
 import shop.bluebooktle.common.dto.book.request.BookUpdateRequest;
-import shop.bluebooktle.common.dto.book.response.AladinBookResponse;
-import shop.bluebooktle.common.dto.book.response.BookAllResponse;
+import shop.bluebooktle.common.dto.book.response.BookInfoResponse;
 import shop.bluebooktle.common.dto.book.response.BookCartOrderResponse;
 import shop.bluebooktle.common.dto.book.response.BookRegisterResponse;
 import shop.bluebooktle.common.dto.book.response.BookResponse;
@@ -83,13 +83,14 @@ public class BookController {
 	}
 
 	@GetMapping
-	public ResponseEntity<JsendResponse<PaginationData<BookAllResponse>>> getPagedBooks(
+	public ResponseEntity<JsendResponse<PaginationData<BookInfoResponse>>> getPagedBooks(
 		@RequestParam("page") int page,
 		@RequestParam("size") int size,
 		@RequestParam(value = "searchKeyword", required = false) String searchKeyword
 	) {
-		PaginationData<BookAllResponse> data = bookService.findAllBooks(page, size, searchKeyword);
-		return ResponseEntity.ok(JsendResponse.success(data));
+		Page<BookInfoResponse> responses = bookService.findAllBooks(page, size, searchKeyword);
+		PaginationData<BookInfoResponse> paginationData = new PaginationData<>(responses);
+		return ResponseEntity.ok(JsendResponse.success(paginationData));
 	}
 
 	@GetMapping("/order/{bookId}")

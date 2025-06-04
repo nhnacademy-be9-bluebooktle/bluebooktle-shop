@@ -24,7 +24,6 @@ VALUES (1, '프리미엄 포장', 3000, now(), null);
 INSERT INTO packaging_option
 VALUES (2, '반짝이 포장', 1000, now(), null);
 
-
 INSERT INTO point_source_type
 VALUES (1, 'EARN', '로그인 적립', now(), null);
 
