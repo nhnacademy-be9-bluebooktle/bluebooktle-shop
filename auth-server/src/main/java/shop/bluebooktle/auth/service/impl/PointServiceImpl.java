@@ -32,7 +32,7 @@ public class PointServiceImpl implements PointService {
 	private final UserRepository userRepository;
 
 	@Override
-	@Transactional()
+	@Transactional
 	public void adjustUserPointAndSavePointHistory(Long userId, PointSourceTypeEnum pointSourceTypeEnum) {
 		User user = userRepository.findById(userId)
 			.orElseThrow(UserNotFoundException::new);
@@ -63,13 +63,13 @@ public class PointServiceImpl implements PointService {
 	}
 
 	@Override
-	@Transactional()
+	@Transactional
 	public void signUpPoint(Long userId) {
 		adjustUserPointAndSavePointHistory(userId, PointSourceTypeEnum.SIGNUP_EARN);
 	}
 
 	@Override
-	@Transactional()
+	@Transactional
 	public void loginPoint(Long userId) {
 		PointHistory last = pointHistoryRepository
 			.findTopByUserIdAndSourceTypeOrderByCreatedAtDesc(userId, PointSourceTypeEnum.LOGIN_EARN)
@@ -79,5 +79,5 @@ public class PointServiceImpl implements PointService {
 			adjustUserPointAndSavePointHistory(userId, PointSourceTypeEnum.LOGIN_EARN);
 		}
 	}
-	
+
 }
