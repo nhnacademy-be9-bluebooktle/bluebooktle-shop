@@ -3,6 +3,7 @@ package shop.bluebooktle.backend.book.service;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -20,11 +21,19 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import shop.bluebooktle.backend.book.entity.Author;
 import shop.bluebooktle.backend.book.entity.Book;
+import shop.bluebooktle.backend.book.entity.BookAuthor;
 import shop.bluebooktle.backend.book.entity.BookCategory;
+import shop.bluebooktle.backend.book.entity.BookImg;
+import shop.bluebooktle.backend.book.entity.BookSaleInfo;
 import shop.bluebooktle.backend.book.entity.Category;
+import shop.bluebooktle.backend.book.entity.Img;
+import shop.bluebooktle.backend.book.repository.BookAuthorRepository;
 import shop.bluebooktle.backend.book.repository.BookCategoryRepository;
+import shop.bluebooktle.backend.book.repository.BookImgRepository;
 import shop.bluebooktle.backend.book.repository.BookRepository;
+import shop.bluebooktle.backend.book.repository.BookSaleInfoRepository;
 import shop.bluebooktle.backend.book.repository.CategoryRepository;
 import shop.bluebooktle.backend.book.service.impl.BookCategoryServiceImpl;
 import shop.bluebooktle.common.dto.book.request.BookInfoRequest;
@@ -48,6 +57,15 @@ public class BookCategoryServiceTest {
 
 	@Mock
 	private BookCategoryRepository bookCategoryRepository;
+
+	@Mock
+	private BookAuthorRepository bookAuthorRepository;
+
+	@Mock
+	private BookSaleInfoRepository bookSaleInfoRepository;
+
+	@Mock
+	private BookImgRepository bookImgRepository;
 
 	@InjectMocks
 	private BookCategoryServiceImpl bookCategoryService;
@@ -655,35 +673,103 @@ public class BookCategoryServiceTest {
 	@Test
 	@DisplayName("카테고리 아이디로 도서 조회 성공")
 	void searchBooksByCategory_success() {
+
 		Book book1 = Book.builder().id(1L).build();
 		Book book2 = Book.builder().id(2L).build();
 
-		Category category = Category.builder().build();
-		ReflectionTestUtils.setField(category, "id", 1L);
+		Category parentCategory = Category.builder().build();
+		ReflectionTestUtils.setField(parentCategory, "id", 10L);
+
+		Category category1 = new Category(parentCategory, "카테고리 1", "10/1");
+		ReflectionTestUtils.setField(category1, "id", 1L);
+
+		Category category2 = new Category(parentCategory, "카테고리 2", "10/2");
+		ReflectionTestUtils.setField(category2, "id", 2L);
+
+		BookSaleInfo bookSaleInfo1 = BookSaleInfo.builder()
+			.book(book1)
+			.salePrice(new BigDecimal("10000"))
+			.price(new BigDecimal("10000"))
+			.star(BigDecimal.valueOf(1.0))
+			.reviewCount(10L)
+			.viewCount(100L)
+			.build();
+
+		BookSaleInfo bookSaleInfo2 = BookSaleInfo.builder()
+			.book(book2)
+			.salePrice(new BigDecimal("20000"))
+			.price(new BigDecimal("20000"))
+			.star(BigDecimal.valueOf(2.0))
+			.reviewCount(20L)
+			.viewCount(200L)
+			.build();
+
+		Author author1 = Author.builder()
+			.name("작가1")
+			.build();
+
+		Author author2 = Author.builder()
+			.name("작가2")
+			.build();
+
+		List<Author> authors1 = List.of(author1, author2);
+
+		Author author3 = Author.builder()
+			.name("작가3")
+			.build();
+
+		Author author4 = Author.builder()
+			.name("작가4")
+			.build();
+
+		List<Author> authors2 = List.of(author3, author4);
+
+		Img Img1 = Img.builder()
+			.imgUrl("url1")
+			.build();
+
+		Img Img2 = Img.builder()
+			.imgUrl("url2")
+			.build();
+
+		BookImg bookImg1 = BookImg.builder()
+			.book(book1)
+			.img(Img1)
+			.build();
+
+		BookImg bookImg2 = BookImg.builder()
+			.book(book2)
+			.img(Img2)
+			.build();
 
 		Pageable pageable = PageRequest.of(0, 10);
 
-		BookCategory bookCategory1 = BookCategory.builder()
-			.book(book1)
-			.category(category)
-			.build();
+		Page<Book> books = new PageImpl<>(List.of(book1, book2));
 
-		BookCategory bookCategory2 = BookCategory.builder()
-			.book(book2)
-			.category(category)
-			.build();
+		when(categoryRepository.findById(parentCategory.getId())).thenReturn(Optional.of(parentCategory));
+		when(bookCategoryRepository.findBookUnderCategory(parentCategory.getId(), pageable)).thenReturn(books);
+		when(bookSaleInfoRepository.findByBook(book1)).thenReturn(Optional.of(bookSaleInfo1));
+		when(bookSaleInfoRepository.findByBook(book2)).thenReturn(Optional.of(bookSaleInfo2));
+		when(bookAuthorRepository.findAuthorsByBook(book1)).thenReturn(authors1);
+		when(bookAuthorRepository.findAuthorsByBook(book2)).thenReturn(authors2);
+		when(bookImgRepository.findByBook(book1)).thenReturn(bookImg1);
+		when(bookImgRepository.findByBook(book2)).thenReturn(bookImg2);
 
-		Page<BookCategory> page = new PageImpl<>(List.of(bookCategory1, bookCategory2), pageable, 2);
+		Page<BookInfoResponse> result = bookCategoryService.searchBooksByCategory(parentCategory.getId(), pageable);
 
-		when(categoryRepository.findById(category.getId())).thenReturn(Optional.of(category));
-		when(bookCategoryRepository.findAllByCategory(category, pageable)).thenReturn(page);
 
-		Page<BookInfoResponse> bookInfoResponses = bookCategoryService.searchBooksByCategory(category.getId(), pageable);
+		assertEquals(2, result.getTotalElements());
+		assertEquals(10, result.getSize());
 
-		assertEquals(2, bookInfoResponses.getTotalElements());
-		assertEquals(book1.getId(), bookInfoResponses.getContent().get(0).bookId());
-		assertEquals(book2.getId(), bookInfoResponses.getContent().get(1).bookId());
-		assertEquals(pageable, bookInfoResponses.getPageable());
+		assertEquals(book1.getId(), result.getContent().get(0).bookId());
+		assertEquals(book2.getId(), result.getContent().get(1).bookId());
+
+		assertEquals(List.of(author1.getName(), author2.getName()), result.getContent().get(0).authors());
+		assertEquals(List.of(author3.getName(), author4.getName()), result.getContent().get(1).authors());
+
+		assertEquals(bookSaleInfo1.getSalePrice(), result.getContent().get(0).salePrice());
+		assertEquals(bookSaleInfo2.getSalePrice(), result.getContent().get(1).salePrice());
+
 	}
 
 	@Test
