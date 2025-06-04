@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import org.springframework.stereotype.Controller;
@@ -186,30 +185,10 @@ public class AdminBookController {
 
 		BookAllRegisterRequest formDto;
 		String pageTitle;
-		if (bookId != null) {
-			pageTitle = "도서 정보 수정 (ID: " + bookId + ")";
+
+		pageTitle = "도서 정보 수정 (ID: " + bookId + ")";
+		try {
 			BookAllResponse resp = adminBookService.getBook(bookId);
-
-			List<Long> authorIds = allAuthorsForMapping.stream()
-				.filter(a -> resp.getAuthors().contains(a.getName()))
-				.map(AuthorResponse::getId)
-				.toList();
-
-			List<Long> categoryIds = allCategoriesForMapping.stream()
-				.filter(c -> resp.getCategories().contains(c.name()))
-				.map(CategoryTreeResponse::id)
-				.toList();
-
-			List<Long> publisherIds = allPublishersForMapping.stream()
-				.filter(p -> resp.getPublishers().contains(p.getName()))
-				.map(PublisherInfoResponse::getId)
-				.toList();
-
-			List<Long> tagIds = allTagsForMapping.stream()
-				.filter(t -> resp.getTags().contains(t.getName()))
-				.map(TagInfoResponse::getId)
-				.toList();
-
 			formDto = BookAllRegisterRequest.builder()
 				.title(resp.getTitle())
 				.isbn(resp.getIsbn())
@@ -227,25 +206,8 @@ public class AdminBookController {
 				.tagIdList(tagIds)
 				.imgUrl(resp.getImgUrl())
 				.build();
-		} else {
-			pageTitle = "새 도서 등록";
-			formDto = BookAllRegisterRequest.builder()
-				.title("")
-				.isbn("")
-				.index("")
-				.description("")
-				.publishDate(LocalDate.now())
-				.price(BigDecimal.ZERO)
-				.salePrice(BigDecimal.ZERO)
-				.stock(0)
-				.isPackable(false)
-				.state(BookSaleInfoState.AVAILABLE)
-				.authorIdList(Collections.emptyList())
-				.publisherIdList(Collections.emptyList())
-				.categoryIdList(Collections.emptyList())
-				.tagIdList(Collections.emptyList())
-				.imgUrl("")
-				.build();
+		} catch (Exception e) {
+			return "redirect:/admin/books";
 		}
 
 		model.addAttribute("pageTitle", pageTitle);
@@ -261,8 +223,6 @@ public class AdminBookController {
 			BookSaleInfoState.SALE_ENDED.name(),
 			BookSaleInfoState.DELETED.name()
 		));
-
-		model.addAttribute("presignedUploadUrl", imgService.getPresignedUploadUrl());
 
 		return "admin/book/book_form";
 	}
