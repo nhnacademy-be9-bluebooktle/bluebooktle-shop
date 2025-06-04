@@ -26,4 +26,10 @@ public interface ReviewRepository {
 		@RequestParam("page") int page,
 		@RequestParam("size") int size
 	);
+
+	@GetMapping
+	PaginationData<ReviewResponse> getReviewsForBook(
+		@RequestParam("page") int page,
+		@RequestParam("size") int size
+	);
 }

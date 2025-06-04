@@ -1,0 +1,6 @@
+### 도서 상세 페이지 리뷰 목록 조회 (GET)
+
+@baseUrl = http://localhost:9012
+
+
+GET {{baseUrl}}/api/orders/reviews/book/1?page=0&size=5

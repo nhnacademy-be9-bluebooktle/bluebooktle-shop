@@ -67,11 +67,12 @@ public class ReviewServiceImpl implements ReviewService {
 	@Override
 	@Transactional(readOnly = true)
 	public Page<ReviewResponse> getMyReviews(Long userId, Pageable pageable) {
-		Page<Review> reviewPage = reviewRepository.findAllByUserId(userId, pageable);
+		Page<Review> reviewPage = reviewRepository.findReviewsByUserId(userId, pageable);
 		return reviewPage.map(review -> ReviewResponse.builder()
 			.reviewId(review.getId())
 			.userId(review.getUser().getId())
 			.bookOrderId(review.getBookOrder().getId())
+			.bookTitle(review.getBookOrder().getBook().getTitle())
 			.imgUrl(review.getImg() != null ? review.getImg().getImgUrl() : null)
 			.star(review.getStar())
 			.reviewContent(review.getReviewContent())
@@ -79,5 +80,21 @@ public class ReviewServiceImpl implements ReviewService {
 			.createdAt(review.getCreatedAt())
 			.build()
 		);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public Page<ReviewResponse> getReviewsForBook(Long bookId, Pageable pageable) {
+		Page<Review> reviews = reviewRepository.findReviewsByBookId(bookId, pageable);
+		return reviews.map(review -> ReviewResponse.builder()
+			.reviewId(review.getId())
+			.userId(review.getUser() != null ? review.getUser().getId() : null)
+			.bookOrderId(review.getBookOrder().getId())
+			.imgUrl((review.getImg() != null) ? review.getImg().getImgUrl() : null)
+			.star(review.getStar())
+			.reviewContent(review.getReviewContent())
+			.likes(review.getLikes())
+			.createdAt(review.getCreatedAt())
+			.build());
 	}
 }
