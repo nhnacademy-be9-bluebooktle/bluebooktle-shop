@@ -11,6 +11,7 @@ public record OrderHistoryResponse(
 	String orderName,
 	BigDecimal totalPrice,
 	String orderKey,
-	OrderStatus orderStatus
+	OrderStatus orderStatus,
+	String thumbnailUrl
 ) {
 }
