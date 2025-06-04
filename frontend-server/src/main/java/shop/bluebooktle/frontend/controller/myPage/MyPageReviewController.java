@@ -28,22 +28,7 @@ public class MyPageReviewController {
 
 	private final ReviewService reviewService;
 
-	//내가 쓴 리뷰 전체조회
-	@GetMapping
-	public String listMyReviews(
-		@AuthenticationPrincipal UserPrincipal userPrincipal,
-		@RequestParam(value = "page", defaultValue = "0") int page,
-		@RequestParam(value = "size", defaultValue = "10") int size,
-		Model model
-	) {
-		Long userId = userPrincipal.getUserId();
-		Page<ReviewResponse> reviewsPage = reviewService.getMyReviews(userId, PageRequest.of(page, size));
-
-		model.addAttribute("reviewsPage", reviewsPage);
-		return "mypage/review_list";
-	}
-
-	//리뷰작성
+	// 리뷰작성
 	@PostMapping("/{bookOrderId}")
 	public String addReview(
 		@AuthenticationPrincipal UserPrincipal userPrincipal,
@@ -61,4 +46,35 @@ public class MyPageReviewController {
 		reviewService.addReview(userId, bookOrderId, reviewRequest);
 		return "redirect:/mypage/orders/" + bookOrderId;
 	}
+
+	// 내가 쓴 리뷰 전체조회
+	@GetMapping
+	public String listMyReviews(
+		@AuthenticationPrincipal UserPrincipal userPrincipal,
+		@RequestParam(value = "page", defaultValue = "0") int page,
+		@RequestParam(value = "size", defaultValue = "10") int size,
+		Model model
+	) {
+		Long userId = userPrincipal.getUserId();
+		Page<ReviewResponse> reviewsPage = reviewService.getMyReviews(userId, PageRequest.of(page, size));
+
+		model.addAttribute("reviewsPage", reviewsPage);
+		return "mypage/review_list";
+	}
+
+	// 도서 상세페이지에서 리뷰 목록 조회
+	@GetMapping("/books/{bookId}/reviews") //도서 상세페이지 완성되면 수정
+	public String getReviewsForBook(
+		@PathVariable Long bookId,
+		@RequestParam(value = "page", defaultValue = "0") int page,
+		@RequestParam(value = "size", defaultValue = "5") int size,
+		Model model
+	) {
+		Page<ReviewResponse> reviewsPage = reviewService.getReviewsForBook(bookId, PageRequest.of(page, size));
+
+		model.addAttribute("bookId", bookId);
+		model.addAttribute("reviewsPage", reviewsPage);
+		return "book/review_list_fragment";
+	}
+
 }

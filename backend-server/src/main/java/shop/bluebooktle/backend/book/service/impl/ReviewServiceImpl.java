@@ -18,7 +18,6 @@ import shop.bluebooktle.common.dto.book.request.ReviewRequest;
 import shop.bluebooktle.common.dto.book.response.ReviewResponse;
 import shop.bluebooktle.common.entity.auth.User;
 import shop.bluebooktle.common.exception.auth.UserNotFoundException;
-import shop.bluebooktle.common.exception.book.ImgNotFoundException;
 import shop.bluebooktle.common.exception.book_order.BookOrderNotFoundException;
 
 @Service
@@ -39,7 +38,14 @@ public class ReviewServiceImpl implements ReviewService {
 		BookOrder bookOrder = bookOrderRepository.findById(bookOrderId)
 			.orElseThrow(BookOrderNotFoundException::new);
 
-		Img img = imgRepository.findByImgUrl(reviewRequest.getImgUrl()).orElseThrow(ImgNotFoundException::new);
+		Img img = null;
+		if (reviewRequest.getImgUrl() != null && !reviewRequest.getImgUrl().isEmpty()) {
+			img = imgRepository.findByImgUrl(reviewRequest.getImgUrl())
+				.orElseGet(() -> {
+					Img newImg = Img.builder().imgUrl(reviewRequest.getImgUrl()).build();
+					return imgRepository.save(newImg);
+				});
+		}
 
 		Review review = Review.builder()
 			.user(user)
@@ -78,8 +84,7 @@ public class ReviewServiceImpl implements ReviewService {
 			.reviewContent(review.getReviewContent())
 			.likes(review.getLikes())
 			.createdAt(review.getCreatedAt())
-			.build()
-		);
+			.build());
 	}
 
 	@Override
@@ -89,7 +94,7 @@ public class ReviewServiceImpl implements ReviewService {
 		return reviews.map(review -> ReviewResponse.builder()
 			.reviewId(review.getId())
 			.userId(review.getUser() != null ? review.getUser().getId() : null)
-			.bookOrderId(review.getBookOrder().getId())
+			.nickname(review.getUser().getNickname())
 			.imgUrl((review.getImg() != null) ? review.getImg().getImgUrl() : null)
 			.star(review.getStar())
 			.reviewContent(review.getReviewContent())
