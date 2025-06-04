@@ -16,6 +16,7 @@ public class ReviewResponse {
 	private Long reviewId;
 	private Long userId;
 	private Long bookOrderId;
+	private String bookTitle;
 	private String imgUrl;
 	private Integer star;
 	private String reviewContent;

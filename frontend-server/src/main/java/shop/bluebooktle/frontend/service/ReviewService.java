@@ -10,4 +10,6 @@ public interface ReviewService {
 	void addReview(Long userId, Long bookOrderId, ReviewRequest reviewRequest);
 
 	Page<ReviewResponse> getMyReviews(Long userId, Pageable pageable);
+
+	Page<ReviewResponse> getReviewsForBook(Long bookId, Pageable pageable);
 }
