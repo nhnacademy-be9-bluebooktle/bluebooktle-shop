@@ -243,7 +243,7 @@
                         <p th:each="err : ${#fields.errors('alias')}" th:text="${err}"></p>
                     </div>
                 </div>
-                
+
 
                 <div class="form-group-kitsch">
                     <label class="label-kitsch handwriting-font-kitsch">주소:</label>
@@ -329,7 +329,7 @@
             new daum.Postcode({
                 oncomplete: function (data) {
                     document.getElementById('postcodeInput').value = data.zonecode;
-                    document.getElementById('roadAddressInput').value = data.userSelectedType === 'R' ? data.roadAddress : data.jibunAddress;
+                    document.getElementById('roadAddressInput').value = data.roadAddress;
                     document.getElementById('detailAddressInput').value = '';
                     document.getElementById('detailAddressInput').focus();
                 }
