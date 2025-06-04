@@ -37,4 +37,17 @@ public class ReviewServiceImpl implements ReviewService {
 		return new PageImpl<>(content, pageable, total);
 
 	}
+
+	// 도서상세페이지 리뷰 목록 조회
+	@Override
+	public Page<ReviewResponse> getReviewsForBook(Long bookId, Pageable pageable) {
+		PaginationData<ReviewResponse> paginationData =
+			reviewRepository.getMyReviews(pageable.getPageNumber(), pageable.getPageSize());
+
+		List<ReviewResponse> content = paginationData.getContent();
+		long total = paginationData.getTotalElements();
+
+		return new PageImpl<>(content, pageable, total);
+
+	}
 }
