@@ -2,10 +2,13 @@ package shop.bluebooktle.backend.book.service;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+
 import shop.bluebooktle.common.dto.book.request.BookRegisterRequest;
 import shop.bluebooktle.common.dto.book.request.BookUpdateRequest;
 import shop.bluebooktle.common.dto.book.response.BookAllResponse;
 import shop.bluebooktle.common.dto.book.response.BookCartOrderResponse;
+import shop.bluebooktle.common.dto.book.response.BookInfoResponse;
 import shop.bluebooktle.common.dto.book.response.BookRegisterResponse;
 import shop.bluebooktle.common.dto.book.response.BookResponse;
 import shop.bluebooktle.common.dto.book.response.BookUpdateResponse;
@@ -25,7 +28,7 @@ public interface BookService {
 
 	List<BookAllResponse> getBookAllByTitle(String title);
 
-	PaginationData<BookAllResponse> findAllBooks(int page, int size, String searchKeyword);
+	Page<BookInfoResponse> findAllBooks(int page, int size, String searchKeyword);
 
 	BookCartOrderResponse getBookCartOrder(Long bookId, int quantity);
 

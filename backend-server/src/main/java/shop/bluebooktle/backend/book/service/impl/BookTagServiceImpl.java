@@ -81,7 +81,8 @@ public class BookTagServiceImpl implements BookTagService {
 	public Page<BookInfoResponse> searchBooksByTag(Long tagId, Pageable pageable) {
 		Tag tag = findTagOrThrow(tagId);
 		Page<BookTag> bookTagPage = bookTagRepository.findAllByTag(tag, pageable);
-		return bookTagPage.map(bt -> new BookInfoResponse(bt.getBook().getId()));
+		// return bookTagPage.map(bt -> new BookInfoResponse(bt.getBook().getId()));
+		return null;
 	}
 
 	private Book findBookOrThrow(Long bookId) {

@@ -38,7 +38,9 @@ public interface BookImgRepository extends JpaRepository<BookImg, Long> {
 	List<BookImg> findByImgId(Long imgId);
 
 	Optional<BookImg> findByBookIdAndImgId(Long bookId, Long imgId);
-	
+
 	// 특정 도서의 썸네일 한 장 조회
 	Optional<BookImg> findFirstByBookIdAndIsThumbnailTrueOrderByIdAsc(Long bookId);
+
+	BookImg findByBook(Book book);
 }

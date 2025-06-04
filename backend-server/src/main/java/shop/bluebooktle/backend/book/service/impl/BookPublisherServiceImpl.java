@@ -82,7 +82,8 @@ public class BookPublisherServiceImpl implements BookPublisherService {
 	public Page<BookInfoResponse> searchBooksByPublisher(Long publisherId, Pageable pageable) {
 		Publisher publisher = findPublisherOrThrow(publisherId);
 		Page<BookPublisher> bookPublisherPage = bookPublisherRepository.findAllByPublisher(publisher, pageable);
-		return bookPublisherPage.map(bp -> new BookInfoResponse(bp.getBook().getId()));
+		/*return bookPublisherPage.map(bp -> new BookInfoResponse(bp.getBook().getId()));*/
+		return null;
 	}
 
 	private Book findBookOrThrow(Long bookId) {

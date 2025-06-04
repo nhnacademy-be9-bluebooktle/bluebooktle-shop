@@ -13,7 +13,7 @@ import shop.bluebooktle.backend.book.entity.Book;
 import shop.bluebooktle.backend.book.entity.BookCategory;
 import shop.bluebooktle.backend.book.entity.Category;
 
-public interface BookCategoryRepository extends JpaRepository<BookCategory, Long> {
+public interface BookCategoryRepository extends JpaRepository<BookCategory, Long>, BookCategoryQueryRepository {
 
 	Optional<BookCategory> findByBookAndCategory(Book book, Category category);
 

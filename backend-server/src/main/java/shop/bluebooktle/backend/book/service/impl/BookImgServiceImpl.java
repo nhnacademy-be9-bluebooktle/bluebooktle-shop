@@ -115,9 +115,10 @@ public class BookImgServiceImpl implements BookImgService {
 		Img img = imgRepository.findById(imgId).orElseThrow(() -> new ImgNotFoundException());
 
 		List<Book> books = bookImgRepository.findBooksByImg(img);
-		return books.stream()
+		/*return books.stream()
 			.map(book -> new BookInfoResponse(book.getId()))
-			.collect(Collectors.toList());
+			.collect(Collectors.toList());*/
+		return null;
 	}
 
 	@Transactional(readOnly = true)
@@ -126,7 +127,7 @@ public class BookImgServiceImpl implements BookImgService {
 		if (bookId == null) {
 			throw new IllegalArgumentException("Book ID must not be null");
 		}
-		return bookImgRepository.findByBookId(bookId).stream()
+		/*return bookImgRepository.findByBookId(bookId).stream()
 			.filter(BookImg::isThumbnail)
 			.findFirst()
 			.map(rel -> BookImgResponse.builder()
@@ -139,7 +140,8 @@ public class BookImgServiceImpl implements BookImgService {
 				.bookInfoResponse(new BookInfoResponse(rel.getBook().getId()))
 				.isThumbnail(true)
 				.build()
-			);
+			);*/
+		return null;
 	}
 
 	@Override
