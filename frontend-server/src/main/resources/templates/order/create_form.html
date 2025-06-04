@@ -427,9 +427,9 @@
                             <input
                                     class="input-kitsch pixel-font-kitsch"
                                     id="ordererName"
-                                    maxlength="150"
+                                    maxlength="20"
                                     name="ordererName"
-                                    placeholder="최대 150자"
+                                    placeholder="최대 20자"
                                     th:readonly="${user != null}"
                                     th:required="${user == null}"
                                     th:value="${user != null} ? ${user.name} : ''"
@@ -442,9 +442,9 @@
                             <input
                                     class="input-kitsch pixel-font-kitsch"
                                     id="ordererEmail"
-                                    maxlength="255"
+                                    maxlength="50"
                                     name="ordererEmail"
-                                    placeholder="example@email.com (최대 255자)"
+                                    placeholder="example@email.com (최대 50자)"
                                     th:readonly="${user != null}"
                                     th:required="${user == null}"
                                     th:value="${user != null} ? ${user.email} : ''"
@@ -458,9 +458,10 @@
                             <input
                                     class="input-kitsch pixel-font-kitsch"
                                     id="ordererPhoneNumber"
-                                    maxlength="100"
+                                    maxlength="11"
                                     name="ordererPhoneNumber"
-                                    placeholder="숫자만 입력 (최대 100자)"
+                                    pattern="^[0-9]+$"
+                                    placeholder="숫자만 입력 (최대 11자)"
                                     th:readonly="${user != null}"
                                     th:required="${user == null}"
                                     th:value="${user != null} ? ${user.phoneNumber} : ''"
@@ -536,9 +537,9 @@
                                 <input
                                         class="input-kitsch pixel-font-kitsch"
                                         id="recipientName"
-                                        maxlength="150"
+                                        maxlength="20"
                                         name="recipientName"
-                                        placeholder="최대 150자"
+                                        placeholder="최대 20자"
                                         required
                                         type="text"
                                 />
@@ -548,10 +549,9 @@
                                 <input
                                         class="input-kitsch pixel-font-kitsch"
                                         id="recipientEmail"
-                                        maxlength="255"
+                                        maxlength="50"
                                         name="recipientEmail"
-                                        placeholder="최대 255자"
-                                        required
+                                        placeholder="최대 50자"
                                         type="email"
                                 />
                             </div>
@@ -560,10 +560,10 @@
                                 <input
                                         class="input-kitsch pixel-font-kitsch"
                                         id="recipientPhone"
-                                        maxlength="100"
+                                        maxlength="11"
                                         name="recipientPhone"
                                         pattern="^[0-9]+$"
-                                        placeholder="최대 100자 (숫자만)"
+                                        placeholder="최대 11자 (숫자만)"
                                         required
                                         type="tel"
                                 />
@@ -574,7 +574,7 @@
                                     <input
                                             class="input-kitsch pixel-font-kitsch"
                                             id="shippingPostcode"
-                                            maxlength="50"
+                                            maxlength="5"
                                             name="shippingPostcode"
                                             placeholder="우편번호"
                                             readonly
