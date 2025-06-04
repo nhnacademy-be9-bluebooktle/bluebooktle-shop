@@ -173,4 +173,19 @@ public class CartController {
 		cartService.mergeOrConvertGuestCartToMemberCart(guestId, user);
 		return ResponseEntity.ok(JsendResponse.success());
 	}
+
+	@GetMapping("quantity")
+	public ResponseEntity<JsendResponse<Long>> getQuantity(
+		@AuthenticationPrincipal UserPrincipal principal,
+		@RequestHeader(value = "GUEST_ID", required = false) String guestId
+	) {
+		Long size;
+		if (principal == null) {
+			size = cartService.getGuestCartSize(guestId);
+		} else {
+			User user = getAuthenticatedUser(principal);
+			size = cartService.getCartSize(user);
+		}
+		return ResponseEntity.ok(JsendResponse.success(size));
+	}
 }

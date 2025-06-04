@@ -19,4 +19,6 @@ public interface CartBookRepository extends JpaRepository<CartBook, Long> {
 
 	// 저장 (수량 증가 등)
 	CartBook save(CartBook cartBook);
+
+	Long countByCart(Cart cart);
 }

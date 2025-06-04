@@ -168,10 +168,20 @@ public class CartServiceImpl implements CartService {
 					.salePrice(saleInfo.getSalePrice())
 					.thumbnailUrl(getThumbnailUrlByBookId(book.getId()))
 					.categories(getCategoriesByBookId(book.getId()))
+					.isPackable(saleInfo.isPackable())
 					.quantity(cartBook.getQuantity())
 					.build();
 			})
 			.toList();
+	}
+
+	@Override
+	public Long getCartSize(User user) {
+		Cart cart = cartRepository.findByUser(user).orElse(null);
+		if (cart == null) {
+			return 0L;
+		}
+		return cartBookRepository.countByCart(cart);
 	}
 
 	// ----------------- 비회원용 -----------------
@@ -205,6 +215,7 @@ public class CartServiceImpl implements CartService {
 					.salePrice(saleInfo.getSalePrice())
 					.thumbnailUrl(getThumbnailUrlByBookId(bookId))
 					.categories(getCategoriesByBookId(bookId))
+					.isPackable(saleInfo.isPackable())
 					.quantity(quantity)
 					.build();
 			})
@@ -261,10 +272,16 @@ public class CartServiceImpl implements CartService {
 					.salePrice(saleInfo.getSalePrice())
 					.thumbnailUrl(getThumbnailUrlByBookId(bookId))
 					.categories(getCategoriesByBookId(bookId))
+					.isPackable(saleInfo.isPackable())
 					.quantity(quantity)
 					.build();
 			})
 			.toList();
+	}
+
+	@Override
+	public Long getGuestCartSize(String guestId) {
+		return guestCartRepository.getCartSize(guestId);
 	}
 
 	// ----------------- 공통 -----------------

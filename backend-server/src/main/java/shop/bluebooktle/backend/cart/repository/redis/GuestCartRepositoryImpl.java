@@ -62,4 +62,9 @@ public class GuestCartRepositoryImpl implements GuestCartRepository {
 				e -> (Integer)e.getValue()
 			));
 	}
+
+	@Override
+	public Long getCartSize(String guestId) {
+		return redisTemplate.opsForHash().size(getKey(guestId));
+	}
 }
