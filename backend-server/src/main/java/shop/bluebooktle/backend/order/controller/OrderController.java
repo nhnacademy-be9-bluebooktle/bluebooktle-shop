@@ -53,7 +53,7 @@ public class OrderController {
 		@Parameter(description = "조회할 주문의 ID") @PathVariable Long orderId,
 		@Parameter(hidden = true) @AuthenticationPrincipal UserPrincipal userPrincipal) {
 		checkPrincipal(userPrincipal);
-		log.info("Request to get order confirmation details for orderId: {} by userId: {}", orderId,
+		log.info("Request to get order confirmation details for orderKey: {} by userId: {}", orderId,
 			userPrincipal.getUserId());
 		OrderConfirmDetailResponse responseDto = orderService.getOrderDetailsForConfirmation(orderId,
 			userPrincipal.getUserId());

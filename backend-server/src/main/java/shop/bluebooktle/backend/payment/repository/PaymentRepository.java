@@ -26,4 +26,5 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
 		OrderStatus status,
 		Pageable pageable
 	);
+
 }

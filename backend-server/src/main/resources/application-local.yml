@@ -89,3 +89,9 @@ dooray:
   webhook:
     verification-channel: https://nhnacademy.dooray.com/services/3204376758577275363/4082541783774462190/kziab347QWW2oZ_D2rumEA
 #    notification-channel: 추후 사용
+
+toss:
+  api:
+    url: https://api.tosspayments.com/v1
+  secret-key: test_sk_LlDJaYngroXzQGEQlMlv8ezGdRpX
+  client-key: test_ck_0RnYX2w532oJMLLx9JBPVNeyqApQ

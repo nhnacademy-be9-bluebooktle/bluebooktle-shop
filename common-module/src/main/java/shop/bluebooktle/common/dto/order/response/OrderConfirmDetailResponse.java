@@ -18,6 +18,7 @@ import shop.bluebooktle.common.dto.coupon.response.AppliedCouponResponse;
 public class OrderConfirmDetailResponse {
 	private Long orderId;
 	private String orderName;
+	private String orderKey;
 
 	private String receiverName;
 	private String receiverPhoneNumber;
@@ -36,4 +37,5 @@ public class OrderConfirmDetailResponse {
 	private BigDecimal packagingTotal;
 	private BigDecimal couponDiscountTotal;
 	private BigDecimal totalAmount;
+	private BigDecimal pointUseAmount;
 }

@@ -25,7 +25,7 @@ import shop.bluebooktle.common.entity.BaseEntity;
 @Table(name = "payment_detail")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(of = "id", callSuper = false)
-@ToString(exclude = {"paymentType"})
+@ToString(exclude = {"method"})
 @SQLDelete(sql = "UPDATE payment_detail SET deleted_at = CURRENT_TIMESTAMP WHERE payment_detail_id = ?")
 @SQLRestriction("deleted_at IS NULL")
 public class PaymentDetail extends BaseEntity {

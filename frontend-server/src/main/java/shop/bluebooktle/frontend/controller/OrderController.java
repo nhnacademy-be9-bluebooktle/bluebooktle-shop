@@ -55,7 +55,7 @@ public class OrderController {
 	private final CartService cartService;
 	private final CouponService couponService;
 
-	@Value("{toss.client-key}")
+	@Value("${toss.client-key}")
 	private String tossPaymentClientKey;
 
 	@GetMapping("/create")
@@ -116,7 +116,6 @@ public class OrderController {
 			.orderKey(orderKey)
 			.build();
 		Long orderId = orderService.createOrder(updatedRequest);
-		log.info("주문 생성 :{}", orderId);
 		return "redirect:/order/" + orderId + "/checkout";
 	}
 
@@ -156,13 +155,20 @@ public class OrderController {
 	public String processOrder(
 		@RequestParam String paymentKey,
 		@RequestParam String orderId,
-		@RequestParam Integer amount,
+		@RequestParam Long amount,
 		RedirectAttributes redirectAttributes
 	) {
+
 		PaymentConfirmRequest req = new PaymentConfirmRequest(paymentKey, orderId, amount);
-		PaymentConfirmResponse resp = paymentsService.confirm(req);
-		redirectAttributes.addFlashAttribute("orderData", resp);
-		return "redirect:/order/complete";
+
+		try {
+			PaymentConfirmResponse resp = paymentsService.confirm(req);
+			redirectAttributes.addFlashAttribute("orderData", resp);
+			return "redirect:/order/complete";
+		} catch (Exception e) {
+			redirectAttributes.addFlashAttribute("GlobalErrorMessage", "결제에 실패했습니다: " + e.getMessage());
+			return "redirect:/mypage/orders";
+		}
 	}
 
 	@GetMapping("/complete")
@@ -171,14 +177,23 @@ public class OrderController {
 		if (bindingResult.hasErrors()) {
 			return "order/fail";
 		}
-
 		return "order/complete";
 	}
 
 	@GetMapping("/fail")
-	public String orderFailPage() {
+	public String orderFailPage(
+		@RequestParam(name = "code", required = false) String code,
+		@RequestParam(name = "message", required = false) String message,
+		RedirectAttributes redirectAttributes
+	) {
 
-		return "order/fail";
+		if (message != null && !message.isBlank()) {
+			redirectAttributes.addFlashAttribute("GlobalErrorTitle", code);
+			redirectAttributes.addFlashAttribute("GlobalErrorMessage", message);
+		} else {
+			redirectAttributes.addFlashAttribute("GlobalErrorMessage", "알 수 없는 오류로 결제에 실패했습니다.");
+		}
+		return "redirect:mypage/orders";
 	}
 
 	private void validateGuestId(String guestId) {

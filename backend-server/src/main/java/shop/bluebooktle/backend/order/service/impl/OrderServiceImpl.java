@@ -296,6 +296,8 @@ public class OrderServiceImpl implements OrderService {
 			.packagingTotal(packagingTotal)
 			.couponDiscountTotal(couponDiscountTotal)
 			.totalAmount(totalAmount)
+			.pointUseAmount(order.getPointUseAmount())
+			.orderKey(order.getOrderKey())
 			.build();
 	}
 

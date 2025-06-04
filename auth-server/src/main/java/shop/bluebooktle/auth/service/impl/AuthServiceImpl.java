@@ -25,6 +25,7 @@ import shop.bluebooktle.auth.service.AccessTokenService;
 import shop.bluebooktle.auth.service.AuthService;
 import shop.bluebooktle.auth.service.PointService;
 import shop.bluebooktle.auth.service.RefreshTokenService;
+import shop.bluebooktle.auth.util.NicknameGenerator;
 import shop.bluebooktle.common.domain.auth.UserProvider;
 import shop.bluebooktle.common.domain.auth.UserStatus;
 import shop.bluebooktle.common.domain.auth.UserType;
@@ -256,14 +257,17 @@ public class AuthServiceImpl implements AuthService {
 			.orElseThrow(() -> new ApplicationException(ErrorCode.INTERNAL_SERVER_ERROR, "기본 멤버십 등급을 찾을 수 없습니다."));
 
 		// 정보 없으면 기본값 사용
-		String nickname = "payco_" + loginId;
+		String nickname = NicknameGenerator.generate();
 		String finalBirth = StringUtils.hasText(birthday) ? birthday.replaceAll("[^0-9]", "") : "00000000";
 		String finalPhoneNumber = StringUtils.hasText(mobile) ? normalizePhoneNumber(mobile) : "01000000000";
 
+		if (!StringUtils.hasText(name)) {
+			throw new ApplicationException(ErrorCode.AUTH_OAUTH_LOGIN_FAILED, "페이코에서 사용자 이름을 전달받지 못했습니다.");
+		}
 		User newUser = User.builder()
 			.loginId(loginId)
 			.encodedPassword(passwordEncoder.encode(UUID.randomUUID().toString()))
-			.name(StringUtils.hasText(name) ? name : "PAYCO_USER")
+			.name(name)
 			.email(email)
 			.nickname(nickname)
 			.birth(finalBirth)
@@ -275,7 +279,7 @@ public class AuthServiceImpl implements AuthService {
 			.build();
 
 		newUser = userRepository.save(newUser);
-		eventPublisher.publishEvent(new UserLoginEvent(newUser.getId()));
+		eventPublisher.publishEvent(new UserSignUpEvent(newUser.getId()));
 		return newUser;
 	}
 
