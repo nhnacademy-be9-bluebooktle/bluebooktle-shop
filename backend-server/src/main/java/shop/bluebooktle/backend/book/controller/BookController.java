@@ -19,7 +19,8 @@ import lombok.extern.slf4j.Slf4j;
 import shop.bluebooktle.backend.book.service.BookRegisterService;
 import shop.bluebooktle.backend.book.service.BookService;
 import shop.bluebooktle.common.dto.book.request.BookAllRegisterRequest;
-import shop.bluebooktle.common.dto.book.request.BookUpdateRequest;
+import shop.bluebooktle.common.dto.book.request.BookUpdateServiceRequest;
+import shop.bluebooktle.common.dto.book.response.AdminBookResponse;
 import shop.bluebooktle.common.dto.book.response.BookAllResponse;
 import shop.bluebooktle.common.dto.book.response.BookCartOrderResponse;
 import shop.bluebooktle.common.dto.book.response.BookInfoResponse;
@@ -54,7 +55,7 @@ public class BookController {
 	@PutMapping("/{bookId}")
 	public ResponseEntity<JsendResponse<Void>> updateBook(
 		@PathVariable Long bookId,
-		@Valid @RequestBody BookUpdateRequest request) {
+		@Valid @RequestBody BookUpdateServiceRequest request) {
 		bookService.updateBook(bookId, request);
 		return ResponseEntity.ok(JsendResponse.success());
 	}
@@ -74,6 +75,17 @@ public class BookController {
 	) {
 		Page<BookInfoResponse> responses = bookService.findAllBooks(page, size, searchKeyword);
 		PaginationData<BookInfoResponse> paginationData = new PaginationData<>(responses);
+		return ResponseEntity.ok(JsendResponse.success(paginationData));
+	}
+
+	@GetMapping("/admin")
+	public ResponseEntity<JsendResponse<PaginationData<AdminBookResponse>>> getPagedBooksByAdmin(
+		@RequestParam("page") int page,
+		@RequestParam("size") int size,
+		@RequestParam(value = "searchKeyword", required = false) String searchKeyword
+	) {
+		Page<AdminBookResponse> responses = bookService.findAllBooksByAdmin(page, size, searchKeyword);
+		PaginationData<AdminBookResponse> paginationData = new PaginationData<>(responses);
 		return ResponseEntity.ok(JsendResponse.success(paginationData));
 	}
 

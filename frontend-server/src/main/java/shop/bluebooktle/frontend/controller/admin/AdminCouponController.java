@@ -25,7 +25,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import shop.bluebooktle.common.dto.book.response.BookAllResponse;
+import shop.bluebooktle.common.dto.book.response.BookInfoResponse;
 import shop.bluebooktle.common.dto.book.response.CategoryTreeResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
 import shop.bluebooktle.common.dto.coupon.request.CouponRegisterRequest;
@@ -100,7 +100,7 @@ public class AdminCouponController {
 		model.addAttribute("couponTypes", couponTypeData.getContent());
 
 		// 도서 목록
-		Page<BookAllResponse> books = adminBookService.getPagedBooks(page, size, searchKeyword);
+		Page<BookInfoResponse> books = adminBookService.getPagedBooks(page, size, searchKeyword);
 		model.addAttribute("books", books.getContent());
 		model.addAttribute("currentPageZeroBased", books.getNumber());
 		model.addAttribute("totalPages", books.getTotalPages());
@@ -132,7 +132,7 @@ public class AdminCouponController {
 		@RequestParam(defaultValue = "10") int size,
 		@RequestParam(required = false) String searchKeyword) {
 
-		Page<BookAllResponse> books = adminBookService.getPagedBooks(page, size, searchKeyword);
+		Page<BookInfoResponse> books = adminBookService.getPagedBooks(page, size, searchKeyword);
 
 		model.addAttribute("books", books);
 		model.addAttribute("totalPages", books.getTotalPages());

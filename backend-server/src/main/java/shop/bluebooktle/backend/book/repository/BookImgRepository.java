@@ -25,8 +25,7 @@ public interface BookImgRepository extends JpaRepository<BookImg, Long> {
 	@Query("SELECT bi.img.imgUrl FROM BookImg bi WHERE bi.book = :book AND bi.img.deletedAt IS NULL")
 	List<String> findActiveImgUrlsByBook(@Param("book") Book book);
 
-	@Query("SELECT bi.img FROM BookImg bi WHERE bi.book = :book")
-	List<Img> findImagesByBook(@Param("book") Book book);
+	Optional<BookImg> findBookImgByBook(Book book);
 
 	@Query("SELECT bi.book FROM BookImg bi WHERE bi.img = :img")
 	List<Book> findBooksByImg(@Param("img") Img img);
@@ -35,12 +34,12 @@ public interface BookImgRepository extends JpaRepository<BookImg, Long> {
 
 	List<BookImg> findByBookId(Long bookId);
 
-	List<BookImg> findByImgId(Long imgId);
-
 	Optional<BookImg> findByBookIdAndImgId(Long bookId, Long imgId);
 
 	// 특정 도서의 썸네일 한 장 조회
 	Optional<BookImg> findFirstByBookIdAndIsThumbnailTrueOrderByIdAsc(Long bookId);
 
 	BookImg findByBook(Book book);
+
+	Long book(Book book);
 }

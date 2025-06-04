@@ -4,24 +4,21 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
-import org.springframework.web.multipart.MultipartFile;
-
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
-import lombok.Value;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import shop.bluebooktle.common.dto.book.BookSaleInfoState;
 
 @Getter
-@Value
-@Builder
+@Setter
+@NoArgsConstructor
 @AllArgsConstructor
-public class BookUpdateRequest {
-
+public class BookUpdateServiceRequest {
 	@NotBlank(message = "도서 제목은 필수 값입니다.")
 	String title;
 
@@ -57,7 +54,6 @@ public class BookUpdateRequest {
 
 	List<@Positive(message = "태그 ID는 양수값이어야 합니다.") Long> tagIdList;
 
-	boolean isAladinImg;
+	String imgUrl;
 
-	MultipartFile imageFile;
 }

@@ -24,12 +24,17 @@ import shop.bluebooktle.common.dto.book.request.BookAllRegisterByAladinRequest;
 import shop.bluebooktle.common.dto.book.request.BookAllRegisterRequest;
 import shop.bluebooktle.common.dto.book.request.BookFormRequest;
 import shop.bluebooktle.common.dto.book.request.BookUpdateRequest;
+import shop.bluebooktle.common.dto.book.request.BookUpdateServiceRequest;
+import shop.bluebooktle.common.dto.book.response.AdminBookResponse;
 import shop.bluebooktle.common.dto.book.response.AladinBookResponse;
 import shop.bluebooktle.common.dto.book.response.BookAllResponse;
+import shop.bluebooktle.common.dto.book.response.BookInfoResponse;
+import shop.bluebooktle.common.dto.book.response.img.ImgResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
 import shop.bluebooktle.frontend.repository.AdminAladinBookRepository;
 import shop.bluebooktle.frontend.repository.AdminBookRepository;
 import shop.bluebooktle.frontend.repository.AdminImgUploadRepository;
+import shop.bluebooktle.frontend.repository.BookImgRepository;
 import shop.bluebooktle.frontend.service.AdminBookService;
 import shop.bluebooktle.frontend.service.AdminImgService;
 
@@ -41,17 +46,31 @@ public class AdminBookServiceImpl implements AdminBookService {
 	private final AdminImgService adminImgService;
 	private final AdminImgUploadRepository adminImgUploadRepository;
 	private final AdminAladinBookRepository adminAladinBookRepository;
+	private final BookImgRepository bookImgRepository;
 
 	@Override
-	public Page<BookAllResponse> getPagedBooks(int page, int size, String searchKeyword) {
+	public Page<BookInfoResponse> getPagedBooks(int page, int size, String searchKeyword) {
 		Pageable pageable = PageRequest.of(page, size);
 
 		String keyword = null;
 		if (searchKeyword != null && !searchKeyword.isBlank()) {
 			keyword = searchKeyword;
 		}
-		PaginationData<BookAllResponse> data = adminBookRepository.getPagedBooks(page, size, keyword);
-		List<BookAllResponse> categories = data.getContent();
+		PaginationData<BookInfoResponse> data = adminBookRepository.getPagedBooks(page, size, keyword);
+		List<BookInfoResponse> categories = data.getContent();
+		return new PageImpl<>(categories, pageable, data.getTotalElements());
+	}
+
+	@Override
+	public Page<AdminBookResponse> getPagedBooksByAdmin(int page, int size, String searchKeyword) {
+		Pageable pageable = PageRequest.of(page, size);
+
+		String keyword = null;
+		if (searchKeyword != null && !searchKeyword.isBlank()) {
+			keyword = searchKeyword;
+		}
+		PaginationData<AdminBookResponse> data = adminBookRepository.getPagedBooksByAdmin(page, size, keyword);
+		List<AdminBookResponse> categories = data.getContent();
 		return new PageImpl<>(categories, pageable, data.getTotalElements());
 	}
 
@@ -62,8 +81,94 @@ public class AdminBookServiceImpl implements AdminBookService {
 
 	@Override
 	public void registerBook(BookFormRequest bookFormRequest) {
-
 		MultipartFile file = bookFormRequest.getImageFile();
+		String uploadedUrl = uploadToMinio(file);
+
+		BookAllRegisterRequest request = BookAllRegisterRequest.builder()
+			.title(bookFormRequest.getTitle())
+			.isbn(bookFormRequest.getIsbn())
+			.description(bookFormRequest.getDescription())
+			.index(bookFormRequest.getIndex())
+			.publishDate(bookFormRequest.getPublishDate())
+			.price(bookFormRequest.getPrice())
+			.salePrice(bookFormRequest.getSalePrice())
+			.stock(bookFormRequest.getStock())
+			.isPackable(bookFormRequest.getIsPackable())
+			.state(bookFormRequest.getState())
+			.authorIdList(bookFormRequest.getAuthorIdList())
+			.publisherIdList(bookFormRequest.getPublisherIdList())
+			.categoryIdList(bookFormRequest.getCategoryIdList())
+			.tagIdList(bookFormRequest.getTagIdList())
+			.imgUrl(uploadedUrl)
+			.build();
+
+		adminBookRepository.registerBook(request);
+	}
+
+	@Override
+	public void deleteBook(Long bookId) {
+		adminBookRepository.deleteBook(bookId);
+	}
+
+	@Override
+	public void updateBook(Long bookId, BookUpdateRequest bookUpdateRequest) {
+		// 알라딘 등록 도서가 이미지 수정하는 경우 : 미니오 서버에 저장
+		String uploadedUrl = "";
+		if (bookUpdateRequest.isAladinImg() && bookUpdateRequest.getImageFile() != null) {
+			MultipartFile file = bookUpdateRequest.getImageFile();
+			uploadedUrl = uploadToMinio(file);
+
+		} else if (bookUpdateRequest.getImageFile() != null) {
+			ImgResponse image = bookImgRepository.getImgsByBookId(bookId);
+			String imageUrl = image.getImgUrl();
+			log.info("{}", imageUrl);
+			// 기존 URL에서 bucket / objectName 추출
+			URI uri = URI.create(imageUrl);
+			log.info("URI아님");
+			String[] pathSegments = uri.getPath().split("/", 3);
+			String objectName = pathSegments[2];       // 2aee492e-...
+
+			// 기존 이미지 미니오에서 삭제
+			adminImgService.deleteMinioUrl(objectName);
+			log.info("기존 이미지 미니오에서 삭제");
+
+			// 미니오 등록
+			MultipartFile file = bookUpdateRequest.getImageFile();
+			uploadedUrl = uploadToMinio(file);
+
+		}
+		BookUpdateServiceRequest updateServiceRequest =
+			new BookUpdateServiceRequest(
+				bookUpdateRequest.getTitle(),
+				bookUpdateRequest.getDescription(),
+				bookUpdateRequest.getIndex(),
+				bookUpdateRequest.getPublishDate(),
+				bookUpdateRequest.getPrice(),
+				bookUpdateRequest.getSalePrice(),
+				bookUpdateRequest.getStock(),
+				bookUpdateRequest.getIsPackable(),
+				bookUpdateRequest.getState(),
+				bookUpdateRequest.getAuthorIdList(),
+				bookUpdateRequest.getPublisherIdList(),
+				bookUpdateRequest.getCategoryIdList(),
+				bookUpdateRequest.getTagIdList(),
+				uploadedUrl
+			);
+
+		adminBookRepository.updateBook(bookId, updateServiceRequest);
+	}
+
+	@Override
+	public void registerBookByAladin(BookAllRegisterByAladinRequest request) {
+		adminAladinBookRepository.registerAladinBook(request);
+	}
+
+	@Override
+	public List<AladinBookResponse> searchAladin(String keyword, int page, int size) {
+		return adminAladinBookRepository.searchBooks(keyword, page, size);
+	}
+
+	private String uploadToMinio(MultipartFile file) {
 		String presignedUploadUrl = adminImgService.getPresignedUploadUrl();
 		URI uri = URI.create(presignedUploadUrl);
 
@@ -82,8 +187,6 @@ public class AdminBookServiceImpl implements AdminBookService {
 		Map<String, String> headers = new HashMap<>();
 		headers.put("Content-Type", file.getContentType());
 
-		log.info("{}", file.getContentType());
-		// 3) Feign 호출
 		try {
 			adminImgUploadRepository.upload(
 				bucket,
@@ -96,43 +199,7 @@ public class AdminBookServiceImpl implements AdminBookService {
 			throw new UncheckedIOException("MinIO 업로드 실패", e);
 		}
 
-		BookAllRegisterRequest request = BookAllRegisterRequest.builder()
-			.title(bookFormRequest.getTitle())
-			.isbn(bookFormRequest.getIsbn())
-			.description(bookFormRequest.getDescription())
-			.index(bookFormRequest.getIndex())
-			.publishDate(bookFormRequest.getPublishDate())
-			.price(bookFormRequest.getPrice())
-			.salePrice(bookFormRequest.getSalePrice())
-			.stock(bookFormRequest.getStock())
-			.state(bookFormRequest.getState())
-			.authorIdList(bookFormRequest.getAuthorIdList())
-			.publisherIdList(bookFormRequest.getPublisherIdList())
-			.categoryIdList(bookFormRequest.getCategoryIdList())
-			.tagIdList(bookFormRequest.getTagIdList())
-			.imgUrl(presignedUploadUrl.split("\\?")[0])
-			.build();
-
-		adminBookRepository.registerBook(request);
-	}
-
-	@Override
-	public void deleteBook(Long bookId) {
-		adminBookRepository.deleteBook(bookId);
-	}
-
-	@Override
-	public void updateBook(Long bookId, BookUpdateRequest bookUpdateRequest) {
-		adminBookRepository.updateBook(bookId, bookUpdateRequest);
-	}
-
-	@Override
-	public void registerBookByAladin(BookAllRegisterByAladinRequest request) {
-		adminAladinBookRepository.registerAladinBook(request);
-	}
-
-	@Override
-	public List<AladinBookResponse> searchAladin(String keyword, int page, int size) {
-		return adminAladinBookRepository.searchBooks(keyword, page, size);
+		log.info("업로드 완료 → URL: {}", presignedUploadUrl.split("\\?")[0]);
+		return presignedUploadUrl.split("\\?")[0]; // 순수 URL만 리턴
 	}
 }

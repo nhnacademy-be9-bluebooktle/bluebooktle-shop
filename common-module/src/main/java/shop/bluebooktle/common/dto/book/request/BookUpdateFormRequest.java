@@ -1,4 +1,4 @@
-package shop.bluebooktle.common.dto.book.response;
+package shop.bluebooktle.common.dto.book.request;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -10,6 +10,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Value;
 import shop.bluebooktle.common.dto.book.BookSaleInfoState;
+import shop.bluebooktle.common.dto.book.response.CategoryResponse;
+import shop.bluebooktle.common.dto.book.response.PublisherInfoResponse;
+import shop.bluebooktle.common.dto.book.response.TagInfoResponse;
 import shop.bluebooktle.common.dto.book.response.author.AuthorResponse;
 
 @Getter
@@ -17,7 +20,7 @@ import shop.bluebooktle.common.dto.book.response.author.AuthorResponse;
 @Value
 @AllArgsConstructor
 @NoArgsConstructor(force = true)
-public class BookAllResponse {
+public class BookUpdateFormRequest {
 	Long id;
 	String title;
 	String description;
@@ -34,7 +37,7 @@ public class BookAllResponse {
 	List<PublisherInfoResponse> publishers;
 	List<CategoryResponse> categories;
 	List<TagInfoResponse> tags;
-	BookSaleInfoState bookSaleInfoState;
+	BookSaleInfoState state;
 	Long viewCount;
 	Long searchCount;
 	Long reviewCount;
