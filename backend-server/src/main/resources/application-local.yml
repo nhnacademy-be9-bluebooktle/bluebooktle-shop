@@ -1,7 +1,11 @@
 server:
   port: 9012
+  gateway-url: localhost:9000
 
 spring:
+  batch:
+    jdbc:
+      initialize-schema: never
   datasource:
     url: jdbc:mysql://localhost:3306/bluebooktle
     username: ${MYSQL_USERNAME}
@@ -80,3 +84,8 @@ mq:
 
 encrypt:
   key: WpqWJ+qndIaLgP1udQD7lUUuaeARZEvOzHefTNS23hA=
+
+dooray:
+  webhook:
+    verification-channel: https://nhnacademy.dooray.com/services/3204376758577275363/4082541783774462190/kziab347QWW2oZ_D2rumEA
+#    notification-channel: 추후 사용

@@ -12,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import shop.bluebooktle.common.dto.common.PaginationData;
 import shop.bluebooktle.common.dto.user.request.AdminUserUpdateRequest;
+import shop.bluebooktle.common.dto.user.request.IssueDormantAuthCodeRequest;
+import shop.bluebooktle.common.dto.user.request.ReactivateDormantUserRequest;
 import shop.bluebooktle.common.dto.user.request.UserSearchRequest;
 import shop.bluebooktle.common.dto.user.request.UserUpdateRequest;
 import shop.bluebooktle.common.dto.user.response.AdminUserResponse;
@@ -81,5 +83,20 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public UserWithAddressResponse getUserWithAddresses() {
 		return userRepository.getUserWithAddresses();
+	}
+
+	@Override
+	public void withdrawAccount() {
+		userRepository.withdrawMyAccount();
+	}
+
+	@Override
+	public void requestDormantCode(IssueDormantAuthCodeRequest request) {
+		userRepository.requestDormantAuthCode(request);
+	}
+
+	@Override
+	public void processReactivateDormant(ReactivateDormantUserRequest request) {
+		userRepository.reactivateDormantUser(request);
 	}
 }

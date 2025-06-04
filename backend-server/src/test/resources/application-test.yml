@@ -26,3 +26,7 @@ jwt:
 
 server:
   gateway-url: localhost:9000
+
+dooray:
+  webhook:
+    verification-channel: https://nhnacademy.dooray.com/services/3204376758577275363/4082541783774462190/kziab347QWW2oZ_D2rumEA
