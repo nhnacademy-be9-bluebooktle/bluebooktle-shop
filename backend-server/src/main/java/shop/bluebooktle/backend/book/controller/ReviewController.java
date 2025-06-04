@@ -55,4 +55,15 @@ public class ReviewController {
 		return ResponseEntity.ok(JsendResponse.success(paginationData));
 	}
 
+	// 도서 상세 페이지에서 리뷰 목록 조회
+	@GetMapping("/book/{bookId}") //도서 상세페이지에 맞게 수정필요
+	public ResponseEntity<JsendResponse<PaginationData<ReviewResponse>>> getReviewsForBook(
+		@PathVariable Long bookId,
+		@RequestParam(value = "page", defaultValue = "0") int page,
+		@RequestParam(value = "size", defaultValue = "5") int size
+	) {
+		Page<ReviewResponse> pageResult = reviewService.getReviewsForBook(bookId, PageRequest.of(page, size));
+		PaginationData<ReviewResponse> paginationData = new PaginationData<>(pageResult);
+		return ResponseEntity.ok(JsendResponse.success(paginationData));
+	}
 }
