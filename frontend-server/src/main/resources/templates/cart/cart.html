@@ -503,7 +503,7 @@
             const quantity = parseInt(quantityInput.value);
             const subtotal = pricePerItem * quantity;
 
-            // ✅ 소계 표시 영역 찾아서 텍스트 변경
+            // 소계 표시 영역 찾아서 텍스트 변경
             const subtotalDisplay = cartItem.querySelector('.cart-item-price-kitsch');
             if (subtotalDisplay) {
                 subtotalDisplay.textContent = formatCurrency(subtotal);

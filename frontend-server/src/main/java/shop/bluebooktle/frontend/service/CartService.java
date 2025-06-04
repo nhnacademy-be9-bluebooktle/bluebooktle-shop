@@ -26,5 +26,7 @@ public interface CartService {
 
 	List<BookCartOrderResponse> getSelectedCartItemsForOrder(String guestId, List<Long> bookIds);
 
-	public void mergeOrConvertGuestCart(String guestId);
+	void mergeOrConvertGuestCart(String guestId);
+
+	Long getCartSize(String guestId);
 }
