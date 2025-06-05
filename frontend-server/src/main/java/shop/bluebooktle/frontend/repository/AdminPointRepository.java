@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import shop.bluebooktle.common.domain.point.PointSourceTypeEnum;
 import shop.bluebooktle.common.dto.point.request.PointPolicyCreateRequest;
 import shop.bluebooktle.common.dto.point.request.PointPolicyUpdateRequest;
 import shop.bluebooktle.common.dto.point.request.PointSourceTypeCreateRequest;
@@ -44,6 +45,9 @@ public interface AdminPointRepository {
 
 	@GetMapping("/rules")
 	List<PointRuleResponse> getAllRules();
+
+	@GetMapping("/rules/type")
+	PointRuleResponse getRuleByType(PointSourceTypeEnum sourceTypeEnum);
 
 	@PostMapping("/source")
 	Long createSourceType(@RequestBody PointSourceTypeCreateRequest req);

@@ -1,4 +1,4 @@
-package shop.bluebooktle.common.util;
+package shop.bluebooktle.common.converter;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;

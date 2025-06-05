@@ -16,8 +16,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import shop.bluebooktle.backend.book.entity.Book;
 import shop.bluebooktle.backend.book.entity.BookImg;
+import shop.bluebooktle.backend.book.entity.BookSaleInfo;
 import shop.bluebooktle.backend.book.entity.Img;
 import shop.bluebooktle.backend.book.repository.BookRepository;
+import shop.bluebooktle.backend.book.repository.BookSaleInfoRepository;
 import shop.bluebooktle.backend.book_order.entity.BookOrder;
 import shop.bluebooktle.backend.book_order.entity.OrderPackaging;
 import shop.bluebooktle.backend.book_order.entity.PackagingOption;
@@ -37,6 +39,7 @@ import shop.bluebooktle.backend.order.repository.OrderStateRepository;
 import shop.bluebooktle.backend.order.service.OrderService;
 import shop.bluebooktle.backend.user.repository.UserRepository;
 import shop.bluebooktle.common.domain.order.OrderStatus;
+import shop.bluebooktle.common.dto.book.BookSaleInfoState;
 import shop.bluebooktle.common.dto.coupon.CalculatedDiscountDetails;
 import shop.bluebooktle.common.dto.coupon.response.AppliedCouponResponse;
 import shop.bluebooktle.common.dto.order.request.OrderCreateRequest;
@@ -48,6 +51,7 @@ import shop.bluebooktle.common.dto.order.response.OrderPackagingResponse;
 import shop.bluebooktle.common.entity.auth.User;
 import shop.bluebooktle.common.exception.auth.UserNotFoundException;
 import shop.bluebooktle.common.exception.book.BookNotFoundException;
+import shop.bluebooktle.common.exception.book.BookSaleInfoNotFoundException;
 import shop.bluebooktle.common.exception.book_order.PackagingOptionNotFoundException;
 import shop.bluebooktle.common.exception.order.OrderNotFoundException;
 import shop.bluebooktle.common.exception.order.delivery_rule.DeliveryRuleNotFoundException;
@@ -67,9 +71,9 @@ public class OrderServiceImpl implements OrderService {
 	private final BookRepository bookRepository;
 	private final BookOrderRepository bookOrderRepository;
 	private final PackagingOptionRepository packagingOptionRepository;
+	private final BookSaleInfoRepository bookSaleInfoRepository;
 
 	@Override
-	@Transactional(readOnly = true)
 	public Page<OrderHistoryResponse> getUserOrders(
 		Long userId,
 		OrderStatus status,
@@ -177,6 +181,13 @@ public class OrderServiceImpl implements OrderService {
 	private void createSingleBookOrder(Order order, OrderItemRequest item) {
 		Book book = bookRepository.findById(item.bookId())
 			.orElseThrow(BookNotFoundException::new);
+
+		BookSaleInfo bookSaleInfo = bookSaleInfoRepository.findByBook(book)
+			.orElseThrow(BookSaleInfoNotFoundException::new);
+
+		if (bookSaleInfo.getBookSaleInfoState() != BookSaleInfoState.AVAILABLE) {
+
+		}
 
 		BookOrder bookOrder = BookOrder.builder()
 			.order(order)

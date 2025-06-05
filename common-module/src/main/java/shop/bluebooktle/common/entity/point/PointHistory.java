@@ -21,10 +21,10 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import shop.bluebooktle.common.converter.PointSourceTypeConverter;
 import shop.bluebooktle.common.domain.point.PointSourceTypeEnum;
 import shop.bluebooktle.common.entity.BaseEntity;
 import shop.bluebooktle.common.entity.auth.User;
-import shop.bluebooktle.common.util.PointSourceTypeConverter;
 
 @Entity
 @Table(name = "point_history")
