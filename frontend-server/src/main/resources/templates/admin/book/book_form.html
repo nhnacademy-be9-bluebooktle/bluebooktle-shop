@@ -165,7 +165,13 @@
                             <label for="price" class="admin-form-label">정가 <span
                                     class="text-danger">*</span></label>
                             <input type="number" id="price" th:field="*{price}" class="admin-form-control"
-                                   th:errorclass="is-invalid">
+                                   th:errorclass="is-invalid"
+                                   step="1"
+                                   min="1"
+                                   max="99999999"
+                                   required
+                                   placeholder="정가를 입력하세요"
+                            >
                             <div th:if="${#fields.hasErrors('price')}" th:errors="*{price}"
                                  class="invalid-feedback"></div>
                         </div>
@@ -173,7 +179,13 @@
                             <label for="salePrice" class="admin-form-label">판매가 <span
                                     class="text-danger">*</span></label>
                             <input type="number" id="salePrice" th:field="*{salePrice}" class="admin-form-control"
-                                   th:errorclass="is-invalid">
+                                   th:errorclass="is-invalid"
+                                   step="1"
+                                   min="1"
+                                   max="99999999"
+                                   required
+                                   placeholder="판매 가격을 입력하세요"
+                            >
                             <div th:if="${#fields.hasErrors('salePrice')}" th:errors="*{salePrice}"
                                  class="invalid-feedback"></div>
                         </div>
