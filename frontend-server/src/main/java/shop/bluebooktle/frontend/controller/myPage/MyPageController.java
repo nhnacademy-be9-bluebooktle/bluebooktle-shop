@@ -13,19 +13,15 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.common.domain.order.OrderStatus;
 import shop.bluebooktle.common.dto.common.PaginationData;
-import shop.bluebooktle.common.dto.order.response.OrderHistoryResponse;
-import shop.bluebooktle.frontend.service.OrderService;
-import org.springframework.web.bind.annotation.RequestParam;
-
-import jakarta.servlet.http.HttpServletRequest;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import shop.bluebooktle.common.dto.common.PaginationData;
 import shop.bluebooktle.common.dto.coupon.response.UserCouponResponse;
+import shop.bluebooktle.common.dto.order.response.OrderConfirmDetailResponse;
+import shop.bluebooktle.common.dto.order.response.OrderHistoryResponse;
 import shop.bluebooktle.frontend.service.CouponService;
+import shop.bluebooktle.frontend.service.OrderService;
 
 @Controller
 @RequiredArgsConstructor
@@ -55,8 +51,11 @@ public class MyPageController {
 	}
 
 	@GetMapping("/orders/{orderId}")
-	public String orderDetailPage(@PathVariable String orderId) {
-		System.out.println("Requesting order detail for (Mock): " + orderId);
+	public String orderDetailPage(@PathVariable Long orderId,
+		Model model) {
+		OrderConfirmDetailResponse orderDetails = orderService.getOrderConfirmDetail(orderId);
+
+		model.addAttribute("order", orderDetails);
 		return "mypage/order_detail";
 	}
 

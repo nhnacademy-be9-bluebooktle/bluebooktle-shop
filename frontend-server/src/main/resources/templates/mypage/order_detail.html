@@ -356,46 +356,65 @@
 
                 <section class="order-detail-section-kitsch">
                     <h3 class="section-title-kitsch"><i class="fas fa-cubes"></i> 주문 상품 목록</h3>
-                    <table class="ordered-products-table-kitsch">
-                        <thead>
-                        <tr>
-                            <th style="width:45%;">상품 정보</th>
-                            <th style="text-align:center;">수량</th>
-                            <th>상품 금액</th>
-                            <th>할인/포장</th>
-                            <th>주문 금액</th>
-                            <th style="text-align:center;">리뷰</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr>
-                            <td data-label="상품 정보">
-                                <div class="product-info-cell-kitsch">
-                                    <img src="https://via.placeholder.com/60x90?text=Book" alt="상품 썸네일"/>
-                                    <div>
-                                        <div class="product-title-kitsch">하드코딩된 책 제목</div>
-                                        <div class="product-option-kitsch">포장: 레트로 선물 포장</div>
+                    <div th:if="${order != null and order.orderItems != null and !#lists.isEmpty(order.orderItems)}">
+                        <table class="ordered-products-table-kitsch">
+                            <thead>
+                            <tr>
+                                <th style="width:45%;">상품 정보</th>
+                                <th style="text-align:center;">수량</th>
+                                <th>상품 단가</th>
+                                <th>포장 옵션</th>
+                                <th>총 상품 금액</th>
+                                <th style="text-align:center;">리뷰</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="orderItem : ${order.orderItems}">
+                                <td data-label="상품 정보">
+                                    <div class="product-info-cell-kitsch">
+                                        <img th:src="${orderItem.bookThumbnailUrl ?: 'https://via.placeholder.com/60x90?text=No+Image'}"
+                                             th:alt="${orderItem.bookTitle} + ' 썸네일'"/>
+                                        <div>
+                                            <div class="product-title-kitsch" th:text="${orderItem.bookTitle}"></div>
+                                        </div>
                                     </div>
-                                </div>
-                            </td>
-                            <td data-label="수량" style="text-align:center;">1</td>
-                            <td data-label="상품 금액" class="price-kitsch">35,000원</td>
-                            <td data-label="할인/포장">
-                                <span class="discount-kitsch">- 3,500원 (할인)</span><br>
-                                <span>+ 1,500원 (포장)</span>
-                            </td>
-                            <td data-label="주문 금액" class="price-kitsch">33,000원</td>
-                            <td data-label="리뷰" style="text-align:center;">
-                                <button
-                                        type="button"
-                                        class="btn-kitsch primary-btn-kitsch retro-shadow-kitsch-small"
-                                        onclick="openOrderReviewModal(123, '하드코딩된 책 제목', event)">
-                                    <i class="fas fa-pencil-alt"></i> 작성
-                                </button>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
+                                </td>
+                                <td data-label="수량" style="text-align:center;" th:text="${orderItem.quantity}"></td>
+                                <td data-label="상품 단가" class="price-kitsch"
+                                    th:text="${#numbers.formatDecimal(orderItem.price, 0, 'COMMA', 0, 'POINT') + '원'}">
+                                    35,000원
+                                </td>
+                                <td data-label="포장 옵션">
+    <span th:if="${!#lists.isEmpty(orderItem.packagingOptions)}"
+          th:each="pkg, iterStat : ${orderItem.packagingOptions}">
+        <span th:text="${pkg.name}"></span>
+        (<span
+            th:text="${#numbers.formatDecimal(pkg.price, 0, 'COMMA', 0, 'POINT') + '원'}"></span>)
+        <br th:if="${!iterStat.last}"/>
+    </span>
+                                    <span th:unless="${!#lists.isEmpty(orderItem.packagingOptions)}">-</span>
+                                </td>
+                                <td data-label="총 상품 금액" class="price-kitsch"
+                                    th:text="${#numbers.formatDecimal(orderItem.price * orderItem.quantity, 0, 'COMMA', 0, 'POINT') + '원'}">
+                                    33,000원
+                                </td>
+                                <td data-label="리뷰" style="text-align:center;">
+                                    <button
+                                            type="button"
+                                            class="btn-kitsch primary-btn-kitsch retro-shadow-kitsch-small"
+                                            th:data-book-order-id="${orderItem.bookOrderId}"
+                                            th:data-book-title="${orderItem.bookTitle}"
+                                            onclick="openOrderReviewModalFromData(this, event)"><i
+                                            class="fas fa-pencil-alt"></i> 작성
+                                    </button>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div th:unless="${order != null and order.orderItems != null and !#lists.isEmpty(order.orderItems)}">
+                        <p>주문 상품 정보가 없습니다.</p>
+                    </div>
                 </section>
 
                 <section class="order-detail-section-kitsch payment-details-summary-kitsch">
@@ -464,7 +483,8 @@
             <p class="pixel-font-kitsch" id="orderItemReviewModalProductInfo"
                style="text-align:center; margin-bottom:1rem; font-size:0.9em;"></p>
 
-            <form id="orderItemReviewForm" onsubmit="handleOrderItemReviewFormSubmit(event)">
+            <form id="orderItemReviewForm" onsubmit="handleOrderItemReviewFormSubmit(event)"
+                  enctype="multipart/form-data">
 
                 <input
                         id="orderItemReviewBookOrderIdInput"
@@ -484,7 +504,7 @@
           </span>
                         <span class="selected-rating-text-kitsch"
                               id="orderItemModalSelectedRatingText">별점을 선택하세요!</span>
-                        <input id="orderItemRatingInput" name="rating" required type="hidden">
+                        <input id="orderItemRatingInput" name="star" required type="hidden">
                     </div>
                 </div>
 
@@ -494,7 +514,7 @@
                             class="textarea-kitsch handwriting-font-kitsch"
                             id="orderItemReviewContentInput"
                             minlength="10"
-                            name="content"
+                            name="reviewContent"
                             placeholder="이 상품에 대한 솔직한 리뷰를 남겨주세요! (최소 10자 이상)"
                             required
                             rows="5"
@@ -502,15 +522,14 @@
                 </div>
 
                 <div class="form-group-kitsch">
-                    <label class="label-kitsch handwriting-font-kitsch">사진 첨부 (최대 3장, Mock):</label>
+                    <label class="label-kitsch handwriting-font-kitsch">사진 첨부 (최대 3장):</label>
                     <div class="file-input-kitsch-wrapper">
                         <input
                                 accept="image/*"
                                 class="file-input-kitsch"
                                 id="orderItemReviewImagesInput"
                                 multiple
-                                name="reviewImages"
-                                type="file"
+                                name="reviewImages" type="file"
                         >
                         <p class="input-description-kitsch pixel-font-kitsch" style="font-size:0.75em;">
                             첫 번째 이미지가 대표 이미지로 사용됩니다.
@@ -541,28 +560,27 @@
 
 </div>
 
+
 <th:block layout:fragment="page_scripts">
     <script>
-        // 모달을 화면에 띄우는 함수
-        function openOrderReviewModal(bookOrderId, bookTitle, event) {
+        function openOrderReviewModalFromData(buttonElement, event) {
+            const bookOrderId = buttonElement.dataset.bookOrderId;
+            const bookTitle = buttonElement.dataset.bookTitle;
+
             const modalId = 'orderItemReviewModal';
             const modalTitleEl = document.getElementById('orderItemReviewModalTitle');
             const modalProductInfoEl = document.getElementById('orderItemReviewModalProductInfo');
             const bookOrderIdInput = document.getElementById('orderItemReviewBookOrderIdInput');
-            const ratingInput = document.getElementById('orderItemRatingInput');
-            const contentInput = document.getElementById('orderItemReviewContentInput');
             const imagePreviewContainer = document.getElementById('orderItemReviewImagePreviewContainer');
 
-            // 1) 폼 리셋 (이전 남아있던 값이 있으면 지워주기)
             const form = document.getElementById('orderItemReviewForm');
             if (form) {
                 form.reset();
             }
             if (imagePreviewContainer) {
-                imagePreviewContainer.innerHTML = '';
+                imagePreviewContainer.innerHTML = ''; // 모달 열 때 이미지 미리보기 초기화
             }
 
-            // 2) 모달 제목·상품명 표시
             if (modalTitleEl) {
                 modalTitleEl.innerHTML = '<i class="fas fa-pencil-alt"></i> 리뷰 작성';
             }
@@ -570,26 +588,22 @@
                 modalProductInfoEl.textContent = `상품명: ${bookTitle}`;
             }
 
-            // 3) 숨겨진 bookOrderId 채우기
             if (bookOrderIdInput) {
                 bookOrderIdInput.value = bookOrderId;
             }
 
-            // 4) 별점 UI 초기화 (별이 선택되어 있으면 해제)
             initializeStarRatingForOrder(
                 'orderItemModalStarRating',
                 'orderItemRatingInput',
                 'orderItemModalSelectedRatingText'
             );
 
-            // 5) 모달 보이기
             const modal = document.getElementById(modalId);
             if (modal) {
-                modal.classList.add('active'); // .active 클래스가 display:block 같은 처리를 한다고 가정
+                modal.classList.add('active');
             }
         }
 
-        // 모달 숨기는 함수
         function hideKitschModal(modalId) {
             const modal = document.getElementById(modalId);
             if (modal) {
@@ -597,7 +611,6 @@
             }
         }
 
-        // 별점 UI 처리 함수 (기존 로직 그대로 가져옴)
         function initializeStarRatingForOrder(containerId, hiddenInputId, displayTextId) {
             const starContainer = document.getElementById(containerId);
             if (!starContainer) return;
@@ -607,7 +620,6 @@
             const displayText = document.getElementById(displayTextId);
             let currentRating = 0;
 
-            // 초기화
             if (hiddenInput) hiddenInput.value = '';
             if (displayText) displayText.textContent = '별점을 선택하세요!';
             stars.forEach(s => {
@@ -639,7 +651,6 @@
                 star.addEventListener('click', function () {
                     currentRating = parseInt(this.dataset.value);
                     if (hiddenInput) hiddenInput.value = currentRating;
-                    // 클릭 시 별점 시각적 표시
                     stars.forEach(s => {
                         s.classList.remove('fas', 'selected');
                         s.classList.add('far');
@@ -653,15 +664,53 @@
             });
         }
 
-        // 리뷰 폼 제출 처리 함수 (AJAX)
+        // --- 이미지 파일 관련 로직 (미리보기 및 개수 제한) ---
+        const orderItemReviewImagesInput = document.getElementById('orderItemReviewImagesInput');
+
+        if (orderItemReviewImagesInput) {
+            orderItemReviewImagesInput.addEventListener('change', function (event) {
+                const previewContainer = document.getElementById('orderItemReviewImagePreviewContainer');
+                if (!previewContainer) return;
+
+                previewContainer.innerHTML = ''; // 기존 미리보기 초기화
+                const files = event.target.files;
+
+                if (files.length > 3) {
+                    alert('사진은 최대 3장까지만 첨부 가능합니다.');
+                    event.target.value = ""; // 파일 선택 초기화
+                    return;
+                }
+
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    if (!file) continue;
+
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        const imgEl = document.createElement('img');
+                        imgEl.src = e.target.result;
+                        imgEl.style.width = '50px';
+                        imgEl.style.height = '50px';
+                        imgEl.style.objectFit = 'cover';
+                        imgEl.style.marginRight = '5px';
+                        imgEl.style.border = '1px solid #ddd';
+                        previewContainer.appendChild(imgEl);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+
+        // handleOrderItemReviewFormSubmit 함수는 변경 없음 (폼 제출만)
         function handleOrderItemReviewFormSubmit(event) {
-            event.preventDefault();
-            // 1) hidden input에서 bookOrderId 가져오기
+            event.preventDefault(); // 기본 폼 제출 동작 방지
+
+            const form = event.target;
             const bookOrderId = document.getElementById('orderItemReviewBookOrderIdInput').value;
-            // 2) 별점 가져오기
             const rating = document.getElementById('orderItemRatingInput').value;
-            // 3) 리뷰 내용 가져오기
             const content = document.getElementById('orderItemReviewContentInput').value;
+            const reviewImagesInput = document.getElementById('orderItemReviewImagesInput');
+            const files = reviewImagesInput.files;
 
             if (!bookOrderId) {
                 alert('주문정보가 올바르지 않습니다.');
@@ -675,72 +724,21 @@
                 alert('리뷰 내용을 10자 이상 입력해주세요.');
                 return;
             }
+            // 이미지 파일 개수 유효성 검사 (최대 3장)
+            if (files.length > 3) {
+                alert('사진은 최대 3장까지만 첨부 가능합니다.');
+                reviewImagesInput.value = ""; // 파일 선택 초기화
+                return;
+            }
 
-            // 4) 백엔드 API 호출 (POST /api/orders/reviews/{bookOrderId})
-            fetch(`/api/orders/reviews/${bookOrderId}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    // 만약 Spring Security CSRF가 활성화되어 있다면, 값을 페이지에 숨겨두거나 메타태그로 가져와야 합니다.
-                    // 예: 'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').getAttribute('content')
-                },
-                credentials: 'same-origin', // 세션 인증이 필요하면 포함
-                body: JSON.stringify({
-                    imgId: null,               // 이미지 기능은 Mock이므로 null 처리
-                    star: Number(rating),
-                    reviewContent: content
-                })
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        return response.json().then(err => Promise.reject(err));
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    // 성공 시 처리
-                    alert('리뷰가 등록되었습니다.');
-                    hideKitschModal('orderItemReviewModal');
-                    // 원한다면 페이지 새로고침/리스트 갱신 등
-                    // location.reload();
-                })
-                .catch(err => {
-                    console.error('리뷰 등록 중 오류:', err);
-                    alert('리뷰 등록에 실패했습니다. 다시 시도해주세요.');
-                });
+            form.action = `/mypage/reviews/${bookOrderId}`;
+            form.method = 'POST';
+            // HTML 폼 태그에 enctype="multipart/form-data"를 설정했으므로 여기서는 별도로 설정할 필요 없습니다.
+            // form.enctype = 'multipart/form-data'; // 이 줄은 제거해도 됨
+
+            form.submit();
         }
 
-        // 이미지 미리보기 로직 (기존 코드 그대로 유지)
-        const orderItemReviewImagesInput = document.getElementById('orderItemReviewImagesInput');
-        if (orderItemReviewImagesInput) {
-            orderItemReviewImagesInput.addEventListener('change', function (event) {
-                const previewContainer = document.getElementById('orderItemReviewImagePreviewContainer');
-                if (!previewContainer) return;
-                previewContainer.innerHTML = '';
-                const files = event.target.files;
-                if (files.length > 3) {
-                    alert('사진은 최대 3장까지만 첨부 가능합니다. (Mock)');
-                    event.target.value = "";
-                    return;
-                }
-                for (let i = 0; i < files.length; i++) {
-                    const file = files[i];
-                    const reader = new FileReader();
-                    reader.onload = function (e) {
-                        const imgEl = document.createElement('img');
-                        imgEl.src = e.target.result;
-                        imgEl.style.width = '50px';
-                        imgEl.style.height = '50px';
-                        imgEl.style.objectFit = 'cover';
-                        imgEl.style.marginRight = '5px';
-                        previewContainer.appendChild(imgEl);
-                    };
-                    reader.readAsDataURL(file);
-                }
-            });
-        }
-
-        // 초기화: 페이지 로드 시 사이드바 활성화 등 (기존 코드 유지)
         document.addEventListener('DOMContentLoaded', function () {
             const currentPath = window.location.pathname;
             const sidebarLinks = document.querySelectorAll('.mypage-sidebar-kitsch .sidebar-menu-kitsch li a');
@@ -752,7 +750,6 @@
                     link.classList.add('active');
                 }
             });
-            toggleNoOrdersMessage && toggleNoOrdersMessage();
         });
 
         function trackDelivery(trackingNumber) {
@@ -767,7 +764,6 @@
             alert("주문번호 " + orderId + " 반품 신청 (Mock)");
         }
     </script>
-
 </th:block>
 </body>
 </html>
