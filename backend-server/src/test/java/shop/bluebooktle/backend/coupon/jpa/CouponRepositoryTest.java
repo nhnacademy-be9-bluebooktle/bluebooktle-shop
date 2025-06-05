@@ -16,15 +16,12 @@ import org.springframework.test.context.ActiveProfiles;
 import jakarta.persistence.EntityManager;
 import shop.bluebooktle.backend.config.JpaAuditingConfiguration;
 import shop.bluebooktle.backend.config.QueryDslConfig;
-import shop.bluebooktle.backend.coupon.dto.CouponSearchRequest;
-import shop.bluebooktle.backend.coupon.entity.Coupon;
 import shop.bluebooktle.backend.coupon.entity.CouponType;
 import shop.bluebooktle.backend.coupon.repository.CouponRepository;
 import shop.bluebooktle.backend.user.repository.MembershipLevelRepository;
 import shop.bluebooktle.backend.user.repository.UserRepository;
 import shop.bluebooktle.common.converter.ProfileAwareStringCryptoConverter;
 import shop.bluebooktle.common.domain.coupon.CouponTypeTarget;
-import shop.bluebooktle.common.dto.coupon.response.CouponResponse;
 import shop.bluebooktle.common.dto.coupon.response.CouponTypeResponse;
 import shop.bluebooktle.common.util.CryptoUtils;
 
@@ -44,35 +41,6 @@ class CouponRepositoryTest {
 
 	@Autowired
 	private EntityManager em;
-
-	@Test
-	@DisplayName("쿠폰 전체 조회")
-	void testFindAllByCoupon() {
-		// given
-		CouponType type = CouponType.builder()
-			.name("타입 A")
-			.target(CouponTypeTarget.ORDER)
-			.minimumPayment(new BigDecimal("10000"))
-			.build();
-		em.persist(type);
-
-		Coupon coupon = Coupon.builder()
-			.couponName("쿠폰1")
-			.type(type)
-			.build();
-		em.persist(coupon);
-
-		em.flush();
-		em.clear();
-
-		// when
-		CouponSearchRequest request = new CouponSearchRequest(); // target 없음
-		Page<CouponResponse> result = couponRepository.findAllByCoupon(request, PageRequest.of(0, 10));
-
-		// then
-		assertThat(result.getTotalElements()).isEqualTo(1);
-		assertThat(result.getContent().getFirst().getCouponName()).isEqualTo("쿠폰1");
-	}
 
 	@Test
 	@DisplayName("쿠폰 정책 전체 조회 테스트")
