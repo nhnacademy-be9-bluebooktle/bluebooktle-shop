@@ -1,6 +1,6 @@
 server:
   port: 9080
-
+  gateway-url: localhost:9000
 spring:
   # H2 DB 설정
   datasource:
@@ -36,3 +36,11 @@ logging:
   level:
     shop.bluebooktle.book: DEBUG
     org.hibernate.SQL: DEBUG
+
+oauth:
+  payco:
+    client-id: "3RDKLuGWlBifp1UfHtinDmZ"
+    redirect-uri: "http://www.localhost:9080/oauth/payco"
+    
+minio:
+  endpoint: http://storage.java21.net:8000

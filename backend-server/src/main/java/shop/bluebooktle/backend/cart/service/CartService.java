@@ -2,7 +2,7 @@ package shop.bluebooktle.backend.cart.service;
 
 import java.util.List;
 
-import shop.bluebooktle.common.dto.cart.response.CartItemResponse;
+import shop.bluebooktle.common.dto.book.response.BookCartOrderResponse;
 import shop.bluebooktle.common.entity.auth.User;
 
 public interface CartService {
@@ -12,7 +12,7 @@ public interface CartService {
 
 	void addBookToUserCart(User user, Long bookId, int quantity);
 
-	List<CartItemResponse> getUserCartItems(User user);
+	List<BookCartOrderResponse> getUserCartItems(User user);
 
 	void increaseUserQuantity(User user, Long bookId, int quantity);
 
@@ -22,10 +22,14 @@ public interface CartService {
 
 	void removeSelectedBooksFromUserCart(User user, List<Long> bookIds);
 
+	List<BookCartOrderResponse> sendSelectedCartItemsToOrder(User user, List<Long> bookIds);
+
+	Long getCartSize(User user);
+
 	// 비회원용
 	void addBookToGuestCart(String guestId, Long bookId, int quantity);
 
-	List<CartItemResponse> getGuestCartItems(String guestId);
+	List<BookCartOrderResponse> getGuestCartItems(String guestId);
 
 	void increaseGuestQuantity(String guestId, Long bookId, int quantity);
 
@@ -35,12 +39,12 @@ public interface CartService {
 
 	void removeSelectedBooksFromGuestCart(String guestId, List<Long> bookIds);
 
+	List<BookCartOrderResponse> sendSelectedGuestCartItemsToOrder(String guestId, List<Long> bookIds);
+
+	Long getGuestCartSize(String guestId);
+
 	// ----------------- 전환용 -----------------
 
-	// 회원가입 직후: Redis → DB로 옮기기 (기존 장바구니 없음)
-	void convertGuestCartToMemberCart(String guestId, User user);
-
-	// 로그인 시점: Redis → DB로 병합 (기존 장바구니 있음)
-	void mergeGuestCartToMemberCart(String guestId, User user);
+	void mergeOrConvertGuestCartToMemberCart(String guestId, User user);
 }
 

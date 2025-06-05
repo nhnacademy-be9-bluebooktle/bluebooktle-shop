@@ -6,7 +6,6 @@
 <head>
     <title>마이페이지 - 주소 관리</title>
     <style>
-        /* 주소 관리 페이지 콘텐츠 스타일 */
         .address-list-header-kitsch {
             display: flex;
             justify-content: space-between;
@@ -14,15 +13,15 @@
             margin-bottom: 1.5rem;
         }
 
-        .address-list-header-kitsch h3.section-title-kitsch { /* styles.css의 .section-title-kitsch 변형 */
+        .address-list-header-kitsch h3.section-title-kitsch {
             font-size: 1.5rem;
             color: var(--kitsch-text-light);
-            background-color: var(--kitsch-color-4); /* 청록 */
+            background-color: var(--kitsch-color-4);
             border: 2px solid var(--kitsch-text-dark);
             border-radius: 5px;
             padding: 0.4em 0.8em;
             text-align: left;
-            margin-bottom: 0; /* 헤더 내에서는 마진 제거 */
+            margin-bottom: 0;
             display: inline-block;
         }
 
@@ -41,7 +40,7 @@
         }
 
         .address-card-kitsch.default-address-kitsch {
-            border-color: var(--kitsch-color-3); /* 핫핑크 강조 */
+            border-color: var(--kitsch-color-3);
             box-shadow: 3px 3px 0px var(--kitsch-color-3), inset 0 0 10px rgba(194, 37, 92, 0.1);
         }
 
@@ -60,7 +59,7 @@
             color: var(--kitsch-color-5);
         }
 
-        .address-alias-kitsch .default-badge-kitsch { /* 기본 배송지 뱃지 */
+        .address-alias-kitsch .default-badge-kitsch {
             font-family: var(--font-pixel);
             font-size: 0.7rem;
             background-color: var(--kitsch-color-3);
@@ -73,7 +72,7 @@
         }
 
         .address-card-actions-kitsch .text-btn-kitsch {
-            font-size: 0.9em; /* 기존 text-btn보다 약간 작게 */
+            font-size: 0.9em;
             margin-left: 0.5rem;
         }
 
@@ -89,14 +88,12 @@
             color: var(--kitsch-color-1);
         }
 
-        /* 받는사람, 연락처 등 강조 */
-
-        .set-default-btn-kitsch { /* 기본 배송지로 설정 버튼 */
+        .set-default-btn-kitsch {
             margin-top: 0.8rem;
-            font-size: 0.8rem !important; /* small-btn-kitsch 보다 우선 적용 */
+            font-size: 0.8rem !important;
         }
 
-        .no-addresses-kitsch { /* 등록된 주소 없을 때 */
+        .no-addresses-kitsch {
             text-align: center;
             padding: 3rem 1rem;
             font-family: var(--font-pixel);
@@ -114,9 +111,8 @@
             color: var(--kitsch-color-4);
         }
 
-        /* 주소 등록/수정 모달 (styles.css의 .modal-overlay-kitsch, .modal-content-kitsch 등 활용) */
         .address-form-modal-content {
-            max-width: 550px !important; /* 주소폼 모달은 약간 더 넓게 */
+            max-width: 550px !important;
             text-align: left;
         }
 
@@ -125,8 +121,7 @@
             font-size: 1.8rem !important;
         }
 
-        /* .form-group-kitsch, .label-kitsch, .input-kitsch 등은 styles.css 공통 스타일 사용 */
-        .address-form-modal-content .address-group-kitsch { /* 주문/회원가입 페이지의 것과 유사 */
+        .address-form-modal-content .address-group-kitsch {
             display: flex;
             gap: 0.5rem;
             align-items: center;
@@ -138,6 +133,17 @@
             display: flex;
             justify-content: flex-end;
             gap: 0.8rem;
+        }
+
+        .password-change-note-kitsch {
+            font-family: var(--font-pixel);
+            font-size: 0.8rem;
+            color: var(--kitsch-color-5);
+            margin-top: 0.5rem;
+            padding: 0.5rem;
+            background-color: rgba(17, 158, 194, 0.1);
+            border: 1px dashed var(--kitsch-color-4);
+            border-radius: 3px;
         }
 
         @media (max-width: 480px) {
@@ -172,8 +178,6 @@
         <div class="mypage-header-kitsch">
             <h1 class="page-main-title-kitsch display-font-kitsch"><i class="fas fa-map-signs"></i> 나의 주소록 <i
                     class="fas fa-truck-monster"></i></h1>
-            <div class="mypage-user-summary-kitsch">
-            </div>
         </div>
 
         <div class="mypage-layout-kitsch">
@@ -183,61 +187,37 @@
                 <div class="address-list-header-kitsch">
                     <h3 class="section-title-kitsch"><i class="fas fa-home"></i> 등록된 배송지</h3>
                     <button class="btn-kitsch primary-btn-kitsch retro-shadow-kitsch-small"
-                            onclick="openAddressFormModal(false)">
+                            onclick="openAddressFormModal(null)">
                         <i class="fas fa-plus-circle"></i> 새 배송지 추가
                     </button>
                 </div>
 
                 <div id="addressListContainer">
-                    <div class="address-card-kitsch default-address-kitsch">
+                    <div th:each="addr : ${addresses}" class="address-card-kitsch">
                         <div class="address-card-header-kitsch">
-                            <h4 class="address-alias-kitsch">우리집 <span class="default-badge-kitsch">기본</span></h4>
+                            <h4 class="address-alias-kitsch" th:text="${addr.alias}"></h4>
                             <div class="address-card-actions-kitsch">
-                                <button class="text-btn-kitsch"
-                                        onclick="openAddressFormModal(true, '우리집', '겜돌이_77', '010-1234-5678', '12345', '서울특별시 키치구 레트로길 88, 101동 1988호', '(레트로아파트)', true)">
+                                <button class="text-btn-kitsch" th:onclick="openAddressFormModal([[${addr}]])">
                                     <i class="fas fa-edit"></i> 수정
                                 </button>
-                                <button class="text-btn-kitsch" onclick="alert('Mock: [우리집] 주소 삭제 기능이 호출되었습니다.')">
+                                <button class="text-btn-kitsch"
+                                        th:onclick="confirmDelete([[${addr.addressId}]], [[${addr.alias}]])">
                                     <i class="fas fa-trash-alt"></i> 삭제
                                 </button>
                             </div>
                         </div>
                         <div class="address-info-kitsch">
-                            <p><strong>받는 분:</strong> 겜돌이_77</p>
-                            <p><strong>연락처:</strong> 010-1234-5678</p>
-                            <p><strong>주소:</strong> (12345) 서울특별시 키치구 레트로길 88, 101동 1988호 (레트로아파트)</p>
+                            <p><strong>주소:</strong>
+                                <th:block th:text="'(' + ${addr.postalCode} + ') '"></th:block>
+                                <th:block th:text="${addr.roadAddress} + ', '"></th:block>
+                                <th:block th:text="${addr.detailAddress}"></th:block>
+                            </p>
                         </div>
                     </div>
-
-                    <div class="address-card-kitsch">
-                        <div class="address-card-header-kitsch">
-                            <h4 class="address-alias-kitsch">회사</h4>
-                            <div class="address-card-actions-kitsch">
-                                <button class="text-btn-kitsch"
-                                        onclick="openAddressFormModal(true, '회사', '김직장', '02-987-6543', '54321', '경기도 성남시 분당구 판교역로 235', '에이치스퀘어 N동', false)">
-                                    <i class="fas fa-edit"></i> 수정
-                                </button>
-                                <button class="text-btn-kitsch" onclick="alert('Mock: [회사] 주소 삭제 기능이 호출되었습니다.')">
-                                    <i class="fas fa-trash-alt"></i> 삭제
-                                </button>
-                            </div>
-                        </div>
-                        <div class="address-info-kitsch">
-                            <p><strong>받는 분:</strong> 김직장</p>
-                            <p><strong>연락처:</strong> 02-987-6543</p>
-                            <p><strong>주소:</strong> (54321) 경기도 성남시 분당구 판교역로 235, 에이치스퀘어 N동</p>
-                        </div>
-                        <button class="btn-kitsch secondary-btn-kitsch color2-kitsch set-default-btn-kitsch retro-shadow-kitsch-small"
-                                onclick="alert('Mock: [회사] 주소를 기본 배송지로 설정합니다.')">
-                            <i class="fas fa-check-circle"></i> 기본 배송지로 설정
-                        </button>
-                    </div>
-
-                    <div class="no-addresses-kitsch" id="noAddressesMessage" style="display:none;">
+                    <div class="no-addresses-kitsch" id="noAddressesMessage"
+                         th:if="${addresses == null || addresses.isEmpty()}">
                         <i class="fas fa-map-signs"></i>
                         <p>등록된 배송지가 아직 없어요!</p>
-                        <p class="handwriting-font-kitsch" style="font-size:1.1rem; margin-top:0.5rem;">새 배송지를 추가하고 편리하게
-                            쇼핑하세요.</p>
                     </div>
                 </div>
             </main>
@@ -250,111 +230,114 @@
                     class="fas fa-times"></i></button>
             <h2 class="modal-title-kitsch display-font-kitsch" id="addressModalTitle"><i
                     class="fas fa-truck-pickup"></i> 새 배송지 추가</h2>
-            <form id="addressForm" method="post" th:action="@{/mypage/addresses/save}">
-                <input id="addressIdInput" name="id" type="hidden">
+
+            <form id="addressForm" method="post" th:action="@{/mypage/addresses/save}" th:object="${addressRequest}">
+                <input id="addressIdInput" name="addressId" type="hidden">
+
                 <div class="form-group-kitsch">
-                    <label class="label-kitsch handwriting-font-kitsch" for="addressAliasInput"
-                           style="margin-top: 1rem">배송지 별칭:</label>
-                    <input class="input-kitsch pixel-font-kitsch" id="addressAliasInput" name="alias" required
-                           type="text">
+                    <label class="label-kitsch handwriting-font-kitsch" for="addressAliasInput">배송지 별칭:</label>
+                    <input class="input-kitsch pixel-font-kitsch" id="addressAliasInput" required type="text"
+                           th:field="*{alias}"
+                           th:classappend="${#fields.hasErrors('alias')} ? 'is-invalid-kitsch' : ''">
+                    <div th:if="${#fields.hasErrors('alias')}" class="error-message-kitsch pixel-font-kitsch">
+                        <p th:each="err : ${#fields.errors('alias')}" th:text="${err}"></p>
+                    </div>
                 </div>
+
+
                 <div class="form-group-kitsch">
-                    <label class="label-kitsch handwriting-font-kitsch" for="recipientNameInput"
-                           style="margin-top: 1rem">받는 분:</label>
-                    <input class="input-kitsch pixel-font-kitsch" id="recipientNameInput" name="name" required
-                           type="text">
-                </div>
-                <div class="form-group-kitsch">
-                    <label class="label-kitsch handwriting-font-kitsch" for="recipientPhoneInput"
-                           style="margin-top: 1rem">연락처:</label>
-                    <input class="input-kitsch pixel-font-kitsch" id="recipientPhoneInput" name="phoneNumber" required
-                           type="tel">
-                </div>
-                <div class="form-group-kitsch">
-                    <label class="label-kitsch handwriting-font-kitsch" style="margin-top: 1rem">주소:</label>
+                    <label class="label-kitsch handwriting-font-kitsch">주소:</label>
                     <div class="address-group-kitsch">
-                        <input class="input-kitsch pixel-font-kitsch" id="postcodeInput" name="postcode"
-                               placeholder="우편번호"
-                               readonly required type="text">
+                        <input class="input-kitsch pixel-font-kitsch" id="postcodeInput" placeholder="우편번호" readonly
+                               required type="text" th:field="*{postalCode}"
+                               th:classappend="${#fields.hasErrors('postalCode')} ? 'is-invalid-kitsch' : ''">
                         <button class="btn-kitsch secondary-btn-kitsch color1-kitsch retro-shadow-kitsch-small small-btn-kitsch"
-                                onclick="execDaumPostcode('postcodeInput', 'addressInput', 'detailAddressInput')"
-                                type="button">
-                            우편번호 찾기
+                                onclick="execDaumPostcode()" type="button">우편번호 찾기
                         </button>
                     </div>
-                    <input class="input-kitsch pixel-font-kitsch" id="addressInput" name="address"
-                           placeholder="도로명/지번 주소"
-                           readonly required style="margin-bottom:0.5rem;" type="text">
-                    <input class="input-kitsch pixel-font-kitsch" id="detailAddressInput" name="detailAddress"
-                           placeholder="상세주소 입력" type="text">
+                    <div th:if="${#fields.hasErrors('postalCode')}" class="error-message-kitsch pixel-font-kitsch"><p
+                            th:each="err : ${#fields.errors('postalCode')}" th:text="${err}"></p></div>
+                    <input class="input-kitsch pixel-font-kitsch" id="roadAddressInput" placeholder="도로명/지번 주소" readonly
+                           required style="margin-bottom:0.5rem;" type="text" th:field="*{roadAddress}"
+                           th:classappend="${#fields.hasErrors('roadAddress')} ? 'is-invalid-kitsch' : ''">
+                    <div th:if="${#fields.hasErrors('roadAddress')}" class="error-message-kitsch pixel-font-kitsch"><p
+                            th:each="err : ${#fields.errors('roadAddress')}" th:text="${err}"></p></div>
+                    <input class="input-kitsch pixel-font-kitsch" id="detailAddressInput" placeholder="상세주소 입력"
+                           type="text" th:field="*{detailAddress}"
+                           th:classappend="${#fields.hasErrors('detailAddress')} ? 'is-invalid-kitsch' : ''">
+                    <div th:if="${#fields.hasErrors('detailAddress')}" class="error-message-kitsch pixel-font-kitsch"><p
+                            th:each="err : ${#fields.errors('detailAddress')}" th:text="${err}"></p></div>
                 </div>
-                <div class="form-group-kitsch">
-                    <label class="checkbox-kitsch">
-                        <input id="isDefaultInput" name="defaultAddress" type="checkbox">
-                        <span class="checkbox-custom-kitsch"></span>
-                        <span class="pixel-font-kitsch" style="font-size:0.9em; margin-left:0.3em;">기본 배송지로 설정</span>
-                    </label>
-                </div>
+
                 <div class="modal-actions-kitsch">
                     <button class="btn-kitsch secondary-btn-kitsch color5-kitsch retro-shadow-kitsch-small"
-                            onclick="hideKitschModal('addressFormModal')"
-                            type="button">취소
+                            onclick="hideKitschModal('addressFormModal')" type="button">취소
                     </button>
                     <button class="btn-kitsch primary-btn-kitsch retro-shadow-kitsch" type="submit">저장하기</button>
                 </div>
             </form>
         </div>
     </div>
+
+    <form id="deleteAddressForm" method="post" style="display: none;"></form>
 </div>
 
 <th:block layout:fragment="page_scripts">
     <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
-    <script>
-        function openAddressFormModal(isEditMode, alias, name, phone, postcode, address, detailAddress, isDefault) {
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        const openModalName = /*[[${openModal}]]*/ null;
+        const addressIdForModal = /*[[${addressIdForModal}]]*/ null;
+        const addressesData = /*[[${addresses}]]*/ [];
+
+        function openAddressFormModal(address) {
             const form = document.getElementById('addressForm');
             const modalTitle = document.getElementById('addressModalTitle');
-            form.reset(); // 폼 초기화
+            const addressIdInput = document.getElementById('addressIdInput');
+            const addressAliasInput = document.getElementById('addressAliasInput');
+            const postcodeInput = document.getElementById('postcodeInput');
+            const roadAddressInput = document.getElementById('roadAddressInput');
+            const detailAddressInput = document.getElementById('detailAddressInput');
 
-            if (isEditMode) {
+            form.reset();
+            document.querySelectorAll('.error-message-kitsch').forEach(el => el.innerHTML = '');
+            document.querySelectorAll('.is-invalid-kitsch').forEach(el => el.classList.remove('is-invalid-kitsch'));
+
+            if (address) { // 수정 모드
                 modalTitle.innerHTML = '<i class="fas fa-truck-pickup"></i> 배송지 수정';
-                // document.getElementById('addressIdInput').value = id; // 실제 ID는 없으므로 생략
-                document.getElementById('addressAliasInput').value = alias || '';
-                document.getElementById('recipientNameInput').value = name || '';
-                document.getElementById('recipientPhoneInput').value = phone || '';
-                document.getElementById('postcodeInput').value = postcode || '';
-                document.getElementById('addressInput').value = address || '';
-                document.getElementById('detailAddressInput').value = detailAddress || '';
-                document.getElementById('isDefaultInput').checked = isDefault || false;
+                addressIdInput.value = address.addressId; // ID 설정
+                addressAliasInput.value = address.alias || '';
+                postcodeInput.value = address.postalCode || '';
+                roadAddressInput.value = address.roadAddress || '';
+                detailAddressInput.value = address.detailAddress || '';
             } else { // 등록 모드
                 modalTitle.innerHTML = '<i class="fas fa-truck-pickup"></i> 새 배송지 추가';
+                addressIdInput.value = ''; // ID 비우기
             }
-            showKitschModal('addressFormModal'); // default_layout.html 에 정의된 전역 함수 사용
+            showKitschModal('addressFormModal');
         }
 
-        // (Mock) 폼 제출 처리 - 실제 저장/수정 로직 없음
-        function handleAddressFormSubmit(event) {
-            event.preventDefault(); // 실제 폼 제출 방지
-            const isEditMode = !!document.getElementById('addressIdInput').value; // ID 유무로 수정/등록 구분 (현재는 항상 신규)
-            if (isEditMode) {
-                alert('Mock: 배송지 정보가 수정되었습니다! (실제 데이터 변경 없음)');
-            } else {
-                alert('Mock: 새 배송지가 추가되었습니다! (실제 데이터 변경 없음)');
+        function confirmDelete(id, alias) {
+            if (confirm("'" + alias + "' 주소를 정말 삭제하시겠습니까?")) {
+                const form = document.getElementById('deleteAddressForm');
+                form.action = '/mypage/addresses/delete/' + id;
+                form.submit();
             }
-            hideKitschModal('addressFormModal');
         }
 
-        // 다음 우편번호 API
-        function execDaumPostcode(postcodeId, addressId, detailAddressId) {
+        function execDaumPostcode() {
             new daum.Postcode({
                 oncomplete: function (data) {
-                    document.getElementById(postcodeId).value = data.zonecode;
-                    document.getElementById(addressId).value = data.userSelectedType === 'R' ? data.roadAddress : data.jibunAddress;
-                    document.getElementById(detailAddressId).focus();
+                    document.getElementById('postcodeInput').value = data.zonecode;
+                    document.getElementById('roadAddressInput').value = data.roadAddress;
+                    document.getElementById('detailAddressInput').value = '';
+                    document.getElementById('detailAddressInput').focus();
                 }
             }).open();
         }
 
         document.addEventListener('DOMContentLoaded', function () {
+            // 사이드바 활성화
             const currentPath = window.location.pathname;
             const sidebarLinks = document.querySelectorAll('.mypage-sidebar-kitsch .sidebar-menu-kitsch li a');
             sidebarLinks.forEach(link => {
@@ -363,14 +346,21 @@
                     link.classList.add('active');
                 }
             });
-            const addressCards = document.querySelectorAll('#addressListContainer .address-card-kitsch');
-            const noMsg = document.getElementById('noAddressesMessage');
-            if (addressCards.length === 0 && noMsg) {
-                noMsg.style.display = 'block';
-            } else if (noMsg) {
-                noMsg.style.display = 'none';
+
+            // 리다이렉트 후 모달 열기
+            if (openModalName === 'addressFormModal') {
+                // th:object가 폼을 채우므로, ID만 설정하고 모달 열기
+                if (addressIdForModal) {
+                    document.getElementById('addressIdInput').value = addressIdForModal;
+                    document.getElementById('addressModalTitle').innerHTML = '<i class="fas fa-truck-pickup"></i> 배송지 수정';
+                } else {
+                    document.getElementById('addressIdInput').value = '';
+                    document.getElementById('addressModalTitle').innerHTML = '<i class="fas fa-truck-pickup"></i> 새 배송지 추가';
+                }
+                showKitschModal(openModalName);
             }
         });
+        /*]]>*/
     </script>
 </th:block>
 </body>

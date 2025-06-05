@@ -4,6 +4,35 @@
       xmlns:th="http://www.thymeleaf.org">
 <head>
     <title th:text="${pageTitle} ?: '회원 정보 수정'"></title>
+    <style>
+        .form-label {
+            font-weight: bold;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .admin-form-control.is-invalid {
+            border-color: #dc3545;
+        }
+
+        .invalid-feedback {
+            color: #dc3545;
+            font-size: 0.875em;
+            display: block;
+        }
+
+        .form-text {
+            font-size: 0.875em;
+            color: #6c757d;
+        }
+
+        .form-control-plaintext {
+            padding-top: .375rem;
+            padding-bottom: .375rem;
+        }
+    </style>
 </head>
 <body>
 <div layout:fragment="admin_content">
@@ -13,140 +42,114 @@
             <th:block th:text="${pageTitle}">회원 정보 수정</th:block>
         </h1>
         <div class="admin-page-actions">
-            <a th:href="@{/admin/members/{id}(id=${memberForm?.userId != null ? memberForm.userId : ''})}"
-               class="admin-btn admin-btn--default" th:if="${memberForm?.userId != null}">
-                <i class="fas fa-eye"></i> 상세 보기
+            <a th:href="@{/admin/members/{id}(id=${userId})}" class="admin-btn admin-btn--default">
+                <i class="fas fa-times"></i> 취소
             </a>
-            <a th:href="@{/admin/members}" class="admin-btn admin-btn--default">
-                <i class="fas fa-list"></i> 목록으로
-            </a>
+            <button type="submit" form="memberEditForm" class="admin-btn admin-btn--primary">
+                <i class="fas fa-save"></i> 저장
+            </button>
         </div>
     </div>
 
     <div th:if="${globalErrorMessage}" class="alert alert-danger" th:text="${globalErrorMessage}"></div>
-    <div th:if="${globalSuccessMessage}" class="alert alert-success" th:text="${globalSuccessMessage}"></div>
-
 
     <div class="admin-panel">
         <div class="admin-panel__body">
-            <form th:action="@{/admin/members/{id}/edit(id=${memberForm.userId})}" th:object="${memberForm}"
-                  method="post">
-                <input type="hidden" th:field="*{userId}"/>
+            <form id="memberEditForm" th:action="@{/admin/members/{id}/edit(id=${userId})}"
+                  th:object="${memberForm}" method="post">
 
-                <div class="admin-form-group row">
-                    <label for="loginId" class="col-sm-2 col-form-label admin-form-label">로그인 ID</label>
+                <div th:if="${#fields.hasGlobalErrors()}" class="alert alert-danger">
+                    <p th:each="err : ${#fields.globalErrors()}" th:text="${err}"></p>
+                </div>
+
+                <div class="row mb-3">
+                    <label class="col-sm-2 col-form-label form-label">로그인 ID:</label>
                     <div class="col-sm-10">
-                        <input type="text" id="loginId" th:field="*{loginId}" class="admin-form-control"
-                               readonly/>
+                        <p class="form-control-plaintext" th:text="${loginId}">user01</p>
                     </div>
                 </div>
 
-                <div class="admin-form-group row">
-                    <label for="name" class="col-sm-2 col-form-label admin-form-label">이름 <span
-                            class="text-danger">*</span></label>
-                    <div class="col-sm-10">
+                <div class="row mb-3">
+                    <div class="col-md-6 form-group">
+                        <label for="name" class="form-label">이름:</label>
                         <input type="text" id="name" th:field="*{name}" class="admin-form-control"
-                               th:errorclass="is-invalid" placeholder="회원 이름">
-                        <div th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="invalid-feedback"></div>
+                               th:classappend="${#fields.hasErrors('name')} ? 'is-invalid' : ''">
+                        <div th:if="${#fields.hasErrors('name')}" class="invalid-feedback" th:errors="*{name}"></div>
                     </div>
-                </div>
-
-                <div class="admin-form-group row">
-                    <label for="nickname" class="col-sm-2 col-form-label admin-form-label">닉네임 <span
-                            class="text-danger">*</span></label>
-                    <div class="col-sm-10">
+                    <div class="col-md-6 form-group">
+                        <label for="nickname" class="form-label">닉네임:</label>
                         <input type="text" id="nickname" th:field="*{nickname}" class="admin-form-control"
-                               th:errorclass="is-invalid" placeholder="닉네임">
-                        <div th:if="${#fields.hasErrors('nickname')}" th:errors="*{nickname}"
-                             class="invalid-feedback"></div>
+                               th:classappend="${#fields.hasErrors('nickname')} ? 'is-invalid' : ''">
+                        <div th:if="${#fields.hasErrors('nickname')}" class="invalid-feedback"
+                             th:errors="*{nickname}"></div>
                     </div>
                 </div>
 
-                <div class="admin-form-group row">
-                    <label for="email" class="col-sm-2 col-form-label admin-form-label">이메일 <span
-                            class="text-danger">*</span></label>
-                    <div class="col-sm-10">
+                <div class="row mb-3">
+                    <div class="col-md-6 form-group">
+                        <label for="email" class="form-label">이메일:</label>
                         <input type="email" id="email" th:field="*{email}" class="admin-form-control"
-                               th:errorclass="is-invalid" placeholder="example@email.com">
-                        <div th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="invalid-feedback"></div>
+                               th:classappend="${#fields.hasErrors('email')} ? 'is-invalid' : ''">
+                        <div th:if="${#fields.hasErrors('email')}" class="invalid-feedback" th:errors="*{email}"></div>
                     </div>
-                </div>
-
-                <div class="admin-form-group row">
-                    <label for="phoneNumber" class="col-sm-2 col-form-label admin-form-label">전화번호 <span
-                            class="text-danger">*</span></label>
-                    <div class="col-sm-10">
+                    <div class="col-md-6 form-group">
+                        <label for="phoneNumber" class="form-label">연락처 ('-' 없이 11자리):</label>
                         <input type="text" id="phoneNumber" th:field="*{phoneNumber}" class="admin-form-control"
-                               th:errorclass="is-invalid" placeholder="'-' 없이 숫자만 입력">
-                        <div th:if="${#fields.hasErrors('phoneNumber')}" th:errors="*{phoneNumber}"
-                             class="invalid-feedback"></div>
+                               maxlength="11" placeholder="01012345678"
+                               th:classappend="${#fields.hasErrors('phoneNumber')} ? 'is-invalid' : ''">
+                        <div th:if="${#fields.hasErrors('phoneNumber')}" class="invalid-feedback"
+                             th:errors="*{phoneNumber}"></div>
                     </div>
                 </div>
 
-                <div class="admin-form-group row">
-                    <label for="birthDate" class="col-sm-2 col-form-label admin-form-label">생년월일</label>
-                    <div class="col-sm-10">
+                <div class="row mb-3">
+                    <div class="col-md-6 form-group">
+                        <label for="birthDate" class="form-label">생년월일 (YYYYMMDD):</label>
                         <input type="text" id="birthDate" th:field="*{birthDate}" class="admin-form-control"
-                               th:errorclass="is-invalid" placeholder="YYYYMMDD (예: 19900101)">
-                        <div th:if="${#fields.hasErrors('birthDate')}" th:errors="*{birthDate}"
-                             class="invalid-feedback"></div>
+                               maxlength="8" placeholder="19900101"
+                               th:classappend="${#fields.hasErrors('birthDate')} ? 'is-invalid' : ''">
+                        <div th:if="${#fields.hasErrors('birthDate')}" class="invalid-feedback"
+                             th:errors="*{birthDate}"></div>
                     </div>
                 </div>
 
-                <hr class="my-4">
-
-                <div class="admin-form-group row">
-                    <label for="userType" class="col-sm-2 col-form-label admin-form-label">회원 유형</label>
-                    <div class="col-sm-10">
+                <div class="row mb-3">
+                    <div class="col-md-4 form-group">
+                        <label for="userType" class="form-label">회원 유형:</label>
                         <select id="userType" th:field="*{userType}" class="admin-form-control"
-                                th:errorclass="is-invalid">
-                            <option value="">-- 선택 --</option>
-                            <option th:each="typeOpt : ${userTypeOptions}" th:value="${typeOpt}"
-                                    th:text="${typeOpt}"></option>
+                                th:classappend="${#fields.hasErrors('userType')} ? 'is-invalid' : ''">
+                            <option th:each="typeOpt : ${userTypeOptions}"
+                                    th:value="${typeOpt}"
+                                    th:text="${typeOpt.name()}"></option>
                         </select>
-                        <div th:if="${#fields.hasErrors('userType')}" th:errors="*{userType}"
-                             class="invalid-feedback"></div>
+                        <div th:if="${#fields.hasErrors('userType')}" class="invalid-feedback"
+                             th:errors="*{userType}"></div>
                     </div>
-                </div>
-
-                <div class="admin-form-group row">
-                    <label for="userStatus" class="col-sm-2 col-form-label admin-form-label">회원 상태</label>
-                    <div class="col-sm-10">
+                    <div class="col-md-4 form-group">
+                        <label for="userStatus" class="form-label">회원 상태:</label>
                         <select id="userStatus" th:field="*{userStatus}" class="admin-form-control"
-                                th:errorclass="is-invalid">
-                            <option value="">-- 선택 --</option>
-                            <option th:each="statusOpt : ${userStatusOptions}" th:value="${statusOpt}"
-                                    th:text="${statusOpt}"></option>
+                                th:classappend="${#fields.hasErrors('userStatus')} ? 'is-invalid' : ''">
+                            <option th:each="statusOpt : ${userStatusOptions}"
+                                    th:value="${statusOpt}"
+                                    th:text="${statusOpt.name()}"></option>
                         </select>
-                        <div th:if="${#fields.hasErrors('userStatus')}" th:errors="*{userStatus}"
-                             class="invalid-feedback"></div>
+                        <div th:if="${#fields.hasErrors('userStatus')}" class="invalid-feedback"
+                             th:errors="*{userStatus}"></div>
                     </div>
-                </div>
-
-                <div class="admin-form-group row">
-                    <label for="membershipId" class="col-sm-2 col-form-label admin-form-label">회원 등급</label>
-                    <div class="col-sm-10">
+                    <div class="col-md-4 form-group">
+                        <label for="membershipId" class="form-label">회원 등급:</label>
                         <select id="membershipId" th:field="*{membershipId}" class="admin-form-control"
-                                th:errorclass="is-invalid">
-                            <option value="">-- 등급 선택 --</option>
+                                th:classappend="${#fields.hasErrors('membershipId')} ? 'is-invalid' : ''">
+                            <option value="">-- 등급 없음 --</option>
                             <option th:each="level : ${membershipLevels}"
                                     th:value="${level.id}"
-                                    th:text="${level.name}"
-                                    th:selected="${memberForm.membershipId == level.id}">
-                            </option>
+                                    th:text="${level.name}"></option>
                         </select>
-                        <div th:if="${#fields.hasErrors('membershipId')}" th:errors="*{membershipId}"
-                             class="invalid-feedback"></div>
+                        <div th:if="${#fields.hasErrors('membershipId')}" class="invalid-feedback"
+                             th:errors="*{membershipId}"></div>
                     </div>
                 </div>
 
-                <div class="admin-form-actions mt-4" style="text-align: right;">
-                    <a th:href="@{/admin/members/{id}(id=${memberForm.userId})}" class="admin-btn admin-btn--default"
-                       style="margin-right: 8px;">취소</a>
-                    <button type="submit" class="admin-btn admin-btn--primary">
-                        <i class="fas fa-save"></i> 저장하기
-                    </button>
-                </div>
             </form>
         </div>
     </div>

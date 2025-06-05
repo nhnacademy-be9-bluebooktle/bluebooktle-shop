@@ -14,7 +14,7 @@ import shop.bluebooktle.common.dto.book.response.PublisherInfoResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
 import shop.bluebooktle.frontend.config.feign.FeignGlobalConfig;
 
-@FeignClient(name = "backend-server", contextId = "adminPublisherRepository", path = "/api/publishers", configuration = FeignGlobalConfig.class)
+@FeignClient(url = "${server.gateway-url}", name = "adminPublisherRepository", path = "/api/publishers", configuration = FeignGlobalConfig.class)
 public interface AdminPublisherRepository {
 	// 출판사 조회
 	@GetMapping

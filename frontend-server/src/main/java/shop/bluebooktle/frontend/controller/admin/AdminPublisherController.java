@@ -3,6 +3,7 @@ package shop.bluebooktle.frontend.controller.admin;
 import java.time.LocalDateTime;
 
 import org.springframework.data.domain.Page;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,7 +25,8 @@ import shop.bluebooktle.frontend.service.AdminPublisherService;
 
 @Slf4j
 @Controller
-@RequestMapping("/admin/publishers")
+// 조선대 서버에서 'publishers', 'wrappers', '-' 포함된 path 차단으로 chulpansa 사용
+@RequestMapping("/admin/chulpansa")
 @RequiredArgsConstructor
 public class AdminPublisherController {
 	private final AdminPublisherService adminPublisherService;
@@ -46,6 +49,17 @@ public class AdminPublisherController {
 		model.addAttribute("size", size);
 
 		return "admin/publisher/publisher_list";
+	}
+
+	/** AJAX/팝업용 — JSON 페이징 결과 반환 */
+	@GetMapping(path = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public Page<PublisherInfoResponse> listPublishersJson(
+		@RequestParam(defaultValue = "0") int page,
+		@RequestParam(defaultValue = "10") int size,
+		@RequestParam(required = false) String searchKeyword) {
+
+		return adminPublisherService.getPublishers(page, size, searchKeyword);
 	}
 
 	/** 출판사 등록 또는 수정 폼 진입 */
@@ -90,9 +104,9 @@ public class AdminPublisherController {
 			redirectAttributes.addFlashAttribute("publisher", publisher);
 			redirectAttributes.addFlashAttribute("globalErrorMessage", "입력값을 확인해주세요.");
 			if (publisher.getId() != null) {
-				return "redirect:/admin/publishers/" + publisher.getId() + "/edit";
+				return "redirect:/admin/chulpansa/" + publisher.getId() + "/edit";
 			} else {
-				return "redirect:/admin/publishers/new";
+				return "redirect:/admin/chulpansa/new";
 			}
 		}
 
@@ -113,12 +127,12 @@ public class AdminPublisherController {
 			redirectAttributes.addFlashAttribute("globalErrorMessage", "출판사 저장 중 오류가 발생했습니다: " + e.getMessage());
 			redirectAttributes.addFlashAttribute("publisher", publisher);
 			if (publisher.getId() != null) {
-				return "redirect:/admin/publishers/" + publisher.getId() + "/edit";
+				return "redirect:/admin/chulpansa/" + publisher.getId() + "/edit";
 			} else {
-				return "redirect:/admin/publishers/new";
+				return "redirect:/admin/chulpansa/new";
 			}
 		}
-		return "redirect:/admin/publishers";
+		return "redirect:/admin/chulpansa";
 	}
 
 	@PostMapping("/{publisherId}/delete") // 비활성화
@@ -133,6 +147,6 @@ public class AdminPublisherController {
 			log.error("출판사 비활성화 중 오류 발생", e);
 			redirectAttributes.addFlashAttribute("globalErrorMessage", "출판사 비활성화 중 오류가 발생했습니다: " + e.getMessage());
 		}
-		return "redirect:/admin/publishers";
+		return "redirect:/admin/chulpansa";
 	}
 }

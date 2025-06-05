@@ -18,12 +18,17 @@ public enum ErrorCode {
 	MEDIA_TYPE_NOT_SUPPORTED(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "C008", "지원되지 않는 미디어 타입입니다."),
 	BAD_GATEWAY(HttpStatus.BAD_GATEWAY, "C009", "외부 서비스 연동 중 오류가 발생했습니다."),
 
+	CRYPTO_INITIALIZATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "S001", "암호화 모듈 초기화에 실패했습니다. 설정(키)을 확인해주세요."),
+	CRYPTO_ENCRYPTION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "S002", "데이터 암호화 중 오류가 발생했습니다."),
+	CRYPTO_DECRYPTION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "S003", "데이터 복호화 중 일반 오류가 발생했습니다."),
+	CRYPTO_INVALID_DATA_FOR_DECRYPTION(HttpStatus.BAD_REQUEST, "S004", "잘못된 암호문 데이터 형식 또는 인증 태그 불일치로 인해 복호화에 실패했습니다."),
+
 	// Auth & User Errors (인증/회원 오류) - A
 	AUTH_AUTHENTICATION_FAILED(HttpStatus.UNAUTHORIZED, "A001", "아이디 또는 비밀번호가 일치하지 않습니다."),
 	AUTH_LOGIN_ID_ALREADY_EXISTS(HttpStatus.CONFLICT, "A002", "이미 사용 중인 아이디입니다."),
 	AUTH_EMAIL_ALREADY_EXISTS(HttpStatus.CONFLICT, "A003", "이미 사용 중인 이메일입니다."),
-	AUTH_INACTIVE_ACCOUNT(HttpStatus.FORBIDDEN, "A004", "비활성화(휴면) 상태 계정입니다. 인증 후 활성화 해주세요."),
-	AUTH_INVALID_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "A005", "유효하지 않거나 만료된 Refresh Token입니다."),
+	AUTH_INACTIVE_ACCOUNT(HttpStatus.BAD_REQUEST, "A004", "비활성화 상태 계정입니다. 인증 후 활성화 해주세요."),
+	AUTH_INVALID_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "A005", "유효하지 않은 인증정보입니다."),
 	AUTH_USER_NOT_FOUND(HttpStatus.NOT_FOUND, "A006", "사용자를 찾을 수 없습니다."),
 	AUTH_PASSWORD_MISMATCH(HttpStatus.BAD_REQUEST, "A007", "현재 비밀번호가 일치하지 않습니다."),
 	AUTH_PASSWORD_ENCRYPTION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "A008", "비밀번호 암호화 중 오류가 발생했습니다."),
@@ -32,10 +37,13 @@ public enum ErrorCode {
 	AUTH_ACCOUNT_WITHDRAWN(HttpStatus.FORBIDDEN, "A011", "탈퇴한 계정입니다."),
 	AUTH_NOT_DORMANT_ACCOUNT(HttpStatus.BAD_REQUEST, "A012", "휴면 상태가 아닌 계정입니다."),
 	AUTH_ADDRESS_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "A013", "주소는 최대 10개까지 등록할 수 있습니다."),
-	AUTH_INVALID_ADDRESS(HttpStatus.BAD_REQUEST, "A014", "유효하지 않은 주소 정보입니다."),
-	AUTH_MEMBERSHIP_LEVEL_NOT_FOUND(HttpStatus.NOT_FOUND, "A015", "회원 등급 정보를 찾을 수 없습니다."),
-	AUTH_INVALID_USER_ID(HttpStatus.BAD_REQUEST, "A016", "유효하지 않은 계정 ID입니다."),
-	AUTH_TOKEN_REISSUE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "A017", "토큰 재발급에 실패했습니다. "),
+	AUTH_ADDRESS_NOT_FOUND(HttpStatus.BAD_REQUEST, "A014", "삭제할 주소를 찾을 수 없거나 권한이 없습니다."),
+	AUTH_INVALID_ADDRESS(HttpStatus.BAD_REQUEST, "A015", "유효하지 않은 주소 정보입니다."),
+	AUTH_MEMBERSHIP_LEVEL_NOT_FOUND(HttpStatus.NOT_FOUND, "A016", "회원 등급 정보를 찾을 수 없습니다."),
+	AUTH_INVALID_USER_ID(HttpStatus.BAD_REQUEST, "A017", "유효하지 않은 계정 ID입니다."),
+	AUTH_TOKEN_REISSUE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "A018", "토큰 재발급에 실패했습니다. "),
+	USER_MEMBERSHIP_NOT_FOUNT(HttpStatus.BAD_REQUEST, "A019", "회원 등급을 찾을 수 없습니다. "),
+	AUTH_OAUTH_LOGIN_FAILED(HttpStatus.BAD_REQUEST, "A020", "OAUTH 로그인에 실패했습니다."),
 
 	// Book Errors (도서 관련 오류) - B
 	BOOK_NOT_FOUND(HttpStatus.NOT_FOUND, "B001", "도서를 찾을 수 없습니다."),
@@ -91,6 +99,7 @@ public enum ErrorCode {
 	G_PACKAGING_QUANTITY_EXCEEDS_BOOK_ORDER(HttpStatus.BAD_REQUEST, "G009", "포장 수량은 도서 주문 수량을 초과할 수 없습니다."),
 	G_ORDER_PACKAGING_DELETE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "G010", "포장 정보 삭제 중 오류가 발생했습니다."),
 	G_ORDER_PACKAGING_OPTION_NOT_FOUND(HttpStatus.NOT_FOUND, "G011", "주문 포장 옵션을 찾을 수 없습니다."),
+	G_ORDER_PACKAGING_OPTION_ALREADY_EXITS(HttpStatus.CONFLICT, "G012", "이미 해당 포장 옵션이 등록되어 있습니다."),
 
 	// 도서 - 이미지
 	BOOK_IMG_BOOK_ID_NULL(HttpStatus.BAD_REQUEST, "BI01", "도서 ID는 필수입니다."),
@@ -120,6 +129,7 @@ public enum ErrorCode {
 	CART_BOOK_ADD_FAILED(HttpStatus.BAD_REQUEST, "T003", "장바구니에 담을 수 없는 도서입니다."), // 판매 상태 등
 	CART_INVALID_QUANTITY(HttpStatus.BAD_REQUEST, "T004", "장바구니 수량이 유효하지 않습니다."),
 	CART_IS_EMPTY(HttpStatus.BAD_REQUEST, "T005", "장바구니가 비어있습니다."),
+	GUEST_USER_NOT_FOUND(HttpStatus.NOT_FOUND, "T006", "GUEST-ID가 유효하지 않습니다."),
 
 	// Order Errors (주문 오류) - O
 	ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "O001", "주문을 찾을 수 없습니다."),
@@ -140,11 +150,14 @@ public enum ErrorCode {
 	POINT_HISTORY_NOT_FOUND(HttpStatus.NOT_FOUND, "P006", "포인트 이력을 찾을 수 없습니다."),
 	POINT_SOURCE_TYPE_NOT_FOUND(HttpStatus.NOT_FOUND, "P007", "포인트 발생/사용 타입을 찾을 수 없습니다."),
 	POINT_POLICY_CREATION_NOT_ALLOWED(HttpStatus.BAD_REQUEST, "P008", "포인트 정책 생성이 허용되지 않습니다."),
-	PAYMENT_INVALID_AMOUNT(HttpStatus.BAD_REQUEST, "P009", "결제 금액이 유효하지 않습니다."),
-	REFUND_NOT_POSSIBLE(HttpStatus.BAD_REQUEST, "P010", "현재 상태에서는 반품/환불이 불가능합니다."),
-	REFUND_ALREADY_PROCESSED(HttpStatus.CONFLICT, "P0011", "이미 처리된 반품/환불 요청입니다."),
-	REFUND_INVALID_REASON(HttpStatus.BAD_REQUEST, "P012", "유효하지 않은 반품 사유입니다."),
-	REFUND_NOT_FOUND(HttpStatus.NOT_FOUND, "P013", "환불 정보를 찾을 수 없습니다."),
+	POINT_POLICY_NOT_ACTIVE(HttpStatus.BAD_REQUEST, "P009", "비활성화된 포인트 정책입니다."),
+	PAYMENT_INVALID_AMOUNT(HttpStatus.BAD_REQUEST, "P010", "결제 금액이 유효하지 않습니다."),
+	POINT_POLICY_NOT_FOUND(HttpStatus.NOT_FOUND, "P011", "포인트 정책을 찾을 수 없습니다."),
+	POINT_POLICY_ALREADY_EXISTS(HttpStatus.CONFLICT, "P012", "이미 존재하는 포인트 정책입니다."),
+	REFUND_NOT_POSSIBLE(HttpStatus.BAD_REQUEST, "P013", "현재 상태에서는 반품/환불이 불가능합니다."),
+	REFUND_ALREADY_PROCESSED(HttpStatus.CONFLICT, "P0014", "이미 처리된 반품/환불 요청입니다."),
+	REFUND_INVALID_REASON(HttpStatus.BAD_REQUEST, "P015", "유효하지 않은 반품 사유입니다."),
+	REFUND_NOT_FOUND(HttpStatus.NOT_FOUND, "P016", "환불 정보를 찾을 수 없습니다."),
 
 	// Coupon Errors (쿠폰 오류) - K (Koopon)
 	K_COUPON_NOT_FOUND(HttpStatus.NOT_FOUND, "K001", "쿠폰을 찾을 수 없습니다."),

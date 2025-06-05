@@ -7,14 +7,18 @@ import java.time.format.DateTimeFormatter;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Value;
 import shop.bluebooktle.common.dto.book.request.AladinBookItem;
 
 @Getter
 @Value
 @Builder
+@NoArgsConstructor(force = true)
+@AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AladinBookResponse {
 	String title;
@@ -27,7 +31,7 @@ public class AladinBookResponse {
 	BigDecimal salePercentage;
 	String publisher;
 	String categoryName;
-	String imageUrl;
+	String imgUrl;
 
 	public static AladinBookResponse from(AladinBookItem item) {
 		BigDecimal price = BigDecimal.valueOf(item.getPriceStandard());
@@ -51,7 +55,7 @@ public class AladinBookResponse {
 			.salePercentage(salePercentage)
 			.publisher(item.getPublisher())
 			.categoryName(item.getCategoryName())
-			.imageUrl(item.getCover())
+			.imgUrl(item.getCover())
 			.build();
 
 	}

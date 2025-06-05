@@ -4,10 +4,14 @@ import java.time.LocalDateTime;
 
 import com.querydsl.core.annotations.QueryProjection;
 
-import lombok.Value;
-import shop.bluebooktle.common.domain.CouponTypeTarget;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import shop.bluebooktle.common.domain.coupon.CouponTypeTarget;
 
-@Value
+@Getter
+@Setter
+@NoArgsConstructor
 public class UserCouponResponse {
 	Long id;
 	LocalDateTime createdAt;
@@ -17,12 +21,14 @@ public class UserCouponResponse {
 	LocalDateTime availableStartAt;
 	LocalDateTime availableEndAt;
 	LocalDateTime usedAt;
-	// [발급일] [쿠폰이름] [쿠폰정책이름] [적용 범위] [사용 가능 시작일] [사용 가능 종료일] [사용일]
+
+	String categoryName;
+	String bookName;
 
 	@QueryProjection
 	public UserCouponResponse(Long id, LocalDateTime createdAt, String couponName, String couponTypeName,
-		CouponTypeTarget target,
-		LocalDateTime availableStartAt, LocalDateTime availableEndAt, LocalDateTime usedAt) {
+		CouponTypeTarget target, LocalDateTime availableStartAt, LocalDateTime availableEndAt,
+		LocalDateTime usedAt, String categoryName, String bookName) {
 		this.id = id;
 		this.createdAt = createdAt;
 		this.couponName = couponName;
@@ -31,5 +37,7 @@ public class UserCouponResponse {
 		this.availableStartAt = availableStartAt;
 		this.availableEndAt = availableEndAt;
 		this.usedAt = usedAt;
+		this.categoryName = categoryName;
+		this.bookName = bookName;
 	}
 }

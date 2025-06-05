@@ -1,10 +1,8 @@
 package shop.bluebooktle.frontend.controller.admin;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.math.BigDecimal;
 
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -13,14 +11,14 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
+import shop.bluebooktle.common.dto.book_order.response.PackagingOptionInfoResponse;
+import shop.bluebooktle.frontend.service.AdminPackagingOptionService;
 
 @Slf4j
 @Controller
@@ -28,150 +26,100 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class AdminPackagingOptionController {
 
-	// private final AdminPackagingOptionService adminPackagingOptionService; // 실제 서비스
+	private final AdminPackagingOptionService packagingOptionService;
 
-	// --- DTO 정의 ---
-	@Getter
-	@Setter
-	@ToString
-	static class PackagingOptionDto {
-		private Long id;
-		// @NotBlank
-		private String name; // 포장명
-		// @NotNull @PositiveOrZero
-		private Double price; // 가격
-		private String description; // 설명
-		private Boolean isActive = true; // 활성화 여부
-		private String imageUrl; // 이미지 URL
-
-		public PackagingOptionDto() {
-		}
-
-		public PackagingOptionDto(Long id, String name, Double price, String description, Boolean isActive,
-			String imageUrl) {
-			this.id = id;
-			this.name = name;
-			this.price = price;
-			this.description = description;
-			this.isActive = isActive;
-			this.imageUrl = imageUrl;
-		}
-	}
-
-	// 임시 데이터 저장소
-	private static final List<PackagingOptionDto> packagingOptionsStore = new ArrayList<>(Arrays.asList(
-		new PackagingOptionDto(1L, "기본 선물 포장 (레드)", 2000.0, "빨간색 포장지와 리본으로 포장합니다.", true,
-			"/images/packaging/red_gift.jpg"),
-		new PackagingOptionDto(2L, "프리미엄 고급 포장 (골드)", 5000.0, "금색 보자기로 고급스럽게 포장합니다.", true,
-			"/images/packaging/gold_premium.jpg"),
-		new PackagingOptionDto(3L, "친환경 포장 (브라운)", 1500.0, "재활용 가능한 종이 포장재를 사용합니다.", false,
-			"/images/packaging/eco_brown.jpg")
-	));
-	private static Long nextOptionId = 4L;
-
+	/** 포장 옵션 목록 조회 */
 	@GetMapping
-	public String listPackagingOptions(Model model, HttpServletRequest request) {
+	public String listPackagingOptions(Model model, HttpServletRequest request,
+		@RequestParam(value = "page", defaultValue = "0") int page,
+		@RequestParam(value = "size", defaultValue = "10") int size,
+		@RequestParam(value = "searchKeyword", required = false) String searchKeyword) {
+		Page<PackagingOptionInfoResponse> optionPage = packagingOptionService.getPackagingOptions(page, size,
+			searchKeyword);
 		log.info("어드민 포장 옵션 목록 페이지 요청. URI: {}", request.getRequestURI());
 		model.addAttribute("pageTitle", "포장 옵션 관리");
 		model.addAttribute("currentURI", request.getRequestURI());
-
-		// TODO: adminPackagingOptionService.getAllPackagingOptions() 호출
-		model.addAttribute("packagingOptions", new ArrayList<>(packagingOptionsStore));
+		model.addAttribute("packagingOptions", optionPage.getContent());
+		model.addAttribute("currentPage", page);
+		model.addAttribute("totalPages", optionPage.getTotalPages());
+		model.addAttribute("searchKeyword", searchKeyword);
+		model.addAttribute("size", size);
 
 		return "admin/packaging/packaging_option_list";
 	}
 
+	/** 포장 옵션 등록 또는 수정 폼 진입 */
 	@GetMapping({"/new", "/{optionId}/edit"})
 	public String packagingOptionForm(@PathVariable(value = "optionId", required = false) Long optionId,
-		Model model, HttpServletRequest request) {
+		Model model,
+		HttpServletRequest request) {
 		log.info("어드민 포장 옵션 폼 페이지 요청. URI: {}, optionId: {}", request.getRequestURI(), optionId);
 		model.addAttribute("currentURI", request.getRequestURI());
 
-		PackagingOptionDto optionDto;
+		PackagingOptionInfoResponse option;
 		String pageTitle;
 
 		if (optionId != null) {
 			pageTitle = "포장 옵션 수정 (ID: " + optionId + ")";
-			// TODO: adminPackagingOptionService.getPackagingOptionById(optionId) 호출
-			optionDto = packagingOptionsStore.stream().filter(opt -> opt.getId().equals(optionId)).findFirst()
-				.orElseGet(() -> {
-					log.warn("요청한 포장 옵션 ID를 찾을 수 없음: {}", optionId);
-					return new PackagingOptionDto(); // 또는 오류 처리
-				});
+			option = packagingOptionService.getPackagingOption(optionId);
 		} else {
 			pageTitle = "새 포장 옵션 추가";
-			optionDto = new PackagingOptionDto();
+			option = PackagingOptionInfoResponse.builder()
+				.id(null)
+				.name("")
+				.price(BigDecimal.ZERO)
+				.build();
 		}
 		model.addAttribute("pageTitle", pageTitle);
-		model.addAttribute("packagingOption", optionDto);
+		model.addAttribute("packagingOption", option);
 
 		return "admin/packaging/packaging_option_form";
 	}
 
+	/** 포장 옵션 저장 */
 	@PostMapping("/save")
 	public String savePackagingOption(//@Valid
-		@ModelAttribute("packagingOption") PackagingOptionDto optionDto,
+		@ModelAttribute("packagingOption")
+		PackagingOptionInfoResponse option,
 		BindingResult bindingResult,
-		RedirectAttributes redirectAttributes,
-		HttpServletRequest request) {
-		log.info("포장 옵션 저장 요청: {}", optionDto);
+		RedirectAttributes redirectAttributes) {
+		log.info("포장 옵션 저장 요청: {}", option);
 
-		// TODO: 유효성 검사 (이름 필수, 가격 음수 불가 등)
-		if (optionDto.getName() == null || optionDto.getName().trim().isEmpty()) {
+		if (option.getName() == null || option.getName().trim().isEmpty()) {
 			bindingResult.rejectValue("name", "NotEmpty", "포장 옵션 이름은 필수입니다.");
-		}
-		if (optionDto.getPrice() == null || optionDto.getPrice() < 0) {
-			bindingResult.rejectValue("price", "InvalidPrice", "가격은 0 이상이어야 합니다.");
 		}
 
 		if (bindingResult.hasErrors()) {
 			log.warn("포장 옵션 저장 폼 유효성 검증 에러: {}", bindingResult.getAllErrors());
 			redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.packagingOption",
 				bindingResult);
-			redirectAttributes.addFlashAttribute("packagingOption", optionDto);
+			redirectAttributes.addFlashAttribute("packagingOption", option);
 			redirectAttributes.addFlashAttribute("globalErrorMessage", "입력값을 확인해주세요.");
 
-			if (optionDto.getId() != null) {
-				return "redirect:/admin/packaging/options/" + optionDto.getId() + "/edit";
+			if (option.getId() != null) {
+				return "redirect:/admin/packaging/options/" + option.getId() + "/edit";
 			} else {
 				return "redirect:/admin/packaging/options/new";
 			}
 		}
 
 		try {
-			// TODO: 실제 서비스 로직 호출 (adminPackagingOptionService.savePackagingOption(optionDto))
-			if (optionDto.getId() == null) { // 새 옵션
-				optionDto.setId(nextOptionId++);
-				packagingOptionsStore.add(optionDto);
+			if (option.getId() == null) { // 새 옵션
+				packagingOptionService.createPackingOption(
+					new PackagingOptionInfoResponse(option.getId(), option.getName(), option.getPrice()));
 			} else { // 기존 옵션 수정
-				Optional<PackagingOptionDto> existingOpt = packagingOptionsStore.stream()
-					.filter(opt -> opt.getId().equals(optionDto.getId())).findFirst();
-				if (existingOpt.isPresent()) {
-					PackagingOptionDto currentOpt = existingOpt.get();
-					currentOpt.setName(optionDto.getName());
-					currentOpt.setPrice(optionDto.getPrice());
-					currentOpt.setDescription(optionDto.getDescription());
-					currentOpt.setIsActive(optionDto.getIsActive());
-					currentOpt.setImageUrl(optionDto.getImageUrl());
-				} else {
-					log.warn("수정하려는 포장 옵션 ID를 찾을 수 없음: {}", optionDto.getId());
-					redirectAttributes.addFlashAttribute("globalErrorMessage", "포장 옵션을 찾을 수 없어 수정에 실패했습니다.");
-					return "redirect:/admin/packaging/options";
-				}
+				packagingOptionService.updatePackingOption(option.getId(), option);
 			}
-
-			String action = (optionDto.getId() == null || packagingOptionsStore.stream()
-				.anyMatch(opt -> opt.getId().equals(optionDto.getId()) && !opt.getName().equals(optionDto.getName()))) ?
-				"등록" : "수정";
-			log.info("포장 옵션 {} 성공 (임시): {}", action, optionDto.getName());
+			String action = (option.getId() == null) ? "등록" : "수정";
+			log.info("포장 옵션 {} 처리: Name={}, DeletedAt={}", action, option.getName());
 			redirectAttributes.addFlashAttribute("globalSuccessMessage",
-				"포장 옵션 '" + optionDto.getName() + "' 정보가 성공적으로 " + action + "되었습니다.");
+				"포장 옵션 '" + option.getName() + "'가 성공적으로 " + action + "되었습니다.");
 		} catch (Exception e) {
 			log.error("포장 옵션 저장 중 오류 발생", e);
 			redirectAttributes.addFlashAttribute("globalErrorMessage", "포장 옵션 저장 중 오류가 발생했습니다: " + e.getMessage());
-			redirectAttributes.addFlashAttribute("packagingOption", optionDto);
-			if (optionDto.getId() != null) {
-				return "redirect:/admin/packaging/options/" + optionDto.getId() + "/edit";
+			redirectAttributes.addFlashAttribute("packagingOption", option);
+			if (option.getId() != null) {
+				return "redirect:/admin/packaging/options/" + option.getId() + "/edit";
 			} else {
 				return "redirect:/admin/packaging/options/new";
 			}
@@ -180,20 +128,13 @@ public class AdminPackagingOptionController {
 	}
 
 	@PostMapping("/{optionId}/delete")
-	public String deletePackagingOption(@PathVariable Long optionId, RedirectAttributes redirectAttributes,
-		HttpServletRequest request) {
+	public String deletePackagingOption(@PathVariable Long optionId, RedirectAttributes redirectAttributes) {
 		log.info("포장 옵션 삭제 요청: ID {}", optionId);
 		try {
-			// TODO: 실제 삭제 로직 (adminPackagingOptionService.deletePackagingOption(optionId))
-			boolean removed = packagingOptionsStore.removeIf(opt -> opt.getId().equals(optionId));
-			if (removed) {
-				log.info("임시 포장 옵션 삭제 성공 처리: ID {}", optionId);
-				redirectAttributes.addFlashAttribute("globalSuccessMessage",
-					"포장 옵션(ID: " + optionId + ")이 성공적으로 삭제되었습니다.");
-			} else {
-				log.warn("삭제하려는 포장 옵션 ID를 찾을 수 없음: {}", optionId);
-				redirectAttributes.addFlashAttribute("globalErrorMessage", "삭제하려는 포장 옵션을 찾을 수 없습니다.");
-			}
+			packagingOptionService.deletePackingOption(optionId);
+			log.info("임시 포장 옵션 삭제 성공 처리: ID {}", optionId);
+			redirectAttributes.addFlashAttribute("globalSuccessMessage",
+				"포장 옵션(ID: " + optionId + ")가 성공적으로 삭제되었습니다.");
 		} catch (Exception e) {
 			log.error("포장 옵션 삭제 중 오류 발생", e);
 			redirectAttributes.addFlashAttribute("globalErrorMessage", "포장 옵션 삭제 중 오류가 발생했습니다: " + e.getMessage());

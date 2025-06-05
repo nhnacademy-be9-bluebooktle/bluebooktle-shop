@@ -10,6 +10,7 @@ import org.hibernate.annotations.SQLRestriction;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -28,6 +29,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import shop.bluebooktle.common.converter.ProfileAwareStringCryptoConverter;
+import shop.bluebooktle.common.domain.auth.UserProvider;
 import shop.bluebooktle.common.domain.auth.UserStatus;
 import shop.bluebooktle.common.domain.auth.UserType;
 import shop.bluebooktle.common.entity.BaseEntity;
@@ -36,9 +39,9 @@ import shop.bluebooktle.common.entity.BaseEntity;
 @Table(name = "users")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@ToString(exclude = {"addresses", "membershipLevel"})
+@ToString(exclude = {"addresses", "membershipLevel", "email", "name", "phoneNumber", "birth"})
 @EqualsAndHashCode(of = "id", callSuper = false)
-@SQLDelete(sql = "UPDATE `users` SET deleted_at = CURRENT_TIMESTAMP WHERE user_id = ?")
+@SQLDelete(sql = "UPDATE `users` SET deleted_at = CURRENT_TIMESTAMP, status = 'WITHDRAWN' WHERE user_id = ?")
 @SQLRestriction("deleted_at IS NULL AND status <> 'WITHDRAWN'")
 public class User extends BaseEntity {
 
@@ -55,23 +58,31 @@ public class User extends BaseEntity {
 	@Column(name = "login_id", nullable = false, unique = true, length = 50)
 	private String loginId;
 
-	@Column(name = "password", nullable = false, length = 255)
+	@Column(name = "password", nullable = false)
 	private String password;
 
-	@Column(name = "name", nullable = false, length = 20)
+	@Convert(converter = ProfileAwareStringCryptoConverter.class)
+	@Column(name = "name", nullable = false, length = 150)
 	private String name;
 
-	@Column(name = "email", nullable = false, unique = true, length = 50)
+	@Convert(converter = ProfileAwareStringCryptoConverter.class)
+	@Column(name = "email", unique = true, length = 255)
 	private String email;
 
-	@Column(name = "nickname", nullable = false, unique = true, length = 20)
+	@Column(name = "nickname", nullable = false, unique = true, length = 50)
 	private String nickname;
 
-	@Column(name = "birth", nullable = false)
+	@Convert(converter = ProfileAwareStringCryptoConverter.class)
+	@Column(name = "birth", nullable = false, length = 100)
 	private String birth;
 
-	@Column(name = "phone_number", nullable = false, length = 11)
+	@Convert(converter = ProfileAwareStringCryptoConverter.class)
+	@Column(name = "phone_number", nullable = false, length = 100)
 	private String phoneNumber;
+
+	@Enumerated(EnumType.STRING)
+	@Column(name = "provider", nullable = false)
+	private UserProvider provider;
 
 	@Column(name = "point_balance", nullable = false, precision = 10, scale = 2)
 	private BigDecimal pointBalance;
@@ -80,6 +91,7 @@ public class User extends BaseEntity {
 	@Column(name = "type", nullable = false, length = 10)
 	private UserType type;
 
+	@Setter
 	@Enumerated(EnumType.STRING)
 	@Column(name = "status", nullable = false, length = 10)
 	private UserStatus status;
@@ -92,10 +104,8 @@ public class User extends BaseEntity {
 
 	@Builder
 	public User(Long id, MembershipLevel membershipLevel, String loginId, String encodedPassword, String name,
-		String email,
-		String nickname,
-		String birth, String phoneNumber, UserType type, UserStatus status,
-		LocalDateTime lastLoginAt) {
+		String email, String nickname, String birth, String phoneNumber, UserProvider provider, UserType type,
+		UserStatus status, LocalDateTime lastLoginAt) {
 		this.id = id;
 		this.membershipLevel = membershipLevel;
 		this.loginId = loginId;
@@ -105,10 +115,26 @@ public class User extends BaseEntity {
 		this.nickname = nickname;
 		this.birth = birth;
 		this.phoneNumber = phoneNumber;
+		this.provider = (provider == null) ? UserProvider.BLUEBOOKTLE : provider;
 		this.pointBalance = (pointBalance == null) ? BigDecimal.ZERO : pointBalance;
 		this.type = (type == null) ? UserType.USER : type;
 		this.status = (status == null) ? UserStatus.ACTIVE : status;
 		this.lastLoginAt = lastLoginAt;
+	}
+
+	public void updateAdminInfo(String name, String nickname, String email, String phoneNumber,
+		String birth, UserType type, UserStatus status,
+		MembershipLevel membershipLevel) {
+		this.name = name;
+		this.nickname = nickname;
+		this.email = email;
+		this.phoneNumber = phoneNumber;
+		this.birth = birth;
+		this.type = type;
+		this.status = status;
+		if (membershipLevel != null) {
+			this.membershipLevel = membershipLevel;
+		}
 	}
 
 	public void addAddress(Address address) {
@@ -129,7 +155,28 @@ public class User extends BaseEntity {
 		this.lastLoginAt = LocalDateTime.now();
 	}
 
+	public void updatePassword(String encodedPassword) {
+		this.password = encodedPassword;
+	}
+
 	public void updateStatus(UserStatus newStatus) {
 		this.status = newStatus;
+	}
+
+	public void addPoint(BigDecimal pointValue) {
+		if (pointValue == null || pointValue.compareTo(BigDecimal.ZERO) < 0) {
+			throw new IllegalArgumentException("포인트 적립은 양수이어야 합니다.");
+		}
+		this.pointBalance = this.pointBalance.add(pointValue);
+	}
+
+	public void subtractPoint(BigDecimal pointValue) {
+		if (pointValue == null || pointValue.compareTo(BigDecimal.ZERO) < 0) {
+			throw new IllegalArgumentException("포인트 사용은 양수이어야 합니다.");
+		}
+		if (this.pointBalance.compareTo(pointValue) < 0) {
+			throw new IllegalArgumentException("사용할 포인트가 부족합니다.");
+		}
+		this.pointBalance = this.pointBalance.subtract(pointValue);
 	}
 }

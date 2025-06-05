@@ -2,7 +2,6 @@ package shop.bluebooktle.backend.book.service.impl;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -86,23 +85,21 @@ public class BookImgServiceImpl implements BookImgService {
 
 	@Transactional(readOnly = true)
 	@Override
-	public List<ImgResponse> getImgByBookId(Long bookId) {
+	public ImgResponse getImgByBookId(Long bookId) {
 		if (bookId == null) {
 			throw new BookIdNullException();
 		}
 
-		Book book = bookRepository.findById(bookId).orElseThrow(() -> new BookNotFoundException());
+		Book book = bookRepository.findById(bookId).orElseThrow(BookNotFoundException::new);
 
-		List<Img> images = bookImgRepository.findImagesByBook(book);
+		BookImg bookImage = bookImgRepository.findBookImgByBook(book).orElseThrow(
+			BookImgNotFoundException::new);
 
-		return images.stream()
-			.map(img -> ImgResponse.builder()
-				.id(img.getId())
-				.imgUrl(img.getImgUrl())
-				.createdAt(img.getCreatedAt())
-				.build()
-			)
-			.collect(Collectors.toList());
+		return ImgResponse.builder()
+			.id(bookImage.getImg().getId())
+			.imgUrl(bookImage.getImg().getImgUrl())
+			.createdAt(bookImage.getImg().getCreatedAt())
+			.build();
 	}
 
 	@Transactional(readOnly = true)
@@ -115,9 +112,10 @@ public class BookImgServiceImpl implements BookImgService {
 		Img img = imgRepository.findById(imgId).orElseThrow(() -> new ImgNotFoundException());
 
 		List<Book> books = bookImgRepository.findBooksByImg(img);
-		return books.stream()
+		/*return books.stream()
 			.map(book -> new BookInfoResponse(book.getId()))
-			.collect(Collectors.toList());
+			.collect(Collectors.toList());*/
+		return null;
 	}
 
 	@Transactional(readOnly = true)
@@ -126,7 +124,7 @@ public class BookImgServiceImpl implements BookImgService {
 		if (bookId == null) {
 			throw new IllegalArgumentException("Book ID must not be null");
 		}
-		return bookImgRepository.findByBookId(bookId).stream()
+		/*return bookImgRepository.findByBookId(bookId).stream()
 			.filter(BookImg::isThumbnail)
 			.findFirst()
 			.map(rel -> BookImgResponse.builder()
@@ -139,7 +137,8 @@ public class BookImgServiceImpl implements BookImgService {
 				.bookInfoResponse(new BookInfoResponse(rel.getBook().getId()))
 				.isThumbnail(true)
 				.build()
-			);
+			);*/
+		return null;
 	}
 
 	@Override
@@ -155,5 +154,14 @@ public class BookImgServiceImpl implements BookImgService {
 			.orElseThrow(() -> new BookImgNotFoundException(bookId, imgId));
 
 		bookImgRepository.delete(relation);
+	}
+
+	@Override
+	public void updateBookImg(Long bookId, String imageUrl) {
+		// 도서에 기존 이미지 삭제
+		List<BookImg> bookImgList = bookImgRepository.findByBookId(bookId);
+		bookImgRepository.deleteAll(bookImgList);
+		// 새로운 이미지 등록
+		registerBookImg(bookId, imageUrl);
 	}
 }

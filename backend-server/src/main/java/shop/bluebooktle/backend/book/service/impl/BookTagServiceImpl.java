@@ -54,6 +54,13 @@ public class BookTagServiceImpl implements BookTagService {
 	}
 
 	@Override
+	public void updateBookTag(Long bookId, List<Long> tagIdList) {
+		List<BookTag> bookTagList = bookTagRepository.findByBookId(bookId);
+		bookTagRepository.deleteAll(bookTagList);
+		registerBookTag(bookId, tagIdList);
+	}
+
+	@Override
 	public void deleteBookTag(Long tagId, Long bookId) {
 		Tag tag = findTagOrThrow(tagId);
 		Book book = findBookOrThrow(bookId);
@@ -81,7 +88,8 @@ public class BookTagServiceImpl implements BookTagService {
 	public Page<BookInfoResponse> searchBooksByTag(Long tagId, Pageable pageable) {
 		Tag tag = findTagOrThrow(tagId);
 		Page<BookTag> bookTagPage = bookTagRepository.findAllByTag(tag, pageable);
-		return bookTagPage.map(bt -> new BookInfoResponse(bt.getBook().getId()));
+		// return bookTagPage.map(bt -> new BookInfoResponse(bt.getBook().getId()));
+		return null;
 	}
 
 	private Book findBookOrThrow(Long bookId) {

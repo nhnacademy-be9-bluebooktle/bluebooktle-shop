@@ -2,39 +2,31 @@ package shop.bluebooktle.frontend.service;
 
 import java.util.List;
 
-import shop.bluebooktle.common.dto.cart.response.CartItemResponse;
+import shop.bluebooktle.common.dto.book.response.BookCartOrderResponse;
 
 public interface CartService {
 
-	// === 비회원 전용 ===
-	void addToGuestCart(String guestId, Long bookId, int quantity);
+	// 공통: 장바구니에 도서 추가
+	void addToCart(String guestId, Long bookId, int quantity);
 
-	List<CartItemResponse> getGuestCartItems(String guestId);
+	// 공통: 장바구니 조회
+	List<BookCartOrderResponse> getCartItems(String guestId);
 
-	Void increaseGuestQuantity(String guestId, Long bookId);
+	// 공통: 수량 증가
+	void increaseQuantity(String guestId, Long bookId);
 
-	Void decreaseGuestQuantity(String guestId, Long bookId);
+	// 공통: 수량 감소
+	void decreaseQuantity(String guestId, Long bookId);
 
-	Void removeOneFromGuestCart(String guestId, Long bookId);
+	// 공통: 도서 1개 삭제
+	void removeOne(String guestId, Long bookId);
 
-	Void removeSelectedFromGuestCart(String guestId, List<Long> bookIds);
+	// 공통: 선택 도서 여러 개 삭제
+	void removeSelected(String guestId, List<Long> bookIds);
 
-	// === 회원 전용 ===
-	Void addToMemberCart(Long bookId, int quantity);
+	List<BookCartOrderResponse> getSelectedCartItemsForOrder(String guestId, List<Long> bookIds);
 
-	List<CartItemResponse> getMemberCartItems();
+	void mergeOrConvertGuestCart(String guestId);
 
-	Void increaseMemberQuantity(Long bookId);
-
-	Void decreaseMemberQuantity(Long bookId);
-
-	Void removeOneFromMemberCart(Long bookId);
-
-	Void removeSelectedFromMemberCart(List<Long> bookIds);
-
-	// === 전환 및 병합 ===
-	Void convertGuestCartToMember(String guestId);
-
-	Void mergeGuestCartToMember(String guestId);
-
+	Long getCartSize(String guestId);
 }

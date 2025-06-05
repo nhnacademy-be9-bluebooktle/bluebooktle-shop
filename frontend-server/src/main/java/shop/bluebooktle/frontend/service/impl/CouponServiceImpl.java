@@ -1,10 +1,15 @@
 package shop.bluebooktle.frontend.service.impl;
 
+import java.util.List;
+
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import shop.bluebooktle.common.domain.coupon.UserCouponFilterType;
 import shop.bluebooktle.common.dto.common.PaginationData;
+import shop.bluebooktle.common.dto.coupon.response.UsableUserCouponMapResponse;
 import shop.bluebooktle.common.dto.coupon.response.UserCouponResponse;
 import shop.bluebooktle.frontend.repository.CouponRepository;
 import shop.bluebooktle.frontend.service.CouponService;
@@ -17,28 +22,23 @@ public class CouponServiceImpl implements CouponService {
 	public final CouponRepository couponRepository;
 
 	@Override
-	public PaginationData<UserCouponResponse> getAllCoupons() {
-		return couponRepository.getAllCoupon();
+	public PaginationData<UserCouponResponse> getAllCoupons(String filter, Pageable pageable) {
+		UserCouponFilterType filterType = UserCouponFilterType.valueOf(filter.toUpperCase());
+		return couponRepository.getAllCoupons(filterType, pageable);
 	}
 
 	@Override
-	public PaginationData<UserCouponResponse> getUsableCoupons() {
-		return couponRepository.getAllCouponUsable();
+	public UsableUserCouponMapResponse getUsableCouponsForOrder(List<Long> bookIds) {
+		return couponRepository.getUsableCouponsForOrder(bookIds);
 	}
 
 	@Override
-	public PaginationData<UserCouponResponse> getUsedCoupons() {
-		return couponRepository.getAllCouponUsed();
+	public void useCoupon(Long id) {
+		couponRepository.useCoupon(id);
 	}
 
 	@Override
-	public PaginationData<UserCouponResponse> getExpiredCoupons() {
-		return couponRepository.getExpiredCoupon();
+	public void cancelCoupon(Long id) {
+		couponRepository.cancelCoupon(id);
 	}
-
-	@Override
-	public void deleteUserCoupon(Long userCouponId) {
-		couponRepository.deleteUserCoupon(userCouponId);
-	}
-
 }

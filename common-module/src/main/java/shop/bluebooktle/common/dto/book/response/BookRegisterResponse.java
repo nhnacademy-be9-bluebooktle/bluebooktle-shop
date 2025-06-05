@@ -13,6 +13,7 @@ public class BookRegisterResponse {
 
 	String title;
 	String description;
+	String index;
 	LocalDate publishDate;
 	String isbn;
 }

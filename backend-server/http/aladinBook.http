@@ -59,7 +59,7 @@ Content-Type: application/json
 
 
 ### 알라딘 도서목록 제목으로 검색
-GET {{baseUrl}}/?query=자바
+GET {{baseUrl}}/aladin-search?keyword=구의 증명
 Accept: application/json
 
 ### 알라딘 도서 isbn으로 검색

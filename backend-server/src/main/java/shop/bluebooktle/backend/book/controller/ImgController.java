@@ -1,5 +1,6 @@
 package shop.bluebooktle.backend.book.controller;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -7,11 +8,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.book.service.ImgService;
+import shop.bluebooktle.backend.book.service.MinioService;
 import shop.bluebooktle.common.dto.book.request.img.ImgRegisterRequest;
 import shop.bluebooktle.common.dto.book.request.img.ImgUpdateRequest;
 import shop.bluebooktle.common.dto.book.response.img.ImgResponse;
@@ -22,6 +25,7 @@ import shop.bluebooktle.common.dto.common.JsendResponse;
 @RequiredArgsConstructor
 public class ImgController {
 	private final ImgService imgService;
+	private final MinioService minioService;
 
 	// 이미지 생성
 	@PostMapping
@@ -58,5 +62,18 @@ public class ImgController {
 	) {
 		imgService.deleteImg(id);
 		return JsendResponse.success();
+	}
+
+	//minio 이미지 업로드 Presigned URL 발급 API
+	@GetMapping("/presignedUploadUrl")
+	public ResponseEntity<JsendResponse<String>> getPresignedUploadUrl(@RequestParam String fileName) {
+		String presignedUrl = minioService.getPresignedUploadUrl(fileName);
+		return ResponseEntity.ok(JsendResponse.success(presignedUrl));
+	}
+
+	@DeleteMapping("/minioUrl")
+	public ResponseEntity<JsendResponse<Void>> deleteImage(@RequestParam String fileName) {
+		minioService.deleteImage(fileName);
+		return ResponseEntity.ok(JsendResponse.success());
 	}
 }

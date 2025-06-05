@@ -9,13 +9,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import shop.bluebooktle.backend.coupon.batch.CouponBatchLauncher;
+import shop.bluebooktle.backend.coupon.batch.direct.DirectCouponBatchLauncher;
 import shop.bluebooktle.backend.coupon.service.CouponService;
 import shop.bluebooktle.common.dto.common.JsendResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
@@ -26,11 +27,11 @@ import shop.bluebooktle.common.dto.coupon.response.CouponResponse;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/admin/coupons")
-@Tag(name = "쿠폰 API", description = "관리자 쿠폰 CRUD API")
+@Tag(name = "관리자 쿠폰 API", description = "관리자 쿠폰 CRUD API")
 public class CouponController {
 
 	private final CouponService couponService;
-	private final CouponBatchLauncher couponBatchLauncher;
+	private final DirectCouponBatchLauncher directCouponBatchLauncher;
 
 	@Operation(summary = "쿠폰 등록", description = "새로운 쿠폰을 등록합니다.")
 	@PostMapping
@@ -42,8 +43,9 @@ public class CouponController {
 	@Operation(summary = "쿠폰 전체 조회", description = "등록된 쿠폰 전체를 조회합니다.")
 	@GetMapping
 	public ResponseEntity<JsendResponse<PaginationData<CouponResponse>>> getAllCoupons(
-		@PageableDefault(size = 10, sort = "id") Pageable pageable) {
-		Page<CouponResponse> couponPage = couponService.getAllCoupons(pageable);
+		@RequestParam(value = "searchCouponName", required = false) String searchCouponName,
+		@PageableDefault(size = 10) Pageable pageable) {
+		Page<CouponResponse> couponPage = couponService.getAllCoupons(searchCouponName, pageable);
 		PaginationData<CouponResponse> paginationData = new PaginationData<>(couponPage);
 		return ResponseEntity.ok(JsendResponse.success(paginationData));
 	}
@@ -53,7 +55,7 @@ public class CouponController {
 	@PostMapping("/issue")
 	public ResponseEntity<JsendResponse<Void>> registerUserCoupon(
 		@RequestBody @Valid UserCouponRegisterRequest request) {
-		couponBatchLauncher.run(request);
+		directCouponBatchLauncher.run(request);
 		return ResponseEntity.status(HttpStatus.CREATED).body(JsendResponse.success());
 	}
 }

@@ -1,5 +1,5 @@
 ### @name Common
-@token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwidXNlck5pY2tuYW1lIjoi7YWM7Iqk7Yq464uJ64Sk7J6EIiwidXNlclR5cGUiOiJVU0VSIiwiaWF0IjoxNzQ3ODMxNjM1LCJleHAiOjE3NDc4MzM0MzV9.r2Nx0VBXVwK_zmf9YopD--TySQnkIVd6DfXYZ07xbZE
+@token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwidXNlck5pY2tuYW1lIjoi7YWM7Iqk7Yq464uJ64Sk7J6EIiwidXNlclR5cGUiOiJVU0VSIiwiaWF0IjoxNzQ4MzY0MDc3LCJleHAiOjE3NDgzNjU4Nzd9.8xrSFXcaaSAyyPYLxNUbCVjQJBD_58N5bNpcFUEVtP4
 
 ### 포인트 발생 유형 생성
 POST http://localhost:9012/api/points/source
@@ -50,9 +50,29 @@ POST http://localhost:9012/api/points/policies
 Content-Type: application/json
 
 {
-  "pointSourceTypeId": 2,
-  "policyType": "PERCENTAGE",
+  "pointSourceTypeId": 1,
+  "policyType": "AMOUNT",
   "value": 1000
+}
+
+
+### 포인트 정책 생성
+POST http://localhost:9012/api/points/policies
+Content-Type: application/json
+
+{
+  "pointSourceTypeId": 2,
+  "policyType": "AMOUNT",
+  "value": 1000
+}
+
+### 포인트 정책 생성
+POST http://localhost:9012/api/points/policies
+Content-Type: application/json
+
+{
+  "pointSourceTypeId": 3,
+  "policyType": null
 }
 
 ### 단일 포인트 정책 조회
@@ -80,3 +100,64 @@ Accept: application/json
 
 ### 포인트 규정 조회
 GET http://localhost:9012/api/points/rules
+
+### 포인트 규정 열거형 조회
+GET http://localhost:9012/api/points/rules/type?pointSourceTypeEnum=PAYMENT_EARN
+
+### 포인트 로그 추가 (pointSourceTypeId = 1 로그인 적립)
+POST http://localhost:9012/api/points
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "pointSourceTypeId": 1,
+  "value": 500.00
+}
+
+### 포인트 로그 추가 (pointSourceTypeId = 2 회원 가입)
+POST http://localhost:9012/api/points
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "pointSourceTypeId": 1,
+  "value": 3000.00
+}
+
+### 포인트 로그 추가 (pointSourceTypeId = 3 리뷰 적립)
+POST http://localhost:9012/api/points
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "pointSourceTypeId": 3,
+  "value": 500.00
+}
+
+
+### 포인트 로그 추가 (pointSourceTypeId = 4 결제 적립)
+POST http://localhost:9012/api/points
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "pointSourceTypeId": 4,
+  "value": 1500.00
+}
+
+### 포인트 로그 추가 (pointSourceTypeId = 5 결제 사용)
+POST http://localhost:9012/api/points
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "pointSourceTypeId": 5,
+  "value": 2500.00
+}
+
+
+### 포인트 이력 조회 (페이징)
+GET http://localhost:9012/api/points/history?page=0&size=10
+Accept: application/json
+Authorization: Bearer {{token}}
+

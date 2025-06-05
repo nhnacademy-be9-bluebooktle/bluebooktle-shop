@@ -28,7 +28,7 @@ public class GlobalExceptionHandler {
 		HttpStatus httpStatus = errorCode.getStatus();
 
 		JsendResponse<?> response = JsendResponse.error(
-			ex.getMessage() != null ? ex.getMessage() : errorCode.getMessage(),
+			ex.getMessage(),
 			errorCode.getCode()
 		);
 

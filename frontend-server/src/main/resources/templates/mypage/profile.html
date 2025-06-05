@@ -5,25 +5,36 @@
 <head>
     <title>마이페이지 - 내 정보 관리</title>
     <style>
-        .profile-info-grid-kitsch {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1rem 1.5rem;
+        .profile-info-grid-kitsch { /* */
+            display: grid; /* */
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* */
+            gap: 1rem 1.5rem; /* */
         }
 
-        .profile-info-grid-kitsch .form-group-kitsch {
-            margin-bottom: 0.5rem;
+        .profile-info-grid-kitsch .form-group-kitsch { /* */
+            margin-bottom: 0.5rem; /* */
         }
 
-        .password-change-note-kitsch {
-            font-family: var(--font-pixel);
-            font-size: 0.8rem;
-            color: var(--kitsch-color-5);
-            margin-top: 0.5rem;
-            padding: 0.5rem;
-            background-color: rgba(17, 158, 194, 0.1);
-            border: 1px dashed var(--kitsch-color-4);
-            border-radius: 3px;
+        .password-change-note-kitsch { /* */
+            font-family: var(--font-pixel); /* */
+            font-size: 0.8rem; /* */
+            color: var(--kitsch-color-5); /* */
+            margin-top: 0.5rem; /* */
+            padding: 0.5rem; /* */
+            background-color: rgba(17, 158, 194, 0.1); /* */
+            border: 1px dashed var(--kitsch-color-4); /* */
+            border-radius: 3px; /* */
+        }
+
+        #withdrawSection .form-group-kitsch p {
+            font-size: 0.9rem;
+            color: var(--kitsch-text-dark);
+            line-height: 1.6;
+            margin-bottom: 1rem;
+            padding: 10px;
+            border: 1px solid var(--kitsch-text-dark);
+            border-radius: 4px;
+            background-color: #f9f9f9;
         }
 
     </style>
@@ -122,33 +133,71 @@
                     </form>
                 </section>
 
-                <section class="mypage-section-kitsch" id="passwordChangeSection">
+                <section class="mypage-section-kitsch" id="passwordChangeSection"
+                         th:if="${user != null && user.provider.name() == 'BLUEBOOKTLE'}">
+
                     <h3 class="section-title-kitsch"><i class="fas fa-key"></i> 비밀번호 변경</h3>
-                    <form action="/mypage/password/update" id="passwordChangeForm" method="post">
+
+                    <form th:action="@{/mypage/profile/password}" id="passwordChangeForm" method="post"
+                          th:object="${PasswordUpdateRequest}">
                         <div class="form-group-kitsch">
                             <label class="label-kitsch handwriting-font-kitsch" for="currentPassword">현재 비밀번호:</label>
-                            <input class="input-kitsch pixel-font-kitsch" id="currentPassword" name="currentPassword"
-                                   required type="password">
+                            <input class="input-kitsch pixel-font-kitsch" id="currentPassword"
+                                   th:field="*{currentPassword}" required type="password"
+                                   th:classappend="${#fields.hasErrors('currentPassword')} ? 'is-invalid-kitsch' : ''">
+                            <div th:if="${#fields.hasErrors('currentPassword')}"
+                                 class="error-message-kitsch pixel-font-kitsch">
+                                <p th:each="err : ${#fields.errors('currentPassword')}" th:text="${err}"></p>
+                            </div>
                         </div>
+
                         <div class="form-group-kitsch">
                             <label class="label-kitsch handwriting-font-kitsch" for="newPassword">새 비밀번호:</label>
-                            <input class="input-kitsch pixel-font-kitsch" id="newPassword" name="newPassword"
-                                   required type="password">
-                            <p class="password-change-note-kitsch">
-                                <i class="fas fa-info-circle"></i> 영문, 숫자, 특수문자 포함 8자 이상으로 만들어주세요!
-                            </p>
+                            <input class="input-kitsch pixel-font-kitsch" id="newPassword"
+                                   th:field="*{newPassword}" required type="password"
+                                   th:classappend="${#fields.hasErrors('newPassword')} ? 'is-invalid-kitsch' : ''">
+                            <div th:if="${#fields.hasErrors('newPassword')}"
+                                 class="error-message-kitsch pixel-font-kitsch">
+                                <p th:each="err : ${#fields.errors('newPassword')}" th:text="${err}"></p>
+                            </div>
                         </div>
+
                         <div class="form-group-kitsch">
                             <label class="label-kitsch handwriting-font-kitsch" for="confirmNewPassword">새 비밀번호
                                 확인:</label>
                             <input class="input-kitsch pixel-font-kitsch" id="confirmNewPassword"
-                                   name="confirmNewPassword"
-                                   required type="password">
+                                   th:field="*{confirmNewPassword}" required type="password"
+                                   th:classappend="${#fields.hasErrors('confirmNewPassword')} ? 'is-invalid-kitsch' : ''">
+                            <div th:if="${#fields.hasErrors('confirmNewPassword')}"
+                                 class="error-message-kitsch pixel-font-kitsch">
+                                <p th:each="err : ${#fields.errors('confirmNewPassword')}" th:text="${err}"></p>
+                            </div>
                         </div>
+
                         <div class="mypage-actions-kitsch">
                             <button class="btn-kitsch secondary-btn-kitsch color3-kitsch retro-shadow-kitsch"
                                     type="submit">
                                 <i class="fas fa-exchange-alt"></i> 비밀번호 변경
+                            </button>
+                        </div>
+                    </form>
+                </section>
+
+                <section class="mypage-section-kitsch" id="withdrawSection"
+                         th:if="${user != null}"><h3 class="section-title-kitsch"><i class="fas fa-user-slash"></i> 회원
+                    탈퇴</h3>
+                    <div class="form-group-kitsch">
+                        <p class="pixel-font-kitsch">
+                            회원 탈퇴 시 계정 정보 및 모든 활동 내역이 당사 정책에 따라 처리됩니다.<br>
+                            탈퇴 후에는 동일한 아이디나 이메일로 재가입이 제한될 수 있으며, 보유하셨던 포인트 및 쿠폰 등 모든 혜택은 즉시 소멸됩니다.<br>
+                            탈퇴를 원하시면 아래 버튼을 눌러주세요. 이 작업은 되돌릴 수 없으니 신중하게 결정해주시기 바랍니다.
+                        </p>
+                    </div>
+                    <form th:action="@{/mypage/profile/withdraw}" method="post" id="withdrawForm"
+                          onsubmit="return confirmWithdrawal();">
+                        <div class="mypage-actions-kitsch">
+                            <button class="btn-kitsch danger-btn-kitsch retro-shadow-kitsch" type="submit">
+                                <i class="fas fa-user-times"></i> 회원 탈퇴하기
                             </button>
                         </div>
                     </form>
@@ -161,17 +210,7 @@
 </div>
 <th:block layout:fragment="page_scripts">
     <script>
-        document.getElementById('passwordChangeForm')?.addEventListener('submit', function (e) {
-            e.preventDefault();
-            const newPassword = document.getElementById('newPassword').value;
-            const confirmNewPassword = document.getElementById('confirmNewPassword').value;
-            if (newPassword !== confirmNewPassword) {
-                alert('새 비밀번호와 확인 비밀번호가 일치하지 않습니다. (Mock)');
-                return false;
-            }
-            alert('비밀번호가 성공적으로 변경되었습니다! (Mock)');
-            this.reset();
-        });
+
 
         document.addEventListener('DOMContentLoaded', function () {
             const currentPath = window.location.pathname;
@@ -204,56 +243,13 @@
                 });
             });
         });
+
+        function confirmWithdrawal() {
+            return confirm('정말로 회원을 탈퇴하시겠습니까? 이 결정은 되돌릴 수 없으며, 모든 데이터와 혜택이 소멸됩니다.');
+        }
+
     </script>
 </th:block>
 
-
-<th:block layout:fragment="page_scripts">
-    <script>
-
-        document.getElementById('passwordChangeForm')?.addEventListener('submit', function (e) {
-            e.preventDefault();
-            const newPassword = document.getElementById('newPassword').value;
-            const confirmNewPassword = document.getElementById('confirmNewPassword').value;
-            if (newPassword !== confirmNewPassword) {
-                alert('새 비밀번호와 확인 비밀번호가 일치하지 않습니다. (Mock)');
-                return false;
-            }
-            alert('비밀번호가 성공적으로 변경되었습니다! (Mock)');
-            this.reset();
-        });
-
-        document.addEventListener('DOMContentLoaded', function () {
-            const currentPath = window.location.pathname;
-            const sidebarLinks = document.querySelectorAll('.mypage-sidebar-kitsch .sidebar-menu-kitsch li a');
-            sidebarLinks.forEach(link => {
-                link.classList.remove('active');
-                if (link.getAttribute('href') === currentPath) {
-                    link.classList.add('active');
-                }
-            });
-            if (currentPath === '/mypage' || currentPath === '/mypage/') {
-                const profileLink = document.querySelector('.mypage-sidebar-kitsch .sidebar-menu-kitsch li a[href$="/mypage/profile"]');
-                if (profileLink) profileLink.classList.add('active');
-            }
-
-            document.querySelectorAll('.modal-overlay-kitsch[data-auto-show="true"]').forEach(modal => {
-                if (modal.style.display !== 'flex') {
-                    modal.style.display = 'flex';
-                }
-            });
-
-            document.querySelectorAll('.js-modal-close-trigger').forEach(trigger => {
-                trigger.addEventListener('click', function () {
-                    const targetModalId = this.getAttribute('data-modal-target');
-                    const modalToClose = document.getElementById(targetModalId);
-                    if (modalToClose) {
-                        modalToClose.style.display = 'none';
-                    }
-                });
-            });
-        });
-    </script>
-</th:block>
 </body>
 </html>

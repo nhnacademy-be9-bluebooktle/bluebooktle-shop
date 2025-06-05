@@ -90,16 +90,16 @@ Content-Type: application/json
     1
   ],
   "tagIdList": [
-    1,
-    2
+    1
   ],
-  "ThumbnailUrl": "https://image.aladin.co.kr/product/35650/80/coversum/k762036819_1.jpg",
+  "index": "목차",
+  "imgUrl": "https://image.aladin.co.kr/product/35650/80/coversum/k762036819_1.jpg",
   "categoryIdList": [
     2,
     3
   ],
   "description": "테스트 설명",
-  "isbn": "1234567890125",
+  "isbn": "1234567890123",
   "publishDate": "2025-05-15",
   "price": 20000,
   "salePrice": 18000,
@@ -123,3 +123,8 @@ Content-Type: application/json
 
 ### 도서 테이블 삭제
 DELETE http://localhost:9012/api/books/1
+
+
+### 도서 bookcartorder
+GET http://localhost:9012/api/books/order/1?quantity=2
+Content-Type: application/json

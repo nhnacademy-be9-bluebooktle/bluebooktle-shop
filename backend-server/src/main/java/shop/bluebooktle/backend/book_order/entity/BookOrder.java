@@ -1,10 +1,14 @@
 package shop.bluebooktle.backend.book_order.entity;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -13,6 +17,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -31,7 +36,7 @@ import shop.bluebooktle.common.entity.BaseEntity;
 @Getter
 @Setter
 @EqualsAndHashCode(of = "id", callSuper = false)
-@ToString(exclude = {"order", "book"})
+@ToString(exclude = {"order", "book", "orderPackagings", "userCouponBookOrdersAssociatedWithThisBookOrder"})
 @SQLDelete(sql = "UPDATE book_order SET deleted_at = CURRENT_TIMESTAMP WHERE book_order_id = ?")
 @SQLRestriction("deleted_at IS NULL")
 public class BookOrder extends BaseEntity {
@@ -55,6 +60,14 @@ public class BookOrder extends BaseEntity {
 	@Column(name = "price", precision = 10, scale = 2, nullable = false)
 	private BigDecimal price;
 
+	@OneToMany(mappedBy = "bookOrder", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+	@BatchSize(size = 10)
+	private List<OrderPackaging> orderPackagings = new ArrayList<>();
+
+	@OneToMany(mappedBy = "bookOrder", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+	@BatchSize(size = 10)
+	private List<UserCouponBookOrder> userCouponBookOrdersAssociatedWithThisBookOrder = new ArrayList<>();
+
 	@Builder
 	public BookOrder(Order order, Book book, Integer quantity, BigDecimal price) {
 		this.order = order;
@@ -62,5 +75,4 @@ public class BookOrder extends BaseEntity {
 		this.quantity = quantity;
 		this.price = price;
 	}
-
 }

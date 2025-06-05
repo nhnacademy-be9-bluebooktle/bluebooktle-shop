@@ -52,25 +52,29 @@ jobs:
       - name: Generate changed-services list
         id: list
         run: |
+          modules=()
+          [[ "${{ steps.filter.outputs.eureka-server }}"   == "true" ]] && modules+=("eureka-server")
+          [[ "${{ steps.filter.outputs.gateway-server }}"  == "true" ]] && modules+=("gateway-server")
+          [[ "${{ steps.filter.outputs.backend-server }}"  == "true" ]] && modules+=("backend-server")
+          [[ "${{ steps.filter.outputs.frontend-server }}" == "true" ]] && modules+=("frontend-server")
+          [[ "${{ steps.filter.outputs.auth-server }}"     == "true" ]] && modules+=("auth-server")
+
           if [[ "${{ steps.filter.outputs.common-module }}" == "true" ]]; then
-            modules=(eureka-server gateway-server backend-server frontend-server auth-server)
-          else
-            modules=()
-            [[ "${{ steps.filter.outputs.eureka-server }}"   == "true" ]] && modules+=("eureka-server")
-            [[ "${{ steps.filter.outputs.gateway-server }}"  == "true" ]] && modules+=("gateway-server")
-            [[ "${{ steps.filter.outputs.backend-server }}"  == "true" ]] && modules+=("backend-server")
-            [[ "${{ steps.filter.outputs.frontend-server }}" == "true" ]] && modules+=("frontend-server")
-            [[ "${{ steps.filter.outputs.auth-server }}"     == "true" ]] && modules+=("auth-server")
+            modules+=("backend-server")
+            modules+=("frontend-server")
+            modules+=("auth-server")
           fi
-          echo "changed=${modules[*]}" >> $GITHUB_OUTPUT
+
+          unique_modules=$(echo "${modules[@]}" | tr ' ' '\n' | sort -u | tr '\n' ' ')
+          echo "changed=${unique_modules% }" >> $GITHUB_OUTPUT
+          echo "Detected Changes: ${unique_modules% }"
 
   build:
     needs: detect_changes
     if: >
       needs.detect_changes.outputs.changed != '' &&
       (
-        (github.event_name == 'push' &&
-         (github.ref_name == 'develop' || github.ref_name == 'master'))
+        github.event_name == 'push'
         ||
         (github.event_name == 'pull_request' &&
          github.event.pull_request.base.ref == 'develop' &&
@@ -83,10 +87,10 @@ jobs:
          github.event.pull_request.merged == true)
       )
     runs-on: ubuntu-latest
-    environment: ${{ github.ref_name == 'master' && 'prod' || 'dev' }}
+    environment: ${{ ((github.event_name == 'push' && github.ref_name == 'master') || (github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'master')) && 'prod' || 'dev' }}
     env:
       CONFIG_SERVER_URI: ${{ secrets.CONFIG_SERVER_URI }}
-      SPRING_PROFILES_ACTIVE: ${{ github.ref_name == 'master' && 'prod' || 'dev' }}
+      SPRING_PROFILES_ACTIVE: ${{ ((github.event_name == 'push' && github.ref_name == 'master') || (github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'master')) && 'prod' || 'dev' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
@@ -95,7 +99,6 @@ jobs:
           java-version: '21'
           cache: maven
 
-      # Redis 설정
       - name: Set up Redis
         uses: supercharge/redis-github-action@1.7.0
         with:
@@ -103,6 +106,7 @@ jobs:
 
       - run: |
           MODULE_CSV=$(echo "${{ needs.detect_changes.outputs.changed }}" | sed 's/ /,/g')
+          echo "Building modules: $MODULE_CSV"
           mvn -B clean package -pl "$MODULE_CSV" -am
       - uses: actions/upload-artifact@v4
         with:
@@ -115,8 +119,7 @@ jobs:
     if: >
       needs.detect_changes.outputs.changed != '' &&
       (
-        (github.event_name == 'push' &&
-         (github.ref_name == 'develop' || github.ref_name == 'master'))
+        github.event_name == 'push'
         ||
         (github.event_name == 'pull_request' &&
          github.event.pull_request.base.ref == 'develop' &&
@@ -129,19 +132,18 @@ jobs:
          github.event.pull_request.merged == true)
       )
     runs-on: ubuntu-latest
-    environment: ${{ github.ref_name == 'master' && 'prod' || 'dev' }}
+    environment: ${{ ((github.event_name == 'push' && github.ref_name == 'master') || (github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'master')) && 'prod' || 'dev' }}
     env:
       CONFIG_SERVER_URI: ${{ secrets.CONFIG_SERVER_URI }}
-      SPRING_PROFILES_ACTIVE: ${{ github.ref_name == 'master' && 'prod' || 'dev' }}
+      SPRING_PROFILES_ACTIVE: ${{ ((github.event_name == 'push' && github.ref_name == 'master') || (github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'master')) && 'prod' || 'dev' }}
     steps:
       - uses: actions/download-artifact@v4
         with:
           name: jars
           path: downloaded_jars
-      - run: |
-          echo ">>> Deploy modules: ${{ needs.detect_changes.outputs.changed }}"
-          echo ">>> PROFILE=${SPRING_PROFILES_ACTIVE}"
-      - uses: appleboy/scp-action@master
+
+      - name: SCP JAR files
+        uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.SSH_IP }}
           username: ${{ secrets.SSH_ID }}
@@ -150,25 +152,51 @@ jobs:
           source: "downloaded_jars"
           target: "~/app/${{ env.SPRING_PROFILES_ACTIVE }}/jars/"
           strip_components: 1
-      - uses: appleboy/ssh-action@master
+          overwrite: true
+
+      - name: SSH Deploy
+        uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SSH_IP }}
           username: ${{ secrets.SSH_ID }}
           password: ${{ secrets.SSH_PASSWORD }}
           port: ${{ secrets.SSH_PORT }}
           script: |
-            set -e
+            bash << 'EOF'
+            set -e 
+            
             export SPRING_PROFILES_ACTIVE="${{ env.SPRING_PROFILES_ACTIVE }}"
             export CONFIG_SERVER_URI="${{ env.CONFIG_SERVER_URI }}"
-            BR=${{ github.ref_name }}
+            
+            if [[ "${{ github.event_name }}" == "push" ]]; then
+              BR="${{ github.ref_name }}"
+            else 
+              BR="${{ github.event.pull_request.base.ref }}"
+            fi
+
             if [ "$BR" = "master" ]; then
               S=prod_startup.sh
             else
               S=dev_startup.sh
             fi
             chmod +x ~/$S
-            CHANGED_SERVICES="${{ needs.detect_changes.outputs.changed }}"
-            for M in $CHANGED_SERVICES; do
-              echo ":arrow_forward: Rolling deploy: $M"
-              bash ~/$S "$M"
+            
+            CHANGED_STRING=" ${{ needs.detect_changes.outputs.changed }} " 
+            DEPLOY_ORDER=(eureka-server gateway-server backend-server auth-server frontend-server)
+            
+            echo ">>> Changed Services Detected: [${{ needs.detect_changes.outputs.changed }}]"
+            echo ">>> Starting deployment following order: ${DEPLOY_ORDER[*]}"
+            
+            DEPLOYED_COUNT=0
+            for M in "${DEPLOY_ORDER[@]}"; do
+              if echo "$CHANGED_STRING" | grep -q " $M "; then
+                echo "  :arrow_forward: Deploying $M..."
+                bash ~/$S "$M" 
+                DEPLOYED_COUNT=$((DEPLOYED_COUNT + 1))
+              else
+                echo "  :heavy_minus_sign: Skipping $M (no changes detected)."
+              fi
             done
+            
+            echo ">>> Deployment finished ($DEPLOYED_COUNT services deployed)."
+            EOF

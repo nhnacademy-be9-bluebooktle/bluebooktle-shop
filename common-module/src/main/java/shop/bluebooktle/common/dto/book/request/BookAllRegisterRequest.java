@@ -31,6 +31,8 @@ public class BookAllRegisterRequest {
 	@NotBlank(message = "도서 설명은 필수 값입니다.")
 	String description;
 
+	String index;
+
 	LocalDate publishDate;
 
 	@NotNull(message = "판매 가격은 필수 값입니다.")
@@ -41,9 +43,6 @@ public class BookAllRegisterRequest {
 
 	@NotNull(message = "재고 수는 필수 값입니다.")
 	Integer stock;
-
-	// @NotNull(message = "할인율은 필수 값입니다.")
-	// BigDecimal salePercentage;
 
 	Boolean isPackable;
 
@@ -62,6 +61,6 @@ public class BookAllRegisterRequest {
 	List<@Positive(message = "태그 ID는 양수값이어야 합니다.") Long> tagIdList;
 
 	@NotBlank
-	String ThumbnailUrl;
+	String imgUrl;
 
 }

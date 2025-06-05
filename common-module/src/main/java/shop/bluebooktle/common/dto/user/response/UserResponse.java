@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import shop.bluebooktle.common.domain.auth.UserProvider;
 import shop.bluebooktle.common.domain.auth.UserStatus;
 import shop.bluebooktle.common.domain.auth.UserType;
 import shop.bluebooktle.common.entity.auth.User;
@@ -22,6 +23,7 @@ public class UserResponse {
 	private String nickname;
 	private String birth;
 	private String phoneNumber;
+	private UserProvider provider;
 	private BigDecimal pointBalance;
 	private UserType type;
 	private UserStatus status;
@@ -31,7 +33,8 @@ public class UserResponse {
 	@Builder
 	public UserResponse(Long id, String loginId, String name, String email, String nickname, String birth,
 		String phoneNumber, BigDecimal pointBalance, UserType type, UserStatus status,
-		LocalDateTime lastLoginAt, String membershipLevelName) {
+		LocalDateTime lastLoginAt, String membershipLevelName,
+		UserProvider provider) {
 		this.id = id;
 		this.loginId = loginId;
 		this.name = name;
@@ -44,6 +47,7 @@ public class UserResponse {
 		this.status = status;
 		this.lastLoginAt = lastLoginAt;
 		this.membershipLevelName = membershipLevelName;
+		this.provider = provider;
 	}
 
 	public static UserResponse fromEntity(User user) {
@@ -59,6 +63,7 @@ public class UserResponse {
 			.type(user.getType())
 			.status(user.getStatus())
 			.lastLoginAt(user.getLastLoginAt())
+			.provider(user.getProvider())
 			.membershipLevelName(user.getMembershipLevel() != null ? user.getMembershipLevel().getName() : null)
 			.build();
 	}

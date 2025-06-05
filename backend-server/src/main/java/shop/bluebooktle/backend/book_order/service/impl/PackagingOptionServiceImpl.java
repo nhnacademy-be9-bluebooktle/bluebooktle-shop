@@ -7,11 +7,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.book_order.entity.PackagingOption;
-import shop.bluebooktle.backend.book_order.repository.PackagingOptionRepository;
+import shop.bluebooktle.backend.book_order.jpa.PackagingOptionRepository;
 import shop.bluebooktle.backend.book_order.service.PackagingOptionService;
 import shop.bluebooktle.common.dto.book_order.request.PackagingOptionRequest;
-import shop.bluebooktle.common.dto.book_order.request.PackagingOptionUpdateRequest;
-import shop.bluebooktle.common.dto.book_order.response.PackagingOptionResponse;
+import shop.bluebooktle.common.dto.book_order.response.PackagingOptionInfoResponse;
+import shop.bluebooktle.common.exception.book_order.PackagingOptionAlreadyExistsException;
 import shop.bluebooktle.common.exception.book_order.PackagingOptionNotFoundException;
 
 @Service
@@ -22,9 +22,9 @@ public class PackagingOptionServiceImpl implements PackagingOptionService {
 
 	/** 포장 옵션 등록 */
 	@Override
-	public PackagingOptionResponse createPackagingOption(PackagingOptionRequest request) {
+	public PackagingOptionInfoResponse createPackagingOption(PackagingOptionRequest request) {
 		if (packagingOptionRepository.existsByName(request.getName())) {
-			throw new PackagingOptionNotFoundException(); // 이미 등록된 포장 옵션 이름이라면 에러 발생
+			throw new PackagingOptionAlreadyExistsException(); // 이미 등록된 포장 옵션 이름이라면 에러 발생
 		}
 		PackagingOption option = PackagingOption.builder()
 			.name(request.getName())
@@ -32,35 +32,54 @@ public class PackagingOptionServiceImpl implements PackagingOptionService {
 			.build();
 		PackagingOption saved = packagingOptionRepository.save(option);
 
-		return PackagingOptionResponse.builder()
-			.packagingOptionId(saved.getId())
+		return PackagingOptionInfoResponse.builder()
+			.id(saved.getId())
 			.name(saved.getName())
 			.price(saved.getPrice())
 			.build();
 	}
 
+	/** 포장 옵션 단건 조회(임시) */
+	@Override
+	@Transactional(readOnly = true)
+	public PackagingOptionInfoResponse getPackagingOption(Long packagingOptionId) {
+		PackagingOption packagingOption = packagingOptionRepository.findById(packagingOptionId)
+			.orElseThrow(() -> new PackagingOptionNotFoundException());
+
+		return new PackagingOptionInfoResponse(packagingOption.getId(), packagingOption.getName(),
+			packagingOption.getPrice());
+	}
+
+	/** 포장 옵션 단건 조회 */
+	@Override
+	@Transactional(readOnly = true)
+	public Page<PackagingOptionInfoResponse> searchPackagingOption(String searchKeyword, Pageable pageable) {
+		Page<PackagingOption> options = packagingOptionRepository.searchNameContaining(searchKeyword, pageable);
+		return options.map(
+			option -> new PackagingOptionInfoResponse(option.getId(), option.getName(), option.getPrice()));
+	}
+
 	/** 포장 옵션 전체 조회 */
 	@Override
-	public Page<PackagingOptionResponse> getPackagingOption(Pageable pageable) {
-		Page<PackagingOption> page = packagingOptionRepository.findAllByDeletedAtIsNull(pageable);
-		return page.map(o -> PackagingOptionResponse.builder()
-			.packagingOptionId(o.getId())
-			.name(o.getName())
-			.price(o.getPrice())
-			.build());
+	@Transactional(readOnly = true)
+	public Page<PackagingOptionInfoResponse> getPackagingOptions(Pageable pageable) {
+		Page<PackagingOption> options = packagingOptionRepository.findAll(pageable);
+		return options.map(
+			option -> new PackagingOptionInfoResponse(option.getId(), option.getName(), option.getPrice()));
 	}
 
 	/** 포장 옵션 수정 */
 	@Override
-	public PackagingOptionResponse updatePackagingOption(Long packagingOptionId, PackagingOptionUpdateRequest request) {
-		PackagingOption option = packagingOptionRepository.findByIdAndDeletedAtIsNull(packagingOptionId)
+	public PackagingOptionInfoResponse updatePackagingOption(Long packagingOptionId,
+		PackagingOptionRequest request) {
+		PackagingOption option = packagingOptionRepository.findById(packagingOptionId)
 			.orElseThrow(PackagingOptionNotFoundException::new);
 
 		option.setName(request.getName());
 		option.setPrice(request.getPrice());
 
-		return PackagingOptionResponse.builder()
-			.packagingOptionId(option.getId())
+		return PackagingOptionInfoResponse.builder()
+			.id(option.getId())
 			.name(option.getName())
 			.price(option.getPrice())
 			.build();

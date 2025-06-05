@@ -14,13 +14,14 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 
 @Entity
 @Table(name = "book_img")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@ToString(exclude = {"book, img"})
+@ToString(exclude = {"book", "img"})
 @EqualsAndHashCode(of = "id", callSuper = false)
 public class BookImg {
 
@@ -31,6 +32,7 @@ public class BookImg {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "book_id", nullable = false)
+	@Setter
 	private Book book;
 
 	@ManyToOne(fetch = FetchType.LAZY)

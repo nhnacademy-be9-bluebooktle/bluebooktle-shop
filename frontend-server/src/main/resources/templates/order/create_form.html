@@ -1,0 +1,1410 @@
+<!DOCTYPE html>
+<html layout:decorate="~{_layouts/default_layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>주문서 작성</title>
+    <style>
+        /* 기존 checkout 페이지 스타일 유지 */
+        .checkout-page-header-kitsch {
+            background-color: var(--kitsch-color-5);
+            color: var(--kitsch-text-light);
+            padding: 2rem;
+            text-align: center;
+            border: 5px dashed var(--kitsch-accent-orange);
+            border-radius: 10px 30px 10px 30px;
+            margin-bottom: 2.5rem;
+            transform: rotate(-0.5deg);
+            box-shadow: 5px 5px 0px var(--kitsch-color-2);
+        }
+
+        .checkout-page-header-kitsch .page-main-title-kitsch {
+            font-size: 2.8rem;
+            color: var(--kitsch-bg-alt);
+            text-shadow: 2px 2px 0 var(--kitsch-text-dark);
+        }
+
+        .checkout-container-kitsch {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2.5rem;
+        }
+
+        .checkout-section-kitsch {
+            background-color: var(--kitsch-bg-alt);
+            padding: 1.5rem 2rem;
+            border: 3px solid var(--kitsch-text-dark);
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+
+        /* ★ 수량 버튼 크기 조절용 CSS 추가 ★ */
+        .qty-button {
+            width: 24px; /* 버튼 가로 크기 */
+            height: 24px; /* 버튼 세로 크기 */
+            padding: 0; /* 기본 패딩 제거 */
+            font-size: 16px; /* 기호(−/+ ) 글자 크기 */
+            line-height: 1; /* 텍스트 수직 정렬 */
+            border: 1px solid var(--kitsch-text-dark);
+            border-radius: 4px;
+            background-color: var(--kitsch-bg-alt);
+            color: var(--kitsch-text-dark);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .qty-button:hover {
+            background-color: var(--kitsch-bg-main);
+        }
+
+        .item-quantity-price-kitsch .qty-button,
+        .item-pack-quantity-kitsch .qty-button {
+            margin: 0 4px;
+        }
+
+        .checkout-section-kitsch h3.section-title-kitsch {
+            font-size: 1.5rem;
+            color: var(--kitsch-text-light);
+            background-color: var(--kitsch-color-1);
+            border: 2px solid var(--kitsch-text-dark);
+            border-radius: 5px;
+            padding: 0.4em 0.8em;
+            text-align: left;
+            margin-bottom: 1.5rem;
+            display: inline-block;
+        }
+
+        .checkout-section-kitsch h3.section-title-kitsch i {
+            margin-right: 0.5em;
+        }
+
+        /* 주문 상품 목록 */
+        .ordered-item-kitsch {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem 0;
+            border-bottom: 1px dashed var(--kitsch-color-4);
+            position: relative; /* 개별 쿠폰 적용 버튼 위치 기준 */
+        }
+
+        .ordered-item-kitsch:last-child {
+            border-bottom: none;
+        }
+
+        .ordered-item-kitsch img {
+            width: 140px;
+            height: 210px;
+            object-fit: cover;
+            border: 2px solid var(--kitsch-text-dark);
+            border-radius: 3px;
+        }
+
+        .ordered-item-details-kitsch {
+            flex-grow: 1;
+        }
+
+        /* 상세 정보 영역이 남은 공간 차지 */
+        .ordered-item-details-kitsch .item-title-kitsch {
+            font-family: var(--font-pixel);
+            font-size: 1rem;
+            color: var(--kitsch-color-5);
+            margin-bottom: 0.2rem;
+        }
+
+        .ordered-item-details-kitsch .item-quantity-price-kitsch {
+            font-family: var(--font-handwriting);
+            font-size: 0.9rem;
+            color: var(--kitsch-text-dark);
+        }
+
+        .item-packaging-kitsch {
+            font-size: 0.8rem;
+            margin-top: 0.3rem;
+        }
+
+        .item-packaging-kitsch .select-kitsch {
+            font-size: 0.75rem;
+            padding: 0.4em 1.5em 0.4em 0.6em;
+            width: auto;
+            margin-top: 0.2rem;
+        }
+
+        /* 개별 상품 쿠폰 적용 UI */
+        .item-coupon-apply-kitsch {
+            margin-top: 0.5rem;
+        }
+
+        .item-coupon-apply-kitsch .label-kitsch {
+            font-size: 0.8em !important;
+            margin-bottom: 0.2em !important;
+        }
+
+        .item-coupon-apply-kitsch .select-kitsch {
+            font-size: 0.75rem;
+            padding: 0.4em 1.5em 0.4em 0.6em;
+            width: auto;
+            max-width: 200px; /* 너무 길어지지 않게 */
+        }
+
+        .item-coupon-applied-info {
+            font-size: 0.75rem;
+            color: var(--kitsch-color-3);
+            font-family: var(--font-pixel);
+            margin-top: 0.2em;
+        }
+
+
+        /* 폼 그룹 스타일 (기존 유지) */
+        .form-group-kitsch {
+            margin-bottom: 1.2rem;
+        }
+
+        .form-group-kitsch .input-kitsch, .form-group-kitsch .select-kitsch, .form-group-kitsch .textarea-kitsch {
+            font-size: 0.9rem;
+        }
+
+        .address-btn-group-kitsch {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        /* 결제 금액 요약 */
+        .payment-summary-kitsch {
+            background-color: var(--kitsch-bg-main);
+            padding: 1.5rem 2rem;
+            border: 3px solid var(--kitsch-color-1);
+            border-radius: 8px;
+            box-shadow: 3px 3px 0 var(--kitsch-color-3);
+        }
+
+        .payment-summary-kitsch h3.summary-title-kitsch {
+            font-family: var(--font-display);
+            font-size: 1.6rem;
+            color: var(--kitsch-color-3);
+            margin-bottom: 1.5rem;
+            text-align: center;
+            border-bottom: 3px dashed var(--kitsch-color-5);
+            padding-bottom: 0.8rem;
+        }
+
+        .summary-row-kitsch {
+            display: flex;
+            justify-content: space-between;
+            font-family: var(--font-pixel);
+            font-size: 1rem;
+            margin-bottom: 0.8rem;
+            padding: 0.4em 0;
+        }
+
+        .summary-row-kitsch .label {
+            color: var(--kitsch-text-dark);
+        }
+
+        .summary-row-kitsch .value {
+            color: var(--kitsch-color-5);
+            font-weight: bold;
+        }
+
+        .summary-row-kitsch .value.discount {
+            color: var(--kitsch-accent-orange);
+        }
+
+        .total-summary-kitsch {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 3px solid var(--kitsch-text-dark);
+        }
+
+        .total-summary-kitsch .summary-row-kitsch .label {
+            font-size: 1.3rem;
+            color: var(--kitsch-color-1);
+        }
+
+        .total-summary-kitsch .summary-row-kitsch .value {
+            font-size: 1.5rem;
+            color: var(--kitsch-color-3);
+            font-family: var(--font-display);
+        }
+
+        /* 결제 수단 (기존 유지) */
+        .payment-methods-kitsch {
+            margin-top: 1.5rem;
+        }
+
+        .payment-methods-kitsch .label-kitsch {
+            margin-bottom: 0.8rem;
+            font-size: 1.2em;
+        }
+
+        .payment-option-kitsch {
+            padding: 0.8rem 1rem;
+            border: 2px dashed transparent;
+            border-radius: 5px;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            background-color: var(--kitsch-bg-alt);
+            transition: all 0.2s ease;
+        }
+
+        .payment-option-kitsch:hover {
+            border-color: var(--kitsch-color-2);
+            background-color: var(--kitsch-bg-main);
+        }
+
+        .payment-option-kitsch.selected-payment {
+            border-color: var(--kitsch-color-4);
+            border-style: solid;
+            background-color: var(--kitsch-color-4);
+            color: var(--kitsch-text-light);
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .payment-option-kitsch .pixel-font-kitsch {
+            font-size: 1rem;
+        }
+
+        .payment-option-kitsch i {
+            margin-right: 0.5em;
+            font-size: 1.2em;
+        }
+
+        .checkout-submit-btn-kitsch {
+            width: 100%;
+            font-size: 1.3rem;
+            padding: 1em;
+            margin-top: 1.5rem;
+        }
+
+        .disabled-option {
+            color: gray;
+            text-decoration: line-through;
+        }
+
+        @media (max-width: 992px) {
+            .checkout-container-kitsch {
+                grid-template-columns: 1fr;
+            }
+
+            .payment-summary-kitsch {
+                order: -1;
+                margin-bottom: 2rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .ordered-item-kitsch {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            /* 기존 스타일 유지 또는 조정 */
+            .ordered-item-kitsch img {
+                width: 60px;
+                height: 90px;
+                margin-bottom: 0.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<div layout:fragment="content">
+    <div class="container-kitsch section-padding-kitsch">
+
+        <div class="checkout-page-header-kitsch">
+            <h1 class="page-main-title-kitsch display-font-kitsch"><i class="fas fa-rocket"></i> 주문 & 결제 <i
+                    class="fas fa-gem"></i></h1>
+        </div>
+
+        <form id="checkoutForm"
+              method="post"
+              th:action="@{/order/create}">
+
+            <div class="checkout-container-kitsch">
+                <div class="checkout-main-panel-kitsch">
+                    <section class="checkout-section-kitsch">
+                        <h3 class="section-title-kitsch"><i class="fas fa-shopping-basket"></i> 주문 상품 확인</h3>
+                        <div id="orderedItemsList">
+                            <div class="ordered-item-kitsch"
+                                 th:data-item-id="${item.bookId}"
+                                 th:data-item-price="${item.price}"
+                                 th:data-item-quantity="${item.quantity}"
+                                 th:data-item-sale-price="${item.salePrice}"
+                                 th:each="item, idx : ${bookItems}">
+
+                                <input th:name="${'orderItems[' + idx.index + '].bookId'}"
+                                       th:value="${item.bookId}"
+                                       type="hidden"/>
+                                <input
+                                        th:id="${'hiddenBookQuantity-' + idx.index}"
+                                        th:name="${'orderItems[' + idx.index + '].bookQuantity'}"
+                                        th:value="${item.quantity}"
+                                        type="hidden"
+                                />
+                                <input th:id="${'hiddenPackagingOptionId-' + idx.index}"
+                                       th:name="${'orderItems[' + idx.index + '].packagingOptionId'}"
+                                       type="hidden"
+                                       value=""/>
+                                <input th:id="${'hiddenPackagingQuantity-' + idx.index}"
+                                       th:name="${'orderItems[' + idx.index + '].packagingQuantity'}"
+                                       type="hidden"
+                                       value="0"/>
+                                <input th:id="${'hiddenItemCoupon-' + idx.index}"
+                                       th:name="${'orderItems[' + idx.index + '].itemCouponCode'}"
+                                       type="hidden"
+                                       value=""/>
+                                <input th:name="${'orderItems[' + idx.index + '].salePrice'}"
+                                       th:value="${item.salePrice}"
+                                       type="hidden"/>
+
+                                <input name="orderName"
+                                       th:value="${defaultOrderName}"
+                                       type="hidden"/>
+
+
+                                <img alt="" th:alt="${item.title}" th:src="${item.thumbnailUrl}"/>
+                                <div class="ordered-item-details-kitsch">
+                                    <a class="item-title-kitsch" href="#" th:text="${item.title}"></a>
+                                    <p class="item-quantity-price-kitsch">
+                                        수량:
+                                        <button class="btn-kitsch qty-button qty-decrease" type="button">−</button>
+                                        <span class="item-qty-display" th:text="${item.quantity}">1</span>개
+                                        <button class="btn-kitsch qty-button qty-increase" type="button">+</button>
+                                        / 가격:
+                                        <span class="item-price-per-unit"
+                                              th:text="${#strings.toString(item.price)} + '원'"></span>
+                                        <span class="item-sale-price" th:if="${item.salePrice != null}">
+                        <span class="item-sale-price"
+                              th:text="'/ 할인가: ' + ${#strings.toString(item.salePrice)} + '원'">
+                        </span>
+                    </span>
+                                    </p>
+
+                                    <!-- ③ 포장 옵션 -->
+                                    <div class="item-packaging-kitsch" th:if="${item.isPackable}">
+                                        <label class="label-kitsch"
+                                               th:for="${'packaging-' + idx.index}">포장 선택:</label>
+                                        <select class="select-kitsch item-packaging-select"
+                                                th:id="${'packaging-' + idx.index}"
+                                                th:name="${'orderItems[' + idx.index + '].packagingOptionId'}">
+                                            <option data-packaging-cost="0" value="">
+                                                포장 선택 안함 (+0원)
+                                            </option>
+                                            <option th:data-packaging-cost="${opt.price}"
+                                                    th:each="opt : ${packagingOptions}"
+                                                    th:text="${opt.name} + ' (+' + ${#strings.toString(opt.price)} + '원)'"
+                                                    th:value="${opt.id}">
+                                            </option>
+                                        </select>
+                                    </div>
+
+                                    <!-- ④ 포장 수량 조절 -->
+                                    <div class="item-pack-quantity-kitsch" style="display: none; margin-top: 0.5rem;">
+                                        <label class="label-kitsch">포장 수량:</label>
+                                        <button aria-label="포장 수량 감소"
+                                                class="btn-kitsch qty-button pack-qty-decrease"
+                                                type="button">−
+                                        </button>
+                                        <span class="item-pack-qty-display">0</span>개
+                                        <button aria-label="포장 수량 증가"
+                                                class="btn-kitsch qty-button pack-qty-increase"
+                                                type="button">+
+                                        </button>
+                                    </div>
+
+                                    <!-- ⑤ 도서 쿠폰 선택 -->
+                                    <div class="item-coupon-apply-kitsch"
+                                         th:if="${coupons.usableUserCouponMap[__${item.bookId}__] != null and !coupons.usableUserCouponMap[__${item.bookId}__].isEmpty()}">
+                                        <label class="label-kitsch" th:for="${'couponSelect-' + idx.index}">도서 쿠폰
+                                            선택:</label>
+                                        <select class="select-kitsch item-coupon-select"
+                                                th:id="${'couponSelect-' + idx.index}"
+                                                th:data-idx="${idx.index}">
+                                            <option value="">선택 안 함</option>
+
+                                            <option
+                                                    th:each="coupon : ${coupons.usableUserCouponMap[__${item.bookId}__]}"
+                                                    th:value="${coupon.userCouponId}"
+                                                    th:data-type="${coupon.discountPrice != null ? 'FIXED' : 'PERCENT'}"
+                                                    th:data-discount-price="${coupon.discountPrice}"
+                                                    th:data-discount-percent="${coupon.discountPercent}"
+                                                    th:data-maximum-discount-price="${coupon.maximumDiscountPrice}"
+                                                    th:data-minimum-payment="${coupon.minimumPayment}"
+                                                    th:disabled="${item.salePrice.doubleValue() < coupon.minimumPayment.doubleValue()}"
+                                                    th:classappend="${item.salePrice.doubleValue() < coupon.minimumPayment.doubleValue()} ? 'disabled-option' : ''"
+                                                    th:title="${item.salePrice.doubleValue() < coupon.minimumPayment.doubleValue()}
+                                                            ? '도서가 최소 결제 금액보다 낮아 사용할 수 없습니다.' : ''"
+                                                    th:text="${coupon.discountPrice != null
+                                                            ? coupon.couponName + ' (-' + #numbers.formatInteger(coupon.discountPrice, 0) + '원)'
+                                                            : coupon.couponName + ' (' + coupon.discountPercent + '% 할인, 최대 ' + #numbers.formatInteger(coupon.maximumDiscountPrice, 0) + '원)'}">
+                                            </option>
+                                        </select>
+
+                                        <input type="hidden" th:id="${'hiddenItemCoupon-' + idx.index}"
+                                               th:name="${'orderItems[' + idx.index + '].itemCouponCode'}" value=""/>
+
+                                        <p class="item-coupon-applied-info" th:id="${'couponInfo-' + idx.index}"
+                                           style="display:none;">
+                                            쿠폰을 적용했습니다.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="checkout-section-kitsch">
+                        <h3 class="section-title-kitsch"><i class="fas fa-user-circle"></i> 주문자 정보</h3>
+
+                        <!-- 주문자 ID(필요 시) -->
+                        <input name="userId" th:if="${user!=null}" th:value="${user.userId}" type="hidden"/>
+
+                        <!-- 주문자 이름 -->
+                        <div class="form-group-kitsch">
+                            <label class="label-kitsch" for="ordererName">이름:</label>
+                            <input
+                                    class="input-kitsch pixel-font-kitsch"
+                                    id="ordererName"
+                                    maxlength="20"
+                                    name="ordererName"
+                                    placeholder="최대 20자"
+                                    th:readonly="${user != null}"
+                                    th:required="${user == null}"
+                                    th:value="${user != null} ? ${user.name} : ''"
+                                    type="text"
+                            />
+                        </div>
+
+                        <div class="form-group-kitsch">
+                            <label class="label-kitsch" for="ordererEmail">이메일:</label>
+                            <input
+                                    class="input-kitsch pixel-font-kitsch"
+                                    id="ordererEmail"
+                                    maxlength="50"
+                                    name="ordererEmail"
+                                    placeholder="example@email.com (최대 50자)"
+                                    th:readonly="${user != null}"
+                                    th:required="${user == null}"
+                                    th:value="${user != null} ? ${user.email} : ''"
+                                    type="email"
+                            />
+                        </div>
+
+                        <!-- 주문자 연락처 -->
+                        <div class="form-group-kitsch">
+                            <label class="label-kitsch" for="ordererPhoneNumber">연락처:</label>
+                            <input
+                                    class="input-kitsch pixel-font-kitsch"
+                                    id="ordererPhoneNumber"
+                                    maxlength="11"
+                                    name="ordererPhoneNumber"
+                                    pattern="^[0-9]+$"
+                                    placeholder="숫자만 입력 (최대 11자)"
+                                    th:readonly="${user != null}"
+                                    th:required="${user == null}"
+                                    th:value="${user != null} ? ${user.phoneNumber} : ''"
+                                    type="tel"
+                            />
+                        </div>
+                    </section>
+
+                    <section class="checkout-section-kitsch">
+                        <h3 class="section-title-kitsch"><i class="fas fa-truck-loading"></i> 배송지 정보</h3>
+
+                        <!-- 1) 숨겨진 필드: OrderCreateRequest 바인딩용 -->
+                        <input id="hiddenReceiverName" name="receiverName" type="hidden" value=""/>
+                        <input id="hiddenReceiverPhoneNumber" name="receiverPhoneNumber" type="hidden" value=""/>
+                        <input id="hiddenPostalCode" name="postalCode" type="hidden" value=""/>
+                        <input id="hiddenAddress" name="address" type="hidden" value=""/>
+                        <input id="hiddenDetailAddress" name="detailAddress" type="hidden" value=""/>
+                        <input id="hiddenReceiverEmail" name="receiverEmail" type="hidden" value=""/>
+                        <input id="hiddenOriginalAmount" name="originalAmount" type="hidden" value="0"/>
+                        <input id="hiddenSaleDiscountAmount" name="saleDiscountAmount" type="hidden" value="0"/>
+                        <input id="hiddenPointUseAmount" name="pointUseAmount" type="hidden" value="0"/>
+
+                        <div class="form-group-kitsch">
+                            <div th:if="${user!=null}">
+                                <label class="label-kitsch" for="shippingAddressOption">배송지 선택:</label>
+                                <select id="shippingAddressOption" name="shippingAddressOption">
+                                    <option th:data-detail="${addr.detailAddress}"
+                                            th:data-email="${user.email}"
+                                            th:data-name="${addr.alias}"
+                                            th:data-phone="${user.phoneNumber}"
+                                            th:data-postal-code="${addr.postalCode}"
+                                            th:data-road="${addr.roadAddress}"
+                                            th:each="addr, stat : ${user.addresses}"
+                                            th:selected="${stat.index == 0}"
+                                            th:text="${addr.alias}"
+                                            th:value="${addr.addressId}">
+                                    </option>
+                                    <option value="new">+ 새 주소 입력</option>
+                                </select>
+                            </div>
+
+                            <div th:if="${user==null}">
+                                <label class="label-kitsch" for="shippingAddressOption">배송지 선택:</label>
+                                <select id="shippingAddressOption" name="shippingAddressOption">
+                                    <option selected value="new">+ 새 주소 입력</option>
+                                </select>
+                            </div>
+
+
+                            <div class="input-description-kitsch" id="savedAddressInfo"
+                                 style="border:1px dashed var(--kitsch-color-2); padding:0.5rem; margin-bottom:1rem; border-radius:3px;">
+                                <p><strong>배송지명:</strong> <span id="savedAlias">정보 없음</span></p>
+                                <p><strong>주소:</strong> <span id="savedRoad">정보 없음</span></p>
+                                <p><strong>상세주소:</strong> <span id="savedDetail">상세주소 없음</span></p>
+                            </div>
+
+                            <div class="form-group-kitsch">
+                                <label class="label-kitsch" for="requestedDeliveryDate">희망 배송일 (선택):</label>
+                                <input
+                                        class="input-kitsch pixel-font-kitsch"
+                                        id="requestedDeliveryDate"
+                                        name="requestedDeliveryDate"
+                                        th:min="${T(java.time.LocalDate).now().plusDays(1)}"
+                                        type="date"
+                                />
+                            </div>
+                        </div>
+
+                        <!-- 3) 새 주소 입력 폼 (기본 숨김) -->
+                        <div id="newAddressForm" style="display:none;">
+                            <div class="form-group-kitsch">
+                                <label class="label-kitsch" for="recipientName">받는 분:</label>
+                                <input
+                                        class="input-kitsch pixel-font-kitsch"
+                                        id="recipientName"
+                                        maxlength="20"
+                                        name="recipientName"
+                                        placeholder="최대 20자"
+                                        required
+                                        type="text"
+                                />
+                            </div>
+                            <div class="form-group-kitsch">
+                                <label class="label-kitsch" for="recipientEmail">이메일 :</label>
+                                <input
+                                        class="input-kitsch pixel-font-kitsch"
+                                        id="recipientEmail"
+                                        maxlength="50"
+                                        name="recipientEmail"
+                                        placeholder="최대 50자"
+                                        type="email"
+                                />
+                            </div>
+                            <div class="form-group-kitsch">
+                                <label class="label-kitsch" for="recipientPhone">연락처:</label>
+                                <input
+                                        class="input-kitsch pixel-font-kitsch"
+                                        id="recipientPhone"
+                                        maxlength="11"
+                                        name="recipientPhone"
+                                        pattern="^[0-9]+$"
+                                        placeholder="최대 11자 (숫자만)"
+                                        required
+                                        type="tel"
+                                />
+                            </div>
+                            <div class="form-group-kitsch">
+                                <label class="label-kitsch">주소:</label>
+                                <div class="address-group-kitsch" style="margin-bottom: 0.5rem;">
+                                    <input
+                                            class="input-kitsch pixel-font-kitsch"
+                                            id="shippingPostcode"
+                                            maxlength="5"
+                                            name="shippingPostcode"
+                                            placeholder="우편번호"
+                                            readonly
+                                            required
+                                            type="text"
+                                    />
+                                    <button
+                                            class="btn-kitsch secondary-btn-kitsch color1-kitsch retro-shadow-kitsch-small small-btn-kitsch"
+                                            onclick="execDaumPostcode('shippingPostcode', 'shippingAddress')"
+                                            type="button"
+                                    >
+                                        우편번호 찾기
+                                    </button>
+                                </div>
+                                <input
+                                        class="input-kitsch pixel-font-kitsch"
+                                        id="shippingAddress"
+                                        maxlength="255"
+                                        name="shippingAddress"
+                                        placeholder="도로명 주소"
+                                        readonly
+                                        required
+                                        style="margin-bottom: 0.5rem;"
+                                        type="text"
+                                />
+                                <input
+                                        class="input-kitsch pixel-font-kitsch"
+                                        id="shippingDetailAddress"
+                                        maxlength="255"
+                                        name="shippingDetailAddress"
+                                        placeholder="상세주소 입력"
+                                        required
+                                        type="text"
+                                />
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+
+                <div class="checkout-sidebar-panel-kitsch">
+                    <section class="checkout-section-kitsch payment-summary-kitsch">
+                        <h3 class="summary-title-kitsch">
+                            <i class="fas fa-money-check-alt"></i> 최종 결제 금액
+                        </h3>
+
+                        <div class="summary-row-kitsch">
+                            <span class="label">총 상품 금액:</span>
+                            <span class="value" id="summaryTotalProductPrice">0원</span>
+                        </div>
+                        <div class="summary-row-kitsch">
+                            <span class="label">총 포장비:</span>
+                            <span class="value" id="summaryPackagingFee">0원</span>
+                        </div>
+                        <div class="summary-row-kitsch">
+                            <span class="label">개별 상품 할인액:</span>
+                            <span class="value discount" id="summaryTotalDiscount">0원</span>
+                        </div>
+                        <div class="summary-row-kitsch">
+                            <span>도서 쿠폰 할인:</span>
+                            <span id="summaryBookCouponDiscount">-0원</span>
+                        </div>
+
+                        <div class="summary-row-kitsch">
+                            <label for="orderCouponSelect" class="label">주문 쿠폰 선택:</label>
+                            <select id="orderCouponSelect" class="select-kitsch" style="max-width: 200px;">
+                                <option value="">선택 안 함</option>
+                                <option th:each="coupon : ${coupons.usableUserCouponMap[-1]}"
+                                        th:value="${coupon.userCouponId}"
+                                        th:data-type="${coupon.discountPrice != null ? 'FIXED' : 'PERCENT'}"
+                                        th:data-discount-price="${coupon.discountPrice}"
+                                        th:data-discount-percent="${coupon.discountPercent}"
+                                        th:data-maximum-discount-price="${coupon.maximumDiscountPrice}"
+                                        th:data-minimum-payment="${coupon.minimumPayment}"
+                                        th:disabled="${summaryTotalProductPrice < coupon.minimumPayment.doubleValue()}"
+                                        th:classappend="${summaryTotalProductPrice < coupon.minimumPayment.doubleValue()} ? 'disabled-option' : ''"
+                                        th:title="${summaryTotalProductPrice < coupon.minimumPayment.doubleValue()}
+                    ? '주문 금액이 최소 결제 금액보다 낮아 사용할 수 없습니다.' : ''"
+                                        th:text="${coupon.discountPrice != null
+                    ? coupon.couponName + ' (-' + #numbers.formatInteger(coupon.discountPrice, 0) + '원)'
+                    : coupon.couponName + ' (' + coupon.discountPercent + '% 할인, 최대 ' + #numbers.formatInteger(coupon.maximumDiscountPrice, 0) + '원)'}">
+                                </option>
+                            </select>
+                            <input type="hidden" name="orderCouponCode" id="hiddenOrderCouponCode" value=""/>
+                        </div>
+                        <div class="summary-row-kitsch">
+                            <span>주문 쿠폰 할인:</span>
+                            <span id="summaryOrderCouponDiscount">-0원</span>
+                        </div>
+
+                        <div class="form-group-kitsch" th:if="${user != null}">
+                            <label class="label-kitsch" for="pointsToUse" style="font-size:1em;">
+                                포인트 사용 (보유: <span th:text="${user.pointBalance}">0</span> P):
+                            </label>
+                            <div style="display:flex; gap:0.5rem;">
+                                <input
+                                        class="input-kitsch pixel-font-kitsch"
+                                        id="pointsToUse"
+                                        name="pointsToUse"
+                                        placeholder="사용할 포인트"
+                                        th:attr="data-available-points=${user.pointBalance},max=${user.pointBalance}"
+                                        th:value="0"
+                                        type="number"/>
+                                <button
+                                        class="btn-kitsch secondary-btn-kitsch color2-kitsch small-btn-kitsch retro-shadow-kitsch-small"
+                                        onclick="applyMaxPoints()"
+                                        style="min-width: fit-content;"
+                                        type="button">
+                                    전액 사용
+                                </button>
+                            </div>
+                        </div>
+
+                        <input type="hidden" name="bookCouponDiscountAmount" id="hiddenBookCouponDiscountAmount"
+                               value="0">
+                        <input type="hidden" name="orderCouponDiscountAmount" id="hiddenOrderCouponDiscountAmount"
+                               value="0">
+
+
+                        <div class="summary-row-kitsch" th:if="${user != null}">
+                            <span class="label">포인트 할인:</span>
+                            <span class="value discount" id="summaryPointDiscount">0원</span>
+                        </div>
+
+                        <div class="summary-row-kitsch">
+                            <span class="label">배송비:</span>
+
+                            <span class="value" id="summaryDeliveryFee">0원</span>
+
+                            <input id="hiddenDeliveryFee" name="deliveryFee" type="hidden" value="0"/>
+                            <input id="hiddenDeliveryRuleId" name="deliveryRuleId" th:value="${deliveryRule.id}"
+                                   type="hidden"/>
+                        </div>
+
+                        <div style="margin-top: 0.25rem;">
+                            <small>※ 무료배송 기준: <span th:text="${deliveryRule.freeDeliveryThreshold}">0</span>원 이상 주문 시
+                                무료배송</small>
+                        </div>
+
+                        <div class="total-summary-kitsch">
+                            <div class="summary-row-kitsch">
+                                <span class="label">최종 결제금액:</span>
+                                <span class="value" id="summaryFinalTotalPrice">0원</span>
+                            </div>
+                        </div>
+                    </section>
+                    <button
+                            class="btn-kitsch primary-btn-kitsch checkout-submit-btn-kitsch retro-shadow-kitsch"
+                            id="payment-button"
+                            type="submit">
+                        <i class="fas fa-check-circle"></i>
+                        <span th:text="주문하기"></span>
+                    </button>
+                </div>
+            </div>
+        </form>
+        <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+        <script th:inline="javascript">
+
+            const deliveryRule = /*[[${deliveryRule}]]*/ null;
+
+            // Helper function to parse numbers from price strings (e.g., "10,000원" -> 10000)
+            function getNumericValue(elementId) {
+                const el = document.getElementById(elementId);
+                if (!el || !el.textContent) return 0;
+                // Removes non-digits. Handles cases like "- 5,000원" by taking the magnitude.
+                return parseInt(el.textContent.replace(/[^0-9]/g, ''), 10) || 0;
+            }
+
+            function updatePriceSummary() {
+                let totalOriginalPrice = 0;
+                let totalEffectiveItemPrice = 0; // Sum of prices after individual item sales
+
+                document.querySelectorAll('.ordered-item-kitsch').forEach(itemEl => {
+                    const originalItemPrice = parseFloat(itemEl.dataset.itemPrice) || 0;
+                    const qtySpan = itemEl.querySelector('.item-qty-display');
+                    const qty = parseInt(qtySpan ? qtySpan.textContent : '0', 10) || 0;
+
+                    totalOriginalPrice += originalItemPrice * qty;
+
+                    // Determine the effective price for this item
+                    // Assumes data-item-sale-price holds the actual sale price if a sale applies.
+                    // If attribute is missing, invalid, or doesn't represent a lower price, original price is used.
+                    const salePriceAttr = itemEl.dataset.itemSalePrice;
+                    let effectiveThisItemPrice = originalItemPrice;
+
+                    if (salePriceAttr) { // Check if attribute exists
+                        const salePrice = parseFloat(salePriceAttr);
+                        // Use salePrice if it's a valid number and genuinely represents the price to pay
+                        // (could be 0 for a free item, or less than original)
+                        if (!isNaN(salePrice) && salePriceAttr.trim() !== "") {
+                            effectiveThisItemPrice = salePrice >= 0 ? salePrice : originalItemPrice;
+                        }
+                    }
+                    totalEffectiveItemPrice += effectiveThisItemPrice * qty;
+                });
+
+                const totalItemDiscount = totalOriginalPrice - totalEffectiveItemPrice;
+
+                // Update display elements
+                const summaryTotalProductPriceEl = document.getElementById('summaryTotalProductPrice');
+                // This displays the sum of original prices for user clarity.
+                if (summaryTotalProductPriceEl) summaryTotalProductPriceEl.textContent = totalOriginalPrice.toLocaleString() + '원';
+
+                const summaryTotalDiscountEl = document.getElementById('summaryTotalDiscount');
+                // Display the total discount from item sales.
+                if (summaryTotalDiscountEl) {
+                    summaryTotalDiscountEl.textContent = (totalItemDiscount > 0 ? '- ' : '') + totalItemDiscount.toLocaleString() + '원';
+                }
+
+                // Update hidden fields for form submission
+                const hiddenOriginalAmountEl = document.getElementById('hiddenOriginalAmount');
+                if (hiddenOriginalAmountEl) hiddenOriginalAmountEl.value = totalOriginalPrice; // Sum of item.price * qty
+
+                const hiddenSaleDiscountAmountEl = document.getElementById('hiddenSaleDiscountAmount');
+                // This is the total discount FROM item sales: (totalOriginalPrice - totalEffectiveItemPrice)
+                if (hiddenSaleDiscountAmountEl) hiddenSaleDiscountAmountEl.value = totalItemDiscount;
+            }
+
+            function updatePackagingFee() {
+                let totalPackagingCost = 0;
+                document.querySelectorAll('.ordered-item-kitsch').forEach((itemEl, idx) => {
+                    const packQtySpan = itemEl.querySelector('.item-pack-qty-display');
+                    const packQty = parseInt(packQtySpan ? packQtySpan.textContent : '0', 10) || 0;
+
+                    const packagingSelectEl = itemEl.querySelector('.item-packaging-select');
+                    let costPerPackage = 0;
+                    if (packagingSelectEl && packagingSelectEl.value !== "") {
+                        const selectedOption = packagingSelectEl.selectedOptions[0];
+                        if (selectedOption) {
+                            costPerPackage = parseFloat(selectedOption.dataset.packagingCost) || 0;
+                        }
+                    }
+                    totalPackagingCost += costPerPackage * packQty;
+
+                    // Update hidden fields for packaging option and quantity per item
+                    const hiddenPackagingOptionIdEl = document.getElementById(`hiddenPackagingOptionId-${idx}`);
+                    if (hiddenPackagingOptionIdEl) hiddenPackagingOptionIdEl.value = packagingSelectEl ? packagingSelectEl.value : '';
+
+                    const hiddenPackagingQuantityEl = document.getElementById(`hiddenPackagingQuantity-${idx}`);
+                    if (hiddenPackagingQuantityEl) hiddenPackagingQuantityEl.value = packQty;
+
+                });
+                const summaryPackagingFeeEl = document.getElementById('summaryPackagingFee');
+                if (summaryPackagingFeeEl) summaryPackagingFeeEl.textContent = totalPackagingCost.toLocaleString() + '원';
+            }
+
+            function syncDeliveryFee() {
+                const feeEl = document.getElementById('summaryDeliveryFee');
+                const hidFee = document.getElementById('hiddenDeliveryFee');
+                if (feeEl && hidFee) {
+                    const feeText = feeEl.textContent.replace(/[^0-9]/g, '');
+                    hidFee.value = feeText;
+                }
+            }
+
+            function updateDeliveryFee() {
+                if (!deliveryRule) {
+                    const feeEl = document.getElementById('summaryDeliveryFee');
+                    if (feeEl) feeEl.textContent = '0원';
+                    syncDeliveryFee(); // Sync even if no rule (to set hidden field to 0)
+                    return;
+                }
+
+                const totalOriginalItemPrice = getNumericValue('summaryTotalProductPrice');
+                const totalItemDiscount = getNumericValue('summaryTotalDiscount'); // Magnitude of discount
+
+                const netProductTotalAfterItemSales = totalOriginalItemPrice - totalItemDiscount;
+
+                const threshold = parseInt(deliveryRule.freeDeliveryThreshold, 10) || 0;
+                const feeAmount = parseInt(deliveryRule.deliveryFee, 10) || 0;
+
+                let calculatedFee = feeAmount;
+                if (netProductTotalAfterItemSales >= threshold && netProductTotalAfterItemSales > 0) {
+                    calculatedFee = 0;
+                }
+
+                const summaryDeliveryFeeEl = document.getElementById('summaryDeliveryFee');
+                if (summaryDeliveryFeeEl) summaryDeliveryFeeEl.textContent = calculatedFee.toLocaleString() + '원';
+
+                syncDeliveryFee(); // Update the hiddenDeliveryFee input immediately
+            }
+
+            function updatePointDiscount() {
+                const pointsInput = document.getElementById('pointsToUse');
+                if (!pointsInput) return;
+
+                let pointsToUse = parseInt(pointsInput.value, 10) || 0;
+                const availablePoints = parseInt(pointsInput.dataset.availablePoints, 10) || 0;
+
+                if (pointsToUse < 0) pointsToUse = 0;
+                if (pointsToUse > availablePoints) pointsToUse = availablePoints;
+
+                const productOriginalTotal = getNumericValue('summaryTotalProductPrice');
+                const itemDiscountTotal = getNumericValue('summaryTotalDiscount');
+                const orderCouponDiscount = getNumericValue('summaryOrderCouponDiscount'); // Assuming this exists
+                const packagingFeeTotal = getNumericValue('summaryPackagingFee');
+                const deliveryFeeTotal = getNumericValue('summaryDeliveryFee');
+
+                const effectiveProductTotal = productOriginalTotal - itemDiscountTotal;
+                const grossAmountBeforePoints = effectiveProductTotal - orderCouponDiscount + packagingFeeTotal + deliveryFeeTotal;
+
+                const maxApplicablePoints = grossAmountBeforePoints > 0 ? grossAmountBeforePoints : 0;
+
+                if (pointsToUse > maxApplicablePoints) {
+                    pointsToUse = maxApplicablePoints;
+                }
+                pointsInput.value = pointsToUse; // Update input field with validated/capped value
+
+                const summaryPointDiscountEl = document.getElementById('summaryPointDiscount');
+                if (summaryPointDiscountEl) {
+                    summaryPointDiscountEl.textContent = (pointsToUse > 0 ? '- ' : '') + pointsToUse.toLocaleString() + '원';
+                }
+
+                const hiddenPointUseAmountEl = document.getElementById('hiddenPointUseAmount');
+                if (hiddenPointUseAmountEl) hiddenPointUseAmountEl.value = pointsToUse;
+            }
+
+            function updateCouponDiscount() {
+                let totalBookCouponDiscount = 0;
+
+                document.querySelectorAll('.item-coupon-select').forEach((sel, idx) => {
+                    const selected = sel.selectedOptions[0];
+                    const selectedCouponId = sel.value;
+                    const itemWrapper = sel.closest('.ordered-item-kitsch');
+                    const infoEl = document.getElementById(`couponInfo-${idx}`);
+                    const hiddenInput = document.getElementById(`hiddenItemCoupon-${idx}`);
+                    const salePrice = parseInt(itemWrapper.dataset.itemSalePrice, 10);
+
+                    let discountText = '';
+                    let discount = 0;
+
+                    if (selectedCouponId) {
+                        const type = selected.dataset.type;
+                        if (type === 'FIXED') {
+                            discount = parseFloat(selected.dataset.discountPrice || 0);
+                            discountText = `할인 적용: -${discount.toLocaleString()}원`;
+                        } else if (type === 'PERCENT') {
+                            const percent = parseFloat(selected.dataset.discountPercent || 0);
+                            const max = parseFloat(selected.dataset.maximumDiscountPrice || 0);
+                            discount = Math.floor(salePrice * (percent / 100));
+                            if (!isNaN(max) && discount > max) discount = max;
+                            discountText = `할인 적용: -${discount.toLocaleString()}원`;
+                        }
+
+                        if (infoEl) {
+                            infoEl.textContent = discountText;
+                            infoEl.style.display = 'block';
+                        }
+                        if (hiddenInput) hiddenInput.value = selectedCouponId;
+                        totalBookCouponDiscount += discount;
+                    } else {
+                        if (infoEl) infoEl.style.display = 'none';
+                        if (hiddenInput) hiddenInput.value = '';
+                    }
+                });
+
+                let orderCouponDiscount = 0;
+                const orderCouponSelect = document.getElementById('orderCouponSelect');
+                const selectedOrder = orderCouponSelect?.selectedOptions?.[0];
+
+                const productTotal = getNumericValue('summaryTotalProductPrice');
+                const saleDiscount = getNumericValue('summaryTotalDiscount');
+                const baseAmount = productTotal - saleDiscount - totalBookCouponDiscount;
+
+                if (selectedOrder && selectedOrder.value) {
+                    const type = selectedOrder.dataset.type;
+                    const minPayment = parseFloat(selectedOrder.dataset.minimumPayment || 0);
+
+                    if (baseAmount >= minPayment) {
+                        if (type === 'FIXED') {
+                            orderCouponDiscount += parseFloat(selectedOrder.dataset.discountPrice || 0);
+                        } else if (type === 'PERCENT') {
+                            const percent = parseFloat(selectedOrder.dataset.discountPercent || 0);
+                            const max = parseFloat(selectedOrder.dataset.maximumDiscountPrice || 0);
+                            let discount = Math.floor(baseAmount * (percent / 100));
+                            if (!isNaN(max) && discount > max) discount = max;
+                            orderCouponDiscount += discount;
+                        }
+                    }
+                }
+
+                document.getElementById('summaryBookCouponDiscount').textContent = '-' + totalBookCouponDiscount.toLocaleString() + '원';
+                document.getElementById('summaryOrderCouponDiscount').textContent = '-' + orderCouponDiscount.toLocaleString() + '원';
+                document.getElementById('hiddenBookCouponDiscountAmount').value = totalBookCouponDiscount;
+                document.getElementById('hiddenOrderCouponDiscountAmount').value = orderCouponDiscount;
+
+                updateFinalTotalPrice();
+            }
+
+
+            function updateOrderCouponAvailability() {
+                const orderCouponSelect = document.getElementById('orderCouponSelect');
+                if (!orderCouponSelect) return;
+
+                const productTotal = getNumericValue('summaryTotalProductPrice');
+                const saleDiscount = getNumericValue('summaryTotalDiscount');
+                const bookCouponDiscount = getNumericValue('summaryBookCouponDiscount');
+                const packagingFee = getNumericValue('summaryPackagingFee');
+
+                const baseAmount = productTotal - saleDiscount - bookCouponDiscount;
+
+                Array.from(orderCouponSelect.options).forEach(opt => {
+                    if (!opt.value) return;
+                    const minPayment = parseFloat(opt.dataset.minimumPayment || 0);
+                    const isUsable = baseAmount >= minPayment;
+
+                    opt.disabled = !isUsable;
+                    if (!isUsable) {
+                        opt.classList.add('disabled-option');
+                        opt.title = '주문 금액이 최소 결제 금액보다 낮아 사용할 수 없습니다.';
+                    } else {
+                        opt.classList.remove('disabled-option');
+                        opt.removeAttribute('title');
+                    }
+                });
+
+                const selected = orderCouponSelect.selectedOptions[0];
+                if (selected?.disabled) {
+                    orderCouponSelect.value = '';
+                }
+            }
+
+            function getBookTotalAfterItemDiscountAndBookCoupons() {
+                let total = 0;
+
+                document.querySelectorAll('.ordered-item-kitsch').forEach(item => {
+                    const salePrice = parseFloat(item.dataset.itemSalePrice) || 0;
+                    let discount = 0;
+
+                    const couponSelect = item.querySelector('.item-coupon-select');
+                    const selected = couponSelect?.selectedOptions?.[0];
+                    if (selected && selected.value) {
+                        const type = selected.dataset.type;
+                        if (type === 'FIXED') {
+                            discount = parseFloat(selected.dataset.discountPrice || 0);
+                        } else if (type === 'PERCENT') {
+                            const percent = parseFloat(selected.dataset.discountPercent || 0);
+                            const max = parseFloat(selected.dataset.maximumDiscountPrice || 0);
+                            discount = Math.floor(salePrice * (percent / 100));
+                            if (!isNaN(max) && discount > max) discount = max;
+                        }
+                    }
+
+                    total += salePrice - discount;
+                });
+
+                return total;
+            }
+
+
+            function updateFinalTotalPrice() {
+                const productTotal = getNumericValue('summaryTotalProductPrice');
+                const itemDisc = getNumericValue('summaryTotalDiscount');
+                const bookCouponDisc = getNumericValue('summaryBookCouponDiscount');
+                const orderCouponDisc = getNumericValue('summaryOrderCouponDiscount');
+                const pointDisc = getNumericValue('summaryPointDiscount');
+                const packagingFee = getNumericValue('summaryPackagingFee');
+                const deliveryFee = getNumericValue('summaryDeliveryFee');
+
+                let finalTotal = productTotal - itemDisc - bookCouponDisc - orderCouponDisc - pointDisc + packagingFee + deliveryFee;
+
+                if (finalTotal < 0) finalTotal = 0;
+
+                const summaryFinalTotalPriceEl = document.getElementById('summaryFinalTotalPrice');
+                if (summaryFinalTotalPriceEl) summaryFinalTotalPriceEl.textContent = finalTotal.toLocaleString() + '원';
+            }
+
+            function fullPriceRecalculation() {
+                updatePriceSummary();   // Item totals and discounts
+                updatePackagingFee();   // Packaging fees and related hidden fields
+                updateCouponDiscount();
+                updateOrderCouponAvailability();
+                updateDeliveryFee();    // Delivery fee (uses correct item totals)
+                updatePointDiscount();  // Points (uses correct delivery fee for max calculation)
+                updateFinalTotalPrice(); // Grand total
+            }
+
+            function syncAddressFields() {
+                const selectEl = document.getElementById('shippingAddressOption');
+                if (!selectEl) return;
+                const opt = selectEl.selectedOptions[0];
+                if (!opt) return;
+
+                const hiddenReceiverName = document.getElementById('hiddenReceiverName');
+                const hiddenReceiverPhoneNumber = document.getElementById('hiddenReceiverPhoneNumber');
+                const hiddenPostalCode = document.getElementById('hiddenPostalCode');
+                const hiddenAddress = document.getElementById('hiddenAddress');
+                const hiddenDetailAddress = document.getElementById('hiddenDetailAddress');
+                const hiddenReceiverEmail = document.getElementById('hiddenReceiverEmail');
+
+                if (opt.value === 'new') {
+                    const recipientName = document.getElementById('recipientName');
+                    const recipientPhone = document.getElementById('recipientPhone');
+                    const shippingPostcode = document.getElementById('shippingPostcode');
+                    const shippingAddress = document.getElementById('shippingAddress');
+                    const shippingDetailAddr = document.getElementById('shippingDetailAddress');
+                    const recipientEmail = document.getElementById('recipientEmail');
+
+                    if (hiddenReceiverName) hiddenReceiverName.value = (recipientName ? recipientName.value.trim() : '');
+                    if (hiddenReceiverPhoneNumber) hiddenReceiverPhoneNumber.value = (recipientPhone ? recipientPhone.value.trim() : '');
+                    if (hiddenPostalCode) hiddenPostalCode.value = (shippingPostcode ? shippingPostcode.value.trim() : '');
+                    if (hiddenAddress) hiddenAddress.value = (shippingAddress ? shippingAddress.value.trim() : '');
+                    if (hiddenDetailAddress) hiddenDetailAddress.value = (shippingDetailAddr ? shippingDetailAddr.value.trim() : '');
+                    if (hiddenReceiverEmail) hiddenReceiverEmail.value = (recipientEmail ? recipientEmail.value.trim() : '');
+                } else {
+                    if (hiddenReceiverName) hiddenReceiverName.value = opt.dataset.name || '';
+                    if (hiddenReceiverPhoneNumber) hiddenReceiverPhoneNumber.value = opt.dataset.phone || '';
+                    if (hiddenPostalCode) hiddenPostalCode.value = opt.dataset.postalCode || '';
+                    if (hiddenAddress) hiddenAddress.value = opt.dataset.road || '';
+                    if (hiddenDetailAddress) hiddenDetailAddress.value = opt.dataset.detail || '';
+                    if (hiddenReceiverEmail) hiddenReceiverEmail.value = opt.dataset.email || '';
+                }
+            }
+
+            function updateAddressBaseUI() {
+                const selectEl = document.getElementById('shippingAddressOption');
+                const infoEl = document.getElementById('savedAddressInfo');
+                const formEl = document.getElementById('newAddressForm');
+                const aliasEl = document.getElementById('savedAlias');
+                const roadEl = document.getElementById('savedRoad');
+                const detailEl = document.getElementById('savedDetail');
+                const orderCouponSelect = document.getElementById('orderCouponSelect');
+                const orderCouponHidden = document.getElementById('hiddenOrderCouponCode')
+
+                orderCouponSelect.addEventListener('change', () => {
+                    const selected = orderCouponSelect.selectedOptions[0];
+                    const discount = selected.dataset.discount ? parseInt(selected.dataset.discount.replace(/[^\d]/g, ''), 10) : 0;
+
+                    orderCouponHidden.value = selected.value || '';
+                    document.getElementById('summaryCouponDiscount').textContent = '-' + discount.toLocaleString() + '원';
+
+                    updateFinalTotalPrice();
+                    updateOrderCouponDisabling();
+                });
+
+                if (!selectEl) return;
+                const opt = selectEl.selectedOptions[0];
+                if (!opt) return;
+
+                const getAllInputs = (container) => container ? container.querySelectorAll('input, select, textarea') : [];
+
+                if (opt.value === 'new') {
+                    if (infoEl) infoEl.style.display = 'none';
+                    if (formEl) formEl.style.display = 'block';
+                    getAllInputs(formEl).forEach(el => el.removeAttribute('disabled'));
+                    // Clear new address form fields if desired when switching to "new"
+                    // document.getElementById('recipientName').value = '';
+                    // ... etc.
+                } else {
+                    if (aliasEl) aliasEl.textContent = opt.dataset.name || '정보 없음';
+                    if (roadEl) roadEl.textContent = opt.dataset.road || '정보 없음';
+                    if (detailEl) detailEl.textContent = opt.dataset.detail || '상세주소 없음';
+                    if (formEl) formEl.style.display = 'none';
+                    if (infoEl) infoEl.style.display = 'block';
+                    getAllInputs(formEl).forEach(el => el.setAttribute('disabled', 'true'));
+                }
+                syncAddressFields(); // Sync hidden fields whenever address UI changes
+            }
+
+
+            document.addEventListener('DOMContentLoaded', () => {
+                const shippingAddressOptionEl = document.getElementById('shippingAddressOption');
+
+                // Initialize hidden packaging fields and their corresponding selects
+                document.querySelectorAll('.ordered-item-kitsch').forEach((itemEl, idx) => {
+                    const packagingSelectEl = itemEl.querySelector('.item-packaging-select');
+                    const hiddenOptIdEl = document.getElementById(`hiddenPackagingOptionId-${idx}`);
+                    const hiddenQtyEl = document.getElementById(`hiddenPackagingQuantity-${idx}`);
+                    const packQtyContainer = itemEl.querySelector('.item-pack-quantity-kitsch');
+
+                    if (packagingSelectEl) {
+                        packagingSelectEl.value = ""; // Default to "no packaging"
+                        if (hiddenOptIdEl) hiddenOptIdEl.value = '';
+                        if (hiddenQtyEl) hiddenQtyEl.value = '0';
+                        if (packQtyContainer) packQtyContainer.style.display = 'none';
+
+                        packagingSelectEl.addEventListener('change', () => {
+                            const selectedOpt = packagingSelectEl.value;
+                            const packQtySpan = itemEl.querySelector('.item-pack-qty-display');
+                            const bookQtySpan = itemEl.querySelector('.item-qty-display');
+                            const bookQty = parseInt(bookQtySpan ? bookQtySpan.textContent : '0', 10) || 0;
+
+                            if (selectedOpt === "") { // No packaging selected
+                                if (packQtyContainer) packQtyContainer.style.display = 'none';
+                                if (packQtySpan) packQtySpan.textContent = '0';
+                            } else { // Packaging selected
+                                if (packQtyContainer) packQtyContainer.style.display = 'flex';
+                                // Set packaging quantity to book quantity, but not less than 1 if bookQty is 0
+                                const initialPackQty = bookQty > 0 ? bookQty : 1;
+                                if (packQtySpan) packQtySpan.textContent = initialPackQty;
+                            }
+                            fullPriceRecalculation();
+                        });
+                    }
+                });
+
+                updateAddressBaseUI(); // Initial UI setup for address display
+                syncAddressFields();   // Sync initial address selection to hidden fields
+                fullPriceRecalculation(); // Perform initial full price calculation
+
+                if (shippingAddressOptionEl) {
+                    shippingAddressOptionEl.addEventListener('change', () => {
+                        updateAddressBaseUI();
+                        // fullPriceRecalculation(); // Delivery fee might change based on address (e.g. region specific rules not implemented here)
+                        // For now, assume address change itself doesn't alter product/packaging/delivery costs directly
+                        // But if it *could*, then uncommenting fullPriceRecalculation() is safer.
+                        // The primary effect of address change is for shipping info, not pricing in this script.
+                    });
+                }
+
+                // Book Quantity Buttons
+                document.querySelectorAll('.qty-decrease').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const itemEl = btn.closest('.ordered-item-kitsch');
+                        if (!itemEl) return;
+                        const qtySpan = itemEl.querySelector('.item-qty-display');
+                        let qty = parseInt(qtySpan ? qtySpan.textContent : '0', 10) || 0;
+                        if (qty > 1) qty -= 1;
+                        if (qtySpan) qtySpan.textContent = qty;
+
+                        const idx = Array.from(document.querySelectorAll('.ordered-item-kitsch')).indexOf(itemEl);
+                        document.getElementById(`hiddenBookQuantity-${idx}`).value = qty;
+
+                        // Adjust packaging quantity if it exceeds book quantity
+                        const packQtySpan = itemEl.querySelector('.item-pack-qty-display');
+                        let packQty = parseInt(packQtySpan ? packQtySpan.textContent : '0', 10) || 0;
+                        if (packQty > qty) {
+                            if (packQtySpan) packQtySpan.textContent = qty;
+                        }
+                        // If packaging is selected but book qty becomes 0, ideally hide packaging or set pack qty to 0.
+                        if (qty === 0 && packQty > 0) {
+                            if (packQtySpan) packQtySpan.textContent = '0';
+                        }
+
+                        fullPriceRecalculation();
+                    });
+                });
+                document.querySelectorAll('.qty-increase').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const itemEl = btn.closest('.ordered-item-kitsch');
+                        if (!itemEl) return;
+                        const qtySpan = itemEl.querySelector('.item-qty-display');
+                        let qty = parseInt(qtySpan ? qtySpan.textContent : '0', 10) || 0;
+                        qty += 1; // Add validation for max quantity if needed
+                        if (qtySpan) qtySpan.textContent = qty;
+
+                        const idx = Array.from(document.querySelectorAll('.ordered-item-kitsch')).indexOf(itemEl);
+                        document.getElementById(`hiddenBookQuantity-${idx}`).value = qty;
+
+                        // If packaging is selected, its quantity might need to match book quantity
+                        const packagingSelectEl = itemEl.querySelector('.item-packaging-select');
+                        if (packagingSelectEl && packagingSelectEl.value !== "") {
+                            const packQtySpan = itemEl.querySelector('.item-pack-qty-display');
+                            if (packQtySpan) packQtySpan.textContent = qty; // Match book quantity
+                        }
+                        fullPriceRecalculation();
+                    });
+                });
+
+                // Packaging Quantity Buttons
+                document.querySelectorAll('.pack-qty-decrease').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const itemEl = btn.closest('.ordered-item-kitsch');
+                        if (!itemEl) return;
+                        const packQtySpan = itemEl.querySelector('.item-pack-qty-display');
+                        let packQty = parseInt(packQtySpan ? packQtySpan.textContent : '0', 10) || 0;
+                        if (packQty > 0) { // Allow pack quantity to be 0 if user desires (means no packaging for that item)
+                            packQty -= 1;
+                        }
+                        if (packQtySpan) packQtySpan.textContent = packQty;
+                        fullPriceRecalculation();
+                    });
+                });
+                document.querySelectorAll('.pack-qty-increase').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const itemEl = btn.closest('.ordered-item-kitsch');
+                        if (!itemEl) return;
+                        const packQtySpan = itemEl.querySelector('.item-pack-qty-display');
+                        const bookQtySpan = itemEl.querySelector('.item-qty-display');
+                        const bookQty = parseInt(bookQtySpan ? bookQtySpan.textContent : '0', 10) || 0;
+                        let packQty = parseInt(packQtySpan ? packQtySpan.textContent : '0', 10) || 0;
+
+                        if (packQty < bookQty) { // Max packaging quantity is book quantity
+                            packQty += 1;
+                        }
+                        if (packQtySpan) packQtySpan.textContent = packQty;
+                        fullPriceRecalculation();
+                    });
+                });
+
+                document.querySelectorAll('.item-coupon-select').forEach(sel => {
+                    sel.addEventListener('change', () => {
+                        updateCouponDiscount();
+                    });
+                });
+
+                document.getElementById('orderCouponSelect')?.addEventListener('change', () => {
+                    updateCouponDiscount();
+                });
+                updateCouponDiscount();
+
+
+                // Points Input
+                const pointsInput = document.getElementById('pointsToUse');
+                if (pointsInput) {
+                    pointsInput.addEventListener('input', () => {
+                        fullPriceRecalculation();
+                    });
+                }
+
+                window.applyMaxPoints = () => {
+                    if (!pointsInput) return;
+                    // Calculate current max applicable points dynamically before setting
+                    // updatePointDiscount itself will cap, but to show correct value in input first:
+                    const availableUserPoints = parseInt(pointsInput.dataset.availablePoints, 10) || 0;
+
+                    const productOriginalTotal = getNumericValue('summaryTotalProductPrice');
+                    const itemDiscountTotal = getNumericValue('summaryTotalDiscount');
+                    const orderCouponDiscount = getNumericValue('summaryOrderCouponDiscount');
+                    const packagingFeeTotal = getNumericValue('summaryPackagingFee');
+                    const deliveryFeeTotal = getNumericValue('summaryDeliveryFee');
+                    const effectiveProductTotal = productOriginalTotal - itemDiscountTotal;
+                    const grossAmountBeforePoints = effectiveProductTotal - orderCouponDiscount + packagingFeeTotal + deliveryFeeTotal;
+                    const maxCanApplyToOrder = grossAmountBeforePoints > 0 ? grossAmountBeforePoints : 0;
+
+                    pointsInput.value = Math.min(availableUserPoints, maxCanApplyToOrder);
+                    fullPriceRecalculation();
+                };
+
+                // Form Submission
+                const checkoutForm = document.getElementById('checkoutForm');
+                if (checkoutForm) {
+                    checkoutForm.addEventListener('submit', (event) => {
+                        // Ensure all hidden fields are up-to-date one last time
+                        syncAddressFields();
+                        fullPriceRecalculation(); // This updates all price-related hidden fields too
+
+                        // Additional validation can go here before submission if needed
+                        // e.g., check if new address form is valid if 'new' is selected
+                        const shippingOption = document.getElementById('shippingAddressOption');
+                        if (shippingOption && shippingOption.value === 'new') {
+                            const requiredNewAddressFields = [
+                                document.getElementById('recipientName'),
+                                document.getElementById('recipientEmail'),
+                                document.getElementById('recipientPhone'),
+                                document.getElementById('shippingPostcode'),
+                                document.getElementById('shippingAddress'),
+                                document.getElementById('shippingDetailAddress')
+                            ];
+                            for (const field of requiredNewAddressFields) {
+                                if (!field.value.trim()) {
+                                    alert(`새 배송지 정보: '${field.labels[0].textContent}' 항목을 입력해주세요.`);
+                                    event.preventDefault(); // Stop form submission
+                                    field.focus();
+                                    return;
+                                }
+                            }
+                        }
+                    });
+                }
+                const orderCouponSelect = document.getElementById('orderCouponSelect');
+                if (orderCouponSelect) {
+                    orderCouponSelect.addEventListener('change', () => {
+                        fullPriceRecalculation(); // 할인 적용 재계산
+                    });
+                }
+            });
+
+            function execDaumPostcode(postcodeId, addressId) {
+                new daum.Postcode({
+                    oncomplete: function (data) {
+                        const postEl = document.getElementById(postcodeId);
+                        const addrEl = document.getElementById(addressId);
+                        if (postEl) postEl.value = data.zonecode;
+                        if (addrEl) {
+                            const fullAddr = (data.userSelectedType === 'R') ? data.roadAddress : data.jibunAddress;
+                            addrEl.value = fullAddr;
+                            const detailEl_ = document.getElementById('shippingDetailAddress');
+                            if (detailEl_) detailEl_.focus();
+                        }
+
+                    }
+                }).open();
+            }
+        </script>
+
+    </div>
+</div>
+</body>
+</html>

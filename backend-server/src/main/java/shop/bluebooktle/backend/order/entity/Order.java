@@ -1,15 +1,17 @@
 package shop.bluebooktle.backend.order.entity;
 
 import java.math.BigDecimal;
-import java.sql.Types;
 import java.time.LocalDateTime;
-import java.util.UUID;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -17,6 +19,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -24,6 +27,11 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import shop.bluebooktle.backend.book_order.entity.BookOrder;
+import shop.bluebooktle.backend.book_order.entity.UserCouponBookOrder;
+import shop.bluebooktle.backend.payment.entity.Payment;
+import shop.bluebooktle.common.converter.ProfileAwareStringCryptoConverter;
+import shop.bluebooktle.common.entity.BaseEntity;
 import shop.bluebooktle.common.entity.auth.User;
 
 @Entity
@@ -31,10 +39,10 @@ import shop.bluebooktle.common.entity.auth.User;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "orders")
 @EqualsAndHashCode(of = "id", callSuper = false)
-@ToString(exclude = {"orderState", "deliveryRule"})
+@ToString(exclude = {"orderState", "deliveryRule", "user", "bookOrders", "userCouponBookOrders", "payments"})
 @SQLDelete(sql = "UPDATE orders SET deleted_at = CURRENT_TIMESTAMP WHERE order_id = ?")
 @SQLRestriction("deleted_at IS NULL")
-public class Order {
+public class Order extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -50,13 +58,13 @@ public class Order {
 	private DeliveryRule deliveryRule;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "user_id", nullable = false)
+	@JoinColumn(name = "user_id")
 	private User user;
 
-	@Column(name = "order_date", nullable = false, updatable = false)
-	private LocalDateTime orderDate;
+	@Column(name = "order_name", nullable = false)
+	private String orderName;
 
-	@Column(name = "requested_delivery_date", nullable = false)
+	@Column(name = "requested_delivery_date")
 	private LocalDateTime requestedDeliveryDate;
 
 	@Column(name = "shipped_at")
@@ -65,16 +73,28 @@ public class Order {
 	@Column(name = "delivery_fee", nullable = false, precision = 10, scale = 2)
 	private BigDecimal deliveryFee;
 
-	@Column(name = "orderer_name", nullable = false, length = 20)
+	@Convert(converter = ProfileAwareStringCryptoConverter.class)
+	@Column(name = "orderer_name", nullable = false, length = 150)
 	private String ordererName;
 
-	@Column(name = "orderer_phone_number", nullable = false, length = 11)
+	@Convert(converter = ProfileAwareStringCryptoConverter.class)
+	@Column(name = "orderer_email", nullable = false, length = 255)
+	private String ordererEmail;
+
+	@Convert(converter = ProfileAwareStringCryptoConverter.class)
+	@Column(name = "orderer_phone_number", nullable = false, length = 100)
 	private String ordererPhoneNumber;
 
-	@Column(name = "receiver_name", nullable = false, length = 20)
+	@Convert(converter = ProfileAwareStringCryptoConverter.class)
+	@Column(name = "receiver_name", nullable = false, length = 150)
 	private String receiverName;
 
-	@Column(name = "receiver_phone_number", nullable = false, length = 11)
+	@Convert(converter = ProfileAwareStringCryptoConverter.class)
+	@Column(name = "receiver_email", nullable = false, length = 200)
+	private String receiverEmail;
+
+	@Convert(converter = ProfileAwareStringCryptoConverter.class)
+	@Column(name = "receiver_phone_number", nullable = false, length = 100)
 	private String receiverPhoneNumber;
 
 	@Column(name = "address", nullable = false, length = 255)
@@ -86,25 +106,47 @@ public class Order {
 	@Column(name = "postal_code", nullable = false, length = 5)
 	private String postalCode;
 
-	@Column(name = "tracking_number", nullable = false, length = 14)
+	@Column(name = "tracking_number", length = 14)
 	private String trackingNumber;
 
-	@Column(name = "deleted_at")
-	private LocalDateTime deletedAt;
+	@Column(name = "order_key", unique = true, nullable = false)
+	private String orderKey;
 
-	@Column(name = "order_key", length = 36)
-	@JdbcTypeCode(Types.VARCHAR)
-	private UUID orderKey;
+	@Column(name = "coupon_discount_amount", precision = 10, scale = 2)
+	private BigDecimal couponDiscountAmount;
+
+	@Column(name = "point_discount_amount", precision = 10, scale = 2)
+	private BigDecimal pointUseAmount;
+
+	@Column(name = "original_amount", precision = 10, scale = 2, nullable = false)
+	private BigDecimal originalAmount;
+
+	@Column(name = "sale_discount_amount", precision = 10, scale = 2)
+	private BigDecimal saleDiscountAmount;
+
+	@OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+	@BatchSize(size = 10)
+	private List<BookOrder> bookOrders = new ArrayList<>();
+
+	@OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+	@BatchSize(size = 10)
+	private List<UserCouponBookOrder> userCouponBookOrders = new ArrayList<>();
+
+	@OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+	@BatchSize(size = 10)
+	private List<Payment> payments = new ArrayList<>();
 
 	@Builder
-	public Order(OrderState orderState, DeliveryRule deliveryRule, User user, LocalDateTime orderDate,
-		LocalDateTime requestedDeliveryDate, LocalDateTime shippedAt, BigDecimal deliveryFee, String ordererName,
-		String ordererPhoneNumber, String receiverName, String receiverPhoneNumber, String address,
-		String detailAddress, String postalCode, String trackingNumber) {
+	public Order(OrderState orderState, DeliveryRule deliveryRule, User user,
+		String orderName, LocalDateTime requestedDeliveryDate, LocalDateTime shippedAt, BigDecimal deliveryFee,
+		String ordererName, String ordererPhoneNumber, String receiverName, String receiverPhoneNumber,
+		String address, String detailAddress, String postalCode, String trackingNumber, String orderKey,
+		String ordererEmail, String receiverEmail, BigDecimal couponDiscountAmount, BigDecimal pointUseAmount,
+		BigDecimal originalAmount, BigDecimal saleDiscountAmount) {
 		this.orderState = orderState;
 		this.deliveryRule = deliveryRule;
 		this.user = user;
-		this.orderDate = orderDate;
+		this.orderName = orderName;
 		this.requestedDeliveryDate = requestedDeliveryDate;
 		this.shippedAt = shippedAt;
 		this.deliveryFee = deliveryFee;
@@ -116,6 +158,13 @@ public class Order {
 		this.detailAddress = detailAddress;
 		this.postalCode = postalCode;
 		this.trackingNumber = trackingNumber;
+		this.orderKey = orderKey;
+		this.ordererEmail = ordererEmail;
+		this.receiverEmail = receiverEmail;
+		this.couponDiscountAmount = couponDiscountAmount;
+		this.pointUseAmount = pointUseAmount;
+		this.originalAmount = originalAmount;
+		this.saleDiscountAmount = saleDiscountAmount;
 	}
 
 	public void changeOrderState(OrderState newState) {

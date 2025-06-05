@@ -313,5 +313,4 @@ public class CategoryServiceImpl implements CategoryService {
 			collectDescendants(child, result); // 재귀 호출로 카테고리에 있는 모든 하위 카테고리를 추가
 		}
 	}
-
 }

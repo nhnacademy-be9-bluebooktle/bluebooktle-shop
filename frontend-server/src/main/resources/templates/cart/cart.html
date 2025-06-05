@@ -385,113 +385,71 @@
                         <button class="text-btn-kitsch" onclick="selectAllCartItems(true)"><i
                                 class="fas fa-check-double"></i> 전체선택
                         </button>
-                        <button class="text-btn-kitsch" onclick="deleteSelectedCartItems()"><i
-                                class="fas fa-trash-alt"></i> 선택삭제
-                        </button>
+                        <form id="selectedDeleteForm" method="post" style="display:inline;"
+                              th:action="@{/cart/selected}">
+                            <input name="_method" type="hidden" value="delete"/>
+                            <input id="bookIdsInput" name="bookIds" type="hidden"/>
+                            <button class="text-btn-kitsch" onclick="submitSelectedDeleteForm()" type="button">
+                                <i class="fas fa-trash-alt"></i> 선택삭제
+                            </button>
+                        </form>
                     </div>
                 </div>
 
-                <div class="cart-item-kitsch">
+                <div class="cart-item-kitsch" th:each="item : ${cartItems}">
                     <div class="cart-item-checkbox-kitsch">
                         <label class="checkbox-kitsch">
-                            <input checked class="cart-item-select" onchange="updateCartSummary()" type="checkbox"
-                                   value="101">
+                            <input checked class="cart-item-select"
+                                   onchange="updateCartSummary()"
+                                   th:value="${item.bookId}"
+                                   type="checkbox">
                             <span class="checkbox-custom-kitsch"></span>
                         </label>
                     </div>
-                    <div class="cart-item-info-kitsch">
-                        <a th:href="@{/books/101}"><img alt="코딩 대모험"
-                                                        src="https://picsum.photos/80/120?random=101"></a>
-                        <div class="cart-item-details-kitsch">
-                            <a class="item-title-kitsch" th:href="@{/books/101}">코딩 대모험</a>
-                            <p class="item-author-kitsch">저자: 고냥이 개발자</p>
 
+                    <div class="cart-item-info-kitsch">
+                        <a th:href="@{/books/{id}(id=${item.bookId})}">
+                            <img alt="도서 썸네일"
+                                 th:src="${item.thumbnailUrl != null} ? ${item.thumbnailUrl} : 'https://via.placeholder.com/80x120?text=No+Image'"/>
+                        </a>
+                        <div class="cart-item-details-kitsch">
+                            <a class="item-title-kitsch" th:href="@{/books/{id}(id=${item.bookId})}"
+                               th:text="${item.title}"></a>
+                            <p class="item-author-kitsch"
+                               th:if="${item.categories != null}"
+                               th:text="${#strings.arrayJoin(item.categories.toArray(), ', ')}">카테고리</p>
                         </div>
                     </div>
+
                     <div class="quantity-input-kitsch">
                         <button class="quantity-btn-kitsch minus-btn-kitsch" onclick="changeCartItemQuantity(this, -1)">
                             -
                         </button>
-                        <input class="quantity-value-kitsch" data-price="25200" min="1"
-                               onchange="updateCartItemSubtotal(this)" type="number"
-                               value="1">
+                        <input class="quantity-value-kitsch"
+                               min="1"
+                               onchange="updateCartItemSubtotal(this)"
+                               th:data-price="${item.salePrice != null ? item.salePrice.intValue() : item.price.intValue()}"
+                               th:value="${item.quantity}"
+                               type="number"/>
                         <button class="quantity-btn-kitsch plus-btn-kitsch" onclick="changeCartItemQuantity(this, 1)">
                             +
                         </button>
                     </div>
-                    <div class="cart-item-price-kitsch item-unit-price">25,200원</div>
+
+                    <div class="cart-item-price-kitsch item-unit-price"
+                         th:text="${#numbers.formatInteger(((item.salePrice != null ? item.salePrice.intValue() : item.price.intValue()) * item.quantity), 3, 'COMMA') + '원'}">
+                        가격
+                    </div>
                     <div class="cart-item-delete-kitsch">
-                        <button class="text-btn-kitsch" onclick="deleteCartItem(this)"><i
-                                class="fas fa-times-circle"></i></button>
+                        <form method="post" th:action="@{/cart}" th:object="${item}">
+                            <input name="_method" type="hidden" value="delete"/>
+                            <input name="bookId" th:value="${item.bookId}" type="hidden"/>
+                            <button class="text-btn-kitsch" type="submit">
+                                <i class="fas fa-times-circle"></i>
+                            </button>
+                        </form>
                     </div>
                 </div>
-
-                <div class="cart-item-kitsch">
-                    <div class="cart-item-checkbox-kitsch">
-                        <label class="checkbox-kitsch">
-                            <input checked class="cart-item-select" onchange="updateCartSummary()" type="checkbox"
-                                   value="102">
-                            <span class="checkbox-custom-kitsch"></span>
-                        </label>
-                    </div>
-                    <div class="cart-item-info-kitsch">
-                        <a th:href="@{/books/102}"><img alt="픽셀 아트로 배우는 알고리즘"
-                                                        src="https://picsum.photos/80/120?random=102"></a>
-                        <div class="cart-item-details-kitsch">
-                            <a class="item-title-kitsch" th:href="@{/books/102}">픽셀 아트로 배우는 알고리즘</a>
-                            <p class="item-author-kitsch">글: 닥터 도트</p>
-                        </div>
-                    </div>
-                    <div class="quantity-input-kitsch">
-                        <button class="quantity-btn-kitsch minus-btn-kitsch" onclick="changeCartItemQuantity(this, -1)">
-                            -
-                        </button>
-                        <input class="quantity-value-kitsch" data-price="31500" min="1"
-                               onchange="updateCartItemSubtotal(this)" type="number"
-                               value="2">
-                        <button class="quantity-btn-kitsch plus-btn-kitsch" onclick="changeCartItemQuantity(this, 1)">
-                            +
-                        </button>
-                    </div>
-                    <div class="cart-item-price-kitsch item-unit-price">31,500원</div>
-                    <div class="cart-item-delete-kitsch">
-                        <button class="text-btn-kitsch" onclick="deleteCartItem(this)"><i
-                                class="fas fa-times-circle"></i></button>
-                    </div>
-                </div>
-
-                <div class="cart-item-kitsch">
-                    <div class="cart-item-checkbox-kitsch">
-                        <label class="checkbox-kitsch">
-                            <input class="cart-item-select" onchange="updateCartSummary()" type="checkbox" value="105">
-                            <span class="checkbox-custom-kitsch"></span>
-                        </label>
-                    </div>
-                    <div class="cart-item-info-kitsch">
-                        <a th:href="@{/books/105}"><img alt="게임보이 개발 비급" src="https://picsum.photos/80/120?random=105"></a>
-                        <div class="cart-item-details-kitsch">
-                            <a class="item-title-kitsch" th:href="@{/books/105}">게임보이 개발 비급</a>
-                            <p class="item-author-kitsch">레트로 장인</p>
-                        </div>
-                    </div>
-                    <div class="quantity-input-kitsch">
-                        <button class="quantity-btn-kitsch minus-btn-kitsch" onclick="changeCartItemQuantity(this, -1)">
-                            -
-                        </button>
-                        <input class="quantity-value-kitsch" data-price="33300" min="1"
-                               onchange="updateCartItemSubtotal(this)" type="number"
-                               value="1">
-                        <button class="quantity-btn-kitsch plus-btn-kitsch" onclick="changeCartItemQuantity(this, 1)">
-                            +
-                        </button>
-                    </div>
-                    <div class="cart-item-price-kitsch item-unit-price">33,300원</div>
-                    <div class="cart-item-delete-kitsch">
-                        <button class="text-btn-kitsch" onclick="deleteCartItem(this)"><i
-                                class="fas fa-times-circle"></i></button>
-                    </div>
-                </div>
-
             </div>
 
             <div class="cart-summary-panel-kitsch">
@@ -503,14 +461,6 @@
                 <div class="summary-row-kitsch">
                     <span class="label">배송비:</span>
                     <span class="value" id="deliveryFee">0원</span>
-                </div>
-                <div class="summary-row-kitsch">
-                    <span class="label">포장비:</span>
-                    <span class="value" id="packagingFee">2,000원</span>
-                </div>
-                <div class="summary-row-kitsch">
-                    <span class="label">할인 금액:</span>
-                    <span class="value discount" id="discountAmount">- 5,000원</span>
                 </div>
                 <div class="total-summary-kitsch">
                     <div class="summary-row-kitsch">
@@ -548,27 +498,49 @@
         }
 
         function updateCartItemSubtotal(quantityInput) {
-            // 수량 변경 시 해당 아이템의 소계는 직접 업데이트하지 않고, 전체 요약 업데이트 함수 호출
-            updateCartSummary();
+            const cartItem = quantityInput.closest('.cart-item-kitsch');
+            const pricePerItem = parseInt(quantityInput.dataset.price);
+            const quantity = parseInt(quantityInput.value);
+            const subtotal = pricePerItem * quantity;
+
+            // 소계 표시 영역 찾아서 텍스트 변경
+            const subtotalDisplay = cartItem.querySelector('.cart-item-price-kitsch');
+            if (subtotalDisplay) {
+                subtotalDisplay.textContent = formatCurrency(subtotal);
+            }
+
+            updateCartSummary(); // 전체 요약도 갱신
         }
 
         function changeCartItemQuantity(buttonElement, amount) {
-            const quantityInput = buttonElement.parentElement.querySelector('.quantity-value-kitsch');
-            let currentValue = parseInt(quantityInput.value);
-            currentValue += amount;
-            if (currentValue < 1) {
-                currentValue = 1;
-            }
-            quantityInput.value = currentValue;
-            updateCartSummary(); // 수량 변경 후 전체 요약 업데이트
+            const cartItem = buttonElement.closest('.cart-item-kitsch');
+            const quantityInput = cartItem.querySelector('.quantity-value-kitsch');
+            const bookId = cartItem.querySelector('.cart-item-select').value;
+
+            const newQuantity = parseInt(quantityInput.value) + amount;
+            if (newQuantity < 1) return;
+
+            const url = amount > 0 ? '/cart/increase' : '/cart/decrease';
+
+            fetch(url + '?bookId=' + bookId, {
+                method: 'POST'
+            })
+                .then(response => {
+                    if (!response.ok) throw new Error("수량 변경 실패");
+                    quantityInput.value = newQuantity;
+                    updateCartItemSubtotal(quantityInput);
+                    updateCartSummary();
+                })
+                .catch(err => {
+                    alert("수량 변경에 실패했습니다.");
+                    console.error(err);
+                });
         }
 
         function updateCartSummary() {
             let totalProductPrice = 0;
-            let packagingFee = 0; // Mock 포장비 (선택된 아이템 기준)
             const MOCK_DELIVERY_FEE_THRESHOLD = 30000; // Mock 무료배송 기준액
             const MOCK_DELIVERY_COST = 3000;       // Mock 기본 배송비
-            const MOCK_DISCOUNT_AMOUNT = 5000;      // Mock 할인 금액
 
             const selectedItems = document.querySelectorAll('.cart-item-select:checked');
             selectedItems.forEach(itemCheckbox => {
@@ -578,10 +550,6 @@
                 const quantity = parseInt(quantityInput.value);
                 totalProductPrice += pricePerItem * quantity;
 
-                // Mock 포장 옵션 (첫번째 아이템만 포장했다고 가정)
-                if (itemCheckbox.value === "101") { // '코딩 대모험'의 value
-                    packagingFee += 2000 * quantity; // 수량만큼 포장비
-                }
             });
 
             let deliveryFee = 0;
@@ -589,12 +557,10 @@
                 deliveryFee = MOCK_DELIVERY_COST;
             }
 
-            const finalTotalPrice = totalProductPrice + deliveryFee + packagingFee - MOCK_DISCOUNT_AMOUNT;
+            const finalTotalPrice = totalProductPrice + deliveryFee;
 
             document.getElementById('totalProductPrice').textContent = formatCurrency(totalProductPrice);
             document.getElementById('deliveryFee').textContent = formatCurrency(deliveryFee);
-            document.getElementById('packagingFee').textContent = formatCurrency(packagingFee);
-            document.getElementById('discountAmount').textContent = "- " + formatCurrency(MOCK_DISCOUNT_AMOUNT);
             document.getElementById('finalTotalPrice').textContent = formatCurrency(Math.max(0, finalTotalPrice)); // 최종금액이 음수가 되지 않도록
 
             // 장바구니 아이템 유무에 따른 메시지 토글
@@ -608,44 +574,32 @@
             updateCartSummary();
         }
 
-        function deleteCartItem(buttonElement) {
-            const cartItem = buttonElement.closest('.cart-item-kitsch');
-            if (cartItem) {
-                cartItem.remove();
-                updateCartSummary();
-                alert("선택한 상품이 삭제되었습니다. (Mock)");
-            }
-        }
-
-        function deleteSelectedCartItems() {
-            const selectedItems = document.querySelectorAll('.cart-item-select:checked');
-            if (selectedItems.length === 0) {
-                alert("삭제할 상품을 선택해주세요. (Mock)");
+        // 선택된 항목들 삭제 메서드
+        function submitSelectedDeleteForm() {
+            const selectedCheckboxes = document.querySelectorAll('.cart-item-select:checked');
+            if (selectedCheckboxes.length === 0) {
+                alert("삭제할 상품을 선택해주세요.");
                 return;
             }
-            selectedItems.forEach(checkbox => {
-                checkbox.closest('.cart-item-kitsch').remove();
-            });
-            updateCartSummary();
-            alert(selectedItems.length + "개 상품이 삭제되었습니다. (Mock)");
+
+            const bookIds = Array.from(selectedCheckboxes).map(cb => cb.value);
+            document.getElementById("bookIdsInput").value = bookIds.join(",");
+            document.getElementById("selectedDeleteForm").submit();
         }
 
         function toggleEmptyCartMessage() {
-            const cartItemsPanel = document.getElementById('cartWithItems');
+            const cartItemsPanel = document.querySelector('.cart-items-panel-kitsch');
+            const summaryPanel = document.querySelector('.cart-summary-panel-kitsch');
             const emptyCartMsg = document.getElementById('emptyCartMessage');
             const cartItemElements = document.querySelectorAll('.cart-item-kitsch');
 
             if (cartItemElements.length === 0) {
-                cartItemsPanel.style.display = 'none'; // 아이템 목록 및 요약 패널 숨김
-                if (document.querySelector('.cart-summary-panel-kitsch')) {
-                    document.querySelector('.cart-summary-panel-kitsch').style.display = 'none';
-                }
+                if (cartItemsPanel) cartItemsPanel.style.display = 'none';
+                if (summaryPanel) summaryPanel.style.display = 'none';
                 emptyCartMsg.style.display = 'block';
             } else {
-                cartItemsPanel.style.display = 'block'; // 또는 grid 등 원래 display 속성
-                if (document.querySelector('.cart-summary-panel-kitsch')) {
-                    document.querySelector('.cart-summary-panel-kitsch').style.display = 'block';
-                }
+                if (cartItemsPanel) cartItemsPanel.style.display = 'block';
+                if (summaryPanel) summaryPanel.style.display = 'block';
                 emptyCartMsg.style.display = 'none';
             }
         }
@@ -659,14 +613,34 @@
         function proceedToCheckout() {
             const selectedItems = document.querySelectorAll('.cart-item-select:checked');
             if (selectedItems.length === 0) {
-                alert("주문할 상품을 선택해주세요. (Mock)");
+                alert("주문할 상품을 선택해주세요.");
                 return;
             }
-            // 선택된 상품 정보를 가지고 주문서 작성 페이지로 이동
-            console.log(selectedItems.length + "개 상품 주문 진행 (Mock)");
-            window.location.href = "/order/checkout"; // 주문서 작성 페이지 URL (가상)
-        }
 
+            const bookIds = Array.from(selectedItems).map(cb => cb.value);
+            const params = new URLSearchParams();
+
+            bookIds.forEach(id => params.append('bookIds', id));
+
+            fetch(`/order/create?${params.toString()}`, {
+                method: 'GET'
+            })
+
+                .then(response => {
+                    if (!response.ok) throw new Error("주문 페이지 요청 실패");
+                    return response.text(); // HTML 반환 받음
+                })
+                .then(html => {
+                    // 현재 페이지를 주문 페이지 HTML로 대체
+                    document.open();
+                    document.write(html);
+                    document.close();
+                })
+                .catch(err => {
+                    alert("주문 페이지로 이동에 실패했습니다.");
+                    console.error(err);
+                });
+        }
 
         // 페이지 로드 시 초기 요약 업데이트
         document.addEventListener('DOMContentLoaded', function () {

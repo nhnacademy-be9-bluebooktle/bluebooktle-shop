@@ -5,8 +5,8 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import shop.bluebooktle.backend.point.entity.PointSourceType;
 import shop.bluebooktle.common.domain.point.ActionType;
+import shop.bluebooktle.common.entity.point.PointSourceType;
 
 public interface PointSourceTypeRepository extends JpaRepository<PointSourceType, Long> {
 	Optional<PointSourceType> findById(Long id);

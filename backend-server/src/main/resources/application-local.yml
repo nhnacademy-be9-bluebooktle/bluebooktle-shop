@@ -1,7 +1,11 @@
 server:
   port: 9012
+  gateway-url: localhost:9000
 
 spring:
+  batch:
+    jdbc:
+      initialize-schema: never
   datasource:
     url: jdbc:mysql://localhost:3306/bluebooktle
     username: ${MYSQL_USERNAME}
@@ -29,16 +33,26 @@ spring:
       host: localhost
       port: 6379
       database: 0
-#  elasticsearch:
-#    uris: http://localhost:9200
-#  rabbitmq:
-#    host: localhost
+  #  elasticsearch:
+  #    uris: http://localhost:9200
+  rabbitmq:
+    host: s4.java21.net
+    port: 5672
+    username: ${RABBITMQ_USERNAME}
+    password: ${RABBITMQ_PASSWORD}
 
 
 eureka:
   client:
     service-url:
       defaultZone: "http://${EUREKA_ID}:${EUREKA_PASSWORD}@localhost:9761/eureka"
+
+# 이미지저장서버 minio
+minio:
+  endpoint: http://storage.java21.net:8000
+  access-key: ${MINIO_ACCESS_KEY}
+  secret-key: ${MINIO_SECRET_KEY}
+  bucket: bluebooktle-bookimage
 
 jwt:
   secret: ${JWT_SECRET_KEY_LOCAL}
@@ -51,3 +65,27 @@ logging:
     org.hibernate.SQL: info
     org.hibernate.orm.jdbc.bind: trace
     org.springframework.transaction.interceptor: trace
+
+mq:
+  queue:
+    birthday: BB.local.birthday.queue
+    birthday-dlq: BB.local.birthday.queue.dlq
+    direct: BB.local.direct.queue
+    direct-dlq: BB.local.direct.queue.dlq
+    welcome: BB.local.welcome.queue
+    welcome-dlq: BB.local.welcome.queue.dlq
+  exchange:
+    birthday: local.birthday.exchange
+    birthday-dlx: local.birthday.dlx
+    direct: local.direct.exchange
+    direct-dlx: local.direct.dlx
+    welcome: local.welcome.exchange
+    welcome-dlx: local.welcome.dlx
+
+encrypt:
+  key: WpqWJ+qndIaLgP1udQD7lUUuaeARZEvOzHefTNS23hA=
+
+dooray:
+  webhook:
+    verification-channel: https://nhnacademy.dooray.com/services/3204376758577275363/4082541783774462190/kziab347QWW2oZ_D2rumEA
+#    notification-channel: 추후 사용

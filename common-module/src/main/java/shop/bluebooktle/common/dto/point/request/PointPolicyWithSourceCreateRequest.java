@@ -14,10 +14,8 @@ public record PointPolicyWithSourceCreateRequest(
 	@NotNull(message = "sourceType은 필수입니다.")
 	String sourceType,
 
-	@NotNull(message = "policyType은 필수입니다.")
 	PolicyType policyType,
 
-	@NotNull(message = "value는 필수입니다.")
 	@DecimalMin(value = "0.00", inclusive = false, message = "value는 0보다 커야 합니다.")
 	BigDecimal value
 ) {

@@ -19,7 +19,7 @@ import shop.bluebooktle.common.dto.book.response.CategoryTreeResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
 import shop.bluebooktle.frontend.config.feign.FeignGlobalConfig;
 
-@FeignClient(name = "backend-server", contextId = "categoryRepository", path = "/api/categories", configuration = FeignGlobalConfig.class)
+@FeignClient(url = "${server.gateway-url}", name = "categoryRepository", path = "/api/categories", configuration = FeignGlobalConfig.class)
 public interface AdminCategoryRepository {
 
 	@GetMapping

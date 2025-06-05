@@ -14,15 +14,11 @@ public interface CartBookRepository extends JpaRepository<CartBook, Long> {
 	// 특정 장바구니 안에 특정 도서가 있는지 조회
 	Optional<CartBook> findByCartAndBook(Cart cart, Book book);
 
-	// 특정 장바구니에 담긴 모든 항목 조회
-	List<CartBook> findAllByCart(Cart cart);
-
 	// 특정 장바구니에서 bookId 리스트로 항목 일괄 조회
 	List<CartBook> findAllByCartAndBookIdIn(Cart cart, List<Long> bookIds);
 
-	// 개별 삭제
-	void delete(CartBook cartBook);
-
 	// 저장 (수량 증가 등)
 	CartBook save(CartBook cartBook);
+
+	Long countByCart(Cart cart);
 }

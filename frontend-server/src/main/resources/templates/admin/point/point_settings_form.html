@@ -84,34 +84,63 @@
                         <input name="pointSourceTypeId" th:value="${rule.pointSourceTypeId}" type="hidden"/>
                         <input name="pointPolicyId" th:value="${rule.pointPolicyId}" type="hidden"/>
 
+                        <span th:text="${rule.pointSourceTypeId}"></span>
+
                         <span class="item-label" th:text="${rule.sourceType}"></span>
 
                         <!-- 활성화 -->
-                        <input name="isActive" th:checked="${rule.active}" type="checkbox"/>
+                        <span>활성화</span>
+                        <label>
+                            <input name="isActive"
+                                   th:checked="${rule.isActive()}"
+                                   type="checkbox"
+                                   value="true"/>
+                            <input name="isActive" type="hidden" value="false"/>
+                        </label>
+
 
                         <!-- 정책 유형 -->
-                        <select name="policyType">
-                            <option th:each="opt : ${earningTypeOptions}"
-                                    th:selected="${opt.value == rule.policyType}"
-                                    th:text="${opt.text}"
-                                    th:value="${opt.value}"></option>
-                        </select>
+                        <label>
+                            <select name="policyType">
+                                <option th:each="opt : ${earningTypeOptions}"
+                                        th:selected="${opt.name() == rule.policyType.name()}"
+                                        th:text="${opt.getDisplayName()}"
+                                        th:value="${opt.name()}"></option>
+                            </select>
+                        </label>
 
                         <!-- 값 -->
-                        <input name="value" placeholder="값"
-                               step="any"
-                               th:value="${rule.value}"
-                               type="number"/>
+                        <label>
+                            <input name="value" placeholder="값"
+                                   step="any"
+                                   th:value="${rule.value()}"
+                                   type="number"/>
+                        </label>
 
                         <!-- 개별 수정 버튼 -->
                         <button class="btn btn-sm btn-primary" type="submit">
                             수정
                         </button>
                     </form>
+
+                    <!-- —— 삭제 버튼 폼 —— -->
+                    <!--                    <form style="display:inline-flex;"-->
+                    <!--                          th:action="@{/admin/points/settings/{policyId}(policyId=${rule.pointPolicyId})}"-->
+                    <!--                          th:method="DELETE">-->
+                    <!--                        <input name="pointSourceTypeId" th:value="${rule.pointSourceTypeId}"-->
+                    <!--                               type="hidden"/>-->
+                    <!--                        <button class="btn btn-sm btn-danger"-->
+                    <!--                                onclick="return confirm('정말 이 규칙을 삭제하시겠습니까?');"-->
+                    <!--                                type="submit">-->
+                    <!--                            삭제-->
+                    <!--                        </button>-->
+                    <!--                    </form>-->
+
+
                 </div>
-                <a class="btn btn-primary mb-3" th:href="@{/admin/points/settings/new}">
-                    + 새 포인트 규칙 생성
-                </a>
+                <!--                <a class="btn btn-primary mb-3" th:href="@{/admin/points/settings/new}">-->
+                <!--                    + 새 포인트 규칙 생성-->
+                <!--                </a>-->
             </fieldset>
 
 

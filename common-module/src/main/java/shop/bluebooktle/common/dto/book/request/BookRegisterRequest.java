@@ -21,6 +21,8 @@ public class BookRegisterRequest {
 	@NotBlank(message = "도서 설명은 필수 값입니다.")
 	String description;
 
+	String index;
+
 	LocalDate publishDate;
 
 	@NotBlank(message = "ISBN 값은 필수 값입니다.")
