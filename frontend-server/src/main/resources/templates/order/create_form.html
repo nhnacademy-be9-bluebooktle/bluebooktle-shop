@@ -279,6 +279,11 @@
             margin-top: 1.5rem;
         }
 
+        .disabled-option {
+            color: gray;
+            text-decoration: line-through;
+        }
+
         @media (max-width: 992px) {
             .checkout-container-kitsch {
                 grid-template-columns: 1fr;
@@ -409,6 +414,43 @@
                                                 class="btn-kitsch qty-button pack-qty-increase"
                                                 type="button">+
                                         </button>
+                                    </div>
+
+                                    <!-- ⑤ 도서 쿠폰 선택 -->
+                                    <div class="item-coupon-apply-kitsch"
+                                         th:if="${coupons.usableUserCouponMap[__${item.bookId}__] != null and !coupons.usableUserCouponMap[__${item.bookId}__].isEmpty()}">
+                                        <label class="label-kitsch" th:for="${'couponSelect-' + idx.index}">도서 쿠폰
+                                            선택:</label>
+                                        <select class="select-kitsch item-coupon-select"
+                                                th:id="${'couponSelect-' + idx.index}"
+                                                th:data-idx="${idx.index}">
+                                            <option value="">선택 안 함</option>
+
+                                            <option
+                                                    th:each="coupon : ${coupons.usableUserCouponMap[__${item.bookId}__]}"
+                                                    th:value="${coupon.userCouponId}"
+                                                    th:data-type="${coupon.discountPrice != null ? 'FIXED' : 'PERCENT'}"
+                                                    th:data-discount-price="${coupon.discountPrice}"
+                                                    th:data-discount-percent="${coupon.discountPercent}"
+                                                    th:data-maximum-discount-price="${coupon.maximumDiscountPrice}"
+                                                    th:data-minimum-payment="${coupon.minimumPayment}"
+                                                    th:disabled="${item.salePrice.doubleValue() < coupon.minimumPayment.doubleValue()}"
+                                                    th:classappend="${item.salePrice.doubleValue() < coupon.minimumPayment.doubleValue()} ? 'disabled-option' : ''"
+                                                    th:title="${item.salePrice.doubleValue() < coupon.minimumPayment.doubleValue()}
+                                                            ? '도서가 최소 결제 금액보다 낮아 사용할 수 없습니다.' : ''"
+                                                    th:text="${coupon.discountPrice != null
+                                                            ? coupon.couponName + ' (-' + #numbers.formatInteger(coupon.discountPrice, 0) + '원)'
+                                                            : coupon.couponName + ' (' + coupon.discountPercent + '% 할인, 최대 ' + #numbers.formatInteger(coupon.maximumDiscountPrice, 0) + '원)'}">
+                                            </option>
+                                        </select>
+
+                                        <input type="hidden" th:id="${'hiddenItemCoupon-' + idx.index}"
+                                               th:name="${'orderItems[' + idx.index + '].itemCouponCode'}" value=""/>
+
+                                        <p class="item-coupon-applied-info" th:id="${'couponInfo-' + idx.index}"
+                                           style="display:none;">
+                                            쿠폰을 적용했습니다.
+                                        </p>
                                     </div>
                                 </div>
                             </div>
@@ -633,6 +675,37 @@
                             <span class="label">개별 상품 할인액:</span>
                             <span class="value discount" id="summaryTotalDiscount">0원</span>
                         </div>
+                        <div class="summary-row-kitsch">
+                            <span>도서 쿠폰 할인:</span>
+                            <span id="summaryBookCouponDiscount">-0원</span>
+                        </div>
+
+                        <div class="summary-row-kitsch">
+                            <label for="orderCouponSelect" class="label">주문 쿠폰 선택:</label>
+                            <select id="orderCouponSelect" class="select-kitsch" style="max-width: 200px;">
+                                <option value="">선택 안 함</option>
+                                <option th:each="coupon : ${coupons.usableUserCouponMap[-1]}"
+                                        th:value="${coupon.userCouponId}"
+                                        th:data-type="${coupon.discountPrice != null ? 'FIXED' : 'PERCENT'}"
+                                        th:data-discount-price="${coupon.discountPrice}"
+                                        th:data-discount-percent="${coupon.discountPercent}"
+                                        th:data-maximum-discount-price="${coupon.maximumDiscountPrice}"
+                                        th:data-minimum-payment="${coupon.minimumPayment}"
+                                        th:disabled="${summaryTotalProductPrice < coupon.minimumPayment.doubleValue()}"
+                                        th:classappend="${summaryTotalProductPrice < coupon.minimumPayment.doubleValue()} ? 'disabled-option' : ''"
+                                        th:title="${summaryTotalProductPrice < coupon.minimumPayment.doubleValue()}
+                    ? '주문 금액이 최소 결제 금액보다 낮아 사용할 수 없습니다.' : ''"
+                                        th:text="${coupon.discountPrice != null
+                    ? coupon.couponName + ' (-' + #numbers.formatInteger(coupon.discountPrice, 0) + '원)'
+                    : coupon.couponName + ' (' + coupon.discountPercent + '% 할인, 최대 ' + #numbers.formatInteger(coupon.maximumDiscountPrice, 0) + '원)'}">
+                                </option>
+                            </select>
+                            <input type="hidden" name="orderCouponCode" id="hiddenOrderCouponCode" value=""/>
+                        </div>
+                        <div class="summary-row-kitsch">
+                            <span>주문 쿠폰 할인:</span>
+                            <span id="summaryOrderCouponDiscount">-0원</span>
+                        </div>
 
                         <div class="form-group-kitsch" th:if="${user != null}">
                             <label class="label-kitsch" for="pointsToUse" style="font-size:1em;">
@@ -657,10 +730,11 @@
                             </div>
                         </div>
 
-                        <div class="summary-row-kitsch">
-                            <span class="label">주문 전체 할인:</span>
-                            <span class="value discount" id="summaryOrderCouponDiscount">0원</span>
-                        </div>
+                        <input type="hidden" name="bookCouponDiscountAmount" id="hiddenBookCouponDiscountAmount"
+                               value="0">
+                        <input type="hidden" name="orderCouponDiscountAmount" id="hiddenOrderCouponDiscountAmount"
+                               value="0">
+
 
                         <div class="summary-row-kitsch" th:if="${user != null}">
                             <span class="label">포인트 할인:</span>
@@ -861,15 +935,149 @@
                 if (hiddenPointUseAmountEl) hiddenPointUseAmountEl.value = pointsToUse;
             }
 
+            function updateCouponDiscount() {
+                let totalBookCouponDiscount = 0;
+
+                document.querySelectorAll('.item-coupon-select').forEach((sel, idx) => {
+                    const selected = sel.selectedOptions[0];
+                    const selectedCouponId = sel.value;
+                    const itemWrapper = sel.closest('.ordered-item-kitsch');
+                    const infoEl = document.getElementById(`couponInfo-${idx}`);
+                    const hiddenInput = document.getElementById(`hiddenItemCoupon-${idx}`);
+                    const salePrice = parseInt(itemWrapper.dataset.itemSalePrice, 10);
+
+                    let discountText = '';
+                    let discount = 0;
+
+                    if (selectedCouponId) {
+                        const type = selected.dataset.type;
+                        if (type === 'FIXED') {
+                            discount = parseFloat(selected.dataset.discountPrice || 0);
+                            discountText = `할인 적용: -${discount.toLocaleString()}원`;
+                        } else if (type === 'PERCENT') {
+                            const percent = parseFloat(selected.dataset.discountPercent || 0);
+                            const max = parseFloat(selected.dataset.maximumDiscountPrice || 0);
+                            discount = Math.floor(salePrice * (percent / 100));
+                            if (!isNaN(max) && discount > max) discount = max;
+                            discountText = `할인 적용: -${discount.toLocaleString()}원`;
+                        }
+
+                        if (infoEl) {
+                            infoEl.textContent = discountText;
+                            infoEl.style.display = 'block';
+                        }
+                        if (hiddenInput) hiddenInput.value = selectedCouponId;
+                        totalBookCouponDiscount += discount;
+                    } else {
+                        if (infoEl) infoEl.style.display = 'none';
+                        if (hiddenInput) hiddenInput.value = '';
+                    }
+                });
+
+                let orderCouponDiscount = 0;
+                const orderCouponSelect = document.getElementById('orderCouponSelect');
+                const selectedOrder = orderCouponSelect?.selectedOptions?.[0];
+
+                const productTotal = getNumericValue('summaryTotalProductPrice');
+                const saleDiscount = getNumericValue('summaryTotalDiscount');
+                const baseAmount = productTotal - saleDiscount - totalBookCouponDiscount;
+
+                if (selectedOrder && selectedOrder.value) {
+                    const type = selectedOrder.dataset.type;
+                    const minPayment = parseFloat(selectedOrder.dataset.minimumPayment || 0);
+
+                    if (baseAmount >= minPayment) {
+                        if (type === 'FIXED') {
+                            orderCouponDiscount += parseFloat(selectedOrder.dataset.discountPrice || 0);
+                        } else if (type === 'PERCENT') {
+                            const percent = parseFloat(selectedOrder.dataset.discountPercent || 0);
+                            const max = parseFloat(selectedOrder.dataset.maximumDiscountPrice || 0);
+                            let discount = Math.floor(baseAmount * (percent / 100));
+                            if (!isNaN(max) && discount > max) discount = max;
+                            orderCouponDiscount += discount;
+                        }
+                    }
+                }
+
+                document.getElementById('summaryBookCouponDiscount').textContent = '-' + totalBookCouponDiscount.toLocaleString() + '원';
+                document.getElementById('summaryOrderCouponDiscount').textContent = '-' + orderCouponDiscount.toLocaleString() + '원';
+                document.getElementById('hiddenBookCouponDiscountAmount').value = totalBookCouponDiscount;
+                document.getElementById('hiddenOrderCouponDiscountAmount').value = orderCouponDiscount;
+
+                updateFinalTotalPrice();
+            }
+
+
+            function updateOrderCouponAvailability() {
+                const orderCouponSelect = document.getElementById('orderCouponSelect');
+                if (!orderCouponSelect) return;
+
+                const productTotal = getNumericValue('summaryTotalProductPrice');
+                const saleDiscount = getNumericValue('summaryTotalDiscount');
+                const bookCouponDiscount = getNumericValue('summaryBookCouponDiscount');
+                const packagingFee = getNumericValue('summaryPackagingFee');
+
+                const baseAmount = productTotal - saleDiscount - bookCouponDiscount;
+
+                Array.from(orderCouponSelect.options).forEach(opt => {
+                    if (!opt.value) return;
+                    const minPayment = parseFloat(opt.dataset.minimumPayment || 0);
+                    const isUsable = baseAmount >= minPayment;
+
+                    opt.disabled = !isUsable;
+                    if (!isUsable) {
+                        opt.classList.add('disabled-option');
+                        opt.title = '주문 금액이 최소 결제 금액보다 낮아 사용할 수 없습니다.';
+                    } else {
+                        opt.classList.remove('disabled-option');
+                        opt.removeAttribute('title');
+                    }
+                });
+
+                const selected = orderCouponSelect.selectedOptions[0];
+                if (selected?.disabled) {
+                    orderCouponSelect.value = '';
+                }
+            }
+
+            function getBookTotalAfterItemDiscountAndBookCoupons() {
+                let total = 0;
+
+                document.querySelectorAll('.ordered-item-kitsch').forEach(item => {
+                    const salePrice = parseFloat(item.dataset.itemSalePrice) || 0;
+                    let discount = 0;
+
+                    const couponSelect = item.querySelector('.item-coupon-select');
+                    const selected = couponSelect?.selectedOptions?.[0];
+                    if (selected && selected.value) {
+                        const type = selected.dataset.type;
+                        if (type === 'FIXED') {
+                            discount = parseFloat(selected.dataset.discountPrice || 0);
+                        } else if (type === 'PERCENT') {
+                            const percent = parseFloat(selected.dataset.discountPercent || 0);
+                            const max = parseFloat(selected.dataset.maximumDiscountPrice || 0);
+                            discount = Math.floor(salePrice * (percent / 100));
+                            if (!isNaN(max) && discount > max) discount = max;
+                        }
+                    }
+
+                    total += salePrice - discount;
+                });
+
+                return total;
+            }
+
+
             function updateFinalTotalPrice() {
                 const productTotal = getNumericValue('summaryTotalProductPrice');
                 const itemDisc = getNumericValue('summaryTotalDiscount');
+                const bookCouponDisc = getNumericValue('summaryBookCouponDiscount');
                 const orderCouponDisc = getNumericValue('summaryOrderCouponDiscount');
                 const pointDisc = getNumericValue('summaryPointDiscount');
                 const packagingFee = getNumericValue('summaryPackagingFee');
                 const deliveryFee = getNumericValue('summaryDeliveryFee');
 
-                let finalTotal = productTotal - itemDisc - orderCouponDisc - pointDisc + packagingFee + deliveryFee;
+                let finalTotal = productTotal - itemDisc - bookCouponDisc - orderCouponDisc - pointDisc + packagingFee + deliveryFee;
 
                 if (finalTotal < 0) finalTotal = 0;
 
@@ -880,6 +1088,8 @@
             function fullPriceRecalculation() {
                 updatePriceSummary();   // Item totals and discounts
                 updatePackagingFee();   // Packaging fees and related hidden fields
+                updateCouponDiscount();
+                updateOrderCouponAvailability();
                 updateDeliveryFee();    // Delivery fee (uses correct item totals)
                 updatePointDiscount();  // Points (uses correct delivery fee for max calculation)
                 updateFinalTotalPrice(); // Grand total
@@ -929,6 +1139,19 @@
                 const aliasEl = document.getElementById('savedAlias');
                 const roadEl = document.getElementById('savedRoad');
                 const detailEl = document.getElementById('savedDetail');
+                const orderCouponSelect = document.getElementById('orderCouponSelect');
+                const orderCouponHidden = document.getElementById('hiddenOrderCouponCode')
+
+                orderCouponSelect.addEventListener('change', () => {
+                    const selected = orderCouponSelect.selectedOptions[0];
+                    const discount = selected.dataset.discount ? parseInt(selected.dataset.discount.replace(/[^\d]/g, ''), 10) : 0;
+
+                    orderCouponHidden.value = selected.value || '';
+                    document.getElementById('summaryCouponDiscount').textContent = '-' + discount.toLocaleString() + '원';
+
+                    updateFinalTotalPrice();
+                    updateOrderCouponDisabling();
+                });
 
                 if (!selectEl) return;
                 const opt = selectEl.selectedOptions[0];
@@ -1085,6 +1308,18 @@
                     });
                 });
 
+                document.querySelectorAll('.item-coupon-select').forEach(sel => {
+                    sel.addEventListener('change', () => {
+                        updateCouponDiscount();
+                    });
+                });
+
+                document.getElementById('orderCouponSelect')?.addEventListener('change', () => {
+                    updateCouponDiscount();
+                });
+                updateCouponDiscount();
+
+
                 // Points Input
                 const pointsInput = document.getElementById('pointsToUse');
                 if (pointsInput) {
@@ -1141,6 +1376,12 @@
                                 }
                             }
                         }
+                    });
+                }
+                const orderCouponSelect = document.getElementById('orderCouponSelect');
+                if (orderCouponSelect) {
+                    orderCouponSelect.addEventListener('change', () => {
+                        fullPriceRecalculation(); // 할인 적용 재계산
                     });
                 }
             });

@@ -1,5 +1,8 @@
 package shop.bluebooktle.common.domain.coupon;
 
+import lombok.Getter;
+
+@Getter
 public enum PredefinedCoupon {
 	BIRTHDAY(1L),
 	WELCOME(2L);
@@ -10,7 +13,4 @@ public enum PredefinedCoupon {
 		this.id = id;
 	}
 
-	public Long getId() {
-		return id;
-	}
 }

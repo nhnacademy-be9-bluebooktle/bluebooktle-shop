@@ -4,7 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import shop.bluebooktle.backend.coupon.dto.CouponSearchRequest;
-import shop.bluebooktle.common.domain.UserCouponFilterType;
+import shop.bluebooktle.common.domain.coupon.UserCouponFilterType;
 import shop.bluebooktle.common.dto.coupon.response.CouponResponse;
 import shop.bluebooktle.common.dto.coupon.response.CouponTypeResponse;
 import shop.bluebooktle.common.dto.coupon.response.UserCouponResponse;
