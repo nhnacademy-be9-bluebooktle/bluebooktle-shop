@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -42,8 +43,9 @@ public class CouponController {
 	@Operation(summary = "쿠폰 전체 조회", description = "등록된 쿠폰 전체를 조회합니다.")
 	@GetMapping
 	public ResponseEntity<JsendResponse<PaginationData<CouponResponse>>> getAllCoupons(
-		@PageableDefault(size = 10, sort = "id") Pageable pageable) {
-		Page<CouponResponse> couponPage = couponService.getAllCoupons(pageable);
+		@RequestParam(value = "searchCouponName", required = false) String searchCouponName,
+		@PageableDefault(size = 10) Pageable pageable) {
+		Page<CouponResponse> couponPage = couponService.getAllCoupons(searchCouponName, pageable);
 		PaginationData<CouponResponse> paginationData = new PaginationData<>(couponPage);
 		return ResponseEntity.ok(JsendResponse.success(paginationData));
 	}

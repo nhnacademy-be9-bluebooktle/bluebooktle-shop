@@ -51,27 +51,10 @@
             </a>
         </div>
     </div>
-    <div class="alert-kitsch error-kitsch" style="margin-bottom: 1rem;"
-         th:if="${error == 'true' && errorMessage != null && !errorMessage.isEmpty()}">
-        <i class="fas fa-exclamation-triangle"></i>
-        <span class="pixel-font-kitsch" th:text="${errorMessage}">에러 메시지가 여기에 표시됩니다.</span>
-    </div>
-    <div class="alert-kitsch success-kitsch" style="margin-bottom: 1rem;"
-         th:if="${globalSuccessMessage != null}">
-        <i class="fas fa-check-circle"></i>
-        <strong class="pixel-font-kitsch" th:text="${globalSuccessTitle}">성공</strong>
-        <span class="pixel-font-kitsch" th:text="${globalSuccessMessage}">작업이 완료되었습니다.</span>
-    </div>
 
     <div class="admin-panel filter-form">
         <div class="admin-panel__body">
             <form method="get" th:action="@{/admin/coupons}" class="row gx-2 gy-2 align-items-center">
-                <div class="col-auto">
-                    <select name="searchField" class="admin-form-control">
-                        <option value="">전체</option>
-                        <option value="couponName" th:selected="${searchField == 'couponName'}">쿠폰명</option>
-                    </select>
-                </div>
                 <div class="col-auto">
                     <input type="text" name="searchKeyword" class="admin-form-control" placeholder="검색어 입력"
                            th:value="${searchKeyword}">
@@ -102,7 +85,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr th:each="coupon : ${coupons}" th:attr="data-coupon-id=${coupon.id}">
+                <tr th:each="coupon : ${coupons.content}" th:attr="data-coupon-id=${coupon.id}">
                     <td th:text="${coupon.id}">1</td>
                     <td th:text="${coupon.couponName}">할인 쿠폰</td>
                     <td th:text="${coupon.target.name() == 'ORDER' ? '전체 주문' : '도서 관련'}"></td>
@@ -127,6 +110,13 @@
                 </tr>
                 </tbody>
             </table>
+            <div th:if="${coupons.pagination.totalPages > 1}" class="pagination-container">
+                <th:block th:replace="~{_fragments/admin_pagination :: commonPagination(
+                    currentPage=${coupons.pagination.currentPage + 1},
+                    totalPages=${coupons.pagination.totalPages},
+                    baseUrl=${baseUrlWithParams},
+                    searchKeyword=${searchKeyword})}"/>
+            </div>
         </div>
     </div>
 </div>
@@ -136,14 +126,13 @@
         function toggleAccordion(button) {
             const currentRow = button.closest('tr');
             const couponId = currentRow.getAttribute('data-coupon-id');
-            // 이미 열려 있는 폼이 이 쿠폰과 관련된 것이면 닫기
             const existingForm = document.querySelector('.inline-issue-form-row');
             if (existingForm) {
                 if (existingForm.previousElementSibling === currentRow) {
-                    existingForm.remove(); // 토글: 다시 누르면 닫힘
+                    existingForm.remove();
                     return;
                 } else {
-                    existingForm.remove(); // 다른 거 열려있으면 제거
+                    existingForm.remove();
                 }
             }
 

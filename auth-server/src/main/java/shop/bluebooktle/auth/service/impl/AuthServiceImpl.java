@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,6 +14,8 @@ import org.springframework.util.StringUtils;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import shop.bluebooktle.auth.event.type.UserLoginEvent;
+import shop.bluebooktle.auth.event.type.UserSignUpEvent;
 import shop.bluebooktle.auth.mq.producer.WelcomeCouponIssueProducer;
 import shop.bluebooktle.auth.repository.MembershipLevelRepository;
 import shop.bluebooktle.auth.repository.UserRepository;
@@ -64,6 +67,7 @@ public class AuthServiceImpl implements AuthService {
 	private final PaycoApiClient paycoApiClient;
 	private final PointService pointService;
 	private final WelcomeCouponIssueProducer welcomeCouponIssueProducer;
+	private final ApplicationEventPublisher eventPublisher;
 
 	@Value("${oauth.payco.client-id}")
 	private String paycoClientId;
@@ -100,8 +104,7 @@ public class AuthServiceImpl implements AuthService {
 			.build();
 
 		userRepository.save(user);
-		// TODO: Transaction 분리
-		pointService.signUpPoint(user.getId());
+		eventPublisher.publishEvent(new UserSignUpEvent(user.getId()));
 
 		welcomeCouponIssueProducer.send(WelcomeCouponIssueMessage.builder()
 			.userId(user.getId())
@@ -137,7 +140,7 @@ public class AuthServiceImpl implements AuthService {
 		user.updateLastLoginAt();
 
 		userRepository.save(user);
-		pointService.loginPoint(user.getId());
+		eventPublisher.publishEvent(new UserLoginEvent(user.getId()));
 
 		String accessToken = jwtUtil.createAccessToken(user.getId(), user.getNickname(), user.getType());
 		String refreshToken = jwtUtil.createRefreshToken(user.getId(), user.getNickname(), user.getType());
@@ -224,6 +227,8 @@ public class AuthServiceImpl implements AuthService {
 		user.updateLastLoginAt();
 		userRepository.save(user);
 
+		eventPublisher.publishEvent(new UserLoginEvent(user.getId()));
+
 		String accessToken = jwtUtil.createAccessToken(user.getId(), user.getNickname(), user.getType());
 		String refreshToken = jwtUtil.createRefreshToken(user.getId(), user.getNickname(), user.getType());
 
@@ -269,7 +274,9 @@ public class AuthServiceImpl implements AuthService {
 			.membershipLevel(defaultLevel)
 			.build();
 
-		return userRepository.save(newUser);
+		newUser = userRepository.save(newUser);
+		eventPublisher.publishEvent(new UserLoginEvent(newUser.getId()));
+		return newUser;
 	}
 
 	private String normalizePhoneNumber(String paycoMobile) {

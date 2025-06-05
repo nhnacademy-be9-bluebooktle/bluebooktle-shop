@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.StringUtils;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.dsl.CaseBuilder;
@@ -17,7 +18,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import shop.bluebooktle.backend.book.entity.QBook;
 import shop.bluebooktle.backend.book.entity.QCategory;
-import shop.bluebooktle.backend.coupon.dto.CouponSearchRequest;
 import shop.bluebooktle.backend.coupon.entity.QAbsoluteCoupon;
 import shop.bluebooktle.backend.coupon.entity.QBookCoupon;
 import shop.bluebooktle.backend.coupon.entity.QCategoryCoupon;
@@ -26,7 +26,7 @@ import shop.bluebooktle.backend.coupon.entity.QCouponType;
 import shop.bluebooktle.backend.coupon.entity.QRelativeCoupon;
 import shop.bluebooktle.backend.coupon.entity.QUserCoupon;
 import shop.bluebooktle.backend.coupon.repository.CouponQueryRepository;
-import shop.bluebooktle.common.domain.UserCouponFilterType;
+import shop.bluebooktle.common.domain.coupon.UserCouponFilterType;
 import shop.bluebooktle.common.dto.coupon.response.CouponResponse;
 import shop.bluebooktle.common.dto.coupon.response.CouponTypeResponse;
 import shop.bluebooktle.common.dto.coupon.response.QCouponResponse;
@@ -43,7 +43,7 @@ public class CouponQueryRepositoryImpl implements CouponQueryRepository {
 
 	//관리자 쿠폰 전체 조회
 	@Override
-	public Page<CouponResponse> findAllByCoupon(CouponSearchRequest request, Pageable pageable) {
+	public Page<CouponResponse> findAllByCoupon(String searchCouponName, Pageable pageable) {
 		QCoupon coupon = QCoupon.coupon;
 		QCouponType couponType = QCouponType.couponType;
 		QBookCoupon bookCoupon = QBookCoupon.bookCoupon;
@@ -54,26 +54,20 @@ public class CouponQueryRepositoryImpl implements CouponQueryRepository {
 
 		BooleanBuilder builder = new BooleanBuilder();
 
-		if (request.getTarget() != null) {
-			builder.and(couponType.target.eq(request.getTarget()));
+		if (StringUtils.hasText(searchCouponName)) {
+			builder.and(coupon.couponName.containsIgnoreCase(searchCouponName));
 		}
 
-		if (request.getBookId() != null) {
-			builder.and(bookCoupon.book.id.eq(request.getBookId()));
-		}
-		if (request.getCategoryId() != null) {
-			builder.and(categoryCoupon.category.id.eq(request.getCategoryId()));
-		}
-
-		List<CouponResponse> content = queryFactory.select(new QCouponResponse(
+		List<CouponResponse> content = queryFactory
+			.select(new QCouponResponse(
 				coupon.id,
 				coupon.couponName,
 				couponType.target,
 				couponType.name,
 				couponType.minimumPayment,
 				coupon.createdAt,
-				categoryCoupon.category.name,
-				bookCoupon.book.title
+				category.name,
+				book.title
 			))
 			.from(coupon)
 			.join(coupon.couponType, couponType)
@@ -82,7 +76,8 @@ public class CouponQueryRepositoryImpl implements CouponQueryRepository {
 			.leftJoin(categoryCoupon).on(categoryCoupon.coupon.eq(coupon))
 			.leftJoin(categoryCoupon.category, category)
 			.where(builder)
-			.offset(pageable.getOffset()) // offset/limit 페이징 처리
+			.orderBy(coupon.id.asc())
+			.offset(pageable.getOffset())
 			.limit(pageable.getPageSize())
 			.fetch();
 

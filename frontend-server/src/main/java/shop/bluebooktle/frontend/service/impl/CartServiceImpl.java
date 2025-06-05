@@ -63,4 +63,9 @@ public class CartServiceImpl implements CartService {
 	public void mergeOrConvertGuestCart(String guestId) {
 		cartRepository.mergeOrConvertGuestCartToMember(guestId);
 	}
+
+	@Override
+	public Long getCartSize(String guestId) {
+		return cartRepository.getCartQuantity(guestId);
+	}
 }

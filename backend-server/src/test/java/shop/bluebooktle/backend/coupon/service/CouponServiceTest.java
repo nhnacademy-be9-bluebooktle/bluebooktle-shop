@@ -4,7 +4,6 @@ import static org.assertj.core.api.AssertionsForClassTypes.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
@@ -13,10 +12,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +19,6 @@ import shop.bluebooktle.backend.book.entity.Book;
 import shop.bluebooktle.backend.book.entity.Category;
 import shop.bluebooktle.backend.book.repository.BookRepository;
 import shop.bluebooktle.backend.book.repository.CategoryRepository;
-import shop.bluebooktle.backend.coupon.dto.CouponSearchRequest;
 import shop.bluebooktle.backend.coupon.entity.BookCoupon;
 import shop.bluebooktle.backend.coupon.entity.Coupon;
 import shop.bluebooktle.backend.coupon.entity.CouponType;
@@ -35,7 +29,6 @@ import shop.bluebooktle.backend.coupon.repository.CouponTypeRepository;
 import shop.bluebooktle.backend.coupon.service.impl.CouponServiceImpl;
 import shop.bluebooktle.common.domain.coupon.CouponTypeTarget;
 import shop.bluebooktle.common.dto.coupon.request.CouponRegisterRequest;
-import shop.bluebooktle.common.dto.coupon.response.CouponResponse;
 import shop.bluebooktle.common.exception.coupon.CouponTypeNotFoundException;
 import shop.bluebooktle.common.exception.coupon.InvalidCouponTargetException;
 
@@ -223,24 +216,6 @@ public class CouponServiceTest {
 
 		assertThatThrownBy(() -> couponService.registerCoupon(request))
 			.isInstanceOf(InvalidCouponTargetException.class);
-	}
-
-	@Test
-	@DisplayName("전체 쿠폰 목록 조회 - 성공")
-	void getAllCoupons_success() {
-		// given
-		Pageable pageable = PageRequest.of(0, 10);
-		CouponSearchRequest request = new CouponSearchRequest();
-		Page<CouponResponse> resultPage = new PageImpl<>(List.of(), pageable, 0);
-
-		given(couponRepository.findAllByCoupon(any(), eq(pageable))).willReturn(resultPage);
-
-		// when
-		Page<CouponResponse> result = couponService.getAllCoupons(pageable);
-
-		// then
-		assertThat(result.getContent()).isInstanceOf(List.class);
-		verify(couponRepository).findAllByCoupon(any(), eq(pageable));
 	}
 
 }

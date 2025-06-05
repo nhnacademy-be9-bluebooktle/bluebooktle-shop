@@ -60,24 +60,24 @@ public class CartController {
 
 	// === 수량 증가 ===
 	@PostMapping("/increase")
-	public String increaseQuantity(@RequestParam Long bookId,
+	public ResponseEntity<Void> increaseQuantity(@RequestParam Long bookId,
 		@CookieValue(value = "GUEST_ID", required = false) String guestId,
 		HttpServletResponse response) {
 
 		validateGuestId(guestId, response);
 		cartService.increaseQuantity(guestId, bookId);
-		return "redirect:/cart";
+		return ResponseEntity.ok().build();
 	}
 
 	// === 수량 감소 ===
 	@PostMapping("/decrease")
-	public String decreaseQuantity(@RequestParam Long bookId,
+	public ResponseEntity<Void> decreaseQuantity(@RequestParam Long bookId,
 		@CookieValue(value = "GUEST_ID", required = false) String guestId,
 		HttpServletResponse response) {
 
 		validateGuestId(guestId, response);
 		cartService.decreaseQuantity(guestId, bookId);
-		return "redirect:/cart";
+		return ResponseEntity.ok().build();
 	}
 
 	// === 단일 삭제 ===
@@ -101,18 +101,6 @@ public class CartController {
 		cartService.removeSelected(guestId, bookIds);
 		return "redirect:/cart";
 	}
-
-	// === 주문 페이지 - 선택된 도서 정보 렌더링 ===
-	// Order 컨트롤러에서 바로 받기
-	// @PostMapping("/order")
-	// public String getSelectedCartItemsForOrder(
-	// 	@CookieValue(value = "GUEST_ID", required = false) String guestId,
-	// 	@RequestParam("bookIds") List<Long> bookIds,
-	// 	Model model
-	// ) {
-	// 	List<BookCartOrderResponse> selectedItems = cartService.getSelectedCartItemsForOrder(guestId, bookIds);
-	// 	return "redirect:order/create";
-	// }
 
 	// === 보조 메서드 ===
 	private void validateGuestId(String guestId, HttpServletResponse response) {
