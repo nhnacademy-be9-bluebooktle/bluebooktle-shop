@@ -41,7 +41,7 @@ import shop.bluebooktle.common.entity.BaseEntity;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString(exclude = {"addresses", "membershipLevel", "email", "name", "phoneNumber", "birth"})
 @EqualsAndHashCode(of = "id", callSuper = false)
-@SQLDelete(sql = "UPDATE `users` SET deleted_at = CURRENT_TIMESTAMP WHERE user_id = ?")
+@SQLDelete(sql = "UPDATE `users` SET deleted_at = CURRENT_TIMESTAMP, status = 'WITHDRAWN' WHERE user_id = ?")
 @SQLRestriction("deleted_at IS NULL AND status <> 'WITHDRAWN'")
 public class User extends BaseEntity {
 
@@ -91,6 +91,7 @@ public class User extends BaseEntity {
 	@Column(name = "type", nullable = false, length = 10)
 	private UserType type;
 
+	@Setter
 	@Enumerated(EnumType.STRING)
 	@Column(name = "status", nullable = false, length = 10)
 	private UserStatus status;

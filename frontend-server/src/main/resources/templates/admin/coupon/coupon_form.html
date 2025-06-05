@@ -165,7 +165,7 @@
                             </tr>
                             </thead>
                             <tbody>
-                            <tr th:each="type : ${couponTypes}"
+                            <tr th:each="type : ${couponTypeData.content}"
                                 th:classappend="${coupon.couponTypeId == type.id} ? 'selected'">
                                 <td th:text="${type.id}">ID</td>
                                 <td th:text="${type.name}">정책 이름</td>
@@ -185,6 +185,16 @@
                             </tr>
                             </tbody>
                         </table>
+
+                        <!-- 페이징 -->
+                        <div th:if="${couponTypeData.pagination.totalPages > 1}" class="pagination-container">
+                            <th:block th:replace="~{_fragments/admin_pagination :: commonPagination(
+                                currentPage=${couponTypeData.pagination.currentPage + 1},
+                                totalPages=${couponTypeData.pagination.totalPages},
+                                baseUrl=${baseUrlWithParams},
+                                searchKeyword=${searchKeyword})}"/>
+                        </div>
+
 
                         <div th:if="${#fields.hasErrors('couponTypeId')}" th:errors="*{couponTypeId}"
                              class="invalid-feedback admin-form-text"></div>

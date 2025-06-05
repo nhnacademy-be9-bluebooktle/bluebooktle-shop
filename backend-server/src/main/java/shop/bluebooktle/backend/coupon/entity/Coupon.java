@@ -27,7 +27,7 @@ import shop.bluebooktle.common.entity.BaseEntity;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(of = "id", callSuper = false)
-@ToString(exclude = {"user_coupon", "coupon_type", "book_coupon", "category_coupon"})
+@ToString(exclude = {"couponType"})
 public class Coupon extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

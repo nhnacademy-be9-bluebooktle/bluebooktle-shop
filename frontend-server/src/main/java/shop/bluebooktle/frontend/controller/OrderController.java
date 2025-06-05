@@ -1,7 +1,5 @@
 package shop.bluebooktle.frontend.controller;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -23,19 +21,20 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import shop.bluebooktle.common.domain.coupon.CouponTypeTarget;
 import shop.bluebooktle.common.dto.book.response.BookCartOrderResponse;
 import shop.bluebooktle.common.dto.book_order.response.PackagingOptionInfoResponse;
-import shop.bluebooktle.common.dto.coupon.response.CouponResponse;
+import shop.bluebooktle.common.dto.coupon.response.UsableUserCouponMapResponse;
 import shop.bluebooktle.common.dto.order.request.OrderCreateRequest;
 import shop.bluebooktle.common.dto.order.response.DeliveryRuleResponse;
 import shop.bluebooktle.common.dto.order.response.OrderConfirmDetailResponse;
 import shop.bluebooktle.common.dto.payment.request.PaymentConfirmRequest;
 import shop.bluebooktle.common.dto.payment.response.PaymentConfirmResponse;
 import shop.bluebooktle.common.dto.user.response.UserWithAddressResponse;
+import shop.bluebooktle.common.exception.cart.GuestUserNotFoundException;
 import shop.bluebooktle.frontend.service.AdminPackagingOptionService;
 import shop.bluebooktle.frontend.service.BookService;
 import shop.bluebooktle.frontend.service.CartService;
+import shop.bluebooktle.frontend.service.CouponService;
 import shop.bluebooktle.frontend.service.DeliveryRuleService;
 import shop.bluebooktle.frontend.service.OrderService;
 import shop.bluebooktle.frontend.service.PaymentsService;
@@ -47,9 +46,6 @@ import shop.bluebooktle.frontend.service.UserService;
 @RequestMapping("/order")
 public class OrderController {
 
-	@Value("{toss.client-key}")
-	private String tossPaymentClientKey;
-
 	private final PaymentsService paymentsService;
 	private final UserService userService;
 	private final AdminPackagingOptionService adminPackagingOptionService;
@@ -57,18 +53,20 @@ public class OrderController {
 	private final OrderService orderService;
 	private final BookService bookService;
 	private final CartService cartService;
+	private final CouponService couponService;
+
+	@Value("{toss.client-key}")
+	private String tossPaymentClientKey;
 
 	@GetMapping("/create")
 	public ModelAndView createPage(
 		@RequestParam(required = false) Long bookId,
 		@RequestParam(defaultValue = "1", required = false) Integer quantity,
 		@RequestParam(required = false) List<Long> bookIds,
-		@CookieValue(value = "GUEST_ID", required = false) String guestId
+		@CookieValue(value = "GUEST_ID", required = false) String guestId,
+		@CookieValue(value = "BB_AT", required = false) String token
 	) {
 		ModelAndView mav = new ModelAndView("order/create_form");
-
-		UserWithAddressResponse user = userService.getUserWithAddresses();
-		mav.addObject("user", user);
 
 		List<BookCartOrderResponse> bookItems;
 		if (bookId != null) {
@@ -94,18 +92,30 @@ public class OrderController {
 		List<PackagingOptionInfoResponse> packagingOptions = page.getContent();
 		mav.addObject("packagingOptions", packagingOptions);
 
-		List<CouponResponse> orderCoupons = createMockOrderCoupons();
-		mav.addObject("coupons", orderCoupons);
-
 		DeliveryRuleResponse deliveryRule = deliveryRuleService.getDefaultDeliveryRule();
 		mav.addObject("deliveryRule", deliveryRule);
+
+		if (token != null) {
+			UserWithAddressResponse user = userService.getUserWithAddresses();
+			mav.addObject("user", user);
+		}
+		List<Long> bookIdsForCoupon = bookItems.stream()
+			.map(BookCartOrderResponse::bookId)
+			.toList();
+
+		UsableUserCouponMapResponse coupons = couponService.getUsableCouponsForOrder(bookIdsForCoupon);
+		mav.addObject("coupons", coupons);
 
 		return mav;
 	}
 
 	@PostMapping("/create")
 	public String createOrder(@ModelAttribute OrderCreateRequest request) {
-		Long orderId = orderService.createOrder(request);
+		String orderKey = java.util.UUID.randomUUID().toString();
+		OrderCreateRequest updatedRequest = request.toBuilder()
+			.orderKey(orderKey)
+			.build();
+		Long orderId = orderService.createOrder(updatedRequest);
 		log.info("주문 생성 :{}", orderId);
 		return "redirect:/order/" + orderId + "/checkout";
 	}
@@ -171,58 +181,10 @@ public class OrderController {
 		return "order/fail";
 	}
 
-	private List<CouponResponse> createMockOrderCoupons() {
-		return List.of(
-			new CouponResponse(
-				10L,
-				"WELCOME! 5,000원 할인",
-				CouponTypeTarget.ORDER,
-				"금액 할인",
-				BigDecimal.valueOf(20000),         // 최소 결제액 20,000원 이상일 때
-				LocalDateTime.now().minusDays(30),
-				null,
-				null
-			),
-			new CouponResponse(
-				11L,
-				"VIP 전용 10% 할인",
-				CouponTypeTarget.ORDER,
-				"퍼센트 할인",
-				BigDecimal.valueOf(50000),         // 최소 결제액 50,000원 이상일 때
-				LocalDateTime.now().minusDays(15),
-				null,
-				null
-			),
-			new CouponResponse(
-				1L,
-				"키치코딩 1,000원 할인",          // couponName
-				CouponTypeTarget.BOOK,          // target
-				"금액 할인",                     // couponTypeName
-				BigDecimal.ZERO,                // minimumPayment (제한 없음)
-				LocalDateTime.now().minusDays(10), // createdAt
-				null,                           // categoryName (전체 카테고리)
-				"코딩 대모험"                     // bookName
-			),
-			new CouponResponse(
-				2L,
-				"키치코딩 5% 할인",
-				CouponTypeTarget.BOOK,
-				"퍼센트 할인",
-				BigDecimal.ZERO,
-				LocalDateTime.now().minusDays(8),
-				null,
-				"코딩 대모험"
-			),
-			new CouponResponse(
-				3L,
-				"픽셀아트 전용 3,000원 할인",
-				CouponTypeTarget.BOOK,
-				"금액 할인",
-				BigDecimal.ZERO,
-				LocalDateTime.now().minusDays(5),
-				"교육",                         // categoryName: 교육 카테고리 한정
-				"픽셀 아트로 배우는 알고리즘"
-			)
-		);
+	private void validateGuestId(String guestId) {
+		if (guestId == null || guestId.isBlank()) {
+			log.warn("GUEST_ID 쿠키가 존재하지 않습니다.");
+			throw new GuestUserNotFoundException("guestId가 존재하지 않습니다. 쿠키를 발급받아야 합니다.");
+		}
 	}
 }

@@ -1,13 +1,10 @@
 package shop.bluebooktle.frontend.controller.admin;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
@@ -96,8 +93,9 @@ public class AdminCouponController {
 		}
 
 		// 쿠폰 정책 목록
-		PaginationData<CouponTypeResponse> couponTypeData = adminCouponService.getAllCouponType();
-		model.addAttribute("couponTypes", couponTypeData.getContent());
+		PaginationData<CouponTypeResponse> couponTypeData = adminCouponService.getAllCouponType(
+			PageRequest.of(page, size));
+		model.addAttribute("couponTypeData", couponTypeData);
 
 		// 도서 목록
 		Page<BookInfoResponse> books = adminBookService.getPagedBooks(page, size, searchKeyword);
@@ -115,11 +113,7 @@ public class AdminCouponController {
 			uriBuilder.queryParam("searchKeyword", searchKeyword);
 		}
 		model.addAttribute("baseUrlWithParams", uriBuilder.toUriString());
-
-		// 검색어 유지
 		model.addAttribute("searchKeyword", searchKeyword);
-
-		// 카테고리 트리 데이터
 		List<CategoryTreeResponse> categoryTree = adminCategoryService.getCategoryTree();
 		model.addAttribute("categoryTree", categoryTree);
 
@@ -168,7 +162,6 @@ public class AdminCouponController {
 		@RequestParam(value = "issueCouponId", required = false) Long issueCouponId,
 		@RequestParam(value = "page", defaultValue = "0") int page,
 		@RequestParam(value = "size", defaultValue = "10") int size,
-		@RequestParam(value = "searchField", required = false) String searchField,
 		@RequestParam(value = "searchKeyword", required = false) String searchKeyword,
 		@ModelAttribute("error") String error,
 		@ModelAttribute("errorCode") String errorCode,
@@ -176,8 +169,7 @@ public class AdminCouponController {
 		@ModelAttribute("globalSuccessMessage") String globalSuccessMessage,
 		@ModelAttribute("globalSuccessTitle") String globalSuccessTitle) {
 
-		log.info("AdminCouponController - getAllCoupon: page={}, size={}, searchField={}, searchKeyword={}",
-			page, size, searchField, searchKeyword);
+		log.info("AdminCouponController - getAllCoupon: page={}, size={}, searchKeyword={}", page, size, searchKeyword);
 
 		model.addAttribute("currentURI", request.getRequestURI());
 
@@ -191,44 +183,23 @@ public class AdminCouponController {
 			model.addAttribute("globalSuccessTitle", globalSuccessTitle);
 		}
 
-		PaginationData<CouponResponse> allCoupons = adminCouponService.getAllCoupon();
-		List<CouponResponse> filteredCoupons = allCoupons.getContent().stream()
-			.filter(coupon -> (searchKeyword == null || searchKeyword.trim().isEmpty()) ||
-				(searchField == null || searchField.trim().isEmpty()) ||
-				("couponName".equals(searchField) && coupon.getCouponName() != null &&
-					coupon.getCouponName().toLowerCase().contains(searchKeyword.toLowerCase())))
-			.collect(Collectors.toList());
+		Pageable pageable = PageRequest.of(page, size);
 
-		Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
-		Pageable pageable = PageRequest.of(page, size, sort);
+		PaginationData<CouponResponse> coupons = adminCouponService.getAllCoupon(pageable, searchKeyword);
+		model.addAttribute("coupons", coupons);
 
 		if (issueCouponId != null) {
 			model.addAttribute("couponId", issueCouponId);
 			model.addAttribute("issueCouponId", issueCouponId);
 		}
 
-		int start = (int)pageable.getOffset();
-		int end = Math.min(start + pageable.getPageSize(), filteredCoupons.size());
-		List<CouponResponse> pageContent =
-			(start >= filteredCoupons.size() || start >= end) ? List.of() : filteredCoupons.subList(start, end);
-
-		Page<CouponResponse> couponPage = new PageImpl<>(pageContent, pageable, filteredCoupons.size());
-
-		model.addAttribute("coupons", couponPage.getContent());
-		model.addAttribute("currentPage", couponPage.getNumber());
-		model.addAttribute("totalPages", couponPage.getTotalPages());
-		model.addAttribute("currentSize", couponPage.getTotalElements());
-		model.addAttribute("totalElements", couponPage.getTotalElements());
-
 		UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(request.getRequestURI())
-			.queryParam("size", couponPage.getSize());
-		if (searchField != null && !searchField.isEmpty())
-			uriBuilder.queryParam("searchField", searchField);
-		if (searchKeyword != null && !searchKeyword.isEmpty())
+			.queryParam("size", size);
+		if (searchKeyword != null && !searchKeyword.isEmpty()) {
 			uriBuilder.queryParam("searchKeyword", searchKeyword);
+		}
 
 		model.addAttribute("baseUrlWithParams", uriBuilder.toUriString());
-		model.addAttribute("searchField", searchField);
 		model.addAttribute("searchKeyword", searchKeyword);
 
 		return "admin/coupon/coupon_list";

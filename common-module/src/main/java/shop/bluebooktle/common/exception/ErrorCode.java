@@ -27,7 +27,7 @@ public enum ErrorCode {
 	AUTH_AUTHENTICATION_FAILED(HttpStatus.UNAUTHORIZED, "A001", "아이디 또는 비밀번호가 일치하지 않습니다."),
 	AUTH_LOGIN_ID_ALREADY_EXISTS(HttpStatus.CONFLICT, "A002", "이미 사용 중인 아이디입니다."),
 	AUTH_EMAIL_ALREADY_EXISTS(HttpStatus.CONFLICT, "A003", "이미 사용 중인 이메일입니다."),
-	AUTH_INACTIVE_ACCOUNT(HttpStatus.FORBIDDEN, "A004", "비활성화 상태 계정입니다. 인증 후 활성화 해주세요."),
+	AUTH_INACTIVE_ACCOUNT(HttpStatus.BAD_REQUEST, "A004", "비활성화 상태 계정입니다. 인증 후 활성화 해주세요."),
 	AUTH_INVALID_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "A005", "유효하지 않은 인증정보입니다."),
 	AUTH_USER_NOT_FOUND(HttpStatus.NOT_FOUND, "A006", "사용자를 찾을 수 없습니다."),
 	AUTH_PASSWORD_MISMATCH(HttpStatus.BAD_REQUEST, "A007", "현재 비밀번호가 일치하지 않습니다."),

@@ -62,16 +62,10 @@ public class OrderController {
 
 	@Operation(summary = "주문 생성", description = "새 주문을 생성합니다.")
 	@PostMapping
-	@Auth(type = UserType.USER)
 	public ResponseEntity<JsendResponse<Long>> createOrder(
 		@Valid @RequestBody OrderCreateRequest request,
 		@Parameter(hidden = true) @AuthenticationPrincipal UserPrincipal userPrincipal
 	) {
-		checkPrincipal(userPrincipal);
-		log.info("Request to create order : {}", request);
-		if (!userPrincipal.getUserId().equals(request.userId())) {
-			throw new InvalidTokenException();
-		}
 		Long createdOrderId = orderService.createOrder(request);
 		return ResponseEntity.ok(JsendResponse.success(createdOrderId));
 	}

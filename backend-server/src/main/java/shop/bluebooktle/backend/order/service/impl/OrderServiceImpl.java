@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
@@ -34,8 +35,6 @@ import shop.bluebooktle.backend.order.repository.DeliveryRuleRepository;
 import shop.bluebooktle.backend.order.repository.OrderRepository;
 import shop.bluebooktle.backend.order.repository.OrderStateRepository;
 import shop.bluebooktle.backend.order.service.OrderService;
-import shop.bluebooktle.backend.payment.entity.Payment;
-import shop.bluebooktle.backend.payment.repository.PaymentRepository;
 import shop.bluebooktle.backend.user.repository.UserRepository;
 import shop.bluebooktle.common.domain.order.OrderStatus;
 import shop.bluebooktle.common.dto.coupon.CalculatedDiscountDetails;
@@ -68,7 +67,6 @@ public class OrderServiceImpl implements OrderService {
 	private final BookRepository bookRepository;
 	private final BookOrderRepository bookOrderRepository;
 	private final PackagingOptionRepository packagingOptionRepository;
-	private final PaymentRepository paymentRepository;
 
 	@Override
 	@Transactional(readOnly = true)
@@ -88,15 +86,34 @@ public class OrderServiceImpl implements OrderService {
 		}
 
 		return orderPage.map(o -> {
-			Payment payment = paymentRepository.findByOrder(o).orElse(null);
-			BigDecimal paidAmount = payment == null ? null : payment.getPrice();
+			BigDecimal paidAmount = o.getOriginalAmount()
+				.subtract(Optional.ofNullable(o.getCouponDiscountAmount())
+					.orElse(BigDecimal.ZERO))
+				.subtract(Optional.ofNullable(o.getPointUseAmount())
+					.orElse(BigDecimal.ZERO))
+				.add(Optional.ofNullable(o.getDeliveryFee())
+					.orElse(BigDecimal.ZERO));
+
+			String thumbnailUrl = o.getBookOrders().stream()
+				.findFirst() // 대표 BookOrder 하나를 가져온 뒤
+				.flatMap(bookOrder -> {
+					Book book = bookOrder.getBook();
+					if (book == null)
+						return Optional.<BookImg>empty();
+					return book.getBookImgs().stream().findFirst();
+				})
+				.map(BookImg::getImg)       // BookImg 에서 Img 엔티티 꺼내고
+				.map(Img::getImgUrl)      // Img 엔티티에서 URL 꺼내기
+				.orElse("");               // 없으면 빈 문자열 혹은 기본 URL
+
 			return new OrderHistoryResponse(
-				o.getId(),                     // orderId
-				o.getCreatedAt(),              // createAt
-				o.getOrderName(),              // orderName
-				paidAmount,                    // totalPrice
-				o.getOrderKey(),               // orderKey
-				o.getOrderState().getState()   // orderStatus
+				o.getId(),
+				o.getCreatedAt(),
+				o.getOrderName(),
+				paidAmount,
+				o.getOrderKey(),
+				o.getOrderState().getState(),
+				thumbnailUrl
 			);
 		});
 	}
@@ -115,10 +132,13 @@ public class OrderServiceImpl implements OrderService {
 
 		DeliveryRule deliveryRule = deliveryRuleRepository.findById(request.deliveryRuleId()).orElseThrow(
 			DeliveryRuleNotFoundException::new);
-
-		User user = userRepository.findById(request.userId())
-			.orElseThrow(UserNotFoundException::new);
-
+		User user;
+		if (request.userId() != null) {
+			user = userRepository.findById(request.userId())
+				.orElseThrow(UserNotFoundException::new);
+		} else {
+			user = null;
+		}
 		Order order = Order.builder()
 			.orderState(initialState)
 			.deliveryRule(deliveryRule)
@@ -137,8 +157,12 @@ public class OrderServiceImpl implements OrderService {
 			.postalCode(request.postalCode())
 			.address(request.address())
 			.detailAddress(request.detailAddress())
+			.couponDiscountAmount(request.couponDiscountAmount())
+			.pointUseAmount(request.pointUseAmount())
+			.saleDiscountAmount(request.saleDiscountAmount())
+			.originalAmount(request.originalAmount())
 			.trackingNumber(null)
-			.orderKey(null)
+			.orderKey(request.orderKey())
 			.build();
 
 		Order saved = orderRepository.save(order);

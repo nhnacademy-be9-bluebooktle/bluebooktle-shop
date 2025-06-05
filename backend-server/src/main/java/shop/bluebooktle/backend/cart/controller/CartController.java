@@ -167,10 +167,25 @@ public class CartController {
 	@PostMapping("/convert/merge")
 	public ResponseEntity<JsendResponse<Void>> mergeOrConvertGuestCart(
 		@AuthenticationPrincipal UserPrincipal principal,
-		@RequestBody String guestId
+		@RequestHeader("GUEST_ID") String guestId
 	) {
 		User user = getAuthenticatedUser(principal);
 		cartService.mergeOrConvertGuestCartToMemberCart(guestId, user);
 		return ResponseEntity.ok(JsendResponse.success());
+	}
+
+	@GetMapping("quantity")
+	public ResponseEntity<JsendResponse<Long>> getQuantity(
+		@AuthenticationPrincipal UserPrincipal principal,
+		@RequestHeader(value = "GUEST_ID", required = false) String guestId
+	) {
+		Long size;
+		if (principal == null) {
+			size = cartService.getGuestCartSize(guestId);
+		} else {
+			User user = getAuthenticatedUser(principal);
+			size = cartService.getCartSize(user);
+		}
+		return ResponseEntity.ok(JsendResponse.success(size));
 	}
 }

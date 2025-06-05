@@ -24,6 +24,8 @@ public interface CartService {
 
 	List<BookCartOrderResponse> sendSelectedCartItemsToOrder(User user, List<Long> bookIds);
 
+	Long getCartSize(User user);
+
 	// 비회원용
 	void addBookToGuestCart(String guestId, Long bookId, int quantity);
 
@@ -38,6 +40,8 @@ public interface CartService {
 	void removeSelectedBooksFromGuestCart(String guestId, List<Long> bookIds);
 
 	List<BookCartOrderResponse> sendSelectedGuestCartItemsToOrder(String guestId, List<Long> bookIds);
+
+	Long getGuestCartSize(String guestId);
 
 	// ----------------- 전환용 -----------------
 

@@ -49,13 +49,13 @@ public class Payment extends BaseEntity {
 	@JoinColumn(name = "payment_detail_id", nullable = false, unique = true)
 	private PaymentDetail paymentDetail;
 
-	@Column(name = "price", nullable = false, precision = 10, scale = 2)
-	private BigDecimal price;
+	@Column(name = "paid_amount", nullable = false, precision = 10, scale = 2)
+	private BigDecimal paidAmount;
 
 	@Builder
-	public Payment(Order order, PaymentDetail paymentDetail, BigDecimal price) {
+	public Payment(Order order, PaymentDetail paymentDetail, BigDecimal paidAmount) {
 		this.order = order;
 		this.paymentDetail = paymentDetail;
-		this.price = price;
+		this.paidAmount = paidAmount;
 	}
 }
