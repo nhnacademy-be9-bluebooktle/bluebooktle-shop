@@ -3,6 +3,7 @@ package shop.bluebooktle.frontend.repository;
 import java.util.Map;
 
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 	name = "minioClient",
 	url = "${minio.endpoint}"
 )
-public interface AdminImgUploadRepository {
+public interface ImageServerClient {
 	/**
 	 * @param bucket     버킷 이름 (여기선 "bluebooktle-bookimage")
 	 * @param objectName 오브젝트 키 (여기선 "86bb07aa-…")
@@ -30,4 +31,9 @@ public interface AdminImgUploadRepository {
 		@RequestHeader Map<String, String> headers,    // ← 헤더 맵
 		@RequestBody byte[] payload
 	);
+
+	@GetMapping("/{bucket}/{objectName}")
+	byte[] download(
+		@PathVariable("bucket") String bucket,
+		@PathVariable("objectName") String objectName);
 }
