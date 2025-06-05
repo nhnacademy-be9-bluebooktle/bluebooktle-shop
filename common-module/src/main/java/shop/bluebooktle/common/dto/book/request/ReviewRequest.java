@@ -8,14 +8,14 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@Setter
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class ReviewRequest {
-
-	private String imgUrl;
 
 	@NotNull
 	@Min(1)
@@ -24,4 +24,6 @@ public class ReviewRequest {
 
 	@Size(min = 10, max = 255, message = "리뷰 내용은 10~255자 입니다")
 	private String reviewContent;
+
+	private String imgUrl;
 }

@@ -16,11 +16,13 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import shop.bluebooktle.common.dto.book.request.ReviewRequest;
 import shop.bluebooktle.common.dto.book.response.ReviewResponse;
 import shop.bluebooktle.common.security.UserPrincipal;
 import shop.bluebooktle.frontend.service.ReviewService;
 
+@Slf4j
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/mypage/reviews")
@@ -41,15 +43,14 @@ public class MyPageReviewController {
 			redirectAttrs.addFlashAttribute("globalErrorMessage", "리뷰 작성 실패!");
 			return "redirect:/mypage/orders/" + bookOrderId;
 		}
-
-		Long userId = userPrincipal.getUserId();
-		reviewService.addReview(userId, bookOrderId, reviewRequest);
+		reviewService.addReview(userPrincipal.getUserId(), bookOrderId, reviewRequest);
+		redirectAttrs.addFlashAttribute("globalSuccessMessage", "리뷰가 성공적으로 등록되었습니다.");
 		return "redirect:/mypage/orders/" + bookOrderId;
 	}
 
 	// 내가 쓴 리뷰 전체조회
 	@GetMapping
-	public String listMyReviews(
+	public String getMyReviews(
 		@AuthenticationPrincipal UserPrincipal userPrincipal,
 		@RequestParam(value = "page", defaultValue = "0") int page,
 		@RequestParam(value = "size", defaultValue = "10") int size,
@@ -74,7 +75,7 @@ public class MyPageReviewController {
 
 		model.addAttribute("bookId", bookId);
 		model.addAttribute("reviewsPage", reviewsPage);
-		return "book/review_list_fragment";
+		return "book/review_list_fragment"; // 도서 상세페이지 완성되면 수정
 	}
 
 }
