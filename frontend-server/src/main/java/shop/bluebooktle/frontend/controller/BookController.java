@@ -41,7 +41,7 @@ public class BookController {
 		model.addAttribute("size", size);
 		model.addAttribute("filterCount", /* 실제 필터 개수 */ 0);
 		model.addAttribute("pagedBooks", pagedBooks);
-
+		
 		return "book/book_list";
 	}
 

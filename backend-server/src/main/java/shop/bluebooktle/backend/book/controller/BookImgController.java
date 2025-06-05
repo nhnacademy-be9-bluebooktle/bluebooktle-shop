@@ -40,10 +40,10 @@ public class BookImgController {
 	}
 
 	@GetMapping("/api/books/{bookId}/images")
-	public ResponseEntity<JsendResponse<List<ImgResponse>>> getImagesByBook(
+	public ResponseEntity<JsendResponse<ImgResponse>> getImagesByBook(
 		@PathVariable Long bookId
 	) {
-		List<ImgResponse> images = bookImgService.getImgByBookId(bookId);
+		ImgResponse images = bookImgService.getImgByBookId(bookId);
 		return ResponseEntity
 			.ok(JsendResponse.success(images));
 	}

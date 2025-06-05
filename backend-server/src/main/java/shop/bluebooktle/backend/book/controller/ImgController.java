@@ -70,4 +70,10 @@ public class ImgController {
 		String presignedUrl = minioService.getPresignedUploadUrl(fileName);
 		return ResponseEntity.ok(JsendResponse.success(presignedUrl));
 	}
+
+	@DeleteMapping("/minioUrl")
+	public ResponseEntity<JsendResponse<Void>> deleteImage(@RequestParam String fileName) {
+		minioService.deleteImage(fileName);
+		return ResponseEntity.ok(JsendResponse.success());
+	}
 }

@@ -7,6 +7,7 @@ import java.util.List;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.multipart.MultipartFile;
 
+import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -41,10 +42,12 @@ public class BookFormRequest {
 
 	@NotNull(message = "판매 가격은 필수 값입니다.")
 	@Positive(message = "판매 가격은 양수값이어야 합니다.")
+	@Digits(integer = 8, fraction = 0, message = "판매 가격은 최대 99999999.99까지 가능합니다.")
 	BigDecimal price;
 
 	@NotNull(message = "할인 가격은 필수 값입니다.")
 	@Positive(message = "할인 가격은 양수값이어야 합니다.")
+	@Digits(integer = 8, fraction = 0, message = "판매 가격은 최대 99999999.99까지 가능합니다.")
 	BigDecimal salePrice;
 
 	@NotNull(message = "재고 수는 필수 값입니다.")

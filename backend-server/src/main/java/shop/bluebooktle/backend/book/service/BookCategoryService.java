@@ -19,6 +19,8 @@ public interface BookCategoryService {
 	// 도서 카테고리 삭제
 	void deleteBookCategory(Long bookId, Long categoryId);
 
+	void updateBookCategory(Long bookId, List<Long> categoryIdList);
+
 	// 해당 도서의 카테고리 수정
 	void updateBookCategoryByBookCategoryId(Long updatedCategoryId, Long bookCategoryId);
 

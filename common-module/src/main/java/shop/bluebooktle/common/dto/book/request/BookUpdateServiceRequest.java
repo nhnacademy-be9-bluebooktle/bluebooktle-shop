@@ -8,25 +8,19 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
-import lombok.Value;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import shop.bluebooktle.common.dto.book.BookSaleInfoState;
 
 @Getter
-@Value
-@Builder
+@Setter
+@NoArgsConstructor
 @AllArgsConstructor
-public class BookAllRegisterRequest {
-
+public class BookUpdateServiceRequest {
 	@NotBlank(message = "도서 제목은 필수 값입니다.")
 	String title;
-
-	@NotBlank(message = "ISBN 값은 필수 값입니다.")
-	@Size(min = 13, max = 13, message = "ISBN 값은 13자여야 합니다")
-	String isbn;
 
 	@NotBlank(message = "도서 설명은 필수 값입니다.")
 	String description;
@@ -60,7 +54,6 @@ public class BookAllRegisterRequest {
 
 	List<@Positive(message = "태그 ID는 양수값이어야 합니다.") Long> tagIdList;
 
-	@NotBlank
 	String imgUrl;
 
 }

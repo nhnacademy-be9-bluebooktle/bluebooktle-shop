@@ -112,11 +112,13 @@
                 <strong th:text="${globalErrorMessage}"></strong>
             </div>
 
-            <form id="bookForm" th:action="@{/admin/books/save}" th:object="${bookForm}" method="post"
+            <form id="bookForm" th:action="@{'/admin/books/update/' + ${bookId}}" th:object="${bookForm}"
+                  method="post"
                   enctype="multipart/form-data">
 
                 <div class="form-section">
                     <h3><i class="fas fa-info-circle"></i> 기본 정보</h3>
+                    <input type="hidden" name="isAladinImg" th:value="${isAladinImg}"/>
                     <div class="row">
                         <div class="col-md-8 admin-form-group">
                             <label for="title" class="admin-form-label">도서 제목 <span class="text-danger">*</span></label>
@@ -128,9 +130,7 @@
                         <div class="col-md-4 admin-form-group">
                             <label for="isbn" class="admin-form-label">ISBN <span class="text-danger">*</span></label>
                             <input type="text" id="isbn" th:field="*{isbn}" class="admin-form-control"
-                                   th:errorclass="is-invalid" placeholder="13자리 숫자" maxlength="13"
-                                   pattern="\d{13}"
-                                   title="숫자 13자리를 입력해주세요">
+                                   th:errorclass="is-invalid" placeholder="13자리 숫자" readonly>
                             <div th:if="${#fields.hasErrors('isbn')}" th:errors="*{isbn}"
                                  class="invalid-feedback"></div>
                         </div>
@@ -146,7 +146,8 @@
                         <textarea id="description"
                                   name="description"
                                   th:field="*{description}"
-                                  style="display: none;"></textarea>
+                                  style="display: none;"
+                                  th:text="*{description}"></textarea>
                         <div id="descriptionEditor"></div>
                         <div th:if="${#fields.hasErrors('description')}"
                              th:errors="*{description}"
@@ -154,7 +155,9 @@
                     </div>
                     <div class="admin-form-group">
                         <label for="publishDate" class="admin-form-label">출판일</label>
-                        <input type="date" id="publishDate" th:field="*{publishDate}" class="admin-form-control">
+                        <input type="date" id="publishDate" name="publishDate"
+                               class="admin-form-control"
+                               th:value="${#temporals.format(bookForm.publishDate, 'yyyy-MM-dd')}"/>
                     </div>
                 </div>
 
@@ -199,7 +202,7 @@
                     </div>
                     <div class="row">
                         <div class="col-md-6 admin-form-group">
-                            <label for="saleState" class="admin-form-label">판매 상태 <span
+                            <label for="saleState" class="admin-form-label">판매 상태 수정 <span
                                     class="text-danger">*</span></label>
                             <select id="saleState" th:field="*{state}" class="admin-form-control">
                                 <option th:each="stateOpt : ${stateOptions}" th:value="${stateOpt}"
@@ -207,11 +210,31 @@
                             </select>
                         </div>
                         <div class="col-md-6 admin-form-group">
-                            <label class="admin-form-label">포장 가능 여부</label>
+                            <label class="admin-form-label">포장 가능 여부 수정</label>
                             <div>
                                 <input type="checkbox" id="isPackable" th:field="*{isPackable}"
                                        class="admin-form-check-input">
                                 <label for="isPackable" class="admin-form-check-label">포장 가능</label>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-md-3 admin-form-group">
+                                <label class="admin-form-label">조회수</label>
+                                <input type="text" class="admin-form-control" th:value="${bookForm.viewCount}" readonly>
+                            </div>
+                            <div class="col-md-3 admin-form-group">
+                                <label class="admin-form-label">검색 수</label>
+                                <input type="text" class="admin-form-control" th:value="${bookForm.searchCount}"
+                                       readonly>
+                            </div>
+                            <div class="col-md-3 admin-form-group">
+                                <label class="admin-form-label">리뷰 수</label>
+                                <input type="text" class="admin-form-control" th:value="${bookForm.reviewCount}"
+                                       readonly>
+                            </div>
+                            <div class="col-md-3 admin-form-group">
+                                <label class="admin-form-label">평점</label>
+                                <input type="text" class="admin-form-control" th:value="${bookForm.star}" readonly>
                             </div>
                         </div>
                     </div>
@@ -220,9 +243,9 @@
                 <div class="form-section">
                     <h3><i class="fas fa-search"></i> 카테고리 / 작가 / 출판사 / 태그 선택</h3>
 
-                    <!-- 카테고리 선택 -->
+                    <!-- 카테고리 수정 -->
                     <div class="admin-form-group" style="position: relative;">
-                        <label class="admin-form-label">카테고리 선택</label>
+                        <label class="admin-form-label">카테고리 수정</label>
                         <button type="button" class="admin-form-control btn btn-primary"
                                 onclick="openPopup('category')">
                             카테고리 검색
@@ -236,14 +259,19 @@
                             </button>
                         </div>
                     </div>
-                    <div id="categorySelectionDisplay"
-                         style="margin-top:10px; font-size:14px; color:#333;">
+                    <div id="categorySelectionDisplay" style="margin-top:10px; font-size:14px; color:#333;">
+                        <strong>선택된 category:</strong>
+                        <th:block th:each="category : ${bookForm.categories}">
+                            <span th:text="${category.name} + ' (ID: ' + ${category.categoryId} + ')'"
+                                  style="margin-right:8px;"></span>
+                            <input type="hidden" name="categoryIdList" th:value="${category.categoryId}"/>
+                        </th:block>
                     </div>
 
 
-                    <!-- 작가 선택 -->
+                    <!-- 작가 수정 -->
                     <div class="admin-form-group" style="position: relative;">
-                        <label class="admin-form-label">작가 선택</label>
+                        <label class="admin-form-label">작가 수정</label>
                         <button type="button" class="admin-form-control btn btn-primary"
                                 onclick="openPopup('author')">
                             작가 검색
@@ -259,14 +287,20 @@
                                 확인
                             </button>
                         </div>
+
                     </div>
-                    <div id="authorSelectionDisplay"
-                         style="margin-top:10px; font-size:14px; color:#333;">
+                    <div id="authorSelectionDisplay" style="margin-top:10px; font-size:14px; color:#333;">
+                        <strong>선택된 author:</strong>
+                        <th:block th:each="author : ${bookForm.authors}">
+                            <span th:text="${author.name} + ' (ID: ' + ${author.id} + ')'"
+                                  style="margin-right:8px;"></span>
+                            <input type="hidden" name="authorIdList" th:value="${author.id}"/>
+                        </th:block>
                     </div>
 
-                    <!-- 출판사 선택 -->
+                    <!-- 출판사 수정 -->
                     <div class="admin-form-group" style="position: relative;">
-                        <label class="admin-form-label">출판사 선택</label>
+                        <label class="admin-form-label">출판사 수정</label>
                         <button type="button"
                                 class="admin-form-control btn btn-primary"
                                 onclick="openPopup('publisher')">
@@ -287,14 +321,19 @@
                         </div>
                     </div>
 
-                    <div id="publisherSelectionDisplay"
-                         style="margin-top:10px; font-size:14px; color:#333;">
+                    <div id="publisherSelectionDisplay" style="margin-top:10px; font-size:14px; color:#333;">
+                        <strong>선택된 publisher:</strong>
+                        <th:block th:each="publisher : ${bookForm.publishers}">
+                            <span th:text="${publisher.name} + ' (ID: ' + ${publisher.id} + ')'"
+                                  style="margin-right:8px;"></span>
+                            <input type="hidden" name="publisherIdList" th:value="${publisher.id}"/>
+                        </th:block>
                     </div>
 
 
-                    <!-- 태그 선택 -->
+                    <!-- 태그 수정 -->
                     <div class="admin-form-group" style="position: relative;">
-                        <label class="admin-form-label">태그 선택</label>
+                        <label class="admin-form-label">태그 수정</label>
                         <button type="button" class="admin-form-control btn btn-primary"
                                 onclick="openPopup('tag')">
                             태그 검색
@@ -311,13 +350,23 @@
                         </div>
                     </div>
                     <div id="tagSelectionDisplay" style="margin-top:10px; font-size:14px; color:#333;">
+                        <strong>선택된 tag:</strong>
+                        <th:block th:each="tag : ${bookForm.tags}">
+                            <span th:text="${tag.name} + ' (ID: ' + ${tag.id} + ')'" style="margin-right:8px;"></span>
+                            <input type="hidden" name="tagIdList" th:value="${tag.id}"/>
+                        </th:block>
                     </div>
 
                     <div class="admin-form-group">
-                        <label class="admin-form-label">도서 이미지</label>
+                        <label class="admin-form-label">기존 도서 이미지</label>
+                        <div th:if="${bookForm.imgUrl != null}" style="margin-bottom: 1rem;">
+                            <img th:src="${bookForm.imgUrl}" alt="기존 이미지"
+                                 style="max-height: 150px; border:1px solid #ccc; padding:5px;">
+                        </div>
+                        <label class="admin-form-label">도서 이미지 변경</label>
                         <input
                                 type="file"
-                                th:field="*{imageFile}"
+                                name="imageFile"
                                 accept="image/*"
                                 class="admin-form-control"/>
                     </div>
@@ -332,7 +381,7 @@
                         </a>
                         <button type="submit" class="admin-btn admin-btn--primary">
                             <i class="fas fa-save"></i>
-                            도서 등록
+                            도서 수정
                         </button>
                     </div>
                 </div>
@@ -557,7 +606,6 @@
 
             closeAllPopups();
         }
-
 
         ['author', 'publisher', 'tag'].forEach(type => {
             document.getElementById(type + 'Search').addEventListener('input', () => {

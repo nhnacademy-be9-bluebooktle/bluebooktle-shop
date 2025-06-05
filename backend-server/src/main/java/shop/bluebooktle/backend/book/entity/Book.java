@@ -22,6 +22,7 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import shop.bluebooktle.backend.cart.entity.Cart;
 import shop.bluebooktle.backend.cart.entity.CartBook;
 import shop.bluebooktle.common.entity.BaseEntity;
@@ -42,15 +43,19 @@ public class Book extends BaseEntity {
 	private Long id;
 
 	@Column(name = "title", nullable = false, length = 255)
+	@Setter
 	private String title;
 
 	@Column(name = "`index`", columnDefinition = "TEXT")
+	@Setter
 	private String index;
 
 	@Column(name = "description", nullable = false, columnDefinition = "TEXT")
+	@Setter
 	private String description;
 
 	@Column(name = "publish_date")
+	@Setter
 	private LocalDateTime publishDate;
 
 	@Column(name = "isbn", nullable = false, length = 13)

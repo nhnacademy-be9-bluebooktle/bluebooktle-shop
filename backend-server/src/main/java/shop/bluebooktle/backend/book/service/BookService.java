@@ -4,23 +4,18 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 
-import shop.bluebooktle.common.dto.book.request.BookRegisterRequest;
-import shop.bluebooktle.common.dto.book.request.BookUpdateRequest;
+import shop.bluebooktle.common.dto.book.request.BookUpdateServiceRequest;
+import shop.bluebooktle.common.dto.book.response.AdminBookResponse;
 import shop.bluebooktle.common.dto.book.response.BookAllResponse;
 import shop.bluebooktle.common.dto.book.response.BookCartOrderResponse;
 import shop.bluebooktle.common.dto.book.response.BookInfoResponse;
-import shop.bluebooktle.common.dto.book.response.BookRegisterResponse;
 import shop.bluebooktle.common.dto.book.response.BookResponse;
-import shop.bluebooktle.common.dto.book.response.BookUpdateResponse;
-import shop.bluebooktle.common.dto.common.PaginationData;
 
 public interface BookService {
 
-	BookRegisterResponse registerBook(BookRegisterRequest request);
-
 	BookResponse findBookById(Long bookId);
 
-	BookUpdateResponse updateBook(Long bookId, BookUpdateRequest request);
+	void updateBook(Long bookId, BookUpdateServiceRequest request);
 
 	void deleteBook(Long bookId);
 
@@ -29,6 +24,8 @@ public interface BookService {
 	List<BookAllResponse> getBookAllByTitle(String title);
 
 	Page<BookInfoResponse> findAllBooks(int page, int size, String searchKeyword);
+
+	Page<AdminBookResponse> findAllBooksByAdmin(int page, int size, String searchKeyword);
 
 	BookCartOrderResponse getBookCartOrder(Long bookId, int quantity);
 

@@ -54,6 +54,13 @@ public class BookTagServiceImpl implements BookTagService {
 	}
 
 	@Override
+	public void updateBookTag(Long bookId, List<Long> tagIdList) {
+		List<BookTag> bookTagList = bookTagRepository.findByBookId(bookId);
+		bookTagRepository.deleteAll(bookTagList);
+		registerBookTag(bookId, tagIdList);
+	}
+
+	@Override
 	public void deleteBookTag(Long tagId, Long bookId) {
 		Tag tag = findTagOrThrow(tagId);
 		Book book = findBookOrThrow(bookId);
