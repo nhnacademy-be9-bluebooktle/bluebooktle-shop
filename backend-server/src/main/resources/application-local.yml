@@ -7,13 +7,13 @@ spring:
     jdbc:
       initialize-schema: never
   datasource:
-    url: jdbc:mysql://localhost:3306/bluebooktle
-    username: ${MYSQL_USERNAME}
-    password: ${MYSQL_PASSWORD}
+    url: jdbc:mysql://s4.java21.net:13306/project_be9_team1_dev?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    username: project_be9_team1
+    password: /JFn8Qzhe8o(NO1r
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: update
     show-sql: true
     properties:
       hibernate:
@@ -68,8 +68,8 @@ logging:
 
 mq:
   queue:
-    birthday: BB.local.birthday.queue
-    birthday-dlq: BB.local.birthday.queue.dlq
+    birthday: K.local.birthday.queue
+    birthday-dlq: K.local.birthday.queue.dlq
     direct: BB.local.direct.queue
     direct-dlq: BB.local.direct.queue.dlq
     welcome: BB.local.welcome.queue

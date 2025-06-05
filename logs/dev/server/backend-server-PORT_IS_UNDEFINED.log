@@ -1,0 +1,50 @@
+00:02:14.289 [background-preinit] INFO  o.h.validator.internal.util.Version - HV000001: Hibernate Validator 8.0.2.Final
+00:02:14.832 [main] INFO  s.b.backend.BackendServerApplication - Starting BackendServerApplication using Java 21.0.6 with PID 10496 (D:\workspace_Spring\bluebooktle-shop\backend-server\target\classes started by pokem in D:\workspace_Spring\bluebooktle-shop)
+00:02:14.844 [main] DEBUG s.b.backend.BackendServerApplication - Running with Spring Boot v3.4.4, Spring v6.2.5
+00:02:14.850 [main] INFO  s.b.backend.BackendServerApplication - The following 1 profile is active: "dev"
+00:02:15.595 [main] WARN  o.s.c.c.c.ConfigServerConfigDataLoader - Could not locate PropertySource ([ConfigServerConfigDataResource@452ba1db uris = array<String>['${CONFIG_SERVER_URI}'], optional = true, profiles = 'default']): Invalid URL: ${CONFIG_SERVER_URI}
+00:02:15.597 [main] WARN  o.s.c.c.c.ConfigServerConfigDataLoader - Could not locate PropertySource ([ConfigServerConfigDataResource@2ce86164 uris = array<String>['${CONFIG_SERVER_URI}'], optional = true, profiles = 'dev']): Invalid URL: ${CONFIG_SERVER_URI}
+00:02:15.598 [main] WARN  o.s.c.c.c.ConfigServerConfigDataLoader - Could not locate PropertySource ([ConfigServerConfigDataResource@5e8f9e2d uris = array<String>['${CONFIG_SERVER_URI}'], optional = true, profiles = 'default']): Invalid URL: ${CONFIG_SERVER_URI}
+00:02:23.954 [main] INFO  o.s.b.c.c.annotation.BatchRegistrar - Finished Spring Batch infrastructure beans configuration in 41 ms.
+00:02:24.147 [main] WARN  o.s.b.w.s.c.AnnotationConfigServletWebServerApplicationContext - Exception encountered during context initialization - cancelling refresh attempt: java.lang.IllegalArgumentException: http://${server.gateway-url} is malformed
+00:02:24.192 [main] INFO  o.s.b.a.l.ConditionEvaluationReportLogger - 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+00:02:24.274 [main] ERROR o.s.boot.SpringApplication - Application run failed
+java.lang.IllegalArgumentException: http://${server.gateway-url} is malformed
+	at org.springframework.cloud.openfeign.FeignClientsRegistrar.getUrl(FeignClientsRegistrar.java:128)
+	at org.springframework.cloud.openfeign.FeignClientsRegistrar.getUrl(FeignClientsRegistrar.java:371)
+	at org.springframework.cloud.openfeign.FeignClientsRegistrar.eagerlyRegisterFeignClientBeanDefinition(FeignClientsRegistrar.java:227)
+	at org.springframework.cloud.openfeign.FeignClientsRegistrar.registerFeignClient(FeignClientsRegistrar.java:216)
+	at org.springframework.cloud.openfeign.FeignClientsRegistrar.registerFeignClients(FeignClientsRegistrar.java:205)
+	at org.springframework.cloud.openfeign.FeignClientsRegistrar.registerBeanDefinitions(FeignClientsRegistrar.java:155)
+	at org.springframework.context.annotation.ImportBeanDefinitionRegistrar.registerBeanDefinitions(ImportBeanDefinitionRegistrar.java:86)
+	at org.springframework.context.annotation.ConfigurationClassBeanDefinitionReader.lambda$loadBeanDefinitionsFromRegistrars$1(ConfigurationClassBeanDefinitionReader.java:397)
+	at java.base/java.util.LinkedHashMap.forEach(LinkedHashMap.java:986)
+	at org.springframework.context.annotation.ConfigurationClassBeanDefinitionReader.loadBeanDefinitionsFromRegistrars(ConfigurationClassBeanDefinitionReader.java:396)
+	at org.springframework.context.annotation.ConfigurationClassBeanDefinitionReader.loadBeanDefinitionsForConfigurationClass(ConfigurationClassBeanDefinitionReader.java:149)
+	at org.springframework.context.annotation.ConfigurationClassBeanDefinitionReader.loadBeanDefinitions(ConfigurationClassBeanDefinitionReader.java:121)
+	at org.springframework.context.annotation.ConfigurationClassPostProcessor.processConfigBeanDefinitions(ConfigurationClassPostProcessor.java:430)
+	at org.springframework.context.annotation.ConfigurationClassPostProcessor.postProcessBeanDefinitionRegistry(ConfigurationClassPostProcessor.java:290)
+	at org.springframework.context.support.PostProcessorRegistrationDelegate.invokeBeanDefinitionRegistryPostProcessors(PostProcessorRegistrationDelegate.java:349)
+	at org.springframework.context.support.PostProcessorRegistrationDelegate.invokeBeanFactoryPostProcessors(PostProcessorRegistrationDelegate.java:118)
+	at org.springframework.context.support.AbstractApplicationContext.invokeBeanFactoryPostProcessors(AbstractApplicationContext.java:791)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:609)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:146)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:752)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:439)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:318)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1361)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1350)
+	at shop.bluebooktle.backend.BackendServerApplication.main(BackendServerApplication.java:21)
+Caused by: java.net.MalformedURLException: Illegal character found in host: '{'
+	at java.base/java.net.URL.<init>(URL.java:806)
+	at java.base/java.net.URL.<init>(URL.java:654)
+	at java.base/java.net.URL.<init>(URL.java:590)
+	at org.springframework.cloud.openfeign.FeignClientsRegistrar.getUrl(FeignClientsRegistrar.java:125)
+	... 24 common frames omitted
+Caused by: java.lang.IllegalArgumentException: Illegal character found in host: '{'
+	at java.base/java.net.URLStreamHandler.setURL(URLStreamHandler.java:523)
+	at java.base/java.net.URLStreamHandler.parseURL(URLStreamHandler.java:326)
+	at java.base/java.net.URL.<init>(URL.java:801)
+	... 27 common frames omitted
