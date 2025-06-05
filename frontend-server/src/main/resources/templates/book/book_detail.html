@@ -562,7 +562,7 @@
 <body>
 <div layout:fragment="content">
     <div class="container-kitsch section-padding-kitsch">
-        <div class="book-detail-layout-kitsch">
+        <span class="book-detail-layout-kitsch">
             <!-- 도서 표지 -->
             <div class="book-image-column-kitsch">
                 <img alt="도서 표지" class="main-book-image-kitsch" id="mainBookImage" th:src="${book.imgUrl}"/>
@@ -693,60 +693,35 @@
                             <i class="fas fa-shopping-cart"></i> 장바구니
                         </button>
 
-                        <!-- 좋아요 취소 폼: 로그인 + 이미 좋아요 누른 경우에만 출력 -->
-                        <form th:if="${isLoggedIn} and ${isLiked}"
-                              th:action="@{/books/{bookId}/unlikes       (bookId=${bookId})}"
-                              method="post" style="display:inline;">
-                            <button type="submit"
-                                    class="btn-kitsch secondary-btn-kitsch color5-kitsch retro-shadow-kitsch like-btn-kitsch"
-                                    style="display: flex; align-items: center; gap: 0.3rem;">
-                                <i class="fas fa-heart"></i>
-                                <span>좋아요 취소</span>
+                        <!-- 좋아요 취소 폼 (이미 좋아요 눌린 경우) -->
+                        <form method="post"
+                              style="display:inline;"
+                              th:action="@{/books/{id}/unlikes(id=${bookId})}"
+                              th:if="${isLoggedIn} and ${isLiked}">
+                            <button class="btn-kitsch secondary-btn-kitsch color5-kitsch retro-shadow-kitsch like-btn-kitsch"
+                                    style="display: flex; align-items: center; gap: 0.3rem;"
+                                    type="submit">
+                                    <i class="fas fa-heart"></i>
+                                    <span>좋아요 취소</span>
                             </button>
                         </form>
 
-                        <!-- 좋아요 등록 폼: 로그인 + 아직 좋아요 안 누른 경우에만 출력 -->
-                        <form th:if="${isLoggedIn} and !${isLiked}"
-                              th:action="@{/books/{bookId}/likes         (bookId=${bookId})}"
-                              method="post" style="display:inline;">
-                            <button type="submit"
-                                    class="btn-kitsch secondary-btn-kitsch color5-kitsch retro-shadow-kitsch like-btn-kitsch"
-                                    style="display: flex; align-items: center; gap: 0.3rem;">
-                                <i class="far fa-heart"></i>
-                                <span>좋아요</span>
+                        <!-- 좋아요 등록 폼 (아직 좋아요 안 눌린 경우) -->
+                        <form method="get"
+                              style="display:inline;"
+                              th:action="@{/books/{id}/likes(id=${bookId})}"
+                              th:unless="${isLiked} and ${isLiked}">
+                            <button class="btn-kitsch secondary-btn-kitsch color5-kitsch retro-shadow-kitsch like-btn-kitsch"
+                                    style="display: flex; align-items: center; gap: 0.3rem;"
+                                    type="submit">
+                                    <i class="far fa-heart"></i>
+                                    <span>좋아요</span>
                             </button>
                         </form>
-
-
-                        <!--                        &lt;!&ndash; 좋아요 취소 폼 (이미 좋아요 눌린 경우) &ndash;&gt;-->
-                        <!--                        <form th:if="${isLiked}"-->
-                        <!--                              th:action="@{/books/{id}/unlikes(id=${bookId})}"-->
-                        <!--                              method="post"-->
-                        <!--                              style="display:inline;">-->
-                        <!--                            <button type="submit"-->
-                        <!--                                    class="btn-kitsch secondary-btn-kitsch color5-kitsch retro-shadow-kitsch like-btn-kitsch"-->
-                        <!--                                    style="display: flex; align-items: center; gap: 0.3rem;">-->
-                        <!--                                <i class="fas fa-heart"></i>-->
-                        <!--                                <span>좋아요 취소</span>-->
-                        <!--                            </button>-->
-                        <!--                        </form>-->
-
-                        <!--                        &lt;!&ndash; 좋아요 등록 폼 (아직 좋아요 안 눌린 경우) &ndash;&gt;-->
-                        <!--                        <form th:unless="${isLiked}"-->
-                        <!--                              th:action="@{/books/{id}/likes(id=${bookId})}"-->
-                        <!--                              method="get"-->
-                        <!--                              style="display:inline;">-->
-                        <!--                            <button type="submit"-->
-                        <!--                                    class="btn-kitsch secondary-btn-kitsch color5-kitsch retro-shadow-kitsch like-btn-kitsch"-->
-                        <!--                                    style="display: flex; align-items: center; gap: 0.3rem;">-->
-                        <!--                                <i class="far fa-heart"></i>-->
-                        <!--                                <span>좋아요</span>-->
-                        <!--                            </button>-->
-                        <!--                        </form>-->
                     </div>
                 </div>
-            </div>
-        </div>
+            </span>
+        </span>
 
         <!-- 상세 탭 영역 (도서 소개 / 목차 등) -->
         <div class="tab-ui-kitsch" id="bookTabs">
