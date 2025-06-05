@@ -10,12 +10,8 @@ import shop.bluebooktle.common.dto.book.response.BookAllResponse;
 import shop.bluebooktle.common.dto.book.response.BookCartOrderResponse;
 import shop.bluebooktle.common.dto.book.response.BookDetailResponse;
 import shop.bluebooktle.common.dto.book.response.BookInfoResponse;
-import shop.bluebooktle.common.dto.book.response.BookRegisterResponse;
-import shop.bluebooktle.common.dto.book.response.BookUpdateResponse;
 
 public interface BookService {
-
-	BookRegisterResponse registerBook(BookRegisterRequest request);
 
 	BookDetailResponse findBookById(Long bookId);
 

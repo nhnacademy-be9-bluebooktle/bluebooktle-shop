@@ -1,7 +1,6 @@
 package shop.bluebooktle.backend.book.service.impl;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -39,17 +38,12 @@ import shop.bluebooktle.common.dto.book.request.BookUpdateServiceRequest;
 import shop.bluebooktle.common.dto.book.response.AdminBookResponse;
 import shop.bluebooktle.common.dto.book.response.BookAllResponse;
 import shop.bluebooktle.common.dto.book.response.BookCartOrderResponse;
+import shop.bluebooktle.common.dto.book.response.BookDetailResponse;
 import shop.bluebooktle.common.dto.book.response.BookInfoResponse;
-import shop.bluebooktle.common.dto.book.response.BookResponse;
 import shop.bluebooktle.common.dto.book.response.CategoryResponse;
 import shop.bluebooktle.common.dto.book.response.PublisherInfoResponse;
 import shop.bluebooktle.common.dto.book.response.TagInfoResponse;
 import shop.bluebooktle.common.dto.book.response.author.AuthorResponse;
-import shop.bluebooktle.common.dto.book.response.BookDetailResponse;
-import shop.bluebooktle.common.dto.book.response.BookInfoResponse;
-import shop.bluebooktle.common.dto.book.response.BookRegisterResponse;
-import shop.bluebooktle.common.dto.book.response.BookUpdateResponse;
-import shop.bluebooktle.common.exception.book.BookAlreadyExistsException;
 import shop.bluebooktle.common.exception.book.BookNotFoundException;
 
 @Service

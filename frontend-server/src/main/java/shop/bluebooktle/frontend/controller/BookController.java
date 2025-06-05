@@ -12,6 +12,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import shop.bluebooktle.common.domain.point.PointSourceTypeEnum;
 import shop.bluebooktle.common.dto.book.response.BookDetailResponse;
 import shop.bluebooktle.common.dto.book.response.BookInfoResponse;
 import shop.bluebooktle.common.dto.book.response.CategoryResponse;
@@ -47,7 +48,7 @@ public class BookController {
 		model.addAttribute("size", size);
 		model.addAttribute("filterCount", /* 실제 필터 개수 */ 0);
 		model.addAttribute("pagedBooks", pagedBooks);
-		
+
 		return "book/book_list";
 	}
 
@@ -78,23 +79,40 @@ public class BookController {
 		RedirectAttributes redirectAttributes) {
 		log.info("도서 상세 조회 요청");
 		try {
+
 			// 도서 정보 가져오기
 			BookDetailResponse book = bookService.getBookDetail(bookId);
 			model.addAttribute("book", book);
 			model.addAttribute("bookId", bookId);
 
-			// 현재 로그인한 사용자가 해당 도서를 좋아요 했는지 확인
-			boolean isLiked = bookService.isLiked(bookId);
-			model.addAttribute("isLiked", isLiked);
+			// 배송 정책 들고오기
+			DeliveryRuleResponse deliveryRule = deliveryRuleService.getDefaultDeliveryRule();
+			model.addAttribute("deliveryRule", deliveryRule);
+
+			// 로그인 여부 확인
+			Boolean isLoggedIn = (Boolean)model.getAttribute("isLoggedIn");
 
 			// 도서의 총 좋아요 개수 가져오기
 			int likeCount = bookService.countLikes(bookId);
 			model.addAttribute("likeCount", likeCount);
 
-			// 배송 정책 들고오기
-			DeliveryRuleResponse deliveryRule = deliveryRuleService.getDefaultDeliveryRule();
-			model.addAttribute("deliveryRule", deliveryRule);
+			// 로그인한 경우에만 좋아요와 적립될 포인트 계산
+			if (isLoggedIn) {
+				// 현재 로그인한 사용자가 해당 도서를 좋아요 했는지 확인
+				boolean isLiked = bookService.isLiked(bookId);
+				model.addAttribute("isLiked", isLiked);
 
+				// 적립될 포인트 계산
+				int earnPercent = PointSourceTypeEnum.PAYMENT_EARN.getId().intValue();
+				if (book.getSalePrice() == null) {
+					log.warn("BookDetailResponse.getSalePrice() 가 null 입니다. bookId={}", bookId);
+					model.addAttribute("earnedPoints", 0);
+				} else {
+					long salePrice = book.getSalePrice().longValue(); // 예: 18_000
+					int earnedPoints = (int)(salePrice * earnPercent / 100.0); // ex) 18,000 × 4% = 720
+					model.addAttribute("earnedPoints", earnedPoints);
+				}
+			}
 			return "book/book_detail";
 		} catch (Exception e) {
 			log.error("도서 상세 조회 실패");
