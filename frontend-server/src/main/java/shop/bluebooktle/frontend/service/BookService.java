@@ -18,4 +18,16 @@ public interface BookService {
 
 	// 도서 조회
 	BookDetailResponse getBookDetail(Long bookId);
+
+	// 도서 찜 등록
+	void like(Long bookId);
+
+	// 도서 찜 해제
+	void unlike(Long bookId);
+
+	// 도서 찜 여부 확인
+	boolean isLiked(Long bookId);
+
+	// 도서 좋아요 개수 확인
+	int countLikes(Long bookId);
 }

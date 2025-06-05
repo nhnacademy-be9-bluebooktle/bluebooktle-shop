@@ -494,34 +494,35 @@
                         <span th:if="${!iterStat.last}">, </span>
                     </span>
                 </p>
-                <div class="detail-rating-kitsch">
-                    <!-- 평점(추후 구현) -->
-                    <span class="stars">
-                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
-                            class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
-                    </span>
-                    <span class="rating-score-text-kitsch">4.7점</span>
-                    <a class="review-count-link-kitsch handwriting-font-kitsch" href="#bookTabs"
-                       onclick="activateTab('reviews')">(<span id="totalReviewCount">1988</span>개 리뷰 보기)</a>
-                </div>
+
+                <!--                <div class="detail-rating-kitsch">-->
+                <!--                    &lt;!&ndash; TODO 평점(추후 구현) &ndash;&gt;-->
+                <!--                    <span class="stars">-->
+                <!--                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i-->
+                <!--                            class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>-->
+                <!--                    </span>-->
+                <!--                    <span class="rating-score-text-kitsch">4.7점</span>-->
+                <!--                    <a class="review-count-link-kitsch handwriting-font-kitsch" href="#bookTabs"-->
+                <!--                       onclick="activateTab('reviews')">(<span id="totalReviewCount">1988</span>개 리뷰 보기)</a>-->
+                <!--                </div>-->
                 <!-- 가격 정보 -->
                 <div class="detail-price-section-kitsch">
                     <span class="final-price-kitsch" th:text="${book.salePrice} + '원'">33,300원</span>
                     <span class="original-price-kitsch" th:text="${book.price} + '원'">37,000원</span>
                 </div>
                 <!-- TODO 포인트, 등급 연동 예정 -->
-                <div class="book-meta-info-kitsch">
-                    <p><strong><i class="fas fa-coins"></i> 포인트 적립:</strong> <span
-                            class="highlight-text-kitsch">999 P</span> (골드회원 기준)</p>
-                    <p><strong><i class="fas fa-truck"></i> 배송비:</strong> <span class="highlight-text-kitsch">무료!</span>
-                        (3만원 이상 구매 시)</p>
-                    <p><strong><i class="fas fa-calendar-alt"></i> 배송예정:</strong> <span class="delivery-date-kitsch">05월 13일 (화)</span>
-                        도착! (지금 주문 시)</p>
-                    <p><strong><i class="fas fa-box-open"></i> 재고상태:</strong> <span
-                            style="color: var(--kitsch-color-4);">재고있음! 어서 주문하세요!</span></p>
-                    <p><strong><i class="fas fa-gift"></i> 포장:</strong> <span
-                            class="highlight-text-kitsch">반짝이 포장 가능!</span> (+2,000원)</p>
-                </div>
+                <!--                <div class="book-meta-info-kitsch">-->
+                <!--                    <p><strong><i class="fas fa-coins"></i> 포인트 적립:</strong> <span-->
+                <!--                            class="highlight-text-kitsch">999 P</span> (골드회원 기준)</p>-->
+                <!--                    <p><strong><i class="fas fa-truck"></i> 배송비:</strong> <span class="highlight-text-kitsch">무료!</span>-->
+                <!--                        (3만원 이상 구매 시)</p>-->
+                <!--                    <p><strong><i class="fas fa-calendar-alt"></i> 배송예정:</strong> <span class="delivery-date-kitsch">05월 13일 (화)</span>-->
+                <!--                        도착! (지금 주문 시)</p>-->
+                <!--                    <p><strong><i class="fas fa-box-open"></i> 재고상태:</strong> <span-->
+                <!--                            style="color: var(&#45;&#45;kitsch-color-4);">재고있음! 어서 주문하세요!</span></p>-->
+                <!--                    <p><strong><i class="fas fa-gift"></i> 포장:</strong> <span-->
+                <!--                            class="highlight-text-kitsch">반짝이 포장 가능!</span> (+2,000원)</p>-->
+                <!--                </div>-->
                 <div class="book-actions-kitsch">
                     <div class="quantity-input-kitsch" style="margin-bottom: 0.5rem;">
                         <button class="quantity-btn-kitsch minus-btn-kitsch" onclick="changeDetailQuantity(-1)">-
@@ -530,41 +531,74 @@
                         <button class="quantity-btn-kitsch plus-btn-kitsch" onclick="changeDetailQuantity(1)">+</button>
                     </div>
                     <div class="action-buttons-kitsch">
-                        <button class="btn-kitsch primary-btn-kitsch retro-shadow-kitsch"><i class="fas fa-bolt"></i>
+                        <input type="hidden" id="bookId" th:value="${bookId}">
+                        <button class="btn-kitsch primary-btn-kitsch retro-shadow-kitsch"
+                                onclick="handleGoToOrder(event)"><i class="fas fa-bolt"></i>
                             바로구매
                         </button>
-                        <input type="hidden" id="bookId" th:value="${bookId}">
                         <button type="button"
                                 onclick="handleAddToCart(event)"
                                 class="btn-kitsch secondary-btn-kitsch color2-kitsch retro-shadow-kitsch">
                             <i class="fas fa-shopping-cart"></i> 장바구니
                         </button>
-                        <button class="btn-kitsch secondary-btn-kitsch color5-kitsch retro-shadow-kitsch like-btn-kitsch"
-                                onclick="toggleBookLike(this)"><i class="far fa-heart"></i> <span>좋아요</span></button>
-                        <button class="btn-kitsch secondary-btn-kitsch color1-kitsch retro-shadow-kitsch"><i
-                                class="fas fa-share-alt"></i> 공유하기
-                        </button>
+
+                        <!-- 좋아요 취소 폼 (이미 좋아요 눌린 경우) -->
+                        <form th:if="${isLiked}"
+                              th:action="@{/books/{id}/unlikes(id=${bookId})}"
+                              method="post"
+                              style="display:inline;">
+                            <button type="submit"
+                                    class="btn-kitsch secondary-btn-kitsch color5-kitsch retro-shadow-kitsch like-btn-kitsch"
+                                    style="display: flex; align-items: center; gap: 0.3rem;">
+                                <i class="fas fa-heart"></i>
+                                <span>좋아요 취소</span>
+                            </button>
+                        </form>
+
+                        <!-- 좋아요 등록 폼 (아직 좋아요 안 눌린 경우) -->
+                        <form th:unless="${isLiked}"
+                              th:action="@{/books/{id}/likes(id=${bookId})}"
+                              method="get"
+                              style="display:inline;">
+                            <button type="submit"
+                                    class="btn-kitsch secondary-btn-kitsch color5-kitsch retro-shadow-kitsch like-btn-kitsch"
+                                    style="display: flex; align-items: center; gap: 0.3rem;">
+                                <i class="far fa-heart"></i>
+                                <span>좋아요</span>
+                            </button>
+                        </form>
+
+                        <!-- 좋아요 수 표시 -->
+                        <span style="margin-left: 1rem; font-size: 1rem; color: var(--kitsch-text-dark);">
+                            <i class="fas fa-heart"></i>
+                            <span th:text="${likeCount}">0</span>개
+                        </span>
                     </div>
                 </div>
             </div>
         </div>
 
+        <!-- 상세 탭 영역 (도서 소개 / 목차 등) -->
         <div class="tab-ui-kitsch" id="bookTabs">
             <div class="tabs-kitsch-container">
+                <!-- 도서 소개 -->
                 <button class="tab-kitsch-button active pixel-font-kitsch" data-tab-target="#desc-content">
                     <i class="fas fa-book-open"></i> 도서 소개
                 </button>
+
+                <!-- 목차 -->
                 <button class="tab-kitsch-button pixel-font-kitsch" data-tab-target="#toc-content">
                     <i class="fas fa-list-ul"></i> 목차
                 </button>
+
                 <!--TODO 리뷰 구현 예정 -->
-                <button class="tab-kitsch-button pixel-font-kitsch" data-tab-target="#reviews-content"><i
-                        class="fas fa-comments"></i> 리뷰 <span class="badge-kitsch hot-badge-kitsch review-tab-count"
-                                                              style="font-size:0.7em; padding:0.1em 0.4em;">1988</span>
-                </button>
-                <button class="tab-kitsch-button pixel-font-kitsch" data-tab-target="#shipping-info-content"><i
-                        class="fas fa-shipping-fast"></i> 배송/반품
-                </button>
+                <!--                <button class="tab-kitsch-button pixel-font-kitsch" data-tab-target="#reviews-content"><i-->
+                <!--                        class="fas fa-comments"></i> 리뷰 <span class="badge-kitsch hot-badge-kitsch review-tab-count"-->
+                <!--                                                              style="font-size:0.7em; padding:0.1em 0.4em;">1988</span>-->
+                <!--                </button>-->
+                <!--                <button class="tab-kitsch-button pixel-font-kitsch" data-tab-target="#shipping-info-content"><i-->
+                <!--                        class="fas fa-shipping-fast"></i> 배송/반품-->
+                <!--                </button>-->
             </div>
             <div class="tab-content-area-kitsch">
                 <div class="tab-content-area-kitsch">
@@ -582,60 +616,60 @@
 
                 </div>
                 <!--TODO 리뷰 구현 예정 -->
-                <div class="tab-pane-kitsch" id="reviews-content">
-                    <h3 class="tab-pane-title-kitsch"><i class="fas fa-microphone-alt"></i> 리뷰 <span
-                            class="review-tab-count">1988</span>개</h3>
+                <!--                <div class="tab-pane-kitsch" id="reviews-content">-->
+                <!--                    <h3 class="tab-pane-title-kitsch"><i class="fas fa-microphone-alt"></i> 리뷰 <span-->
+                <!--                            class="review-tab-count">1988</span>개</h3>-->
 
-                    <div class="review-item-kitsch-detail">
-                        <div class="review-header-kitsch">
-                            <div>
-                                <strong class="review-author-kitsch">겜돌이_77</strong>
-                                <span class="review-date-kitsch">2025.05.01</span>
-                            </div>
-                            <div class="review-stars-kitsch">
-                                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
-                                    class="fas fa-star"></i><i class="fas fa-star"></i>
-                            </div>
-                        </div>
-                        <p class="review-text-kitsch">이거 완전 제 인생겜... 아니 인생책입니다! 시간 가는 줄 모르고 읽었어요! 강추!</p>
-                        <img alt="리뷰 이미지" class="review-image-kitsch"
-                             onclick="showImageInModal(this.src, 'bookDetailImageModal')"
-                             src="https://picsum.photos/150/100?random=231">
-                    </div>
-                    <div class="review-item-kitsch-detail">
-                        <div class="review-header-kitsch">
-                            <div>
-                                <span class="review-author-kitsch">코딩공주</span>
-                                <span class="review-stars-kitsch">
-                                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
-                                        class="fas fa-star"></i><i class="far fa-star"></i>
-                                </span>
-                            </div>
-                            <span class="review-date-kitsch">2025.04.28</span>
-                        </div>
-                        <p class="review-text-kitsch">주인공 비트 너무 귀여워요 ㅠㅠ 근데 포인터 마왕 너무 어려워서 밤샜어요... 그래도 꿀잼!</p>
-                        <img alt="리뷰 이미지 2" class="review-image-kitsch"
-                             onclick="showImageInModal(this.src, 'bookDetailImageModal')"
-                             src="https://picsum.photos/150/100?random=232">
-                    </div>
-                    <div style="text-align: center; margin-top: 2rem;">
-                        <button class="btn-kitsch secondary-btn-kitsch color4-kitsch retro-shadow-kitsch-small load-more-reviews-btn-kitsch"
-                                onclick="loadMoreReviews()">
-                            <i class="fas fa-plus-circle"></i> 더보기
-                        </button>
-                    </div>
-                </div>
-                <!--TODO 배송 구현 예정 -->
-                <div class="tab-pane-kitsch" id="shipping-info-content">
-                    <h3><i class="fas fa-box"></i> 빛의 속도로 배송! (배송/반품 안내)</h3>
-                    <p><strong>배송:</strong> BlueBookttle은 주문하신 용사님들의 모험 아이템(도서)을 최대한 빠르게 전달하기 위해 노력합니다! 평일 오후 2시 이전 주문 시
-                        <strong style='color:var(--kitsch-color-3)'>🚀당일 로켓 발송🚀</strong> (재고 상황에 따라 하루 정도 지연될 수 있음, 그럴 땐
-                        포션이라도 보내드리고 싶은 심정!). 배송비는 3,000원이지만, 3만원 이상 구매 시 <strong style='color:var(--kitsch-color-4)'>✨무료
-                            배송 마법✨</strong>이 시전됩니다!</p>
-                    <p><strong>반품/교환:</strong> 마음이 바뀌셨나요? 괜찮습니다! 수령 후 7일 이내라면 주문 취소/반품이 가능합니다. 단, 책에 커피를 쏟거나, 드래곤의 불꽃에
-                        그을린 경우는 곤란합니다 (상품 가치 훼손 시 불가). 단순 변심 반품 시에는 귀환 스크롤 비용(왕복 배송비)이 발생합니다. 오배송이나 파본인 경우, 즉시 1:1 문의
-                        게시판에 알려주시면 빛보다 빠르게 처리해 드립니다!</p>
-                </div>
+                <!--                    <div class="review-item-kitsch-detail">-->
+                <!--                        <div class="review-header-kitsch">-->
+                <!--                            <div>-->
+                <!--                                <strong class="review-author-kitsch">겜돌이_77</strong>-->
+                <!--                                <span class="review-date-kitsch">2025.05.01</span>-->
+                <!--                            </div>-->
+                <!--                            <div class="review-stars-kitsch">-->
+                <!--                                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i-->
+                <!--                                    class="fas fa-star"></i><i class="fas fa-star"></i>-->
+                <!--                            </div>-->
+                <!--                        </div>-->
+                <!--                        <p class="review-text-kitsch">이거 완전 제 인생겜... 아니 인생책입니다! 시간 가는 줄 모르고 읽었어요! 강추!</p>-->
+                <!--                        <img alt="리뷰 이미지" class="review-image-kitsch"-->
+                <!--                             onclick="showImageInModal(this.src, 'bookDetailImageModal')"-->
+                <!--                             src="https://picsum.photos/150/100?random=231">-->
+                <!--                    </div>-->
+                <!--                    <div class="review-item-kitsch-detail">-->
+                <!--                        <div class="review-header-kitsch">-->
+                <!--                            <div>-->
+                <!--                                <span class="review-author-kitsch">코딩공주</span>-->
+                <!--                                <span class="review-stars-kitsch">-->
+                <!--                                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i-->
+                <!--                                        class="fas fa-star"></i><i class="far fa-star"></i>-->
+                <!--                                </span>-->
+                <!--                            </div>-->
+                <!--                            <span class="review-date-kitsch">2025.04.28</span>-->
+                <!--                        </div>-->
+                <!--                        <p class="review-text-kitsch">주인공 비트 너무 귀여워요 ㅠㅠ 근데 포인터 마왕 너무 어려워서 밤샜어요... 그래도 꿀잼!</p>-->
+                <!--                        <img alt="리뷰 이미지 2" class="review-image-kitsch"-->
+                <!--                             onclick="showImageInModal(this.src, 'bookDetailImageModal')"-->
+                <!--                             src="https://picsum.photos/150/100?random=232">-->
+                <!--                    </div>-->
+                <!--                    <div style="text-align: center; margin-top: 2rem;">-->
+                <!--                        <button class="btn-kitsch secondary-btn-kitsch color4-kitsch retro-shadow-kitsch-small load-more-reviews-btn-kitsch"-->
+                <!--                                onclick="loadMoreReviews()">-->
+                <!--                            <i class="fas fa-plus-circle"></i> 더보기-->
+                <!--                        </button>-->
+                <!--                    </div>-->
+                <!--                </div>-->
+                <!--                &lt;!&ndash;TODO 배송 구현 예정 &ndash;&gt;-->
+                <!--                <div class="tab-pane-kitsch" id="shipping-info-content">-->
+                <!--                    <h3><i class="fas fa-box"></i> 빛의 속도로 배송! (배송/반품 안내)</h3>-->
+                <!--                    <p><strong>배송:</strong> BlueBookttle은 주문하신 용사님들의 모험 아이템(도서)을 최대한 빠르게 전달하기 위해 노력합니다! 평일 오후 2시 이전 주문 시-->
+                <!--                        <strong style='color:var(&#45;&#45;kitsch-color-3)'>🚀당일 로켓 발송🚀</strong> (재고 상황에 따라 하루 정도 지연될 수 있음, 그럴 땐-->
+                <!--                        포션이라도 보내드리고 싶은 심정!). 배송비는 3,000원이지만, 3만원 이상 구매 시 <strong style='color:var(&#45;&#45;kitsch-color-4)'>✨무료-->
+                <!--                            배송 마법✨</strong>이 시전됩니다!</p>-->
+                <!--                    <p><strong>반품/교환:</strong> 마음이 바뀌셨나요? 괜찮습니다! 수령 후 7일 이내라면 주문 취소/반품이 가능합니다. 단, 책에 커피를 쏟거나, 드래곤의 불꽃에-->
+                <!--                        그을린 경우는 곤란합니다 (상품 가치 훼손 시 불가). 단순 변심 반품 시에는 귀환 스크롤 비용(왕복 배송비)이 발생합니다. 오배송이나 파본인 경우, 즉시 1:1 문의-->
+                <!--                        게시판에 알려주시면 빛보다 빠르게 처리해 드립니다!</p>-->
+                <!--                </div>-->
             </div>
         </div>
     </div>
@@ -717,7 +751,6 @@
 
         function handleAddToCart(event) {
             event.preventDefault();
-            console.debug('✅ handleAddToCart 실행됨');
 
             const bookId = document.getElementById('bookId').value;
             const quantity = document.getElementById('detailQuantity').value;
@@ -820,6 +853,18 @@
             });
 
         });
+
+        // 바로 구매 기능
+        function handleGoToOrder(event) {
+            event.preventDefault();
+
+            const bookId = document.getElementById('bookId').value;
+            const quantity = document.getElementById('detailQuantity').value;
+
+            const params = new URLSearchParams({bookId, quantity});
+
+            window.location.href = '/order/create?${params.toString()}';
+        }
 
         // 리뷰 더보기 Mock 함수 유지
         let mockReviewPage = 1;

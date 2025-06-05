@@ -5,6 +5,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -74,14 +75,50 @@ public class BookController {
 		RedirectAttributes redirectAttributes) {
 		log.info("도서 상세 조회 요청");
 		try {
+			// 도서 정보 가져오기
 			BookDetailResponse book = bookService.getBookDetail(bookId);
 			model.addAttribute("book", book);
 			model.addAttribute("bookId", bookId);
+
+			// 현재 로그인한 사용자가 해당 도서를 좋아요 했는지 확인
+			boolean isLiked = bookService.isLiked(bookId);
+			model.addAttribute("isLiked", isLiked);
+
+			// 도서의 총 좋아요 개수 가져오기
+			int likeCount = bookService.countLikes(bookId);
+			model.addAttribute("likeCount", likeCount);
+
 			return "book/book_detail";
 		} catch (Exception e) {
 			log.error("도서 상세 조회 실패");
 			redirectAttributes.addFlashAttribute("globalErrorMessage", "도서 정보 조회에 실패했습니다: " + e.getMessage());
 			return "redirect:/books";
 		}
+	}
+
+	// 도서 찜 등록
+	@GetMapping("/books/{bookId}/likes")
+	public String likeBook(@PathVariable Long bookId, RedirectAttributes redirectAttributes) {
+		try {
+			bookService.like(bookId);
+			redirectAttributes.addFlashAttribute("globalSuccessMessage", "찜 완료!");
+		} catch (Exception e) {
+			log.error("도서 찜 실패");
+			redirectAttributes.addFlashAttribute("globalErrorMessage", "찜에 실패했습니다: " + e.getMessage());
+		}
+		return "redirect:/books/" + bookId;
+	}
+
+	// 도서 찜 취소
+	@PostMapping("/books/{bookId}/unlikes")
+	public String unlikeBook(@PathVariable Long bookId, RedirectAttributes redirectAttributes) {
+		try {
+			bookService.unlike(bookId);
+			redirectAttributes.addFlashAttribute("globalSuccessMessage", "찜 취소!");
+		} catch (Exception e) {
+			log.error("도서 찜 취소 실패");
+			redirectAttributes.addFlashAttribute("globalErrorMessage", "찜 취소에 실패했습니다: " + e.getMessage());
+		}
+		return "redirect:/books/" + bookId;
 	}
 }

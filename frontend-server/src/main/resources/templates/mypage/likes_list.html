@@ -252,9 +252,10 @@
 
                         <!-- 카드 하단 버튼: 장바구니 담기 / 찜 해제 -->
                         <div class="wishlist-item-actions-kitsch">
+                            <input id="bookId" th:value="${item.bookId}" type="hidden">
                             <button type="button"
                                     class="btn-kitsch primary-btn-kitsch retro-shadow-kitsch-small"
-                                    th:onclick="|handleAddToCart(${item.bookId})|">
+                                    th:onclick="handleAddToCart()">
                                 <i class="fas fa-shopping-basket"></i> 장바구니 담기
                             </button>
                             <form th:action="@{/mypage/likes/{bookId}/delete(bookId=${item.bookId})}"
@@ -346,7 +347,7 @@
         }
 
         // 카드 함수
-        function handleAddToCart(bookId) {
+        function handleAddToCart(event) {
             event.preventDefault();
             console.debug('handleAddToCart 실행됨, bookId:', bookId);
 

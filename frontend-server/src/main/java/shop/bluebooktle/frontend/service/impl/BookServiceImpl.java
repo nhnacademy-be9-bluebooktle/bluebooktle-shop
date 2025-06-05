@@ -66,4 +66,25 @@ public class BookServiceImpl implements BookService {
 	public BookDetailResponse getBookDetail(Long bookId) {
 		return bookRepository.getBookDetail(bookId);
 	}
+
+	@Override
+	public void like(Long bookId) {
+		bookRepository.likeBook(bookId);
+	}
+
+	@Override
+	public void unlike(Long bookId) {
+		bookRepository.unlikeBook(bookId);
+	}
+
+	@Override
+	public boolean isLiked(Long bookId) {
+		return bookRepository.isLiked(bookId).isLiked();
+		// 뒤에 isLiked()는 BookLikesResponse(DTO)에 있는 boolean을 꺼내기 위함
+	}
+
+	@Override
+	public int countLikes(Long bookId) {
+		return bookRepository.countLikes(bookId).getCountLikes();
+	}
 }

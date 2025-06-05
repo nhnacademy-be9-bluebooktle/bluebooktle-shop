@@ -1,16 +1,23 @@
 package shop.bluebooktle.common.dto.book.response;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Value;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@AllArgsConstructor
 @Getter
-@Value
-@Builder
+@Setter
+@NoArgsConstructor   // Jackson용 기본 생성자
 public class BookLikesResponse {
-	Long bookId;
-	boolean isLiked;
-	int countLikes;
+	private Long bookId;
+	private boolean isLiked;
+	private int countLikes;
+
+	@Builder
+	public BookLikesResponse(Long bookId, boolean isLiked, int countLikes) {
+		this.bookId = bookId;
+		this.isLiked = isLiked;
+		this.countLikes = countLikes;
+	}
 }
+
