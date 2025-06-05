@@ -710,7 +710,8 @@
                         <form method="get"
                               style="display:inline;"
                               th:action="@{/books/{id}/likes(id=${bookId})}"
-                              th:unless="${isLiked} and ${isLiked}">
+                              th:if="${isLoggedIn}"
+                              th:unless="${isLiked}">
                             <button class="btn-kitsch secondary-btn-kitsch color5-kitsch retro-shadow-kitsch like-btn-kitsch"
                                     style="display: flex; align-items: center; gap: 0.3rem;"
                                     type="submit">
