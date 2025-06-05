@@ -1,4 +1,4 @@
-package shop.bluebooktle.auth.event.listener; // 적절한 패키지로 변경하세요.
+package shop.bluebooktle.auth.event.listener;
 
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
