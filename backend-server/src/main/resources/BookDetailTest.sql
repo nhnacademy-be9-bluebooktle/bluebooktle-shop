@@ -1,4 +1,6 @@
--- 샘플 책 1권 추가
+-- ===============================================
+-- 1) 샘플 책 1권 추가
+-- ===============================================
 INSERT INTO book (title,
                   description,
                   isbn,
@@ -10,25 +12,20 @@ VALUES ('코딩 대모험',
         '2025-05-01',
         CURRENT_TIMESTAMP);
 
--- img 테이블에 이미지 URL 등록
-INSERT INTO img (img_url,
-                 created_at -- BaseEntity 에 매핑된 생성일자 컬럼
-)
+-- 2) 샘플 이미지 추가 (Img 테이블)
+INSERT INTO img (img_url, created_at)
 VALUES ('https://image.aladin.co.kr/product/13537/89/cover200/k762532810_1.jpg',
         CURRENT_TIMESTAMP);
 
--- 방금 등록된 img_id 가져오기 (MySQL 기준)
+-- MySQL 기준: 방금 넣은 img의 자동증가 PK를 변수에 보관
 SET @imgId = LAST_INSERT_ID();
 
--- book_img 에 썸네일로 맵핑 (book_id = 1 로 가정)
-INSERT INTO book_img (book_id,
-                      img_id,
-                      is_thumbnail)
-VALUES (1,
-        @imgId,
-        TRUE);
+-- 3) book_img 에 썸네일로 연결
+-- (book_id = 1, img_id = @imgId, is_thumbnail = TRUE)
+INSERT INTO book_img (book_id, img_id, is_thumbnail)
+VALUES (1, @imgId, TRUE);
 
--- 도서 판매 정보
+-- 4) 도서 판매 정보(book_sale_info) 삽입
 INSERT INTO book_sale_info (book_id,
                             price,
                             sale_price,
@@ -37,28 +34,41 @@ INSERT INTO book_sale_info (book_id,
                             sale_percentage,
                             state,
                             created_at)
-VALUES (1, -- 방금 만든 책(book_id=1)에 대응
-        20000.00, -- 정가
-        18000.00, -- 할인된 가격
-        100, -- 재고 수량
-        TRUE, -- 포장 여부
-        10.00, -- 할인율(퍼센트)
-        'AVAILABLE', -- 판매 상태 (BookSaleInfoState.AVAILABLE)
+VALUES (1, -- book_id = 1
+        20000.00,
+        18000.00,
+        100,
+        TRUE,
+        10.00, -- sale_percentage = 10%
+        'AVAILABLE',
         CURRENT_TIMESTAMP);
 
--- author 테이블에 저자 추가
+-- 5) 저자 삽입 및 book_author 매핑
 INSERT INTO author (name, created_at)
 VALUES ('홍길동', CURRENT_TIMESTAMP);
 
--- 방금 추가된 author_id 꺼내오기
+-- 방금 추가된 author의 PK를 변수에 담기
 SET @authorId = LAST_INSERT_ID();
 
--- book_author (책-저자 중간) 테이블에 맵핑
+-- book_author 중간 테이블에 매핑 (book_id=1, author_id=@authorId)
 INSERT INTO book_author (book_id, author_id)
 VALUES (1, @authorId);
 
 
--- user_id=1 사용자가 book_id=2 번 도서를 좋아요에 추가
-INSERT INTO book_likes (book_id, user_id)
-VALUES (1, 1);
+-- 6) 출판사(publisher) 삽입 + book_publisher 매핑
+INSERT INTO publisher (name, created_at)
+VALUES ('에이콘출판사', CURRENT_TIMESTAMP);
+SET @pub1 = LAST_INSERT_ID();
+
+INSERT INTO publisher (name, created_at)
+VALUES ('인사이트', CURRENT_TIMESTAMP);
+SET @pub2 = LAST_INSERT_ID();
+
+INSERT INTO publisher (name, created_at)
+VALUES ('길벗', CURRENT_TIMESTAMP);
+SET @pub3 = LAST_INSERT_ID();
+
+-- '코딩 대모험'(book_id=1) → '에이콘출판사' 연결
+INSERT INTO book_publisher (book_id, publisher_id)
+VALUES (1, @pub1);
 

@@ -72,22 +72,32 @@ public class BookServiceImpl implements BookService {
 	@Override
 	@Transactional(readOnly = true)
 	public BookDetailResponse findBookById(Long bookId) {
+		// 도서 조회
 		Book book = bookRepository.findById(bookId)
 			.orElseThrow(BookNotFoundException::new);
 
+		// 도서 판매 정보 조회
 		BookSaleInfo saleInfo = bookSaleInfoRepository.findByBook(book)
 			.orElseThrow(BookNotFoundException::new);
 
+		// 작가 목록 조회
 		List<BookAuthor> bookAuthors = bookAuthorRepository.findByBook_Id(bookId);
-		List<BookPublisher> bookPublishers = bookPublisherRepository.findByBook_Id(bookId);
-
 		List<String> authors = bookAuthors.stream()
 			.map(bookAuthor -> bookAuthor.getAuthor().getName())
 			.toList();
 
+		// 출판사 목록 조회
+		List<BookPublisher> bookPublishers = bookPublisherRepository.findByBook_Id(bookId);
 		List<String> publisher = bookPublishers.stream()
 			.map(bookPublisher -> bookPublisher.getPublisher().getName())
 			.toList();
+
+		// 썸네일 URL 가져오기
+		String imgUrl = book.getBookImgs().stream()
+			.filter(b1 -> b1.isThumbnail())
+			.findFirst()
+			.map(b1 -> b1.getImg().getImgUrl())
+			.orElse("");
 
 		return BookDetailResponse.builder()
 			.isbn(book.getIsbn())
@@ -95,9 +105,12 @@ public class BookServiceImpl implements BookService {
 			.authors(authors)
 			.publishers(publisher)
 			.price(saleInfo.getPrice())
-			.salePrice(saleInfo.getPrice())
+			.salePrice(saleInfo.getSalePrice())
+			.salePercentage(saleInfo.getSalePercentage().intValue())
 			.description(book.getDescription())
 			.index(book.getIndex())
+			.imgUrl(imgUrl)
+			.saleState(saleInfo.getBookSaleInfoState())
 			.build();
 	}
 

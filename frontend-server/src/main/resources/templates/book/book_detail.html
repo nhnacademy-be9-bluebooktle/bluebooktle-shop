@@ -165,21 +165,81 @@
         .action-buttons-kitsch {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-            gap: 0.8rem;
+            gap: 1rem;
         }
 
         .action-buttons-kitsch .btn-kitsch {
             padding: 0.8em 1em; /* 버튼 크기 통일 */
+            grid-template-columns:repeat(3, 1fr);
             font-size: 0.95rem;
+        }
+
+        /* ② grid 셀로 들어가는 요소(form, button 모두) 너비 동일화 */
+        .action-buttons-kitsch > form,
+        .action-buttons-kitsch > button {
+            width: 100%; /* 셀 전체를 채움 */
+        }
+
+        /* ③ 실제 버튼(.btn-kitsch)은 부모 너비에 맞춰 100% 확장 */
+        .action-buttons-kitsch .btn-kitsch {
+            width: 100%;
+            display: block; /* 인라인 요소 여백 문제 방지 */
         }
 
         .like-btn-kitsch i.fas { /* 채워진 하트 */
             color: var(--kitsch-color-3); /* 핫핑크 */
         }
 
+        /* 수량 입력기와 좋아요 영역(버튼+개수)을 같은 행에 가로 정렬 */
+        .action-top-row-kitsch {
+            display: flex;
+            align-items: center;
+            gap: 1rem; /* 수량 입력기 ↔ 좋아요 영역 사이 여백 */
+            margin-bottom: 1rem; /* 아래 버튼 그룹(.action-buttons-kitsch)과 분리하기 위한 여백 */
+        }
+
+        /* 좋아요 버튼과 좋아요 개수를 묶는 컨테이너 */
+        .like-area-kitsch {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem; /* 좋아요 버튼 ↔ 좋아요 개수 사이 간격 */
+        }
+
+        /* 좋아요 개수 텍스트(♥ + 숫자)를 가운데 정렬 */
+        .like-count-kitsch {
+            display: flex;
+            align-items: center;
+            font-family: var(--font-pixel);
+            font-size: 1.2rem;
+            color: var(--kitsch-text-dark);
+        }
+
+        /* 좋아요 개수 아이콘(하트)에 약간의 우측 여백 주기 */
+        .like-count-kitsch i.fas {
+            color: var(--kitsch-color-3);
+            margin-right: 0.2rem;
+        }
+
         /* 탭 메뉴는 styles.css의 .tab-ui-kitsch 관련 스타일 사용 */
         /* .tab-content-kitsch 등은 styles.css에 이미 정의됨 */
-        /* .tab-pane-kitsch h3 는 .tab-pane-title-kitsch 로 대체 (styles.css) */
+
+        /* 탭 안 h3 제목(도서 소개 · 목차)을 동일 테마로 맞추기 */
+        .tab-pane-title-kitsch {
+            font-family: var(--font-display);
+            font-size: 1rem; /* 큼직하게 */
+            font-weight: 700;
+            color: var(--kitsch-text-dark); /* 도서 소개와 같은 갈색 */
+            display: flex;
+            align-items: center;
+            gap: .35rem; /* 아이콘 ↔ 글자 간격 */
+            margin-bottom: 1rem;
+        }
+
+        /* 아이콘 컬러도 글자와 통일 */
+        .tab-pane-title-kitsch i {
+            color: var(--kitsch-text-dark);
+        }
+
 
         /* Review Item Demo (상세페이지용, styles.css 에 유사한 .review-item-kitsch-detail 등과 병합/선택) */
         .review-item-kitsch-detail {
@@ -380,19 +440,59 @@
             background-color: rgba(255, 255, 255, 0.3);
         }
 
-        .action-buttons-kitsch {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-            gap: 0.8rem;
+        /* 수량 조절 컨테이너를 플렉스 박스로 맞붙여 정렬 */
+        .quantity-input-kitsch {
+            display: inline-flex; /* 버튼·input 이 한 줄로 깔끔하게 */
+            align-items: stretch; /* 높이도 동일하게 */
         }
 
-        .action-buttons-kitsch .btn-kitsch {
-            padding: 0.8em 1em;
-            font-size: 0.95rem;
+        /* “+” 버튼을 “–” 버튼과 같은 배경색으로 통일 */
+        .quantity-btn-kitsch.plus-btn-kitsch {
+            background-color: #B3B348; /* minus 와 동일한 올리브색 */
+            color: var(--kitsch-text-dark); /* 글자색도 minus 와 맞춤 */
         }
 
-        .like-btn-kitsch i.fas {
-            color: var(--kitsch-color-3);
+        /* “+” 버튼에 마우스를 올렸을 때 버건디 계열로 변하도록 덮어쓰기 */
+        .quantity-btn-kitsch.plus-btn-kitsch:hover {
+            background-color: #801530 !important; /* – 버튼과 같은 버건디 */
+            color: #FFFFFF; /* 기호 “+”는 흰색으로 */
+        }
+
+
+        /* 가운데 input 과 겹쳐 보이는 현상 제거 */
+        .quantity-btn-kitsch.minus-btn-kitsch {
+            border-right: none;
+        }
+
+        /* 중간 경계선 1줄만 보이도록 */
+        .quantity-btn-kitsch.plus-btn-kitsch {
+            border-left: none;
+        }
+
+        /* 동일 */
+        .quantity-value-kitsch {
+            border-left: 2px solid #3F3329; /* 경계선 한 줄만 넣어 연결감 유지 */
+            border-right: 2px solid #3F3329;
+            width: 4rem; /* 버튼보다 약간 넓게 */
+            height: 3rem; /* 버튼 높이와 동일 */
+            font-size: 1.2rem; /* 숫자 크기 조정 */
+            line-height: 3rem; /* 세로 중앙 정렬 유지 */
+        }
+
+        /* z-index 로 인해 살짝 떠보이는 느낌 제거 */
+        .quantity-btn-kitsch {
+            position: static; /* 상대 위치·z-index 제거 */
+            width: 3rem; /* ← 기존 3rem → 3.5rem */
+            height: 3rem; /* ← 기존 3rem → 3.5rem */
+            font-size: 1.2rem; /* 기호(+,−)도 함께 확대 */
+        }
+
+        .action-top-row-kitsch {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start; /* 전체를 좌측 정렬, 가운데 정렬하고 싶으면 'center'로 변경 */
+            gap: 1rem;
+            margin-bottom: 1rem;
         }
 
         /* 리뷰 탭 내 아이템 스타일은 유지 */
@@ -462,25 +562,13 @@
 <div layout:fragment="content">
     <div class="container-kitsch section-padding-kitsch">
         <div class="book-detail-layout-kitsch">
+            <!-- 도서 표지 -->
             <div class="book-image-column-kitsch">
-                <img alt="판타지 소설 표지" class="main-book-image-kitsch"
-                     id="mainBookImage" src="https://picsum.photos/350/520?random=201">
-                <!-- TODO 썸네일 구현 예정 -->
-                <div class="book-thumbnails-kitsch">
-                    <img alt="썸네일1" class="active-thumbnail-kitsch"
-                         onclick="changeMainImage('https://picsum.photos/350/520?random=211')"
-                         src="https://picsum.photos/60/90?random=211">
-                    <img alt="썸네일2" onclick="changeMainImage('https://picsum.photos/350/520?random=212')"
-                         src="https://picsum.photos/60/90?random=212">
-                    <img alt="썸네일3" onclick="changeMainImage('https://picsum.photos/350/520?random=213')"
-                         src="https://picsum.photos/60/90?random=213">
-                    <img alt="썸네일4" onclick="changeMainImage('https://picsum.photos/350/520?random=214')"
-                         src="https://picsum.photos/60/90?random=214">
-                </div>
+                <img alt="도서 표지" class="main-book-image-kitsch" id="mainBookImage" th:src="${book.imgUrl}"/>
             </div>
 
+            <!-- 책 제목, 작가, 출판사 -->
             <div class="book-info-column-kitsch">
-                <!-- 책 제목, 작가, 출판사 -->
                 <h1 class="detail-title-kitsch" th:text="${book.title}">책 제목</h1>
                 <p class="detail-author-publisher-kitsch">
                     <span class="pixel-font-kitsch">글/그림:</span>
@@ -505,31 +593,92 @@
                 <!--                    <a class="review-count-link-kitsch handwriting-font-kitsch" href="#bookTabs"-->
                 <!--                       onclick="activateTab('reviews')">(<span id="totalReviewCount">1988</span>개 리뷰 보기)</a>-->
                 <!--                </div>-->
+
                 <!-- 가격 정보 -->
                 <div class="detail-price-section-kitsch">
-                    <span class="final-price-kitsch" th:text="${book.salePrice} + '원'">33,300원</span>
-                    <span class="original-price-kitsch" th:text="${book.price} + '원'">37,000원</span>
+                    <!-- 할인된 가격을 천 단위 콤마와 “원” 붙여서 포맷 -->
+                    <span class="final-price-kitsch"
+                          th:text="${T(java.lang.String).format('%,d원', book.salePrice.longValue())}"> 0원
+                    </span>
+
+                    <!-- 원래 가격(정가)을 취소선 처리하면서 천 단위 콤마를 넣고 “원” 붙이기 -->
+                    <span class="original-price-kitsch"
+                          th:text="${T(java.lang.String).format('%,d원', book.price.longValue())}"> 0원
+                    </span>
+
+                    <!-- 할인율만 계산해서 “OO%↓”로 표시 -->
+                    <span class="discount-rate-kitsch"
+                          th:text="${T(java.lang.String).format('%d%%↓', book.salePercentage)}"> 0%
+                    </span>
                 </div>
-                <!-- TODO 포인트, 등급 연동 예정 -->
-                <!--                <div class="book-meta-info-kitsch">-->
-                <!--                    <p><strong><i class="fas fa-coins"></i> 포인트 적립:</strong> <span-->
-                <!--                            class="highlight-text-kitsch">999 P</span> (골드회원 기준)</p>-->
-                <!--                    <p><strong><i class="fas fa-truck"></i> 배송비:</strong> <span class="highlight-text-kitsch">무료!</span>-->
-                <!--                        (3만원 이상 구매 시)</p>-->
-                <!--                    <p><strong><i class="fas fa-calendar-alt"></i> 배송예정:</strong> <span class="delivery-date-kitsch">05월 13일 (화)</span>-->
-                <!--                        도착! (지금 주문 시)</p>-->
-                <!--                    <p><strong><i class="fas fa-box-open"></i> 재고상태:</strong> <span-->
-                <!--                            style="color: var(&#45;&#45;kitsch-color-4);">재고있음! 어서 주문하세요!</span></p>-->
-                <!--                    <p><strong><i class="fas fa-gift"></i> 포장:</strong> <span-->
-                <!--                            class="highlight-text-kitsch">반짝이 포장 가능!</span> (+2,000원)</p>-->
-                <!--                </div>-->
+
+                <div class="book-meta-info-kitsch">
+                    <!-- TODO 포인트 연동 예정-->
+                    <!--                    <p><strong><i class="fas fa-coins"></i> 포인트 적립:</strong> <span-->
+                    <!--                            class="highlight-text-kitsch">999 P</span> (골드회원 기준)</p>-->
+                    <p><strong><i class="fas fa-truck"></i> 배송비:</strong>
+                        <span class="highlight-text-kitsch"
+                              th:if="${book.salePrice >= deliveryRule.freeDeliveryThreshold}"> 무료 배송 </span>
+                        <span th:text="${T(java.lang.String).format('%,d원', deliveryRule.deliveryFee.longValue())}"
+                              th:unless="${book.salePrice >= deliveryRule.freeDeliveryThreshold}"> 0원 </span>
+                        <span th:if="${book.salePrice.longValue()} < ${deliveryRule.freeDeliveryThreshold.longValue()}"
+                              style="margin-left:0.5em; font-size:0.8rem; color:gray;"> (총 결제 금액
+                            <span th:text="${T(java.lang.String).format('%,d원', deliveryRule.freeDeliveryThreshold.longValue())}"> 30,000원 </span> 이상 시 무료)
+                        </span>
+                    </p>
+
+
+                    <!-- 재고 상태 -->
+                    <p>
+                        <strong><i class="fas fa-box-open"></i> 재고상태:</strong>
+                        <span th:switch="${book.saleState}">
+                            <!-- 재고 충분할 때 -->
+                            <span th:case="${T(shop.bluebooktle.common.dto.book.BookSaleInfoState).AVAILABLE}"
+                                  style="color: var(--kitsch-color-4);">
+                                재고있음! 어서 주문하세요!
+                            </span>
+                            <!-- 재고 얼마 남지 않았을 때 -->
+                            <span th:case="${T(shop.bluebooktle.common.dto.book.BookSaleInfoState).LOW_STOCK}"
+                                  style="color: var(--kitsch-color-2);">
+                                재고 얼마 남지 않았어요! 서둘러주세요!
+                            </span>
+                            <!-- 품절되었을 때 -->
+                            <span th:case="${T(shop.bluebooktle.common.dto.book.BookSaleInfoState).SALE_ENDED}"
+                                  style="color: red;">
+                                품절되었습니다.
+                            </span>
+                            <!-- 판매 중단(삭제)되었을 때 -->
+                            <span th:case="${T(shop.bluebooktle.common.dto.book.BookSaleInfoState).DELETED}"
+                                  style="color: gray;">
+                                판매 종료된 도서입니다.
+                            </span>
+                            <!-- 그 외(null 등) -->
+                            <span th:case="*">
+                                재고 정보 없음
+                            </span>
+                        </span>
+                    </p>
+                </div>
+
                 <div class="book-actions-kitsch">
-                    <div class="quantity-input-kitsch" style="margin-bottom: 0.5rem;">
-                        <button class="quantity-btn-kitsch minus-btn-kitsch" onclick="changeDetailQuantity(-1)">-
-                        </button>
-                        <input class="quantity-value-kitsch" id="detailQuantity" min="1" type="number" value="1">
-                        <button class="quantity-btn-kitsch plus-btn-kitsch" onclick="changeDetailQuantity(1)">+</button>
+                    <!-- 첫 번째 행: 수량 조절기 + 좋아요 영역 -->
+                    <div class="action-top-row-kitsch">
+                        <!-- 수량 조절기 -->
+                        <div class="quantity-input-kitsch">
+                            <button class="quantity-btn-kitsch minus-btn-kitsch" onclick="changeDetailQuantity(-1)">-
+                            </button>
+                            <input class="quantity-value-kitsch" id="detailQuantity" min="1" type="number" value="1">
+                            <button class="quantity-btn-kitsch plus-btn-kitsch" onclick="changeDetailQuantity(1)">+
+                            </button>
+                        </div>
+                        <!-- 좋아요 개수 -->
+                        <span class="like-count-kitsch">
+                            <i class="fas fa-heart"></i>
+                            <span th:text="${likeCount}">0</span>개
+                        </span>
                     </div>
+
+                    <!-- 바로 구매 -->
                     <div class="action-buttons-kitsch">
                         <input type="hidden" id="bookId" th:value="${bookId}">
                         <button class="btn-kitsch primary-btn-kitsch retro-shadow-kitsch"
@@ -567,12 +716,6 @@
                                 <span>좋아요</span>
                             </button>
                         </form>
-
-                        <!-- 좋아요 수 표시 -->
-                        <span style="margin-left: 1rem; font-size: 1rem; color: var(--kitsch-text-dark);">
-                            <i class="fas fa-heart"></i>
-                            <span th:text="${likeCount}">0</span>개
-                        </span>
                     </div>
                 </div>
             </div>
@@ -603,7 +746,7 @@
             <div class="tab-content-area-kitsch">
                 <div class="tab-content-area-kitsch">
                     <div class="tab-pane-kitsch active" id="desc-content">
-                        <h3><i class="fas fa-scroll"></i> 도서 소개</h3>
+                        <h3 class="tab-pane-title-kitsch"><i class="fas fa-scroll"></i> 도서 소개</h3>
                         <p th:text="${book.description}">도서 소개 텍스트</p>
                     </div>
 
@@ -659,21 +802,9 @@
                 <!--                        </button>-->
                 <!--                    </div>-->
                 <!--                </div>-->
-                <!--                &lt;!&ndash;TODO 배송 구현 예정 &ndash;&gt;-->
-                <!--                <div class="tab-pane-kitsch" id="shipping-info-content">-->
-                <!--                    <h3><i class="fas fa-box"></i> 빛의 속도로 배송! (배송/반품 안내)</h3>-->
-                <!--                    <p><strong>배송:</strong> BlueBookttle은 주문하신 용사님들의 모험 아이템(도서)을 최대한 빠르게 전달하기 위해 노력합니다! 평일 오후 2시 이전 주문 시-->
-                <!--                        <strong style='color:var(&#45;&#45;kitsch-color-3)'>🚀당일 로켓 발송🚀</strong> (재고 상황에 따라 하루 정도 지연될 수 있음, 그럴 땐-->
-                <!--                        포션이라도 보내드리고 싶은 심정!). 배송비는 3,000원이지만, 3만원 이상 구매 시 <strong style='color:var(&#45;&#45;kitsch-color-4)'>✨무료-->
-                <!--                            배송 마법✨</strong>이 시전됩니다!</p>-->
-                <!--                    <p><strong>반품/교환:</strong> 마음이 바뀌셨나요? 괜찮습니다! 수령 후 7일 이내라면 주문 취소/반품이 가능합니다. 단, 책에 커피를 쏟거나, 드래곤의 불꽃에-->
-                <!--                        그을린 경우는 곤란합니다 (상품 가치 훼손 시 불가). 단순 변심 반품 시에는 귀환 스크롤 비용(왕복 배송비)이 발생합니다. 오배송이나 파본인 경우, 즉시 1:1 문의-->
-                <!--                        게시판에 알려주시면 빛보다 빠르게 처리해 드립니다!</p>-->
-                <!--                </div>-->
             </div>
         </div>
     </div>
-
 
     <div class="modal-overlay-kitsch" id="bookDetailImageModal" onclick="hideKitschModal('bookDetailImageModal')">
         <div class="modal-content-kitsch" onclick="event.stopPropagation();" style="max-width:600px; padding:1rem;">
@@ -863,7 +994,7 @@
 
             const params = new URLSearchParams({bookId, quantity});
 
-            window.location.href = '/order/create?${params.toString()}';
+            window.location.href = `/order/create?${params.toString()}`;
         }
 
         // 리뷰 더보기 Mock 함수 유지

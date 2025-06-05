@@ -15,7 +15,9 @@ import lombok.extern.slf4j.Slf4j;
 import shop.bluebooktle.common.dto.book.response.BookDetailResponse;
 import shop.bluebooktle.common.dto.book.response.BookInfoResponse;
 import shop.bluebooktle.common.dto.book.response.CategoryResponse;
+import shop.bluebooktle.common.dto.order.response.DeliveryRuleResponse;
 import shop.bluebooktle.frontend.service.BookService;
+import shop.bluebooktle.frontend.service.DeliveryRuleService;
 
 @Controller
 @RequestMapping
@@ -24,6 +26,7 @@ import shop.bluebooktle.frontend.service.BookService;
 public class BookController {
 
 	private final BookService bookService;
+	private final DeliveryRuleService deliveryRuleService;
 
 	@GetMapping("/books")
 	public String bookListPage(
@@ -87,6 +90,10 @@ public class BookController {
 			// 도서의 총 좋아요 개수 가져오기
 			int likeCount = bookService.countLikes(bookId);
 			model.addAttribute("likeCount", likeCount);
+
+			// 배송 정책 들고오기
+			DeliveryRuleResponse deliveryRule = deliveryRuleService.getDefaultDeliveryRule();
+			model.addAttribute("deliveryRule", deliveryRule);
 
 			return "book/book_detail";
 		} catch (Exception e) {
