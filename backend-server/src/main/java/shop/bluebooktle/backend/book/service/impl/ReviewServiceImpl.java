@@ -6,8 +6,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import shop.bluebooktle.backend.book.entity.Book;
+import shop.bluebooktle.backend.book.entity.BookSaleInfo;
 import shop.bluebooktle.backend.book.entity.Img;
 import shop.bluebooktle.backend.book.entity.Review;
+import shop.bluebooktle.backend.book.repository.BookSaleInfoRepository;
 import shop.bluebooktle.backend.book.repository.ImgRepository;
 import shop.bluebooktle.backend.book.repository.ReviewRepository;
 import shop.bluebooktle.backend.book.service.ReviewService;
@@ -18,6 +21,7 @@ import shop.bluebooktle.common.dto.book.request.ReviewRequest;
 import shop.bluebooktle.common.dto.book.response.ReviewResponse;
 import shop.bluebooktle.common.entity.auth.User;
 import shop.bluebooktle.common.exception.auth.UserNotFoundException;
+import shop.bluebooktle.common.exception.book.BookSaleInfoNotFoundException;
 import shop.bluebooktle.common.exception.book_order.BookOrderNotFoundException;
 
 @Service
@@ -29,6 +33,7 @@ public class ReviewServiceImpl implements ReviewService {
 	private final UserRepository userRepository;
 	private final BookOrderRepository bookOrderRepository;
 	private final ImgRepository imgRepository;
+	private final BookSaleInfoRepository bookSaleInfoRepository;
 
 	@Override
 	public ReviewResponse addReview(Long userId, Long bookOrderId, ReviewRequest reviewRequest) {
@@ -57,6 +62,15 @@ public class ReviewServiceImpl implements ReviewService {
 			.build();
 
 		Review saved = reviewRepository.save(review);
+
+		Book book = bookOrder.getBook();
+
+		BookSaleInfo bookSaleInfo = bookSaleInfoRepository.findByBook(book)
+			.orElseThrow(BookSaleInfoNotFoundException::new);
+
+		bookSaleInfo.addReviewAndCalculateStar(saved.getStar());
+
+		bookSaleInfoRepository.save(bookSaleInfo);
 
 		return ReviewResponse.builder()
 			.reviewId(saved.getId())

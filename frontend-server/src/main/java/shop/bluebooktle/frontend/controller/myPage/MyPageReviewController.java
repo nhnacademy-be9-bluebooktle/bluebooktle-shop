@@ -53,7 +53,7 @@ public class MyPageReviewController {
 	public String getMyReviews(
 		@AuthenticationPrincipal UserPrincipal userPrincipal,
 		@RequestParam(value = "page", defaultValue = "0") int page,
-		@RequestParam(value = "size", defaultValue = "10") int size,
+		@RequestParam(value = "size", defaultValue = "5") int size,
 		Model model
 	) {
 		Long userId = userPrincipal.getUserId();
@@ -64,7 +64,7 @@ public class MyPageReviewController {
 	}
 
 	// 도서 상세페이지에서 리뷰 목록 조회
-	@GetMapping("/books/{bookId}/reviews") //도서 상세페이지 완성되면 수정
+	@GetMapping("/books/{bookId}/reviews") // TODO 도서 상세페이지 완성되면 수정
 	public String getReviewsForBook(
 		@PathVariable Long bookId,
 		@RequestParam(value = "page", defaultValue = "0") int page,
@@ -75,7 +75,7 @@ public class MyPageReviewController {
 
 		model.addAttribute("bookId", bookId);
 		model.addAttribute("reviewsPage", reviewsPage);
-		return "book/review_list_fragment"; // 도서 상세페이지 완성되면 수정
+		return "book/review_list_fragment"; // TODO 도서 상세페이지 완성되면 수정
 	}
 
 }
