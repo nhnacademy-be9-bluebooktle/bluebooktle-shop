@@ -7,13 +7,13 @@ spring:
     jdbc:
       initialize-schema: never
   datasource:
-    url: jdbc:mysql://s4.java21.net:13306/project_be9_team1_dev?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
-    username: project_be9_team1
-    password: /JFn8Qzhe8o(NO1r
+    url: jdbc:mysql://localhost:3306/bluebooktle
+    username: ${MYSQL_USERNAME}
+    password: ${MYSQL_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     show-sql: true
     properties:
       hibernate:
