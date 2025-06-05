@@ -19,19 +19,36 @@ on:
       - 'eureka-server/**'
       - 'common-module/**'
       - 'auth-server/**'
+  workflow_dispatch:
+    inputs:
+      modules_to_deploy:
+        description: '배포할 모듈 목록 (공백으로 구분, 예: backend-server frontend-server). common-module 입력 시 연관 모듈(backend, frontend, auth)이 자동으로 포함됩니다. 비워두면 작업이 실행되지 않습니다.'
+        required: false
+        type: string
+        default: ''
+      target_branch:
+        description: '배포 대상 브랜치. dev/prod 환경 및 체크아웃할 소스 코드 브랜치가 결정됩니다.'
+        required: true
+        type: choice
+        options:
+          - develop
+          - master
+        default: 'develop'
 
 jobs:
   detect_changes:
     runs-on: ubuntu-latest
     outputs:
-      changed: ${{ steps.list.outputs.changed }}
+      changed: ${{ steps.set_changed_modules.outputs.changed }}
     steps:
-      - name: Checkout full history
+      - name: Checkout full history (for push/pr)
+        if: github.event_name != 'workflow_dispatch'
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Filter changed paths
+      - name: Filter changed paths (for push/pr)
+        if: github.event_name != 'workflow_dispatch'
         id: filter
         uses: dorny/paths-filter@v3
         with:
@@ -49,25 +66,61 @@ jobs:
             auth-server:
               - 'auth-server/**'
 
-      - name: Generate changed-services list
-        id: list
+      - name: Set changed modules
+        id: set_changed_modules
         run: |
-          modules=()
-          [[ "${{ steps.filter.outputs.eureka-server }}"   == "true" ]] && modules+=("eureka-server")
-          [[ "${{ steps.filter.outputs.gateway-server }}"  == "true" ]] && modules+=("gateway-server")
-          [[ "${{ steps.filter.outputs.backend-server }}"  == "true" ]] && modules+=("backend-server")
-          [[ "${{ steps.filter.outputs.frontend-server }}" == "true" ]] && modules+=("frontend-server")
-          [[ "${{ steps.filter.outputs.auth-server }}"     == "true" ]] && modules+=("auth-server")
+          changed_output=""
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            if [[ "${{ github.event.inputs.modules_to_deploy }}" != "" ]]; then
+              echo "Manual trigger with specific modules: ${{ github.event.inputs.modules_to_deploy }} on branch ${{ github.event.inputs.target_branch }}"
+              manual_modules_input="${{ github.event.inputs.modules_to_deploy }}"
+          
+              temp_processed_modules=()
+              common_module_in_input=false
 
-          if [[ "${{ steps.filter.outputs.common-module }}" == "true" ]]; then
-            modules+=("backend-server")
-            modules+=("frontend-server")
-            modules+=("auth-server")
+              IFS=' ' read -r -a modules_array <<< "$manual_modules_input"
+              for m in "${modules_array[@]}"; do
+                if [[ "$m" == "common-module" ]]; then
+                  common_module_in_input=true
+                else
+                  temp_processed_modules+=("$m")
+                fi
+              done
+
+              if [[ "$common_module_in_input" == "true" ]]; then
+                temp_processed_modules+=("backend-server")
+                temp_processed_modules+=("frontend-server")
+                temp_processed_modules+=("auth-server")
+              fi
+          
+              unique_modules_string=$(echo "${temp_processed_modules[@]}" | tr ' ' '\n' | sort -u | tr '\n' ' ' | sed 's/ $//')
+              changed_output="$unique_modules_string"
+              echo "Processed modules for manual deployment: $changed_output"
+            else
+              echo "Manual trigger but no modules specified. No modules will be processed."
+              changed_output=""
+            fi
+          else 
+            echo "Automatic trigger (${{ github.event_name }})"
+            auto_modules=()
+            [[ "${{ steps.filter.outputs.eureka-server }}"   == "true" ]] && auto_modules+=("eureka-server")
+            [[ "${{ steps.filter.outputs.gateway-server }}"  == "true" ]] && auto_modules+=("gateway-server")
+            [[ "${{ steps.filter.outputs.backend-server }}"  == "true" ]] && auto_modules+=("backend-server")
+            [[ "${{ steps.filter.outputs.frontend-server }}" == "true" ]] && auto_modules+=("frontend-server")
+            [[ "${{ steps.filter.outputs.auth-server }}"     == "true" ]] && auto_modules+=("auth-server")
+
+            if [[ "${{ steps.filter.outputs.common-module }}" == "true" ]]; then
+              auto_modules+=("backend-server")
+              auto_modules+=("frontend-server")
+              auto_modules+=("auth-server")
+            fi
+          
+            unique_modules_string=$(echo "${auto_modules[@]}" | tr ' ' '\n' | sort -u | tr '\n' ' ' | sed 's/ $//')
+            changed_output="$unique_modules_string"
+            echo "Detected changes for auto deployment: $changed_output"
           fi
-
-          unique_modules=$(echo "${modules[@]}" | tr ' ' '\n' | sort -u | tr '\n' ' ')
-          echo "changed=${unique_modules% }" >> $GITHUB_OUTPUT
-          echo "Detected Changes: ${unique_modules% }"
+          
+          echo "changed=$changed_output" >> $GITHUB_OUTPUT
 
   build:
     needs: detect_changes
@@ -85,14 +138,19 @@ jobs:
          github.event.pull_request.base.ref == 'master' &&
          github.event.action == 'closed' &&
          github.event.pull_request.merged == true)
+        ||
+        github.event_name == 'workflow_dispatch'
       )
     runs-on: ubuntu-latest
-    environment: ${{ ((github.event_name == 'push' && github.ref_name == 'master') || (github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'master')) && 'prod' || 'dev' }}
+    environment: ${{ ( (github.event_name == 'push' && github.ref_name == 'master') || (github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'master') || (github.event_name == 'workflow_dispatch' && github.event.inputs.target_branch == 'master') ) && 'prod' || 'dev' }}
     env:
       CONFIG_SERVER_URI: ${{ secrets.CONFIG_SERVER_URI }}
-      SPRING_PROFILES_ACTIVE: ${{ ((github.event_name == 'push' && github.ref_name == 'master') || (github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'master')) && 'prod' || 'dev' }}
+      SPRING_PROFILES_ACTIVE: ${{ ( (github.event_name == 'push' && github.ref_name == 'master') || (github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'master') || (github.event_name == 'workflow_dispatch' && github.event.inputs.target_branch == 'master') ) && 'prod' || 'dev' }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.target_branch || github.ref }}
+
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -130,12 +188,14 @@ jobs:
          github.event.pull_request.base.ref == 'master' &&
          github.event.action == 'closed' &&
          github.event.pull_request.merged == true)
+        ||
+        github.event_name == 'workflow_dispatch'
       )
     runs-on: ubuntu-latest
-    environment: ${{ ((github.event_name == 'push' && github.ref_name == 'master') || (github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'master')) && 'prod' || 'dev' }}
+    environment: ${{ ( (github.event_name == 'push' && github.ref_name == 'master') || (github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'master') || (github.event_name == 'workflow_dispatch' && github.event.inputs.target_branch == 'master') ) && 'prod' || 'dev' }}
     env:
       CONFIG_SERVER_URI: ${{ secrets.CONFIG_SERVER_URI }}
-      SPRING_PROFILES_ACTIVE: ${{ ((github.event_name == 'push' && github.ref_name == 'master') || (github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'master')) && 'prod' || 'dev' }}
+      SPRING_PROFILES_ACTIVE: ${{ ( (github.event_name == 'push' && github.ref_name == 'master') || (github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'master') || (github.event_name == 'workflow_dispatch' && github.event.inputs.target_branch == 'master') ) && 'prod' || 'dev' }}
     steps:
       - uses: actions/download-artifact@v4
         with:
@@ -168,16 +228,23 @@ jobs:
             export SPRING_PROFILES_ACTIVE="${{ env.SPRING_PROFILES_ACTIVE }}"
             export CONFIG_SERVER_URI="${{ env.CONFIG_SERVER_URI }}"
             
+            BR=""
             if [[ "${{ github.event_name }}" == "push" ]]; then
               BR="${{ github.ref_name }}"
-            else 
+            elif [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+              BR="${{ github.event.inputs.target_branch }}"
+            elif [[ "${{ github.event_name }}" == "pull_request" && "${{ github.event.action }}" == "closed" && "${{ github.event.pull_request.merged }}" == "true" ]]; then
               BR="${{ github.event.pull_request.base.ref }}"
             fi
 
+            S=""
             if [ "$BR" = "master" ]; then
               S=prod_startup.sh
-            else
+            elif [ "$BR" = "develop" ]; then
               S=dev_startup.sh
+            else
+              echo "Error: Could not determine startup script for branch '$BR'"
+              exit 1
             fi
             chmod +x ~/$S
             
@@ -185,7 +252,7 @@ jobs:
             DEPLOY_ORDER=(eureka-server gateway-server backend-server auth-server frontend-server)
             
             echo ">>> Changed Services Detected: [${{ needs.detect_changes.outputs.changed }}]"
-            echo ">>> Starting deployment following order: ${DEPLOY_ORDER[*]}"
+            echo ">>> Starting deployment using script $S, following order: ${DEPLOY_ORDER[*]}"
             
             DEPLOYED_COUNT=0
             for M in "${DEPLOY_ORDER[@]}"; do
@@ -194,9 +261,15 @@ jobs:
                 bash ~/$S "$M" 
                 DEPLOYED_COUNT=$((DEPLOYED_COUNT + 1))
               else
-                echo "  :heavy_minus_sign: Skipping $M (no changes detected)."
+                echo "  :heavy_minus_sign: Skipping $M (no changes detected or not selected for manual deployment)."
               fi
             done
             
-            echo ">>> Deployment finished ($DEPLOYED_COUNT services deployed)."
+            if [[ "$DEPLOYED_COUNT" -eq 0 && "${{ needs.detect_changes.outputs.changed }}" != "" ]]; then
+              echo "Warning: Changed modules were detected/selected, but none matched the DEPLOY_ORDER. Check module names."
+            elif [[ "$DEPLOYED_COUNT" -gt 0 ]]; then
+              echo ">>> Deployment finished ($DEPLOYED_COUNT services deployed)."
+            else
+              echo ">>> No services to deploy."
+            fi
             EOF
