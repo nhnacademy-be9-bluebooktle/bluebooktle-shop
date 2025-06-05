@@ -14,5 +14,7 @@ public interface GuestCartRepository {
 
 	void removeSelectedBooks(String guestId, List<Long> bookIds);
 
-	Map<Long, Integer> getCart(String guestId); // bookId → quantity
+	Map<Long, Integer> getCart(String guestId);
+
+	Long getCartSize(String guestId);
 }

@@ -37,28 +37,26 @@ public record OrderCreateRequest(
 	Long deliveryRuleId,
 
 	@NotBlank(message = "주문자 이름은 필수입니다.")
-	@Size(max = 150, message = "주문자 이름은 최대 150자까지 입력 가능합니다.")
+	@Size(max = 20, message = "주문자 이름은 최대 20자까지 입력 가능합니다.")
 	String ordererName,
 
-	@NotBlank(message = "주문자 이메일은 필수입니다.")
-	@Email(message = "유효한 이메일 형식이 아닙니다.") // 이메일 형식 검증 추가
-	@Size(max = 255, message = "주문자 이메일은 최대 255자까지 입력 가능합니다.")
+	@Size(max = 50, message = "주문자 이메일은 최대 50자 까지 입력 가능합니다.")
 	String ordererEmail,
 
 	@NotBlank(message = "주문자 전화번호는 필수입니다.")
-	@Size(max = 100, message = "주문자 전화번호는 최대 100자까지 입력 가능합니다.")
+	@Size(max = 11, message = "주문자 전화번호는 최대 11자까지 입력 가능합니다.")
 	String ordererPhoneNumber,
 
 	@NotBlank(message = "수령인 이름은 필수입니다.")
-	@Size(max = 150, message = "수령인 이름은 최대 150자까지 입력 가능합니다.")
+	@Size(max = 20, message = "수령인 이름은 최대 20자까지 입력 가능합니다.")
 	String receiverName,
 
 	@Email(message = "유효한 이메일 형식이 아닙니다.")
-	@Size(max = 255, message = "수령인 이메일은 최대 255자까지 입력 가능합니다.")
+	@Size(max = 50, message = "수령인 이메일은 최대 50자까지 입력 가능합니다.")
 	String receiverEmail,
 
 	@NotBlank(message = "수령인 전화번호는 필수입니다.")
-	@Size(max = 100, message = "수령인 전화번호는 최대 100자까지 입력 가능합니다.")
+	@Size(max = 11, message = "수령인 전화번호는 최대 11자까지 입력 가능합니다.")
 	String receiverPhoneNumber,
 
 	@NotBlank(message = "우편번호는 필수입니다.")

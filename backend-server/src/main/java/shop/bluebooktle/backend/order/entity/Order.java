@@ -11,6 +11,7 @@ import org.hibernate.annotations.SQLRestriction;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -29,6 +30,7 @@ import lombok.ToString;
 import shop.bluebooktle.backend.book_order.entity.BookOrder;
 import shop.bluebooktle.backend.book_order.entity.UserCouponBookOrder;
 import shop.bluebooktle.backend.payment.entity.Payment;
+import shop.bluebooktle.common.converter.ProfileAwareStringCryptoConverter;
 import shop.bluebooktle.common.entity.BaseEntity;
 import shop.bluebooktle.common.entity.auth.User;
 
@@ -71,22 +73,28 @@ public class Order extends BaseEntity {
 	@Column(name = "delivery_fee", nullable = false, precision = 10, scale = 2)
 	private BigDecimal deliveryFee;
 
-	@Column(name = "orderer_name", nullable = false, length = 20)
+	@Convert(converter = ProfileAwareStringCryptoConverter.class)
+	@Column(name = "orderer_name", nullable = false, length = 150)
 	private String ordererName;
 
-	@Column(name = "orderer_email", nullable = false, length = 50)
+	@Convert(converter = ProfileAwareStringCryptoConverter.class)
+	@Column(name = "orderer_email", nullable = false, length = 255)
 	private String ordererEmail;
 
-	@Column(name = "orderer_phone_number", nullable = false, length = 11)
+	@Convert(converter = ProfileAwareStringCryptoConverter.class)
+	@Column(name = "orderer_phone_number", nullable = false, length = 100)
 	private String ordererPhoneNumber;
 
-	@Column(name = "receiver_name", nullable = false, length = 20)
+	@Convert(converter = ProfileAwareStringCryptoConverter.class)
+	@Column(name = "receiver_name", nullable = false, length = 150)
 	private String receiverName;
 
-	@Column(name = "receiver_email", nullable = false, length = 50)
+	@Convert(converter = ProfileAwareStringCryptoConverter.class)
+	@Column(name = "receiver_email", nullable = false, length = 200)
 	private String receiverEmail;
 
-	@Column(name = "receiver_phone_number", nullable = false, length = 11)
+	@Convert(converter = ProfileAwareStringCryptoConverter.class)
+	@Column(name = "receiver_phone_number", nullable = false, length = 100)
 	private String receiverPhoneNumber;
 
 	@Column(name = "address", nullable = false, length = 255)

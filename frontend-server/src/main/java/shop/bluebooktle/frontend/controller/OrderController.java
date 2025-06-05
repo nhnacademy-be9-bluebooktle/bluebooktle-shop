@@ -23,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import shop.bluebooktle.common.dto.book.response.BookCartOrderResponse;
 import shop.bluebooktle.common.dto.book_order.response.PackagingOptionInfoResponse;
+import shop.bluebooktle.common.dto.coupon.response.UsableUserCouponMapResponse;
 import shop.bluebooktle.common.dto.order.request.OrderCreateRequest;
 import shop.bluebooktle.common.dto.order.response.DeliveryRuleResponse;
 import shop.bluebooktle.common.dto.order.response.OrderConfirmDetailResponse;
@@ -33,6 +34,7 @@ import shop.bluebooktle.common.exception.cart.GuestUserNotFoundException;
 import shop.bluebooktle.frontend.service.AdminPackagingOptionService;
 import shop.bluebooktle.frontend.service.BookService;
 import shop.bluebooktle.frontend.service.CartService;
+import shop.bluebooktle.frontend.service.CouponService;
 import shop.bluebooktle.frontend.service.DeliveryRuleService;
 import shop.bluebooktle.frontend.service.OrderService;
 import shop.bluebooktle.frontend.service.PaymentsService;
@@ -51,6 +53,8 @@ public class OrderController {
 	private final OrderService orderService;
 	private final BookService bookService;
 	private final CartService cartService;
+	private final CouponService couponService;
+
 	@Value("{toss.client-key}")
 	private String tossPaymentClientKey;
 
@@ -95,6 +99,12 @@ public class OrderController {
 			UserWithAddressResponse user = userService.getUserWithAddresses();
 			mav.addObject("user", user);
 		}
+		List<Long> bookIdsForCoupon = bookItems.stream()
+			.map(BookCartOrderResponse::bookId)
+			.toList();
+
+		UsableUserCouponMapResponse coupons = couponService.getUsableCouponsForOrder(bookIdsForCoupon);
+		mav.addObject("coupons", coupons);
 
 		return mav;
 	}
