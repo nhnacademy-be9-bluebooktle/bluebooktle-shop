@@ -2,7 +2,6 @@ package shop.bluebooktle.frontend.controller.admin;
 
 import java.util.List;
 
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
@@ -22,7 +21,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import shop.bluebooktle.common.dto.book.response.BookInfoResponse;
 import shop.bluebooktle.common.dto.book.response.CategoryTreeResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
 import shop.bluebooktle.common.dto.coupon.request.CouponRegisterRequest;
@@ -98,7 +96,7 @@ public class AdminCouponController {
 		model.addAttribute("couponTypeData", couponTypeData);
 
 		// 도서 목록
-		Page<BookInfoResponse> books = adminBookService.getPagedBooks(page, size, searchKeyword);
+		var books = adminBookService.getPagedBooksByAdmin(page, size, searchKeyword);
 		model.addAttribute("books", books.getContent());
 		model.addAttribute("currentPageZeroBased", books.getNumber());
 		model.addAttribute("totalPages", books.getTotalPages());
@@ -126,9 +124,9 @@ public class AdminCouponController {
 		@RequestParam(defaultValue = "10") int size,
 		@RequestParam(required = false) String searchKeyword) {
 
-		Page<BookInfoResponse> books = adminBookService.getPagedBooks(page, size, searchKeyword);
+		var books = adminBookService.getPagedBooksByAdmin(page, size, searchKeyword);
 
-		model.addAttribute("books", books);
+		model.addAttribute("books", books.getContent());
 		model.addAttribute("totalPages", books.getTotalPages());
 		model.addAttribute("currentPageZeroBased", books.getNumber());
 		model.addAttribute("searchKeyword", searchKeyword);
