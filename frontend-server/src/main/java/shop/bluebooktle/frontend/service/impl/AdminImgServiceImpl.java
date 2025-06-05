@@ -21,4 +21,9 @@ public class AdminImgServiceImpl implements AdminImgService {
 		log.info("file name: {}", fileName);
 		return adminImgRepository.getPresignedUploadUrl(fileName.toString());
 	}
+
+	@Override
+	public void deleteImage(String fileName) {
+		adminImgRepository.deleteImage(fileName);
+	}
 }

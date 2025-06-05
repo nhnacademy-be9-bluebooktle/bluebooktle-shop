@@ -71,9 +71,9 @@
                 </thead>
                 <tbody>
                 <tr th:each="book : ${books}">
-                    <td th:text="${book.id}">1</td>
+                    <td th:text="${book.bookId}">1</td>
                     <td>
-                        <a th:href="@{/admin/books/{id}/edit(id=${book.id})}"
+                        <a th:href="@{/admin/books/{id}/edit(id=${book.bookId})}"
                            th:text="${book.title}"
                            style="font-weight: bold;"></a>
                     </td>
@@ -85,15 +85,15 @@
                     <td th:text="${book.bookSaleInfoState}"></td>
                     <td th:text="${#temporals.format(book.publishDate, 'yyyy-MM-dd')}"></td>
                     <td class="category-actions">
-                        <a th:href="@{/admin/books/{id}/edit(id=${book.id})}"
+                        <a th:href="@{/admin/books/{id}/edit(id=${book.bookId})}"
                            class="admin-btn admin-btn--sm admin-btn--outline-primary"
                            title="수정">
                             <i class="fas fa-edit"></i>
                         </a>
-                        <form th:if="${book.deletedAt == null}"
-                              th:action="@{/admin/books/{id}/delete(id=${book.id})}"
-                              method="post" style="display:inline;"
-                              onsubmit="return confirm('이 도서를 삭제(비활성) 처리하시겠습니까?');">
+                        <form
+                                th:action="@{/admin/books/{id}/delete(id=${book.bookId})}"
+                                method="post" style="display:inline;"
+                                onsubmit="return confirm('이 도서를 삭제(비활성) 처리하시겠습니까?');">
                             <button type="submit"
                                     class="admin-btn admin-btn--sm admin-btn--danger"
                                     title="삭제">

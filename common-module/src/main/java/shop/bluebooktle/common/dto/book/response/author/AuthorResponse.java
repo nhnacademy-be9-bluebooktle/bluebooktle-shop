@@ -14,7 +14,6 @@ import lombok.extern.jackson.Jacksonized;
 @NoArgsConstructor        // 파라미터 없는 생성자
 @AllArgsConstructor
 public class AuthorResponse {
-
 	Long id;
 	String name;
 	LocalDateTime createdAt;

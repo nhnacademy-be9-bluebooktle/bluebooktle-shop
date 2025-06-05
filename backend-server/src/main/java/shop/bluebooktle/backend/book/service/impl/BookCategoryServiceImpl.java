@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
-import shop.bluebooktle.backend.book.entity.Author;
 import shop.bluebooktle.backend.book.entity.Book;
 import shop.bluebooktle.backend.book.entity.BookCategory;
 import shop.bluebooktle.backend.book.entity.BookSaleInfo;
@@ -86,6 +85,16 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 		bookCategoryRepository.delete(bookCategory);
 	}
 
+	@Override
+	public void updateBookCategory(Long bookId, List<Long> categoryIdList) {
+		// 도서에 등록 되었던 기존 카테고리 삭제
+		List<BookCategory> bookCategoryList = bookCategoryRepository.findByBook_Id(bookId);
+		bookCategoryRepository.deleteAll(bookCategoryList);
+		// 다시 새롭게 등록
+		registerBookCategory(bookId, categoryIdList);
+
+	}
+
 	// 해당 도서의 카테고리 수정
 	@Override
 	public void updateBookCategoryByBookCategoryId(Long updatedCategoryId, Long bookCategoryId) {
@@ -137,8 +146,8 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 			.map(book -> {
 				BookSaleInfo bookSaleInfo = bookSaleInfoRepository.findByBook(book)
 					.orElseThrow(BookNotFoundException::new);
-				List<String> authorNameList = bookAuthorRepository.findAuthorsByBook(book).stream()
-					.map(Author::getName)
+				List<String> authorNameList = bookAuthorRepository.findByBookId(book.getId()).stream()
+					.map(bookAuthor -> bookAuthor.getAuthor().getName())
 					.toList();
 
 				String imgUrl = bookImgRepository.findByBook(book).getImg().getImgUrl();

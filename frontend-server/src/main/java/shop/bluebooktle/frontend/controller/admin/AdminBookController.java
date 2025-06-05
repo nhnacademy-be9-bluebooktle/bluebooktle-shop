@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import org.springframework.stereotype.Controller;
@@ -25,8 +24,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import shop.bluebooktle.common.dto.book.BookSaleInfoState;
-import shop.bluebooktle.common.dto.book.request.BookAllRegisterRequest;
 import shop.bluebooktle.common.dto.book.request.BookFormRequest;
+import shop.bluebooktle.common.dto.book.request.BookUpdateFormRequest;
+import shop.bluebooktle.common.dto.book.request.BookUpdateRequest;
 import shop.bluebooktle.common.dto.book.response.BookAllResponse;
 import shop.bluebooktle.common.dto.book.response.CategoryTreeResponse;
 import shop.bluebooktle.common.dto.book.response.PublisherInfoResponse;
@@ -38,6 +38,7 @@ import shop.bluebooktle.frontend.service.AdminCategoryService;
 import shop.bluebooktle.frontend.service.AdminImgService;
 import shop.bluebooktle.frontend.service.AdminPublisherService;
 import shop.bluebooktle.frontend.service.AdminTagService;
+import shop.bluebooktle.frontend.service.BookService;
 
 // AdminCategoryController.CategoryDto를 사용하기 위해 import (같은 패키지면 필요 없을 수 있음)
 // import shop.bluebooktle.frontend.controller.admin.AdminCategoryController.CategoryDto;
@@ -55,6 +56,7 @@ public class AdminBookController {
 	private final AdminTagService adminTagService;
 	private final AdminBookService adminBookService;
 	private final AdminCategoryService adminCategoryService;
+	private final BookService bookService;
 
 	@GetMapping
 	public String listBooks(
@@ -67,7 +69,7 @@ public class AdminBookController {
 		log.info("AdminBookController - listBooks: page={}, size={}, searchKeyword={}",
 			page, size, searchKeyword);
 
-		var booksPage = adminBookService.getPagedBooks(page, size, searchKeyword);
+		var booksPage = adminBookService.getPagedBooksByAdmin(page, size, searchKeyword);
 
 		model.addAttribute("pageTitle", "도서 관리");
 		model.addAttribute("currentURI", request.getRequestURI());
@@ -122,9 +124,7 @@ public class AdminBookController {
 			adminTagService.getTags(0, Integer.MAX_VALUE, null)
 				.getContent();
 
-		String pageTitle;
-
-		pageTitle = "새 도서 등록";
+		String pageTitle = "새 도서 등록";
 
 		model.addAttribute("pageTitle", pageTitle);
 
@@ -183,77 +183,54 @@ public class AdminBookController {
 			adminTagService.getTags(0, Integer.MAX_VALUE, null)
 				.getContent();
 
-		BookAllRegisterRequest formDto;
-		String pageTitle;
-		if (bookId != null) {
-			pageTitle = "도서 정보 수정 (ID: " + bookId + ")";
+		BookUpdateFormRequest formDto;
+		String pageTitle = "도서 정보 수정 (ID: " + bookId + ")";
+		boolean isAladinImg = false;
+		try {
 			BookAllResponse resp = adminBookService.getBook(bookId);
-
-			List<Long> authorIds = allAuthorsForMapping.stream()
-				.filter(a -> resp.getAuthors().contains(a.getName()))
-				.map(AuthorResponse::getId)
-				.toList();
-
-			List<Long> categoryIds = allCategoriesForMapping.stream()
-				.filter(c -> resp.getCategories().contains(c.name()))
-				.map(CategoryTreeResponse::id)
-				.toList();
-
-			List<Long> publisherIds = allPublishersForMapping.stream()
-				.filter(p -> resp.getPublishers().contains(p.getName()))
-				.map(PublisherInfoResponse::getId)
-				.toList();
-
-			List<Long> tagIds = allTagsForMapping.stream()
-				.filter(t -> resp.getTags().contains(t.getName()))
-				.map(TagInfoResponse::getId)
-				.toList();
-
-			formDto = BookAllRegisterRequest.builder()
+			if (resp.getImgUrl().contains("aladin")) {
+				isAladinImg = true;
+			}
+			log.info("review Conunt : {}", resp.getReviewCount());
+			log.info("isPackable : {}", resp.getIsPackable());
+			formDto = BookUpdateFormRequest.builder()
 				.title(resp.getTitle())
 				.isbn(resp.getIsbn())
 				.index(resp.getIndex())
 				.description(resp.getDescription())
-				.publishDate(resp.getPublishDate().toLocalDate())
+				.publishDate(resp.getPublishDate())
 				.price(resp.getPrice())
 				.salePrice(resp.getSalePrice())
 				.stock(resp.getStock())
 				.isPackable(resp.getIsPackable())
 				.state(resp.getBookSaleInfoState())
-				.authorIdList(authorIds)
-				.publisherIdList(publisherIds)
-				.categoryIdList(categoryIds)
-				.tagIdList(tagIds)
+				.authors(resp.getAuthors())
+				.publishers(resp.getPublishers())
+				.categories(resp.getCategories())
+				.tags(resp.getTags())
 				.imgUrl(resp.getImgUrl())
+				.viewCount(resp.getViewCount())
+				.searchCount(resp.getSearchCount())
+				.reviewCount(resp.getReviewCount())
+				.star(resp.getStar())
+				.createdAt(resp.getCreatedAt())
 				.build();
-		} else {
-			pageTitle = "새 도서 등록";
-			formDto = BookAllRegisterRequest.builder()
-				.title("")
-				.isbn("")
-				.index("")
-				.description("")
-				.publishDate(LocalDate.now())
-				.price(BigDecimal.ZERO)
-				.salePrice(BigDecimal.ZERO)
-				.stock(0)
-				.isPackable(false)
-				.state(BookSaleInfoState.AVAILABLE)
-				.authorIdList(Collections.emptyList())
-				.publisherIdList(Collections.emptyList())
-				.categoryIdList(Collections.emptyList())
-				.tagIdList(Collections.emptyList())
-				.imgUrl("")
-				.build();
+		} catch (Exception e) {
+			return "redirect:/admin/books";
 		}
-
+		model.addAttribute("stateOptions", Arrays.asList(
+			BookSaleInfoState.AVAILABLE.name(),
+			BookSaleInfoState.LOW_STOCK.name(),
+			BookSaleInfoState.SALE_ENDED.name(),
+			BookSaleInfoState.DELETED.name()
+		));
 		model.addAttribute("pageTitle", pageTitle);
-		model.addAttribute("book", formDto);
+		model.addAttribute("bookForm", formDto);
+		model.addAttribute("bookId", bookId);
 		model.addAttribute("allCategoriesForMapping", allCategoriesForMapping);
 		model.addAttribute("allAuthorsForMapping", allAuthorsForMapping);
 		model.addAttribute("allPublishers", allPublishersForMapping);
 		model.addAttribute("allTagsForMapping", allTagsForMapping);
-
 		model.addAttribute("stateOptions", Arrays.asList(
 			BookSaleInfoState.AVAILABLE.name(),
 			BookSaleInfoState.LOW_STOCK.name(),
@@ -261,18 +238,15 @@ public class AdminBookController {
 			BookSaleInfoState.DELETED.name()
 		));
 
-		model.addAttribute("presignedUploadUrl", imgService.getPresignedUploadUrl());
-
-		return "admin/book/book_form";
+		model.addAttribute("isAladinImg", isAladinImg);
+		return "admin/book/book_edit_form";
 	}
 
 	@PostMapping("/save")
 	public String saveBook(
 		@Valid @ModelAttribute BookFormRequest bookFormRequest,
 		BindingResult bindingResult,
-		RedirectAttributes redirectAttributes,
-		HttpServletRequest request,
-		Model model
+		RedirectAttributes redirectAttributes
 	) {
 		log.info(bookFormRequest.toString());
 
@@ -290,11 +264,38 @@ public class AdminBookController {
 			redirectAttributes.addFlashAttribute("globalErrorMessage", "책 등록 중 오류 발생: " + e.getMessage());
 			redirectAttributes.addAttribute("bookForm", bookFormRequest);
 			return "redirect:/admin/books/new";
-
 		}
 		redirectAttributes.addFlashAttribute("globalSuccessMessage",
 			"도서 '" + bookFormRequest.getTitle() + "' 이(가) 성공적으로 등록되었습니다.");
 
+		return "redirect:/admin/books";
+	}
+
+	@PostMapping("/update/{bookId}")
+	public String updateBook(
+		@PathVariable Long bookId,
+		@Valid @ModelAttribute BookUpdateRequest bookUpdateRequest,
+		BindingResult bindingResult,
+		RedirectAttributes redirectAttributes,
+		HttpServletRequest request,
+		Model model
+	) {
+		if (bindingResult.hasErrors()) {
+			log.warn("도서 수정 폼 유효성 검증 에러: {}", bindingResult.getAllErrors());
+			redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.bookFormRequest",
+				bindingResult);
+			redirectAttributes.addFlashAttribute("globalErrorMessage", "입력값을 확인해주세요.");
+			return "redirect:/admin/books";
+		}
+		try {
+			log.warn("도서 수정 이미지 : {}", bookUpdateRequest.getImageFile());
+			adminBookService.updateBook(bookId, bookUpdateRequest);
+		} catch (Exception e) {
+			redirectAttributes.addFlashAttribute("globalErrorMessage", "책 수정 중 오류 발생: " + e.getMessage());
+			return "redirect:/admin/books";
+		}
+		redirectAttributes.addFlashAttribute("globalSuccessMessage",
+			"도서 '" + bookUpdateRequest.getTitle() + "' 이(가) 성공적으로 수정되었습니다.");
 		return "redirect:/admin/books";
 	}
 

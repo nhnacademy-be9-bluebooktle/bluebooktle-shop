@@ -31,7 +31,7 @@ public interface BookPublisherRepository extends JpaRepository<BookPublisher, Lo
 
 	Page<BookPublisher> findAllByPublisher(Publisher publisher, Pageable pageable);
 
-	Optional<BookPublisher> findByBookId(Long bookId);
+	List<BookPublisher> findByBookId(Long bookId);
 
 	boolean existsByPublisher(Publisher publisher);
 
