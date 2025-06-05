@@ -72,8 +72,8 @@ public class ImgController {
 	}
 
 	@DeleteMapping("/minioUrl")
-	public ResponseEntity<JsendResponse<Void>> deleteMinioUrl(@RequestParam String fileName) {
-		minioService.deleteMinioBucket(fileName);
+	public ResponseEntity<JsendResponse<Void>> deleteImage(@RequestParam String fileName) {
+		minioService.deleteImage(fileName);
 		return ResponseEntity.ok(JsendResponse.success());
 	}
 }

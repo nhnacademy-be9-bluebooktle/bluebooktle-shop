@@ -40,6 +40,4 @@ public interface BookImgRepository extends JpaRepository<BookImg, Long> {
 	Optional<BookImg> findFirstByBookIdAndIsThumbnailTrueOrderByIdAsc(Long bookId);
 
 	BookImg findByBook(Book book);
-
-	Long book(Book book);
 }

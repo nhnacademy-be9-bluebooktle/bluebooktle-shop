@@ -23,7 +23,7 @@ public class AdminImgServiceImpl implements AdminImgService {
 	}
 
 	@Override
-	public void deleteMinioUrl(String fileName) {
-		adminImgRepository.deleteMinioUrl(fileName);
+	public void deleteImage(String fileName) {
+		adminImgRepository.deleteImage(fileName);
 	}
 }

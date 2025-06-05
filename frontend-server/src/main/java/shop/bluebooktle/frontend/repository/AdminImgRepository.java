@@ -13,6 +13,6 @@ public interface AdminImgRepository {
 	String getPresignedUploadUrl(@RequestParam("fileName") String fileName);
 
 	@DeleteMapping("/minioUrl")
-	void deleteMinioUrl(@RequestParam("fileName") String fileName);
+	void deleteImage(@RequestParam("fileName") String fileName);
 
 }

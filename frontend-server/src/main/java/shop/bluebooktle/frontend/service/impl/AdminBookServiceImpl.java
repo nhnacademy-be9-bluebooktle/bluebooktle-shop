@@ -129,7 +129,7 @@ public class AdminBookServiceImpl implements AdminBookService {
 			String objectName = pathSegments[2];       // 2aee492e-...
 
 			// 기존 이미지 미니오에서 삭제
-			adminImgService.deleteMinioUrl(objectName);
+			adminImgService.deleteImage(objectName);
 			log.info("기존 이미지 미니오에서 삭제");
 
 			// 미니오 등록

@@ -4,5 +4,5 @@ public interface MinioService {
 
 	String getPresignedUploadUrl(String fileName);
 
-	void deleteMinioBucket(String objectName);
+	void deleteImage(String fileName);
 }

@@ -38,7 +38,7 @@ public class MinioServiceImpl implements MinioService {
 	}
 
 	@Override
-	public void deleteMinioBucket(String fileName) {
+	public void deleteImage(String fileName) {
 		try {
 			minioClient.removeObject(
 				RemoveObjectArgs.builder()

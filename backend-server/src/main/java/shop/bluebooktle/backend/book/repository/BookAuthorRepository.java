@@ -12,8 +12,8 @@ import shop.bluebooktle.backend.book.entity.Book;
 import shop.bluebooktle.backend.book.entity.BookAuthor;
 
 public interface BookAuthorRepository extends JpaRepository<BookAuthor, Long> {
-
-	// 특정 도서의 모든 작가들 조회 -> 쿼리 어노테이션 안 쓰기로 했습니다. 사용한 부분 수정해주세요
+	
+	// TODO Query 어노테이션 수정
 	@Query("SELECT ba.author FROM BookAuthor ba WHERE ba.book = :book")
 	List<Author> findAuthorsByBook(@Param("book") Book book);
 
@@ -23,6 +23,4 @@ public interface BookAuthorRepository extends JpaRepository<BookAuthor, Long> {
 	List<BookAuthor> findByBookId(Long bookId);
 
 	Optional<BookAuthor> findByBookAndAuthor(Book book, Author author);
-
-	Long book(Book book);
 }
