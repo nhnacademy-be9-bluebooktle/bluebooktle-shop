@@ -101,7 +101,8 @@ Accept: application/json
 ### 포인트 규정 조회
 GET http://localhost:9012/api/points/rules
 
-
+### 포인트 규정 열거형 조회
+GET http://localhost:9012/api/points/rules/type?pointSourceTypeEnum=PAYMENT_EARN
 
 ### 포인트 로그 추가 (pointSourceTypeId = 1 로그인 적립)
 POST http://localhost:9012/api/points

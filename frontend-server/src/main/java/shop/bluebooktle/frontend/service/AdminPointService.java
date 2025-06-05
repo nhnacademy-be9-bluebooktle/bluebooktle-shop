@@ -2,6 +2,7 @@ package shop.bluebooktle.frontend.service;
 
 import java.util.List;
 
+import shop.bluebooktle.common.domain.point.PointSourceTypeEnum;
 import shop.bluebooktle.common.dto.point.request.PointPolicyCreateRequest;
 import shop.bluebooktle.common.dto.point.request.PointPolicyUpdateRequest;
 import shop.bluebooktle.common.dto.point.request.PointSourceTypeCreateRequest;
@@ -30,4 +31,6 @@ public interface AdminPointService {
 	List<PointSourceTypeResponse> getAllSourceTypes(String actionType);
 
 	void deleteSourceType(Long id);
+
+	PointRuleResponse getRuleByType(PointSourceTypeEnum type);
 }
