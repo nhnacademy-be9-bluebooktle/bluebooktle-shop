@@ -45,6 +45,7 @@ import shop.bluebooktle.common.dto.book.response.PublisherInfoResponse;
 import shop.bluebooktle.common.dto.book.response.TagInfoResponse;
 import shop.bluebooktle.common.dto.book.response.author.AuthorResponse;
 import shop.bluebooktle.common.exception.book.BookNotFoundException;
+import shop.bluebooktle.common.exception.book.BookSaleInfoNotFoundException;
 
 @Service
 @Transactional
@@ -77,8 +78,8 @@ public class BookServiceImpl implements BookService {
 			.orElseThrow(BookNotFoundException::new);
 
 		// 도서 판매 정보 조회
-		BookSaleInfo saleInfo = bookSaleInfoRepository.findByBook(book)
-			.orElseThrow(BookNotFoundException::new);
+		BookSaleInfo saleInfo = bookSaleInfoRepository.findByBookId(book.getId())
+			.orElseThrow(BookSaleInfoNotFoundException::new);
 
 		// 작가 목록 조회
 		List<BookAuthor> bookAuthors = bookAuthorRepository.findByBook_Id(bookId);

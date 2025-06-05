@@ -1,5 +1,7 @@
 package shop.bluebooktle.frontend.controller;
 
+import java.math.BigDecimal;
+
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,6 +19,8 @@ import shop.bluebooktle.common.dto.book.response.BookDetailResponse;
 import shop.bluebooktle.common.dto.book.response.BookInfoResponse;
 import shop.bluebooktle.common.dto.book.response.CategoryResponse;
 import shop.bluebooktle.common.dto.order.response.DeliveryRuleResponse;
+import shop.bluebooktle.common.dto.point.response.PointRuleResponse;
+import shop.bluebooktle.frontend.service.AdminPointService;
 import shop.bluebooktle.frontend.service.BookService;
 import shop.bluebooktle.frontend.service.DeliveryRuleService;
 
@@ -28,6 +32,7 @@ public class BookController {
 
 	private final BookService bookService;
 	private final DeliveryRuleService deliveryRuleService;
+	private final AdminPointService adminPointService;
 
 	@GetMapping("/books")
 	public String bookListPage(
@@ -90,7 +95,8 @@ public class BookController {
 			model.addAttribute("deliveryRule", deliveryRule);
 
 			// 로그인 여부 확인
-			Boolean isLoggedIn = (Boolean)model.getAttribute("isLoggedIn");
+			Object rawIsLoggedIn = model.asMap().get("isLoggedIn");
+			boolean isLoggedIn = (rawIsLoggedIn instanceof Boolean) ? (Boolean)rawIsLoggedIn : false;
 
 			// 도서의 총 좋아요 개수 가져오기
 			int likeCount = bookService.countLikes(bookId);
@@ -103,13 +109,16 @@ public class BookController {
 				model.addAttribute("isLiked", isLiked);
 
 				// 적립될 포인트 계산
-				int earnPercent = PointSourceTypeEnum.PAYMENT_EARN.getId().intValue();
-				if (book.getSalePrice() == null) {
-					log.warn("BookDetailResponse.getSalePrice() 가 null 입니다. bookId={}", bookId);
+				PointRuleResponse ruleResponse = adminPointService.getRuleByType(PointSourceTypeEnum.PAYMENT_EARN);
+				log.info("ruleResponse: {}", ruleResponse);
+				if (ruleResponse == null) {
+					log.warn("PointRuleResponse가 없거나 value가 null 입니다.");
 					model.addAttribute("earnedPoints", 0);
 				} else {
-					long salePrice = book.getSalePrice().longValue(); // 예: 18_000
-					int earnedPoints = (int)(salePrice * earnPercent / 100.0); // ex) 18,000 × 4% = 720
+					BigDecimal earnPercent = ruleResponse.value();
+					long salePrice = book.getSalePrice().longValue();
+					int earnPercentage = earnPercent.intValue();
+					int earnedPoints = (int)(earnPercentage * salePrice / 100.0);
 					model.addAttribute("earnedPoints", earnedPoints);
 				}
 			}

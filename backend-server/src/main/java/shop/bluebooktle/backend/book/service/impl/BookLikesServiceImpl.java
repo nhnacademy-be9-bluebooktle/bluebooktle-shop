@@ -105,7 +105,7 @@ public class BookLikesServiceImpl implements BookLikesService {
 
 			// 모든 저자 가져오기
 			List<String> authorName = bookAuthorRepository
-				.findByBook(book)
+				.findByBook_Id(book.getId())
 				.stream()
 				.map(BookAuthor::getAuthor)
 				.map(Author::getName)

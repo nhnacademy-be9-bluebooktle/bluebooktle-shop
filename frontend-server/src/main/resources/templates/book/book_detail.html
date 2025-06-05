@@ -569,7 +569,7 @@
             </div>
 
             <!-- 책 제목, 작가, 출판사 -->
-            <div class="book-info-column-kitsch">
+            <span class="book-info-column-kitsch">
                 <h1 class="detail-title-kitsch" th:text="${book.title}">책 제목</h1>
                 <p class="detail-author-publisher-kitsch">
                     <span class="pixel-font-kitsch">글/그림:</span>
@@ -612,14 +612,14 @@
                     </span>
                 </div>
 
-                <div th:if="${isLoggedIn}">
-                    <p><strong><i class="fas fa-coins"></i> 포인트 적립:</strong>
-                        <span class="highlight-text-kitsch"
-                              th:if="${earnedPoints!=null}"
-                              th:text="${earnedPoints} + 'P '">0 P</span>
-                        <span th:unless="${earnedPoints != null}">0 P</span></p>
-                </div>
                 <div class="book-meta-info-kitsch">
+                    <span th:if="${isLoggedIn}">
+                        <p><strong><i class="fas fa-coins"></i> 포인트 적립:</strong>
+                            <span class="highlight-text-kitsch"
+                                  th:if="${earnedPoints!=null}"
+                                  th:text="${earnedPoints} + 'P '">0 P</span>
+                            <span th:unless="${earnedPoints != null}">0 P</span></p>
+                    </span>
                     <p><strong><i class="fas fa-truck"></i> 배송비:</strong>
                         <span class="highlight-text-kitsch"
                               th:if="${book.salePrice >= deliveryRule.freeDeliveryThreshold}"> 무료 배송 </span>

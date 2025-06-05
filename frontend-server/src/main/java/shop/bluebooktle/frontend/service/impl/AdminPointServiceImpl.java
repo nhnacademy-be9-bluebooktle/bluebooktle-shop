@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import shop.bluebooktle.common.domain.point.PointSourceTypeEnum;
 import shop.bluebooktle.common.dto.point.request.PointPolicyCreateRequest;
 import shop.bluebooktle.common.dto.point.request.PointPolicyUpdateRequest;
@@ -15,6 +16,7 @@ import shop.bluebooktle.common.dto.point.response.PointSourceTypeResponse;
 import shop.bluebooktle.frontend.repository.AdminPointRepository;
 import shop.bluebooktle.frontend.service.AdminPointService;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AdminPointServiceImpl implements AdminPointService {
@@ -73,6 +75,8 @@ public class AdminPointServiceImpl implements AdminPointService {
 
 	@Override
 	public PointRuleResponse getRuleByType(PointSourceTypeEnum type) {
-		return pointRepository.getRuleByType(type);
+		PointRuleResponse ruleResponse = pointRepository.getRuleByType(type);
+		log.info("ruleResponse: {}", ruleResponse);
+		return ruleResponse;
 	}
 }

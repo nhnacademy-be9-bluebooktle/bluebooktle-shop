@@ -12,13 +12,10 @@ import shop.bluebooktle.backend.book.entity.Book;
 import shop.bluebooktle.backend.book.entity.BookAuthor;
 
 public interface BookAuthorRepository extends JpaRepository<BookAuthor, Long> {
-	
+
 	// TODO Query 어노테이션 수정
 	@Query("SELECT ba.author FROM BookAuthor ba WHERE ba.book = :book")
 	List<Author> findAuthorsByBook(@Param("book") Book book);
-
-	// 특정 도서와 연결된 BookAuthor 엔티티 전체 조회
-	List<BookAuthor> findByBook(Book book);
 
 	// 도서 ID로 BookAuthor 엔티티 리스트 조회
 	List<BookAuthor> findByBook_Id(Long bookId);
