@@ -24,7 +24,6 @@ import shop.bluebooktle.common.dto.cart.request.CartRemoveSelectedRequest;
 import shop.bluebooktle.common.dto.common.JsendResponse;
 import shop.bluebooktle.common.entity.auth.User;
 import shop.bluebooktle.common.exception.auth.UserNotFoundException;
-import shop.bluebooktle.common.exception.cart.GuestUserNotFoundException;
 import shop.bluebooktle.common.security.UserPrincipal;
 
 @Slf4j
@@ -44,7 +43,7 @@ public class CartController {
 
 	private String validateGuestId(String guestId) {
 		if (guestId == null || guestId.isBlank()) {
-			throw new GuestUserNotFoundException();
+			return "UnIdentified_GUEST";
 		}
 		return guestId;
 	}
