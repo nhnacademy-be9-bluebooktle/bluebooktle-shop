@@ -177,7 +177,7 @@ public class CartServiceImpl implements CartService {
 
 	@Override
 	public Long getCartSize(User user) {
-		Cart cart = cartRepository.findByUser(user).orElse(null);
+		Cart cart = getOrCreateCart(user);
 		if (cart == null) {
 			return 0L;
 		}

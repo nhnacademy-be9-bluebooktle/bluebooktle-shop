@@ -27,7 +27,7 @@ public class BookController {
 		Model model,
 		@RequestParam(required = false) String query,
 		@RequestParam(value = "page", defaultValue = "0") int page,
-		@RequestParam(value = "size", defaultValue = "15") int size,
+		@RequestParam(value = "size", defaultValue = "20") int size,
 		@RequestParam(value = "searchKeyword", required = false) String searchKeyword) {
 
 		Page<BookInfoResponse> pagedBooks = bookService.getPagedBooks(page, size, searchKeyword);
