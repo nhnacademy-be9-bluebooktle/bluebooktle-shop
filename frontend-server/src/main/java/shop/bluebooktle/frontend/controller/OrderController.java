@@ -1,5 +1,6 @@
 package shop.bluebooktle.frontend.controller;
 
+import java.util.HashMap;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -64,7 +65,7 @@ public class OrderController {
 		@RequestParam(defaultValue = "1", required = false) Integer quantity,
 		@RequestParam(required = false) List<Long> bookIds,
 		@CookieValue(value = "GUEST_ID", required = false) String guestId,
-		@CookieValue(value = "BB_AT", required = false) String token
+		Model model
 	) {
 		ModelAndView mav = new ModelAndView("order/create_form");
 
@@ -95,16 +96,23 @@ public class OrderController {
 		DeliveryRuleResponse deliveryRule = deliveryRuleService.getDefaultDeliveryRule();
 		mav.addObject("deliveryRule", deliveryRule);
 
-		if (token != null) {
+		Boolean isLoggedIn = (Boolean)model.getAttribute("isLoggedIn");
+
+		log.info("isLoggedIn: {}", isLoggedIn);
+
+		if (Boolean.TRUE.equals(isLoggedIn)) {
 			UserWithAddressResponse user = userService.getUserWithAddresses();
 			mav.addObject("user", user);
-		}
-		List<Long> bookIdsForCoupon = bookItems.stream()
-			.map(BookCartOrderResponse::bookId)
-			.toList();
-
-		UsableUserCouponMapResponse coupons = couponService.getUsableCouponsForOrder(bookIdsForCoupon);
-		mav.addObject("coupons", coupons);
+			List<Long> bookIdsForCoupon = bookItems.stream()
+				.map(BookCartOrderResponse::bookId)
+				.toList();
+			UsableUserCouponMapResponse coupons = couponService.getUsableCouponsForOrder(bookIdsForCoupon);
+			mav.addObject("coupons", coupons);
+		} //todo else
+		UsableUserCouponMapResponse emptyCoupons = new UsableUserCouponMapResponse();
+		emptyCoupons.setUsableUserCouponMap(new HashMap<>());
+		mav.addObject("coupons", emptyCoupons);
+		// mav.addObject("coupons", new UsableUserCouponMapResponse());
 
 		return mav;
 	}

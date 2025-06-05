@@ -68,8 +68,8 @@ logging:
 
 mq:
   queue:
-    birthday: BB.local.birthday.queue
-    birthday-dlq: BB.local.birthday.queue.dlq
+    birthday: K.local.birthday.queue
+    birthday-dlq: K.local.birthday.queue.dlq
     direct: BB.local.direct.queue
     direct-dlq: BB.local.direct.queue.dlq
     welcome: BB.local.welcome.queue

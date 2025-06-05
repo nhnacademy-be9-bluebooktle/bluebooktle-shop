@@ -140,6 +140,7 @@ public enum ErrorCode {
 	ORDER_DELIVERY_RULE_NOT_FOUND(HttpStatus.NOT_FOUND, "O006", "배송 정책을 찾을 수 없습니다."),
 	ORDER_INVALID_ORDER_KEY(HttpStatus.UNAUTHORIZED, "O007", "유효하지 않은 주문 확인 정보입니다."), // 비회원 주문 확인
 	ORDER_STATE_NOT_FOUND(HttpStatus.NOT_FOUND, "O008", "해당 주문상태가 존재하지 않습니다."),
+	ORDER_STOCK_NOT_ENOUGH(HttpStatus.BAD_REQUEST, "O009", "주문 수량이 재고보다 많습니다."), // 재고 부족
 
 	// Payment & Point Errors (결제/포인트 오류) - P
 	PAYMENT_FAILED(HttpStatus.BAD_GATEWAY, "P001", "결제 시스템 오류가 발생했습니다."), // 외부 결제사 오류
