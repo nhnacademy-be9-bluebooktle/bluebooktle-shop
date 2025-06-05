@@ -17,7 +17,8 @@ public interface BookPublisherRepository extends JpaRepository<BookPublisher, Lo
 
 	List<BookPublisher> findByBook(Book book);
 
-	List<BookPublisher> findByPublisher(Publisher publisher);
+	// 책으로 출판사 목록 조회
+	List<BookPublisher> findByBook_Id(Long bookId);
 
 	// 특정 출판사의 특정 도서 존재 유무 조회
 	boolean existsByBookAndPublisher(Book book, Publisher publisher);

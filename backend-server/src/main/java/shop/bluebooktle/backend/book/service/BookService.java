@@ -8,12 +8,12 @@ import shop.bluebooktle.common.dto.book.request.BookUpdateServiceRequest;
 import shop.bluebooktle.common.dto.book.response.AdminBookResponse;
 import shop.bluebooktle.common.dto.book.response.BookAllResponse;
 import shop.bluebooktle.common.dto.book.response.BookCartOrderResponse;
+import shop.bluebooktle.common.dto.book.response.BookDetailResponse;
 import shop.bluebooktle.common.dto.book.response.BookInfoResponse;
-import shop.bluebooktle.common.dto.book.response.BookResponse;
 
 public interface BookService {
 
-	BookResponse findBookById(Long bookId);
+	BookDetailResponse findBookById(Long bookId);
 
 	void updateBook(Long bookId, BookUpdateServiceRequest request);
 
