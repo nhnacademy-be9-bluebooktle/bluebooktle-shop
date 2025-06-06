@@ -127,12 +127,6 @@ public class OrderServiceImpl implements OrderService {
 		});
 	}
 
-	@Override
-	public Order getOrderByOrderKey(String orderKey) {
-		return orderRepository.findByOrderKey(orderKey)
-			.orElseThrow(OrderNotFoundException::new);
-	}
-
 	@Transactional
 	public Long createOrder(OrderCreateRequest request) {
 
@@ -191,7 +185,7 @@ public class OrderServiceImpl implements OrderService {
 			.orElseThrow(BookSaleInfoNotFoundException::new);
 
 		if (bookSaleInfo.getBookSaleInfoState() != BookSaleInfoState.AVAILABLE) {
-
+			throw new ApplicationException(ErrorCode.BOOK_STATE_NOT_AVAILABLE);
 		}
 
 		BookOrder bookOrder = BookOrder.builder()
@@ -223,7 +217,7 @@ public class OrderServiceImpl implements OrderService {
 	@Transactional(readOnly = true)
 	public OrderConfirmDetailResponse getOrderByKey(String orderKey, Long userId) {
 		Order order = orderRepository.findByOrderKey(orderKey)
-			.orElseThrow(() -> new OrderNotFoundException());
+			.orElseThrow(OrderNotFoundException::new);
 
 		if (userId != null && order.getUser() != null) {
 			if (!order.getUser().getId().equals(userId)) {
@@ -238,7 +232,7 @@ public class OrderServiceImpl implements OrderService {
 	@Transactional(readOnly = true)
 	public OrderConfirmDetailResponse getOrderById(Long orderId, Long userId) {
 		Order order = orderRepository.findById(orderId)
-			.orElseThrow(() -> new OrderNotFoundException());
+			.orElseThrow(OrderNotFoundException::new);
 
 		if (userId != null && order.getUser() != null) {
 			if (!order.getUser().getId().equals(userId)) {

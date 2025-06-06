@@ -73,8 +73,7 @@ public class OrderController {
 	@Operation(summary = "주문 생성", description = "새 주문을 생성합니다.")
 	@PostMapping
 	public ResponseEntity<JsendResponse<Long>> createOrder(
-		@Valid @RequestBody OrderCreateRequest request,
-		@Parameter(hidden = true) @AuthenticationPrincipal UserPrincipal userPrincipal
+		@Valid @RequestBody OrderCreateRequest request
 	) {
 		Long createdOrderId = orderService.createOrder(request);
 		return ResponseEntity.ok(JsendResponse.success(createdOrderId));

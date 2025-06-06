@@ -28,7 +28,6 @@ import shop.bluebooktle.common.dto.order.response.OrderConfirmDetailResponse;
 import shop.bluebooktle.common.dto.payment.request.PaymentConfirmRequest;
 import shop.bluebooktle.common.dto.payment.response.PaymentConfirmResponse;
 import shop.bluebooktle.common.dto.user.response.UserWithAddressResponse;
-import shop.bluebooktle.common.exception.cart.GuestUserNotFoundException;
 import shop.bluebooktle.frontend.service.AdminPackagingOptionService;
 import shop.bluebooktle.frontend.service.BookService;
 import shop.bluebooktle.frontend.service.CartService;
@@ -207,11 +206,5 @@ public class OrderController {
 		}
 		return "redirect:mypage/orders";
 	}
-
-	private void validateGuestId(String guestId) {
-		if (guestId == null || guestId.isBlank()) {
-			log.warn("GUEST_ID 쿠키가 존재하지 않습니다.");
-			throw new GuestUserNotFoundException("guestId가 존재하지 않습니다. 쿠키를 발급받아야 합니다.");
-		}
-	}
+	
 }
