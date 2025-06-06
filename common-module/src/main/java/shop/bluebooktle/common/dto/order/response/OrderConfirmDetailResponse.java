@@ -1,6 +1,7 @@
 package shop.bluebooktle.common.dto.order.response;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
@@ -38,4 +39,9 @@ public class OrderConfirmDetailResponse {
 	private BigDecimal couponDiscountTotal;
 	private BigDecimal totalAmount;
 	private BigDecimal pointUseAmount;
+
+	private String paymentKey;
+	private String paymentMethod;
+	private BigDecimal paidAmount;
+	private LocalDateTime paidAt;
 }

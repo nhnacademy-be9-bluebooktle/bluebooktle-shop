@@ -1,9 +1,9 @@
 package shop.bluebooktle.backend.order.service.impl;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -37,6 +37,8 @@ import shop.bluebooktle.backend.order.repository.DeliveryRuleRepository;
 import shop.bluebooktle.backend.order.repository.OrderRepository;
 import shop.bluebooktle.backend.order.repository.OrderStateRepository;
 import shop.bluebooktle.backend.order.service.OrderService;
+import shop.bluebooktle.backend.payment.entity.Payment;
+import shop.bluebooktle.backend.payment.repository.PaymentRepository;
 import shop.bluebooktle.backend.user.repository.UserRepository;
 import shop.bluebooktle.common.domain.order.OrderStatus;
 import shop.bluebooktle.common.dto.book.BookSaleInfoState;
@@ -49,6 +51,8 @@ import shop.bluebooktle.common.dto.order.response.OrderHistoryResponse;
 import shop.bluebooktle.common.dto.order.response.OrderItemResponse;
 import shop.bluebooktle.common.dto.order.response.OrderPackagingResponse;
 import shop.bluebooktle.common.entity.auth.User;
+import shop.bluebooktle.common.exception.ApplicationException;
+import shop.bluebooktle.common.exception.ErrorCode;
 import shop.bluebooktle.common.exception.auth.UserNotFoundException;
 import shop.bluebooktle.common.exception.book.BookNotFoundException;
 import shop.bluebooktle.common.exception.book.BookSaleInfoNotFoundException;
@@ -69,6 +73,7 @@ public class OrderServiceImpl implements OrderService {
 	private final UserRepository userRepository;
 	private final OrderStateRepository orderStateRepository;
 	private final BookRepository bookRepository;
+	private final PaymentRepository paymentRepository;
 	private final BookOrderRepository bookOrderRepository;
 	private final PackagingOptionRepository packagingOptionRepository;
 	private final BookSaleInfoRepository bookSaleInfoRepository;
@@ -215,15 +220,37 @@ public class OrderServiceImpl implements OrderService {
 	}
 
 	@Override
-	public OrderConfirmDetailResponse getOrderDetailsForConfirmation(Long orderId, Long userId) {
+	@Transactional(readOnly = true)
+	public OrderConfirmDetailResponse getOrderByKey(String orderKey, Long userId) {
+		Order order = orderRepository.findByOrderKey(orderKey)
+			.orElseThrow(() -> new OrderNotFoundException());
 
-		Order order = orderRepository.findFullOrderDetailsById(orderId)
-			.orElseThrow(() -> new OrderNotFoundException("주문을 찾을 수 없거나 접근 권한이 없습니다."));
-
-		User user = order.getUser();
-		if ((user == null && userId != null) || (user != null && !Objects.equals(user.getId(), userId))) {
-			throw new OrderNotFoundException("주문을 찾을 수 없거나 접근 권한이 없습니다.");
+		if (userId != null && order.getUser() != null) {
+			if (!order.getUser().getId().equals(userId)) {
+				throw new OrderNotFoundException("접근 권한이 없습니다.");
+			}
 		}
+
+		return buildOrderDetailsResponse(order);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public OrderConfirmDetailResponse getOrderById(Long orderId, Long userId) {
+		Order order = orderRepository.findById(orderId)
+			.orElseThrow(() -> new OrderNotFoundException());
+
+		if (userId != null && order.getUser() != null) {
+			if (!order.getUser().getId().equals(userId)) {
+				throw new OrderNotFoundException("접근 권한이 없습니다.");
+			}
+		}
+
+		return buildOrderDetailsResponse(order);
+	}
+
+	private OrderConfirmDetailResponse buildOrderDetailsResponse(Order order) {
+		User user = order.getUser();
 
 		List<UserCouponBookOrder> allUserCouponBookOrdersInOrder = order.getUserCouponBookOrders() == null ?
 			Collections.emptyList() : order.getUserCouponBookOrders();
@@ -233,7 +260,7 @@ public class OrderServiceImpl implements OrderService {
 				.map(bookOrder -> mapToOrderItemResponse(bookOrder, allUserCouponBookOrdersInOrder))
 				.collect(Collectors.toList());
 
-		List<AppliedCouponResponse> AppliedCoupons = allUserCouponBookOrdersInOrder.stream()
+		List<AppliedCouponResponse> appliedCoupons = allUserCouponBookOrdersInOrder.stream()
 			.map(ucbo -> {
 				CalculatedDiscountDetails discountDetails = couponCalculationService.calculateDiscountDetails(ucbo);
 				UserCoupon userCoupon = ucbo.getUserCoupon();
@@ -267,7 +294,7 @@ public class OrderServiceImpl implements OrderService {
 			.map(pkg -> pkg.getPrice().multiply(BigDecimal.valueOf(pkg.getQuantity())))
 			.reduce(BigDecimal.ZERO, BigDecimal::add);
 
-		BigDecimal couponDiscountTotal = AppliedCoupons.stream()
+		BigDecimal couponDiscountTotal = appliedCoupons.stream()
 			.map(AppliedCouponResponse::getAppliedDiscountAmount)
 			.filter(java.util.Objects::nonNull)
 			.reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -278,7 +305,9 @@ public class OrderServiceImpl implements OrderService {
 			.add(deliveryFee)
 			.subtract(couponDiscountTotal);
 
-		return OrderConfirmDetailResponse.builder()
+		Optional<Payment> paymentOpt = paymentRepository.findByOrder(order);
+
+		OrderConfirmDetailResponse.OrderConfirmDetailResponseBuilder builder = OrderConfirmDetailResponse.builder()
 			.orderId(order.getId())
 			.orderName(order.getOrderName())
 			.receiverName(order.getReceiverName())
@@ -290,15 +319,24 @@ public class OrderServiceImpl implements OrderService {
 			.postalCode(order.getPostalCode())
 			.deliveryFee(deliveryFee)
 			.orderItems(orderItems)
-			.appliedCoupons(AppliedCoupons)
+			.appliedCoupons(appliedCoupons)
 			.userPointBalance(user != null ? user.getPointBalance() : BigDecimal.ZERO)
 			.subTotal(subTotal)
 			.packagingTotal(packagingTotal)
 			.couponDiscountTotal(couponDiscountTotal)
 			.totalAmount(totalAmount)
 			.pointUseAmount(order.getPointUseAmount())
-			.orderKey(order.getOrderKey())
-			.build();
+			.orderKey(order.getOrderKey());
+
+		if (paymentOpt.isPresent()) {
+			Payment payment = paymentOpt.get();
+			builder.paymentKey(payment.getPaymentDetail().getKey())
+				.paymentMethod(payment.getPaymentDetail().getPaymentType().getMethod())
+				.paidAmount(payment.getPaidAmount())
+				.paidAt(payment.getCreatedAt());
+		}
+
+		return builder.build();
 	}
 
 	private OrderItemResponse mapToOrderItemResponse(BookOrder bookOrder,
@@ -377,5 +415,24 @@ public class OrderServiceImpl implements OrderService {
 			.price(option.getPrice())
 			.quantity(orderPackaging.getQuantity())
 			.build();
+	}
+
+	@Override
+	public void shipOrder(Long orderId) {
+		Order order = orderRepository.findById(orderId)
+			.orElseThrow(OrderNotFoundException::new);
+
+		if (!OrderStatus.PENDING.equals(order.getOrderState().getState())) {
+			throw new ApplicationException(ErrorCode.INVALID_INPUT_VALUE,
+				"결제 대기 상태의 주문만 배송 처리할 수 있습니다. 현재 상태: " + order.getOrderState().getState().name());
+		}
+
+		OrderState shippingState = orderStateRepository.findByState(OrderStatus.SHIPPING)
+			.orElseThrow(() -> new ApplicationException(ErrorCode.INTERNAL_SERVER_ERROR, "'SHIPPING' 상태를 찾을 수 없습니다."));
+
+		order.changeOrderState(shippingState);
+		order.changeShippedAt(LocalDateTime.now());
+
+		orderRepository.save(order);
 	}
 }

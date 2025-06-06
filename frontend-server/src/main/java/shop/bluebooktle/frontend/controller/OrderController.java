@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -18,7 +17,6 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import shop.bluebooktle.common.dto.book.response.BookCartOrderResponse;
@@ -164,20 +162,34 @@ public class OrderController {
 		try {
 			PaymentConfirmResponse resp = paymentsService.confirm(req);
 			redirectAttributes.addFlashAttribute("orderData", resp);
-			return "redirect:/order/complete";
+			return "redirect:/order/complete/" + resp.orderId();
 		} catch (Exception e) {
 			redirectAttributes.addFlashAttribute("GlobalErrorMessage", "결제에 실패했습니다: " + e.getMessage());
 			return "redirect:/mypage/orders";
 		}
 	}
 
-	@GetMapping("/complete")
-	public String orderCompletePage(@Valid @ModelAttribute("orderData") PaymentConfirmResponse data,
-		BindingResult bindingResult) {
-		if (bindingResult.hasErrors()) {
-			return "order/fail";
+	@GetMapping("/complete/{orderKey}")
+	public String orderCompletePage(@PathVariable String orderKey, Model model, RedirectAttributes redirectAttributes
+	) {
+		try {
+			OrderConfirmDetailResponse fullDetails = orderService.getOrderByKey(orderKey);
+
+			model.addAttribute("orderKey", fullDetails.getOrderKey());
+			model.addAttribute("totalAmount", fullDetails.getPaidAmount());
+			model.addAttribute("paymentMethod", fullDetails.getPaymentMethod());
+			model.addAttribute("fullAddress", fullDetails.getAddress() + " " + fullDetails.getDetailAddress());
+			model.addAttribute("orderedItems", fullDetails.getOrderItems());
+			if (fullDetails.getOrdererName() != null) {
+				model.addAttribute("ordererNickname", fullDetails.getOrdererName());
+			} else {
+				model.addAttribute("ordererNickname", "비회원");
+			}
+			return "order/complete";
+		} catch (Exception e) {
+			redirectAttributes.addFlashAttribute("GlobalErrorMessage", "주문 정보를 조회할 수 없습니다.");
+			return "redirect:mypage/order";
 		}
-		return "order/complete";
 	}
 
 	@GetMapping("/fail")

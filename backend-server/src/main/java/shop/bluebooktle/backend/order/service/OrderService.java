@@ -15,8 +15,11 @@ public interface OrderService {
 
 	Order getOrderByOrderKey(String orderKey);
 
-	OrderConfirmDetailResponse getOrderDetailsForConfirmation(Long orderId, Long userId);
-
 	Long createOrder(OrderCreateRequest request);
 
+	OrderConfirmDetailResponse getOrderByKey(String orderKey, Long userId);
+
+	OrderConfirmDetailResponse getOrderById(Long orderId, Long userId);
+
+	void shipOrder(Long orderId);
 }

@@ -172,4 +172,8 @@ public class Order extends BaseEntity {
 	public void changeOrderState(OrderState newState) {
 		this.orderState = newState;
 	}
+
+	public void changeShippedAt(LocalDateTime newShippedAt) {
+		this.shippedAt = newShippedAt;
+	}
 }

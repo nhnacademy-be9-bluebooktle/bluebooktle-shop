@@ -70,12 +70,6 @@ public class PaymentServiceImpl implements PaymentService {
 		BigDecimal pointDiscount = Optional.ofNullable(order.getPointUseAmount()).orElse(BigDecimal.ZERO);
 		BigDecimal couponDiscount = Optional.ofNullable(order.getCouponDiscountAmount()).orElse(BigDecimal.ZERO);
 
-		log.info("== Origin Amount {}", originalAmount);
-		log.info("== Delivery Fee {}", deliveryFee);
-		log.info("== Sale Discount {}", saleDiscount);
-		log.info("== Point Discount {}", pointDiscount);
-		log.info("== Coupon Discount {}", couponDiscount);
-
 		BigDecimal expectedAmount = originalAmount
 			.add(deliveryFee)
 			.subtract(saleDiscount
@@ -100,6 +94,10 @@ public class PaymentServiceImpl implements PaymentService {
 			throw new ApplicationException(ErrorCode.INVALID_INPUT_VALUE, "지원하지 않는 결제 서비스입니다: " + gatewayName);
 		}
 
+		OrderState pendingOrderState = orderStateRepository.findByState(OrderStatus.PENDING)
+			.orElseThrow(() -> new ApplicationException(ErrorCode.INTERNAL_SERVER_ERROR, "PENDING 상태를 찾을 수 없습니다."));
+		order.changeOrderState(pendingOrderState);
+
 		GenericPaymentConfirmResponse gatewayResponse = selectedGateway.confirmPayment(request);
 
 		if (gatewayResponse.status() == PaymentStatus.SUCCESS || gatewayResponse.status() == PaymentStatus.PENDING) {
@@ -120,30 +118,7 @@ public class PaymentServiceImpl implements PaymentService {
 				.build();
 			paymentRepository.save(payment);
 
-			if (gatewayResponse.status() == PaymentStatus.SUCCESS) {
-				OrderState newOrderState = orderStateRepository.findByState(OrderStatus.SHIPPING)
-					.orElseThrow(
-						() -> new ApplicationException(ErrorCode.INTERNAL_SERVER_ERROR,
-							"주문 상태를 SHIPPING으로 변경 중 에러가 발생했습니다. "));
-				order.changeOrderState(newOrderState);
-				orderRepository.save(order);
-			} else {
-				OrderState pendingOrderState = orderStateRepository.findByState(OrderStatus.PENDING)
-					.orElseThrow(
-						() -> new ApplicationException(ErrorCode.INTERNAL_SERVER_ERROR,
-							"주문 상태를 PENDING으로 변경 중 에러가 발생했습니다. "));
-				order.changeOrderState(pendingOrderState);
-				orderRepository.save(order);
-			}
-
 		} else {
-			// 결제 실패시에도 결제 대기 상태 유지
-			OrderState pendingOrderState = orderStateRepository.findByState(OrderStatus.PENDING)
-				.orElseThrow(() -> new ApplicationException(ErrorCode.INTERNAL_SERVER_ERROR,
-					"주문 상태를 PENDING으로 변경 중 에러가 발생했습니다. "));
-			order.changeOrderState(pendingOrderState);
-			orderRepository.save(order);
-
 			String failReason = "결제 실패";
 			if (gatewayResponse.additionalData() != null
 				&& gatewayResponse.additionalData().get("errorMessage") != null) {
@@ -152,8 +127,9 @@ public class PaymentServiceImpl implements PaymentService {
 				&& gatewayResponse.additionalData().get("tossApiErrorMessage") != null) {
 				failReason = gatewayResponse.additionalData().get("tossApiErrorMessage").toString();
 			}
-
 			throw new ApplicationException(ErrorCode.PAYMENT_CONFIRMATION_FAILED, failReason);
 		}
+
+		orderRepository.save(order);
 	}
 }
