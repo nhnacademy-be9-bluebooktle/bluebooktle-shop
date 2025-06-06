@@ -65,6 +65,7 @@ logging:
     org.hibernate.SQL: info
     org.hibernate.orm.jdbc.bind: trace
     org.springframework.transaction.interceptor: trace
+    net.javacrumbs.shedlock: DEBUG
 
 mq:
   queue:
