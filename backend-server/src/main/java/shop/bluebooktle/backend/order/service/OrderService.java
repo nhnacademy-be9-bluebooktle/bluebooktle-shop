@@ -19,4 +19,6 @@ public interface OrderService {
 
 	Long createOrder(OrderCreateRequest request);
 
+	void cancelOrder(String orderKey, Long userId);
+
 }

@@ -33,4 +33,10 @@ public class OrderServiceImpl implements OrderService {
 	) {
 		return orderRepository.getOrderHistory(page, size, status);
 	}
+
+	@Override
+	public void cancelOrder(String orderKey) {
+		orderRepository.cancelOrder(orderKey);
+	}
+
 }

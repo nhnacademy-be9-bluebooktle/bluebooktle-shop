@@ -29,4 +29,7 @@ public interface OrderRepository {
 		@RequestParam("size") int size,
 		@RequestParam(value = "status", required = false) OrderStatus status
 	);
+
+	@PostMapping("/{orderKey}/cancel")
+	void cancelOrder(@PathVariable String orderKey);
 }

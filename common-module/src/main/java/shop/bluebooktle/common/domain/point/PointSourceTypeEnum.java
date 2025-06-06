@@ -13,7 +13,8 @@ public enum PointSourceTypeEnum {
 	SIGNUP_EARN(2L, ActionType.EARN, "회원 가입"),
 	REVIEW_EARN(3L, ActionType.EARN, "리뷰 적립"),
 	PAYMENT_EARN(4L, ActionType.EARN, "결제 적립"),
-	PAYMENT_USE(5L, ActionType.USE, "결제 사용");
+	PAYMENT_USE(5L, ActionType.USE, "결제 사용"),
+	ORDER_CANCEL(6L, ActionType.EARN, "주문 취소 환불");
 
 	private static final Map<Long, PointSourceTypeEnum> BY_ID =
 		Arrays.stream(values()).collect(Collectors.toMap(PointSourceTypeEnum::getId, e -> e));

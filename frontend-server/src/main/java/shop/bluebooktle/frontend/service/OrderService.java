@@ -12,4 +12,6 @@ public interface OrderService {
 	Long createOrder(OrderCreateRequest orderCreateRequest);
 
 	PaginationData<OrderHistoryResponse> getOrderHistory(int page, int size, OrderStatus status);
+
+	void cancelOrder(String orderKey);
 }
