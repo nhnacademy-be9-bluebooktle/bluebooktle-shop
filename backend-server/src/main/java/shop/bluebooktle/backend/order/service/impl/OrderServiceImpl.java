@@ -62,6 +62,7 @@ import shop.bluebooktle.common.exception.order.BookNotOrderableException;
 import shop.bluebooktle.common.exception.order.OrderNotFoundException;
 import shop.bluebooktle.common.exception.order.StockNotEnoughException;
 import shop.bluebooktle.common.exception.order.delivery_rule.DeliveryRuleNotFoundException;
+import shop.bluebooktle.common.exception.order.order_state.OrderInvalidStateException;
 import shop.bluebooktle.common.exception.order.order_state.OrderStateNotFoundException;
 
 @Slf4j
@@ -94,9 +95,9 @@ public class OrderServiceImpl implements OrderService {
 
 		Page<Order> orderPage;
 		if (status == null) {
-			orderPage = orderRepository.findByUser(user, pageable);
+			orderPage = orderRepository.findByUserOrderByCreatedAtDesc(user, pageable);
 		} else {
-			orderPage = orderRepository.findByUserAndOrderState_State(user, status, pageable);
+			orderPage = orderRepository.findByUserAndOrderState_StateOrderByCreatedAtDesc(user, status, pageable);
 		}
 
 		return orderPage.map(o -> {
@@ -150,15 +151,17 @@ public class OrderServiceImpl implements OrderService {
 		if (request.userId() != null) {
 			user = userRepository.findById(request.userId())
 				.orElseThrow(UserNotFoundException::new);
-			user.subtractPoint(request.pointUseAmount());
-			userRepository.save(user);
+			if (!request.pointUseAmount().equals(BigDecimal.ZERO)) {
+				user.subtractPoint(request.pointUseAmount());
+				userRepository.save(user);
 
-			PointHistory history = PointHistory.builder()
-				.user(user)
-				.sourceType(PointSourceTypeEnum.PAYMENT_USE)
-				.value(request.pointUseAmount())
-				.build();
-			pointHistoryRepository.save(history);
+				PointHistory history = PointHistory.builder()
+					.user(user)
+					.sourceType(PointSourceTypeEnum.PAYMENT_USE)
+					.value(request.pointUseAmount())
+					.build();
+				pointHistoryRepository.save(history);
+			}
 		} else {
 			user = null;
 		}
@@ -206,11 +209,13 @@ public class OrderServiceImpl implements OrderService {
 
 		if (bookSaleInfo.getBookSaleInfoState() != BookSaleInfoState.AVAILABLE
 			&& bookSaleInfo.getBookSaleInfoState() != BookSaleInfoState.LOW_STOCK) {
-			throw new BookNotOrderableException();
+			throw new BookNotOrderableException(
+				" %s 는 현재 판매 가능한 상태가 아닙니다.".formatted(book.getTitle()));
 		}
 
 		if (bookSaleInfo.getStock() < item.bookQuantity()) {
-			throw new StockNotEnoughException();
+			throw new StockNotEnoughException(
+				" %s 상품의 재고가 부족합니다. (남은 수량: %d개)".formatted(book.getTitle(), bookSaleInfo.getStock()));
 		}
 
 		BookOrder bookOrder = BookOrder.builder()
@@ -399,5 +404,39 @@ public class OrderServiceImpl implements OrderService {
 			.price(option.getPrice())
 			.quantity(orderPackaging.getQuantity())
 			.build();
+	}
+
+	@Override
+	@Transactional
+	public void cancelOrder(String orderKey, Long userId) {
+
+		Order order = orderRepository.findByOrderKey(orderKey)
+			.orElseThrow(OrderNotFoundException::new);
+
+		User user = order.getUser();
+		if ((user == null && userId != null) || (user != null && !Objects.equals(user.getId(), userId))) {
+			throw new OrderNotFoundException("주문을 찾을 수 없거나 접근 권한이 없습니다.");
+		}
+
+		if (order.getOrderState().getState() != OrderStatus.PENDING
+			&& order.getOrderState().getState() != OrderStatus.SHIPPING) {
+			throw new OrderInvalidStateException("배송이 시작되면 주문을 취소할 수 없습니다.");
+		}
+
+		BigDecimal usedPoints = order.getPointUseAmount();
+		if (usedPoints != null && usedPoints.compareTo(BigDecimal.ZERO) > 0) {
+			user.addPoint(usedPoints);
+
+			PointHistory pointHistory = PointHistory.builder()
+				.user(user)
+				.sourceType(PointSourceTypeEnum.ORDER_CANCEL)
+				.value(usedPoints)
+				.build();
+			pointHistoryRepository.save(pointHistory);
+		}
+
+		OrderState canceledState = orderStateRepository.findByState(OrderStatus.CANCELED)
+			.orElseThrow(OrderStateNotFoundException::new);
+		order.changeOrderState(canceledState);
 	}
 }

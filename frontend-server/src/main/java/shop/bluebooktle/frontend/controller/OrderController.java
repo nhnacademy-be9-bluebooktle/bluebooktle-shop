@@ -26,6 +26,7 @@ import shop.bluebooktle.common.dto.book.response.BookCartOrderResponse;
 import shop.bluebooktle.common.dto.book_order.response.PackagingOptionInfoResponse;
 import shop.bluebooktle.common.dto.coupon.response.UsableUserCouponMapResponse;
 import shop.bluebooktle.common.dto.order.request.OrderCreateRequest;
+import shop.bluebooktle.common.dto.order.request.OrderItemRequest;
 import shop.bluebooktle.common.dto.order.response.DeliveryRuleResponse;
 import shop.bluebooktle.common.dto.order.response.OrderConfirmDetailResponse;
 import shop.bluebooktle.common.dto.payment.request.PaymentConfirmRequest;
@@ -68,14 +69,15 @@ public class OrderController {
 		Model model
 	) {
 		ModelAndView mav = new ModelAndView("order/create_form");
-
 		List<BookCartOrderResponse> bookItems;
+
 		if (bookId != null) {
 			BookCartOrderResponse bookInfo = bookService.getBookCartOrder(bookId, quantity);
 			bookItems = List.of(bookInfo);
 		} else {
 			bookItems = cartService.getSelectedCartItemsForOrder(guestId, bookIds);
 		}
+
 		mav.addObject("bookItems", bookItems);
 
 		String defaultOrderName;
@@ -118,14 +120,31 @@ public class OrderController {
 	}
 
 	@PostMapping("/create")
-	public String createOrder(@ModelAttribute OrderCreateRequest request) {
+	public String createOrder(@ModelAttribute OrderCreateRequest request, RedirectAttributes ra) {
 		String orderKey = java.util.UUID.randomUUID().toString();
 		OrderCreateRequest updatedRequest = request.toBuilder()
 			.orderKey(orderKey)
 			.build();
-		Long orderId = orderService.createOrder(updatedRequest);
-		log.info("주문 생성 :{}", orderId);
-		return "redirect:/order/" + orderId + "/checkout";
+		try {
+			Long orderId = orderService.createOrder(updatedRequest);
+			log.info("주문 생성 :{}", orderId);
+			return "redirect:/order/" + orderId + "/checkout";
+		} catch (Exception e) {
+			ra.addFlashAttribute("globalErrorMessage", e.getMessage());
+			List<OrderItemRequest> items = request.orderItems();
+
+			if (items.size() == 1) {
+				OrderItemRequest item = items.getFirst();
+				return "redirect:/order/create?bookId=%d&quantity=%d".formatted(item.bookId(), item.bookQuantity());
+			} else {
+				List<String> bookIdStrings = items.stream()
+					.map(item -> String.valueOf(item.bookId()))
+					.toList();
+				String joinedBookIds = String.join(",", bookIdStrings);
+
+				return "redirect:/order/create?bookIds=" + joinedBookIds;
+			}
+		}
 	}
 
 	@GetMapping("/{orderId}/checkout")

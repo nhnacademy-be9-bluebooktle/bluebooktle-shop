@@ -329,6 +329,9 @@
                     <section class="checkout-section-kitsch">
                         <h3 class="section-title-kitsch"><i class="fas fa-shopping-basket"></i> 주문 상품 확인</h3>
                         <div id="orderedItemsList">
+                            <input name="orderName"
+                                   th:value="${defaultOrderName}"
+                                   type="hidden"/>
                             <div class="ordered-item-kitsch"
                                  th:data-item-id="${item.bookId}"
                                  th:data-item-price="${item.price}"
@@ -359,10 +362,6 @@
                                        value=""/>
                                 <input th:name="${'orderItems[' + idx.index + '].salePrice'}"
                                        th:value="${item.salePrice}"
-                                       type="hidden"/>
-
-                                <input name="orderName"
-                                       th:value="${defaultOrderName}"
                                        type="hidden"/>
 
 

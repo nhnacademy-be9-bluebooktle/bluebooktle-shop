@@ -88,4 +88,16 @@ public class OrderController {
 		return ResponseEntity
 			.ok(JsendResponse.success(paginationData));
 	}
+
+	@Operation(summary = "주문 취소", description = "주문을 취소합니다.")
+	@PostMapping("/{orderKey}/cancel")
+	@Auth(type = UserType.USER)
+	public ResponseEntity<JsendResponse<Void>> cancelOrder(
+		@PathVariable String orderKey,
+		@Parameter(hidden = true) @AuthenticationPrincipal UserPrincipal userPrincipal
+	) {
+		checkPrincipal(userPrincipal);
+		orderService.cancelOrder(orderKey, userPrincipal.getUserId());
+		return ResponseEntity.ok(JsendResponse.success());
+	}
 }

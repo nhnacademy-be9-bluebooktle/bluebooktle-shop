@@ -23,7 +23,7 @@ public interface OrderRepository extends JpaRepository<Order, Long>, OrderQueryR
 		"orderState",
 		"bookOrders.book.bookImgs.img"
 	})
-	Page<Order> findByUserAndOrderState_State(User user, OrderStatus state, Pageable pageable);
+	Page<Order> findByUserAndOrderState_StateOrderByCreatedAtDesc(User user, OrderStatus state, Pageable pageable);
 
 	// 사용자 + 상태 + 기간 조회
 	@EntityGraph(attributePaths = {"orderState"})
@@ -35,7 +35,7 @@ public interface OrderRepository extends JpaRepository<Order, Long>, OrderQueryR
 		"orderState",
 		"bookOrders.book.bookImgs.img"
 	})
-	Page<Order> findByUser(User user, Pageable pageable);
+	Page<Order> findByUserOrderByCreatedAtDesc(User user, Pageable pageable);
 
 	@EntityGraph(attributePaths = {
 		"orderState",
