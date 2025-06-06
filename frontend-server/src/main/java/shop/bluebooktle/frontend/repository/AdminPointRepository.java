@@ -47,7 +47,7 @@ public interface AdminPointRepository {
 	List<PointRuleResponse> getAllRules();
 
 	@GetMapping("/rules/type")
-	PointRuleResponse getRuleByType(PointSourceTypeEnum sourceTypeEnum);
+	PointRuleResponse getRuleByType(@RequestParam PointSourceTypeEnum pointSourceTypeEnum);
 
 	@PostMapping("/source")
 	Long createSourceType(@RequestBody PointSourceTypeCreateRequest req);

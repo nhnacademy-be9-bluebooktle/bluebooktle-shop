@@ -5,24 +5,33 @@
         <table class="admin-table">
             <thead>
             <tr>
+                <th>ID</th>
                 <th>제목</th>
                 <th>ISBN</th>
                 <th>저자</th>
                 <th>출판사</th>
                 <th>판매가</th>
+                <th>상태</th>
                 <th>선택</th>
             </tr>
             </thead>
             <tbody>
-            <tr th:each="book : ${books}" th:classappend="${coupon != null and coupon.bookId == book.id} ? 'selected'">
+            <tr th:each="book : ${books}"
+                th:classappend="${coupon != null and coupon.bookId == book.bookId} ? 'selected'">
+                <td>
+                    <a th:href="@{/admin/books/{id}/edit(id=${book.bookId})}"
+                       th:text="${book.title}"
+                       style="font-weight: bold;"></a>
+                </td>
                 <td th:text="${book.title}">도서 제목</td>
                 <td th:text="${book.isbn}">ISBN</td>
                 <td th:text="${book.authors}">저자</td>
                 <td th:text="${book.publishers}">출판사</td>
                 <td th:text="${#numbers.formatDecimal(book.salePrice,0,'COMMA',0,'POINT')} + '원'">판매가</td>
+                <td th:text="${book.bookSaleInfoState}">상태</td>
                 <td>
                     <button type="button" class="admin-btn admin-btn--sm admin-btn--info"
-                            th:attr="data-id=${book.id}" onclick="selectBook(this)">선택
+                            th:attr="data-id=${book.bookId}" onclick="selectBook(this)">선택
                     </button>
                 </td>
             </tr>

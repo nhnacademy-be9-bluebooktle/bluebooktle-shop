@@ -16,16 +16,17 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import shop.bluebooktle.backend.book.service.BookRegisterService;
 import shop.bluebooktle.backend.book.service.BookService;
 import shop.bluebooktle.common.dto.book.request.BookAllRegisterRequest;
 import shop.bluebooktle.common.dto.book.request.BookUpdateServiceRequest;
 import shop.bluebooktle.common.dto.book.response.AdminBookResponse;
-import shop.bluebooktle.common.dto.book.response.BookAllResponse;
 import shop.bluebooktle.common.dto.book.response.BookCartOrderResponse;
 import shop.bluebooktle.common.dto.book.response.BookInfoResponse;
 import shop.bluebooktle.common.dto.common.JsendResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
+import shop.bluebooktle.common.dto.book.response.BookDetailResponse;
 
 @RestController
 @RequestMapping("/api/books")
@@ -46,8 +47,8 @@ public class BookController {
 
 	//도서 정보 조회
 	@GetMapping("/{bookId}")
-	public ResponseEntity<JsendResponse<BookAllResponse>> getBook(@PathVariable Long bookId) {
-		BookAllResponse bookResponse = bookService.findBookAllById(bookId);
+	public ResponseEntity<JsendResponse<BookDetailResponse>> getBook(@PathVariable Long bookId) {
+		BookDetailResponse bookResponse = bookService.findBookById(bookId);
 		return ResponseEntity.ok(JsendResponse.success(bookResponse));
 	}
 

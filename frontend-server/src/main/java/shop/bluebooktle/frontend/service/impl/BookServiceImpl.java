@@ -10,12 +10,11 @@ import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.common.dto.book.response.BookCartOrderResponse;
-import shop.bluebooktle.frontend.repository.AdminBookRepository;
-import shop.bluebooktle.common.dto.book.response.BookAllResponse;
-import shop.bluebooktle.common.dto.book.response.BookCartOrderResponse;
+import shop.bluebooktle.common.dto.book.response.BookDetailResponse;
 import shop.bluebooktle.common.dto.book.response.BookInfoResponse;
 import shop.bluebooktle.common.dto.book.response.CategoryResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
+import shop.bluebooktle.frontend.repository.AdminBookRepository;
 import shop.bluebooktle.frontend.repository.BookCategoryRepository;
 import shop.bluebooktle.frontend.repository.BookRepository;
 import shop.bluebooktle.frontend.repository.CategoryRepository;
@@ -34,6 +33,7 @@ public class BookServiceImpl implements BookService {
 	public BookCartOrderResponse getBookCartOrder(Long bookId, int quantity) {
 		return adminBookRepository.getBookCartOrder(bookId, quantity);
 	}
+
 	@Override
 	public Page<BookInfoResponse> getPagedBooks(int page, int size, String searchKeyword) {
 		Pageable pageable = PageRequest.of(page, size);
@@ -62,4 +62,29 @@ public class BookServiceImpl implements BookService {
 		return categoryRepository.getCategory(categoryId);
 	}
 
+	@Override
+	public BookDetailResponse getBookDetail(Long bookId) {
+		return bookRepository.getBookDetail(bookId);
+	}
+
+	@Override
+	public void like(Long bookId) {
+		bookRepository.likeBook(bookId);
+	}
+
+	@Override
+	public void unlike(Long bookId) {
+		bookRepository.unlikeBook(bookId);
+	}
+
+	@Override
+	public boolean isLiked(Long bookId) {
+		return bookRepository.isLiked(bookId).isLiked();
+		// 뒤에 isLiked()는 BookLikesResponse(DTO)에 있는 boolean을 꺼내기 위함
+	}
+
+	@Override
+	public int countLikes(Long bookId) {
+		return bookRepository.countLikes(bookId).getCountLikes();
+	}
 }

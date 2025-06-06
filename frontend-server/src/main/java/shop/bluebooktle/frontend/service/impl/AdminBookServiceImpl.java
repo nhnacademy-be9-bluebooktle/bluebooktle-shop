@@ -33,8 +33,9 @@ import shop.bluebooktle.common.dto.book.response.img.ImgResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
 import shop.bluebooktle.frontend.repository.AdminAladinBookRepository;
 import shop.bluebooktle.frontend.repository.AdminBookRepository;
-import shop.bluebooktle.frontend.repository.AdminImgUploadRepository;
 import shop.bluebooktle.frontend.repository.BookImgRepository;
+import shop.bluebooktle.frontend.repository.ImageServerClient;
+import shop.bluebooktle.frontend.repository.ImgRepository;
 import shop.bluebooktle.frontend.service.AdminBookService;
 import shop.bluebooktle.frontend.service.AdminImgService;
 
@@ -44,9 +45,10 @@ import shop.bluebooktle.frontend.service.AdminImgService;
 public class AdminBookServiceImpl implements AdminBookService {
 	private final AdminBookRepository adminBookRepository;
 	private final AdminImgService adminImgService;
-	private final AdminImgUploadRepository adminImgUploadRepository;
+	private final ImageServerClient imageServerClient;
 	private final AdminAladinBookRepository adminAladinBookRepository;
 	private final BookImgRepository bookImgRepository;
+	private final ImgRepository imgRepository;
 
 	@Override
 	public Page<BookInfoResponse> getPagedBooks(int page, int size, String searchKeyword) {
@@ -83,6 +85,8 @@ public class AdminBookServiceImpl implements AdminBookService {
 	public void registerBook(BookFormRequest bookFormRequest) {
 		MultipartFile file = bookFormRequest.getImageFile();
 		String uploadedUrl = uploadToMinio(file);
+		String imageKey = uploadedUrl.substring(uploadedUrl.indexOf("/bluebooktle-bookimage"));
+		log.info("imageKey : {}", imageKey);
 
 		BookAllRegisterRequest request = BookAllRegisterRequest.builder()
 			.title(bookFormRequest.getTitle())
@@ -99,7 +103,7 @@ public class AdminBookServiceImpl implements AdminBookService {
 			.publisherIdList(bookFormRequest.getPublisherIdList())
 			.categoryIdList(bookFormRequest.getCategoryIdList())
 			.tagIdList(bookFormRequest.getTagIdList())
-			.imgUrl(uploadedUrl)
+			.imgUrl("/images" + imageKey)
 			.build();
 
 		adminBookRepository.registerBook(request);
@@ -113,28 +117,28 @@ public class AdminBookServiceImpl implements AdminBookService {
 	@Override
 	public void updateBook(Long bookId, BookUpdateRequest bookUpdateRequest) {
 		// 알라딘 등록 도서가 이미지 수정하는 경우 : 미니오 서버에 저장
-		String uploadedUrl = "";
+		String imageKey = "";
 		if (bookUpdateRequest.isAladinImg() && bookUpdateRequest.getImageFile() != null) {
 			MultipartFile file = bookUpdateRequest.getImageFile();
-			uploadedUrl = uploadToMinio(file);
+			String uploadedUrl = uploadToMinio(file);
+			imageKey = uploadedUrl.substring(uploadedUrl.indexOf("/bluebooktle-bookimage"));
 
 		} else if (bookUpdateRequest.getImageFile() != null) {
 			ImgResponse image = bookImgRepository.getImgsByBookId(bookId);
 			String imageUrl = image.getImgUrl();
-			log.info("{}", imageUrl);
-			// 기존 URL에서 bucket / objectName 추출
-			URI uri = URI.create(imageUrl);
-			log.info("URI아님");
-			String[] pathSegments = uri.getPath().split("/", 3);
-			String objectName = pathSegments[2];       // 2aee492e-...
+			log.info("imageUrl : {}", imageUrl);
+			String objectName = imageUrl.substring(imageUrl.lastIndexOf("/") + 1);
 
 			// 기존 이미지 미니오에서 삭제
 			adminImgService.deleteImage(objectName);
 			log.info("기존 이미지 미니오에서 삭제");
+			// 기존 이미지 삭제
+			imgRepository.deleteImg(image.getId());
 
 			// 미니오 등록
 			MultipartFile file = bookUpdateRequest.getImageFile();
-			uploadedUrl = uploadToMinio(file);
+			String uploadedUrl = uploadToMinio(file);
+			imageKey = uploadedUrl.substring(uploadedUrl.indexOf("/bluebooktle-bookimage"));
 
 		}
 		BookUpdateServiceRequest updateServiceRequest =
@@ -152,7 +156,7 @@ public class AdminBookServiceImpl implements AdminBookService {
 				bookUpdateRequest.getPublisherIdList(),
 				bookUpdateRequest.getCategoryIdList(),
 				bookUpdateRequest.getTagIdList(),
-				uploadedUrl
+				"/images" + imageKey
 			);
 
 		adminBookRepository.updateBook(bookId, updateServiceRequest);
@@ -188,7 +192,7 @@ public class AdminBookServiceImpl implements AdminBookService {
 		headers.put("Content-Type", file.getContentType());
 
 		try {
-			adminImgUploadRepository.upload(
+			imageServerClient.upload(
 				bucket,
 				objectName,
 				queryParams,

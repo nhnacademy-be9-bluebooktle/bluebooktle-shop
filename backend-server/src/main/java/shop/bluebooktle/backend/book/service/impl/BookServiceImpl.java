@@ -1,7 +1,6 @@
 package shop.bluebooktle.backend.book.service.impl;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -16,6 +15,8 @@ import org.springframework.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import shop.bluebooktle.backend.book.entity.Book;
+import shop.bluebooktle.backend.book.entity.BookAuthor;
+import shop.bluebooktle.backend.book.entity.BookPublisher;
 import shop.bluebooktle.backend.book.entity.BookSaleInfo;
 import shop.bluebooktle.backend.book.repository.BookAuthorRepository;
 import shop.bluebooktle.backend.book.repository.BookCategoryRepository;
@@ -37,13 +38,14 @@ import shop.bluebooktle.common.dto.book.request.BookUpdateServiceRequest;
 import shop.bluebooktle.common.dto.book.response.AdminBookResponse;
 import shop.bluebooktle.common.dto.book.response.BookAllResponse;
 import shop.bluebooktle.common.dto.book.response.BookCartOrderResponse;
+import shop.bluebooktle.common.dto.book.response.BookDetailResponse;
 import shop.bluebooktle.common.dto.book.response.BookInfoResponse;
-import shop.bluebooktle.common.dto.book.response.BookResponse;
 import shop.bluebooktle.common.dto.book.response.CategoryResponse;
 import shop.bluebooktle.common.dto.book.response.PublisherInfoResponse;
 import shop.bluebooktle.common.dto.book.response.TagInfoResponse;
 import shop.bluebooktle.common.dto.book.response.author.AuthorResponse;
 import shop.bluebooktle.common.exception.book.BookNotFoundException;
+import shop.bluebooktle.common.exception.book.BookSaleInfoNotFoundException;
 
 @Service
 @Transactional
@@ -67,18 +69,49 @@ public class BookServiceImpl implements BookService {
 	private final BookTagService bookTagService;
 	private final BookImgService bookImgService;
 
+	// 도서 상세 조회를 위한 메소드
 	@Override
 	@Transactional(readOnly = true)
-	public BookResponse findBookById(Long bookId) {
+	public BookDetailResponse findBookById(Long bookId) {
+		// 도서 조회
 		Book book = bookRepository.findById(bookId)
 			.orElseThrow(BookNotFoundException::new);
 
-		return BookResponse.builder()
+		// 도서 판매 정보 조회
+		BookSaleInfo saleInfo = bookSaleInfoRepository.findByBookId(book.getId())
+			.orElseThrow(BookSaleInfoNotFoundException::new);
+
+		// 작가 목록 조회
+		List<BookAuthor> bookAuthors = bookAuthorRepository.findByBook_Id(bookId);
+		List<String> authors = bookAuthors.stream()
+			.map(bookAuthor -> bookAuthor.getAuthor().getName())
+			.toList();
+
+		// 출판사 목록 조회
+		List<BookPublisher> bookPublishers = bookPublisherRepository.findByBook_Id(bookId);
+		List<String> publisher = bookPublishers.stream()
+			.map(bookPublisher -> bookPublisher.getPublisher().getName())
+			.toList();
+
+		// 썸네일 URL 가져오기
+		String imgUrl = book.getBookImgs().stream()
+			.filter(b1 -> b1.isThumbnail())
+			.findFirst()
+			.map(b1 -> b1.getImg().getImgUrl())
+			.orElse("");
+
+		return BookDetailResponse.builder()
+			.isbn(book.getIsbn())
 			.title(book.getTitle())
+			.authors(authors)
+			.publishers(publisher)
+			.price(saleInfo.getPrice())
+			.salePrice(saleInfo.getSalePrice())
+			.salePercentage(saleInfo.getSalePercentage().intValue())
 			.description(book.getDescription())
 			.index(book.getIndex())
-			.publishDate(LocalDate.from(book.getPublishDate()))
-			.isbn(book.getIsbn())
+			.imgUrl(imgUrl)
+			.saleState(saleInfo.getBookSaleInfoState())
 			.build();
 	}
 
