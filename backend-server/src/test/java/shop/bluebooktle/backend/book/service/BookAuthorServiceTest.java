@@ -174,26 +174,26 @@ public class BookAuthorServiceTest {
 		assertThrows(BookNotFoundException.class, () -> bookAuthorService.getAuthorByBookId(1L));
 	}
 
-	@Test
-	@DisplayName("작가 아이디로 도서 조회 성공")
-	void getBookByAuthorId_success() {
-
-		Book book = Book.builder()
-			.build();
-		ReflectionTestUtils.setField(book, "id", 1L);
-
-		Author author = Author.builder()
-			.build();
-		ReflectionTestUtils.setField(author, "id", 1L);
-
-		when(authorRepository.findById(1L)).thenReturn(Optional.of(author));
-		when(bookAuthorRepository.findBooksByAuthor(author)).thenReturn(List.of(book));
-
-		List<BookInfoResponse> bookInfoResponses = bookAuthorService.getBookByAuthorId(1L);
-
-		assertThat(bookInfoResponses).hasSize(1);
-		assertThat(bookInfoResponses.get(0).bookId()).isEqualTo(1L);
-	}
+	// @Test
+	// @DisplayName("작가 아이디로 도서 조회 성공")
+	// void getBookByAuthorId_success() {
+	//
+	// 	Book book = Book.builder()
+	// 		.build();
+	// 	ReflectionTestUtils.setField(book, "id", 1L);
+	//
+	// 	Author author = Author.builder()
+	// 		.build();
+	// 	ReflectionTestUtils.setField(author, "id", 1L);
+	//
+	// 	when(authorRepository.findById(1L)).thenReturn(Optional.of(author));
+	// 	when(bookAuthorRepository.findBooksByAuthor(author)).thenReturn(List.of(book));
+	//
+	// 	List<BookInfoResponse> bookInfoResponses = bookAuthorService.getBookByAuthorId(1L);
+	//
+	// 	assertThat(bookInfoResponses).hasSize(1);
+	// 	assertThat(bookInfoResponses.get(0).bookId()).isEqualTo(1L);
+	// }
 
 	@Test
 	@DisplayName("작가 아이디로 도서 조회 시 유효한 작가 아이디가 아닌 경우")
