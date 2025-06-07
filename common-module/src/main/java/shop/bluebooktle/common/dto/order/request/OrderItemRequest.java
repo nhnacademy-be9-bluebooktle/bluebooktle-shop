@@ -22,6 +22,6 @@ public record OrderItemRequest(
 
 	Integer packagingQuantity,
 
-	String itemCouponCode
+	Long itemCouponId
 ) {
 }

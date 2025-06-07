@@ -50,7 +50,6 @@ public class CouponController {
 		return ResponseEntity.ok(JsendResponse.success(paginationData));
 	}
 
-	// 쿠폰 발급
 	@Operation(summary = "쿠폰 직접 발급", description = "쿠폰을 직접 발급합니다.")
 	@PostMapping("/issue")
 	public ResponseEntity<JsendResponse<Void>> registerUserCoupon(

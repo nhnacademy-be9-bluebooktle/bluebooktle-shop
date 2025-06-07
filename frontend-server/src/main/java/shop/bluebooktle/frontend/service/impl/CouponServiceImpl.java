@@ -31,14 +31,4 @@ public class CouponServiceImpl implements CouponService {
 	public UsableUserCouponMapResponse getUsableCouponsForOrder(List<Long> bookIds) {
 		return couponRepository.getUsableCouponsForOrder(bookIds);
 	}
-
-	@Override
-	public void useCoupon(Long id) {
-		couponRepository.useCoupon(id);
-	}
-
-	@Override
-	public void cancelCoupon(Long id) {
-		couponRepository.cancelCoupon(id);
-	}
 }

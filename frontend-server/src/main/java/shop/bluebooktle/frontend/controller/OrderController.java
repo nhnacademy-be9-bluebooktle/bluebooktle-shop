@@ -1,5 +1,6 @@
 package shop.bluebooktle.frontend.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -22,9 +23,11 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import shop.bluebooktle.common.dto.book.response.BookCartOrderResponse;
+import shop.bluebooktle.common.dto.book_order.request.UserCouponBookOrderRequest;
 import shop.bluebooktle.common.dto.book_order.response.PackagingOptionInfoResponse;
 import shop.bluebooktle.common.dto.coupon.response.UsableUserCouponMapResponse;
 import shop.bluebooktle.common.dto.order.request.OrderCreateRequest;
+import shop.bluebooktle.common.dto.order.request.OrderItemRequest;
 import shop.bluebooktle.common.dto.order.response.DeliveryRuleResponse;
 import shop.bluebooktle.common.dto.order.response.OrderConfirmDetailResponse;
 import shop.bluebooktle.common.dto.payment.request.PaymentConfirmRequest;
@@ -38,6 +41,7 @@ import shop.bluebooktle.frontend.service.CouponService;
 import shop.bluebooktle.frontend.service.DeliveryRuleService;
 import shop.bluebooktle.frontend.service.OrderService;
 import shop.bluebooktle.frontend.service.PaymentsService;
+import shop.bluebooktle.frontend.service.UserCouponUsageService;
 import shop.bluebooktle.frontend.service.UserService;
 
 @Slf4j
@@ -54,6 +58,7 @@ public class OrderController {
 	private final BookService bookService;
 	private final CartService cartService;
 	private final CouponService couponService;
+	private final UserCouponUsageService userCouponUsageService;
 
 	@Value("{toss.client-key}")
 	private String tossPaymentClientKey;
@@ -117,6 +122,40 @@ public class OrderController {
 			.build();
 		Long orderId = orderService.createOrder(updatedRequest);
 		log.info("주문 생성 :{}", orderId);
+
+		List<UserCouponBookOrderRequest.CouponUsageDto> usageCoupons = new ArrayList<>();
+
+		//도서 쿠폰
+		for (OrderItemRequest item : updatedRequest.orderItems()) {
+			log.debug("item: bookId={}, couponId={}", item.bookId(), item.itemCouponId());
+			if (item.itemCouponId() != null) {
+				usageCoupons.add(
+					UserCouponBookOrderRequest.CouponUsageDto.builder()
+						.userCouponId(item.itemCouponId())
+						.bookOrderId(item.bookId())
+						.build()
+				);
+			}
+		}
+		// 주문 쿠폰
+		if (updatedRequest.orderCouponId() != null) {
+			log.debug("선택된 주문 쿠폰 ID = {}", updatedRequest.orderCouponId());
+			usageCoupons.add(
+				UserCouponBookOrderRequest.CouponUsageDto.builder()
+					.userCouponId(updatedRequest.orderCouponId())
+					.bookOrderId(null)
+					.build()
+			);
+		}
+
+		UserCouponBookOrderRequest usageRequest = UserCouponBookOrderRequest.builder()
+			.orderId(orderId)
+			.userId(updatedRequest.userId())
+			.usages(usageCoupons)
+			.build();
+
+		userCouponUsageService.saveCouponUsage(usageRequest);
+
 		return "redirect:/order/" + orderId + "/checkout";
 	}
 
