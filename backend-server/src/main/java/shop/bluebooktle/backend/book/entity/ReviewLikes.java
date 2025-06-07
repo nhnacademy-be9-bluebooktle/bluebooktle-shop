@@ -12,7 +12,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -22,9 +21,7 @@ import shop.bluebooktle.common.entity.BaseEntity;
 import shop.bluebooktle.common.entity.auth.User;
 
 @Entity
-@Table(name = "review_likes", uniqueConstraints = {
-	@UniqueConstraint(columnNames = {"user_id", "review_id"})
-})
+@Table(name = "review_likes")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(of = "id", callSuper = false)
