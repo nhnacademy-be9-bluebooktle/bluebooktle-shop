@@ -7,13 +7,13 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import shop.bluebooktle.backend.order.entity.Order;
 import shop.bluebooktle.backend.order.entity.OrderState;
 import shop.bluebooktle.backend.order.repository.OrderRepository;
@@ -36,9 +36,8 @@ import shop.bluebooktle.common.exception.order.OrderNotFoundException;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class PaymentServiceImpl implements PaymentService {
-
-	private static final Logger log = LoggerFactory.getLogger(PaymentServiceImpl.class);
 
 	private final PaymentRepository paymentRepository;
 	private final OrderRepository orderRepository;
@@ -64,18 +63,7 @@ public class PaymentServiceImpl implements PaymentService {
 			throw new ApplicationException(ErrorCode.ORDER_INVALID_ORDER_KEY, "요청된 주문 ID와 실제 주문 정보가 일치하지 않습니다.");
 		}
 
-		BigDecimal originalAmount = Optional.ofNullable(order.getOriginalAmount()).orElse(BigDecimal.ZERO);
-		BigDecimal deliveryFee = Optional.ofNullable(order.getDeliveryFee()).orElse(BigDecimal.ZERO);
-		BigDecimal saleDiscount = Optional.ofNullable(order.getSaleDiscountAmount()).orElse(BigDecimal.ZERO);
-		BigDecimal pointDiscount = Optional.ofNullable(order.getPointUseAmount()).orElse(BigDecimal.ZERO);
-		BigDecimal couponDiscount = Optional.ofNullable(order.getCouponDiscountAmount()).orElse(BigDecimal.ZERO);
-
-		BigDecimal expectedAmount = originalAmount
-			.add(deliveryFee)
-			.subtract(saleDiscount
-				.add(pointDiscount)
-				.add(couponDiscount));
-
+		BigDecimal expectedAmount = getExpectedAmount(order);
 		BigDecimal requestedAmount = BigDecimal.valueOf(request.amount());
 
 		log.info("== Expected Amount {}", expectedAmount);
@@ -132,4 +120,22 @@ public class PaymentServiceImpl implements PaymentService {
 
 		orderRepository.save(order);
 	}
+
+	@NotNull
+	private BigDecimal getExpectedAmount(Order order) {
+		BigDecimal totalPackagingPrice = orderRepository.findTotalPackagingPriceByOrderId(order.getId());
+		BigDecimal originalAmount = Optional.ofNullable(order.getOriginalAmount()).orElse(BigDecimal.ZERO);
+		BigDecimal deliveryFee = Optional.ofNullable(order.getDeliveryFee()).orElse(BigDecimal.ZERO);
+		BigDecimal saleDiscount = Optional.ofNullable(order.getSaleDiscountAmount()).orElse(BigDecimal.ZERO);
+		BigDecimal pointDiscount = Optional.ofNullable(order.getPointUseAmount()).orElse(BigDecimal.ZERO);
+		BigDecimal couponDiscount = Optional.ofNullable(order.getCouponDiscountAmount()).orElse(BigDecimal.ZERO);
+
+		return originalAmount
+			.add(deliveryFee)
+			.add(totalPackagingPrice)
+			.subtract(saleDiscount
+				.add(pointDiscount)
+				.add(couponDiscount));
+	}
+
 }
