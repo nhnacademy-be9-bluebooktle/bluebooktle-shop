@@ -27,8 +27,9 @@ public interface ReviewRepository {
 		@RequestParam("size") int size
 	);
 
-	@GetMapping
+	@GetMapping("/book/{bookId}")
 	PaginationData<ReviewResponse> getReviewsForBook(
+		@PathVariable("bookId") Long bookId,
 		@RequestParam("page") int page,
 		@RequestParam("size") int size
 	);

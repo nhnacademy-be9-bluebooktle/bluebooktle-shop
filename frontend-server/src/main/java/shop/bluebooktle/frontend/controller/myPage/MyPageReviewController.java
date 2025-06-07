@@ -63,19 +63,4 @@ public class MyPageReviewController {
 		return "mypage/review_list";
 	}
 
-	// 도서 상세페이지에서 리뷰 목록 조회
-	@GetMapping("/books/{bookId}/reviews") // TODO 도서 상세페이지 완성되면 수정
-	public String getReviewsForBook(
-		@PathVariable Long bookId,
-		@RequestParam(value = "page", defaultValue = "0") int page,
-		@RequestParam(value = "size", defaultValue = "5") int size,
-		Model model
-	) {
-		Page<ReviewResponse> reviewsPage = reviewService.getReviewsForBook(bookId, PageRequest.of(page, size));
-
-		model.addAttribute("bookId", bookId);
-		model.addAttribute("reviewsPage", reviewsPage);
-		return "book/review_list_fragment"; // TODO 도서 상세페이지 완성되면 수정
-	}
-
 }

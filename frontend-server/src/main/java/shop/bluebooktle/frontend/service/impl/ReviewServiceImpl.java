@@ -42,7 +42,7 @@ public class ReviewServiceImpl implements ReviewService {
 	@Override
 	public Page<ReviewResponse> getReviewsForBook(Long bookId, Pageable pageable) {
 		PaginationData<ReviewResponse> paginationData =
-			reviewRepository.getReviewsForBook(pageable.getPageNumber(), pageable.getPageSize());
+			reviewRepository.getReviewsForBook(bookId, pageable.getPageNumber(), pageable.getPageSize());
 
 		List<ReviewResponse> content = paginationData.getContent();
 		long total = paginationData.getTotalElements();
