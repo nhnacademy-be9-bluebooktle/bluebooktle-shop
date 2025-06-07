@@ -354,7 +354,7 @@
                                        type="hidden"
                                        value="0"/>
                                 <input th:id="${'hiddenItemCoupon-' + idx.index}"
-                                       th:name="${'orderItems[' + idx.index + '].itemCouponCode'}"
+                                       th:name="${'orderItems[' + idx.index + '].itemCouponId'}"
                                        type="hidden"
                                        value=""/>
                                 <input th:name="${'orderItems[' + idx.index + '].salePrice'}"
@@ -445,7 +445,7 @@
                                         </select>
 
                                         <input type="hidden" th:id="${'hiddenItemCoupon-' + idx.index}"
-                                               th:name="${'orderItems[' + idx.index + '].itemCouponCode'}" value=""/>
+                                               th:name="${'orderItems[' + idx.index + '].itemCouponId'}" value=""/>
 
                                         <p class="item-coupon-applied-info" th:id="${'couponInfo-' + idx.index}"
                                            style="display:none;">
@@ -700,7 +700,7 @@
                     : coupon.couponName + ' (' + coupon.discountPercent + '% 할인, 최대 ' + #numbers.formatInteger(coupon.maximumDiscountPrice, 0) + '원)'}">
                                 </option>
                             </select>
-                            <input type="hidden" name="orderCouponCode" id="hiddenOrderCouponCode" value=""/>
+                            <input type="hidden" name="orderCouponId" id="hiddenOrderCouponCode" value=""/>
                         </div>
                         <div class="summary-row-kitsch">
                             <span>주문 쿠폰 할인:</span>
@@ -1139,19 +1139,6 @@
                 const aliasEl = document.getElementById('savedAlias');
                 const roadEl = document.getElementById('savedRoad');
                 const detailEl = document.getElementById('savedDetail');
-                const orderCouponSelect = document.getElementById('orderCouponSelect');
-                const orderCouponHidden = document.getElementById('hiddenOrderCouponCode')
-
-                orderCouponSelect.addEventListener('change', () => {
-                    const selected = orderCouponSelect.selectedOptions[0];
-                    const discount = selected.dataset.discount ? parseInt(selected.dataset.discount.replace(/[^\d]/g, ''), 10) : 0;
-
-                    orderCouponHidden.value = selected.value || '';
-                    document.getElementById('summaryCouponDiscount').textContent = '-' + discount.toLocaleString() + '원';
-
-                    updateFinalTotalPrice();
-                    updateOrderCouponDisabling();
-                });
 
                 if (!selectEl) return;
                 const opt = selectEl.selectedOptions[0];
@@ -1309,14 +1296,50 @@
                 });
 
                 document.querySelectorAll('.item-coupon-select').forEach(sel => {
-                    sel.addEventListener('change', () => {
+                    sel.addEventListener('change', (e) => {
+                        const idx = e.target.dataset.idx;
+                        const hiddenInput = document.getElementById(`hiddenItemCoupon-${idx}`);
+                        if (hiddenInput) {
+                            hiddenInput.value = e.target.value;
+                        }
+
                         updateCouponDiscount();
                     });
                 });
+                const orderCouponSelect = document.getElementById('orderCouponSelect');
+                if (orderCouponSelect) {
+                    orderCouponSelect.addEventListener('change', (e) => {
+                        const hiddenOrderInput = document.getElementById('hiddenOrderCouponCode');
+                        const selected = orderCouponSelect.selectedOptions[0];
 
-                document.getElementById('orderCouponSelect')?.addEventListener('change', () => {
-                    updateCouponDiscount();
-                });
+                        if (hiddenOrderInput) {
+                            hiddenOrderInput.value = e.target.value;
+                        }
+
+                        // 할인 금액 계산
+                        let discount = 0;
+                        if (selected) {
+                            const type = selected.dataset.type;
+                            const baseAmount = getNumericValue('summaryTotalProductPrice') - getNumericValue('summaryTotalDiscount') - getNumericValue('summaryBookCouponDiscount');
+
+                            if (type === 'FIXED') {
+                                discount = parseFloat(selected.dataset.discountPrice || 0);
+                            } else if (type === 'PERCENT') {
+                                const percent = parseFloat(selected.dataset.discountPercent || 0);
+                                const max = parseFloat(selected.dataset.maximumDiscountPrice || 0);
+                                discount = Math.floor(baseAmount * (percent / 100));
+                                if (!isNaN(max) && discount > max) discount = max;
+                            }
+                        }
+
+                        const displayEl = document.getElementById('summaryCouponDiscount');
+                        if (displayEl) {
+                            displayEl.textContent = '-' + discount.toLocaleString() + '원';
+                        }
+
+                        updateCouponDiscount();
+                    });
+                }
                 updateCouponDiscount();
 
 
@@ -1376,12 +1399,6 @@
                                 }
                             }
                         }
-                    });
-                }
-                const orderCouponSelect = document.getElementById('orderCouponSelect');
-                if (orderCouponSelect) {
-                    orderCouponSelect.addEventListener('change', () => {
-                        fullPriceRecalculation(); // 할인 적용 재계산
                     });
                 }
             });

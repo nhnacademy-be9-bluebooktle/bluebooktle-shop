@@ -306,8 +306,7 @@
 
             // 도서 정보 표시
             const title = selectedRow.cells[0].textContent;
-            const isbn = selectedRow.cells[1].textContent;
-            document.getElementById("selectedBookInfo").innerText = `선택한 도서: ${title} (ISBN: ${isbn})`;
+            document.getElementById("selectedBookInfo").innerText = `선택한 도서: ${title}`;
         }
 
         // 카테고리 트리 렌더링

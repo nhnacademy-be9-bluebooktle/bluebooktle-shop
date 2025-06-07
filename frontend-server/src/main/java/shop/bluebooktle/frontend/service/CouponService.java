@@ -13,7 +13,4 @@ public interface CouponService {
 
 	UsableUserCouponMapResponse getUsableCouponsForOrder(List<Long> bookIds);
 
-	void useCoupon(Long id);
-
-	void cancelCoupon(Long id);
 }
