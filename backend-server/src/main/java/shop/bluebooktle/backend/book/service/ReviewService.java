@@ -12,4 +12,6 @@ public interface ReviewService {
 	Page<ReviewResponse> getMyReviews(Long userId, Pageable pageable);
 
 	Page<ReviewResponse> getReviewsForBook(Long bookId, Pageable pageable);
+
+	boolean toggleReviewLike(Long userId, Long reviewId);
 }
