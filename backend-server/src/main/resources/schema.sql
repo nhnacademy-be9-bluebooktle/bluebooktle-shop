@@ -619,6 +619,8 @@ CREATE TABLE `review_likes`
     `review_likes_id` bigint    NOT NULL AUTO_INCREMENT,
     `user_id`         bigint    NOT NULL,
     `review_id`       bigint    NOT NULL,
+    `deleted_at`     timestamp NULL,
+    `created_at`     timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT `PK_REVIEW_LIKES` PRIMARY KEY (`review_likes_id`),
     CONSTRAINT `FK_review_likes_user_id_user`
@@ -626,8 +628,7 @@ CREATE TABLE `review_likes`
             REFERENCES `users` (`user_id`),
     CONSTRAINT `FK_review_likes_review_id_review`
         FOREIGN KEY (`review_id`)
-            REFERENCES `review` (`review_id`),
-    CONSTRAINT `UK_review_likes_user_id_review_id` UNIQUE (`user_id`, `review_id`)
+            REFERENCES `review` (`review_id`)
 );
 
 CREATE TABLE `user_coupon_book_order`
