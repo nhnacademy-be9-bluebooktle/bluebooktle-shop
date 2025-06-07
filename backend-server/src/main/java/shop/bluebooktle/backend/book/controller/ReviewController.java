@@ -66,4 +66,15 @@ public class ReviewController {
 		PaginationData<ReviewResponse> paginationData = new PaginationData<>(pageResult);
 		return ResponseEntity.ok(JsendResponse.success(paginationData));
 	}
+
+	// 리뷰 좋아요
+	@PostMapping("/{reviewId}/like")
+	public ResponseEntity<JsendResponse<Boolean>> toggleReviewLike(
+		@PathVariable Long reviewId,
+		@AuthenticationPrincipal UserPrincipal userPrincipal
+	) {
+		Long userId = userPrincipal.getUserId();
+		boolean liked = reviewService.toggleReviewLike(reviewId, userId);
+		return ResponseEntity.ok(JsendResponse.success(liked));
+	}
 }

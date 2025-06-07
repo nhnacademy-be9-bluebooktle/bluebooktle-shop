@@ -1,5 +1,7 @@
 package shop.bluebooktle.backend.book.service.impl;
 
+import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -10,8 +12,10 @@ import shop.bluebooktle.backend.book.entity.Book;
 import shop.bluebooktle.backend.book.entity.BookSaleInfo;
 import shop.bluebooktle.backend.book.entity.Img;
 import shop.bluebooktle.backend.book.entity.Review;
+import shop.bluebooktle.backend.book.entity.ReviewLikes;
 import shop.bluebooktle.backend.book.repository.BookSaleInfoRepository;
 import shop.bluebooktle.backend.book.repository.ImgRepository;
+import shop.bluebooktle.backend.book.repository.ReviewLikesRepository;
 import shop.bluebooktle.backend.book.repository.ReviewRepository;
 import shop.bluebooktle.backend.book.service.ReviewService;
 import shop.bluebooktle.backend.book_order.entity.BookOrder;
@@ -20,6 +24,7 @@ import shop.bluebooktle.backend.user.repository.UserRepository;
 import shop.bluebooktle.common.dto.book.request.ReviewRequest;
 import shop.bluebooktle.common.dto.book.response.ReviewResponse;
 import shop.bluebooktle.common.entity.auth.User;
+import shop.bluebooktle.common.exception.InvalidInputValueException;
 import shop.bluebooktle.common.exception.auth.UserNotFoundException;
 import shop.bluebooktle.common.exception.book.BookSaleInfoNotFoundException;
 import shop.bluebooktle.common.exception.book_order.BookOrderNotFoundException;
@@ -34,6 +39,7 @@ public class ReviewServiceImpl implements ReviewService {
 	private final BookOrderRepository bookOrderRepository;
 	private final ImgRepository imgRepository;
 	private final BookSaleInfoRepository bookSaleInfoRepository;
+	private final ReviewLikesRepository reviewLikesRepository;
 
 	@Override
 	public ReviewResponse addReview(Long userId, Long bookOrderId, ReviewRequest reviewRequest) {
@@ -116,4 +122,47 @@ public class ReviewServiceImpl implements ReviewService {
 			.createdAt(review.getCreatedAt())
 			.build());
 	}
+
+	@Override
+	public boolean toggleReviewLike(Long reviewId, Long userId) {
+		Optional<ReviewLikes> existingLike = reviewLikesRepository.findByUserIdAndReviewId(userId, reviewId);
+
+		boolean liked;
+
+		if (existingLike.isPresent()) {
+			reviewLikesRepository.deleteByUserIdAndReviewId(userId, reviewId);
+			liked = false;
+			decrementReviewLikeCount(reviewId);
+		} else {
+			User user = userRepository.findById(userId)
+				.orElseThrow(UserNotFoundException::new);
+			Review review = reviewRepository.findById(reviewId)
+				.orElseThrow(InvalidInputValueException::new);
+
+			ReviewLikes newLikes = ReviewLikes.builder()
+				.user(user)
+				.review(review)
+				.build();
+
+			reviewLikesRepository.save(newLikes);
+			liked = true;
+			incrementReviewLikeCount(reviewId);
+		}
+		return liked;
+	}
+
+	private void incrementReviewLikeCount(Long reviewId) {
+		Review review = reviewRepository.findById(reviewId)
+			.orElseThrow(InvalidInputValueException::new);
+		review.incrementLikeCount();
+		reviewRepository.save(review);
+	}
+
+	private void decrementReviewLikeCount(Long reviewId) {
+		Review review = reviewRepository.findById(reviewId)
+			.orElseThrow(InvalidInputValueException::new);
+		review.decrementLikeCount();
+		reviewRepository.save(review);
+	}
+
 }
