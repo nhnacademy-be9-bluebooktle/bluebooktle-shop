@@ -16,8 +16,4 @@ public interface CouponService {
 	Long countAllUsableCoupons();
 
 	Long countExpiringThisMonth();
-
-	void useCoupon(Long id);
-
-	void cancelCoupon(Long id);
 }

@@ -533,6 +533,19 @@
                                       th:text="'- ' + ${#numbers.formatDecimal(coupon.appliedDiscountAmount, 0, 'COMMA', 0, 'POINT')} + '원'"></span>
                             </div>
                         </th:block>
+                        <th:block th:if="${order.appliedCoupons != null}">
+                            <div class="summary-line coupon-detail-header"
+                                 th:if="${order.appliedCoupons.?[target != null && target.toString() == 'BOOK'].size() > 0}">
+                                <span class="label" style="text-decoration: underline;">└ 도서별 적용 쿠폰:</span>
+                            </div>
+                            <div th:each="coupon : ${order.appliedCoupons}"
+                                 th:if="${coupon.target != null && coupon.target.toString() == 'BOOK'}"
+                                 class="summary-line coupon-item-detail">
+                                <span class="label" th:text="${coupon.couponName}"></span>
+                                <span class="value discount"
+                                      th:text="'- ' + ${#numbers.formatDecimal(coupon.appliedDiscountAmount, 0, 'COMMA', 0, 'POINT')} + '원'"></span>
+                            </div>
+                        </th:block>
 
                         <div class="summary-line sub-total-line">
                             <span class="label">쿠폰 적용 후 합계:</span>
