@@ -219,7 +219,7 @@ public class AdminOrderController {
 		log.info("어드민 주문 상세 페이지 요청. URI: {}, 주문 ID: {}", request.getRequestURI(), orderId);
 		model.addAttribute("currentURI", request.getRequestURI());
 
-		// TODO: adminOrderService.getOrderDetail(orderId) 호출
+		// TODO: adminOrderService.getOrderDetail(orderKey) 호출
 		// 임시 데이터
 		OrderDetailDto orderDetail = new OrderDetailDto(orderId,
 			"ORD" + LocalDate.now().getYear() + String.format("%02d", LocalDate.now().getMonthValue()) + String.format(
@@ -240,7 +240,7 @@ public class AdminOrderController {
 		RedirectAttributes redirectAttributes) {
 		log.info("주문 상태 변경 요청. 주문 ID: {}, 변경할 상태: {}", orderId, status);
 		try {
-			// TODO: adminOrderService.updateOrderStatus(orderId, status);
+			// TODO: adminOrderService.updateOrderStatus(orderKey, status);
 			redirectAttributes.addFlashAttribute("globalSuccessMessage",
 				"주문(ID: " + orderId + ") 상태가 '" + status + "'(으)로 성공적으로 변경되었습니다.");
 		} catch (Exception e) {
@@ -256,7 +256,7 @@ public class AdminOrderController {
 		// @RequestParam("deliveryCompany") String deliveryCompany, // 필요시 배송업체도 함께
 		RedirectAttributes redirectAttributes) {
 		try {
-			// TODO: adminOrderService.updateTrackingNumber(orderId, trackingNumber, deliveryCompany);
+			// TODO: adminOrderService.updateTrackingNumber(orderKey, trackingNumber, deliveryCompany);
 			redirectAttributes.addFlashAttribute("globalSuccessMessage",
 				"주문(ID: " + orderId + ")의 운송장 번호가 성공적으로 등록/수정되었습니다.");
 		} catch (Exception e) {

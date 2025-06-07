@@ -118,6 +118,7 @@
         <div class="book-grid-kitsch list-page-grid-kitsch">
             <div th:each="book, stat : ${pagedBooks.content}"
                  class="book-item-kitsch"
+                 style="max-width: 276px"
                  th:classappend="${stat.index % 2 == 0} ? ' tilt-left-kitsch' : ' tilt-right-kitsch'">
 
                 <a th:href="@{/books/{id}(id=${book.bookId})}" class="book-item-link-kitsch">

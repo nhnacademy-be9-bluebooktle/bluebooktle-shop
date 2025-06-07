@@ -516,7 +516,7 @@
                 };
             })(document.querySelector);
             */
-            // jQuery 객체 모방은 confirmPurchase 등에서 document.querySelector(`.order-id:contains("${orderId}")`) 형태로 사용되고 있지 않으므로,
+            // jQuery 객체 모방은 confirmPurchase 등에서 document.querySelector(`.order-id:contains("${orderKey}")`) 형태로 사용되고 있지 않으므로,
             // 해당 부분은 Vanilla JS에 맞게 수정했습니다. (Array.from(document.querySelectorAll...find))
         }
 
