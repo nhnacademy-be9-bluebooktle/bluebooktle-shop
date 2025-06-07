@@ -125,14 +125,21 @@ public class ReviewServiceImpl implements ReviewService {
 
 	@Override
 	public boolean toggleReviewLike(Long reviewId, Long userId) {
-		Optional<ReviewLikes> existingLike = reviewLikesRepository.findByUserIdAndReviewId(userId, reviewId);
+		Optional<ReviewLikes> activeLike = reviewLikesRepository.findByUserIdAndReviewId(userId, reviewId);
+
+		Optional<ReviewLikes> softDeletedLike = reviewLikesRepository.findSoftDeletedByUserIdAndReviewId(userId,
+			reviewId);
 
 		boolean liked;
 
-		if (existingLike.isPresent()) {
+		if (activeLike.isPresent()) {
 			reviewLikesRepository.deleteByUserIdAndReviewId(userId, reviewId);
 			liked = false;
 			decrementReviewLikeCount(reviewId);
+		} else if (softDeletedLike.isPresent()) {
+			reviewLikesRepository.undeleteByUserIdAndReviewId(userId, reviewId);
+			liked = true;
+			incrementReviewLikeCount(reviewId);
 		} else {
 			User user = userRepository.findById(userId)
 				.orElseThrow(UserNotFoundException::new);
