@@ -1,7 +1,5 @@
 package shop.bluebooktle.backend.book.service;
 
-import java.util.List;
-
 import org.springframework.data.domain.Page;
 
 import shop.bluebooktle.common.dto.book.request.BookUpdateServiceRequest;
@@ -20,8 +18,6 @@ public interface BookService {
 	void deleteBook(Long bookId);
 
 	BookAllResponse findBookAllById(Long bookId);
-
-	List<BookAllResponse> getBookAllByTitle(String title);
 
 	Page<BookInfoResponse> findAllBooks(int page, int size, String searchKeyword);
 

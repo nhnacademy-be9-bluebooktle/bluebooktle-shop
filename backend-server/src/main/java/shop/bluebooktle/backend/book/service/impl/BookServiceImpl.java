@@ -33,6 +33,7 @@ import shop.bluebooktle.backend.book.service.BookPublisherService;
 import shop.bluebooktle.backend.book.service.BookService;
 import shop.bluebooktle.backend.book.service.BookTagService;
 import shop.bluebooktle.backend.book.service.PublisherService;
+import shop.bluebooktle.backend.elasticsearch.service.BookElasticSearchService;
 import shop.bluebooktle.common.dto.book.request.BookRegisterRequest;
 import shop.bluebooktle.common.dto.book.request.BookUpdateServiceRequest;
 import shop.bluebooktle.common.dto.book.response.AdminBookResponse;
@@ -68,6 +69,9 @@ public class BookServiceImpl implements BookService {
 	private final PublisherService publisherService;
 	private final BookTagService bookTagService;
 	private final BookImgService bookImgService;
+
+	// 엘라스틱 서비스
+	private final BookElasticSearchService bookElasticSearchService;
 
 	// 도서 상세 조회를 위한 메소드
 	@Override
@@ -206,40 +210,6 @@ public class BookServiceImpl implements BookService {
 			.build();
 	}
 
-	//도서 연관 데이터 한번에 제목으로 조회
-	@Override
-	@Transactional(readOnly = true)
-	public List<BookAllResponse> getBookAllByTitle(String title) {
-		List<Book> books = bookRepository.findAllByTitle(title);
-
-		return books.stream()
-			.map(book -> {
-				BookSaleInfo saleInfo = getBookSaleInfoByBookId(book.getId());
-
-				return BookAllResponse.builder()
-					.id(book.getId())                             // 책 ID
-					.title(book.getTitle())                       // 책 제목
-					.description(book.getDescription())           // 책 설명
-					.index(book.getIndex())
-					.publishDate(book.getPublishDate())           // 출판일
-					.isbn(book.getIsbn())                         // ISBN
-					.price(saleInfo.getPrice())                   // 정가
-					.salePrice(saleInfo.getSalePrice())           // 할인가
-					.stock(saleInfo.getStock())                   // 재고
-					.salePercentage(saleInfo.getSalePercentage()) // 할인율
-					.imgUrl(getThumbnailUrlByBookId(book.getId()))    // 썸네일 URL
-					.authors(getAuthorsByBookId(book.getId()))               // 저자 리스트
-					.publishers(getPublisherByBookId(book.getId()))           // 출판사 이름
-					.categories(getCategoriesByBookId(book.getId()))         // 카테고리 리스트
-					.tags(getTagsByBookId(book.getId()))                     // 태그 리스트
-					.bookSaleInfoState(saleInfo.getBookSaleInfoState())
-					.viewCount(saleInfo.getViewCount())                      // 조회수
-					.searchCount(saleInfo.getSearchCount())                  // 검색수
-					.build();
-			})
-			.toList();
-	}
-
 	@Override
 	@Transactional(readOnly = true)
 	public Page<BookInfoResponse> findAllBooks(int page, int size, String searchKeyword) {
@@ -247,7 +217,9 @@ public class BookServiceImpl implements BookService {
 		Page<Book> bookPage;
 
 		if (StringUtils.hasText(searchKeyword)) {
-			bookPage = bookRepository.findByTitleContainingIgnoreCase(searchKeyword, pageable);
+			// 엘라스틱 서치 검색 기능
+			bookPage = bookElasticSearchService.searchBookByKeyword(searchKeyword, page, size);
+			log.info("{}", bookPage);
 		} else {
 			bookPage = bookRepository.findAll(pageable);
 			log.info("{}", bookPage);
@@ -287,7 +259,8 @@ public class BookServiceImpl implements BookService {
 		Page<Book> bookPage;
 
 		if (StringUtils.hasText(searchKeyword)) {
-			bookPage = bookRepository.findByTitleContainingIgnoreCase(searchKeyword, pageable);
+			bookPage = bookElasticSearchService.searchBookByKeyword(searchKeyword, page, size);
+			log.info("{}", bookPage);
 		} else {
 			bookPage = bookRepository.findAll(pageable);
 			log.info("{}", bookPage);

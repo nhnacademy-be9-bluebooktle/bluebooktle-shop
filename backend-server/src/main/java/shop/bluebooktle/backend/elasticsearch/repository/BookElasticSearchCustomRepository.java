@@ -1,15 +1,23 @@
 package shop.bluebooktle.backend.elasticsearch.repository;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHit;
+import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.data.elasticsearch.core.query.Criteria;
 import org.springframework.data.elasticsearch.core.query.CriteriaQuery;
 import org.springframework.stereotype.Repository;
 
 import lombok.RequiredArgsConstructor;
+import shop.bluebooktle.backend.book.entity.Book;
+import shop.bluebooktle.backend.book.repository.BookRepository;
 import shop.bluebooktle.backend.elasticsearch.document.BookDocument;
 
 @Repository
@@ -17,9 +25,11 @@ import shop.bluebooktle.backend.elasticsearch.document.BookDocument;
 public class BookElasticSearchCustomRepository {
 
 	private final ElasticsearchOperations operations;
+	private final BookRepository bookRepository;
 
 	// 키워드 검색을 위한 메소드, 반환값 : book_id
-	public List<Long> searchByWeightedKeyword(String keyword, int page, int size) {
+	public Page<Book> searchByWeightedKeyword(String keyword, int page, int size) {
+		PageRequest pageable = PageRequest.of(page, size);
 		Criteria criteria = new Criteria()
 			.or(new Criteria("title").matches(keyword).boost(10.0f))
 			.or(new Criteria("description").matches(keyword).boost(3.0f))
@@ -27,11 +37,25 @@ public class BookElasticSearchCustomRepository {
 			.or(new Criteria("authorNames").matches(keyword).boost(4.0f))
 			.or(new Criteria("tagNames").matches(keyword).boost(5.0f));
 
-		CriteriaQuery query = new CriteriaQuery(criteria, PageRequest.of(page, size));
-		return operations.search(query, BookDocument.class)
-			.stream()
+		CriteriaQuery query = new CriteriaQuery(criteria);
+		query.setPageable(pageable);
+		
+		SearchHits<BookDocument> hits = operations.search(query, BookDocument.class);
+
+		List<Long> bookIds = hits.getSearchHits().stream()
 			.map(SearchHit::getContent)
 			.map(BookDocument::getId)
 			.toList();
+
+		List<Book> books = bookRepository.findAllById(bookIds);
+		Map<Long, Book> bookMap = books.stream()
+			.collect(Collectors.toMap(Book::getId, b -> b));
+
+		List<Book> sortedBooks = bookIds.stream()
+			.map(bookMap::get)
+			.filter(Objects::nonNull)
+			.toList();
+
+		return new PageImpl<>(sortedBooks, pageable, hits.getTotalHits());
 	}
 }
