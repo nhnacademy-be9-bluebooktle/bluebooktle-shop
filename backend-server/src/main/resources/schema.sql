@@ -614,6 +614,22 @@ CREATE TABLE `review`
             REFERENCES `img` (`img_id`)
 );
 
+CREATE TABLE `review_likes`
+(
+    `review_likes_id` bigint    NOT NULL AUTO_INCREMENT,
+    `user_id`         bigint    NOT NULL,
+    `review_id`       bigint    NOT NULL,
+
+    CONSTRAINT `PK_REVIEW_LIKES` PRIMARY KEY (`review_likes_id`),
+    CONSTRAINT `FK_review_likes_user_id_user`
+        FOREIGN KEY (`user_id`)
+            REFERENCES `users` (`user_id`),
+    CONSTRAINT `FK_review_likes_review_id_review`
+        FOREIGN KEY (`review_id`)
+            REFERENCES `review` (`review_id`),
+    CONSTRAINT `UK_review_likes_user_id_review_id` UNIQUE (`user_id`, `review_id`)
+);
+
 CREATE TABLE `user_coupon_book_order`
 (
     `user_coupon_book_order_id` bigint NOT NULL AUTO_INCREMENT,
