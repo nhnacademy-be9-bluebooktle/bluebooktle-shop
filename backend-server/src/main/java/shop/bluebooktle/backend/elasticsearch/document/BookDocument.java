@@ -40,7 +40,7 @@ public class BookDocument {
 	@Field(type = FieldType.Text)
 	private String description; // 도서설명
 
-	@Field(type = FieldType.Date, format = {DateFormat.date_hour_minute_second_millis, DateFormat.epoch_millis})
+	@Field(type = FieldType.Date, format = {DateFormat.date_hour_minute_second_millis})
 	private LocalDateTime publishDate; // 발행일
 
 	@Field(type = FieldType.Scaled_Float, scalingFactor = 100) // 소수점 둘째 자리까지 저장

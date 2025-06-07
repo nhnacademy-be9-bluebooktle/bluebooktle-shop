@@ -29,11 +29,11 @@ spring:
       host: localhost
       port: 6379
       database: 0
-    # 엘라스틱 서치
-    elasticsearch:
-      uris: http://s4.java21.net:5601
-      username: elastic
-      password: nhnacademy123!
+  # 엘라스틱 서치
+  elasticsearch:
+    uris: s4.java21.net:9200
+    username: elastic
+    password: nhnacademy123!
 
   rabbitmq:
     host: s4.java21.net
