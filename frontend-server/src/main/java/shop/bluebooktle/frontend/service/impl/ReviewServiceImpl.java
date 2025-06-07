@@ -50,4 +50,9 @@ public class ReviewServiceImpl implements ReviewService {
 		return new PageImpl<>(content, pageable, total);
 
 	}
+
+	@Override
+	public boolean toggleReviewLike(Long reviewId) {
+		return reviewRepository.toggleReviewLike(reviewId);
+	}
 }

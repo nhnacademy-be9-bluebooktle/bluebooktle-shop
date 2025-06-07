@@ -32,4 +32,10 @@ public interface ReviewRepository {
 		@RequestParam("page") int page,
 		@RequestParam("size") int size
 	);
+
+	@PostMapping("/{reviewId}/like")
+	Boolean toggleReviewLike(
+		@PathVariable("reviewId") Long reviewId
+	);
+
 }
