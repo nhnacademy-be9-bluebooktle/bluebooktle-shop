@@ -1,5 +1,6 @@
 package shop.bluebooktle.backend.book.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -32,7 +33,7 @@ public class BookPublisherServiceImpl implements BookPublisherService {
 	private final PublisherRepository publisherRepository;
 
 	@Override
-	public void registerBookPublisher(Long bookId, Long publisherId) {
+	public PublisherInfoResponse registerBookPublisher(Long bookId, Long publisherId) {
 		Book book = findBookOrThrow(bookId);
 		Publisher publisher = findPublisherOrThrow(publisherId);
 		// 이미 도서에 등록된 출판사인 경우
@@ -44,13 +45,21 @@ public class BookPublisherServiceImpl implements BookPublisherService {
 			.publisher(publisher)
 			.build();
 		bookPublisherRepository.save(bookPublisher);
+		return PublisherInfoResponse.builder()
+			.id(publisher.getId())
+			.name(publisher.getName())
+			.createdAt(publisher.getCreatedAt())
+			.build();
 	}
 
 	@Override
-	public void registerBookPublisher(Long bookId, List<Long> publisherIdList) {
+	public List<PublisherInfoResponse> registerBookPublisher(Long bookId, List<Long> publisherIdList) {
+		List<PublisherInfoResponse> responses = new ArrayList<>();
 		for (Long publisherId : publisherIdList) {
-			registerBookPublisher(bookId, publisherId);
+			PublisherInfoResponse response = registerBookPublisher(bookId, publisherId);
+			responses.add(response);
 		}
+		return responses;
 	}
 
 	@Override

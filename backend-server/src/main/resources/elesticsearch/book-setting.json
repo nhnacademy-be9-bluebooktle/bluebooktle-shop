@@ -1,0 +1,97 @@
+{
+  "analysis": {
+    "char_filter": {
+      "icu_normalizer": {
+        "type": "icu_normalizer",
+        "name": "nfkc_cf"
+      }
+    },
+    "tokenizer": {
+      "nori_mixed": {
+        "type": "nori_tokenizer",
+        "decompound_mode": "mixed"
+      }
+    },
+    "filter": {
+      "korean_synonym": {
+        "type": "synonym_graph",
+        "synonyms": [
+          "감동, 뭉클, 울림",
+          "재미, 흥미, 즐거움",
+          "지식, 정보, 인사이트, 팁",
+          "사랑, 연애, 로맨스",
+          "우정, 친구, 동료",
+          "성장, 변화, 발전",
+          "꿈, 희망, 목표",
+          "가족, 부모, 형제, 자매",
+          "삶, 인생, 생애",
+          "고민, 걱정, 불안",
+          "자존감, 자신감, 멘탈",
+          "치유, 힐링, 위로",
+          "웃음, 유쾌, 개그",
+          "추리, 반전, 미스터리",
+          "공포, 스릴, 긴장",
+          "전쟁, 역사, 시대극",
+          "성공, 성취, 목표달성",
+          "리더십, 리더쉽, 지도력",
+          "대화, 소통, 커뮤니케이션",
+          "집중력, 몰입, 플로우",
+          "몰입, 빠져드는, 흡입력",
+          "생각, 사고, 사유, 철학",
+          "열정, 의지, 도전",
+          "어린이, 아동, 키즈, 아이",
+          "유아, 영유아, 아기, 베이비",
+          "청소년, 틴에이저, 10대",
+          "프로그래밍, 코딩, 개발",
+          "개발자, 프로그래머, 코더",
+          "데이터베이스, DB, SQL",
+          "머신러닝, 기계학습, 딥러닝"
+        ]
+      },
+      "korean_posfilter": {
+        "type": "nori_part_of_speech",
+        "stoptags": [
+          "J",
+          "E",
+          "IC",
+          "SP",
+          "SC",
+          "SE",
+          "SSO",
+          "SSC",
+          "XPN",
+          "XSA",
+          "XSN",
+          "XSV",
+          "UNA",
+          "NA",
+          "VSV"
+        ]
+      }
+    },
+    "analyzer": {
+      "search_korean_mixed": {
+        "type": "custom",
+        "char_filter": [
+          "icu_normalizer"
+        ],
+        "tokenizer": "nori_mixed",
+        "filter": [
+          "lowercase",
+          "korean_posfilter",
+          "korean_synonym"
+        ]
+      },
+      "search_icu_multilang": {
+        "type": "custom",
+        "char_filter": [
+          "icu_normalizer"
+        ],
+        "tokenizer": "icu_tokenizer",
+        "filter": [
+          "lowercase"
+        ]
+      }
+    }
+  }
+}

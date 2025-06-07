@@ -8,9 +8,9 @@ import shop.bluebooktle.common.dto.book.response.author.AuthorResponse;
 public interface BookAuthorService {
 
 	// 도서 작가 등록
-	void registerBookAuthor(Long bookId, Long authorId);
+	AuthorResponse registerBookAuthor(Long bookId, Long authorId);
 
-	void registerBookAuthor(Long bookId, List<Long> authorIdList);
+	List<AuthorResponse> registerBookAuthor(Long bookId, List<Long> authorIdList);
 
 	void updateBookAuthor(Long bookId, List<Long> authorIdList);
 
