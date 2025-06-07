@@ -7,6 +7,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -30,16 +31,17 @@ import shop.bluebooktle.backend.coupon.entity.Coupon;
 import shop.bluebooktle.backend.coupon.entity.CouponType;
 import shop.bluebooktle.backend.coupon.entity.UserCoupon;
 import shop.bluebooktle.backend.coupon.service.CouponCalculationService;
+import shop.bluebooktle.backend.order.dto.response.OrderCancelMessage;
 import shop.bluebooktle.backend.order.entity.DeliveryRule;
 import shop.bluebooktle.backend.order.entity.Order;
 import shop.bluebooktle.backend.order.entity.OrderState;
+import shop.bluebooktle.backend.order.mq.properties.OrderExchangeProperties;
+import shop.bluebooktle.backend.order.mq.properties.OrderQueueProperties;
 import shop.bluebooktle.backend.order.repository.DeliveryRuleRepository;
 import shop.bluebooktle.backend.order.repository.OrderRepository;
 import shop.bluebooktle.backend.order.repository.OrderStateRepository;
 import shop.bluebooktle.backend.order.service.OrderService;
 import shop.bluebooktle.backend.point.repository.PointHistoryRepository;
-import shop.bluebooktle.backend.point.repository.PointPolicyRepository;
-import shop.bluebooktle.backend.point.repository.PointSourceTypeRepository;
 import shop.bluebooktle.backend.user.repository.UserRepository;
 import shop.bluebooktle.common.domain.order.OrderStatus;
 import shop.bluebooktle.common.domain.point.PointSourceTypeEnum;
@@ -81,8 +83,9 @@ public class OrderServiceImpl implements OrderService {
 	private final PackagingOptionRepository packagingOptionRepository;
 	private final BookSaleInfoRepository bookSaleInfoRepository;
 	private final PointHistoryRepository pointHistoryRepository;
-	private final PointPolicyRepository pointPolicyRepository;
-	private final PointSourceTypeRepository pointSourceTypeRepository;
+	private final ApplicationEventPublisher eventPublisher;
+	private final OrderExchangeProperties orderExchange;
+	private final OrderQueueProperties orderQueue;
 
 	@Override
 	public Page<OrderHistoryResponse> getUserOrders(
@@ -196,6 +199,8 @@ public class OrderServiceImpl implements OrderService {
 		for (OrderItemRequest itemReq : request.orderItems()) {
 			createSingleBookOrder(saved, itemReq);
 		}
+
+		eventPublisher.publishEvent(new OrderCancelMessage(saved.getId()));
 
 		return saved.getId();
 	}
@@ -422,7 +427,20 @@ public class OrderServiceImpl implements OrderService {
 			&& order.getOrderState().getState() != OrderStatus.SHIPPING) {
 			throw new OrderInvalidStateException("배송이 시작되면 주문을 취소할 수 없습니다.");
 		}
+		cancelOrderInternal(order.getId());
+	}
 
+	@Override
+	@Transactional
+	public void cancelOrderInternal(Long orderId) {
+		Order order = orderRepository.findById(orderId)
+			.orElseThrow(OrderNotFoundException::new);
+
+		if (order.getOrderState().getState() != OrderStatus.PENDING) {
+			return;
+		}
+
+		User user = order.getUser();
 		BigDecimal usedPoints = order.getPointUseAmount();
 		if (usedPoints != null && usedPoints.compareTo(BigDecimal.ZERO) > 0) {
 			user.addPoint(usedPoints);

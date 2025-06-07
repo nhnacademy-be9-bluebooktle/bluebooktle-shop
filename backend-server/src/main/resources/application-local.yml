@@ -82,6 +82,14 @@ mq:
     direct-dlx: local.direct.dlx
     welcome: local.welcome.exchange
     welcome-dlx: local.welcome.dlx
+  order:
+    queue:
+      order-wait: BB.local.order.payment.waiting.queue
+      order-cancel: BB.local.order.cancel.queue
+      order-cancel-dlq: BB.local.order.cancel.dlq
+    exchange:
+      order: local.order.exchange
+      order-dlx: local.order.dlx
 
 encrypt:
   key: WpqWJ+qndIaLgP1udQD7lUUuaeARZEvOzHefTNS23hA=

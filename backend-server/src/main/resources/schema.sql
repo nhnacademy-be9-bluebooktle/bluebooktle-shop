@@ -654,3 +654,11 @@ CREATE TABLE `order_packaging`
         FOREIGN KEY (`book_order_id`)
             REFERENCES `book_order` (`book_order_id`)
 );
+
+CREATE TABLE shedlock
+(
+    name       VARCHAR(64)  NOT NULL PRIMARY KEY,
+    lock_until TIMESTAMP    NOT NULL,
+    locked_at  TIMESTAMP    NOT NULL,
+    locked_by  VARCHAR(255) NOT NULL
+);

@@ -21,4 +21,6 @@ public interface OrderService {
 
 	void cancelOrder(String orderKey, Long userId);
 
+	void cancelOrderInternal(Long orderId);
+
 }
