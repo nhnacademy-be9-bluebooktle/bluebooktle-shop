@@ -19,7 +19,7 @@ public interface BookService {
 
 	void deleteBook(Long bookId);
 
-	BookAllResponse findBookAllById(Long id);
+	BookAllResponse findBookAllById(Long bookId);
 
 	List<BookAllResponse> getBookAllByTitle(String title);
 

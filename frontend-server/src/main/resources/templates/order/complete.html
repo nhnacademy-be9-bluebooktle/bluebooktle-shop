@@ -94,6 +94,7 @@
             margin-bottom: 0.5rem;
             padding-bottom: 0.5rem;
             border-bottom: 1px dotted var(--kitsch-bg-alt);
+            font-family: var(--font-pixel);
         }
 
         .ordered-product-item-kitsch:last-child {
@@ -129,9 +130,9 @@
                 <i class="fas fa-party-popper"></i></div>
             <h1 class="completion-title-kitsch">주문 완료!</h1>
             <p class="completion-message-kitsch">
-                겜돌이_77님의 주문이 성공적으로 완료되었습니다! <br>
-                주문번호는 <strong th:text="${orderData.orderId}">[orderId]</strong> 입니다. <br>
-                키치한 상품들이 곧 용사님을 찾아갈 거예요!
+                <strong th:text="${userNickname ?: ordererNickname}"></strong>님의 주문이 성공적으로 완료되었습니다! <br>
+                주문번호는 <strong th:text="${orderKey}">[orderKey]</strong> 입니다. <br>
+                주문하신 상품이 곧 배송될 예정입니다.
             </p>
 
             <div class="order-summary-box-kitsch">
@@ -139,27 +140,28 @@
                 <div class="summary-item-kitsch">
                     <span class="label">결제 금액:</span>
                     <span class="value" style="color:var(--kitsch-color-3); font-size:1.1rem;">
-                        <strong th:text="${orderData.totalAmount()}"></strong>
+                        <strong th:text="${#numbers.formatInteger(totalAmount, 0, 'COMMA') + '원'}">[Total Amount]</strong>
                     </span>
                 </div>
                 <div class="summary-item-kitsch">
                     <span class="label">결제 수단:</span>
-                    <span class="value">토스페이먼츠 (카드)</span>
+                    <span class="value" th:text="${paymentMethod}">[Payment Method]</span>
                 </div>
                 <div class="summary-item-kitsch">
                     <span class="label">배송지:</span>
-                    <span class="value">서울시 키치구 레트로길 88 (우리집)</span>
+                    <span class="value" th:text="${fullAddress}">[Full Address]</span>
                 </div>
 
                 <h4><i class="fas fa-cubes"></i> 주문 상품</h4>
-                <div class="ordered-product-list-kitsch">
-                    <div class="ordered-product-item-kitsch">
-                        <img alt="코딩" src="https://picsum.photos/40/60?random=101">
-                        <span>코딩 대모험 x 1 (✨반짝이 포장)</span>
-                    </div>
-                    <div class="ordered-product-item-kitsch">
-                        <img alt="픽셀 알고리즘" src="https://picsum.photos/40/60?random=102">
-                        <span>픽셀 아트로 배우는 알고리즘 x 2</span>
+                <div class="ordered-product-list-kitsch" th:if="${orderedItems != null and !orderedItems.isEmpty()}">
+                    <div class="ordered-product-item-kitsch" th:each="item : ${orderedItems}">
+                        <img th:src="${item.bookThumbnailUrl ?: 'https://via.placeholder.com/40x60'}"
+                             alt="Book Thumbnail">
+                        <span>
+                            <th:block th:text="${item.bookTitle + ' x ' + item.quantity}"></th:block>
+                            <th:block th:if="${item.packagingOptions != null and !item.packagingOptions.isEmpty()}"
+                                      th:text="' (' + ${item.packagingOptions[0].name} + ')'"></th:block>
+                        </span>
                     </div>
                 </div>
             </div>
@@ -179,15 +181,13 @@
 
 <th:block layout:fragment="page_scripts">
     <script>
-        // Font Awesome 6 Pro 아이콘이 없는 경우 대체 아이콘으로 변경 (선택적)
         document.addEventListener('DOMContentLoaded', function () {
             const partyPopperIcon = document.querySelector('.completion-icon-kitsch .fa-party-popper');
             if (partyPopperIcon && getComputedStyle(partyPopperIcon).getPropertyValue('font-family').toLowerCase().indexOf('fontawesome') === -1) {
                 partyPopperIcon.classList.remove('fa-party-popper');
-                partyPopperIcon.classList.add('fa-gifts'); // 대체 아이콘
+                partyPopperIcon.classList.add('fa-gifts');
             }
 
-            // 스크롤바 디자인 (웹킷) - styles.css에도 유사한 내용이 있다면 중복될 수 있음
             const scrollableLists = document.querySelectorAll('.ordered-product-list-kitsch');
             scrollableLists.forEach(list => {
                 list.style.setProperty('--kitsch-scrollbar-track', 'var(--kitsch-bg-alt)');

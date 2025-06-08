@@ -61,7 +61,7 @@ public class BookController {
 	public String booksByCategoryPage(
 		Model model,
 		@RequestParam(value = "page", defaultValue = "0") int page,
-		@RequestParam(value = "size", defaultValue = "15") int size,
+		@RequestParam(value = "size", defaultValue = "20") int size,
 		@PathVariable Long categoryId
 	) {
 		log.info("요청된 카테고리 ID: {}", categoryId);
