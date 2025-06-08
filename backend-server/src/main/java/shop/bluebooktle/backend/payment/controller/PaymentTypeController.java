@@ -59,4 +59,5 @@ public class PaymentTypeController {
 		paymentTypeService.delete(id);
 		return ResponseEntity.ok().body(JsendResponse.success());
 	}
+	
 }
