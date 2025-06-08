@@ -10,14 +10,11 @@ import shop.bluebooktle.common.dto.book.request.BookUpdateRequest;
 import shop.bluebooktle.common.dto.book.response.AdminBookResponse;
 import shop.bluebooktle.common.dto.book.response.AladinBookResponse;
 import shop.bluebooktle.common.dto.book.response.BookAllResponse;
-import shop.bluebooktle.common.dto.book.response.BookInfoResponse;
 
 public interface AdminBookService {
 	BookAllResponse getBook(Long bookId);
 
 	void registerBook(BookFormRequest request);
-
-	Page<BookInfoResponse> getPagedBooks(int page, int size, String searchKeyword);
 
 	Page<AdminBookResponse> getPagedBooksByAdmin(int page, int size, String searchKeyword);
 
