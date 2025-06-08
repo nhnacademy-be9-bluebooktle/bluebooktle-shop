@@ -2,6 +2,8 @@ package shop.bluebooktle.backend.user.repository.impl;
 
 import static shop.bluebooktle.common.entity.auth.QUser.*;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -14,13 +16,23 @@ import org.springframework.util.StringUtils;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.SubQueryExpression;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.NumberExpression;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import shop.bluebooktle.backend.book_order.entity.QBookOrder;
+import shop.bluebooktle.backend.book_order.entity.QOrderPackaging;
+import shop.bluebooktle.backend.book_order.entity.QPackagingOption;
+import shop.bluebooktle.backend.order.entity.QOrder;
+import shop.bluebooktle.backend.payment.entity.QPayment;
+import shop.bluebooktle.backend.user.dto.UserNetSpentAmountDto;
 import shop.bluebooktle.backend.user.repository.UserQueryRepository;
 import shop.bluebooktle.common.domain.auth.UserStatus;
 import shop.bluebooktle.common.domain.auth.UserType;
@@ -78,6 +90,75 @@ public class UserQueryRepositoryImpl implements UserQueryRepository {
 			.where(builder);
 
 		return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
+	}
+
+	@Override
+	public List<UserNetSpentAmountDto> findUserNetSpentAmountForLastThreeMonths() {
+		QUser user = QUser.user;
+		QOrder order = QOrder.order;
+		QPayment payment = QPayment.payment;
+
+		QBookOrder bookOrder = QBookOrder.bookOrder;
+		QOrderPackaging orderPackaging = QOrderPackaging.orderPackaging;
+		QPackagingOption packagingOption = QPackagingOption.packagingOption;
+
+		// 포장비 계산
+		NumberExpression<BigDecimal> wrappingPriceExpression =
+			packagingOption.price.multiply(orderPackaging.quantity.castToNum(BigDecimal.class));
+
+		// 한 주문의 포장비
+		SubQueryExpression<BigDecimal> wrappingCostSubquery = JPAExpressions
+			.select(wrappingPriceExpression.sum())
+			.from(bookOrder)
+			.join(orderPackaging).on(orderPackaging.bookOrder.eq(bookOrder))
+			.join(packagingOption).on(packagingOption.eq(orderPackaging.packagingOption))
+			.where(bookOrder.order.eq(order))
+			.groupBy(bookOrder.order.id);
+
+		NumberExpression<BigDecimal> safeWrappingCost = Expressions.numberTemplate(
+			BigDecimal.class, "coalesce({0}, {1})", wrappingCostSubquery, BigDecimal.ZERO
+		);
+
+		return queryFactory
+			.select(Projections.constructor(UserNetSpentAmountDto.class,
+				user.id,
+				order.originalAmount
+					.subtract(order.couponDiscountAmount.coalesce(BigDecimal.ZERO))
+					.subtract(order.deliveryFee.coalesce(BigDecimal.ZERO))
+					.subtract(safeWrappingCost)
+					.sum()
+					.coalesce(BigDecimal.ZERO)
+			))
+			.from(user)
+			.leftJoin(order).on(
+				order.user.eq(user)
+					.and(order.createdAt.after(LocalDateTime.now().minusMonths(3)))
+					.and(order.deletedAt.isNull())
+			)
+			.leftJoin(payment).on(payment.order.id.eq(order.id))
+			.groupBy(user.id)
+			.fetch();
+	}
+
+	@Override
+	public void updateMembershipLevel(Long userId, Long newMembershipLevelId) {
+		QUser user = QUser.user;
+
+		queryFactory.update(user)
+			.set(user.membershipLevel.id, newMembershipLevelId)
+			.where(user.id.eq(userId))
+			.execute();
+	}
+
+	@Override
+	public Long findMembershipIdById(Long userId) {
+		QUser user = QUser.user;
+
+		return queryFactory
+			.select(user.membershipLevel.id)
+			.from(user)
+			.where(user.id.eq(userId))
+			.fetchOne();
 	}
 
 	private OrderSpecifier<?>[] getOrderSpecifier(Sort sort) {
