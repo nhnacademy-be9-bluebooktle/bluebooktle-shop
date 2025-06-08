@@ -14,6 +14,7 @@ import shop.bluebooktle.backend.elasticsearch.repository.BookElasticSearchReposi
 import shop.bluebooktle.backend.elasticsearch.service.BookElasticSearchService;
 import shop.bluebooktle.common.dto.book.BookSortType;
 import shop.bluebooktle.common.dto.elasticsearch.BookElasticSearchRegisterRequest;
+import shop.bluebooktle.common.dto.elasticsearch.BookElasticSearchUpdateRequest;
 import shop.bluebooktle.common.exception.elasticsearch.ElasticsearchBookDocumentSaveException;
 import shop.bluebooktle.common.exception.elasticsearch.ElasticsearchBookNotFoundException;
 
@@ -67,6 +68,24 @@ public class BookElasticSearchServiceImpl implements BookElasticSearchService {
 			.orElseThrow(ElasticsearchBookNotFoundException::new);
 		bookDocument.setViewCount(bookDocument.getViewCount() + 1);
 		bookElasticSearchRepository.save(bookDocument);
+	}
+
+	@Override
+	public void updateBook(BookElasticSearchUpdateRequest request) {
+		BookDocument bookDocument = bookElasticSearchRepository.findById(request.getBookId())
+			.orElseThrow(ElasticsearchBookNotFoundException::new);
+
+		bookDocument.setTitle(request.getTitle());
+		bookDocument.setDescription(request.getDescription());
+		bookDocument.setPublishDate(request.getPublishDate());
+		bookDocument.setSalePrice(request.getSalePrice());
+		bookDocument.setAuthorNames(request.getAuthorNames());
+		bookDocument.setPublisherNames(request.getPublisherNames());
+		bookDocument.setTagNames(request.getTagNames());
+		bookDocument.setCategoryIds(request.getCategoryIds());
+
+		bookElasticSearchRepository.save(bookDocument);
+
 	}
 
 	@Override

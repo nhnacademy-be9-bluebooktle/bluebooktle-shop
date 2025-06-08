@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import shop.bluebooktle.backend.book.entity.Book;
 import shop.bluebooktle.common.dto.book.BookSortType;
 import shop.bluebooktle.common.dto.elasticsearch.BookElasticSearchRegisterRequest;
+import shop.bluebooktle.common.dto.elasticsearch.BookElasticSearchUpdateRequest;
 
 public interface BookElasticSearchService {
 
@@ -22,7 +23,7 @@ public interface BookElasticSearchService {
 	// TODO 리뷰 등록 시 리뷰수 증가 및 평점 수정
 
 	// TODO 도서 수정 시 엘라스틱 도서 수정
-	void updateBook()
+	void updateBook(BookElasticSearchUpdateRequest request);
 
 	// 엘라스틱 도서 정보 삭제
 	void deleteBook(Book book);

@@ -1,6 +1,7 @@
 package shop.bluebooktle.backend.book.service.impl;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -35,7 +36,6 @@ import shop.bluebooktle.backend.book.service.BookTagService;
 import shop.bluebooktle.backend.book.service.PublisherService;
 import shop.bluebooktle.backend.elasticsearch.service.BookElasticSearchService;
 import shop.bluebooktle.common.dto.book.BookSortType;
-import shop.bluebooktle.common.dto.book.request.BookRegisterRequest;
 import shop.bluebooktle.common.dto.book.request.BookUpdateServiceRequest;
 import shop.bluebooktle.common.dto.book.response.AdminBookResponse;
 import shop.bluebooktle.common.dto.book.response.BookAllResponse;
@@ -46,6 +46,7 @@ import shop.bluebooktle.common.dto.book.response.CategoryResponse;
 import shop.bluebooktle.common.dto.book.response.PublisherInfoResponse;
 import shop.bluebooktle.common.dto.book.response.TagInfoResponse;
 import shop.bluebooktle.common.dto.book.response.author.AuthorResponse;
+import shop.bluebooktle.common.dto.elasticsearch.BookElasticSearchUpdateRequest;
 import shop.bluebooktle.common.exception.book.BookNotFoundException;
 import shop.bluebooktle.common.exception.book.BookSaleInfoNotFoundException;
 
@@ -125,7 +126,6 @@ public class BookServiceImpl implements BookService {
 
 	@Override
 	public void updateBook(Long bookId, BookUpdateServiceRequest request) {
-
 		Book book = bookRepository.findById(bookId)
 			.orElseThrow(BookNotFoundException::new);
 
@@ -162,15 +162,22 @@ public class BookServiceImpl implements BookService {
 		List<PublisherInfoResponse> publisherInfoResponses = bookPublisherService.updateBookPublisher(bookId,
 			request.getPublisherIdList()); // 출판사
 		bookCategoryService.updateBookCategory(bookId, request.getCategoryIdList());// 카테고리
+
+		List<String> tagNames = new ArrayList<>();
 		if (request.getTagIdList() != null && !request.getTagIdList().isEmpty()) {
 			List<TagInfoResponse> tagInfoResponses = bookTagService.updateBookTag(bookId, request.getTagIdList()); // 태그
+			tagNames = tagInfoResponses.stream()
+				.map(TagInfoResponse::getName)
+				.toList();
 		}
 		if (request.getImgUrl() != null && !request.getImgUrl().isBlank()) {
 			bookImgService.updateBookImg(bookId, request.getImgUrl()); // 이미지
 		}
 
 		// 엘라스틱 정보 수정
-
+		updateElasticsearch(book, updatedBookSaleInfo, authorResponses.stream().map(AuthorResponse::getName).toList(),
+			publisherInfoResponses.stream().map(PublisherInfoResponse::getName).toList(), tagNames,
+			request.getCategoryIdList());
 	}
 
 	@Override
@@ -236,7 +243,6 @@ public class BookServiceImpl implements BookService {
 			bookPage = bookElasticSearchService.searchBooksBySortOnly(bookSortType, page, size);
 			log.info("{}", bookPage);
 		}
-
 		List<BookInfoResponse> content = bookPage.getContent().stream()
 			.map(book -> {
 				BookSaleInfo bookSaleInfo = bookSaleInfoRepository.findByBook(book)
@@ -325,20 +331,6 @@ public class BookServiceImpl implements BookService {
 			quantity);
 	}
 
-	// //메인페이지에 표시될 정보(id, title, author, price, salePrice, imgUrl) 조회
-	// @Override
-	// @Transactional(readOnly = true)
-	// public Page<BookInfoResponse> getBooksForMainPage(Long bookId, Pageable pageable) {
-	// 	return bookRepository.findBooksForMainPage(bookId, pageable);
-	// }
-	//
-	// //제목으로 검색하여 표시될 정보(id, title, author, price, salePrice, imgUrl) 조회
-	// @Override
-	// @Transactional(readOnly = true)
-	// public Page<BookInfoResponse> searchBooksByTitle(String title, Pageable pageable) {
-	// 	return bookRepository.findBooksForSearchPageBytitle(title, pageable);
-	// }
-
 	private List<AuthorResponse> getAuthorsByBookId(Long bookId) {
 		return bookAuthorRepository.findByBookId(bookId)
 			.stream()
@@ -407,12 +399,19 @@ public class BookServiceImpl implements BookService {
 			.orElseThrow(BookNotFoundException::new);
 	}
 
-	private Book toEntity(BookRegisterRequest request) {
-		return Book.builder()
-			.title(request.getTitle())
-			.description(request.getDescription())
-			.isbn(request.getIsbn())
-			.publishDate(request.getPublishDate() != null ? request.getPublishDate().atStartOfDay() : null)
-			.build();
+	private void updateElasticsearch(Book book, BookSaleInfo bookSaleInfo, List<String> authorNames,
+		List<String> publisherNames, List<String> tagNames, List<Long> categoryIds) {
+		BookElasticSearchUpdateRequest request = new BookElasticSearchUpdateRequest(
+			book.getId(),
+			book.getTitle(),
+			book.getDescription(),
+			book.getPublishDate(),
+			bookSaleInfo.getSalePrice(),
+			authorNames,
+			publisherNames,
+			tagNames,
+			categoryIds
+		);
+		bookElasticSearchService.updateBook(request);
 	}
 }

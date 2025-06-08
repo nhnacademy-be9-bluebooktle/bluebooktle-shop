@@ -19,7 +19,6 @@ public class BookElasticSearchUpdateRequest {
 	String description;
 	LocalDateTime publishDate;
 	BigDecimal salePrice;
-	BigDecimal star;
 	List<String> authorNames;
 	List<String> publisherNames;
 	List<String> tagNames;

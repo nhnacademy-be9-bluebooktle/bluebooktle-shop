@@ -35,42 +35,51 @@ public class BookDocument {
 	@Field(type = FieldType.Long)
 	private Long id; // 도서 ID
 
+	@Setter
 	@Field(type = FieldType.Text)
 	private String title; // 도서명
 
+	@Setter
 	@Field(type = FieldType.Text)
 	private String description; // 도서설명
 
+	@Setter
 	@Field(type = FieldType.Date, format = {DateFormat.date_hour_minute_second_millis})
 	private LocalDateTime publishDate; // 발행일
 
+	@Setter
 	@Field(type = FieldType.Scaled_Float, scalingFactor = 100) // 소수점 둘째 자리까지 저장
 	private BigDecimal salePrice; // 판매가
 
+	@Setter
 	@Field(type = FieldType.Scaled_Float, scalingFactor = 10) // 소수점 첫째 자리까지 저장
 	private BigDecimal star; // 평점
 
-	@Field(type = FieldType.Long)
 	@Setter
+	@Field(type = FieldType.Long)
 	private Long viewCount; // 조회수
 
-	@Field(type = FieldType.Long)
 	@Setter
+	@Field(type = FieldType.Long)
 	private Long searchCount; // 검색횟수
 
-	@Field(type = FieldType.Long)
 	@Setter
+	@Field(type = FieldType.Long)
 	private Long reviewCount; // 리뷰수
 
+	@Setter
 	@Field(type = FieldType.Keyword)
 	private List<String> authorNames; // 작가 리스트
 
+	@Setter
 	@Field(type = FieldType.Keyword)
 	private List<String> publisherNames; // 출판사 리스트
 
+	@Setter
 	@Field(type = FieldType.Keyword)
 	private List<String> tagNames; // 태그 리스트
 
+	@Setter
 	@Field(type = FieldType.Long)
 	private List<Long> categoryIds; // 카테고리 ID 리스트
 
