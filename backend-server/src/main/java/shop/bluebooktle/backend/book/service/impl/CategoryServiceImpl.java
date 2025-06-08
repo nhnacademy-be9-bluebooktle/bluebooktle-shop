@@ -135,7 +135,7 @@ public class CategoryServiceImpl implements CategoryService {
 		List<Category> descendants = getAllDescendantCategories(category);
 		for (Category descendant : descendants) {
 			if (bookCategoryRepository.existsByCategory(descendant)) {
-				throw new CategoryCannotDeleteRootException("(도서가 등록된 하위 카테고리 존재시 삭제 불가");
+				throw new CategoryCannotDeleteRootException("(도서가 등록된 하위 카테고리 존재시 삭제 불가)");
 			}
 		}
 
@@ -216,7 +216,6 @@ public class CategoryServiceImpl implements CategoryService {
 
 	@Override
 	@Transactional(readOnly = true)
-	// 자기 자신도 포함되어 나가야 함
 	public List<CategoryResponse> getParentCategoriesByLeafCategoryId(Long leafCategoryId) {
 		List<Category> parents = new ArrayList<>();
 		List<CategoryResponse> parentcategories = new ArrayList<>();
@@ -248,7 +247,6 @@ public class CategoryServiceImpl implements CategoryService {
 	@Transactional(readOnly = true)
 	public Page<CategoryResponse> getCategories(Pageable pageable) {
 		Page<Category> categoryPage = categoryRepository.findAll(pageable);
-
 		return categoryPage.map(c ->
 			new CategoryResponse(c.getId(),
 				c.getName(),
@@ -298,7 +296,8 @@ public class CategoryServiceImpl implements CategoryService {
 	}
 
 	@Transactional(readOnly = true)
-	protected List<Category> getAllDescendantCategories(Category parent) {
+	@Override
+	public List<Category> getAllDescendantCategories(Category parent) {
 		List<Category> result = new ArrayList<>();
 		collectDescendants(parent, result);
 		return result;
@@ -310,7 +309,7 @@ public class CategoryServiceImpl implements CategoryService {
 			if (Objects.isNull(child))
 				return;
 			result.add(child);
-			collectDescendants(child, result); // 재귀 호출로 카테고리에 있는 모든 하위 카테고리를 추가
+			collectDescendants(child, result);
 		}
 	}
 

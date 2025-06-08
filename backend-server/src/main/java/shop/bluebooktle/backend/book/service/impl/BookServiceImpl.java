@@ -34,6 +34,7 @@ import shop.bluebooktle.backend.book.service.BookService;
 import shop.bluebooktle.backend.book.service.BookTagService;
 import shop.bluebooktle.backend.book.service.PublisherService;
 import shop.bluebooktle.backend.elasticsearch.service.BookElasticSearchService;
+import shop.bluebooktle.common.dto.book.BookSortType;
 import shop.bluebooktle.common.dto.book.request.BookRegisterRequest;
 import shop.bluebooktle.common.dto.book.request.BookUpdateServiceRequest;
 import shop.bluebooktle.common.dto.book.response.AdminBookResponse;
@@ -80,6 +81,9 @@ public class BookServiceImpl implements BookService {
 		// 도서 조회
 		Book book = bookRepository.findById(bookId)
 			.orElseThrow(BookNotFoundException::new);
+
+		// 엘라스틱 서치 조회수 증가
+		bookElasticSearchService.updateViewCount(book);
 
 		// 도서 판매 정보 조회
 		BookSaleInfo saleInfo = bookSaleInfoRepository.findByBookId(book.getId())
@@ -153,15 +157,19 @@ public class BookServiceImpl implements BookService {
 			.build();
 		bookSaleInfoRepository.save(updatedBookSaleInfo);
 
-		bookAuthorService.updateBookAuthor(bookId, request.getAuthorIdList()); // 작가
-		bookPublisherService.updateBookPublisher(bookId, request.getPublisherIdList()); // 출판사
+		List<AuthorResponse> authorResponses = bookAuthorService.updateBookAuthor(bookId,
+			request.getAuthorIdList()); // 작가
+		List<PublisherInfoResponse> publisherInfoResponses = bookPublisherService.updateBookPublisher(bookId,
+			request.getPublisherIdList()); // 출판사
 		bookCategoryService.updateBookCategory(bookId, request.getCategoryIdList());// 카테고리
 		if (request.getTagIdList() != null && !request.getTagIdList().isEmpty()) {
-			bookTagService.updateBookTag(bookId, request.getTagIdList()); // 태그
+			List<TagInfoResponse> tagInfoResponses = bookTagService.updateBookTag(bookId, request.getTagIdList()); // 태그
 		}
 		if (request.getImgUrl() != null && !request.getImgUrl().isBlank()) {
 			bookImgService.updateBookImg(bookId, request.getImgUrl()); // 이미지
 		}
+
+		// 엘라스틱 정보 수정
 
 	}
 
@@ -173,8 +181,9 @@ public class BookServiceImpl implements BookService {
 
 		// book 삭제시 관련 BookSaleInfo 함께 삭제
 		bookSaleInfoRepository.findByBook(book).ifPresent(bookSaleInfoRepository::delete);
-
 		bookRepository.delete(book);
+		// 엘라스틱 서치 도서 삭제
+		bookElasticSearchService.deleteBook(book);
 	}
 
 	//도서 연관 데이터 한번에 id로조회
@@ -212,16 +221,19 @@ public class BookServiceImpl implements BookService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public Page<BookInfoResponse> findAllBooks(int page, int size, String searchKeyword) {
+	public Page<BookInfoResponse> findAllBooks(int page, int size, String searchKeyword, BookSortType bookSortType) {
 		Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
 		Page<Book> bookPage;
 
 		if (StringUtils.hasText(searchKeyword)) {
 			// 엘라스틱 서치 검색 기능
-			bookPage = bookElasticSearchService.searchBookByKeyword(searchKeyword, page, size);
+			bookPage = bookElasticSearchService.searchBooksByKeywordAndSort(searchKeyword, bookSortType, page, size);
+			// 검색횟수 증가
+			bookElasticSearchService.updateSearchCount(bookPage.getContent());
+
 			log.info("{}", bookPage);
 		} else {
-			bookPage = bookRepository.findAll(pageable);
+			bookPage = bookElasticSearchService.searchBooksBySortOnly(bookSortType, page, size);
 			log.info("{}", bookPage);
 		}
 
@@ -259,7 +271,7 @@ public class BookServiceImpl implements BookService {
 		Page<Book> bookPage;
 
 		if (StringUtils.hasText(searchKeyword)) {
-			bookPage = bookElasticSearchService.searchBookByKeyword(searchKeyword, page, size);
+			bookPage = bookElasticSearchService.searchBooksByKeyword(searchKeyword, page, size);
 			log.info("{}", bookPage);
 		} else {
 			bookPage = bookRepository.findAll(pageable);

@@ -193,7 +193,8 @@ public enum ErrorCode {
 	DELIVERY_RULE_ALREADY_EXISTS(HttpStatus.CONFLICT, "D004", "해당 이름의 배송정책이 존재합니다."),
 
 	// Elasticsearch Error (엘라스틱 서치 오류) - E
-	ELASTIC_SEARCH_SAVE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "E001", "Elasticsearch에 저장을 실패하였습니다.");
+	ELASTIC_SEARCH_SAVE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "E001", "Elasticsearch에 도서 저장을 실패하였습니다."),
+	ELASTIC_SEARCH_BOOK_NOT_FOUND(HttpStatus.NOT_FOUND, "E002", "Elasticsearch에 해당 도서를 찾을 수 없습니다.");
 
 	private final HttpStatus status; // HTTP 상태 코드
 	private final String code;       // 고유 오류 코드 (클라이언트 사용)

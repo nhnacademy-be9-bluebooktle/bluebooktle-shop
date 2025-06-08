@@ -2,6 +2,7 @@ package shop.bluebooktle.backend.book.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -21,6 +22,9 @@ import shop.bluebooktle.backend.book.repository.BookRepository;
 import shop.bluebooktle.backend.book.repository.BookSaleInfoRepository;
 import shop.bluebooktle.backend.book.repository.CategoryRepository;
 import shop.bluebooktle.backend.book.service.BookCategoryService;
+import shop.bluebooktle.backend.book.service.CategoryService;
+import shop.bluebooktle.backend.elasticsearch.service.BookElasticSearchService;
+import shop.bluebooktle.common.dto.book.BookSortType;
 import shop.bluebooktle.common.dto.book.request.BookInfoRequest;
 import shop.bluebooktle.common.dto.book.response.BookInfoResponse;
 import shop.bluebooktle.common.dto.book.response.CategoryResponse;
@@ -42,6 +46,9 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 	private final BookAuthorRepository bookAuthorRepository;
 	private final BookSaleInfoRepository bookSaleInfoRepository;
 	private final BookImgRepository bookImgRepository;
+
+	private CategoryService categoryService;
+	private BookElasticSearchService bookElasticSearchService;
 
 	@Override
 	public void registerBookCategory(Long bookId, Long categoryId) {
@@ -139,9 +146,16 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public Page<BookInfoResponse> searchBooksByCategory(Long categoryId, Pageable pageable) {
+	public Page<BookInfoResponse> searchBooksByCategory(Long categoryId, Pageable pageable, BookSortType bookSortType) {
 		Category category = requireCategory(categoryId);
-		Page<Book> bookPage = bookCategoryRepository.findBookUnderCategory(categoryId, pageable);
+		List<Long> categoryIds = categoryService.getAllDescendantCategories(category).stream()
+			.map(Category::getId)
+			.collect(Collectors.toCollection(ArrayList::new));
+		categoryIds.add(category.getId());
+
+		// 엘라스틱에서 도서 찾기
+		Page<Book> bookPage = bookElasticSearchService.searchBooksByCategoryAndSort(categoryIds, bookSortType,
+			pageable.getPageNumber(), pageable.getPageSize());
 		List<BookInfoResponse> responseList = bookPage.getContent().stream()
 			.map(book -> {
 				BookSaleInfo bookSaleInfo = bookSaleInfoRepository.findByBook(book)

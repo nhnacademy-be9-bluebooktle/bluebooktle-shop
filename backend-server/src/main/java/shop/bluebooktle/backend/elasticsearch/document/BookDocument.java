@@ -16,6 +16,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import shop.bluebooktle.backend.book.entity.Book;
 import shop.bluebooktle.backend.book.entity.BookAuthor;
 import shop.bluebooktle.backend.book.entity.BookCategory;
@@ -50,12 +51,15 @@ public class BookDocument {
 	private BigDecimal star; // 평점
 
 	@Field(type = FieldType.Long)
+	@Setter
 	private Long viewCount; // 조회수
 
 	@Field(type = FieldType.Long)
+	@Setter
 	private Long searchCount; // 검색횟수
 
 	@Field(type = FieldType.Long)
+	@Setter
 	private Long reviewCount; // 리뷰수
 
 	@Field(type = FieldType.Keyword)

@@ -65,12 +65,12 @@ public class BookAuthorServiceImpl implements BookAuthorService {
 	}
 
 	@Override
-	public void updateBookAuthor(Long bookId, List<Long> authorIdList) {
+	public List<AuthorResponse> updateBookAuthor(Long bookId, List<Long> authorIdList) {
 		// 도서에 등록되었던 기존 작가 삭제
 		List<BookAuthor> bookAuthorList = bookAuthorRepository.findByBookId(bookId);
 		bookAuthorRepository.deleteAll(bookAuthorList);
 		// 다시 새롭게 등록
-		registerBookAuthor(bookId, authorIdList);
+		return registerBookAuthor(bookId, authorIdList);
 	}
 
 	@Transactional(readOnly = true)

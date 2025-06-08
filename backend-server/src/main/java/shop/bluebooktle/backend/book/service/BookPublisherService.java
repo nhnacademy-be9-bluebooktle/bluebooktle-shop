@@ -15,7 +15,7 @@ public interface BookPublisherService {
 
 	List<PublisherInfoResponse> registerBookPublisher(Long bookId, List<Long> publisherIdList);
 
-	void updateBookPublisher(Long bookId, List<Long> publisherIdList);
+	List<PublisherInfoResponse> updateBookPublisher(Long bookId, List<Long> publisherIdList);
 
 	// 도서 출판사 삭제
 	void deleteBookPublisher(Long bookId, Long publisherId);

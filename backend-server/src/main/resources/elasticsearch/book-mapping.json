@@ -5,13 +5,13 @@
     },
     "title": {
       "type": "text",
-      "analyzer": "search_custom",
-      "search_analyzer": "search_korean_synonym"
+      "analyzer": "index_analyzer",
+      "search_analyzer": "search_analyzer_with_synonym"
     },
     "description": {
       "type": "text",
-      "analyzer": "search_custom",
-      "search_analyzer": "search_korean_synonym"
+      "analyzer": "index_analyzer",
+      "search_analyzer": "search_analyzer_with_synonym"
     },
     "authorNames": {
       "type": "keyword"

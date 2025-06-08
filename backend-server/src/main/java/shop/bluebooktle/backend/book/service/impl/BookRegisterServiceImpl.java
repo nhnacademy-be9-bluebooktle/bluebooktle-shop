@@ -26,11 +26,11 @@ import shop.bluebooktle.backend.book.service.PublisherService;
 import shop.bluebooktle.backend.elasticsearch.service.BookElasticSearchService;
 import shop.bluebooktle.common.dto.book.request.BookAllRegisterByAladinRequest;
 import shop.bluebooktle.common.dto.book.request.BookAllRegisterRequest;
-import shop.bluebooktle.common.dto.book.request.BookElasticSearchRegisterRequest;
 import shop.bluebooktle.common.dto.book.response.AladinBookResponse;
 import shop.bluebooktle.common.dto.book.response.PublisherInfoResponse;
 import shop.bluebooktle.common.dto.book.response.TagInfoResponse;
 import shop.bluebooktle.common.dto.book.response.author.AuthorResponse;
+import shop.bluebooktle.common.dto.elasticsearch.BookElasticSearchRegisterRequest;
 import shop.bluebooktle.common.exception.book.AladinBookNotFoundException;
 import shop.bluebooktle.common.exception.book.BookAlreadyExistsException;
 
@@ -200,6 +200,6 @@ public class BookRegisterServiceImpl implements BookRegisterService {
 			tagNames,
 			categoryIds
 		);
-		bookElasticSearchService.create(request);
+		bookElasticSearchService.registerBook(request);
 	}
 }

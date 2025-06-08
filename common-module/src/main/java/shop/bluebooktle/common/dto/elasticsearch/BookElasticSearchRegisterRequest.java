@@ -1,4 +1,4 @@
-package shop.bluebooktle.common.dto.book.request;
+package shop.bluebooktle.common.dto.elasticsearch;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

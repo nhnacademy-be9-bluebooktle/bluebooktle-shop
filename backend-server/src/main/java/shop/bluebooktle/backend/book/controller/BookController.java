@@ -19,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import shop.bluebooktle.backend.book.service.BookRegisterService;
 import shop.bluebooktle.backend.book.service.BookService;
+import shop.bluebooktle.common.dto.book.BookSortType;
 import shop.bluebooktle.common.dto.book.request.BookAllRegisterRequest;
 import shop.bluebooktle.common.dto.book.request.BookUpdateServiceRequest;
 import shop.bluebooktle.common.dto.book.response.AdminBookResponse;
@@ -82,9 +83,10 @@ public class BookController {
 	public ResponseEntity<JsendResponse<PaginationData<BookInfoResponse>>> getPagedBooks(
 		@RequestParam("page") int page,
 		@RequestParam("size") int size,
-		@RequestParam(value = "searchKeyword", required = false) String searchKeyword
+		@RequestParam(value = "searchKeyword", required = false) String searchKeyword,
+		@RequestParam("bookSortType") BookSortType bookSortType
 	) {
-		Page<BookInfoResponse> responses = bookService.findAllBooks(page, size, searchKeyword);
+		Page<BookInfoResponse> responses = bookService.findAllBooks(page, size, searchKeyword, bookSortType);
 		PaginationData<BookInfoResponse> paginationData = new PaginationData<>(responses);
 		return ResponseEntity.ok(JsendResponse.success(paginationData));
 	}

@@ -12,7 +12,7 @@ public interface BookAuthorService {
 
 	List<AuthorResponse> registerBookAuthor(Long bookId, List<Long> authorIdList);
 
-	void updateBookAuthor(Long bookId, List<Long> authorIdList);
+	List<AuthorResponse> updateBookAuthor(Long bookId, List<Long> authorIdList);
 
 	// 특정 도서의 모든 작가 목록 조회
 	List<AuthorResponse> getAuthorByBookId(Long bookId);

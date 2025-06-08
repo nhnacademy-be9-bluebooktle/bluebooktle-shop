@@ -15,6 +15,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import shop.bluebooktle.common.domain.point.PointSourceTypeEnum;
+import shop.bluebooktle.common.dto.book.BookSortType;
 import shop.bluebooktle.common.dto.book.response.BookDetailResponse;
 import shop.bluebooktle.common.dto.book.response.BookInfoResponse;
 import shop.bluebooktle.common.dto.book.response.CategoryResponse;
@@ -37,10 +38,11 @@ public class BookController {
 	@GetMapping("/books")
 	public String bookListPage(
 		Model model,
-		@RequestParam(required = false) String query,
 		@RequestParam(value = "page", defaultValue = "0") int page,
 		@RequestParam(value = "size", defaultValue = "20") int size,
-		@RequestParam(value = "searchKeyword", required = false) String searchKeyword) {
+		@RequestParam(value = "searchKeyword", required = false) String searchKeyword,
+		@RequestParam(defaultValue = "POPULARITY") BookSortType bookSortType
+	) {
 
 		Page<BookInfoResponse> pagedBooks = bookService.getPagedBooks(page, size, searchKeyword);
 		log.info("pagedBooks: {}", pagedBooks);
@@ -49,9 +51,11 @@ public class BookController {
 		log.info("pagedBooks: {}", pagedBooks.getNumberOfElements());
 		log.info("pagedBooks: {}", pagedBooks.getContent());
 
+		model.addAttribute("sortTypes", BookSortType.values());
+		model.addAttribute("bookSortType", bookSortType);
 		model.addAttribute("searchKeyword", searchKeyword);
 		model.addAttribute("size", size);
-		model.addAttribute("filterCount", /* 실제 필터 개수 */ 0);
+		model.addAttribute("filterCount", 6);
 		model.addAttribute("pagedBooks", pagedBooks);
 
 		return "book/book_list";
