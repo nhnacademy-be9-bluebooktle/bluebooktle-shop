@@ -17,4 +17,6 @@ public interface OrderService {
 	void cancelOrder(String orderKey);
 
 	OrderDetailResponse getOrderDetailByOrderKey(String orderKey);
+
+	OrderConfirmDetailResponse getOrderByKey(String orderKey);
 }

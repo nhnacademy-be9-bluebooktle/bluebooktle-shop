@@ -28,7 +28,6 @@ import shop.bluebooktle.common.dto.book.request.BookUpdateServiceRequest;
 import shop.bluebooktle.common.dto.book.response.AdminBookResponse;
 import shop.bluebooktle.common.dto.book.response.AladinBookResponse;
 import shop.bluebooktle.common.dto.book.response.BookAllResponse;
-import shop.bluebooktle.common.dto.book.response.BookInfoResponse;
 import shop.bluebooktle.common.dto.book.response.img.ImgResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
 import shop.bluebooktle.frontend.repository.AdminAladinBookRepository;
@@ -49,19 +48,6 @@ public class AdminBookServiceImpl implements AdminBookService {
 	private final AdminAladinBookRepository adminAladinBookRepository;
 	private final BookImgRepository bookImgRepository;
 	private final ImgRepository imgRepository;
-
-	@Override
-	public Page<BookInfoResponse> getPagedBooks(int page, int size, String searchKeyword) {
-		Pageable pageable = PageRequest.of(page, size);
-
-		String keyword = null;
-		if (searchKeyword != null && !searchKeyword.isBlank()) {
-			keyword = searchKeyword;
-		}
-		PaginationData<BookInfoResponse> data = adminBookRepository.getPagedBooks(page, size, keyword);
-		List<BookInfoResponse> categories = data.getContent();
-		return new PageImpl<>(categories, pageable, data.getTotalElements());
-	}
 
 	@Override
 	public Page<AdminBookResponse> getPagedBooksByAdmin(int page, int size, String searchKeyword) {

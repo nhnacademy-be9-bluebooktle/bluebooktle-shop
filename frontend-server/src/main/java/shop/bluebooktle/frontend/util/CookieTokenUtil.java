@@ -1,9 +1,13 @@
 package shop.bluebooktle.frontend.util;
 
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 
 import jakarta.servlet.http.Cookie;
@@ -74,5 +78,24 @@ public class CookieTokenUtil {
 		cookie.setPath("/");
 		cookie.setMaxAge(0);
 		response.addCookie(cookie);
+	}
+
+	public static final String GUEST_ID_COOKIE_NAME = "GUEST_ID";
+
+	public String getOrCreateGuestId(HttpServletRequest request, HttpServletResponse response) {
+		Optional<String> existing = getCookieValue(request, GUEST_ID_COOKIE_NAME);
+		if (existing.isPresent()) {
+			return existing.get();
+		}
+
+		String guestId = UUID.randomUUID().toString();
+		ResponseCookie cookie = ResponseCookie.from(GUEST_ID_COOKIE_NAME, guestId)
+			.httpOnly(true)
+			.path("/")
+			.maxAge(Duration.ofDays(7))
+			.build();
+		response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+
+		return guestId;
 	}
 }

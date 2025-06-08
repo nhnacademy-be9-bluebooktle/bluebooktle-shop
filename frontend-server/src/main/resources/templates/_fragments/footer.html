@@ -8,17 +8,18 @@
                 <h2 class="logo-main-kitsch display-font-kitsch">Blue<span class="logo-alt-color-kitsch">Book</span>tle
                 </h2>
             </a>
-            <p class="handwriting-font-kitsch">즐거운 책 읽기, 키치한 스타일로!</p>
+            <p class="handwriting-font-kitsch">즐거운 책 읽기, 블루북틀과 함께!</p>
         </div>
         <div class="footer-links-kitsch">
-            <a th:href="@{/legal/terms}">이용약관</a>
-            <a th:href="@{/legal/privacy}">개인정보처리방침</a>
-            <a th:href="@{/support/faq}">고객센터</a>
+            <a href="/legal/terms.html" target="_blank">이용약관</a>
+            <a href="/legal/privacy.html" target="_blank">개인정보처리방침</a>
+            <a href="/support/faq.html" target="_blank">고객센터</a>
         </div>
         <div class="footer-social-kitsch">
-            <a href="#" target="_blank" title="Instagram"><i class="fab fa-instagram"></i></a>
-            <a href="#" target="_blank" title="Twitter"><i class="fab fa-twitter"></i></a>
-            <a href="#" target="_blank" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+            <a href="https://github.com/nhnacademy-be9-bluebooktle" target="_blank" title="github"><i
+                    class="fab fa-github"></i></a>
+            <a href="https://sites.google.com/g.cnu.ac.kr/nhn/6%EA%B8%B0-%EA%B5%90%EC%9C%A1%EC%9A%B4%EC%98%81?authuser=0"
+               target="_blank" title="sw-academy"><i class="fab fa-solid fa-globe"></i></a>
         </div>
         <div class="footer-copyright-kitsch pixel-font-kitsch">
             &copy; <span th:text="${#dates.year(#dates.createNow())}">2024</span> Bluebooktle. All Rights Reserved.

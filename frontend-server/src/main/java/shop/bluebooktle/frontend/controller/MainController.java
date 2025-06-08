@@ -1,46 +1,48 @@
 package shop.bluebooktle.frontend.controller;
 
-import java.time.Duration;
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.UUID;
-
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseCookie;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import shop.bluebooktle.frontend.service.AdminCategoryService;
+import lombok.extern.slf4j.Slf4j;
+import shop.bluebooktle.common.dto.book.response.BookInfoResponse;
+import shop.bluebooktle.common.dto.book.response.CategoryResponse;
+import shop.bluebooktle.frontend.service.BookService;
 
+@Slf4j
 @Controller
 @RequiredArgsConstructor
 public class MainController {
 
-	private final AdminCategoryService adminCategoryService;
+	private final BookService bookService;
 
 	@GetMapping("/")
 	public String mainPage(
 		Model model,
 		HttpServletRequest request,
-		HttpServletResponse response
+		HttpServletResponse response,
+		@RequestParam(value = "page", defaultValue = "0") int page,
+		@RequestParam(value = "size", defaultValue = "20") int size
 	) {
-		boolean hasGuestId = Arrays.stream(Optional.ofNullable(request.getCookies()).orElse(new Cookie[0]))
-			.anyMatch(cookie -> "GUEST_ID".equals(cookie.getName()));
+		Long hotCategoryId = 65L;
 
-		if (!hasGuestId) {
-			String guestId = UUID.randomUUID().toString();
-			ResponseCookie cookie = ResponseCookie.from("GUEST_ID", guestId)
-				.httpOnly(true)
-				.path("/")
-				.maxAge(Duration.ofDays(7))
-				.build();
-			response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
-		}
+		// HOT 도서: 카테고리 기반
+		Page<BookInfoResponse> hotBooks = bookService.getPagedBooksByCategoryId(page, size, hotCategoryId);
+		CategoryResponse hotCategory = bookService.getCategoryById(hotCategoryId);
+
+		// NEW 도서: 전체 최신 도서
+		Page<BookInfoResponse> newBooks = bookService.getPagedBooks(page, size, "");
+
+		model.addAttribute("hotBooks", hotBooks);
+		model.addAttribute("hotCategory", hotCategory);
+		model.addAttribute("newBooks", newBooks);
+		model.addAttribute("size", size);
+
 		return "main";
 	}
 }

@@ -45,4 +45,9 @@ public class OrderServiceImpl implements OrderService {
 		return orderRepository.getOrderDetailByOrderKey(orderKey);
 	}
 
+
+	@Override
+	public OrderConfirmDetailResponse getOrderByKey(String orderKey) {
+		return orderRepository.getOrderByKey(orderKey);
+	}
 }

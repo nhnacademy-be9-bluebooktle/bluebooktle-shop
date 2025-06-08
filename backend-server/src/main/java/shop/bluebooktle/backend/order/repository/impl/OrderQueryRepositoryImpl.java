@@ -13,6 +13,7 @@ import static shop.bluebooktle.common.entity.auth.QUser.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.math.BigDecimal;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -27,6 +28,9 @@ import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
+import shop.bluebooktle.backend.book_order.entity.QBookOrder;
+import shop.bluebooktle.backend.book_order.entity.QOrderPackaging;
+import shop.bluebooktle.backend.book_order.entity.QPackagingOption;
 import shop.bluebooktle.backend.order.entity.Order;
 import shop.bluebooktle.backend.order.repository.OrderQueryRepository;
 import shop.bluebooktle.common.domain.order.AdminOrderSearchType;
@@ -148,5 +152,24 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
 			return null;
 		}
 		return order.createdAt.between(startDate.atStartOfDay(), endDate.atTime(LocalTime.MAX));
+	}
+
+	@Override
+	public BigDecimal findTotalPackagingPriceByOrderId(Long orderId) {
+		QOrderPackaging orderPackaging = QOrderPackaging.orderPackaging;
+		QPackagingOption packagingOption = QPackagingOption.packagingOption;
+		QBookOrder bookOrder = QBookOrder.bookOrder;
+
+		Integer totalPackagingPrice = queryFactory
+			.select(
+				orderPackaging.quantity.multiply(packagingOption.price).sum()
+			)
+			.from(orderPackaging)
+			.join(orderPackaging.packagingOption, packagingOption)
+			.join(orderPackaging.bookOrder, bookOrder)
+			.where(bookOrder.order.id.eq(orderId))
+			.fetchOne();
+
+		return totalPackagingPrice != null ? BigDecimal.valueOf(totalPackagingPrice) : BigDecimal.ZERO;
 	}
 }

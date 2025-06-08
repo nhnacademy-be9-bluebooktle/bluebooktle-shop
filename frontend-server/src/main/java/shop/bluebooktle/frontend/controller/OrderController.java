@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -19,7 +18,6 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import shop.bluebooktle.common.dto.book.response.BookCartOrderResponse;
@@ -32,7 +30,6 @@ import shop.bluebooktle.common.dto.order.response.OrderConfirmDetailResponse;
 import shop.bluebooktle.common.dto.payment.request.PaymentConfirmRequest;
 import shop.bluebooktle.common.dto.payment.response.PaymentConfirmResponse;
 import shop.bluebooktle.common.dto.user.response.UserWithAddressResponse;
-import shop.bluebooktle.common.exception.cart.GuestUserNotFoundException;
 import shop.bluebooktle.frontend.service.AdminPackagingOptionService;
 import shop.bluebooktle.frontend.service.BookService;
 import shop.bluebooktle.frontend.service.CartService;
@@ -57,7 +54,7 @@ public class OrderController {
 	private final CartService cartService;
 	private final CouponService couponService;
 
-	@Value("{toss.client-key}")
+	@Value("${toss.client-key}")
 	private String tossPaymentClientKey;
 
 	@GetMapping("/create")
@@ -183,35 +180,59 @@ public class OrderController {
 	public String processOrder(
 		@RequestParam String paymentKey,
 		@RequestParam String orderId,
-		@RequestParam Integer amount,
+		@RequestParam Long amount,
 		RedirectAttributes redirectAttributes
 	) {
+
 		PaymentConfirmRequest req = new PaymentConfirmRequest(paymentKey, orderId, amount);
-		PaymentConfirmResponse resp = paymentsService.confirm(req);
-		redirectAttributes.addFlashAttribute("orderData", resp);
-		return "redirect:/order/complete";
+
+		try {
+			PaymentConfirmResponse resp = paymentsService.confirm(req);
+			redirectAttributes.addFlashAttribute("orderData", resp);
+			return "redirect:/order/complete/" + resp.orderId();
+		} catch (Exception e) {
+			redirectAttributes.addFlashAttribute("GlobalErrorMessage", "결제에 실패했습니다: " + e.getMessage());
+			return "redirect:/mypage/orders";
+		}
 	}
 
-	@GetMapping("/complete")
-	public String orderCompletePage(@Valid @ModelAttribute("orderData") PaymentConfirmResponse data,
-		BindingResult bindingResult) {
-		if (bindingResult.hasErrors()) {
-			return "order/fail";
-		}
+	@GetMapping("/complete/{orderKey}")
+	public String orderCompletePage(@PathVariable String orderKey, Model model, RedirectAttributes redirectAttributes
+	) {
+		try {
+			OrderConfirmDetailResponse fullDetails = orderService.getOrderByKey(orderKey);
 
-		return "order/complete";
+			model.addAttribute("orderKey", fullDetails.getOrderKey());
+			model.addAttribute("totalAmount", fullDetails.getPaidAmount());
+			model.addAttribute("paymentMethod", fullDetails.getPaymentMethod());
+			model.addAttribute("fullAddress", fullDetails.getAddress() + " " + fullDetails.getDetailAddress());
+			model.addAttribute("orderedItems", fullDetails.getOrderItems());
+			if (fullDetails.getOrdererName() != null) {
+				model.addAttribute("ordererNickname", fullDetails.getOrdererName());
+			} else {
+				model.addAttribute("ordererNickname", "비회원");
+			}
+			return "order/complete";
+		} catch (Exception e) {
+			redirectAttributes.addFlashAttribute("GlobalErrorMessage", "주문 정보를 조회할 수 없습니다.");
+			return "redirect:mypage/order";
+		}
 	}
 
 	@GetMapping("/fail")
-	public String orderFailPage() {
+	public String orderFailPage(
+		@RequestParam(name = "code", required = false) String code,
+		@RequestParam(name = "message", required = false) String message,
+		RedirectAttributes redirectAttributes
+	) {
 
-		return "order/fail";
-	}
-
-	private void validateGuestId(String guestId) {
-		if (guestId == null || guestId.isBlank()) {
-			log.warn("GUEST_ID 쿠키가 존재하지 않습니다.");
-			throw new GuestUserNotFoundException("guestId가 존재하지 않습니다. 쿠키를 발급받아야 합니다.");
+		if (message != null && !message.isBlank()) {
+			redirectAttributes.addFlashAttribute("GlobalErrorTitle", code);
+			redirectAttributes.addFlashAttribute("GlobalErrorMessage", message);
+		} else {
+			redirectAttributes.addFlashAttribute("GlobalErrorMessage", "알 수 없는 오류로 결제에 실패했습니다.");
 		}
+		return "redirect:mypage/orders";
 	}
+
 }

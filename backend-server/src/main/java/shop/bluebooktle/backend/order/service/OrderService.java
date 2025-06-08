@@ -34,4 +34,9 @@ public interface OrderService {
 
 	Page<AdminOrderListResponse> searchOrders(AdminOrderSearchRequest searchRequest, Pageable pageable);
 
+	OrderConfirmDetailResponse getOrderByKey(String orderKey, Long userId);
+
+	OrderConfirmDetailResponse getOrderById(Long orderId, Long userId);
+
+	void shipOrder(Long orderId);
 }

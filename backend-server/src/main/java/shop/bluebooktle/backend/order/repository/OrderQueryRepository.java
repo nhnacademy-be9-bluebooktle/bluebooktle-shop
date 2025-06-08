@@ -1,5 +1,6 @@
 package shop.bluebooktle.backend.order.repository;
 
+import java.math.BigDecimal;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -14,5 +15,7 @@ public interface OrderQueryRepository {
 	Optional<Order> findOrderDetailsByOrderKey(String orderKey);
 
 	Page<Order> searchOrders(AdminOrderSearchRequest searchRequest, Pageable pageable);
+
+	BigDecimal findTotalPackagingPriceByOrderId(Long orderId);
 
 }
