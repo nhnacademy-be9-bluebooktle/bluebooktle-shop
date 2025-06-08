@@ -34,6 +34,16 @@ public class UserCouponServiceImpl implements UserCouponService {
 	}
 
 	@Override
+	public Long countAllUsableCoupons(Long userId) {
+		return userCouponRepository.couponAllUsableCoupons(userId);
+	}
+
+	@Override
+	public Long countExpiringThisMonth(Long userId) {
+		return userCouponRepository.couponExpiringThisMonth(userId);
+	}
+
+	@Override
 	@Transactional
 	public void useCoupon(Long id) {
 		UserCoupon userCoupon = userCouponRepository.findById(id)

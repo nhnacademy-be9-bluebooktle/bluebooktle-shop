@@ -16,6 +16,10 @@ public interface UserCouponService {
 	// 주문에 해당하는 쿠폰 조회
 	UsableUserCouponMapResponse getUsableCouponsForOrder(Long userId, List<Long> bookIds);
 
+	Long countAllUsableCoupons(Long userId);
+
+	Long countExpiringThisMonth(Long userId);
+
 	// 쿠폰 사용 - used_at = now
 	void useCoupon(Long id);
 

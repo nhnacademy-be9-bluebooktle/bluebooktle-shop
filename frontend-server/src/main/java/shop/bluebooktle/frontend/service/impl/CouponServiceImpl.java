@@ -33,6 +33,16 @@ public class CouponServiceImpl implements CouponService {
 	}
 
 	@Override
+	public Long countAllUsableCoupons() {
+		return couponRepository.countAllUsableCoupons();
+	}
+
+	@Override
+	public Long countExpiringThisMonth() {
+		return couponRepository.countExpiringThisMonth();
+	}
+
+	@Override
 	public void useCoupon(Long id) {
 		couponRepository.useCoupon(id);
 	}

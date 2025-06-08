@@ -58,6 +58,22 @@ public class UserCouponController {
 		return ResponseEntity.ok(JsendResponse.success(response));
 	}
 
+	@Operation(summary = "사용 가능 쿠폰 개수 조회", description = "현재 시점 기준으로 사용 가능한 모든 쿠폰의 개수를 반환합니다.")
+	@GetMapping("/count/usable")
+	public ResponseEntity<JsendResponse<Long>> countAllUsableCoupons(
+		@AuthenticationPrincipal UserPrincipal userPrincipal) {
+		Long count = userCouponService.countAllUsableCoupons(userPrincipal.getUserId());
+		return ResponseEntity.ok(JsendResponse.success(count));
+	}
+
+	@Operation(summary = "이번 달 내 소멸 예정 쿠폰 개수 조회", description = "이번 달 안에 소멸 예정인 쿠폰의 개수를 반환합니다.")
+	@GetMapping("/count/expiring")
+	public ResponseEntity<JsendResponse<Long>> countExpiringThisMonth(
+		@AuthenticationPrincipal UserPrincipal userPrincipal) {
+		Long count = userCouponService.countExpiringThisMonth(userPrincipal.getUserId());
+		return ResponseEntity.ok(JsendResponse.success(count));
+	}
+
 	@Operation(summary = "쿠폰 사용", description = "유저가 보유한 쿠폰 중 주문에 해당하는 쿠폰을 사용합니다.")
 	@PostMapping("/{id}/use")
 	public ResponseEntity<Void> useCoupon(@PathVariable Long id) {

@@ -3,6 +3,8 @@ package shop.bluebooktle.backend.coupon.repository.impl;
 import static com.querydsl.core.types.dsl.Expressions.*;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.temporal.TemporalAdjusters;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -194,6 +196,40 @@ public class UserCouponQueryRepositoryImpl implements UserCouponQueryRepository 
 				t -> t.get(book.id),
 				Collectors.mapping(t -> t.get(category.categoryPath), Collectors.toList())
 			));
+	}
+
+	@Override
+	public Long couponAllUsableCoupons(Long userId) {
+		QUserCoupon userCoupon = QUserCoupon.userCoupon;
+		LocalDateTime now = LocalDateTime.now();
+
+		return queryFactory
+			.select(userCoupon.count())
+			.from(userCoupon)
+			.where(
+				userCoupon.user.id.eq(userId),
+				userCoupon.usedAt.isNull(),
+				userCoupon.availableStartAt.loe(now),
+				userCoupon.availableEndAt.goe(now)
+			)
+			.fetchOne();
+	}
+
+	@Override
+	public Long couponExpiringThisMonth(Long userId) {
+		QUserCoupon uc = QUserCoupon.userCoupon;
+		LocalDateTime now = LocalDateTime.now();
+		LocalDateTime endOfMonth = now.with(TemporalAdjusters.lastDayOfMonth()).with(LocalTime.MAX);
+
+		return queryFactory
+			.select(uc.count())
+			.from(uc)
+			.where(
+				uc.user.id.eq(userId),
+				uc.usedAt.isNull(),
+				uc.availableEndAt.between(now, endOfMonth)
+			)
+			.fetchOne();
 	}
 }
 
