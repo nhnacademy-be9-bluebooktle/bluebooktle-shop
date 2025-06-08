@@ -34,7 +34,7 @@ public interface OrderRepository {
 	@PostMapping("/{orderKey}/cancel")
 	void cancelOrder(@PathVariable String orderKey);
 
-	@GetMapping("/{orderKey}")
+	@GetMapping("/{orderKey}/detail")
 	OrderDetailResponse getOrderDetailByOrderKey(@PathVariable String orderKey);
 
 	@GetMapping("/key/{orderKey}")

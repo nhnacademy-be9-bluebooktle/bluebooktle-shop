@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -42,9 +43,8 @@ import shop.bluebooktle.backend.order.service.OrderService;
 import shop.bluebooktle.backend.payment.entity.Payment;
 import shop.bluebooktle.backend.payment.entity.PaymentDetail;
 import shop.bluebooktle.backend.payment.entity.PaymentType;
-import shop.bluebooktle.backend.point.repository.PointHistoryRepository;
-import shop.bluebooktle.backend.payment.entity.Payment;
 import shop.bluebooktle.backend.payment.repository.PaymentRepository;
+import shop.bluebooktle.backend.point.repository.PointHistoryRepository;
 import shop.bluebooktle.backend.user.repository.UserRepository;
 import shop.bluebooktle.common.domain.order.OrderStatus;
 import shop.bluebooktle.common.domain.point.PointSourceTypeEnum;
@@ -141,12 +141,6 @@ public class OrderServiceImpl implements OrderService {
 				thumbnailUrl
 			);
 		});
-	}
-
-	@Override
-	public Order getOrderByOrderKey(String orderKey) {
-		return orderRepository.findByOrderKey(orderKey)
-			.orElseThrow(OrderNotFoundException::new);
 	}
 
 	@Transactional

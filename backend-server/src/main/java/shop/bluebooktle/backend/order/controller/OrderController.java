@@ -54,6 +54,7 @@ public class OrderController {
 		@Parameter(description = "조회할 주문의 ID") @PathVariable Long orderId,
 		@Parameter(hidden = true) @AuthenticationPrincipal UserPrincipal userPrincipal) {
 		checkPrincipal(userPrincipal);
+		log.info("주문조회");
 		OrderConfirmDetailResponse responseDto = orderService.getOrderById(orderId,
 			userPrincipal.getUserId());
 		return ResponseEntity.ok(JsendResponse.success(responseDto));
@@ -112,7 +113,7 @@ public class OrderController {
 	}
 
 	@Operation(summary = "회원 주문 상세 조회", description = "회원 주문상세 페이지를 조회합니다.")
-	@GetMapping("/{orderKey}")
+	@GetMapping("/{orderKey}/detail")
 	@Auth(type = UserType.USER)
 	public ResponseEntity<JsendResponse<OrderDetailResponse>> getMemberOrderDetail(
 		@Parameter(description = "조회할 주문키") @PathVariable String orderKey,
