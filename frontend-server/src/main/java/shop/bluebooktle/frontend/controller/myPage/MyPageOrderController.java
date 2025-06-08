@@ -13,6 +13,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.common.domain.order.OrderStatus;
 import shop.bluebooktle.common.dto.common.PaginationData;
+import shop.bluebooktle.common.dto.order.response.OrderDetailResponse;
 import shop.bluebooktle.common.dto.order.response.OrderHistoryResponse;
 import shop.bluebooktle.frontend.service.OrderService;
 
@@ -51,10 +52,18 @@ public class MyPageOrderController {
 	}
 
 	@GetMapping("/{orderKey}")
-	public ModelAndView orderDetailPage(@PathVariable String orderKey) {
+	public ModelAndView orderDetailPage(@PathVariable String orderKey,
+		RedirectAttributes redirectAttributes
+	) {
 		ModelAndView mav = new ModelAndView("mypage/order_detail");
-		mav.addObject("orderKey", orderKey);
+
+		try {
+			OrderDetailResponse orderDetails = orderService.getOrderDetailByOrderKey(orderKey);
+			mav.addObject("order", orderDetails);
+		} catch (Exception e) {
+			redirectAttributes.addFlashAttribute("globalErrorMessage", e.getMessage());
+			mav.setViewName("redirect:/");
+		}
 		return mav;
 	}
-
 }

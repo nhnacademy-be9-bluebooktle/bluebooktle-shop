@@ -4,8 +4,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,6 +23,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
+import shop.bluebooktle.common.domain.order.AdminOrderSearchType;
+import shop.bluebooktle.common.domain.order.OrderStatus;
+import shop.bluebooktle.common.dto.common.PaginationData;
+import shop.bluebooktle.common.dto.order.request.AdminOrderSearchRequest;
+import shop.bluebooktle.common.dto.order.response.AdminOrderListResponse;
+import shop.bluebooktle.frontend.service.AdminOrderService;
 
 @Slf4j
 @Controller
@@ -29,37 +36,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class AdminOrderController {
 
-	// private final AdminOrderService adminOrderService; // 실제 서비스 주입
-
-	// --- DTO 정의 ---
-	@Getter
-	@Setter
-	@ToString
-	static class OrderListDto {
-		private Long orderId;
-		private String orderNumber;
-		private LocalDateTime orderDate;
-		private String ordererName;
-		private String ordererId; // 회원 아이디
-		private String recipientName;
-		private Long totalAmount;
-		private String orderStatus;
-		private String paymentMethod;
-
-		// 임시 생성자
-		public OrderListDto(Long orderId, String orderNumber, LocalDateTime orderDate, String ordererName,
-			String ordererId, String recipientName, Long totalAmount, String orderStatus, String paymentMethod) {
-			this.orderId = orderId;
-			this.orderNumber = orderNumber;
-			this.orderDate = orderDate;
-			this.ordererName = ordererName;
-			this.ordererId = ordererId;
-			this.recipientName = recipientName;
-			this.totalAmount = totalAmount;
-			this.orderStatus = orderStatus;
-			this.paymentMethod = paymentMethod;
-		}
-	}
+	private final AdminOrderService adminOrderService;
 
 	@Getter
 	@Setter
@@ -182,34 +159,21 @@ public class AdminOrderController {
 	}
 
 	@GetMapping
-	public String listOrders(@ModelAttribute("searchCriteria") OrderSearchCriteria searchCriteria,
+	public String listOrders(@ModelAttribute("searchCriteria") AdminOrderSearchRequest searchRequest,
+		@PageableDefault(size = 10) Pageable pageable,
 		Model model, HttpServletRequest request) {
-		log.info("어드민 주문 목록 페이지 요청. URI: {}, 검색조건: {}", request.getRequestURI(), searchCriteria);
 		model.addAttribute("pageTitle", "주문 관리");
 		model.addAttribute("currentURI", request.getRequestURI());
 
-		// TODO: adminOrderService.getOrders(searchCriteria) 호출
-		// 임시 데이터
-		List<OrderListDto> orders = Arrays.asList(
-			new OrderListDto(1001L, "ORD20250517001", LocalDateTime.now().minusDays(1), "김주문", "member01", "박수령",
-				55000L, "결제완료", "신용카드"),
-			new OrderListDto(1002L, "ORD20250516005", LocalDateTime.now().minusDays(2), "이비회", null, "최받는", 32000L,
-				"배송준비중", "가상계좌"),
-			new OrderListDto(1003L, "ORD20250515012", LocalDateTime.now().minusDays(3), "강회원", "member02", "강회원",
-				78000L, "배송완료", "카카오페이")
-		);
-		model.addAttribute("orders", orders);
-		model.addAttribute("currentPage", searchCriteria.getPage());
-		model.addAttribute("totalPages", 3); // 실제 페이징 처리 시 동적으로 계산
-		model.addAttribute("searchCriteria", searchCriteria); // 검색 조건 유지를 위해
+		PaginationData<AdminOrderListResponse> responseData = adminOrderService.searchOrders(searchRequest,
+			pageable);
 
-		// 필터링을 위한 셀렉트 박스 옵션 (실제로는 Enum 또는 DB에서 가져옴)
-		model.addAttribute("orderStatusOptions",
-			Arrays.asList("전체", "결제대기", "결제완료", "배송준비중", "배송중", "배송완료", "취소", "교환", "환불"));
+		model.addAttribute("orderPage", responseData);
+		model.addAttribute("searchCriteria", searchRequest);
+
+		model.addAttribute("orderStatusOptions", OrderStatus.values());
 		model.addAttribute("paymentMethodOptions", Arrays.asList("전체", "신용카드", "가상계좌", "카카오페이", "네이버페이"));
-		model.addAttribute("searchKeywordTypes",
-			Map.of("orderNumber", "주문번호", "ordererName", "주문자명", "ordererId", "주문자ID", "recipientName", "수령인명",
-				"productName", "상품명"));
+		model.addAttribute("searchKeywordTypes", AdminOrderSearchType.values());
 
 		return "admin/order/order_list";
 	}

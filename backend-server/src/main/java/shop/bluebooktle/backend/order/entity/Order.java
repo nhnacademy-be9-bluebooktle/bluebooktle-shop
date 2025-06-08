@@ -20,6 +20,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -39,7 +40,7 @@ import shop.bluebooktle.common.entity.auth.User;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "orders")
 @EqualsAndHashCode(of = "id", callSuper = false)
-@ToString(exclude = {"orderState", "deliveryRule", "user", "bookOrders", "userCouponBookOrders", "payments"})
+@ToString(exclude = {"orderState", "deliveryRule", "user", "bookOrders", "userCouponBookOrders", "payment"})
 @SQLDelete(sql = "UPDATE orders SET deleted_at = CURRENT_TIMESTAMP WHERE order_id = ?")
 @SQLRestriction("deleted_at IS NULL")
 public class Order extends BaseEntity {
@@ -132,9 +133,8 @@ public class Order extends BaseEntity {
 	@BatchSize(size = 10)
 	private List<UserCouponBookOrder> userCouponBookOrders = new ArrayList<>();
 
-	@OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-	@BatchSize(size = 10)
-	private List<Payment> payments = new ArrayList<>();
+	@OneToOne(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Payment payment;
 
 	@Builder
 	public Order(OrderState orderState, DeliveryRule deliveryRule, User user,

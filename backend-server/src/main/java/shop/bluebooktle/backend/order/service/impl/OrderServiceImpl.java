@@ -35,12 +35,13 @@ import shop.bluebooktle.backend.order.dto.response.OrderCancelMessage;
 import shop.bluebooktle.backend.order.entity.DeliveryRule;
 import shop.bluebooktle.backend.order.entity.Order;
 import shop.bluebooktle.backend.order.entity.OrderState;
-import shop.bluebooktle.backend.order.mq.properties.OrderExchangeProperties;
-import shop.bluebooktle.backend.order.mq.properties.OrderQueueProperties;
 import shop.bluebooktle.backend.order.repository.DeliveryRuleRepository;
 import shop.bluebooktle.backend.order.repository.OrderRepository;
 import shop.bluebooktle.backend.order.repository.OrderStateRepository;
 import shop.bluebooktle.backend.order.service.OrderService;
+import shop.bluebooktle.backend.payment.entity.Payment;
+import shop.bluebooktle.backend.payment.entity.PaymentDetail;
+import shop.bluebooktle.backend.payment.entity.PaymentType;
 import shop.bluebooktle.backend.point.repository.PointHistoryRepository;
 import shop.bluebooktle.backend.user.repository.UserRepository;
 import shop.bluebooktle.common.domain.order.OrderStatus;
@@ -48,9 +49,12 @@ import shop.bluebooktle.common.domain.point.PointSourceTypeEnum;
 import shop.bluebooktle.common.dto.book.BookSaleInfoState;
 import shop.bluebooktle.common.dto.coupon.CalculatedDiscountDetails;
 import shop.bluebooktle.common.dto.coupon.response.AppliedCouponResponse;
+import shop.bluebooktle.common.dto.order.request.AdminOrderSearchRequest;
 import shop.bluebooktle.common.dto.order.request.OrderCreateRequest;
 import shop.bluebooktle.common.dto.order.request.OrderItemRequest;
+import shop.bluebooktle.common.dto.order.response.AdminOrderListResponse;
 import shop.bluebooktle.common.dto.order.response.OrderConfirmDetailResponse;
+import shop.bluebooktle.common.dto.order.response.OrderDetailResponse;
 import shop.bluebooktle.common.dto.order.response.OrderHistoryResponse;
 import shop.bluebooktle.common.dto.order.response.OrderItemResponse;
 import shop.bluebooktle.common.dto.order.response.OrderPackagingResponse;
@@ -84,8 +88,6 @@ public class OrderServiceImpl implements OrderService {
 	private final BookSaleInfoRepository bookSaleInfoRepository;
 	private final PointHistoryRepository pointHistoryRepository;
 	private final ApplicationEventPublisher eventPublisher;
-	private final OrderExchangeProperties orderExchange;
-	private final OrderQueueProperties orderQueue;
 
 	@Override
 	public Page<OrderHistoryResponse> getUserOrders(
@@ -420,7 +422,7 @@ public class OrderServiceImpl implements OrderService {
 
 		User user = order.getUser();
 		if ((user == null && userId != null) || (user != null && !Objects.equals(user.getId(), userId))) {
-			throw new OrderNotFoundException("주문을 찾을 수 없거나 접근 권한이 없습니다.");
+			throw new OrderNotFoundException();
 		}
 
 		if (order.getOrderState().getState() != OrderStatus.PENDING
@@ -456,5 +458,163 @@ public class OrderServiceImpl implements OrderService {
 		OrderState canceledState = orderStateRepository.findByState(OrderStatus.CANCELED)
 			.orElseThrow(OrderStateNotFoundException::new);
 		order.changeOrderState(canceledState);
+	}
+
+	@Override
+	public OrderDetailResponse getOrderDetailByUserId(String orderKey, Long userId) {
+
+		Order order = orderRepository.findOrderDetailsByOrderKey(orderKey)
+			.orElseThrow(OrderNotFoundException::new);
+
+		if (order.getUser() != null) {
+			if (!order.getUser().getId().equals(userId)) {
+				throw new OrderNotFoundException();
+			}
+		}
+		return getOrderDetailInternal(orderKey);
+	}
+
+	@Override
+	public OrderDetailResponse getOrderDetailByOrdererPhoneNumber(String orderKey, String phoneNumber) {
+
+		Order order = orderRepository.findOrderDetailsByOrderKey(orderKey)
+			.orElseThrow(OrderNotFoundException::new);
+
+		if (!order.getOrdererPhoneNumber().equals(phoneNumber)) {
+			throw new OrderNotFoundException();
+		}
+		return getOrderDetailInternal(orderKey);
+	}
+
+	@Override
+	public OrderDetailResponse getOrderDetailInternal(String orderKey) {
+		Order order = orderRepository.findOrderDetailsByOrderKey(orderKey)
+			.orElseThrow(OrderNotFoundException::new);
+
+		List<OrderItemResponse> itemResponses = order.getBookOrders().stream()
+			.map(this::mapToItemResponse)
+			.toList();
+
+		Payment payment = order.getPayment();
+
+		BigDecimal paidAmount = Optional.ofNullable(payment)
+			.map(Payment::getPaidAmount)
+			.orElse(null);
+
+		String paidMethod = Optional.ofNullable(payment)
+			.map(Payment::getPaymentDetail)
+			.map(PaymentDetail::getPaymentType)
+			.map(PaymentType::getMethod)
+			.orElse(null);
+
+		return new OrderDetailResponse(
+			order.getId(),
+			order.getOrderKey(),
+			order.getCreatedAt(),
+			order.getOrdererName(),
+			paidAmount,
+			paidMethod,
+			order.getOrderState().getState(),
+			order.getReceiverName(),
+			order.getReceiverPhoneNumber(),
+			order.getReceiverEmail(),
+			order.getAddress(),
+			order.getDetailAddress(),
+			order.getPostalCode(),
+			itemResponses,
+			order.getOriginalAmount(),
+			order.getPointUseAmount(),
+			order.getCouponDiscountAmount(),
+			order.getDeliveryFee(),
+			order.getTrackingNumber()
+		);
+	}
+
+	@Override
+	public Page<AdminOrderListResponse> searchOrders(AdminOrderSearchRequest searchRequest, Pageable pageable) {
+		Page<Order> orderPage = orderRepository.searchOrders(searchRequest, pageable);
+		return orderPage.map(this::convertToResponseDto); // 메소드 이름 변경
+	}
+
+	private AdminOrderListResponse convertToResponseDto(Order order) {
+		String paymentMethod = null;
+		if (order.getPayment() != null && order.getPayment().getPaymentDetail() != null
+			&& order.getPayment().getPaymentDetail().getPaymentType() != null) {
+			paymentMethod = order.getPayment().getPaymentDetail().getPaymentType().getMethod();
+		}
+
+		BigDecimal totalAmount = order.getOriginalAmount()
+			.subtract(Optional.ofNullable(order.getCouponDiscountAmount()).orElse(BigDecimal.ZERO))
+			.subtract(order.getPointUseAmount());
+
+		return new AdminOrderListResponse(
+			order.getId(),
+			order.getOrderKey(),
+			order.getCreatedAt(),
+			order.getOrdererName(),
+			order.getUser() != null ? order.getUser().getLoginId() : "비회원",
+			order.getReceiverName(),
+			totalAmount,
+			order.getOrderState().getState(),
+			paymentMethod
+		);
+	}
+
+	private OrderItemResponse mapToItemResponse(BookOrder bookOrder) {
+		Book book = bookOrder.getBook();
+		String thumbnailUrl = book.getBookImgs().stream()
+			.filter(BookImg::isThumbnail)
+			.findFirst()
+			.map(bookImg -> bookImg.getImg().getImgUrl())
+			.orElse(null);
+		List<OrderPackagingResponse> packagingResponses = bookOrder.getOrderPackagings().stream()
+			.map(this::mapToPackagingResponse)
+			.toList();
+		List<AppliedCouponResponse> couponResponses = bookOrder.getUserCouponBookOrdersAssociatedWithThisBookOrder()
+			.stream()
+			.map(this::mapToAppliedCouponResponse)
+			.toList();
+
+		BigDecimal totalDiscountAmount = couponResponses.stream()
+			.map(AppliedCouponResponse::getAppliedDiscountAmount)
+			.reduce(BigDecimal.ZERO, BigDecimal::add);
+
+		BigDecimal totalPackagingFee = packagingResponses.stream()
+			.map(p -> p.getPrice().multiply(BigDecimal.valueOf(p.getQuantity())))
+			.reduce(BigDecimal.ZERO, BigDecimal::add);
+
+		BigDecimal basePrice = bookOrder.getPrice().multiply(BigDecimal.valueOf(bookOrder.getQuantity()));
+		BigDecimal finalPrice = basePrice.subtract(totalDiscountAmount).add(totalPackagingFee);
+
+		return OrderItemResponse.builder()
+			.bookOrderId(bookOrder.getId())
+			.bookId(book.getId())
+			.bookTitle(book.getTitle())
+			.bookThumbnailUrl(thumbnailUrl)
+			.quantity(bookOrder.getQuantity())
+			.price(bookOrder.getPrice())
+			.packagingOptions(packagingResponses)
+			.appliedItemCoupons(couponResponses)
+			.finalItemPrice(finalPrice)
+			.build();
+	}
+
+	private OrderPackagingResponse mapToPackagingResponse(OrderPackaging packaging) {
+		PackagingOption option = packaging.getPackagingOption();
+		return OrderPackagingResponse.builder()
+			.packageId(option.getId())
+			.name(option.getName())
+			.price(option.getPrice())
+			.quantity(packaging.getQuantity())
+			.build();
+	}
+
+	private AppliedCouponResponse mapToAppliedCouponResponse(UserCouponBookOrder ucb) {
+		UserCoupon userCoupon = ucb.getUserCoupon();
+		Coupon coupon = userCoupon.getCoupon();
+		return AppliedCouponResponse.builder()
+			.userCouponBookOrderId(ucb.getId())
+			.couponName(coupon.getCouponName())
+			.build();
 	}
 }

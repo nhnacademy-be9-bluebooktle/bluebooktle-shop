@@ -26,6 +26,7 @@ import shop.bluebooktle.common.dto.common.JsendResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
 import shop.bluebooktle.common.dto.order.request.OrderCreateRequest;
 import shop.bluebooktle.common.dto.order.response.OrderConfirmDetailResponse;
+import shop.bluebooktle.common.dto.order.response.OrderDetailResponse;
 import shop.bluebooktle.common.dto.order.response.OrderHistoryResponse;
 import shop.bluebooktle.common.exception.auth.InvalidTokenException;
 import shop.bluebooktle.common.security.Auth;
@@ -93,11 +94,24 @@ public class OrderController {
 	@PostMapping("/{orderKey}/cancel")
 	@Auth(type = UserType.USER)
 	public ResponseEntity<JsendResponse<Void>> cancelOrder(
-		@PathVariable String orderKey,
+		@Parameter(description = "조회할 주문키") @PathVariable String orderKey,
 		@Parameter(hidden = true) @AuthenticationPrincipal UserPrincipal userPrincipal
 	) {
 		checkPrincipal(userPrincipal);
 		orderService.cancelOrder(orderKey, userPrincipal.getUserId());
 		return ResponseEntity.ok(JsendResponse.success());
 	}
+
+	@Operation(summary = "회원 주문 상세 조회", description = "회원 주문상세 페이지를 조회합니다.")
+	@GetMapping("/{orderKey}")
+	@Auth(type = UserType.USER)
+	public ResponseEntity<JsendResponse<OrderDetailResponse>> getMemberOrderDetail(
+		@Parameter(description = "조회할 주문키") @PathVariable String orderKey,
+		@Parameter(hidden = true) @AuthenticationPrincipal UserPrincipal userPrincipal) {
+		checkPrincipal(userPrincipal);
+		OrderDetailResponse responseDto = orderService.getOrderDetailByUserId(orderKey, userPrincipal.getUserId());
+		log.info("주문 조회 {}", responseDto);
+		return ResponseEntity.ok(JsendResponse.success(responseDto));
+	}
+
 }

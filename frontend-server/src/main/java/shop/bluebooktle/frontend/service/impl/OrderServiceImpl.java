@@ -7,6 +7,7 @@ import shop.bluebooktle.common.domain.order.OrderStatus;
 import shop.bluebooktle.common.dto.common.PaginationData;
 import shop.bluebooktle.common.dto.order.request.OrderCreateRequest;
 import shop.bluebooktle.common.dto.order.response.OrderConfirmDetailResponse;
+import shop.bluebooktle.common.dto.order.response.OrderDetailResponse;
 import shop.bluebooktle.common.dto.order.response.OrderHistoryResponse;
 import shop.bluebooktle.frontend.repository.OrderRepository;
 import shop.bluebooktle.frontend.service.OrderService;
@@ -37,6 +38,11 @@ public class OrderServiceImpl implements OrderService {
 	@Override
 	public void cancelOrder(String orderKey) {
 		orderRepository.cancelOrder(orderKey);
+	}
+
+	@Override
+	public OrderDetailResponse getOrderDetailByOrderKey(String orderKey) {
+		return orderRepository.getOrderDetailByOrderKey(orderKey);
 	}
 
 }
