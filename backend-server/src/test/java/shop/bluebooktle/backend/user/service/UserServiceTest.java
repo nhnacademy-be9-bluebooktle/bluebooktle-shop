@@ -590,6 +590,48 @@ public class UserServiceTest {
 	}
 
 	@Test
+	@DisplayName("사용자 탈퇴 처리 - 토큰이 null인 경우")
+	void withdrawUser_accessTokenForAuthLogout_is_null() {
+
+		Long userId = 1L;
+		String accessTokenForAuthLogout = null;
+
+		User user = User.builder()
+			.id(userId)
+			.status(UserStatus.ACTIVE)
+			.build();
+
+		when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+
+		userService.withdrawUser(userId, accessTokenForAuthLogout);
+
+		verify(userRepository).findById(userId);
+		verify(userRepository).delete(user);
+		verify(authServerClient, never()).logout(accessTokenForAuthLogout);
+	}
+
+	@Test
+	@DisplayName("사용자 탈퇴 처리 - 토큰이 빈 값인 경우")
+	void withdrawUser_accessTokenForAuthLogout_is_blank() {
+
+		Long userId = 1L;
+		String accessTokenForAuthLogout = "";
+
+		User user = User.builder()
+			.id(userId)
+			.status(UserStatus.ACTIVE)
+			.build();
+
+		when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+
+		userService.withdrawUser(userId, accessTokenForAuthLogout);
+
+		verify(userRepository).findById(userId);
+		verify(userRepository).delete(user);
+		verify(authServerClient, never()).logout(accessTokenForAuthLogout);
+	}
+
+	@Test
 	@DisplayName("사용자 탈퇴 처리 실패 - 사용자 아이디가 null인 경우")
 	void withdrawUser_fail_userId_null() {
 
