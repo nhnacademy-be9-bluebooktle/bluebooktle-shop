@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import shop.bluebooktle.common.dto.book.BookSortType;
 import shop.bluebooktle.common.dto.book.response.BookInfoResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
 import shop.bluebooktle.frontend.config.feign.FeignGlobalConfig;
@@ -16,6 +17,7 @@ public interface BookCategoryRepository {
 	PaginationData<BookInfoResponse> getBooksByCategory(
 		@RequestParam("page") int page,
 		@RequestParam("size") int size,
+		@RequestParam("bookSortType") BookSortType bookSortType,
 		@PathVariable Long categoryId
 	);
 

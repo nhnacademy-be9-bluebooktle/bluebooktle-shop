@@ -44,7 +44,7 @@ public class BookController {
 		@RequestParam(defaultValue = "POPULARITY") BookSortType bookSortType
 	) {
 
-		Page<BookInfoResponse> pagedBooks = bookService.getPagedBooks(page, size, searchKeyword);
+		Page<BookInfoResponse> pagedBooks = bookService.getPagedBooks(page, size, searchKeyword, bookSortType);
 		log.info("pagedBooks: {}", pagedBooks);
 		log.info("pagedBooks: {}", pagedBooks.getNumber());
 		log.info("pagedBooks: {}", pagedBooks.getTotalElements());
@@ -66,14 +66,18 @@ public class BookController {
 		Model model,
 		@RequestParam(value = "page", defaultValue = "0") int page,
 		@RequestParam(value = "size", defaultValue = "20") int size,
+		@RequestParam(defaultValue = "POPULARITY") BookSortType bookSortType,
 		@PathVariable Long categoryId
 	) {
 		log.info("요청된 카테고리 ID: {}", categoryId);
-		Page<BookInfoResponse> pagedBooksByCategory = bookService.getPagedBooksByCategoryId(page, size, categoryId);
+		Page<BookInfoResponse> pagedBooksByCategory = bookService.getPagedBooksByCategoryId(page, size, bookSortType,
+			categoryId);
 		CategoryResponse category = bookService.getCategoryById(categoryId);
 		log.info("pagedBooksByCategory: {}", pagedBooksByCategory);
 		log.info("category: {}", category);
 
+		model.addAttribute("sortTypes", BookSortType.values());
+		model.addAttribute("bookSortType", bookSortType);
 		model.addAttribute("category", category);
 		model.addAttribute("size", size);
 		model.addAttribute("pagedBooks", pagedBooksByCategory);
