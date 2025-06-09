@@ -294,8 +294,8 @@
                     <div class="control-group-kitsch">
                         <label class="label-kitsch handwriting-font-kitsch" for="orderStatusFilter">주문 상태:</label>
                         <select class="select-kitsch" id="orderStatusFilter" name="status">
-                            <option th:selected="${status == null}"
-                                    th:value="${null}">
+                            <option th:selected="${#strings.isEmpty(status)}"
+                                    value="">
                                 전체 상태
                             </option>
                             <option th:selected="${status == T(shop.bluebooktle.common.domain.order.OrderStatus).PENDING}"
@@ -404,31 +404,27 @@
                 <nav aria-label="Page navigation"
                      class="pagination-kitsch"
                      style="margin-top: 2.5rem;"
-                     th:if="${ordersPage.pagination.totalPages > 1}">
-                    <ul class="pagination">
-                        <!-- 이전 버튼 -->
-                        <li th:classappend="${ordersPage.pagination.isFirst} ? 'disabled'">
-                            <a aria-label="Previous"
-                               th:href="@{|/mypage/orders?page=${ordersPage.pagination.currentPage - 1}&size=${ordersPage.pagination.pageSize}&status=${status}|}">
-                                <span aria-hidden="true"><i class="fas fa-angle-left"></i> 이전</span>
-                            </a>
-                        </li>
+                     th:if="${ordersPage.pagination.totalPages > 0}">
 
-                        <!-- 페이지 번호 -->
-                        <li th:classappend="${idx == ordersPage.pagination.currentPage} ? 'active-kitsch'"
-                            th:each="idx : ${#numbers.sequence(0, ordersPage.pagination.totalPages - 1)}">
-                            <a th:href="@{|/mypage/orders?page=${idx}&size=${ordersPage.pagination.pageSize}&status=${status}|}"
-                               th:text="${idx + 1}">1</a>
-                        </li>
+                    <a class="page-btn-kitsch prev-kitsch retro-shadow-kitsch-small"
+                       th:classappend="${ordersPage.pagination.currentPage == 0} ? ' disabled' : ''"
+                       th:href="@{/mypage/orders(page=${ordersPage.pagination.currentPage - 1}, size=${ordersPage.pagination.pageSize}, status=${status})}">
+                        <i class="fas fa-angle-left"></i> 이전
+                    </a>
 
-                        <!-- 다음 버튼 -->
-                        <li th:classappend="${ordersPage.pagination.isLast} ? 'disabled'">
-                            <a aria-label="Next"
-                               th:href="@{|/mypage/orders?page=${ordersPage.pagination.currentPage + 1}&size=${ordersPage.pagination.pageSize}&status=${status}|}">
-                                <span aria-hidden="true">다음 <i class="fas fa-angle-right"></i></span>
-                            </a>
-                        </li>
-                    </ul>
+                    <th:block th:each="i : ${#numbers.sequence(0, ordersPage.pagination.totalPages - 1)}">
+                        <a class="page-btn-kitsch num-kitsch retro-shadow-kitsch-small"
+                           th:classappend="${i == ordersPage.pagination.currentPage} ? ' active-kitsch' : ''"
+                           th:href="@{/mypage/orders(page=${i}, size=${ordersPage.pagination.pageSize}, status=${status})}"
+                           th:text="${i + 1}">
+                        </a>
+                    </th:block>
+
+                    <a class="page-btn-kitsch next-kitsch retro-shadow-kitsch-small"
+                       th:classappend="${ordersPage.pagination.currentPage + 1 >= ordersPage.pagination.totalPages} ? ' disabled' : ''"
+                       th:href="@{/mypage/orders(page=${ordersPage.pagination.currentPage + 1}, size=${ordersPage.pagination.pageSize}, status=${status})}">
+                        다음 <i class="fas fa-angle-right"></i>
+                    </a>
                 </nav>
 
             </main>

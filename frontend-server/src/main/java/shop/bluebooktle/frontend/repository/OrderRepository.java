@@ -11,6 +11,7 @@ import shop.bluebooktle.common.domain.order.OrderStatus;
 import shop.bluebooktle.common.dto.common.PaginationData;
 import shop.bluebooktle.common.dto.order.request.OrderCreateRequest;
 import shop.bluebooktle.common.dto.order.response.OrderConfirmDetailResponse;
+import shop.bluebooktle.common.dto.order.response.OrderDetailResponse;
 import shop.bluebooktle.common.dto.order.response.OrderHistoryResponse;
 import shop.bluebooktle.frontend.config.feign.FeignGlobalConfig;
 
@@ -29,6 +30,12 @@ public interface OrderRepository {
 		@RequestParam("size") int size,
 		@RequestParam(value = "status", required = false) OrderStatus status
 	);
+
+	@PostMapping("/{orderKey}/cancel")
+	void cancelOrder(@PathVariable String orderKey);
+
+	@GetMapping("/{orderKey}/detail")
+	OrderDetailResponse getOrderDetailByOrderKey(@PathVariable String orderKey);
 
 	@GetMapping("/key/{orderKey}")
 	OrderConfirmDetailResponse getOrderByKey(@PathVariable("orderKey") String orderKey);

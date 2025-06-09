@@ -295,27 +295,32 @@
                     <div class="detail-info-grid-kitsch">
                         <div class="info-item-kitsch">
                             <span class="label">주문번호:</span>
-                            <span class="value highlight" th:text="${mockOrderId} ?: 'BKTTL-20250501-001'">BKTTL-20250501-001</span>
+                            <span class="value highlight" th:text="${order.orderKey}"></span>
                         </div>
                         <div class="info-item-kitsch">
                             <span class="label">주문일자:</span>
-                            <span class="value">2025년 05월 01일</span>
+                            <span class="value" th:text="${#temporals.format(order.orderDate, 'yyyy년 MM월 dd일')}"></span>
                         </div>
                         <div class="info-item-kitsch">
                             <span class="label">주문자:</span>
-                            <span class="value">겜돌이_77</span>
+                            <span class="value" th:text="*{order.ordererName}"></span>
                         </div>
-                        <div class="info-item-kitsch">
-                            <span class="label">총 결제금액:</span>
-                            <span class="value" style="color:var(--kitsch-color-1); font-size:1.1em;">48,700원</span>
-                        </div>
-                        <div class="info-item-kitsch">
-                            <span class="label">결제수단:</span>
-                            <span class="value">토스페이먼츠 (신한카드)</span>
+                        <div th:if="${order.paidAmount()!=null}">
+                            <div class="info-item-kitsch">
+                                <span class="label">총 결제금액:</span>
+                                <span class="value" style="color:var(--kitsch-color-1); font-size:1.1em;"
+                                      th:text="${#numbers.formatDecimal(order.paidAmount, 0, 'COMMA', 0, 'POINT')} + '원'"></span>
+                            </div>
+                            <div class="info-item-kitsch">
+                                <span class="label">결제수단:</span>
+                                <span class="value" th:text="${order.paidMethod}"></span>
+                            </div>
                         </div>
                         <div class="info-item-kitsch">
                             <span class="label">주문상태:</span>
-                            <span class="value order-status-kitsch status-delivered">배송완료</span>
+                            <span class="value order-status-kitsch"
+                                  th:text="*{order.orderStatus().getDescription()}">
+                            </span>
                         </div>
                     </div>
                 </section>
@@ -325,32 +330,32 @@
                     <div class="detail-info-grid-kitsch">
                         <div class="info-item-kitsch">
                             <span class="label">받는 분:</span>
-                            <span class="value">겜돌이_77</span>
+                            <span class="value" th:text="${order.receiverName}"></span>
                         </div>
-                        <div class="info-item-kitsch">
+                        <div class="info-item-kitsch" th:if="${order.receiverPhoneNumber() != null}">
                             <span class="label">연락처:</span>
-                            <span class="value">010-1234-5678</span>
+                            <span class="value" th:text="${order.receiverPhoneNumber}"></span>
                         </div>
+
+                        <div class="info-item-kitsch" th:if="${order.receiverEmail() != null}">
+                            <span class="label">이메일:</span>
+                            <span class="value" th:text="${order.receiverEmail}"></span>
+                        </div>
+
                         <div class="info-item-kitsch" style="grid-column: 1 / -1;">
                             <span class="label">배송지 주소:</span>
-                            <span class="value">(12345) 서울특별시 키치구 레트로길 88, 101동 1988호 (레트로아파트)</span>
-                        </div>
-                        <div class="info-item-kitsch" style="grid-column: 1 / -1;">
-                            <span class="label">배송 요청사항:</span>
-                            <span class="value">문 앞에 놓아주세요. 부재 시 연락 바랍니다.</span>
-                        </div>
-                        <div class="info-item-kitsch">
-                            <span class="label">배송 상태:</span>
-                            <span class="value order-status-kitsch status-delivered">배송완료</span>
-                        </div>
-                        <div class="info-item-kitsch">
-                            <span class="label">운송장 번호:</span>
-                            <span class="value">
-                                123-4567-8900
-                                <a class="tracking-link-kitsch" href="#" onclick="trackDelivery('12345678900')"
-                                   style="margin-left:0.5em;">(배송조회)</a>
+                            <span class="value"
+                                  th:text="${'(' + order.postalCode() + ')' + order.address() + ',' + order.detailAddress()}">
                             </span>
                         </div>
+
+                        <div class="info-item-kitsch" th:if="${order.trackingNumber() != null}">
+                            <span class="label">운송장 번호:</span>
+                            <span class="value"
+                                  th:text="${order.trackingNumber}">
+                            </span>}
+                        </div>
+
                     </div>
                 </section>
 
@@ -368,49 +373,53 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <tr>
+                        <tr th:each="item : ${order.orderItemResponses}">
                             <td data-label="상품 정보">
                                 <div class="product-info-cell-kitsch">
-                                    <img alt="초절정 판타지" src="https://picsum.photos/60/90?random=301">
+                                    <img th:src="${item.bookThumbnailUrl}"
+                                         th:alt="${item.bookTitle}">
                                     <div>
-                                        <a class="product-title-kitsch" href="#">초절정 판타지 대모험 DX</a>
-                                        <p class="product-option-kitsch">포장: ✨반짝이 (+2,000원)</p>
+                                        <a class="product-title-kitsch" th:href="@{/books/{id}(id=${item.bookId})}"
+                                           th:text="${item.bookTitle}">상품 제목</a>
+
+                                        <th:block th:if="${!item.packagingOptions.isEmpty()}"
+                                                  th:each="packaging : ${item.packagingOptions}">
+                                            <p class="product-option-kitsch"
+                                               th:text="|포장: ${packaging.name} (+${#numbers.formatDecimal(packaging.price, 0, 'COMMA', 0, 'POINT')}원) * ${packaging.quantity}개 |">
+                                                포장 옵션
+                                            </p>
+                                        </th:block>
+                                        <p class="product-option-kitsch" th:if="${item.packagingOptions.isEmpty()}">포장:
+                                            없음</p>
                                     </div>
                                 </div>
                             </td>
-                            <td data-label="수량" style="text-align:center;">1</td>
-                            <td class="price-kitsch" data-label="상품 금액">25,200원</td>
-                            <td data-label="할인/포장">
-                                <span class="discount-kitsch">-1,000원 (개별쿠폰)</span><br>
-                                <span class="discount-kitsch">+2,000원 (포장)</span>
+                            <td data-label="수량" style="text-align:center;" th:text="${item.quantity}">1</td>
+                            <td class="price-kitsch" data-label="상품 금액"
+                                th:text="${#numbers.formatDecimal(item.price, 0, 'COMMA', 0, 'POINT')} + '원'">0원
                             </td>
-                            <td class="price-kitsch" data-label="주문 금액">26,200원</td>
+
+                            <td data-label="할인/포장">
+                                <th:block th:each="coupon : ${item.appliedItemCoupons}">
+                                    <span class="discount-kitsch"
+                                          th:text="'-' + ${#numbers.formatDecimal(coupon.appliedDiscountAmount, 0, 'COMMA', 0, 'POINT')} + '원 (' + ${coupon.couponName} + ')'"></span><br>
+                                </th:block>
+                                <th:block th:each="packaging : ${item.packagingOptions}">
+                                    <span style="color:var(--kitsch-color-1);"
+                                          th:text="'+' + ${#numbers.formatDecimal(packaging.price * packaging.quantity, 0, 'COMMA', 0, 'POINT')} + '원 (포장)'"></span>
+                                </th:block>
+                            </td>
+
+                            <td class="price-kitsch" data-label="주문 금액"
+                                th:text="${#numbers.formatDecimal(item.getFinalItemPrice, 0, 'COMMA', 0, 'POINT')} + '원'">
+                                0원
+                            </td>
+
                             <td data-label="리뷰" style="text-align:center;">
                                 <button class="btn-kitsch primary-btn-kitsch retro-shadow-kitsch-small"
-                                        onclick="openOrderReviewModal('PROD_ID_001', '초절정 판타지 대모험 DX', event)">
-                                    <i class="fas fa-pencil-alt"></i> 작성
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td data-label="상품 정보">
-                                <div class="product-info-cell-kitsch">
-                                    <img alt="픽셀 아트 알고리즘" src="https://picsum.photos/60/90?random=302">
-                                    <div>
-                                        <a class="product-title-kitsch" href="#">픽셀 아트로 배우는 알고리즘</a>
-                                        <p class="product-option-kitsch">포장: 없음</p>
-                                    </div>
-                                </div>
-                            </td>
-                            <td data-label="수량" style="text-align:center;">1</td>
-                            <td class="price-kitsch" data-label="상품 금액">31,500원</td>
-                            <td data-label="할인/포장">
-                                <span class="discount-kitsch">-3,000원 (개별쿠폰)</span>
-                            </td>
-                            <td class="price-kitsch" data-label="주문 금액">28,500원</td>
-                            <td data-label="리뷰" style="text-align:center;">
-                                <button class="btn-kitsch primary-btn-kitsch retro-shadow-kitsch-small"
-                                        onclick="openOrderReviewModal('PROD_ID_002', '픽셀 아트로 배우는 알고리즘', event)">
+                                        th:data-book-id="${item.bookId}"
+                                        th:data-book-title="${item.bookTitle}"
+                                        onclick="openOrderReviewModal(this, event)">
                                     <i class="fas fa-pencil-alt"></i> 작성
                                 </button>
                             </td>
@@ -419,40 +428,45 @@
                     </table>
                 </section>
 
-                <section class="order-detail-section-kitsch payment-details-summary-kitsch">
+                <section class="order-detail-section-kitsch payment-details-summary-kitsch"
+                         th:if="${order.paidAmount()!=null}">
                     <h3 class="section-title-kitsch"
                         style="background-color:var(--kitsch-color-3); text-align:center;">
                         <i class="fas fa-file-signature"></i> 결제 금액 상세</h3>
+
                     <div class="summary-row-kitsch">
-                        <span class="label pixel-font-kitsch">총 상품 금액 (할인 전):</span>
-                        <span class="value pixel-font-kitsch">56,700원</span>
+                        <span class="label pixel-font-kitsch">총 상품 금액:</span>
+                        <span class="value pixel-font-kitsch"
+                              th:text="${#numbers.formatDecimal(order.originalAmount, 0, 'COMMA', 0, 'POINT')} + '원'">0원</span>
                     </div>
-                    <div class="summary-row-kitsch">
-                        <span class="label pixel-font-kitsch">상품 할인 (개별 쿠폰):</span>
-                        <span class="value discount pixel-font-kitsch">- 4,000원</span>
+
+                    <div class="summary-row-kitsch"
+                         th:if="${order.couponDiscountAmount != null and order.couponDiscountAmount > 0}">
+                        <span class="label pixel-font-kitsch">쿠폰 할인:</span>
+                        <span class="value discount pixel-font-kitsch"
+                              th:text="'- ' + ${#numbers.formatDecimal(order.couponDiscountAmount, 0, 'COMMA', 0, 'POINT')} + '원'">0원</span>
                     </div>
-                    <div class="summary-row-kitsch">
-                        <span class="label pixel-font-kitsch">주문 전체 할인 (쿠폰):</span>
-                        <span class="value discount pixel-font-kitsch">- 5,000원</span>
-                    </div>
-                    <div class="summary-row-kitsch">
-                        <span class="label pixel-font-kitsch">포장비 합계:</span>
-                        <span class="value pixel-font-kitsch">+ 2,000원</span>
-                    </div>
-                    <div class="summary-row-kitsch">
+
+                    <div class="summary-row-kitsch"
+                         th:if="${order.pointUserAmount() != null and order.pointUserAmount() > 0}">
                         <span class="label pixel-font-kitsch">포인트 사용:</span>
-                        <span class="value discount pixel-font-kitsch">- 1,000원</span>
+                        <span class="value discount pixel-font-kitsch"
+                              th:text="'- ' + ${#numbers.formatDecimal(order.pointUserAmount(), 0, 'COMMA', 0, 'POINT')} + '원'">0원</span>
                     </div>
+
                     <div class="summary-row-kitsch">
                         <span class="label pixel-font-kitsch">배송비:</span>
-                        <span class="value pixel-font-kitsch">0원</span>
+                        <span class="value pixel-font-kitsch"
+                              th:text="${order.deliveryFee == 0 ? '무료' : #numbers.formatDecimal(order.deliveryFee, 0, 'COMMA', 0, 'POINT') + '원'}">0원</span>
                     </div>
+
                     <div class="total-summary-kitsch">
                         <div class="summary-row-kitsch">
-                            <span class="label display-font-kitsch"
-                                  style="color:var(--kitsch-color-1); font-size:1.3em;">최종 결제 금액:</span>
+            <span class="label display-font-kitsch"
+                  style="color:var(--kitsch-color-1); font-size:1.3em;">최종 결제 금액:</span>
                             <span class="value display-font-kitsch"
-                                  style="color:var(--kitsch-color-1); font-size:1.6em;">48,700원</span>
+                                  style="color:var(--kitsch-color-1); font-size:1.6em;"
+                                  th:text="${#numbers.formatDecimal(order.paidAmount, 0, 'COMMA', 0, 'POINT')} + '원'">0원</span>
                         </div>
                     </div>
                 </section>
@@ -464,9 +478,16 @@
                     </a>
 
                     <button class="btn-kitsch secondary-btn-kitsch color2-kitsch retro-shadow-kitsch-small"
-                            onclick="requestReturn('BKTTL-20250501-001')">
+                            onclick="requestReturn()">
                         <i class="fas fa-undo-alt"></i> 반품 신청
                     </button>
+
+                    <form th:action="@{|/mypage/orders/${order.orderKey()}/cancel|}" method="post">
+                        <button type="submit"
+                                class="btn-kitsch secondary-btn-kitsch color2-kitsch retro-shadow-kitsch-small">
+                            주문 취소
+                        </button>
+                    </form>
                 </div>
 
             </main>
@@ -530,7 +551,6 @@
 
 <th:block layout:fragment="page_scripts">
     <script>
-
         function showKitschModal(modalId) {
             const modal = document.getElementById(modalId);
             console.log("Showing modal:", modalId); // 어떤 모달을 보여주려 하는지 확인
@@ -621,7 +641,9 @@
         }
 
         // 리뷰 작성 모달 열기
-        function openOrderReviewModal(productId, productName, event) {
+        function openOrderReviewModal(buttonElement, event) {
+            const productId = buttonElement.getAttribute('data-book-id');
+            const productName = buttonElement.getAttribute('data-book-title');
             console.log("openOrderReviewModal called with:", productId, productName);
             const modalId = 'orderItemReviewModal';
 
