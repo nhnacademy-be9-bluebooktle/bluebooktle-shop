@@ -16,6 +16,8 @@ import org.springframework.context.annotation.Configuration;
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.coupon.mq.properties.ExchangeProperties;
 import shop.bluebooktle.backend.coupon.mq.properties.QueueProperties;
+import shop.bluebooktle.backend.order.mq.properties.OrderExchangeProperties;
+import shop.bluebooktle.backend.order.mq.properties.OrderQueueProperties;
 
 @Configuration
 @RequiredArgsConstructor
@@ -23,6 +25,52 @@ public class RabbitMqConfig {
 
 	private final QueueProperties props;
 	private final ExchangeProperties exchange;
+
+	private final OrderQueueProperties orderProps;
+	private final OrderExchangeProperties orderExchange;
+
+	private static final int ORDER_TTL = 600000;
+
+	//----order
+	@Bean
+	public DirectExchange orderExchange() {
+		return new DirectExchange(orderExchange.getOrder());
+	}
+
+	@Bean
+	public DirectExchange orderDlxExchange() {
+		return new DirectExchange(orderExchange.getOrderDlx());
+	}
+
+	@Bean
+	public Queue orderWaitQueue() {
+		return QueueBuilder.durable(orderProps.getOrderWait())
+			.withArgument("x-message-ttl", ORDER_TTL)
+			.withArgument("x-dead-letter-exchange", orderExchange.getOrderDlx())
+			.withArgument("x-dead-letter-routing-key", orderProps.getOrderCancel())
+			.build();
+	}
+
+	@Bean
+	public Queue orderCancelQueue() {
+		return new Queue(orderProps.getOrderCancel(), true);
+	}
+
+	@Bean
+	public Binding orderBinding() {
+		return BindingBuilder
+			.bind(orderWaitQueue())
+			.to(orderExchange())
+			.with(orderProps.getOrderWait());
+	}
+
+	@Bean
+	public Binding orderDlxBinding() {
+		return BindingBuilder
+			.bind(orderCancelQueue())
+			.to(orderDlxExchange())
+			.with(orderProps.getOrderCancel());
+	}
 
 	// ---------birthday
 	@Bean
