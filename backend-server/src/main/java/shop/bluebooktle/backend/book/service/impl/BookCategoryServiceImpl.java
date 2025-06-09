@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import shop.bluebooktle.backend.book.entity.Book;
 import shop.bluebooktle.backend.book.entity.BookCategory;
 import shop.bluebooktle.backend.book.entity.BookSaleInfo;
@@ -38,6 +39,7 @@ import shop.bluebooktle.common.exception.book.CategoryNotFoundException;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class BookCategoryServiceImpl implements BookCategoryService {
 
 	private final BookRepository bookRepository;
@@ -47,8 +49,8 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 	private final BookSaleInfoRepository bookSaleInfoRepository;
 	private final BookImgRepository bookImgRepository;
 
-	private CategoryService categoryService;
-	private BookElasticSearchService bookElasticSearchService;
+	private final CategoryService categoryService;
+	private final BookElasticSearchService bookElasticSearchService;
 
 	@Override
 	public void registerBookCategory(Long bookId, Long categoryId) {
@@ -148,10 +150,18 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 	@Transactional(readOnly = true)
 	public Page<BookInfoResponse> searchBooksByCategory(Long categoryId, Pageable pageable, BookSortType bookSortType) {
 		Category category = requireCategory(categoryId);
-		List<Long> categoryIds = categoryService.getAllDescendantCategories(category).stream()
-			.map(Category::getId)
-			.collect(Collectors.toCollection(ArrayList::new));
+		List<Category> descendants = categoryService.getAllDescendantCategories(category);
+		List<Long> categoryIds = new ArrayList<>();
+
+		if (descendants != null) {
+			categoryIds = descendants.stream()
+				.map(Category::getId)
+				.collect(Collectors.toCollection(ArrayList::new));
+		}
+
 		categoryIds.add(category.getId());
+
+		log.info("categoryIds : {}", categoryIds);
 
 		// 엘라스틱에서 도서 찾기
 		Page<Book> bookPage = bookElasticSearchService.searchBooksByCategoryAndSort(categoryIds, bookSortType,

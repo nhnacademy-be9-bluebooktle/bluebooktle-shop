@@ -2,7 +2,6 @@ package shop.bluebooktle.backend.book.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
@@ -305,9 +304,13 @@ public class CategoryServiceImpl implements CategoryService {
 
 	@Transactional(readOnly = true)
 	protected void collectDescendants(Category category, List<Category> result) {
-		for (Category child : category.getChildCategories()) {
-			if (Objects.isNull(child))
-				return;
+		List<Category> children = category.getChildCategories();
+		if (children == null)
+			return;
+
+		for (Category child : children) {
+			if (child == null)
+				continue;
 			result.add(child);
 			collectDescendants(child, result);
 		}
