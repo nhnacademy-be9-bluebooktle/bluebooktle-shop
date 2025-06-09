@@ -10,13 +10,15 @@ VALUES (3, '도서산간', null, 10000, 'MOUNTAINOUS_AREA', true, now(), null);
 INSERT INTO order_state
 VALUES (1, 'PENDING', now(), null);
 INSERT INTO order_state
-VALUES (2, 'SHIPPING', now(), null);
+VALUES (2, 'PREPARING', now(), null);
 INSERT INTO order_state
-VALUES (3, 'COMPLETED', now(), null);
+VALUES (3, 'SHIPPING', now(), null);
 INSERT INTO order_state
-VALUES (4, 'RETURNED', now(), null);
+VALUES (4, 'COMPLETED', now(), null);
 INSERT INTO order_state
-VALUES (5, 'CANCELED', now(), null);
+VALUES (5, 'RETURNED', now(), null);
+INSERT INTO order_state
+VALUES (6, 'CANCELED', now(), null);
 
 INSERT INTO packaging_option
 VALUES (1, '프리미엄 포장', 3000, now(), null);
