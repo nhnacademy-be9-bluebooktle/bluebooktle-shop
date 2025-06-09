@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import shop.bluebooktle.common.domain.order.OrderStatus;
 import shop.bluebooktle.common.dto.order.request.AdminOrderSearchRequest;
 import shop.bluebooktle.common.dto.order.request.OrderCreateRequest;
+import shop.bluebooktle.common.dto.order.response.AdminOrderDetailResponse;
 import shop.bluebooktle.common.dto.order.response.AdminOrderListResponse;
 import shop.bluebooktle.common.dto.order.response.OrderConfirmDetailResponse;
 import shop.bluebooktle.common.dto.order.response.OrderDetailResponse;
@@ -34,4 +35,8 @@ public interface OrderService {
 	OrderConfirmDetailResponse getOrderById(Long orderId, Long userId);
 
 	void shipOrder(Long orderId);
+
+	AdminOrderDetailResponse getAdminOrderDetail(Long orderKey);
+
+	void updateOrderStatus(Long orderId, OrderStatus status);
 }

@@ -18,4 +18,6 @@ public interface OrderQueryRepository {
 
 	BigDecimal findTotalPackagingPriceByOrderId(Long orderId);
 
+	Optional<Order> findAdminOrderDetailsByOrderId(Long orderId);
+
 }

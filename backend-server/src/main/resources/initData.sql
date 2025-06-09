@@ -161,3 +161,14 @@ VALUES (1, NULL, '문학', '/1', '2025-05-25 17:48:16', NULL),
        (63, 62, '육아·부모', '/54/62/63', '2025-05-25 18:06:23', NULL),
        (64, 62, '인테리어·DIY', '/54/62/64', '2025-05-25 18:06:39', NULL)
 ;
+INSERT INTO category (category_id,
+                      parent_category_id,
+                      name,
+                      category_path,
+                      created_at,
+                      deleted_at)
+VALUES (65, NULL, '베스트셀러', '/65', now(), NULL);
+
+INSERT INTO category (category_id, parent_category_id, name, category_path, created_at, deleted_at)
+VALUES (66, 65, '국내도서', '/65/66', '2025-06-05 10:06:13', NULL),
+       (67, 65, '해외도서', '/65/67', '2025-06-05 10:07:00', NULL);
