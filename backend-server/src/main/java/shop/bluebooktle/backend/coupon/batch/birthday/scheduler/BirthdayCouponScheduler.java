@@ -16,8 +16,7 @@ public class BirthdayCouponScheduler {
 
 	private final BirthdayCouponLauncher launcher;
 
-	// @Scheduled(cron = "0 0 0 1 * *")
-	@Scheduled(cron = "0 0 * * * *") // TODO dev에서 Test를 위함 -> test 후 변경
+	@Scheduled(cron = "0 0 0 1 * *")
 	@SchedulerLock(name = "BirthdayCouponScheduler", lockAtLeastFor = "PT1M", lockAtMostFor = "PT5M")
 	public void runBirthdayCouponJob() {
 		log.info("생일 쿠폰 발급 스케줄러 실행");

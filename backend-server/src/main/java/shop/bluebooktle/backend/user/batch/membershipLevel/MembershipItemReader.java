@@ -26,6 +26,7 @@ public class MembershipItemReader implements ItemReader<UserNetSpentAmountDto> {
 			log.info("등급 갱신 대상 회원 수: {}", data.size());
 			iterator = data.iterator();
 		}
+		log.info("등급 변경할 유저 조회 결과 없음");
 		return iterator.hasNext() ? iterator.next() : null;
 	}
 }

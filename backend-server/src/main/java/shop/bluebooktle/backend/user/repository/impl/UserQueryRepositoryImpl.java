@@ -19,6 +19,7 @@ import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.SubQueryExpression;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.JPAExpressions;
@@ -119,15 +120,20 @@ public class UserQueryRepositoryImpl implements UserQueryRepository {
 			BigDecimal.class, "coalesce({0}, {1})", wrappingCostSubquery, BigDecimal.ZERO
 		);
 
+		NumberExpression<BigDecimal> netAmountExpression =
+			new CaseBuilder()
+				.when(payment.id.isNotNull())
+				.then(
+					order.originalAmount
+						.subtract(order.deliveryFee.coalesce(BigDecimal.ZERO))
+						.subtract(safeWrappingCost)
+				)
+				.otherwise(BigDecimal.ZERO);
+
 		return queryFactory
 			.select(Projections.constructor(UserNetSpentAmountDto.class,
 				user.id,
-				order.originalAmount
-					.subtract(order.couponDiscountAmount.coalesce(BigDecimal.ZERO))
-					.subtract(order.deliveryFee.coalesce(BigDecimal.ZERO))
-					.subtract(safeWrappingCost)
-					.sum()
-					.coalesce(BigDecimal.ZERO)
+				netAmountExpression.sum().coalesce(BigDecimal.ZERO)
 			))
 			.from(user)
 			.leftJoin(order).on(

@@ -30,10 +30,9 @@ public class MembershipProcessor implements ItemProcessor<UserNetSpentAmountDto,
 		Long currentMembershipId = userRepository.findMembershipIdById(userId);
 
 		if (!newMembershipLevel.getId().equals(currentMembershipId)) {
-			log.info("등급 변경 대상: userId={}, from={} to={}", userId, currentMembershipId, newMembershipLevel.getId());
+			log.info("등급 변경 대상: userId = {}, 현재등급 = {} 변경등급 = {}", userId, currentMembershipId,
+				newMembershipLevel.getId());
 			return new UserMembershipLevelUpdateCommand(userId, newMembershipLevel.getId());
-		} else {
-			log.info("등급 유지: userId={}, 등급={}", userId, currentMembershipId);
 		}
 		return null;
 	}
