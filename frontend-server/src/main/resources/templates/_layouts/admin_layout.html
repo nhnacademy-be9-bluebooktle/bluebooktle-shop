@@ -19,8 +19,10 @@
 <div th:replace="~{_fragments/admin_header :: adminHeaderFragment}"></div>
 
 <div class="admin-main-container">
-    <div th:replace="~{_fragments/admin_sidebar :: adminSidebarFragment}"></div>
-
+    <div th:if="${showSidebar == null or showSidebar}"
+         th:replace="~{_fragments/mypage_sidebar :: mypageSidebarFragment(activeMenu=${activeMenu})}">
+    </div>
+    
     <main class="admin-content-area">
         <div class="admin-content-area__inner">
             <div layout:fragment="admin_content">

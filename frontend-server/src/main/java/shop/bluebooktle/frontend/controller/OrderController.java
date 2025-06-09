@@ -153,8 +153,12 @@ public class OrderController {
 		OrderConfirmDetailResponse orderDetails = orderService.getOrderConfirmDetail(orderId);
 		model.addAttribute("order", orderDetails);
 
-		UserWithAddressResponse currentUser = userService.getUserWithAddresses();
-		model.addAttribute("currentUser", currentUser);
+		Boolean isLoggedIn = (Boolean)model.getAttribute("isLoggedIn");
+		if (Boolean.TRUE.equals(isLoggedIn)) {
+			UserWithAddressResponse currentUser = userService.getUserWithAddresses();
+			model.addAttribute("currentUser", currentUser);
+		}
+
 		model.addAttribute("userPointBalance", orderDetails.getUserPointBalance());
 
 		model.addAttribute("tossClientKey", tossPaymentClientKey);
@@ -181,7 +185,8 @@ public class OrderController {
 		@RequestParam String paymentKey,
 		@RequestParam String orderId,
 		@RequestParam Long amount,
-		RedirectAttributes redirectAttributes
+		RedirectAttributes redirectAttributes,
+		Model model
 	) {
 
 		PaymentConfirmRequest req = new PaymentConfirmRequest(paymentKey, orderId, amount);
@@ -191,8 +196,15 @@ public class OrderController {
 			redirectAttributes.addFlashAttribute("orderData", resp);
 			return "redirect:/order/complete/" + resp.orderId();
 		} catch (Exception e) {
+			redirectAttributes.addFlashAttribute("GlobalErrorTitle", "주문 결제 실패");
 			redirectAttributes.addFlashAttribute("GlobalErrorMessage", "결제에 실패했습니다: " + e.getMessage());
-			return "redirect:/mypage/orders";
+			Boolean isLoggedIn = (Boolean)model.getAttribute("isLoggedIn");
+			if (Boolean.TRUE.equals(isLoggedIn)) {
+				return "redirect:/mypage/orders";
+			} else {
+				return "redirect:/";
+			}
+
 		}
 	}
 
@@ -214,8 +226,14 @@ public class OrderController {
 			}
 			return "order/complete";
 		} catch (Exception e) {
+			redirectAttributes.addFlashAttribute("GlobalErrorTitle", "주문 정보 조회 실패");
 			redirectAttributes.addFlashAttribute("GlobalErrorMessage", "주문 정보를 조회할 수 없습니다.");
-			return "redirect:mypage/order";
+			Boolean isLoggedIn = (Boolean)model.getAttribute("isLoggedIn");
+			if (Boolean.TRUE.equals(isLoggedIn)) {
+				return "redirect:/mypage/orders";
+			} else {
+				return "redirect:/";
+			}
 		}
 	}
 
