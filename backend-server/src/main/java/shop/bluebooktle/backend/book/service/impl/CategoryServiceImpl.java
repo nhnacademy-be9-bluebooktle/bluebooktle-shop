@@ -313,4 +313,13 @@ public class CategoryServiceImpl implements CategoryService {
 			collectDescendants(child, result); // 재귀 호출로 카테고리에 있는 모든 하위 카테고리를 추가
 		}
 	}
+
+	@Override
+	public CategoryResponse getCategoryByName(String categoryName) {
+		Category category = categoryRepository.findByName(categoryName);
+		return new CategoryResponse(category.getId(), category.getName(),
+			category.getParentCategory() != null
+				? category.getParentCategory().getName()
+				: "-", category.getCategoryPath());
+	}
 }

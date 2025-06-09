@@ -40,4 +40,5 @@ public interface CategoryService {
 
 	Page<CategoryResponse> searchCategories(String searchKeyword, Pageable pageable);
 
+	CategoryResponse getCategoryByName(String categoryName);
 }
