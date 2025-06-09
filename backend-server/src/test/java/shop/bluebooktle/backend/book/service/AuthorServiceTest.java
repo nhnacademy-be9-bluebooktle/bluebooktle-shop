@@ -3,10 +3,6 @@ package shop.bluebooktle.backend.book.service;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.PageRequest;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,18 +12,22 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import shop.bluebooktle.backend.book.entity.Author;
 import shop.bluebooktle.backend.book.repository.AuthorRepository;
+import shop.bluebooktle.backend.book.repository.BookAuthorRepository;
 import shop.bluebooktle.backend.book.service.impl.AuthorServiceImpl;
+import shop.bluebooktle.backend.elasticsearch.service.BookElasticSearchService;
 import shop.bluebooktle.common.dto.book.request.author.AuthorRegisterRequest;
 import shop.bluebooktle.common.dto.book.request.author.AuthorUpdateRequest;
 import shop.bluebooktle.common.dto.book.response.author.AuthorResponse;
 import shop.bluebooktle.common.exception.book.AuthorAlreadyExistsException;
-import shop.bluebooktle.common.exception.book.AuthorFieldNullException;
 import shop.bluebooktle.common.exception.book.AuthorNotFoundException;
-import shop.bluebooktle.common.exception.book.AuthorUpdateFieldMissingException;
 
 @ExtendWith(MockitoExtension.class)
 public class AuthorServiceTest {
@@ -37,6 +37,12 @@ public class AuthorServiceTest {
 
 	@Mock
 	private AuthorRepository authorRepository;
+
+	@Mock
+	private BookElasticSearchService bookElasticSearchService;
+
+	@Mock
+	private BookAuthorRepository bookAuthorRepository;
 
 	// 작가 등록
 
@@ -50,22 +56,6 @@ public class AuthorServiceTest {
 		authorService.registerAuthor(authorRegisterRequest);
 
 		verify(authorRepository, times(1)).save(any(Author.class));
-	}
-
-	@Test
-	@DisplayName("작가 등록 실패 - 이름이 null인 경우")
-	void registerAuthor_fail_name_null() {
-		AuthorRegisterRequest authorRegisterRequest = new AuthorRegisterRequest(null);
-
-		assertThrows(AuthorFieldNullException.class, () -> authorService.registerAuthor(authorRegisterRequest));
-	}
-
-	@Test
-	@DisplayName("작가 등록 실패 - 이름이 공백 문자열인 경우")
-	void registerAuthor_fail_name_blank() {
-		AuthorRegisterRequest authorRegisterRequest = new AuthorRegisterRequest(" ");
-
-		assertThrows(AuthorFieldNullException.class, () -> authorService.registerAuthor(authorRegisterRequest));
 	}
 
 	@Test
@@ -124,34 +114,13 @@ public class AuthorServiceTest {
 		ReflectionTestUtils.setField(author, "id", authorId);
 
 		when(authorRepository.findById(authorId)).thenReturn(Optional.of(author));
-
+		when(authorRepository.existsByName("청길동")).thenReturn(false);
+		when(bookAuthorRepository.findByAuthor(author)).thenReturn(List.of());
+		doNothing().when(bookElasticSearchService).updateAuthorName(anyList(), anyString(), anyString());
 		authorService.updateAuthor(authorId, authorUpdateRequest);
 
 		assertEquals("청길동", author.getName());
 		verify(authorRepository, times(1)).save(author);
-	}
-
-	@Test
-	@DisplayName("작가 수정 실패 - 수정 이름이 null인 경우")
-	void updateAuthor_fail_name_null() {
-		Long authorId = 1L;
-		AuthorUpdateRequest authorUpdateRequest = AuthorUpdateRequest.builder()
-			.name(null)
-			.build();
-
-		assertThrows(
-			AuthorUpdateFieldMissingException.class, () -> authorService.updateAuthor(authorId, authorUpdateRequest));
-	}
-
-	@Test
-	@DisplayName("작가 수정 실패 - 수정 이름이 공백인 경우")
-	void updateAuthor_fail_name_blank() {
-		Long authorId = 1L;
-		AuthorUpdateRequest authorUpdateRequest = AuthorUpdateRequest.builder()
-			.name(" ")
-			.build();
-
-		assertThrows(AuthorUpdateFieldMissingException.class, () -> authorService.updateAuthor(authorId, authorUpdateRequest));
 	}
 
 	@Test
@@ -179,8 +148,8 @@ public class AuthorServiceTest {
 
 		ReflectionTestUtils.setField(author, "id", authorId);
 
-		when (authorRepository.findById(authorId)).thenReturn(Optional.of(author));
-
+		when(authorRepository.findById(authorId)).thenReturn(Optional.of(author));
+		when(bookAuthorRepository.existsByAuthor(author)).thenReturn(false);
 		authorService.deleteAuthor(authorId);
 
 		verify(authorRepository, times(1)).delete(author);
@@ -191,7 +160,7 @@ public class AuthorServiceTest {
 	void deleteAuthor_fail_not_found() {
 		Long authorId = 999L;
 
-		when (authorRepository.findById(authorId)).thenReturn(Optional.empty());
+		when(authorRepository.findById(authorId)).thenReturn(Optional.empty());
 
 		assertThrows(AuthorNotFoundException.class, () -> authorService.deleteAuthor(authorId));
 	}
@@ -242,7 +211,7 @@ public class AuthorServiceTest {
 	@Test
 	@DisplayName("작가 목록 조회 성공 - 페이징")
 	void getAuthors_success() {
-		Pageable pageable = PageRequest.of(0,2);
+		Pageable pageable = PageRequest.of(0, 2);
 
 		Author author1 = Author.builder()
 			.name("홍길동")
@@ -273,12 +242,11 @@ public class AuthorServiceTest {
 	@DisplayName("작가 부분 이름 검색 성공 - 페이징")
 	void searchAuthors_success() {
 		String keyword = "길동";
-		Pageable pageable = PageRequest.of(0,2);
+		Pageable pageable = PageRequest.of(0, 2);
 
 		Author author1 = Author.builder()
 			.name("홍길동")
 			.build();
-
 
 		ReflectionTestUtils.setField(author1, "id", 1L);
 

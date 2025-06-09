@@ -20,6 +20,7 @@ import shop.bluebooktle.backend.book.entity.Publisher;
 import shop.bluebooktle.backend.book.repository.BookPublisherRepository;
 import shop.bluebooktle.backend.book.repository.PublisherRepository;
 import shop.bluebooktle.backend.book.service.impl.PublisherServiceImpl;
+import shop.bluebooktle.backend.elasticsearch.service.BookElasticSearchService;
 import shop.bluebooktle.common.dto.book.request.PublisherRequest;
 import shop.bluebooktle.common.dto.book.response.PublisherInfoResponse;
 import shop.bluebooktle.common.exception.book.PublisherAlreadyExistsException;
@@ -34,6 +35,9 @@ public class PublisherServiceTest {
 
 	@Mock
 	private BookPublisherRepository bookPublisherRepository;
+
+	@Mock
+	private BookElasticSearchService bookElasticSearchService;
 
 	@InjectMocks
 	private PublisherServiceImpl publisherService;
@@ -72,7 +76,7 @@ public class PublisherServiceTest {
 		PublisherRequest request = new PublisherRequest("Updated Publisher");
 		Publisher publisher = Publisher.builder().id(publisherId).name("Old Name").build();
 		when(publisherRepository.findById(publisherId)).thenReturn(Optional.of(publisher));
-
+		doNothing().when(bookElasticSearchService).updatePublisherName(anyList(), anyString(), anyString());
 		// When: updatePublisher 메서드를 호출할 때
 		publisherService.updatePublisher(publisherId, request);
 
