@@ -17,6 +17,12 @@ import shop.bluebooktle.common.dto.coupon.response.UserCouponResponse;
 import shop.bluebooktle.common.dto.order.response.OrderHistoryResponse;
 import shop.bluebooktle.frontend.service.CouponService;
 import shop.bluebooktle.frontend.service.OrderService;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
+import shop.bluebooktle.common.dto.common.PaginationData;
+import shop.bluebooktle.common.dto.coupon.response.UserCouponResponse;
+import shop.bluebooktle.frontend.service.CouponService;
+import shop.bluebooktle.frontend.service.OrderService;
 
 @Controller
 @RequiredArgsConstructor
