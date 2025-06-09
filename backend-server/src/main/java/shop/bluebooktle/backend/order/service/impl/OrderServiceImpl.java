@@ -500,11 +500,12 @@ public class OrderServiceImpl implements OrderService {
 		Order order = orderRepository.findOrderDetailsByOrderKey(orderKey)
 			.orElseThrow(OrderNotFoundException::new);
 
-		if (order.getUser() != null) {
+		if (userId != null && order.getUser() != null) {
 			if (!order.getUser().getId().equals(userId)) {
-				throw new OrderNotFoundException();
+				throw new OrderNotFoundException("접근 권한이 없습니다.");
 			}
 		}
+		
 		return getOrderDetailInternal(orderKey);
 	}
 

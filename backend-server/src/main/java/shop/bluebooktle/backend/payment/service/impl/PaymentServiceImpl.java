@@ -105,7 +105,10 @@ public class PaymentServiceImpl implements PaymentService {
 				.paidAmount(gatewayResponse.confirmedAmount())
 				.build();
 			paymentRepository.save(payment);
-
+			OrderState preparingOrderState = orderStateRepository.findByState(OrderStatus.PREPARING)
+				.orElseThrow(
+					() -> new ApplicationException(ErrorCode.INTERNAL_SERVER_ERROR, "PREPARING 상태를 찾을 수 없습니다."));
+			order.changeOrderState(preparingOrderState);
 		} else {
 			String failReason = "결제 실패";
 			if (gatewayResponse.additionalData() != null
