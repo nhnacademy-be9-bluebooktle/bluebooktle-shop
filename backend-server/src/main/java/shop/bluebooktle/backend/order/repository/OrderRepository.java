@@ -19,6 +19,9 @@ public interface OrderRepository extends JpaRepository<Order, Long>, OrderQueryR
 	Page<Order> findByUserAndCreatedAtBetween(User user, LocalDateTime createdAtAfter, LocalDateTime createdAtBefore,
 		Pageable pageable);
 
+	@EntityGraph(attributePaths = {"orderState", "bookOrders.book"})
+	Order getOrderById(Long id);
+
 	// 사용자 + 상태(enum) 조회
 	@EntityGraph(attributePaths = {
 		"orderState",

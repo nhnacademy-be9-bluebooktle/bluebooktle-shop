@@ -56,8 +56,6 @@ import shop.bluebooktle.common.dto.order.request.OrderCreateRequest;
 import shop.bluebooktle.common.dto.order.request.OrderItemRequest;
 import shop.bluebooktle.common.dto.order.response.AdminOrderDetailResponse;
 import shop.bluebooktle.common.dto.order.response.AdminOrderListResponse;
-import shop.bluebooktle.common.dto.order.response.AdminOrderDetailResponse;
-import shop.bluebooktle.common.dto.order.response.AdminOrderListResponse;
 import shop.bluebooktle.common.dto.order.response.OrderConfirmDetailResponse;
 import shop.bluebooktle.common.dto.order.response.OrderDetailResponse;
 import shop.bluebooktle.common.dto.order.response.OrderHistoryResponse;
@@ -500,7 +498,6 @@ public class OrderServiceImpl implements OrderService {
 		OrderState canceledState = orderStateRepository.findByState(OrderStatus.CANCELED)
 			.orElseThrow(OrderStateNotFoundException::new);
 		order.changeOrderState(canceledState);
-
 	}
 
 	@Override
@@ -515,19 +512,6 @@ public class OrderServiceImpl implements OrderService {
 			}
 		}
 
-		return getOrderDetailInternal(orderKey);
-	}
-
-	@Override
-	public OrderDetailResponse getOrderDetailByOrdererPhoneNumber(String orderKey, String phoneNumber) {
-
-		Order order = orderRepository.findOrderDetailsByOrderKey(orderKey)
-			.orElseThrow(OrderNotFoundException::new);
-
-		if (!order.getOrdererPhoneNumber().equals(phoneNumber)) {
-		} else {
-			throw new OrderNotFoundException();
-		}
 		return getOrderDetailByOrderKey(orderKey);
 	}
 
