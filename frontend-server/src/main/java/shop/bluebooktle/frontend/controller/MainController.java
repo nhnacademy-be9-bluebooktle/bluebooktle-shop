@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import shop.bluebooktle.common.dto.book.response.BookInfoResponse;
 import shop.bluebooktle.common.dto.book.response.CategoryResponse;
 import shop.bluebooktle.frontend.service.BookService;
+import shop.bluebooktle.frontend.service.CategoryService;
 
 @Slf4j
 @Controller
@@ -20,6 +21,7 @@ import shop.bluebooktle.frontend.service.BookService;
 public class MainController {
 
 	private final BookService bookService;
+	private final CategoryService categoryService;
 
 	@GetMapping("/")
 	public String mainPage(
@@ -29,7 +31,7 @@ public class MainController {
 		@RequestParam(value = "page", defaultValue = "0") int page,
 		@RequestParam(value = "size", defaultValue = "20") int size
 	) {
-		Long hotCategoryId = 65L;
+		Long hotCategoryId = categoryService.getCategoryByName("베스트셀러").categoryId();
 
 		// HOT 도서: 카테고리 기반
 		Page<BookInfoResponse> hotBooks = bookService.getPagedBooksByCategoryId(page, size, hotCategoryId);
