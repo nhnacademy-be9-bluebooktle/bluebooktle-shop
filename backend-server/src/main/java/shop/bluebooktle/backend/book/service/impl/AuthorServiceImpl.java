@@ -78,7 +78,7 @@ public class AuthorServiceImpl implements AuthorService {
 			.toList();
 
 		// 엘라스틱에 등록된 도서 정보 수정
-		bookElasticSearchService.updateTagName(bookList, name, author.getName());
+		bookElasticSearchService.updateAuthorName(bookList, name, author.getName());
 
 		author.setName(name);
 		authorRepository.save(author);

@@ -53,9 +53,9 @@ public class PublisherServiceImpl implements PublisherService {
 			.stream()
 			.map(BookPublisher::getBook)
 			.toList();
-		
+
 		// 엘라스틱에 등록된 도서 정보 수정
-		bookElasticSearchService.updateTagName(bookList, request.getName(), publisher.getName());
+		bookElasticSearchService.updatePublisherName(bookList, request.getName(), publisher.getName());
 
 		publisher.setName(request.getName());
 		publisherRepository.save(publisher);

@@ -28,10 +28,10 @@ public interface BookElasticSearchService {
 	// 태그명 수정시 엘라스틱 도서 수정
 	void updateTagName(List<Book> bookList, String updatedTagName, String currentTagName);
 
-	// TODO 작가명 수정시 엘라스틱 도서 수정
+	// 작가명 수정시 엘라스틱 도서 수정
 	void updateAuthorName(List<Book> bookList, String updatedAuthorName, String currentAuthorName);
 
-	// TODO 출판사명 수정시 엘라스틱 도서 수정
+	// 출판사명 수정시 엘라스틱 도서 수정
 	void updatePublisherName(List<Book> bookList, String updatePublisherName, String currentPublisherName);
 
 	// 엘라스틱 도서 정보 삭제
