@@ -6,7 +6,6 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -30,26 +29,6 @@ public class MyPageController {
 	@GetMapping
 	public String myPageDefault() {
 		return "redirect:/mypage/profile";
-	}
-
-	@GetMapping("/orders")
-	public String userOrdersPage(
-		@RequestParam(value = "page", defaultValue = "0") int page,
-		@RequestParam(value = "size", defaultValue = "20") int size,
-		@RequestParam(value = "status", required = false) OrderStatus status,
-		Model model
-	) {
-		PaginationData<OrderHistoryResponse> paginationData = orderService.getOrderHistory(page, size, status);
-
-		model.addAttribute("ordersPage", paginationData);
-		model.addAttribute("status", status);
-		return "mypage/order_list";
-	}
-
-	@GetMapping("/orders/{orderId}")
-	public String orderDetailPage(@PathVariable String orderId) {
-		System.out.println("Requesting order detail for (Mock): " + orderId);
-		return "mypage/order_detail";
 	}
 
 	@GetMapping("/coupons")

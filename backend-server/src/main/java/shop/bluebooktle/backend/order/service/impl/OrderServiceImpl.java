@@ -4,9 +4,11 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -30,6 +32,7 @@ import shop.bluebooktle.backend.coupon.entity.Coupon;
 import shop.bluebooktle.backend.coupon.entity.CouponType;
 import shop.bluebooktle.backend.coupon.entity.UserCoupon;
 import shop.bluebooktle.backend.coupon.service.CouponCalculationService;
+import shop.bluebooktle.backend.order.dto.response.OrderCancelMessage;
 import shop.bluebooktle.backend.order.entity.DeliveryRule;
 import shop.bluebooktle.backend.order.entity.Order;
 import shop.bluebooktle.backend.order.entity.OrderState;
@@ -38,27 +41,38 @@ import shop.bluebooktle.backend.order.repository.OrderRepository;
 import shop.bluebooktle.backend.order.repository.OrderStateRepository;
 import shop.bluebooktle.backend.order.service.OrderService;
 import shop.bluebooktle.backend.payment.entity.Payment;
+import shop.bluebooktle.backend.payment.entity.PaymentDetail;
+import shop.bluebooktle.backend.payment.entity.PaymentType;
 import shop.bluebooktle.backend.payment.repository.PaymentRepository;
+import shop.bluebooktle.backend.point.repository.PointHistoryRepository;
 import shop.bluebooktle.backend.user.repository.UserRepository;
 import shop.bluebooktle.common.domain.order.OrderStatus;
+import shop.bluebooktle.common.domain.point.PointSourceTypeEnum;
 import shop.bluebooktle.common.dto.book.BookSaleInfoState;
 import shop.bluebooktle.common.dto.coupon.CalculatedDiscountDetails;
 import shop.bluebooktle.common.dto.coupon.response.AppliedCouponResponse;
+import shop.bluebooktle.common.dto.order.request.AdminOrderSearchRequest;
 import shop.bluebooktle.common.dto.order.request.OrderCreateRequest;
 import shop.bluebooktle.common.dto.order.request.OrderItemRequest;
+import shop.bluebooktle.common.dto.order.response.AdminOrderListResponse;
 import shop.bluebooktle.common.dto.order.response.OrderConfirmDetailResponse;
+import shop.bluebooktle.common.dto.order.response.OrderDetailResponse;
 import shop.bluebooktle.common.dto.order.response.OrderHistoryResponse;
 import shop.bluebooktle.common.dto.order.response.OrderItemResponse;
 import shop.bluebooktle.common.dto.order.response.OrderPackagingResponse;
 import shop.bluebooktle.common.entity.auth.User;
+import shop.bluebooktle.common.entity.point.PointHistory;
 import shop.bluebooktle.common.exception.ApplicationException;
 import shop.bluebooktle.common.exception.ErrorCode;
 import shop.bluebooktle.common.exception.auth.UserNotFoundException;
 import shop.bluebooktle.common.exception.book.BookNotFoundException;
 import shop.bluebooktle.common.exception.book.BookSaleInfoNotFoundException;
 import shop.bluebooktle.common.exception.book_order.PackagingOptionNotFoundException;
+import shop.bluebooktle.common.exception.order.BookNotOrderableException;
 import shop.bluebooktle.common.exception.order.OrderNotFoundException;
+import shop.bluebooktle.common.exception.order.StockNotEnoughException;
 import shop.bluebooktle.common.exception.order.delivery_rule.DeliveryRuleNotFoundException;
+import shop.bluebooktle.common.exception.order.order_state.OrderInvalidStateException;
 import shop.bluebooktle.common.exception.order.order_state.OrderStateNotFoundException;
 
 @Slf4j
@@ -77,6 +91,8 @@ public class OrderServiceImpl implements OrderService {
 	private final BookOrderRepository bookOrderRepository;
 	private final PackagingOptionRepository packagingOptionRepository;
 	private final BookSaleInfoRepository bookSaleInfoRepository;
+	private final PointHistoryRepository pointHistoryRepository;
+	private final ApplicationEventPublisher eventPublisher;
 
 	@Override
 	public Page<OrderHistoryResponse> getUserOrders(
@@ -89,9 +105,9 @@ public class OrderServiceImpl implements OrderService {
 
 		Page<Order> orderPage;
 		if (status == null) {
-			orderPage = orderRepository.findByUser(user, pageable);
+			orderPage = orderRepository.findByUserOrderByCreatedAtDesc(user, pageable);
 		} else {
-			orderPage = orderRepository.findByUserAndOrderState_State(user, status, pageable);
+			orderPage = orderRepository.findByUserAndOrderState_StateOrderByCreatedAtDesc(user, status, pageable);
 		}
 
 		return orderPage.map(o -> {
@@ -104,16 +120,16 @@ public class OrderServiceImpl implements OrderService {
 					.orElse(BigDecimal.ZERO));
 
 			String thumbnailUrl = o.getBookOrders().stream()
-				.findFirst() // 대표 BookOrder 하나를 가져온 뒤
+				.findFirst()
 				.flatMap(bookOrder -> {
 					Book book = bookOrder.getBook();
 					if (book == null)
 						return Optional.<BookImg>empty();
 					return book.getBookImgs().stream().findFirst();
 				})
-				.map(BookImg::getImg)       // BookImg 에서 Img 엔티티 꺼내고
-				.map(Img::getImgUrl)      // Img 엔티티에서 URL 꺼내기
-				.orElse("");               // 없으면 빈 문자열 혹은 기본 URL
+				.map(BookImg::getImg)
+				.map(Img::getImgUrl)
+				.orElse("");
 
 			return new OrderHistoryResponse(
 				o.getId(),
@@ -139,6 +155,17 @@ public class OrderServiceImpl implements OrderService {
 		if (request.userId() != null) {
 			user = userRepository.findById(request.userId())
 				.orElseThrow(UserNotFoundException::new);
+			if (!request.pointUseAmount().equals(BigDecimal.ZERO)) {
+				user.subtractPoint(request.pointUseAmount());
+				userRepository.save(user);
+
+				PointHistory history = PointHistory.builder()
+					.user(user)
+					.sourceType(PointSourceTypeEnum.PAYMENT_USE)
+					.value(request.pointUseAmount())
+					.build();
+				pointHistoryRepository.save(history);
+			}
 		} else {
 			user = null;
 		}
@@ -174,6 +201,8 @@ public class OrderServiceImpl implements OrderService {
 			createSingleBookOrder(saved, itemReq);
 		}
 
+		eventPublisher.publishEvent(new OrderCancelMessage(saved.getId()));
+
 		return saved.getId();
 	}
 
@@ -184,8 +213,15 @@ public class OrderServiceImpl implements OrderService {
 		BookSaleInfo bookSaleInfo = bookSaleInfoRepository.findByBook(book)
 			.orElseThrow(BookSaleInfoNotFoundException::new);
 
-		if (bookSaleInfo.getBookSaleInfoState() != BookSaleInfoState.AVAILABLE) {
-			throw new ApplicationException(ErrorCode.BOOK_STATE_NOT_AVAILABLE);
+		if (bookSaleInfo.getBookSaleInfoState() != BookSaleInfoState.AVAILABLE
+			&& bookSaleInfo.getBookSaleInfoState() != BookSaleInfoState.LOW_STOCK) {
+			throw new BookNotOrderableException(
+				" %s 는 현재 판매 가능한 상태가 아닙니다.".formatted(book.getTitle()));
+		}
+
+		if (bookSaleInfo.getStock() < item.bookQuantity()) {
+			throw new StockNotEnoughException(
+				" %s 상품의 재고가 부족합니다. (남은 수량: %d개)".formatted(book.getTitle(), bookSaleInfo.getStock()));
 		}
 
 		BookOrder bookOrder = BookOrder.builder()
@@ -408,6 +444,211 @@ public class OrderServiceImpl implements OrderService {
 			.name(option.getName())
 			.price(option.getPrice())
 			.quantity(orderPackaging.getQuantity())
+			.build();
+	}
+
+	@Override
+	@Transactional
+	public void cancelOrder(String orderKey, Long userId) {
+
+		Order order = orderRepository.findByOrderKey(orderKey)
+			.orElseThrow(OrderNotFoundException::new);
+
+		User user = order.getUser();
+		if ((user == null && userId != null) || (user != null && !Objects.equals(user.getId(), userId))) {
+			throw new OrderNotFoundException();
+		}
+
+		if (order.getOrderState().getState() != OrderStatus.PENDING
+			&& order.getOrderState().getState() != OrderStatus.SHIPPING) {
+			throw new OrderInvalidStateException("배송이 시작되면 주문을 취소할 수 없습니다.");
+		}
+		cancelOrderInternal(order.getId());
+	}
+
+	@Override
+	@Transactional
+	public void cancelOrderInternal(Long orderId) {
+		Order order = orderRepository.findById(orderId)
+			.orElseThrow(OrderNotFoundException::new);
+
+		if (order.getOrderState().getState() != OrderStatus.PENDING) {
+			return;
+		}
+
+		User user = order.getUser();
+		BigDecimal usedPoints = order.getPointUseAmount();
+		if (usedPoints != null && usedPoints.compareTo(BigDecimal.ZERO) > 0) {
+			user.addPoint(usedPoints);
+
+			PointHistory pointHistory = PointHistory.builder()
+				.user(user)
+				.sourceType(PointSourceTypeEnum.ORDER_CANCEL)
+				.value(usedPoints)
+				.build();
+			pointHistoryRepository.save(pointHistory);
+		}
+
+		OrderState canceledState = orderStateRepository.findByState(OrderStatus.CANCELED)
+			.orElseThrow(OrderStateNotFoundException::new);
+		order.changeOrderState(canceledState);
+	}
+
+	@Override
+	public OrderDetailResponse getOrderDetailByUserId(String orderKey, Long userId) {
+
+		Order order = orderRepository.findOrderDetailsByOrderKey(orderKey)
+			.orElseThrow(OrderNotFoundException::new);
+
+		if (order.getUser() != null) {
+			if (!order.getUser().getId().equals(userId)) {
+				throw new OrderNotFoundException();
+			}
+		}
+		return getOrderDetailInternal(orderKey);
+	}
+
+	@Override
+	public OrderDetailResponse getOrderDetailByOrdererPhoneNumber(String orderKey, String phoneNumber) {
+
+		Order order = orderRepository.findOrderDetailsByOrderKey(orderKey)
+			.orElseThrow(OrderNotFoundException::new);
+
+		if (!order.getOrdererPhoneNumber().equals(phoneNumber)) {
+			throw new OrderNotFoundException();
+		}
+		return getOrderDetailInternal(orderKey);
+	}
+
+	@Override
+	public OrderDetailResponse getOrderDetailInternal(String orderKey) {
+		Order order = orderRepository.findOrderDetailsByOrderKey(orderKey)
+			.orElseThrow(OrderNotFoundException::new);
+
+		List<OrderItemResponse> itemResponses = order.getBookOrders().stream()
+			.map(this::mapToItemResponse)
+			.toList();
+
+		Payment payment = order.getPayment();
+
+		BigDecimal paidAmount = Optional.ofNullable(payment)
+			.map(Payment::getPaidAmount)
+			.orElse(null);
+
+		String paidMethod = Optional.ofNullable(payment)
+			.map(Payment::getPaymentDetail)
+			.map(PaymentDetail::getPaymentType)
+			.map(PaymentType::getMethod)
+			.orElse(null);
+
+		return new OrderDetailResponse(
+			order.getId(),
+			order.getOrderKey(),
+			order.getCreatedAt(),
+			order.getOrdererName(),
+			paidAmount,
+			paidMethod,
+			order.getOrderState().getState(),
+			order.getReceiverName(),
+			order.getReceiverPhoneNumber(),
+			order.getReceiverEmail(),
+			order.getAddress(),
+			order.getDetailAddress(),
+			order.getPostalCode(),
+			itemResponses,
+			order.getOriginalAmount(),
+			order.getPointUseAmount(),
+			order.getCouponDiscountAmount(),
+			order.getDeliveryFee(),
+			order.getTrackingNumber()
+		);
+	}
+
+	@Override
+	public Page<AdminOrderListResponse> searchOrders(AdminOrderSearchRequest searchRequest, Pageable pageable) {
+		Page<Order> orderPage = orderRepository.searchOrders(searchRequest, pageable);
+		return orderPage.map(this::convertToResponseDto); // 메소드 이름 변경
+	}
+
+	private AdminOrderListResponse convertToResponseDto(Order order) {
+		String paymentMethod = null;
+		if (order.getPayment() != null && order.getPayment().getPaymentDetail() != null
+			&& order.getPayment().getPaymentDetail().getPaymentType() != null) {
+			paymentMethod = order.getPayment().getPaymentDetail().getPaymentType().getMethod();
+		}
+
+		BigDecimal totalAmount = order.getOriginalAmount()
+			.subtract(Optional.ofNullable(order.getCouponDiscountAmount()).orElse(BigDecimal.ZERO))
+			.subtract(order.getPointUseAmount());
+
+		return new AdminOrderListResponse(
+			order.getId(),
+			order.getOrderKey(),
+			order.getCreatedAt(),
+			order.getOrdererName(),
+			order.getUser() != null ? order.getUser().getLoginId() : "비회원",
+			order.getReceiverName(),
+			totalAmount,
+			order.getOrderState().getState(),
+			paymentMethod
+		);
+	}
+
+	private OrderItemResponse mapToItemResponse(BookOrder bookOrder) {
+		Book book = bookOrder.getBook();
+		String thumbnailUrl = book.getBookImgs().stream()
+			.filter(BookImg::isThumbnail)
+			.findFirst()
+			.map(bookImg -> bookImg.getImg().getImgUrl())
+			.orElse(null);
+		List<OrderPackagingResponse> packagingResponses = bookOrder.getOrderPackagings().stream()
+			.map(this::mapToPackagingResponse)
+			.toList();
+		List<AppliedCouponResponse> couponResponses = bookOrder.getUserCouponBookOrdersAssociatedWithThisBookOrder()
+			.stream()
+			.map(this::mapToAppliedCouponResponse)
+			.toList();
+
+		BigDecimal totalDiscountAmount = couponResponses.stream()
+			.map(AppliedCouponResponse::getAppliedDiscountAmount)
+			.reduce(BigDecimal.ZERO, BigDecimal::add);
+
+		BigDecimal totalPackagingFee = packagingResponses.stream()
+			.map(p -> p.getPrice().multiply(BigDecimal.valueOf(p.getQuantity())))
+			.reduce(BigDecimal.ZERO, BigDecimal::add);
+
+		BigDecimal basePrice = bookOrder.getPrice().multiply(BigDecimal.valueOf(bookOrder.getQuantity()));
+		BigDecimal finalPrice = basePrice.subtract(totalDiscountAmount).add(totalPackagingFee);
+
+		return OrderItemResponse.builder()
+			.bookOrderId(bookOrder.getId())
+			.bookId(book.getId())
+			.bookTitle(book.getTitle())
+			.bookThumbnailUrl(thumbnailUrl)
+			.quantity(bookOrder.getQuantity())
+			.price(bookOrder.getPrice())
+			.packagingOptions(packagingResponses)
+			.appliedItemCoupons(couponResponses)
+			.finalItemPrice(finalPrice)
+			.build();
+	}
+
+	private OrderPackagingResponse mapToPackagingResponse(OrderPackaging packaging) {
+		PackagingOption option = packaging.getPackagingOption();
+		return OrderPackagingResponse.builder()
+			.packageId(option.getId())
+			.name(option.getName())
+			.price(option.getPrice())
+			.quantity(packaging.getQuantity())
+			.build();
+	}
+
+	private AppliedCouponResponse mapToAppliedCouponResponse(UserCouponBookOrder ucb) {
+		UserCoupon userCoupon = ucb.getUserCoupon();
+		Coupon coupon = userCoupon.getCoupon();
+		return AppliedCouponResponse.builder()
+			.userCouponBookOrderId(ucb.getId())
+			.couponName(coupon.getCouponName())
 			.build();
 	}
 

@@ -655,6 +655,14 @@ CREATE TABLE `order_packaging`
             REFERENCES `book_order` (`book_order_id`)
 );
 
+CREATE TABLE shedlock
+(
+    name       VARCHAR(64)  NOT NULL PRIMARY KEY,
+    lock_until TIMESTAMP    NOT NULL,
+    locked_at  TIMESTAMP    NOT NULL,
+    locked_by  VARCHAR(255) NOT NULL
+);
+
 CREATE TABLE BATCH_JOB_INSTANCE
 (
     JOB_INSTANCE_ID BIGINT       NOT NULL PRIMARY KEY,
