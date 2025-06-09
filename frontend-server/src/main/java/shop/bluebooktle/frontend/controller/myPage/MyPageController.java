@@ -1,8 +1,5 @@
 package shop.bluebooktle.frontend.controller.myPage;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -12,6 +9,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
+import shop.bluebooktle.common.domain.order.OrderStatus;
+import shop.bluebooktle.common.dto.common.PaginationData;
+import shop.bluebooktle.common.dto.coupon.response.UserCouponResponse;
+import shop.bluebooktle.common.dto.order.response.OrderHistoryResponse;
+import shop.bluebooktle.frontend.service.CouponService;
+import shop.bluebooktle.frontend.service.OrderService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.common.dto.common.PaginationData;
@@ -46,26 +51,11 @@ public class MyPageController {
 		model.addAttribute("coupons", coupons.getContent());
 		model.addAttribute("selectedFilter", filter);
 
-		List<UserCouponResponse> couponList = coupons.getContent();
-
-		LocalDateTime now = LocalDateTime.now();
-		int usableCount = (int)couponList.stream()
-			.filter(coupon ->
-				coupon.getUsedAt() == null &&
-					!coupon.getAvailableStartAt().isAfter(now) &&
-					!coupon.getAvailableEndAt().isBefore(now))
-			.count();
-
-		int expiringThisMonth = (int)couponList.stream()
-			.filter(coupon ->
-				coupon.getUsedAt() == null &&
-					coupon.getAvailableEndAt().getMonthValue() == now.getMonthValue() &&
-					coupon.getAvailableEndAt().getYear() == now.getYear() &&
-					!coupon.getAvailableEndAt().isBefore(now))
-			.count();
+		Long usableCount = couponService.countAllUsableCoupons();
+		Long expiringCount = couponService.countExpiringThisMonth();
 
 		model.addAttribute("usableCouponCount", usableCount);
-		model.addAttribute("expiringCouponCount", expiringThisMonth);
+		model.addAttribute("expiringCouponCount", expiringCount);
 
 		return "mypage/coupon_list";
 	}

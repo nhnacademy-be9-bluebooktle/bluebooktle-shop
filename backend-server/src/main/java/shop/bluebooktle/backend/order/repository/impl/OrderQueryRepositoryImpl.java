@@ -10,6 +10,9 @@ import static shop.bluebooktle.backend.payment.entity.QPaymentDetail.*;
 import static shop.bluebooktle.backend.payment.entity.QPaymentType.*;
 import static shop.bluebooktle.common.entity.auth.QUser.*;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -68,22 +71,6 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
 			.leftJoin(paymentDetail.paymentType, paymentType).fetchJoin()
 			.leftJoin(bookOrder.book, book).fetchJoin()
 			.where(order.orderKey.eq(orderKey))
-			.fetchOne();
-		return Optional.ofNullable(result);
-	}
-
-	@Override
-	public Optional<Order> findAdminOrderDetailsByOrderId(Long orderId) {
-		Order result = queryFactory
-			.selectFrom(order)
-			.leftJoin(order.user, user).fetchJoin()
-			.leftJoin(order.orderState, orderState).fetchJoin()
-			.leftJoin(order.bookOrders, bookOrder).fetchJoin()
-			.leftJoin(order.payment, payment).fetchJoin()
-			.leftJoin(payment.paymentDetail, paymentDetail).fetchJoin()
-			.leftJoin(paymentDetail.paymentType, paymentType).fetchJoin()
-			.leftJoin(bookOrder.book, book).fetchJoin()
-			.where(order.id.eq(orderId))
 			.fetchOne();
 		return Optional.ofNullable(result);
 	}
@@ -169,6 +156,25 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
 		}
 		return order.createdAt.between(startDate.atStartOfDay(), endDate.atTime(LocalTime.MAX));
 	}
+
+
+	@Override
+	public Optional<Order> findAdminOrderDetailsByOrderId(Long orderId) {
+		Order result = queryFactory
+			.selectFrom(order)
+			.leftJoin(order.user, user).fetchJoin()
+			.leftJoin(order.orderState, orderState).fetchJoin()
+			.leftJoin(order.bookOrders, bookOrder).fetchJoin()
+			.leftJoin(order.payment, payment).fetchJoin()
+			.leftJoin(payment.paymentDetail, paymentDetail).fetchJoin()
+			.leftJoin(paymentDetail.paymentType, paymentType).fetchJoin()
+			.leftJoin(bookOrder.book, book).fetchJoin()
+			.where(order.id.eq(orderId))
+			.fetchOne();
+		return Optional.ofNullable(result);
+	}
+
+
 
 	@Override
 	public BigDecimal findTotalPackagingPriceByOrderId(Long orderId) {

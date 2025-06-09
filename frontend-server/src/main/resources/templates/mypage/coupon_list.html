@@ -52,86 +52,29 @@
             margin-bottom: 2rem;
         }
 
-        /* .coupon-controls-kitsch .control-group-kitsch 등은 styles.css 재활용 */
-        .coupon-register-form-kitsch { /* 쿠폰 등록 폼 */
-            display: flex;
-            gap: 0.5rem;
-            align-items: center;
-        }
-
-        .coupon-register-form-kitsch .input-kitsch {
-            width: 200px; /* 쿠폰 코드 입력창 너비 */
-            font-size: 0.85rem;
-        }
-
         .coupon-list-kitsch {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            /*grid-template-columns: repeat(3, 1fr);*/
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(2, auto);
             gap: 1.5rem;
-            justify-content: flex-start;
+            justify-content: center;
         }
 
         .coupon-card-kitsch {
-
             background-color: var(--kitsch-bg-main);
             border: 3px solid var(--kitsch-text-dark);
             border-radius: 10px;
             padding: 1.2rem 1.5rem;
-            box-shadow: 3px 3px 0px var(--kitsch-color-1); /* 버건디 */
+            box-shadow: 3px 3px 0px var(--kitsch-color-1);
             display: flex;
             flex-direction: column;
-            justify-content: space-between; /* 내용과 유효기간 분리 */
-            position: relative; /* 뱃지 위치 기준 */
-            overflow: hidden; /* 찢어진 효과를 위해 */
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
         }
 
-        /* pagination-kitsch 꾸미기 */
-        .pagination-list-kitsch {
-            list-style: none;
-            display: flex;
-            justify-content: center;
-            gap: 0.5rem;
-            padding: 0;
-            margin: 0;
-        }
-
-        .page-item-kitsch {
-            /* 기본 테두리와 그림자 */
-            border: 2px solid var(--kitsch-color-1);
-            border-radius: 4px;
-            box-shadow: 1px 1px 0 var(--kitsch-color-5);
-        }
-
-        .page-link-kitsch {
-            display: block;
-            padding: 0.5rem 0.75rem;
-            text-decoration: none;
-            font-family: var(--font-display);
-            color: var(--kitsch-color-1);
-            transition: background 0.2s, color 0.2s;
-        }
-
-        .page-item-kitsch:hover .page-link-kitsch:not(.disabled) {
-            background-color: var(--kitsch-color-1);
-            color: var(--kitsch-text-light);
-        }
-
-        .page-item-kitsch.active-kitsch {
-            background-color: var(--kitsch-color-1);
-        }
-
-        .page-item-kitsch.active-kitsch .page-link-kitsch {
-            color: var(--kitsch-text-light);
-            font-weight: bold;
-        }
-
-        .page-item-kitsch.disabled .page-link-kitsch {
-            opacity: 0.5;
-            pointer-events: none;
-        }
-
-        .coupon-card-kitsch::before, .coupon-card-kitsch::after { /* 찢어진 효과 */
+        .coupon-card-kitsch::before,
+        .coupon-card-kitsch::after {
             content: '';
             position: absolute;
             width: 20px;
@@ -153,7 +96,6 @@
             transform: translateY(-50%);
         }
 
-
         .coupon-card-kitsch.used-coupon-kitsch,
         .coupon-card-kitsch.expired-coupon-kitsch {
             opacity: 0.6;
@@ -162,12 +104,13 @@
             box-shadow: 2px 2px 0px #888;
         }
 
-        .coupon-card-kitsch.used-coupon-kitsch::before, .coupon-card-kitsch.used-coupon-kitsch::after,
-        .coupon-card-kitsch.expired-coupon-kitsch::before, .coupon-card-kitsch.expired-coupon-kitsch::after {
-            background: var(--kitsch-bg-alt); /* 상위 배경색 */
+        .coupon-card-kitsch.used-coupon-kitsch::before,
+        .coupon-card-kitsch.used-coupon-kitsch::after,
+        .coupon-card-kitsch.expired-coupon-kitsch::before,
+        .coupon-card-kitsch.expired-coupon-kitsch::after {
+            background: var(--kitsch-bg-alt);
             border-color: #aaa;
         }
-
 
         .coupon-info-kitsch .coupon-name-kitsch {
             font-family: var(--font-display);
@@ -202,7 +145,7 @@
             text-align: center;
         }
 
-        .coupon-footer-kitsch .status-badge-kitsch {
+        .status-badge-kitsch {
             font-size: 0.75rem;
             padding: 0.2em 0.5em;
             border-radius: 3px;
@@ -212,15 +155,6 @@
             right: 10px;
             transform: rotate(5deg);
             border: 1px solid var(--kitsch-text-dark);
-        }
-
-        .available-coupon-kitsch {
-            background-color: var(--kitsch-bg-main);
-            border-color: var(--kitsch-color-1);
-            box-shadow: 3px 3px 0px var(--kitsch-color-1);
-        }
-
-        .status-badge-kitsch {
             font-family: var(--font-pixel);
         }
 
@@ -236,7 +170,50 @@
             background-color: var(--kitsch-color-1);
         }
 
-        .no-coupons-kitsch { /* 쿠폰 없을 때 */
+        .pagination-list-kitsch {
+            list-style: none;
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0;
+            margin: 0;
+        }
+
+        .page-item-kitsch {
+            border: 2px solid var(--kitsch-color-1);
+            border-radius: 4px;
+            box-shadow: 1px 1px 0 var(--kitsch-color-5);
+        }
+
+        .page-link-kitsch {
+            display: block;
+            padding: 0.5rem 0.75rem;
+            text-decoration: none;
+            font-family: var(--font-display);
+            color: var(--kitsch-color-1);
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .page-item-kitsch:hover .page-link-kitsch:not(.disabled) {
+            background-color: var(--kitsch-color-1);
+            color: var(--kitsch-text-light);
+        }
+
+        .page-item-kitsch.active-kitsch {
+            background-color: var(--kitsch-color-1);
+        }
+
+        .page-item-kitsch.active-kitsch .page-link-kitsch {
+            color: var(--kitsch-text-light);
+            font-weight: bold;
+        }
+
+        .page-item-kitsch.disabled .page-link-kitsch {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .no-coupons-kitsch {
             text-align: center;
             padding: 3rem 1rem;
             font-family: var(--font-pixel);
@@ -253,7 +230,6 @@
             margin-bottom: 1rem;
             color: var(--kitsch-color-4);
         }
-
 
         @media (max-width: 768px) {
             .coupon-summary-kitsch {
@@ -301,11 +277,11 @@
 
                 <div class="coupon-summary-kitsch">
                     <div class="coupon-summary-item-kitsch">
-                        <span class="count-kitsch" th:text="${usableCouponCount}">3</span>
+                        <span class="count-kitsch" th:text="${usableCouponCount}">0</span>
                         <span class="label-kitsch">사용 가능 쿠폰</span>
                     </div>
                     <div class="coupon-summary-item-kitsch">
-                        <span class="count-kitsch" th:text="${expiringCouponCount}">1</span>
+                        <span class="count-kitsch" th:text="${expiringCouponCount}">0</span>
                         <span class="label-kitsch">이달 소멸 예정</span>
                     </div>
                 </div>
@@ -326,7 +302,8 @@
                 </form>
 
                 <!-- 쿠폰 리스트 -->
-                <div class="coupon-list-kitsch">
+                <div class="coupon-list-kitsch"
+                     style="display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(2, auto); gap: 1.5rem;">
                     <div th:each="coupon : ${coupons}"
                          th:with="
                             now=${T(java.time.LocalDateTime).now()},
@@ -364,50 +341,51 @@
                 </div>
 
 
-                <nav aria-label="Page navigation"
-                     class="pagination-kitsch"
-                     style="margin-top: 2.5rem;"
+                <!-- 페이징 -->
+                <nav aria-label="Page navigation" class="pagination-kitsch" style="margin-top: 2.5rem;"
                      th:if="${page.pagination.totalPages > 0}">
-
-                    <!-- lastIndex = totalPages-1 (최소 0) -->
-                    <ul class="pagination-list-kitsch"
-                        th:with="lastIndex=${page.pagination.totalPages > 0
-                           ? page.pagination.totalPages - 1
-                           : 0}">
+                    <ul class="pagination-list-kitsch" th:with="lastIndex=${page.pagination.totalPages - 1}">
 
                         <!-- 이전 -->
-                        <li class="page-item-kitsch"
-                            th:classappend="${!page.pagination.hasPrevious} ? ' disabled'">
+                        <li class="page-item-kitsch" th:classappend="${!page.pagination.hasPrevious} ? ' disabled'">
                             <a class="page-link-kitsch"
-                               aria-label="Previous"
                                th:href="@{${currentURI}(page=${page.pagination.hasPrevious ? page.pagination.currentPage - 1 : 0})}">
                                 &laquo; 이전
                             </a>
                         </li>
 
-                        <!-- 페이지 번호 (0~lastIndex) -->
+                        <!-- 처음 페이지 -->
+                        <li th:if="${page.pagination.currentPage > 2}">
+                            <a class="page-link-kitsch" th:href="@{${currentURI}(page=0)}">1</a>
+                        </li>
+                        <li th:if="${page.pagination.currentPage > 3}">
+                            <span class="page-link-kitsch">...</span>
+                        </li>
+
                         <li class="page-item-kitsch"
-                            th:each="idx : ${#numbers.sequence(0, lastIndex)}"
+                            th:each="idx : ${#numbers.sequence(T(java.lang.Math).max(0, page.pagination.currentPage - 2), T(java.lang.Math).min(lastIndex, page.pagination.currentPage + 2))}"
                             th:classappend="${idx == page.pagination.currentPage} ? ' active-kitsch'">
                             <a class="page-link-kitsch"
                                th:href="@{${currentURI}(page=${idx})}"
                                th:text="${idx + 1}">1</a>
                         </li>
 
+                        <!-- 마지막 페이지 -->
+                        <li th:if="${page.pagination.currentPage + 3 < lastIndex}">
+                            <span class="page-link-kitsch">...</span>
+                        </li>
+                        <li th:if="${page.pagination.currentPage + 2 < lastIndex}">
+                            <a class="page-link-kitsch" th:href="@{${currentURI}(page=${lastIndex})}"
+                               th:text="${lastIndex + 1}">끝</a>
+                        </li>
+
                         <!-- 다음 -->
-                        <li class="page-item-kitsch"
-                            th:classappend="${!page.pagination.hasNext} ? ' disabled'">
+                        <li class="page-item-kitsch" th:classappend="${!page.pagination.hasNext} ? ' disabled'">
                             <a class="page-link-kitsch"
-                               aria-label="Next"
-                               th:href="@{${currentURI}(page=${
-            page.pagination.hasNext
-              ? page.pagination.currentPage + 1
-              : page.pagination.currentPage
-         })}">
+                               th:href="@{${currentURI}(page=${page.pagination.hasNext ? page.pagination.currentPage + 1 : page.pagination.currentPage})}">
                                 다음 &raquo;
                             </a>
                         </li>
-
                     </ul>
                 </nav>
 
