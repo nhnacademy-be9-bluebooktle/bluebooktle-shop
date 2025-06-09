@@ -54,6 +54,8 @@ import shop.bluebooktle.common.dto.coupon.response.AppliedCouponResponse;
 import shop.bluebooktle.common.dto.order.request.AdminOrderSearchRequest;
 import shop.bluebooktle.common.dto.order.request.OrderCreateRequest;
 import shop.bluebooktle.common.dto.order.request.OrderItemRequest;
+import shop.bluebooktle.common.dto.order.response.AdminOrderDetailResponse;
+import shop.bluebooktle.common.dto.order.response.AdminOrderListResponse;
 import shop.bluebooktle.common.dto.order.response.AdminOrderListResponse;
 import shop.bluebooktle.common.dto.order.response.OrderConfirmDetailResponse;
 import shop.bluebooktle.common.dto.order.response.OrderDetailResponse;
@@ -668,6 +670,70 @@ public class OrderServiceImpl implements OrderService {
 		order.changeOrderState(shippingState);
 		order.changeShippedAt(LocalDateTime.now());
 
+		orderRepository.save(order);
+	}
+
+	@Override
+	public AdminOrderDetailResponse getAdminOrderDetail(Long orderId) {
+		Order order = orderRepository.findAdminOrderDetailsByOrderId(orderId)
+			.orElseThrow(OrderNotFoundException::new);
+
+		List<OrderItemResponse> itemResponses = order.getBookOrders().stream()
+			.map(this::mapToItemResponse)
+			.toList();
+
+		Payment payment = order.getPayment();
+
+		BigDecimal paidAmount = Optional.ofNullable(payment)
+			.map(Payment::getPaidAmount)
+			.orElse(null);
+
+		String paidMethod = Optional.ofNullable(payment)
+			.map(Payment::getPaymentDetail)
+			.map(PaymentDetail::getPaymentType)
+			.map(PaymentType::getMethod)
+			.orElse(null);
+
+		return new AdminOrderDetailResponse(
+			order.getId(),
+			order.getOrderKey(),
+			order.getCreatedAt(),
+			order.getOrdererName(),
+			order.getUser() != null ? order.getUser().getLoginId() : "비회원",
+			order.getOrdererPhoneNumber(),
+			order.getOrdererEmail(),
+			order.getReceiverName(),
+			order.getReceiverPhoneNumber(),
+			order.getReceiverEmail(),
+			order.getPostalCode(),
+			order.getAddress(),
+			order.getDetailAddress(),
+			itemResponses,
+			paidMethod,
+			order.getOriginalAmount().subtract(order.getDeliveryFee()),
+			order.getPointUseAmount(),
+			order.getCouponDiscountAmount(),
+			order.getDeliveryFee(),
+			paidAmount,
+			order.getOrderState().getState(),
+			order.getTrackingNumber()
+		);
+	}
+
+	@Override
+	@Transactional
+	public void updateOrderStatus(Long orderId, OrderStatus status) {
+		Order order = orderRepository.findById(orderId)
+			.orElseThrow(OrderNotFoundException::new);
+
+		OrderState newState = orderStateRepository.findByState(status)
+			.orElseThrow(OrderStateNotFoundException::new);
+
+		if (order.getOrderState().getState() == OrderStatus.CANCELED) {
+			throw new OrderInvalidStateException("취소된 주문의 상태를 변경할 수 없습니다.");
+		}
+
+		order.changeOrderState(newState);
 		orderRepository.save(order);
 	}
 }
