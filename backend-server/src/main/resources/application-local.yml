@@ -22,12 +22,8 @@ spring:
         highlight_sql: true
         auto_quote_keyword: true
     #    database-platform: org.hibernate.dialect.H2Dialect
-    database-platform: org.hibernate.dialect.MySQL8Dialect
+    database-platform: org.hibernate.dialect.MySQLDialect
     defer-datasource-initialization: true
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
   data:
     redis:
       host: localhost

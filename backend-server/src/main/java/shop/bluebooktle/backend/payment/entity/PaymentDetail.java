@@ -39,7 +39,7 @@ public class PaymentDetail extends BaseEntity {
 	@JoinColumn(name = "payment_type_id", nullable = false)
 	private PaymentType paymentType;
 
-	@Column(name = "key", length = 255)
+	@Column(name = "`key`", length = 255)
 	private String key;
 
 	@Builder
