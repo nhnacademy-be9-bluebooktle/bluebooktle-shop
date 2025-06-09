@@ -101,22 +101,21 @@ public enum ErrorCode {
 	G_ORDER_PACKAGING_OPTION_NOT_FOUND(HttpStatus.NOT_FOUND, "G011", "주문 포장 옵션을 찾을 수 없습니다."),
 	G_ORDER_PACKAGING_OPTION_ALREADY_EXITS(HttpStatus.CONFLICT, "G012", "이미 해당 포장 옵션이 등록되어 있습니다."),
 
-	// 도서 - 이미지
+	// BOOK - 이미지
 	BOOK_IMG_BOOK_ID_NULL(HttpStatus.BAD_REQUEST, "BI01", "도서 ID는 필수입니다."),
 	BOOK_IMG_IMAGE_ID_NULL(HttpStatus.BAD_REQUEST, "BI02", "이미지 ID는 필수입니다."),
 	BOOK_IMG_ALREADY_EXISTS(HttpStatus.CONFLICT, "BI03", "이미 등록된 도서-이미지 매핑입니다."),
 	BOOK_IMG_NOT_FOUND(HttpStatus.NOT_FOUND, "BI04", "도서-이미지 매핑 정보를 찾을 수 없습니다."),
 
-	// Author - 작가
+	// BOOK - 작가
 	AUTHOR_FIELD_NULL(HttpStatus.BAD_REQUEST, "BA01", "작가 등록에 필요한 필드(name, description, authorKey)는 null 일 수 없습니다."),
 	AUTHOR_ID_NULL(HttpStatus.BAD_REQUEST, "BA02", "작가 ID는 필수입니다."),
 	AUTHOR_ALREADY_EXISTS(HttpStatus.CONFLICT, "BA03", "이미 존재하는 작가 이름입니다."),
 	AUTHOR_NOT_FOUND(HttpStatus.NOT_FOUND, "BA04", "존재하지 않는 작가입니다."),
 	AUTHOR_UPDATE_FIELD_MISSING(HttpStatus.BAD_REQUEST, "BA05",
 		"적어도 하나 이상의 필드(name, description, authorKey)를 제공해야 합니다."),
-
-	// 도서 - 작가
 	BOOK_AUTHOR_ALREADY_EXISTS(HttpStatus.CONFLICT, "BA06", "이미 등록된 도서-작가 매핑입니다."),
+	AUTHOR_DELETE_NOT_AVAILABLE(HttpStatus.BAD_REQUEST, "BA07", "도서에 등록된 작가로 삭제할 수 없습니다."),
 
 	IMAGE_ID_NULL(HttpStatus.BAD_REQUEST, "B015", "이미지 ID는 필수입니다."),
 	IMAGE_URL_EMPTY(HttpStatus.BAD_REQUEST, "B016", "이미지 URL은 비어 있을 수 없습니다."),

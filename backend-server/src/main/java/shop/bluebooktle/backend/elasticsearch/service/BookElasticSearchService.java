@@ -22,8 +22,17 @@ public interface BookElasticSearchService {
 
 	// TODO 리뷰 등록 시 리뷰수 증가 및 평점 수정
 
-	// TODO 도서 수정 시 엘라스틱 도서 수정
+	// 도서 수정 시 엘라스틱 도서 수정
 	void updateBook(BookElasticSearchUpdateRequest request);
+
+	// 태그명 수정시 엘라스틱 도서 수정
+	void updateTagName(List<Book> bookList, String updatedTagName, String currentTagName);
+
+	// TODO 작가명 수정시 엘라스틱 도서 수정
+	void updateAuthorName(List<Book> bookList, String updatedAuthorName, String currentAuthorName);
+
+	// TODO 출판사명 수정시 엘라스틱 도서 수정
+	void updatePublisherName(List<Book> bookList, String updatePublisherName, String currentPublisherName);
 
 	// 엘라스틱 도서 정보 삭제
 	void deleteBook(Book book);

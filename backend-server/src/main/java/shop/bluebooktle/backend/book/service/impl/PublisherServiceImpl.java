@@ -1,15 +1,20 @@
 package shop.bluebooktle.backend.book.service.impl;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import shop.bluebooktle.backend.book.entity.Book;
+import shop.bluebooktle.backend.book.entity.BookPublisher;
 import shop.bluebooktle.backend.book.entity.Publisher;
 import shop.bluebooktle.backend.book.repository.BookPublisherRepository;
 import shop.bluebooktle.backend.book.repository.PublisherRepository;
 import shop.bluebooktle.backend.book.service.PublisherService;
+import shop.bluebooktle.backend.elasticsearch.service.BookElasticSearchService;
 import shop.bluebooktle.common.dto.book.request.PublisherRequest;
 import shop.bluebooktle.common.dto.book.response.PublisherInfoResponse;
 import shop.bluebooktle.common.exception.book.PublisherAlreadyExistsException;
@@ -23,6 +28,7 @@ public class PublisherServiceImpl implements PublisherService {
 
 	private final PublisherRepository publisherRepository;
 	private final BookPublisherRepository bookPublisherRepository;
+	private final BookElasticSearchService bookElasticSearchService;
 
 	@Override
 	public void registerPublisher(PublisherRequest request) {
@@ -43,6 +49,13 @@ public class PublisherServiceImpl implements PublisherService {
 		if (publisherRepository.existsByName(request.getName())) {
 			throw new PublisherAlreadyExistsException("출판사명 : " + request.getName());
 		}
+		List<Book> bookList = bookPublisherRepository.findByPublisher(publisher)
+			.stream()
+			.map(BookPublisher::getBook)
+			.toList();
+		
+		// 엘라스틱에 등록된 도서 정보 수정
+		bookElasticSearchService.updateTagName(bookList, request.getName(), publisher.getName());
 
 		publisher.setName(request.getName());
 		publisherRepository.save(publisher);

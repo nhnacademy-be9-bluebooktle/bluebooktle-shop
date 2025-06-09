@@ -89,6 +89,66 @@ public class BookElasticSearchServiceImpl implements BookElasticSearchService {
 	}
 
 	@Override
+	public void updateTagName(List<Book> bookList, String updatedTagName, String currentTagName) {
+		List<BookDocument> bookDocumentList = bookElasticSearchRepository.findByIdIn(
+			bookList.stream().map(Book::getId).toList()
+		);
+
+		for (BookDocument bookDocument : bookDocumentList) {
+			List<String> tagNames = bookDocument.getTagNames();
+
+			if (tagNames.contains(currentTagName)) {
+				tagNames = tagNames.stream()
+					.map(tag -> tag.equals(currentTagName) ? updatedTagName : tag)
+					.toList();
+
+				bookDocument.setTagNames(tagNames);
+				bookElasticSearchRepository.save(bookDocument);
+			}
+		}
+	}
+
+	@Override
+	public void updateAuthorName(List<Book> bookList, String updatedAuthorName, String currentAuthorName) {
+		List<BookDocument> bookDocumentList = bookElasticSearchRepository.findByIdIn(
+			bookList.stream().map(Book::getId).toList()
+		);
+
+		for (BookDocument bookDocument : bookDocumentList) {
+			List<String> authorNames = bookDocument.getAuthorNames();
+
+			if (authorNames.contains(currentAuthorName)) {
+				authorNames = authorNames.stream()
+					.map(author -> author.equals(currentAuthorName) ? updatedAuthorName : author)
+					.toList();
+
+				bookDocument.setAuthorNames(authorNames);
+				bookElasticSearchRepository.save(bookDocument);
+			}
+		}
+	}
+
+	@Override
+	public void updatePublisherName(List<Book> bookList, String updatePublisherName, String currentPublisherName) {
+		List<BookDocument> bookDocumentList = bookElasticSearchRepository.findByIdIn(
+			bookList.stream().map(Book::getId).toList()
+		);
+
+		for (BookDocument bookDocument : bookDocumentList) {
+			List<String> publisherNames = bookDocument.getPublisherNames();
+
+			if (publisherNames.contains(currentPublisherName)) {
+				publisherNames = publisherNames.stream()
+					.map(author -> author.equals(currentPublisherName) ? updatePublisherName : author)
+					.toList();
+
+				bookDocument.setPublisherNames(publisherNames);
+				bookElasticSearchRepository.save(bookDocument);
+			}
+		}
+	}
+
+	@Override
 	public void deleteBook(Book book) {
 		BookDocument bookDocument = bookElasticSearchRepository.findById(book.getId())
 			.orElseThrow(ElasticsearchBookNotFoundException::new);
