@@ -29,6 +29,12 @@ public interface CouponRepository {
 	@GetMapping("/usable-order")
 	UsableUserCouponMapResponse getUsableCouponsForOrder(@RequestParam("bookIds") List<Long> bookIds);
 
+	@GetMapping("/count/usable")
+	Long countAllUsableCoupons();
+
+	@GetMapping("/count/expiring")
+	Long countExpiringThisMonth();
+
 	@PostMapping("/{id}/use")
 	void useCoupon(@PathVariable Long id);
 
