@@ -105,7 +105,7 @@ public class User extends BaseEntity {
 	@Builder
 	public User(Long id, MembershipLevel membershipLevel, String loginId, String encodedPassword, String name,
 		String email, String nickname, String birth, String phoneNumber, UserProvider provider, UserType type,
-		UserStatus status, LocalDateTime lastLoginAt) {
+		BigDecimal pointBalance, UserStatus status, LocalDateTime lastLoginAt) {
 		this.id = id;
 		this.membershipLevel = membershipLevel;
 		this.loginId = loginId;

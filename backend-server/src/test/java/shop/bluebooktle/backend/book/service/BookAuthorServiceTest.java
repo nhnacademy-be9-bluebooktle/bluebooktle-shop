@@ -1,3 +1,6 @@
+
+// 서비스 로직 변경으로 인한 주석 처리
+
 // package shop.bluebooktle.backend.book.service;
 //
 // import static org.assertj.core.api.Assertions.*;
