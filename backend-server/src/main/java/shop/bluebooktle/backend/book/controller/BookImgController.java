@@ -1,6 +1,5 @@
 package shop.bluebooktle.backend.book.controller;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
@@ -18,7 +17,6 @@ import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.book.service.BookImgService;
 import shop.bluebooktle.common.dto.book.request.BookImgRegisterRequest;
 import shop.bluebooktle.common.dto.book.response.BookImgResponse;
-import shop.bluebooktle.common.dto.book.response.BookInfoResponse;
 import shop.bluebooktle.common.dto.book.response.img.ImgResponse;
 import shop.bluebooktle.common.dto.common.JsendResponse;
 
@@ -61,15 +59,6 @@ public class BookImgController {
 			return ResponseEntity
 				.ok(JsendResponse.success(null));
 		}
-	}
-
-	@GetMapping("/api/images/{imgId}/books")
-	public ResponseEntity<JsendResponse<List<BookInfoResponse>>> getBooksByImage(
-		@PathVariable Long imgId
-	) {
-		List<BookInfoResponse> books = bookImgService.getBookByImgId(imgId);
-		return ResponseEntity
-			.ok(JsendResponse.success(books));
 	}
 
 	@DeleteMapping("/api/books/{bookId}/images/{imgId}")

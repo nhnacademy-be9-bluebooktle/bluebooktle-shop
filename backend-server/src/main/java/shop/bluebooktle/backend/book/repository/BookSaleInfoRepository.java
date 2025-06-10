@@ -11,6 +11,4 @@ public interface BookSaleInfoRepository extends JpaRepository<BookSaleInfo, Long
 	Optional<BookSaleInfo> findByBook(Book book);
 
 	Optional<BookSaleInfo> findByBookId(Long bookId);
-
-	boolean existsByBookId(Long id);
 }
