@@ -5,13 +5,12 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import shop.bluebooktle.backend.payment.client.TossPaymentClient;
 import shop.bluebooktle.backend.payment.dto.request.GenericPaymentCancelRequest;
 import shop.bluebooktle.backend.payment.dto.request.TossApiPaymentCancelRequest;
@@ -26,12 +25,12 @@ import shop.bluebooktle.common.dto.payment.request.PaymentConfirmRequest;
 
 @Component("TOSS")
 @RequiredArgsConstructor
+@Slf4j
 public class TossPaymentGatewayImpl implements PaymentGateway {
 
 	@Value("${toss.secret-key}")
 	private String secretKey;
 
-	private static final Logger log = LoggerFactory.getLogger(TossPaymentGatewayImpl.class);
 	private final TossPaymentClient tossPaymentClient;
 
 	@Override
