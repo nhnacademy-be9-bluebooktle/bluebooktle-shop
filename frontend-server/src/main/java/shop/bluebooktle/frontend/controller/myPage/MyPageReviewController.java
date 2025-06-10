@@ -41,11 +41,11 @@ public class MyPageReviewController {
 	) {
 		if (bindingResult.hasErrors()) {
 			redirectAttrs.addFlashAttribute("globalErrorMessage", "리뷰 작성 실패!");
-			return "redirect:/mypage/orders/" + bookOrderId;
+			return "redirect:/mypage/reviews";
 		}
 		reviewService.addReview(userPrincipal.getUserId(), bookOrderId, reviewRequest);
 		redirectAttrs.addFlashAttribute("globalSuccessMessage", "리뷰가 성공적으로 등록되었습니다.");
-		return "redirect:/mypage/orders/" + bookOrderId;
+		return "redirect:/mypage/reviews";
 	}
 
 	// 내가 쓴 리뷰 전체조회
