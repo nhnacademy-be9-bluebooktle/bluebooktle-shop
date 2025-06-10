@@ -38,13 +38,7 @@ public class BookServiceImpl implements BookService {
 	@Override
 	public Page<BookInfoResponse> getPagedBooks(int page, int size, String searchKeyword, BookSortType bookSortType) {
 		Pageable pageable = PageRequest.of(page, size);
-
-		String keyword = null;
-		if (searchKeyword != null && !searchKeyword.isBlank()) {
-			keyword = searchKeyword;
-		}
-
-		PaginationData<BookInfoResponse> response = bookRepository.searchBooks(page, size, keyword, bookSortType);
+		PaginationData<BookInfoResponse> response = bookRepository.searchBooks(page, size, searchKeyword, bookSortType);
 		List<BookInfoResponse> books = response.getContent();
 		return new PageImpl<>(books, pageable, response.getTotalElements());
 	}
