@@ -11,6 +11,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.payment.service.PaymentService;
 import shop.bluebooktle.common.dto.common.JsendResponse;
+import shop.bluebooktle.common.dto.payment.request.PaymentCancelRequest;
 import shop.bluebooktle.common.dto.payment.request.PaymentConfirmRequest;
 import shop.bluebooktle.common.dto.payment.response.PaymentConfirmResponse;
 
@@ -32,5 +33,14 @@ public class PaymentController {
 			request.amount().intValue()
 		);
 		return ResponseEntity.ok(JsendResponse.success(responsePayload));
+	}
+
+	@PostMapping("/{gatewayName}/cancel")
+	public ResponseEntity<JsendResponse<Void>> cancel(
+		@PathVariable String gatewayName,
+		@Valid @RequestBody PaymentCancelRequest request) throws Exception {
+		paymentService.cancelPayment(request, gatewayName.toUpperCase());
+
+		return ResponseEntity.ok(JsendResponse.success());
 	}
 }

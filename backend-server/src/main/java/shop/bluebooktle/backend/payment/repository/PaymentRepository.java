@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import shop.bluebooktle.backend.order.entity.Order;
 import shop.bluebooktle.backend.payment.entity.Payment;
+import shop.bluebooktle.backend.payment.entity.PaymentDetail;
 import shop.bluebooktle.common.domain.order.OrderStatus;
 import shop.bluebooktle.common.entity.auth.User;
 
@@ -16,6 +17,8 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
 	Optional<Payment> findById(long id);
 
 	Optional<Payment> findByOrder(Order order);
+
+	Optional<Payment> findByPaymentDetail(PaymentDetail paymentDetail);
 
 	@EntityGraph(attributePaths = {"order", "order.orderState"})
 	Page<Payment> findByOrder_User(User user, Pageable pageable);

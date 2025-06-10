@@ -167,11 +167,14 @@ CREATE TABLE `packaging_option`
 
 CREATE TABLE `payment_detail`
 (
-    `payment_detail_id` bigint       NOT NULL AUTO_INCREMENT,
-    `payment_type_id`   bigint       NOT NULL,
-    `key`               varchar(255) NULL,
-    `created_at`        timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `deleted_at`        timestamp    NULL,
+    `payment_detail_id` bigint                                                                                                      NOT NULL AUTO_INCREMENT,
+    `payment_type_id`   bigint                                                                                                      NOT NULL,
+    `payment_key`       varchar(255)                                                                                                NULL,
+    `payment_status`    ENUM ('READY','IN_PROGRESS','WAITING_FOR_DEPOSIT','DONE','CANCELED','PARTIAL_CANCELED','ABORTED','EXPIRED') NOT NULL DEFAULT 'READY',
+    `requested_at`      timestamp                                                                                                   NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `approved_at`       timestamp                                                                                                   NULL,
+    `created_at`        timestamp                                                                                                   NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `deleted_at`        timestamp                                                                                                   NULL,
 
     CONSTRAINT `PK_PAYMENT_DETAIL` PRIMARY KEY (`payment_detail_id`),
     CONSTRAINT `FK_payment_detail_payment_type_id_payment_type`
