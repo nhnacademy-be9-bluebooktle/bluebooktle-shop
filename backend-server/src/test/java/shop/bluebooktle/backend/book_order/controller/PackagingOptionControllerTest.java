@@ -123,6 +123,42 @@ public class PackagingOptionControllerTest {
 			.searchPackagingOption(eq(keyword), any(Pageable.class));
 	}
 
+	@DisplayName("검색 키워드가 null일 때 전체 조회 - 성공")
+	@Test
+	void getPackagingOptions_withNullKeyword() throws Exception {
+		PackagingOptionInfoResponse dto = new PackagingOptionInfoResponse(1L, "기본 포장지", BigDecimal.valueOf(500));
+		given(packagingOptionService.getPackagingOptions(any(Pageable.class)))
+			.willReturn(new PageImpl<>(List.of(dto)));
+
+		mockMvc.perform(get("/api/options")
+				.contentType(MediaType.APPLICATION_JSON))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.status").value("success"))
+			.andExpect(jsonPath("$.data.content[0].id").value(1));
+
+		then(packagingOptionService).should()
+			.getPackagingOptions(any(Pageable.class));
+	}
+
+	@Test
+	@DisplayName("검색 키워드가 빈 문자열일 때 전체 조회 - 성공")
+	void getPackagingOptions_withEmptyKeyword() throws Exception {
+		PackagingOptionInfoResponse dto =
+			new PackagingOptionInfoResponse(7L, "포장지", BigDecimal.valueOf(300));
+		given(packagingOptionService.getPackagingOptions(any(Pageable.class)))
+			.willReturn(new PageImpl<>(List.of(dto)));
+
+		mockMvc.perform(get("/api/options")
+				.param("searchKeyword", " ")
+				.contentType(MediaType.APPLICATION_JSON))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.status").value("success"))
+			.andExpect(jsonPath("$.data.content[0].id").value(7));
+
+		then(packagingOptionService).should()
+			.getPackagingOptions(any(Pageable.class));
+	}
+
 	@Test
 	@DisplayName("단건 조회 - 성공")
 	void getPackagingOption_success() throws Exception {
