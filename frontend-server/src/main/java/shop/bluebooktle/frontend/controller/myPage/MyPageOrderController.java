@@ -56,7 +56,6 @@ public class MyPageOrderController {
 		RedirectAttributes redirectAttributes
 	) {
 		ModelAndView mav = new ModelAndView("mypage/order_detail");
-
 		try {
 			OrderDetailResponse orderDetails = orderService.getOrderDetailByOrderKey(orderKey);
 			mav.addObject("order", orderDetails);

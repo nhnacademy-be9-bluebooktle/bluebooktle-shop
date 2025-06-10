@@ -239,15 +239,9 @@
                 <form class="admin-form" method="post"
                       th:action="@{/admin/orders/{id}/update-tracking(id=${order.orderId})}">
                     <div class="admin-form-group">
-                        <label class="admin-form-label" for="deliveryStatus">현재 배송 상태</label>
-                        <input class="admin-form-control" id="deliveryStatus" readonly
-                               th:value="${order.orderStatus().getDescription()}" type="text">
-                    </div>
-                    <div class="admin-form-group">
                         <label class="admin-form-label" for="trackingNumber">운송장 번호</label>
                         <input class="admin-form-control" id="trackingNumber" name="trackingNumber"
-                               placeholder="운송장 번호를 입력하세요" th:value="${order.trackingNumber()}"
-                               type="text">
+                               type="text" placeholder="운송장 번호를 입력하세요" th:value="${order.trackingNumber()}">
                     </div>
                     <div class="admin-form-actions" style="text-align: right;">
                         <button class="admin-btn admin-btn--primary" type="submit">

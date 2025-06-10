@@ -8,7 +8,6 @@ import shop.bluebooktle.common.dto.order.request.AdminOrderSearchRequest;
 import shop.bluebooktle.common.dto.order.request.OrderCreateRequest;
 import shop.bluebooktle.common.dto.order.response.AdminOrderDetailResponse;
 import shop.bluebooktle.common.dto.order.response.AdminOrderListResponse;
-import shop.bluebooktle.common.dto.order.response.AdminOrderListResponse;
 import shop.bluebooktle.common.dto.order.response.OrderConfirmDetailResponse;
 import shop.bluebooktle.common.dto.order.response.OrderDetailResponse;
 import shop.bluebooktle.common.dto.order.response.OrderHistoryResponse;
@@ -19,13 +18,13 @@ public interface OrderService {
 
 	OrderDetailResponse getOrderDetailByUserId(String orderKey, Long userId);
 
-	OrderDetailResponse getOrderDetailByOrdererPhoneNumber(String orderKey, String phoneNumber);
-
-	OrderDetailResponse getOrderDetailInternal(String orderKey);
+	OrderDetailResponse getOrderDetailByOrderKey(String orderKey);
 
 	Long createOrder(OrderCreateRequest request);
 
-	void cancelOrder(String orderKey, Long userId);
+	void cancelOrderMember(String orderKey, Long userId);
+
+	void cancelOrderNonMember(String orderKey);
 
 	void cancelOrderInternal(Long orderId);
 
@@ -40,4 +39,6 @@ public interface OrderService {
 	AdminOrderDetailResponse getAdminOrderDetail(Long orderKey);
 
 	void updateOrderStatus(Long orderId, OrderStatus status);
+
+	void updateOrderTrackingNumber(Long orderId, String trackingNumber);
 }

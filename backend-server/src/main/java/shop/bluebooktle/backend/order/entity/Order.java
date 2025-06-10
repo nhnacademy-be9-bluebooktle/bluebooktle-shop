@@ -176,4 +176,8 @@ public class Order extends BaseEntity {
 	public void changeShippedAt(LocalDateTime newShippedAt) {
 		this.shippedAt = newShippedAt;
 	}
+
+	public void changeTrackingNumber(String newTrackingNumber) {
+		this.trackingNumber = newTrackingNumber;
+	}
 }

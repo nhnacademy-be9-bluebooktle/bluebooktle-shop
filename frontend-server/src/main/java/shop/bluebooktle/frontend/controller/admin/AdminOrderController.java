@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,13 +21,8 @@ import shop.bluebooktle.common.domain.order.OrderStatus;
 import shop.bluebooktle.common.dto.common.PaginationData;
 import shop.bluebooktle.common.dto.order.request.AdminOrderSearchRequest;
 import shop.bluebooktle.common.dto.order.request.AdminOrderStatusUpdateRequest;
+import shop.bluebooktle.common.dto.order.request.AdminOrderTrackingNumberUpdateRequest;
 import shop.bluebooktle.common.dto.order.response.AdminOrderDetailResponse;
-import shop.bluebooktle.common.dto.order.response.AdminOrderListResponse;
-import shop.bluebooktle.frontend.service.AdminOrderService;
-import shop.bluebooktle.common.domain.order.AdminOrderSearchType;
-import shop.bluebooktle.common.domain.order.OrderStatus;
-import shop.bluebooktle.common.dto.common.PaginationData;
-import shop.bluebooktle.common.dto.order.request.AdminOrderSearchRequest;
 import shop.bluebooktle.common.dto.order.response.AdminOrderListResponse;
 import shop.bluebooktle.frontend.service.AdminOrderService;
 
@@ -92,11 +86,10 @@ public class AdminOrderController {
 
 	@PostMapping("/{orderId}/update-tracking")
 	public String updateTrackingNumber(@PathVariable("orderId") Long orderId,
-		@RequestParam("trackingNumber") String trackingNumber,
-		// @RequestParam("deliveryCompany") String deliveryCompany, // 필요시 배송업체도 함께
+		@ModelAttribute AdminOrderTrackingNumberUpdateRequest status,
 		RedirectAttributes redirectAttributes) {
 		try {
-			// TODO: adminOrderService.updateTrackingNumber(orderKey, trackingNumber, deliveryCompany);
+			adminOrderService.updateOrderTrackingNumber(orderId, status);
 			redirectAttributes.addFlashAttribute("globalSuccessMessage",
 				"주문(ID: " + orderId + ")의 운송장 번호가 성공적으로 등록/수정되었습니다.");
 		} catch (Exception e) {

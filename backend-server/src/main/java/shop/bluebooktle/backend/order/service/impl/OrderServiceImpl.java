@@ -56,7 +56,6 @@ import shop.bluebooktle.common.dto.order.request.OrderCreateRequest;
 import shop.bluebooktle.common.dto.order.request.OrderItemRequest;
 import shop.bluebooktle.common.dto.order.response.AdminOrderDetailResponse;
 import shop.bluebooktle.common.dto.order.response.AdminOrderListResponse;
-import shop.bluebooktle.common.dto.order.response.AdminOrderListResponse;
 import shop.bluebooktle.common.dto.order.response.OrderConfirmDetailResponse;
 import shop.bluebooktle.common.dto.order.response.OrderDetailResponse;
 import shop.bluebooktle.common.dto.order.response.OrderHistoryResponse;
@@ -117,8 +116,6 @@ public class OrderServiceImpl implements OrderService {
 				.subtract(Optional.ofNullable(o.getCouponDiscountAmount())
 					.orElse(BigDecimal.ZERO))
 				.subtract(Optional.ofNullable(o.getPointUseAmount())
-					.orElse(BigDecimal.ZERO))
-				.add(Optional.ofNullable(o.getDeliveryFee())
 					.orElse(BigDecimal.ZERO));
 
 			String thumbnailUrl = o.getBookOrders().stream()
@@ -249,6 +246,13 @@ public class OrderServiceImpl implements OrderService {
 
 			bookOrderRepository.save(bookOrder);
 		}
+
+		int stock = bookSaleInfo.getStock() - item.bookQuantity();
+		bookSaleInfo.updateStock(stock);
+		if (stock <= 0) {
+			bookSaleInfo.changeSaleState(BookSaleInfoState.SALE_ENDED);
+		}
+		bookSaleInfoRepository.save(bookSaleInfo);
 	}
 
 	@Override
@@ -451,7 +455,7 @@ public class OrderServiceImpl implements OrderService {
 
 	@Override
 	@Transactional
-	public void cancelOrder(String orderKey, Long userId) {
+	public void cancelOrderMember(String orderKey, Long userId) {
 
 		Order order = orderRepository.findByOrderKey(orderKey)
 			.orElseThrow(OrderNotFoundException::new);
@@ -470,8 +474,22 @@ public class OrderServiceImpl implements OrderService {
 
 	@Override
 	@Transactional
+	public void cancelOrderNonMember(String orderKey) {
+
+		Order order = orderRepository.findByOrderKey(orderKey)
+			.orElseThrow(OrderNotFoundException::new);
+
+		if (order.getOrderState().getState() != OrderStatus.PENDING
+			&& order.getOrderState().getState() != OrderStatus.SHIPPING) {
+			throw new OrderInvalidStateException("배송이 시작되면 주문을 취소할 수 없습니다.");
+		}
+		cancelOrderInternal(order.getId());
+	}
+
+	@Override
+	@Transactional
 	public void cancelOrderInternal(Long orderId) {
-		Order order = orderRepository.findById(orderId)
+		Order order = orderRepository.findOrderForCancelById(orderId)
 			.orElseThrow(OrderNotFoundException::new);
 
 		if (order.getOrderState().getState() != OrderStatus.PENDING) {
@@ -479,21 +497,34 @@ public class OrderServiceImpl implements OrderService {
 		}
 
 		User user = order.getUser();
-		BigDecimal usedPoints = order.getPointUseAmount();
-		if (usedPoints != null && usedPoints.compareTo(BigDecimal.ZERO) > 0) {
-			user.addPoint(usedPoints);
+		if (user != null) {
+			BigDecimal usedPoints = order.getPointUseAmount();
+			if (usedPoints != null && usedPoints.compareTo(BigDecimal.ZERO) > 0) {
+				user.addPoint(usedPoints);
 
-			PointHistory pointHistory = PointHistory.builder()
-				.user(user)
-				.sourceType(PointSourceTypeEnum.ORDER_CANCEL)
-				.value(usedPoints)
-				.build();
-			pointHistoryRepository.save(pointHistory);
+				PointHistory pointHistory = PointHistory.builder()
+					.user(user)
+					.sourceType(PointSourceTypeEnum.ORDER_CANCEL)
+					.value(usedPoints)
+					.build();
+				pointHistoryRepository.save(pointHistory);
+			}
 		}
 
 		OrderState canceledState = orderStateRepository.findByState(OrderStatus.CANCELED)
 			.orElseThrow(OrderStateNotFoundException::new);
 		order.changeOrderState(canceledState);
+
+		for (BookOrder bookOrder : order.getBookOrders()) {
+			BookSaleInfo bookSaleInfo = bookOrder.getBook().getBookSaleInfo();
+			int currentStock = bookSaleInfo.getStock();
+			int orderedQuantity = bookOrder.getQuantity();
+			bookSaleInfo.updateStock(currentStock + orderedQuantity);
+
+			if (bookSaleInfo.getBookSaleInfoState() == BookSaleInfoState.SALE_ENDED) {
+				bookSaleInfo.changeSaleState(BookSaleInfoState.AVAILABLE);
+			}
+		}
 	}
 
 	@Override
@@ -502,29 +533,16 @@ public class OrderServiceImpl implements OrderService {
 		Order order = orderRepository.findOrderDetailsByOrderKey(orderKey)
 			.orElseThrow(OrderNotFoundException::new);
 
-		if (userId != null && order.getUser() != null) {
+		if (order.getUser() != null) {
 			if (!order.getUser().getId().equals(userId)) {
 				throw new OrderNotFoundException("접근 권한이 없습니다.");
 			}
 		}
-		
-		return getOrderDetailInternal(orderKey);
+		return getOrderDetailByOrderKey(orderKey);
 	}
 
 	@Override
-	public OrderDetailResponse getOrderDetailByOrdererPhoneNumber(String orderKey, String phoneNumber) {
-
-		Order order = orderRepository.findOrderDetailsByOrderKey(orderKey)
-			.orElseThrow(OrderNotFoundException::new);
-
-		if (!order.getOrdererPhoneNumber().equals(phoneNumber)) {
-			throw new OrderNotFoundException();
-		}
-		return getOrderDetailInternal(orderKey);
-	}
-
-	@Override
-	public OrderDetailResponse getOrderDetailInternal(String orderKey) {
+	public OrderDetailResponse getOrderDetailByOrderKey(String orderKey) {
 		Order order = orderRepository.findOrderDetailsByOrderKey(orderKey)
 			.orElseThrow(OrderNotFoundException::new);
 
@@ -735,6 +753,23 @@ public class OrderServiceImpl implements OrderService {
 		}
 
 		order.changeOrderState(newState);
+		orderRepository.save(order);
+	}
+
+	@Override
+	@Transactional
+	public void updateOrderTrackingNumber(Long orderId, String trackingNumber) {
+		Order order = orderRepository.findById(orderId)
+			.orElseThrow(OrderNotFoundException::new);
+
+		OrderState newState = orderStateRepository.findByState(OrderStatus.SHIPPING)
+			.orElseThrow(OrderStateNotFoundException::new);
+
+		if (order.getOrderState().getState() == OrderStatus.CANCELED) {
+			throw new OrderInvalidStateException("취소된 주문의 상태를 변경할 수 없습니다.");
+		}
+		order.changeOrderState(newState);
+		order.changeTrackingNumber(trackingNumber);
 		orderRepository.save(order);
 	}
 }
