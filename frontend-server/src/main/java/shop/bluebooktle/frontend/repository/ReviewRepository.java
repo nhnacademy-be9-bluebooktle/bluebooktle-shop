@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import shop.bluebooktle.common.dto.book.request.ReviewRequest;
+import shop.bluebooktle.common.dto.book.request.ReviewRegisterRequest;
 import shop.bluebooktle.common.dto.book.response.ReviewResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
 import shop.bluebooktle.frontend.config.feign.FeignGlobalConfig;
@@ -18,7 +18,7 @@ public interface ReviewRepository {
 	@PostMapping("/{bookOrderId}")
 	ReviewResponse addReview(
 		@PathVariable("bookOrderId") Long bookOrderId,
-		@RequestBody ReviewRequest reviewRequest
+		@RequestBody ReviewRegisterRequest reviewRegisterRequest
 	);
 
 	@GetMapping
