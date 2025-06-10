@@ -34,15 +34,8 @@ public class AdminCategoryServiceImpl implements AdminCategoryService {
 	@Override
 	public Page<CategoryResponse> getCategories(int page, int size, String searchKeyword) {
 		Pageable pageable = PageRequest.of(page, size);
-
-		String keyword = null;
-		if (searchKeyword != null && !searchKeyword.isBlank()) {
-			keyword = searchKeyword;
-		}
-
 		PaginationData<CategoryResponse> response = categoryRepository.getPagedCategories(page, size,
-			keyword);
-		// PaginationData<CategoryResponse> data = response;
+			searchKeyword);
 		List<CategoryResponse> categories = response.getContent();
 		return new PageImpl<>(categories, pageable, response.getTotalElements());
 	}
