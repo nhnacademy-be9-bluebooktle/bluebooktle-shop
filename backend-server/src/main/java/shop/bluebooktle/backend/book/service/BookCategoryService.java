@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import shop.bluebooktle.common.dto.book.BookSortType;
 import shop.bluebooktle.common.dto.book.request.BookInfoRequest;
 import shop.bluebooktle.common.dto.book.response.BookInfoResponse;
 import shop.bluebooktle.common.dto.book.response.CategoryResponse;
@@ -30,5 +31,5 @@ public interface BookCategoryService {
 	List<CategoryResponse> getCategoryByBookId(BookInfoRequest request);
 
 	// 특정 카테고리 안에 등록된 도서 조회
-	Page<BookInfoResponse> searchBooksByCategory(Long categoryId, Pageable pageable);
+	Page<BookInfoResponse> searchBooksByCategory(Long categoryId, Pageable pageable, BookSortType bookSortType);
 }

@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
+import shop.bluebooktle.common.dto.book.BookSortType;
 import shop.bluebooktle.common.dto.book.response.BookCartOrderResponse;
 import shop.bluebooktle.common.dto.book.response.BookDetailResponse;
 import shop.bluebooktle.common.dto.book.response.BookInfoResponse;
@@ -35,24 +36,21 @@ public class BookServiceImpl implements BookService {
 	}
 
 	@Override
-	public Page<BookInfoResponse> getPagedBooks(int page, int size, String searchKeyword) {
+	public Page<BookInfoResponse> getPagedBooks(int page, int size, String searchKeyword, BookSortType bookSortType) {
 		Pageable pageable = PageRequest.of(page, size);
-
-		String keyword = null;
-		if (searchKeyword != null && !searchKeyword.isBlank()) {
-			keyword = searchKeyword;
-		}
-
-		PaginationData<BookInfoResponse> response = bookRepository.searchBooks(page, size, searchKeyword);
+		PaginationData<BookInfoResponse> response = bookRepository.searchBooks(page, size, searchKeyword, bookSortType);
 		List<BookInfoResponse> books = response.getContent();
 		return new PageImpl<>(books, pageable, response.getTotalElements());
 	}
 
 	@Override
-	public Page<BookInfoResponse> getPagedBooksByCategoryId(int page, int size, Long categoryId) {
+	public Page<BookInfoResponse> getPagedBooksByCategoryId(int page, int size, BookSortType bookSortType,
+		Long categoryId
+	) {
 		Pageable pageable = PageRequest.of(page, size);
 
-		PaginationData<BookInfoResponse> response = bookCategoryRepository.getBooksByCategory(page, size, categoryId);
+		PaginationData<BookInfoResponse> response = bookCategoryRepository.getBooksByCategory(page, size, bookSortType,
+			categoryId);
 		List<BookInfoResponse> books = response.getContent();
 		return new PageImpl<>(books, pageable, response.getTotalElements());
 	}

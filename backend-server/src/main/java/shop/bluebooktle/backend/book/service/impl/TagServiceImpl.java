@@ -1,15 +1,20 @@
 package shop.bluebooktle.backend.book.service.impl;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import shop.bluebooktle.backend.book.entity.Book;
+import shop.bluebooktle.backend.book.entity.BookTag;
 import shop.bluebooktle.backend.book.entity.Tag;
 import shop.bluebooktle.backend.book.repository.BookTagRepository;
 import shop.bluebooktle.backend.book.repository.TagRepository;
 import shop.bluebooktle.backend.book.service.TagService;
+import shop.bluebooktle.backend.elasticsearch.service.BookElasticSearchService;
 import shop.bluebooktle.common.dto.book.request.TagRequest;
 import shop.bluebooktle.common.dto.book.response.TagInfoResponse;
 import shop.bluebooktle.common.exception.book.TagAlreadyExistsException;
@@ -22,6 +27,7 @@ public class TagServiceImpl implements TagService {
 
 	private final TagRepository tagRepository;
 	private final BookTagRepository bookTagRepository;
+	private final BookElasticSearchService bookElasticSearchService;
 
 	@Override
 	public void registerTag(TagRequest request) {
@@ -44,7 +50,16 @@ public class TagServiceImpl implements TagService {
 			throw new TagAlreadyExistsException("태그명 : " + request.getName());
 		}
 
+		List<Book> bookList = bookTagRepository.findByTag(tag)
+			.stream()
+			.map(BookTag::getBook)
+			.toList();
+		
+		// 엘라스틱에 등록된 도서 정보 수정
+		bookElasticSearchService.updateTagName(bookList, request.getName(), tag.getName());
+
 		tag.setName(request.getName());
+
 		tagRepository.save(tag);
 	}
 

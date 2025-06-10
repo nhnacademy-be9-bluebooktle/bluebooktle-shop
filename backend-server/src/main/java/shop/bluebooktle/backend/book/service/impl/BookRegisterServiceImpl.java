@@ -1,6 +1,7 @@
 package shop.bluebooktle.backend.book.service.impl;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -22,11 +23,14 @@ import shop.bluebooktle.backend.book.service.BookPublisherService;
 import shop.bluebooktle.backend.book.service.BookRegisterService;
 import shop.bluebooktle.backend.book.service.BookTagService;
 import shop.bluebooktle.backend.book.service.PublisherService;
+import shop.bluebooktle.backend.elasticsearch.service.BookElasticSearchService;
 import shop.bluebooktle.common.dto.book.request.BookAllRegisterByAladinRequest;
 import shop.bluebooktle.common.dto.book.request.BookAllRegisterRequest;
 import shop.bluebooktle.common.dto.book.response.AladinBookResponse;
 import shop.bluebooktle.common.dto.book.response.PublisherInfoResponse;
+import shop.bluebooktle.common.dto.book.response.TagInfoResponse;
 import shop.bluebooktle.common.dto.book.response.author.AuthorResponse;
+import shop.bluebooktle.common.dto.elasticsearch.BookElasticSearchRegisterRequest;
 import shop.bluebooktle.common.exception.book.AladinBookNotFoundException;
 import shop.bluebooktle.common.exception.book.BookAlreadyExistsException;
 
@@ -47,6 +51,9 @@ public class BookRegisterServiceImpl implements BookRegisterService {
 	private final AuthorService authorService;
 	private final PublisherService publisherService;
 
+	// 엘라스틱서치
+	private final BookElasticSearchService bookElasticSearchService;
+
 	@Override
 	public void registerBook(BookAllRegisterRequest request) {
 		Optional<Book> existBook = bookRepository.findByIsbn(request.getIsbn());
@@ -62,17 +69,6 @@ public class BookRegisterServiceImpl implements BookRegisterService {
 				request.getPublishDate().atStartOfDay() : null)
 			.build();
 		bookRepository.save(book);
-
-		// 작가, 출판사, 카테고리, 태그 연결
-		bookAuthorService.registerBookAuthor(book.getId(), request.getAuthorIdList());
-		bookPublisherService.registerBookPublisher(book.getId(), request.getPublisherIdList());
-		bookCategoryService.registerBookCategory(book.getId(), request.getCategoryIdList());
-		if (request.getTagIdList() != null && !request.getTagIdList().isEmpty()) {
-			bookTagService.registerBookTag(book.getId(), request.getTagIdList());
-		}
-
-		// 이미지 연결
-		bookImgService.registerBookImg(book.getId(), request.getImgUrl());
 
 		// 판매 정보 저장
 		BigDecimal salePercentage = request.getPrice().subtract(request.getSalePrice())
@@ -90,6 +86,27 @@ public class BookRegisterServiceImpl implements BookRegisterService {
 			.salePercentage(salePercentage)
 			.build();
 		bookSaleInfoRepository.save(saleInfo);
+
+		// 작가, 출판사, 카테고리, 태그 연결
+		List<AuthorResponse> authorResponses = bookAuthorService.registerBookAuthor(book.getId(),
+			request.getAuthorIdList());
+		List<PublisherInfoResponse> publisherInfoResponses = bookPublisherService.registerBookPublisher(book.getId(),
+			request.getPublisherIdList());
+		bookCategoryService.registerBookCategory(book.getId(), request.getCategoryIdList());
+		List<String> tagNames = new ArrayList<>();
+		if (request.getTagIdList() != null && !request.getTagIdList().isEmpty()) {
+			List<TagInfoResponse> registeredTags = bookTagService.registerBookTag(book.getId(), request.getTagIdList());
+			tagNames = registeredTags.stream()
+				.map(TagInfoResponse::getName)
+				.toList();
+		}
+		// 이미지 연결
+		bookImgService.registerBookImg(book.getId(), request.getImgUrl());
+
+		// 엘라스틱 저장
+		saveElasticsearch(book, saleInfo, authorResponses.stream().map(AuthorResponse::getName).toList(),
+			publisherInfoResponses.stream().map(PublisherInfoResponse::getName).toList(), tagNames,
+			request.getCategoryIdList());
 	}
 
 	@Override
@@ -113,28 +130,6 @@ public class BookRegisterServiceImpl implements BookRegisterService {
 			.build();
 		bookRepository.save(book);
 
-		List<String> authorsName = parseAuthors(aladinBook.getAuthor());
-		for (String authorName : authorsName) {
-			// 도서에 작가 등록 (작가 없으면 작가 테이블에 등록)
-			AuthorResponse author = authorService.registerAuthorByName(authorName);
-			bookAuthorService.registerBookAuthor(book.getId(), author.getId());
-		}
-		// 도서에 출판사 등록 (출판사 없으면 출판사 테이블에 등록)
-		PublisherInfoResponse publisher = publisherService.registerPublisherByName(aladinBook.getPublisher());
-		bookPublisherService.registerBookPublisher(book.getId(), publisher.getId());
-
-		bookImgService.registerBookImg(book.getId(), aladinBook.getImgUrl());
-
-		for (Long categoryId : request.getCategoryIdList()) {
-			bookCategoryService.registerBookCategory(book.getId(), categoryId);
-		}
-
-		if (request.getTagIdList() != null && !request.getTagIdList().isEmpty()) {
-			for (Long tagId : request.getTagIdList()) {
-				bookTagService.registerBookTag(book.getId(), tagId);
-			}
-		}
-
 		BookSaleInfo saleInfo = BookSaleInfo.builder()
 			.book(book)
 			.price(aladinBook.getPrice())
@@ -145,6 +140,39 @@ public class BookRegisterServiceImpl implements BookRegisterService {
 			.bookSaleInfoState(request.getState())
 			.build();
 		bookSaleInfoRepository.save(saleInfo);
+
+		List<String> authorsName = parseAuthors(aladinBook.getAuthor());
+		for (String authorName : authorsName) {
+			// 도서에 작가 등록 (작가 없으면 작가 테이블에 등록)
+			AuthorResponse author = authorService.registerAuthorByName(authorName);
+			bookAuthorService.registerBookAuthor(book.getId(), author.getId());
+		}
+
+		// 도서에 출판사 등록 (출판사 없으면 출판사 테이블에 등록)
+		PublisherInfoResponse publisher = publisherService.registerPublisherByName(aladinBook.getPublisher());
+		bookPublisherService.registerBookPublisher(book.getId(), publisher.getId());
+
+		// 도서 이미지 등록
+		bookImgService.registerBookImg(book.getId(), aladinBook.getImgUrl());
+
+		// 도서 카테고리 등록
+		for (Long categoryId : request.getCategoryIdList()) {
+			bookCategoryService.registerBookCategory(book.getId(), categoryId);
+		}
+
+		// 도서 태그 등록
+		List<String> tagNames = new ArrayList<>();
+		if (request.getTagIdList() != null && !request.getTagIdList().isEmpty()) {
+			List<TagInfoResponse> registeredTags = bookTagService.registerBookTag(book.getId(), request.getTagIdList());
+			tagNames = registeredTags.stream()
+				.map(TagInfoResponse::getName)
+				.toList();
+		}
+
+		// 엘라스틱 저장
+		saveElasticsearch(book, saleInfo, authorsName, List.of(publisher.getName()), tagNames,
+			request.getCategoryIdList());
+
 	}
 
 	private List<String> parseAuthors(String author) {
@@ -153,5 +181,25 @@ public class BookRegisterServiceImpl implements BookRegisterService {
 		return Arrays.stream(authorsStr.split(","))
 			.map(String::trim)
 			.toList();
+	}
+
+	private void saveElasticsearch(Book book, BookSaleInfo bookSaleInfo, List<String> authorNames,
+		List<String> publisherNames, List<String> tagNames, List<Long> categoryIds) {
+		BookElasticSearchRegisterRequest request = new BookElasticSearchRegisterRequest(
+			book.getId(),
+			book.getTitle(),
+			book.getDescription(),
+			book.getPublishDate(),
+			bookSaleInfo.getSalePrice(),
+			bookSaleInfo.getStar(),
+			bookSaleInfo.getViewCount(),
+			bookSaleInfo.getSearchCount(),
+			bookSaleInfo.getReviewCount(),
+			authorNames,
+			publisherNames,
+			tagNames,
+			categoryIds
+		);
+		bookElasticSearchService.registerBook(request);
 	}
 }

@@ -16,8 +16,10 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import shop.bluebooktle.backend.book.service.BookRegisterService;
 import shop.bluebooktle.backend.book.service.BookService;
+import shop.bluebooktle.common.dto.book.BookSortType;
 import shop.bluebooktle.common.dto.book.request.BookAllRegisterRequest;
 import shop.bluebooktle.common.dto.book.request.BookUpdateServiceRequest;
 import shop.bluebooktle.common.dto.book.response.AdminBookResponse;
@@ -27,6 +29,7 @@ import shop.bluebooktle.common.dto.book.response.BookDetailResponse;
 import shop.bluebooktle.common.dto.book.response.BookInfoResponse;
 import shop.bluebooktle.common.dto.common.JsendResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
+import shop.bluebooktle.common.dto.book.response.BookDetailResponse;
 
 @RestController
 @RequestMapping("/api/books")
@@ -75,19 +78,20 @@ public class BookController {
 		return ResponseEntity.ok(JsendResponse.success());
 	}
 
-	// 도서 목록 조회
+	// 도서 목록 조회 및 검색 기능
 	@GetMapping
 	public ResponseEntity<JsendResponse<PaginationData<BookInfoResponse>>> getPagedBooks(
 		@RequestParam("page") int page,
 		@RequestParam("size") int size,
-		@RequestParam(value = "searchKeyword", required = false) String searchKeyword
+		@RequestParam(value = "searchKeyword", required = false) String searchKeyword,
+		@RequestParam("bookSortType") BookSortType bookSortType
 	) {
-		Page<BookInfoResponse> responses = bookService.findAllBooks(page, size, searchKeyword);
+		Page<BookInfoResponse> responses = bookService.findAllBooks(page, size, searchKeyword, bookSortType);
 		PaginationData<BookInfoResponse> paginationData = new PaginationData<>(responses);
 		return ResponseEntity.ok(JsendResponse.success(paginationData));
 	}
 
-	// 도서 목록 조회 - 관리자 페이지
+	// 관리자 페이지 도서 목록 조회 및 검색 기능
 	@GetMapping("/admin")
 	public ResponseEntity<JsendResponse<PaginationData<AdminBookResponse>>> getPagedBooksByAdmin(
 		@RequestParam("page") int page,

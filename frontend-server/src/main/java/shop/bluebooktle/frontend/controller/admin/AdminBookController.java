@@ -102,10 +102,9 @@ public class AdminBookController {
 
 	@GetMapping({"/new"})
 	public String bookForm(
-		@PathVariable(value = "bookId", required = false) Long bookId,
 		HttpServletRequest request,
 		Model model) {
-		log.info("어드민 도서 폼 페이지 요청. URI: {}, bookId: {}", request.getRequestURI(), bookId);
+		log.info("어드민 도서 등록 폼 페이지 요청. URI: {}", request.getRequestURI());
 		model.addAttribute("currentURI", request.getRequestURI());
 
 		// 카테고리, 작가, 출판사, 태그 모든 리스트 불러오기 : 수정 예정
@@ -162,10 +161,10 @@ public class AdminBookController {
 
 	@GetMapping({"/{bookId}/edit"})
 	public String bookEditForm(
-		@PathVariable(value = "bookId", required = false) Long bookId,
+		@PathVariable(value = "bookId") Long bookId,
 		HttpServletRequest request,
 		Model model) {
-		log.info("어드민 도서 폼 페이지 요청. URI: {}, bookId: {}", request.getRequestURI(), bookId);
+		log.info("어드민 도서 수정 폼 페이지 요청. URI: {}, bookId: {}", request.getRequestURI(), bookId);
 		model.addAttribute("currentURI", request.getRequestURI());
 
 		List<AuthorResponse> allAuthorsForMapping =
