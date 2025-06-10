@@ -171,7 +171,7 @@
                     <i class="fas fa-home"></i> 메인으로 돌아가기
                 </a>
                 <a class="btn-kitsch secondary-btn-kitsch color1-kitsch retro-shadow-kitsch-small"
-                   th:href="@{/mypage/orders}">
+                   th:href="@{/mypage/orders/{orderKey}(orderKey=${orderKey})}">
                     <i class="fas fa-list-alt"></i> 주문 내역 확인
                 </a>
             </div>

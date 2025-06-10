@@ -16,6 +16,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -68,6 +69,9 @@ public class Book extends BaseEntity {
 	@OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
 	@BatchSize(size = 10)
 	private List<BookImg> bookImgs = new ArrayList<>();
+
+	@OneToOne(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
+	private BookSaleInfo bookSaleInfo;
 
 	public void addCart(Cart cart, int quantity) {
 		CartBook cartBook = CartBook.builder().book(this).cart(cart).quantity(quantity).build();

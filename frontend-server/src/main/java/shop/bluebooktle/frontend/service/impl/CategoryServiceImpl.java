@@ -6,6 +6,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
+import shop.bluebooktle.common.dto.book.response.CategoryResponse;
 import shop.bluebooktle.common.dto.book.response.CategoryTreeResponse;
 import shop.bluebooktle.frontend.repository.CategoryRepository;
 import shop.bluebooktle.frontend.service.CategoryService;
@@ -20,5 +21,10 @@ public class CategoryServiceImpl implements CategoryService {
 	@Cacheable(value = "categoryTree")
 	public List<CategoryTreeResponse> getCategoryTreeCached() {
 		return categoryRepository.allCategoriesTree();
+	}
+
+	@Override
+	public CategoryResponse getCategoryByName(String name) {
+		return categoryRepository.getCategoryByName(name);
 	}
 }

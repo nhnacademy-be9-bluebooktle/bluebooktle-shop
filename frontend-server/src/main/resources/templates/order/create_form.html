@@ -982,42 +982,40 @@
                 }
 
                 const summaryBookCouponDiscountEl = document.getElementById('summaryBookCouponDiscount');
-                if (summaryBookCouponDiscountEl) { // Check if element exists
+                if (summaryBookCouponDiscountEl) {
                     summaryBookCouponDiscountEl.textContent = '-' + totalBookCouponDiscount.toLocaleString() + '원';
                 }
 
                 const summaryOrderCouponDiscountEl = document.getElementById('summaryOrderCouponDiscount');
-                if (summaryOrderCouponDiscountEl) { // Check if element exists
+                if (summaryOrderCouponDiscountEl) {
                     summaryOrderCouponDiscountEl.textContent = '-' + orderCouponDiscount.toLocaleString() + '원';
                 }
 
-                // 'hiddenBookCouponDiscountAmount' ID의 요소가 있는지 확인 필요
                 const hiddenBookCouponDiscountAmountEl = document.getElementById('hiddenBookCouponDiscountAmount');
                 if (hiddenBookCouponDiscountAmountEl) {
                     hiddenBookCouponDiscountAmountEl.value = totalBookCouponDiscount;
                 }
 
                 const hiddenOrderCouponDiscountAmountEl = document.getElementById('hiddenOrderCouponDiscountAmount');
-                if (hiddenOrderCouponDiscountAmountEl) { // Check if element exists
+                if (hiddenOrderCouponDiscountAmountEl) {
                     hiddenOrderCouponDiscountAmountEl.value = orderCouponDiscount;
                 }
 
                 const hiddenOrderCouponCodeEl = document.getElementById('hiddenOrderCouponCode');
-                if (hiddenOrderCouponCodeEl && orderCouponSelect) { // Check if elements exist
+                if (hiddenOrderCouponCodeEl && orderCouponSelect) {
                     hiddenOrderCouponCodeEl.value = selectedOrder?.value || '';
                 }
-                // updateFinalTotalPrice(); // This is often called by fullPriceRecalculation()
+
             }
 
             function updateOrderCouponAvailability() {
                 const orderCouponSelect = document.getElementById('orderCouponSelect');
-                if (!orderCouponSelect) return; // Exit if the select element doesn't exist
+                if (!orderCouponSelect) return;
 
                 const productTotal = getNumericValue('summaryTotalProductPrice');
                 const saleDiscount = getNumericValue('summaryTotalDiscount');
                 const bookCouponDiscount = getNumericValue('summaryBookCouponDiscount');
-                // Packaging fee is not typically part of coupon eligibility base amount, but confirm business logic.
-                // const packagingFee = getNumericValue('summaryPackagingFee');
+
 
                 const baseAmount = productTotal - saleDiscount - bookCouponDiscount;
 
@@ -1037,10 +1035,8 @@
                 });
 
                 const selected = orderCouponSelect.selectedOptions[0];
-                if (selected?.disabled) { // If currently selected coupon becomes disabled
-                    orderCouponSelect.value = ''; // Reset to "선택 안 함"
-                    // Potentially trigger a recalculation if resetting the coupon
-                    // updateCouponDiscount(); // This will also call updateFinalTotalPrice
+                if (selected?.disabled) {
+                    orderCouponSelect.value = '';
                 }
             }
 
@@ -1087,41 +1083,16 @@
             function fullPriceRecalculation() {
                 updatePriceSummary();
                 updatePackagingFee();
-                // updateCouponDiscount should be called before updateOrderCouponAvailability
-                // because availability might depend on book coupon discounts.
                 updateCouponDiscount();
-                updateOrderCouponAvailability(); // Check and update order coupon options
+                updateOrderCouponAvailability();
                 updateDeliveryFee();
-                // updateCouponDiscount might have changed orderCouponDisc, so call it again
-                // or ensure the sequence is correct.
-                // However, updateCouponDiscount already updates the displayed discount and hidden fields.
-                // The main thing is that updatePointDiscount and updateFinalTotalPrice use the latest values.
-                // Let's ensure updateCouponDiscount is called once, then availability, then point, then final.
-                // If updateOrderCouponAvailability changes the selected order coupon, updateCouponDiscount needs to run again.
-                // A simpler flow: prices -> packaging -> book_coupons -> order_coupon_availability -> order_coupons -> delivery -> points -> final.
-                // To avoid re-calling updateCouponDiscount multiple times if orderCouponSelect.value changes in updateOrderCouponAvailability:
-                // 1. updatePriceSummary();
-                // 2. updatePackagingFee();
-                // 3. Call updateCouponDiscount() for book coupons part first (or separate book/order coupon logic)
-                // 4. updateOrderCouponAvailability(); // This might reset orderCouponSelect.value
-                // 5. updateCouponDiscount(); // This will now use the potentially reset orderCouponSelect.value to calculate orderCouponDiscount
-                // 6. updateDeliveryFee();
-                // 7. updatePointDiscount();
-                // 8. updateFinalTotalPrice();
-                // Current updateCouponDiscount handles both book and order coupons.
-                // So, the sequence: price, packaging, coupon_availability, coupon_discounts, delivery, points, final.
-
-                // Refined sequence for clarity and correctness:
-                updatePriceSummary();           // 1. Calculates item totals and item sales discounts.
-                updatePackagingFee();           // 2. Calculates packaging fees.
-                                                // 3. Book coupon discounts are calculated within updateCouponDiscount.
-                updateOrderCouponAvailability();  // 4. Enables/disables order coupons based on current totals (pre-order-coupon).
-                //    This might change the selected order coupon if the current one becomes invalid.
-                updateCouponDiscount();         // 5. Calculates book AND order coupon discounts.
-                                                //    Uses the (potentially updated) selected order coupon.
-                updateDeliveryFee();            // 6. Calculates delivery fee.
-                updatePointDiscount();          // 7. Calculates point discount.
-                updateFinalTotalPrice();        // 8. Calculates grand total.
+                updatePriceSummary();
+                updatePackagingFee();
+                updateOrderCouponAvailability();
+                updateCouponDiscount();
+                updateDeliveryFee();
+                updatePointDiscount();
+                updateFinalTotalPrice();
             }
 
             function syncAddressFields() {
@@ -1171,10 +1142,8 @@
 
                 const orderCouponSelect = document.getElementById('orderCouponSelect'); // May be null
 
-                // Event listener for order coupon select (only if it exists)
                 if (orderCouponSelect) {
                     orderCouponSelect.addEventListener('change', () => {
-                        // When order coupon changes, a full recalculation is the safest
                         fullPriceRecalculation();
                     });
                 }
@@ -1241,9 +1210,6 @@
                 if (shippingAddressOptionEl) {
                     shippingAddressOptionEl.addEventListener('change', () => {
                         updateAddressBaseUI();
-                        // Address change itself might not directly affect pricing in this script,
-                        // but good to call syncAddressFields if not already called by updateAddressBaseUI.
-                        // fullPriceRecalculation(); // Uncomment if address can affect delivery costs not covered by deliveryRule.
                     });
                 }
 
@@ -1330,18 +1296,10 @@
 
                 document.querySelectorAll('.item-coupon-select').forEach(sel => {
                     sel.addEventListener('change', () => {
-                        fullPriceRecalculation(); // Item coupon change affects everything
+                        fullPriceRecalculation();
                     });
                 });
 
-                // This event listener is now inside updateAddressBaseUI for when orderCouponSelect exists
-                // const orderCouponSelectEl = document.getElementById('orderCouponSelect');
-                // if (orderCouponSelectEl) {
-                //     orderCouponSelectEl.addEventListener('change', () => {
-                //         fullPriceRecalculation();
-                //     });
-                // }
-                // Initial call to updateCouponDiscount is part of fullPriceRecalculation
 
                 const pointsInput = document.getElementById('pointsToUse');
                 if (pointsInput) {
@@ -1351,7 +1309,7 @@
                 }
 
                 window.applyMaxPoints = () => {
-                    const currentPointsInput = document.getElementById('pointsToUse'); // Re-fetch in case of dynamic changes
+                    const currentPointsInput = document.getElementById('pointsToUse');
                     if (!currentPointsInput) return;
 
                     const availableUserPoints = parseInt(currentPointsInput.dataset.availablePoints, 10) || 0;

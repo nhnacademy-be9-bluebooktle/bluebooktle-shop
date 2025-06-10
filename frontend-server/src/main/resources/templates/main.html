@@ -69,17 +69,16 @@
                        style="margin-top: 0.5rem; font-size: 1.1em; color: var(--kitsch-color-1);">매주 핫한 도서들로 업데이트!</p>
                 </div>
                 <div class="book-grid-kitsch list-page-grid-kitsch">
-                    <div th:each="book, stat : ${hotBooks.content}" class="book-item-kitsch"
-                         th:classappend="${stat.index % 2 == 0} ? ' tilt-left-kitsch' : ' tilt-right-kitsch'">
+                    <div class="book-item-kitsch" th:classappend="${stat.index % 2 == 0} ? ' tilt-left-kitsch' : ' tilt-right-kitsch'"
+                         th:each="book, stat : ${hotBooks.content}">
                         <a class="book-link-kitsch" th:href="@{/books/{id}(id=${book.bookId})}">
                             <div class="book-cover-wrap-kitsch">
-                                <img th:src="${book.imgUrl}" alt="도서 표지" class="book-cover-kitsch"/>
+                                <img alt="도서 표지" class="book-cover-kitsch" th:src="${book.imgUrl}"/>
                                 <div class="book-hover-overlay-kitsch">
                                     <i class="fas fa-search-plus"></i>
                                     <p class="pixel-font-kitsch">상세 보기</p>
                                 </div>
-                                <span th:if="${book.createdAt.until(T(java.time.LocalDateTime).now(), T(java.time.temporal.ChronoUnit).DAYS) <= 3}"
-                                      class="sticker-hot-kitsch pixel-font-kitsch">HOT</span>
+                                <span class="sticker-hot-kitsch pixel-font-kitsch">HOT</span>
                             </div>
 
                             <div class="book-info-kitsch">
@@ -94,9 +93,9 @@
 
                                 <p class="book-price-kitsch pixel-font-kitsch">
                                     <span th:text="${#numbers.formatDecimal(book.salePrice, 0, 'COMMA', 0, 'NONE')} + '원'">0원</span>
-                                    <span th:if="${book.salePrice < book.price}"
-                                          class="original-price-kitsch pixel-font-kitsch"
+                                    <span class="original-price-kitsch pixel-font-kitsch"
                                           style="font-size: 0.8em;"
+                                          th:if="${book.salePrice < book.price}"
                                           th:text="${#numbers.formatDecimal(book.price, 0, 'COMMA', 0, 'NONE')} + '원'">0원</span>
                                 </p>
                             </div>
@@ -104,20 +103,20 @@
                     </div>
                 </div>
 
-                <nav class="pagination-kitsch" aria-label="메인 페이지 HOT 도서 페이징">
-                    <a th:if="${hotBooks.hasPrevious()}" class="page-btn-kitsch prev-kitsch retro-shadow-kitsch-small"
-                       th:href="@{/(page=${hotBooks.number - 1}, size=${size})}">
+                <nav aria-label="메인 페이지 HOT 도서 페이징" class="pagination-kitsch">
+                    <a class="page-btn-kitsch prev-kitsch retro-shadow-kitsch-small" th:href="@{/(page=${hotBooks.number - 1}, size=${size})}"
+                       th:if="${hotBooks.hasPrevious()}">
                         <i class="fas fa-angle-left"></i> 이전
                     </a>
 
-                    <a th:each="i : ${#numbers.sequence(0, hotBooks.totalPages - 1)}"
-                       class="page-btn-kitsch num-kitsch retro-shadow-kitsch-small"
+                    <a class="page-btn-kitsch num-kitsch retro-shadow-kitsch-small"
                        th:classappend="${i == hotBooks.number} ? ' active-kitsch' : ''"
+                       th:each="i : ${#numbers.sequence(0, hotBooks.totalPages - 1)}"
                        th:href="@{/(page=${i}, size=${size})}"
                        th:text="${i + 1}">1</a>
 
-                    <a th:if="${hotBooks.hasNext()}" class="page-btn-kitsch next-kitsch retro-shadow-kitsch-small"
-                       th:href="@{/(page=${hotBooks.number + 1}, size=${size})}">
+                    <a class="page-btn-kitsch next-kitsch retro-shadow-kitsch-small" th:href="@{/(page=${hotBooks.number + 1}, size=${size})}"
+                       th:if="${hotBooks.hasNext()}">
                         다음 <i class="fas fa-angle-right"></i>
                     </a>
                 </nav>
@@ -135,17 +134,17 @@
                         도서들!</p>
                 </div>
                 <div class="book-grid-kitsch list-page-grid-kitsch">
-                    <div th:each="book, stat : ${newBooks.content}" class="book-item-kitsch"
-                         th:classappend="${stat.index % 2 == 0} ? ' tilt-left-kitsch' : ' tilt-right-kitsch'">
+                    <div class="book-item-kitsch" th:classappend="${stat.index % 2 == 0} ? ' tilt-left-kitsch' : ' tilt-right-kitsch'"
+                         th:each="book, stat : ${newBooks.content}">
                         <a class="book-link-kitsch" th:href="@{/books/{id}(id=${book.bookId})}">
                             <div class="book-cover-wrap-kitsch">
-                                <img th:src="${book.imgUrl}" alt="도서 표지" class="book-cover-kitsch"/>
+                                <img alt="도서 표지" class="book-cover-kitsch" th:src="${book.imgUrl}"/>
                                 <div class="book-hover-overlay-kitsch">
                                     <i class="fas fa-search-plus"></i>
                                     <p class="pixel-font-kitsch">상세 보기</p>
                                 </div>
-                                <span th:if="${book.createdAt.until(T(java.time.LocalDateTime).now(), T(java.time.temporal.ChronoUnit).DAYS) <= 7}"
-                                      class="sticker-new-kitsch pixel-font-kitsch">NEW</span>
+                                <span class="sticker-new-kitsch pixel-font-kitsch"
+                                      th:if="${book.createdAt.until(T(java.time.LocalDateTime).now(), T(java.time.temporal.ChronoUnit).DAYS) <= 7}">NEW</span>
                             </div>
 
                             <div class="book-info-kitsch">
@@ -160,9 +159,9 @@
 
                                 <p class="book-price-kitsch pixel-font-kitsch">
                                     <span th:text="${#numbers.formatDecimal(book.salePrice, 0, 'COMMA', 0, 'NONE')} + '원'">0원</span>
-                                    <span th:if="${book.salePrice < book.price}"
-                                          class="original-price-kitsch pixel-font-kitsch"
+                                    <span class="original-price-kitsch pixel-font-kitsch"
                                           style="font-size: 0.8em;"
+                                          th:if="${book.salePrice < book.price}"
                                           th:text="${#numbers.formatDecimal(book.price, 0, 'COMMA', 0, 'NONE')} + '원'">0원</span>
                                 </p>
                             </div>
@@ -170,20 +169,20 @@
                     </div>
                 </div>
 
-                <nav class="pagination-kitsch" aria-label="메인 페이지 신규 도서 페이징">
-                    <a th:if="${newBooks.hasPrevious()}" class="page-btn-kitsch prev-kitsch retro-shadow-kitsch-small"
-                       th:href="@{/(page=${newBooks.number - 1}, size=${size})}">
+                <nav aria-label="메인 페이지 신규 도서 페이징" class="pagination-kitsch">
+                    <a class="page-btn-kitsch prev-kitsch retro-shadow-kitsch-small" th:href="@{/(page=${newBooks.number - 1}, size=${size})}"
+                       th:if="${newBooks.hasPrevious()}">
                         <i class="fas fa-angle-left"></i> 이전
                     </a>
 
-                    <a th:each="i : ${#numbers.sequence(0, newBooks.totalPages - 1)}"
-                       class="page-btn-kitsch num-kitsch retro-shadow-kitsch-small"
+                    <a class="page-btn-kitsch num-kitsch retro-shadow-kitsch-small"
                        th:classappend="${i == newBooks.number} ? ' active-kitsch' : ''"
+                       th:each="i : ${#numbers.sequence(0, newBooks.totalPages - 1)}"
                        th:href="@{/(page=${i}, size=${size})}"
                        th:text="${i + 1}">1</a>
 
-                    <a th:if="${newBooks.hasNext()}" class="page-btn-kitsch next-kitsch retro-shadow-kitsch-small"
-                       th:href="@{/(page=${newBooks.number + 1}, size=${size})}">
+                    <a class="page-btn-kitsch next-kitsch retro-shadow-kitsch-small" th:href="@{/(page=${newBooks.number + 1}, size=${size})}"
+                       th:if="${newBooks.hasNext()}">
                         다음 <i class="fas fa-angle-right"></i>
                     </a>
                 </nav>

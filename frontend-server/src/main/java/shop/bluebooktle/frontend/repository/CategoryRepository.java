@@ -62,4 +62,7 @@ public interface CategoryRepository {
 		@PathVariable("categoryId") Long categoryId
 	);
 
+	@GetMapping("/name/{categoryName}")
+	CategoryResponse getCategoryByName(@PathVariable String categoryName);
+
 }

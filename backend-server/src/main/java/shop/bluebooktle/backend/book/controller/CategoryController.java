@@ -123,4 +123,11 @@ public class CategoryController {
 		return ResponseEntity.ok(JsendResponse.success(parents));
 	}
 
+	// 카테고리 이름으로 조회
+	@GetMapping("/name/{categoryName}")
+	public ResponseEntity<JsendResponse<CategoryResponse>> getCategoryByName(@PathVariable String categoryName) {
+		CategoryResponse categoryResponse = categoryService.getCategoryByName(categoryName);
+		return ResponseEntity.ok(JsendResponse.success(categoryResponse));
+	}
+
 }

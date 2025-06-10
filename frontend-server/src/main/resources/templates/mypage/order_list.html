@@ -385,8 +385,8 @@
                                     <!-- 상태에 따라 버튼 예시 (예: 입금대기일 때는 결제하기 버튼, 배송중일 때는 배송조회 버튼 등) -->
                                     <button
                                             class="btn-kitsch secondary-btn-kitsch color3-kitsch retro-shadow-kitsch-small"
+                                            th:attr="onclick=|location.href='/order/${orderResp.orderId}/checkout'|"
                                             th:if="${orderResp.orderStatus.name() == 'PENDING'}"
-                                            th:attr="onclick=|location.href='/payment/continue/${orderResp.orderKey}'|"
                                             th:text="결제하기">
                                     </button>
                                     <button class="btn-kitsch secondary-btn-kitsch color2-kitsch retro-shadow-kitsch-small"

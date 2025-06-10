@@ -89,31 +89,60 @@
     <div class="container-kitsch section-padding-kitsch">
 
         <div class="page-header-kitsch book-list-header">
+
+
+            <!-- 검색 키워드가 있는 경우 -->
             <h1 class="page-main-title-kitsch display-font-kitsch"
-                th:text="'✨ ' + (${category} == null ? '전체보기' : ${category.name()}+' 카테고리') + ' 검색 결과 ✨'">
+                th:if="${searchKeyword != null}"
+                th:text="'✨ ' + ${searchKeyword} + ' 검색 결과 ✨'">
             </h1>
+
+            <!-- 카테고리만 있는 경우 -->
+            <h1 class="page-main-title-kitsch display-font-kitsch"
+                th:if="${searchKeyword == null and category != null}"
+                th:text="'✨ ' + ${category.name()} + ' 카테고리 검색 결과 ✨'">
+            </h1>
+
+            <!-- 아무것도 없는 경우 -->
+            <h1 class="page-main-title-kitsch display-font-kitsch"
+                th:if="${searchKeyword == null and category == null}"
+                th:text="'✨ 전체보기 검색 결과 ✨'">
+            </h1>
+
+
             <p class="page-subtitle-kitsch handwriting-font-kitsch"
                th:text="'(총 ' + ${pagedBooks.totalElements} + '권의 멋진 책을 찾았어요!)'">
             </p>
         </div>
 
-        <div class="list-controls-kitsch">
-            <div class="control-group-kitsch">
-                <label class="label-kitsch" for="sort-order">정렬:</label>
-                <select class="select-kitsch" id="sort-order" name="sortOrder">
-                    <option selected value="popularity">인기순</option>
-                    <option value="newest">신상품순</option>
-                    <option value="price_low">가격낮은순</option>
-                    <option value="price_high">가격높은순</option>
-                    <option value="rating">평점순</option>
-                </select>
+        <form method="get"
+              th:action="${category != null} ? '/categories/' + ${category.categoryId} : '/books'"
+              id="sortForm">
+            <div class="list-controls-kitsch">
+                <div class="control-group-kitsch">
+                    <label class="label-kitsch" for="sort-order">정렬:</label>
+                    <select class="select-kitsch" id="sort-order" name="bookSortType">
+                        <option th:each="sortType : ${sortTypes}"
+                                th:value="${sortType.name()}"
+                                th:text="${sortType.displayName}"
+                                th:selected="${sortType.name() == bookSortType.name()}">
+                        </option>
+                    </select>
+                </div>
+
+                <!-- 필터링 버튼이 form submit 역할 수행 -->
+                <div class="control-group-kitsch">
+                    <button type="submit" class="btn-kitsch filter-btn-kitsch retro-shadow-kitsch-small">
+                        <i class="fas fa-filter"></i> 필터링 (<span th:text="${filterCount}">0</span>)
+                    </button>
+                </div>
             </div>
-            <div class="control-group-kitsch">
-                <button class="btn-kitsch filter-btn-kitsch retro-shadow-kitsch-small">
-                    <i class="fas fa-filter"></i> 필터링 (5)
-                </button>
-            </div>
-        </div>
+
+            <!-- 상태 유지용 hidden 필드들 -->
+            <input type="hidden" name="searchKeyword" th:value="${searchKeyword}"/>
+            <input type="hidden" name="page" th:value="${pagedBooks.number}"/>
+            <input type="hidden" name="size" th:value="${pagedBooks.size}"/>
+        </form>
 
         <div class="book-grid-kitsch list-page-grid-kitsch">
             <div th:each="book, stat : ${pagedBooks.content}"
@@ -186,7 +215,7 @@
                         </div>
                     </div>
                 </a>
-                <input id="bookId" th:value="${item.bookId}" type="hidden">
+                <input id="bookId" th:value="${book.bookId}" type="hidden">
                 <button class="btn-kitsch primary-btn-kitsch add-to-cart-btn-kitsch retro-shadow-kitsch-small"
                         onclick="handleAddToCart(event)"
                         type="button">

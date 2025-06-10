@@ -10,11 +10,11 @@ import shop.bluebooktle.common.dto.book.response.TagInfoResponse;
 
 public interface BookTagService {
 	// 도서 태그 등록
-	void registerBookTag(Long bookId, Long tagId);
+	TagInfoResponse registerBookTag(Long bookId, Long tagId);
 
-	void registerBookTag(Long bookId, List<Long> tagIdList);
+	List<TagInfoResponse> registerBookTag(Long bookId, List<Long> tagIdList);
 
-	void updateBookTag(Long bookId, List<Long> tagIdList);
+	List<TagInfoResponse> updateBookTag(Long bookId, List<Long> tagIdList);
 
 	// 도서 태그 삭제
 	void deleteBookTag(Long tagId, Long bookId);

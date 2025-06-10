@@ -10,9 +10,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import shop.bluebooktle.common.dto.book.BookSortType;
 import shop.bluebooktle.common.dto.book.response.BookInfoResponse;
 import shop.bluebooktle.common.dto.book.response.CategoryResponse;
 import shop.bluebooktle.frontend.service.BookService;
+import shop.bluebooktle.frontend.service.CategoryService;
 
 @Slf4j
 @Controller
@@ -20,6 +22,7 @@ import shop.bluebooktle.frontend.service.BookService;
 public class MainController {
 
 	private final BookService bookService;
+	private final CategoryService categoryService;
 
 	@GetMapping("/")
 	public String mainPage(
@@ -29,14 +32,15 @@ public class MainController {
 		@RequestParam(value = "page", defaultValue = "0") int page,
 		@RequestParam(value = "size", defaultValue = "20") int size
 	) {
-		Long hotCategoryId = 65L;
+		Long hotCategoryId = categoryService.getCategoryByName("베스트셀러").categoryId();
 
 		// HOT 도서: 카테고리 기반
-		Page<BookInfoResponse> hotBooks = bookService.getPagedBooksByCategoryId(page, size, hotCategoryId);
+		Page<BookInfoResponse> hotBooks = bookService.getPagedBooksByCategoryId(page, size, BookSortType.NEWEST,
+			hotCategoryId);
 		CategoryResponse hotCategory = bookService.getCategoryById(hotCategoryId);
 
 		// NEW 도서: 전체 최신 도서
-		Page<BookInfoResponse> newBooks = bookService.getPagedBooks(page, size, "");
+		Page<BookInfoResponse> newBooks = bookService.getPagedBooks(page, size, "", BookSortType.NEWEST);
 
 		model.addAttribute("hotBooks", hotBooks);
 		model.addAttribute("hotCategory", hotCategory);

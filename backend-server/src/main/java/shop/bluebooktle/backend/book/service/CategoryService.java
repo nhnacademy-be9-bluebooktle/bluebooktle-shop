@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import shop.bluebooktle.backend.book.entity.Category;
 import shop.bluebooktle.common.dto.book.request.CategoryRegisterRequest;
 import shop.bluebooktle.common.dto.book.request.CategoryUpdateRequest;
 import shop.bluebooktle.common.dto.book.request.RootCategoryRegisterRequest;
@@ -39,5 +40,8 @@ public interface CategoryService {
 	CategoryTreeResponse getCategoryTreeById(Long categoryId);
 
 	Page<CategoryResponse> searchCategories(String searchKeyword, Pageable pageable);
+	
+	List<Category> getAllDescendantCategories(Category parent);
 
+	CategoryResponse getCategoryByName(String categoryName);
 }
