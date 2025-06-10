@@ -19,7 +19,12 @@ public interface OrderRepository extends JpaRepository<Order, Long>, OrderQueryR
 	Page<Order> findByUserAndCreatedAtBetween(User user, LocalDateTime createdAtAfter, LocalDateTime createdAtBefore,
 		Pageable pageable);
 
-	@EntityGraph(attributePaths = {"user", "orderState", "bookOrders.book.bookSaleInfo"})
+	@EntityGraph(attributePaths = {
+		"user",
+		"orderState",
+		"bookOrders.book.bookSaleInfo,",
+		"payment.paymentPointHistory"
+	})
 	Optional<Order> findOrderForCancelById(Long id);
 
 	// 사용자 + 상태(enum) 조회

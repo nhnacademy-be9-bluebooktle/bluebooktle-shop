@@ -376,14 +376,14 @@
                         <tr th:each="item : ${order.orderItemResponses}">
                             <td data-label="상품 정보">
                                 <div class="product-info-cell-kitsch">
-                                    <img th:src="${item.bookThumbnailUrl}"
-                                         th:alt="${item.bookTitle}">
+                                    <img th:alt="${item.bookTitle}"
+                                         th:src="${item.bookThumbnailUrl}">
                                     <div>
                                         <a class="product-title-kitsch" th:href="@{/books/{id}(id=${item.bookId})}"
                                            th:text="${item.bookTitle}">상품 제목</a>
 
-                                        <th:block th:if="${!item.packagingOptions.isEmpty()}"
-                                                  th:each="packaging : ${item.packagingOptions}">
+                                        <th:block th:each="packaging : ${item.packagingOptions}"
+                                                  th:if="${!item.packagingOptions.isEmpty()}">
                                             <p class="product-option-kitsch"
                                                th:text="|포장: ${packaging.name} (+${#numbers.formatDecimal(packaging.price, 0, 'COMMA', 0, 'POINT')}원) * ${packaging.quantity}개 |">
                                                 포장 옵션
@@ -417,9 +417,9 @@
 
                             <td data-label="리뷰" style="text-align:center;">
                                 <button class="btn-kitsch primary-btn-kitsch retro-shadow-kitsch-small"
+                                        onclick="openOrderReviewModal(this, event)"
                                         th:data-book-id="${item.bookId}"
-                                        th:data-book-title="${item.bookTitle}"
-                                        onclick="openOrderReviewModal(this, event)">
+                                        th:data-book-title="${item.bookTitle}">
                                     <i class="fas fa-pencil-alt"></i> 작성
                                 </button>
                             </td>
@@ -478,13 +478,15 @@
                     </a>
 
                     <button class="btn-kitsch secondary-btn-kitsch color2-kitsch retro-shadow-kitsch-small"
-                            onclick="requestReturn()">
+                            onclick="requestReturn()"
+                            th:if="${order.orderStatus() != T(shop.bluebooktle.common.domain.order.OrderStatus).PENDING}">
                         <i class="fas fa-undo-alt"></i> 반품 신청
                     </button>
 
-                    <form th:action="@{|/mypage/orders/${order.orderKey()}/cancel|}" method="post">
-                        <button type="submit"
-                                class="btn-kitsch secondary-btn-kitsch color2-kitsch retro-shadow-kitsch-small">
+                    <form method="post" th:action="@{|/mypage/orders/${order.orderKey()}/cancel|}"
+                          th:if="${order.orderStatus() == T(shop.bluebooktle.common.domain.order.OrderStatus).PENDING}">
+                        <button class="btn-kitsch secondary-btn-kitsch color2-kitsch retro-shadow-kitsch-small"
+                                type="submit">
                             주문 취소
                         </button>
                     </form>

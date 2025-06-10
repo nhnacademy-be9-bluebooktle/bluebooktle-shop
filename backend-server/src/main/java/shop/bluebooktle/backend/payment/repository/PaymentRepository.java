@@ -13,7 +13,6 @@ import shop.bluebooktle.common.domain.order.OrderStatus;
 import shop.bluebooktle.common.entity.auth.User;
 
 public interface PaymentRepository extends JpaRepository<Payment, Long> {
-	Optional<Payment> findById(long id);
 
 	Optional<Payment> findByOrder(Order order);
 

@@ -23,9 +23,10 @@ public class PaymentPointEarnEventListener {
 	public void handlePointEarnEvent(PaymentPointEarnEvent event) {
 		Long userId = event.userId();
 		BigDecimal amount = event.amount();
-
+		Long paymentId = event.paymentId();
 		try {
-			pointService.adjustUserPointAndSavePointHistory(userId, PointSourceTypeEnum.PAYMENT_EARN, amount);
+			pointService.adjustUserPointAndSavePointHistory(userId, PointSourceTypeEnum.PAYMENT_EARN, amount,
+				paymentId);
 		} catch (Exception e) {
 			log.error("결제 적립 포인트 지급 중 오류 발생 ID: {}. message: {}", userId, e.getMessage(), e);
 		}

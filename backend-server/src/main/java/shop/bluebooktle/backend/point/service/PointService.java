@@ -15,5 +15,6 @@ public interface PointService {
 
 	Page<PointHistoryResponse> getPointHistoriesByUserId(Long userId, Pageable pageable);
 
-	void adjustUserPointAndSavePointHistory(Long userId, PointSourceTypeEnum pointSourceTypeEnum, BigDecimal amount);
+	void adjustUserPointAndSavePointHistory(Long userId, PointSourceTypeEnum pointSourceTypeEnum, BigDecimal amount,
+		Long paymentId);
 }

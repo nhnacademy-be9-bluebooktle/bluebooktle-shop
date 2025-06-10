@@ -116,6 +116,8 @@ public class OrderServiceImpl implements OrderService {
 				.subtract(Optional.ofNullable(o.getCouponDiscountAmount())
 					.orElse(BigDecimal.ZERO))
 				.subtract(Optional.ofNullable(o.getPointUseAmount())
+					.orElse(BigDecimal.ZERO))
+				.subtract(Optional.ofNullable(o.getSaleDiscountAmount())
 					.orElse(BigDecimal.ZERO));
 
 			String thumbnailUrl = o.getBookOrders().stream()
@@ -488,6 +490,18 @@ public class OrderServiceImpl implements OrderService {
 
 	@Override
 	@Transactional
+	public void cancelOrderListener(Long orderId) {
+		Order order = orderRepository.findOrderForCancelById(orderId)
+			.orElseThrow(OrderNotFoundException::new);
+
+		if (order.getOrderState().getState() != OrderStatus.PENDING) {
+			return;
+		}
+		cancelOrderInternal(orderId);
+	}
+
+	@Override
+	@Transactional
 	public void cancelOrderInternal(Long orderId) {
 		Order order = orderRepository.findOrderForCancelById(orderId)
 			.orElseThrow(OrderNotFoundException::new);
@@ -577,7 +591,7 @@ public class OrderServiceImpl implements OrderService {
 			order.getDetailAddress(),
 			order.getPostalCode(),
 			itemResponses,
-			order.getOriginalAmount(),
+			order.getOriginalAmount().subtract(order.getSaleDiscountAmount()),
 			order.getPointUseAmount(),
 			order.getCouponDiscountAmount(),
 			order.getDeliveryFee(),

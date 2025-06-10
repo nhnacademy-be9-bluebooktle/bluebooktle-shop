@@ -107,11 +107,16 @@ public class PaymentServiceImpl implements PaymentService {
 				.paymentDetail(paymentDetail)
 				.paidAmount(gatewayResponse.confirmedAmount())
 				.build();
-			paymentRepository.save(payment);
+			Payment savedPayment = paymentRepository.save(payment);
 			OrderState preparingOrderState = orderStateRepository.findByState(OrderStatus.PREPARING)
 				.orElseThrow(
 					() -> new ApplicationException(ErrorCode.INTERNAL_SERVER_ERROR, "PREPARING 상태를 찾을 수 없습니다."));
 			order.changeOrderState(preparingOrderState);
+			if (order.getUser() != null) {
+				eventPublisher.publishEvent(
+					new PaymentPointEarnEvent(order.getUser().getId(), gatewayResponse.confirmedAmount(),
+						savedPayment.getId()));
+			}
 		} else {
 			String failReason = "결제 실패";
 			if (gatewayResponse.additionalData() != null
@@ -122,10 +127,6 @@ public class PaymentServiceImpl implements PaymentService {
 				failReason = gatewayResponse.additionalData().get("tossApiErrorMessage").toString();
 			}
 			throw new ApplicationException(ErrorCode.PAYMENT_CONFIRMATION_FAILED, failReason);
-		}
-		if (order.getUser() != null) {
-			eventPublisher.publishEvent(
-				new PaymentPointEarnEvent(order.getUser().getId(), gatewayResponse.confirmedAmount()));
 		}
 		orderRepository.save(order);
 	}

@@ -159,7 +159,6 @@ public enum ErrorCode {
 	REFUND_NOT_POSSIBLE(HttpStatus.BAD_REQUEST, "P015", "현재 상태에서는 반품/환불이 불가능합니다."),
 	REFUND_ALREADY_PROCESSED(HttpStatus.CONFLICT, "P016", "이미 처리된 반품/환불 요청입니다."),
 	REFUND_INVALID_REASON(HttpStatus.BAD_REQUEST, "P017", "유효하지 않은 반품 사유입니다."),
-	REFUND_NOT_FOUND(HttpStatus.NOT_FOUND, "P018", "환불 정보를 찾을 수 없습니다."),
 
 	// Coupon Errors (쿠폰 오류) - K (Koopon)
 	K_COUPON_NOT_FOUND(HttpStatus.NOT_FOUND, "K001", "쿠폰을 찾을 수 없습니다."),

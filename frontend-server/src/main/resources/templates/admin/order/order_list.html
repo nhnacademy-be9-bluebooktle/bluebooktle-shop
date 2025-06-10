@@ -101,40 +101,40 @@
             </h2>
         </div>
         <div class="admin-panel__body">
-            <form th:action="@{/admin/orders}" method="get" th:object="${searchCriteria}" class="admin-form">
+            <form class="admin-form" method="get" th:action="@{/admin/orders}" th:object="${searchCriteria}">
                 <div class="search-filters">
                     <div class="admin-form-group">
-                        <label for="searchKeywordType" class="admin-form-label">검색 조건</label>
-                        <select id="searchKeywordType" th:field="*{searchKeywordType}" class="admin-form-control">
+                        <label class="admin-form-label" for="searchKeywordType">검색 조건</label>
+                        <select class="admin-form-control" id="searchKeywordType" th:field="*{searchKeywordType}">
                             <option value="">- 전체 -</option>
-                            <option th:each="type : ${searchKeywordTypes}" th:value="${type.name()}"
-                                    th:text="${type.getDescription()}">검색 타입
+                            <option th:each="type : ${searchKeywordTypes}" th:text="${type.getDescription()}"
+                                    th:value="${type.name()}">검색 타입
                             </option>
                         </select>
                     </div>
 
                     <div class="admin-form-group">
-                        <label for="searchKeywordInput" class="admin-form-label">검색어</label>
-                        <input type="text" id="searchKeywordInput" th:field="*{searchKeyword}"
-                               class="admin-form-control" placeholder="검색어를 입력하세요">
+                        <label class="admin-form-label" for="searchKeywordInput">검색어</label>
+                        <input class="admin-form-control" id="searchKeywordInput" placeholder="검색어를 입력하세요"
+                               th:field="*{searchKeyword}" type="text">
                     </div>
 
                     <div class="admin-form-group">
-                        <label for="orderStatusFilter" class="admin-form-label">주문 상태</label>
-                        <select id="orderStatusFilter" th:field="*{orderStatusFilter}" class="admin-form-control">
+                        <label class="admin-form-label" for="orderStatusFilter">주문 상태</label>
+                        <select class="admin-form-control" id="orderStatusFilter" th:field="*{orderStatusFilter}">
                             <option value="">- 전체 -</option>
-                            <option th:each="status : ${orderStatusOptions}" th:value="${status.name()}"
-                                    th:text="${status.getDescription()}">상태
+                            <option th:each="status : ${orderStatusOptions}" th:text="${status.getDescription()}"
+                                    th:value="${status.name()}">상태
                             </option>
                         </select>
                     </div>
 
                     <div class="admin-form-group">
-                        <label for="paymentMethodFilter" class="admin-form-label">결제 수단</label>
-                        <select id="paymentMethodFilter" th:field="*{paymentMethodFilter}" class="admin-form-control">
+                        <label class="admin-form-label" for="paymentMethodFilter">결제 수단</label>
+                        <select class="admin-form-control" id="paymentMethodFilter" th:field="*{paymentMethodFilter}">
                             <option value="">- 전체 -</option>
                             <option th:each="method : ${paymentMethodOptions}" th:if="${method != '전체'}"
-                                    th:value="${method}" th:text="${method}">결제수단
+                                    th:text="${method}" th:value="${method}">결제수단
                             </option>
                         </select>
                     </div>
@@ -142,17 +142,17 @@
                     <div class="admin-form-group admin-form-group-full">
                         <label class="admin-form-label">주문 기간</label>
                         <div class="date-range-inputs">
-                            <input type="date" id="startDate" th:field="*{startDate}" class="admin-form-control">
+                            <input class="admin-form-control" id="startDate" th:field="*{startDate}" type="date">
                             <span>~</span>
-                            <input type="date" id="endDate" th:field="*{endDate}" class="admin-form-control">
+                            <input class="admin-form-control" id="endDate" th:field="*{endDate}" type="date">
                         </div>
                     </div>
                 </div>
                 <div class="admin-form-actions" style="text-align: right; margin-top: 10px;">
-                    <button type="submit" class="admin-btn admin-btn--primary">
+                    <button class="admin-btn admin-btn--primary" type="submit">
                         <i class="fas fa-search"></i> 검색
                     </button>
-                    <a th:href="@{/admin/orders}" class="admin-btn admin-btn--default">
+                    <a class="admin-btn admin-btn--default" th:href="@{/admin/orders}">
                         <i class="fas fa-undo"></i> 초기화
                     </a>
                 </div>
@@ -174,25 +174,25 @@
                     <td colspan="8" style="text-align:center;">조회된 주문이 없습니다.</td>
                 </tr>
                 <tr th:each="order : ${orderPage.getContent()}">
-                    <td th:text="${order.orderKey()}">ORD...</td>
-                    <td th:text="${#temporals.format(order.orderDate(), 'yyyy-MM-dd HH:mm')}">2025-06-09 00:53</td>
+                    <td th:text="${order.orderKey()}"></td>
+                    <td th:text="${#temporals.format(order.orderDate(), 'yyyy-MM-dd HH:mm')}"></td>
                     <td>
-                        <th:block th:text="${order.ordererName()}">김블루</th:block>
+                        <th:block th:text="${order.ordererName()}"></th:block>
                         <th:block th:if="${order.ordererLoginId() != null}"
-                                  th:text="' (' + ${order.ordererLoginId()} + ')'">(blue)
+                                  th:text="' (' + ${order.ordererLoginId()} + ')'">
                         </th:block>
                     </td>
-                    <td th:text="${order.receiverName()}">이북클</td>
-                    <td th:text="${#numbers.formatInteger(order.totalAmount(), 0, 'COMMA') + '원'}">55,000원</td>
+                    <td th:text="${order.receiverName()}"></td>
+                    <td th:text="${#numbers.formatInteger(order.totalAmount(), 0, 'COMMA') + '원'}"></td>
                     <td>
-                        <span th:text="${order.orderStatus.getDescription()}">결제완료</span>
+                        <span th:text="${order.orderStatus.getDescription()}"></span>
                     </td>
                     <td>
-                        <span th:text="${order.paymentMethod() != null ? order.paymentMethod().getMethodName() : ''}">신용카드</span>
+                        <span th:text="${order.paymentMethod() != null ? order.paymentMethod() : ''}">신용카드</span>
                     </td>
                     <td>
-                        <a th:href="@{/admin/orders/{id}(id=${order.orderId()})}"
-                           class="admin-btn admin-btn--sm admin-btn--info">
+                        <a class="admin-btn admin-btn--sm admin-btn--info"
+                           th:href="@{/admin/orders/{id}(id=${order.orderId()})}">
                             <i class="fas fa-eye"></i> 상세
                         </a>
                     </td>
