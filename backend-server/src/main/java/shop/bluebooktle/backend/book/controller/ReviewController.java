@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.book.service.ReviewService;
-import shop.bluebooktle.common.dto.book.request.ReviewRequest;
+import shop.bluebooktle.common.dto.book.request.ReviewRegisterRequest;
 import shop.bluebooktle.common.dto.book.response.ReviewResponse;
 import shop.bluebooktle.common.dto.common.JsendResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
@@ -34,10 +34,10 @@ public class ReviewController {
 	public ResponseEntity<JsendResponse<ReviewResponse>> addReview(
 		@PathVariable Long bookOrderId,
 		@AuthenticationPrincipal UserPrincipal userPrincipal,
-		@RequestBody @Valid ReviewRequest reviewRequest
+		@RequestBody @Valid ReviewRegisterRequest reviewRegisterRequest
 	) {
 		Long userId = userPrincipal.getUserId();
-		ReviewResponse created = reviewService.addReview(userId, bookOrderId, reviewRequest);
+		ReviewResponse created = reviewService.addReview(userId, bookOrderId, reviewRegisterRequest);
 		return ResponseEntity.status(HttpStatus.CREATED).body(JsendResponse.success(created));
 	}
 

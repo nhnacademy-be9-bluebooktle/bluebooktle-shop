@@ -558,10 +558,18 @@
         }
 
         .review-image-kitsch {
-            max-width: 150px;
+            max-width: 100px;
             border-radius: 5px;
             border: 2px solid var(--kitsch-color-2);
             cursor: pointer;
+        }
+
+        .modal-review-image-kitsch {
+            max-width: 400px;
+            width: 100%;
+            border-radius: 5px;
+            display: block;
+            margin: 0 auto;
         }
 
         /* 리뷰 카드 내 수정/삭제 버튼 스타일은 더 이상 필요 없음 */
@@ -804,11 +812,11 @@
                             </div>
                         </div>
                         <p class="review-text-kitsch" th:text="${rev.reviewContent}"></p>
-                        <!--                        <img th:if="${rev.imgUrl != null and rev.imgUrl != ''}"-->
-                        <!--                             alt="리뷰 이미지" class="review-image-kitsch"-->
-                        <!--                             th:data-img-url="${rev.imgUrl}"-->
-                        <!--                             onclick="showImageInModalFromData(this, 'bookDetailImageModal')"-->
-                        <!--                             th:src="${rev.imgUrl}">-->
+                        <img th:if="${rev.imgUrl != null and rev.imgUrl != ''}"
+                             alt="리뷰 이미지" class="review-image-kitsch"
+                             th:data-img-url="${rev.imgUrl}"
+                             onclick="showImageInModalFromData(this, 'bookDetailImageModal')"
+                             th:src="${rev.imgUrl}">
                         <div style="display: flex; justify-content: flex-end; align-items: center; gap: 0.5rem; margin-top: 0.5rem;">
                             <span class="pixel-font-kitsch" style="font-size: 0.9rem; color: var(--kitsch-color-5);">
                                 <i class="fas fa-heart" style="color: var(--kitsch-color-3);"></i>
@@ -863,8 +871,8 @@
         <div class="modal-content-kitsch" onclick="event.stopPropagation();" style="max-width:600px; padding:1rem;">
             <button class="modal-close-btn-kitsch" onclick="hideKitschModal('bookDetailImageModal')"><i
                     class="fas fa-times"></i></button>
-            <img alt="리뷰 이미지 크게 보기" id="bookDetailModalImageSrc" src="https://picsum.photos/500/300?random=231"
-                 style="width:100%; border-radius:5px;">
+            <img alt="리뷰 이미지 크게 보기" id="bookDetailModalImageSrc" src=""
+                 class="modal-review-image-kitsch">
         </div>
     </div>
 
@@ -995,13 +1003,15 @@
         }
 
 
-        // 이미지 확대 모달 함수는 유지
-        function showImageInModal(src, modalId = 'bookDetailImageModal') {
-            const modalImageElementId = modalId === 'bookDetailImageModal' ? 'bookDetailModalImageSrc' : 'modalImageSrc';
-            const modalImage = document.getElementById(modalImageElementId);
-            if (modalImage) {
-                modalImage.src = src.includes('150/100') ? src.replace('150/100', '500/300') : src.replace('80/80', '500/300');
-                showKitschModal(modalId); // default_layout.html의 전역 함수 사용
+        function showImageInModalFromData(clickedElement, modalId) {
+            // 클릭된 이미지 요소의 'data-img-url' 속성에서 원본 이미지 URL 가져오기
+            const imageUrl = clickedElement.getAttribute('data-img-url');
+            // 모달 내부에 이미지를 표시할 <img> 태그 가져오기
+            const modalImage = document.getElementById('bookDetailModalImageSrc');
+
+            if (modalImage && imageUrl) {
+                modalImage.src = imageUrl; // 모달 이미지의 src를 원본 이미지 URL로 설정
+                showKitschModal(modalId); // 지정된 ID의 모달을 표시
             }
         }
 

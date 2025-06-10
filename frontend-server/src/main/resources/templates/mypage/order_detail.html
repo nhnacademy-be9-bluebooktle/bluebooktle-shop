@@ -204,11 +204,56 @@
 
         .review-form-modal-content .file-input-kitsch-wrapper {
             margin-top: 0.5rem;
+            padding: 1rem;
+            border: 2px dashed var(--kitsch-color-4);
+            border-radius: 8px;
+            background-color: var(--kitsch-bg-alt);
+        }
+
+        /* file-input-kitsch-wrapper 스타일 */
+        .review-form-modal-content .file-input-kitsch-wrapper {
+            margin-top: 0.5rem;
+            padding: 1rem;
+            border: 2px dashed var(--kitsch-color-4);
+            border-radius: 8px;
+            background-color: var(--kitsch-bg-alt);
         }
 
         .review-form-modal-content .file-input-kitsch {
             font-size: 0.9rem;
+            width: 100%;
+            padding: 0.7rem;
+            border: 1px solid var(--kitsch-color-2);
+            border-radius: 5px;
+            background-color: white;
+            color: var(--kitsch-text-dark);
+            font-family: var(--font-pixel);
+            margin-top: 0.5rem;
         }
+
+        /* 새로 추가/수정: 이미지 미리보기 컨테이너 및 아이템 스타일 */
+        .review-image-preview-container {
+            display: flex;
+            flex-wrap: wrap; /* 여러 줄로 표시 */
+            gap: 10px; /* 이미지들 사이 간격 */
+            margin-top: 15px; /* input과 미리보기 사이 간격 */
+        }
+
+        .review-image-preview-item {
+            width: 40px; /* 미리보기 이미지 너비 */
+            height: 40px; /* 미리보기 이미지 높이 */
+            border: 2px solid var(--kitsch-color-2); /* 머스타드 테두리 */
+            border-radius: 5px;
+            overflow: hidden; /* 이미지가 영역을 벗어나지 않도록 */
+            flex-shrink: 0; /* 크기 줄어들지 않도록 고정 */
+        }
+
+        .review-image-preview-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* 이미지가 잘리지 않고 영역을 채우도록 */
+        }
+
 
         .review-form-modal-content .modal-actions-kitsch {
             margin-top: 1.5rem;
@@ -561,27 +606,22 @@
                     ></textarea>
                 </div>
 
-                <!-- TODO 이미지 업로드 -->
-
-                <!--                <div class="form-group-kitsch">-->
-                <!--                    <label class="label-kitsch handwriting-font-kitsch">사진 첨부 (최대 3장):</label>-->
-                <!--                    <div class="file-input-kitsch-wrapper">-->
-                <!--                        <input-->
-                <!--                                accept="image/*"-->
-                <!--                                class="file-input-kitsch"-->
-                <!--                                id="orderItemReviewImagesInput"-->
-                <!--                                multiple-->
-                <!--                                name="reviewImages" type="file"-->
-                <!--                        >-->
-                <!--                        <p class="input-description-kitsch pixel-font-kitsch" style="font-size:0.75em;">-->
-                <!--                            첫 번째 이미지가 대표 이미지로 사용됩니다.-->
-                <!--                        </p>-->
-                <!--                    </div>-->
-                <!--                    <div-->
-                <!--                            id="orderItemReviewImagePreviewContainer"-->
-                <!--                            style="margin-top:0.5rem; display:flex; gap:0.5rem;"-->
-                <!--                    ></div>-->
-                <!--                </div>-->
+                <div class="form-group-kitsch">
+                    <label class="label-kitsch handwriting-font-kitsch">사진 첨부 : 최대 3장 (한번에 선택해주세요)</label>
+                    <div class="file-input-kitsch-wrapper">
+                        <input
+                                accept="image/*"
+                                class="file-input-kitsch"
+                                id="orderItemReviewImagesInput"
+                                multiple
+                                name="imageFiles" type="file"
+                        >
+                    </div>
+                    <div
+                            id="orderItemReviewImagePreviewContainer"
+                            style="margin-top:0.5rem; display:flex; gap:0.5rem;"
+                    ></div>
+                </div>
 
                 <div class="modal-actions-kitsch">
                     <button
@@ -681,11 +721,16 @@
             const modalTitleEl = document.getElementById('orderItemReviewModalTitle');
             const modalProductInfoEl = document.getElementById('orderItemReviewModalProductInfo');
             const bookOrderIdInput = document.getElementById('orderItemReviewBookOrderIdInput');
+            const reviewContentInput = document.getElementById('orderItemReviewContentInput');
+            const reviewImagesInput = document.getElementById('orderItemReviewImagesInput');
             const imagePreviewContainer = document.getElementById('orderItemReviewImagePreviewContainer');
 
-            const form = document.getElementById('orderItemReviewForm');
-            if (form) {
-                form.reset();
+            // 폼 필드 초기화
+            if (reviewContentInput) {
+                reviewContentInput.value = '';
+            }
+            if (reviewImagesInput) {
+                reviewImagesInput.value = '';
             }
             if (imagePreviewContainer) {
                 imagePreviewContainer.innerHTML = ''; // 모달 열 때 이미지 미리보기 초기화
@@ -784,14 +829,12 @@
 
         // --- 이미지 파일 관련 로직 (미리보기 및 개수 제한) ---
         const orderItemReviewImagesInput = document.getElementById('orderItemReviewImagesInput');
+        const orderItemReviewImagePreviewContainer = document.getElementById('orderItemReviewImagePreviewContainer');
 
-        if (orderItemReviewImagesInput) {
+        if (orderItemReviewImagesInput && orderItemReviewImagePreviewContainer) {
             orderItemReviewImagesInput.addEventListener('change', function (event) {
-                const previewContainer = document.getElementById('orderItemReviewImagePreviewContainer');
-                if (!previewContainer) return;
-
-                previewContainer.innerHTML = ''; // 기존 미리보기 초기화
                 const files = event.target.files;
+                orderItemReviewImagePreviewContainer.innerHTML = '';
 
                 if (files.length > 3) {
                     alert('사진은 최대 3장까지만 첨부 가능합니다.');
@@ -805,21 +848,21 @@
 
                     const reader = new FileReader();
                     reader.onload = function (e) {
+                        const previewItem = document.createElement('div');
+                        previewItem.classList.add('review-image-preview-item');
+
                         const imgEl = document.createElement('img');
                         imgEl.src = e.target.result;
-                        imgEl.style.width = '50px';
-                        imgEl.style.height = '50px';
-                        imgEl.style.objectFit = 'cover';
-                        imgEl.style.marginRight = '5px';
-                        imgEl.style.border = '1px solid #ddd';
-                        previewContainer.appendChild(imgEl);
+                        imgEl.alt = `미리보기 이미지 ${i + 1}`;
+
+                        previewItem.appendChild(imgEl);
+                        orderItemReviewImagePreviewContainer.appendChild(previewItem);
                     };
                     reader.readAsDataURL(file);
                 }
             });
         }
 
-        // handleOrderItemReviewFormSubmit 함수는 변경 없음 (폼 제출만)
         function handleOrderItemReviewFormSubmit(event) {
             event.preventDefault(); // 기본 폼 제출 동작 방지
 
@@ -851,8 +894,6 @@
 
             form.action = `/mypage/reviews/${bookOrderId}`;
             form.method = 'POST';
-            // HTML 폼 태그에 enctype="multipart/form-data"를 설정했으므로 여기서는 별도로 설정할 필요 없습니다.
-            // form.enctype = 'multipart/form-data'; // 이 줄은 제거해도 됨
 
             form.submit();
         }

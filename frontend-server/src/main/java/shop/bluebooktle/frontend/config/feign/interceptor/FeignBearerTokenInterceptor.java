@@ -25,6 +25,10 @@ public class FeignBearerTokenInterceptor implements RequestInterceptor {
 			return;
 		}
 
+		if ("minioClient".equals(template.feignTarget().name())) {
+			return;
+		}
+
 		ServletRequestAttributes requestAttributes = (ServletRequestAttributes)RequestContextHolder.getRequestAttributes();
 		if (requestAttributes != null) {
 			HttpServletRequest request = requestAttributes.getRequest();

@@ -1,5 +1,6 @@
 package shop.bluebooktle.backend.book.service.impl;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -21,7 +22,7 @@ import shop.bluebooktle.backend.book.service.ReviewService;
 import shop.bluebooktle.backend.book_order.entity.BookOrder;
 import shop.bluebooktle.backend.book_order.jpa.BookOrderRepository;
 import shop.bluebooktle.backend.user.repository.UserRepository;
-import shop.bluebooktle.common.dto.book.request.ReviewRequest;
+import shop.bluebooktle.common.dto.book.request.ReviewRegisterRequest;
 import shop.bluebooktle.common.dto.book.response.ReviewResponse;
 import shop.bluebooktle.common.entity.auth.User;
 import shop.bluebooktle.common.exception.InvalidInputValueException;
@@ -42,7 +43,7 @@ public class ReviewServiceImpl implements ReviewService {
 	private final ReviewLikesRepository reviewLikesRepository;
 
 	@Override
-	public ReviewResponse addReview(Long userId, Long bookOrderId, ReviewRequest reviewRequest) {
+	public ReviewResponse addReview(Long userId, Long bookOrderId, ReviewRegisterRequest reviewRegisterRequest) {
 		User user = userRepository.findById(userId)
 			.orElseThrow(UserNotFoundException::new);
 
@@ -50,10 +51,12 @@ public class ReviewServiceImpl implements ReviewService {
 			.orElseThrow(BookOrderNotFoundException::new);
 
 		Img img = null;
-		if (reviewRequest.getImgUrl() != null && !reviewRequest.getImgUrl().isEmpty()) {
-			img = imgRepository.findByImgUrl(reviewRequest.getImgUrl())
+		List<String> imageUrls = reviewRegisterRequest.getImgUrls();
+		if (imageUrls != null && !imageUrls.isEmpty()) {
+			String firstImageUrl = imageUrls.getFirst();
+			img = imgRepository.findByImgUrl(firstImageUrl)
 				.orElseGet(() -> {
-					Img newImg = Img.builder().imgUrl(reviewRequest.getImgUrl()).build();
+					Img newImg = Img.builder().imgUrl(firstImageUrl).build();
 					return imgRepository.save(newImg);
 				});
 		}
@@ -62,8 +65,8 @@ public class ReviewServiceImpl implements ReviewService {
 			.user(user)
 			.bookOrder(bookOrder)
 			.img(img)
-			.star(reviewRequest.getStar())
-			.reviewContent(reviewRequest.getReviewContent())
+			.star(reviewRegisterRequest.getStar())
+			.reviewContent(reviewRegisterRequest.getReviewContent())
 			.likes(0)
 			.build();
 
