@@ -3,6 +3,7 @@ package shop.bluebooktle.backend.order.service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import shop.bluebooktle.backend.order.entity.Order;
 import shop.bluebooktle.common.domain.order.OrderStatus;
 import shop.bluebooktle.common.dto.order.request.AdminOrderSearchRequest;
 import shop.bluebooktle.common.dto.order.request.OrderCreateRequest;
@@ -26,7 +27,9 @@ public interface OrderService {
 
 	void cancelOrderNonMember(String orderKey);
 
-	void cancelOrderInternal(Long orderId);
+	void cancelOrderInternal(Order order);
+
+	void cancelOrderListener(Long orderId);
 
 	Page<AdminOrderListResponse> searchOrders(AdminOrderSearchRequest searchRequest, Pageable pageable);
 

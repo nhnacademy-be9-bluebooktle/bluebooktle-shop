@@ -116,6 +116,8 @@ public class OrderServiceImpl implements OrderService {
 				.subtract(Optional.ofNullable(o.getCouponDiscountAmount())
 					.orElse(BigDecimal.ZERO))
 				.subtract(Optional.ofNullable(o.getPointUseAmount())
+					.orElse(BigDecimal.ZERO))
+				.add(Optional.ofNullable(o.getDeliveryFee())
 					.orElse(BigDecimal.ZERO));
 
 			String thumbnailUrl = o.getBookOrders().stream()
@@ -123,7 +125,7 @@ public class OrderServiceImpl implements OrderService {
 				.flatMap(bookOrder -> {
 					Book book = bookOrder.getBook();
 					if (book == null)
-						return Optional.<BookImg>empty();
+						return Optional.empty();
 					return book.getBookImgs().stream().findFirst();
 				})
 				.map(BookImg::getImg)
@@ -244,15 +246,14 @@ public class OrderServiceImpl implements OrderService {
 
 			bookOrder.getOrderPackagings().add(packaging);
 
+			int stock = bookSaleInfo.getStock() - item.bookQuantity();
+			bookSaleInfo.updateStock(stock);
+			if (stock <= 0) {
+				bookSaleInfo.changeSaleState(BookSaleInfoState.SALE_ENDED);
+			}
+			bookSaleInfoRepository.save(bookSaleInfo);
 			bookOrderRepository.save(bookOrder);
 		}
-
-		int stock = bookSaleInfo.getStock() - item.bookQuantity();
-		bookSaleInfo.updateStock(stock);
-		if (stock <= 0) {
-			bookSaleInfo.changeSaleState(BookSaleInfoState.SALE_ENDED);
-		}
-		bookSaleInfoRepository.save(bookSaleInfo);
 	}
 
 	@Override
@@ -366,7 +367,7 @@ public class OrderServiceImpl implements OrderService {
 
 		if (paymentOpt.isPresent()) {
 			Payment payment = paymentOpt.get();
-			builder.paymentKey(payment.getPaymentDetail().getKey())
+			builder.paymentKey(payment.getPaymentDetail().getPaymentKey())
 				.paymentMethod(payment.getPaymentDetail().getPaymentType().getMethod())
 				.paidAmount(payment.getPaidAmount())
 				.paidAt(payment.getCreatedAt());
@@ -469,7 +470,7 @@ public class OrderServiceImpl implements OrderService {
 			&& order.getOrderState().getState() != OrderStatus.SHIPPING) {
 			throw new OrderInvalidStateException("배송이 시작되면 주문을 취소할 수 없습니다.");
 		}
-		cancelOrderInternal(order.getId());
+		cancelOrderInternal(order);
 	}
 
 	@Override
@@ -483,18 +484,24 @@ public class OrderServiceImpl implements OrderService {
 			&& order.getOrderState().getState() != OrderStatus.SHIPPING) {
 			throw new OrderInvalidStateException("배송이 시작되면 주문을 취소할 수 없습니다.");
 		}
-		cancelOrderInternal(order.getId());
+		cancelOrderInternal(order);
 	}
 
 	@Override
 	@Transactional
-	public void cancelOrderInternal(Long orderId) {
+	public void cancelOrderListener(Long orderId) {
 		Order order = orderRepository.findOrderForCancelById(orderId)
 			.orElseThrow(OrderNotFoundException::new);
 
 		if (order.getOrderState().getState() != OrderStatus.PENDING) {
 			return;
 		}
+		cancelOrderInternal(order);
+	}
+
+	@Override
+	@Transactional
+	public void cancelOrderInternal(Order order) {
 
 		User user = order.getUser();
 		if (user != null) {
