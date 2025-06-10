@@ -104,7 +104,7 @@ dooray:
 #    notification-channel: 추후 사용
 search:
   index:
-    name: bluebooktle-books-local-v2
+    name: bluebooktle-books-local
 
 toss:
   api:

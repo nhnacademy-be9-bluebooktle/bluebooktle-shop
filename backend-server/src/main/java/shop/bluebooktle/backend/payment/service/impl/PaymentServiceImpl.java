@@ -3,6 +3,7 @@ package shop.bluebooktle.backend.payment.service.impl;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -19,8 +20,11 @@ import shop.bluebooktle.backend.order.entity.Order;
 import shop.bluebooktle.backend.order.entity.OrderState;
 import shop.bluebooktle.backend.order.repository.OrderRepository;
 import shop.bluebooktle.backend.order.repository.OrderStateRepository;
+import shop.bluebooktle.backend.order.service.OrderService;
+import shop.bluebooktle.backend.payment.dto.request.GenericPaymentCancelRequest;
+import shop.bluebooktle.backend.payment.dto.response.GenericPaymentCancelResponse;
 import shop.bluebooktle.backend.payment.dto.response.GenericPaymentConfirmResponse;
-import shop.bluebooktle.backend.payment.dto.response.GenericPaymentConfirmResponse.PaymentStatus;
+import shop.bluebooktle.backend.payment.dto.response.PaymentStatus;
 import shop.bluebooktle.backend.payment.entity.Payment;
 import shop.bluebooktle.backend.payment.entity.PaymentDetail;
 import shop.bluebooktle.backend.payment.entity.PaymentType;
@@ -31,7 +35,9 @@ import shop.bluebooktle.backend.payment.repository.PaymentRepository;
 import shop.bluebooktle.backend.payment.repository.PaymentTypeRepository;
 import shop.bluebooktle.backend.payment.service.PaymentService;
 import shop.bluebooktle.common.domain.order.OrderStatus;
+import shop.bluebooktle.common.dto.payment.request.PaymentCancelRequest;
 import shop.bluebooktle.common.dto.payment.request.PaymentConfirmRequest;
+import shop.bluebooktle.common.entity.auth.User;
 import shop.bluebooktle.common.exception.ApplicationException;
 import shop.bluebooktle.common.exception.ErrorCode;
 import shop.bluebooktle.common.exception.order.OrderNotFoundException;
@@ -46,6 +52,7 @@ public class PaymentServiceImpl implements PaymentService {
 	private final PaymentDetailRepository paymentDetailRepository;
 	private final PaymentTypeRepository paymentTypeRepository;
 	private final OrderStateRepository orderStateRepository;
+	private final OrderService orderService;
 	private final List<PaymentGateway> gatewayList;
 	private final ApplicationEventPublisher eventPublisher;
 
@@ -60,6 +67,11 @@ public class PaymentServiceImpl implements PaymentService {
 	@Override
 	@Transactional
 	public void confirmPayment(PaymentConfirmRequest request, String gatewayName) {
+		PaymentGateway selectedGateway = paymentGateways.get(gatewayName.toUpperCase());
+		if (selectedGateway == null) {
+			throw new ApplicationException(ErrorCode.INVALID_INPUT_VALUE, "지원하지 않는 결제 서비스입니다: " + gatewayName);
+		}
+
 		Order order = orderRepository.findByOrderKey(request.orderId()).orElseThrow(OrderNotFoundException::new);
 
 		if (!request.orderId().equals(order.getOrderKey())) {
@@ -69,8 +81,8 @@ public class PaymentServiceImpl implements PaymentService {
 		BigDecimal expectedAmount = getExpectedAmount(order);
 		BigDecimal requestedAmount = BigDecimal.valueOf(request.amount());
 
-		log.info("== Expected Amount {}", expectedAmount);
-		log.info("== Requested Amount {}", requestedAmount);
+		log.debug("PaymentService - confirmPayment: Expected Amount {}", expectedAmount);
+		log.debug("PaymentService - confirmPayment: Requested Amount {}", requestedAmount);
 
 		if (requestedAmount.compareTo(expectedAmount) != 0) {
 			throw new ApplicationException(ErrorCode.PAYMENT_AMOUNT_MISMATCH);
@@ -78,11 +90,6 @@ public class PaymentServiceImpl implements PaymentService {
 
 		if (paymentGateways == null || paymentGateways.isEmpty()) {
 			throw new ApplicationException(ErrorCode.INTERNAL_SERVER_ERROR, "결제 서비스가 올바르게 초기화되지 않았습니다.");
-		}
-
-		PaymentGateway selectedGateway = paymentGateways.get(gatewayName.toUpperCase());
-		if (selectedGateway == null) {
-			throw new ApplicationException(ErrorCode.INVALID_INPUT_VALUE, "지원하지 않는 결제 서비스입니다: " + gatewayName);
 		}
 
 		OrderState pendingOrderState = orderStateRepository.findByState(OrderStatus.PENDING)
@@ -98,7 +105,7 @@ public class PaymentServiceImpl implements PaymentService {
 
 			PaymentDetail paymentDetail = PaymentDetail.builder()
 				.paymentType(paymentType)
-				.key(gatewayResponse.transactionId())
+				.paymentKey(gatewayResponse.transactionId())
 				.build();
 			paymentDetailRepository.save(paymentDetail);
 
@@ -129,6 +136,57 @@ public class PaymentServiceImpl implements PaymentService {
 			throw new ApplicationException(ErrorCode.PAYMENT_CONFIRMATION_FAILED, failReason);
 		}
 		orderRepository.save(order);
+	}
+
+	@Override
+	@Transactional
+	public void cancelPayment(PaymentCancelRequest request, String gatewayName, Long userId) {
+		PaymentGateway selectedGateway = paymentGateways.get(gatewayName.toUpperCase());
+		if (selectedGateway == null) {
+			throw new ApplicationException(ErrorCode.INVALID_INPUT_VALUE, "지원하지 않는 결제 서비스입니다: " + gatewayName);
+		}
+		Order order = orderRepository.findByOrderKey(request.orderKey()).orElseThrow(OrderNotFoundException::new);
+
+		User user = order.getUser();
+
+		if (!((user == null && userId == null) || (user != null && Objects.equals(user.getId(), userId)))) {
+			throw new OrderNotFoundException();
+		}
+
+		PaymentDetail paymentDetail = paymentDetailRepository.findByPaymentKey(
+				order.getPayment().getPaymentDetail().getPaymentKey())
+			.orElseThrow(() -> new ApplicationException(ErrorCode.PAYMENT_NOT_FOUND));
+
+		if (paymentDetail.getPaymentStatus() == shop.bluebooktle.common.domain.payment.PaymentStatus.CANCELED) {
+			throw new ApplicationException(ErrorCode.PAYMENT_ALREADY_CANCELLED);
+		}
+
+		GenericPaymentCancelRequest paymentCancelRequest = new GenericPaymentCancelRequest(
+			order.getPayment().getPaymentDetail()
+				.getPaymentKey(), request.cancelReason());
+		GenericPaymentCancelResponse gatewayResponse = selectedGateway.cancelPayment(paymentCancelRequest);
+
+		if (gatewayResponse.status() == PaymentStatus.SUCCESS) {
+			Payment payment = paymentRepository.findByPaymentDetail(paymentDetail)
+				.orElseThrow(() -> new ApplicationException(ErrorCode.PAYMENT_NOT_FOUND));
+
+			paymentDetail.updateStatus(shop.bluebooktle.common.domain.payment.PaymentStatus.CANCELED);
+
+			orderService.cancelOrderInternal(payment.getOrder());
+
+			paymentRepository.save(payment);
+			paymentDetailRepository.save(paymentDetail);
+
+		} else {
+			String failReason = "결제 취소 실패";
+			if (gatewayResponse.additionalData() != null) {
+				failReason = gatewayResponse.additionalData()
+					.getOrDefault("tossApiErrorMessage", failReason)
+					.toString();
+				failReason = gatewayResponse.additionalData().getOrDefault("errorMessage", failReason).toString();
+			}
+			throw new ApplicationException(ErrorCode.PAYMENT_CANCELLATION_FAILED, failReason);
+		}
 	}
 
 	@NotNull

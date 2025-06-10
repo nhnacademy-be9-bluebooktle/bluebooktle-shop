@@ -117,6 +117,8 @@ public class OrderServiceImpl implements OrderService {
 					.orElse(BigDecimal.ZERO))
 				.subtract(Optional.ofNullable(o.getPointUseAmount())
 					.orElse(BigDecimal.ZERO))
+				.add(Optional.ofNullable(o.getDeliveryFee())
+					.orElse(BigDecimal.ZERO))
 				.subtract(Optional.ofNullable(o.getSaleDiscountAmount())
 					.orElse(BigDecimal.ZERO));
 
@@ -125,7 +127,7 @@ public class OrderServiceImpl implements OrderService {
 				.flatMap(bookOrder -> {
 					Book book = bookOrder.getBook();
 					if (book == null)
-						return Optional.<BookImg>empty();
+						return Optional.empty();
 					return book.getBookImgs().stream().findFirst();
 				})
 				.map(BookImg::getImg)
@@ -368,7 +370,7 @@ public class OrderServiceImpl implements OrderService {
 
 		if (paymentOpt.isPresent()) {
 			Payment payment = paymentOpt.get();
-			builder.paymentKey(payment.getPaymentDetail().getKey())
+			builder.paymentKey(payment.getPaymentDetail().getPaymentKey())
 				.paymentMethod(payment.getPaymentDetail().getPaymentType().getMethod())
 				.paidAmount(payment.getPaidAmount())
 				.paidAt(payment.getCreatedAt());
@@ -471,7 +473,7 @@ public class OrderServiceImpl implements OrderService {
 			&& order.getOrderState().getState() != OrderStatus.SHIPPING) {
 			throw new OrderInvalidStateException("배송이 시작되면 주문을 취소할 수 없습니다.");
 		}
-		cancelOrderInternal(order.getId());
+		cancelOrderInternal(order);
 	}
 
 	@Override
@@ -485,7 +487,7 @@ public class OrderServiceImpl implements OrderService {
 			&& order.getOrderState().getState() != OrderStatus.SHIPPING) {
 			throw new OrderInvalidStateException("배송이 시작되면 주문을 취소할 수 없습니다.");
 		}
-		cancelOrderInternal(order.getId());
+		cancelOrderInternal(order);
 	}
 
 	@Override
@@ -497,18 +499,12 @@ public class OrderServiceImpl implements OrderService {
 		if (order.getOrderState().getState() != OrderStatus.PENDING) {
 			return;
 		}
-		cancelOrderInternal(orderId);
+		cancelOrderInternal(order);
 	}
 
 	@Override
 	@Transactional
-	public void cancelOrderInternal(Long orderId) {
-		Order order = orderRepository.findOrderForCancelById(orderId)
-			.orElseThrow(OrderNotFoundException::new);
-
-		if (order.getOrderState().getState() != OrderStatus.PENDING) {
-			return;
-		}
+	public void cancelOrderInternal(Order order) {
 
 		User user = order.getUser();
 		if (user != null) {

@@ -20,7 +20,7 @@ public class OrderCancelRabbitListener {
 			return;
 		}
 		try {
-			orderService.cancelOrderInternal(message.orderId());
+			orderService.cancelOrderListener(message.orderId());
 		} catch (Exception e) {
 			log.error("order cancel failed. orderId: {}, {}", message.orderId(), e.getMessage(), e);
 		}
