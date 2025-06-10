@@ -176,29 +176,36 @@
                 <div class="admin-panel__body">
                     <dl>
                         <dt>결제 수단</dt>
-                        <dd th:if="${order.paymentMethod() != null}" th:text="${order.paymentMethod()}"></dd>
-                        <dd th:if="${order.paymentMethod() == null}"
-                            th:text="${order.orderStatus().getDescription()}"></dd>
-                        <dt>상품 총액</dt>
-                        <dd th:text="${T(java.lang.String).format('%,d원', order.originalAmount().longValue())}"> 0원
-                        </dd>
+                        <dd th:text="${order.paymentMethod()}"></dd>
+
+                        <dt>상품 금액</dt>
+                        <dd th:text="${#numbers.formatDecimal(order.productAmount(), 0, 'COMMA', 0, 'POINT')} + '원'"></dd>
+
+                        <dt th:if="${order.totalPackagingFee() != null && order.totalPackagingFee() > 0}">포장비</dt>
+                        <dd th:if="${order.totalPackagingFee() != null && order.totalPackagingFee() > 0}"
+                            th:text="'+ ' + ${#numbers.formatDecimal(order.totalPackagingFee(), 0, 'COMMA', 0, 'POINT')} + '원'"></dd>
+
                         <dt>배송비</dt>
-                        <dd th:text="${T(java.lang.String).format('%,d원', order.deliveryFee().longValue())}"> 0원
-                        </dd>
+                        <dd th:text="${order.deliveryFee() == 0 ? '무료' : #numbers.formatDecimal(order.deliveryFee(), 0, 'COMMA', 0, 'POINT') + '원'}"></dd>
+
+                        <div th:if="${order.couponDiscountAmount() != null && order.couponDiscountAmount() > 0}">
+                            <dt>쿠폰 할인</dt>
+                            <dd th:text="'- ' + ${#numbers.formatDecimal(order.couponDiscountAmount(), 0, 'COMMA', 0, 'POINT')} + '원'"></dd>
+                        </div>
+
                         <div th:if="${order.pointUserAmount() != null && order.pointUserAmount() > 0}">
-                            <dt>사용 포인트</dt>
-                            <dd th:text="${T(java.lang.String).format('%,dP', order.pointUserAmount().longValue())}">
-                            </dd>
+                            <dt>포인트 사용</dt>
+                            <dd th:text="'- ' + ${#numbers.formatDecimal(order.pointUserAmount(), 0, 'COMMA', 0, 'POINT')} + '원'"></dd>
                         </div>
-                        <div th:if="${order.couponDiscountAmount()!=null && order.couponDiscountAmount() > 0}">
-                            <dt>쿠폰 할인액</dt>
-                            <dd th:text="${T(java.lang.String).format('%,dP', order.couponDiscountAmount().longValue())}">
-                            </dd>
-                            <dt>최종 결제액</dt>
-                            <dd style="font-weight: bold; font-size: 1.1em;"
-                                th:text="${T(java.lang.String).format('%,dP', order.paidAmount().longValue())}">
-                            </dd>
-                        </div>
+
+                        <dt>최종 결제액</dt>
+                        <dd th:if="${order.paidAmount() != null}"
+                            style="font-weight: bold; font-size: 1.2em; color: #007bff;"
+                            th:text="${#numbers.formatDecimal(order.paidAmount(), 0, 'COMMA', 0, 'POINT')} + '원'"></dd>
+                        <dd th:if="${order.paidAmount() == null}"
+                            style="font-weight: bold; font-size: 1.1em; color: #E8A87C;">
+                            결제 대기
+                        </dd>
                     </dl>
                 </div>
             </div>
@@ -221,7 +228,7 @@
                                         <span th:text="${packaging.name}">포장지 이름</span>
                                         (
                                         <span th:text="${#numbers.formatCurrency(packaging.price)}">포장 가격</span>
-                                        )
+                                        ) * <span th:text="${packaging.quantity}"></span> 개
                                     </li>
                                 </ul>
                             </div>

@@ -27,6 +27,7 @@ import shop.bluebooktle.common.dto.order.request.OrderCreateRequest;
 import shop.bluebooktle.common.dto.order.request.OrderItemRequest;
 import shop.bluebooktle.common.dto.order.response.DeliveryRuleResponse;
 import shop.bluebooktle.common.dto.order.response.OrderConfirmDetailResponse;
+import shop.bluebooktle.common.dto.order.response.OrderDetailResponse;
 import shop.bluebooktle.common.dto.payment.request.PaymentConfirmRequest;
 import shop.bluebooktle.common.dto.payment.response.PaymentConfirmResponse;
 import shop.bluebooktle.common.dto.user.response.UserWithAddressResponse;
@@ -253,4 +254,18 @@ public class OrderController {
 		return "redirect:mypage/orders";
 	}
 
+	@GetMapping("/{orderKey}")
+	public ModelAndView orderDetailPage(@PathVariable String orderKey,
+		RedirectAttributes redirectAttributes
+	) {
+		ModelAndView mav = new ModelAndView("mypage/order_detail");
+		try {
+			OrderDetailResponse orderDetails = orderService.getOrderDetailByOrderKey(orderKey);
+			mav.addObject("order", orderDetails);
+		} catch (Exception e) {
+			redirectAttributes.addFlashAttribute("globalErrorMessage", e.getMessage());
+			mav.setViewName("redirect:/");
+		}
+		return mav;
+	}
 }

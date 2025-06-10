@@ -91,6 +91,9 @@ mq:
       order-wait: BB.local.order.payment.waiting.queue
       order-cancel: BB.local.order.cancel.queue
       order-cancel-dlq: BB.local.order.cancel.dlq
+      order-shipping: BB.local.order.shipping.queue
+      order-complete: BB.local.order.complete.queue
+      order-complete-dlq: BB.local.order.complete.dlq
     exchange:
       order: local.order.exchange
       order-dlx: local.order.dlx

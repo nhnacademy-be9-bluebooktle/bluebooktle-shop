@@ -44,4 +44,6 @@ public interface OrderService {
 	void updateOrderTrackingNumber(Long orderId, String trackingNumber);
 
 	void cancelOrderListener(Long orderId);
+
+	void completeOrder(Long orderId);
 }

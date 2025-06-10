@@ -10,9 +10,6 @@ import static shop.bluebooktle.backend.payment.entity.QPaymentDetail.*;
 import static shop.bluebooktle.backend.payment.entity.QPaymentType.*;
 import static shop.bluebooktle.common.entity.auth.QUser.*;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.List;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -80,9 +77,9 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
 		JPAQuery<Order> query = queryFactory
 			.select(order)
 			.from(order)
-			.leftJoin(order.user, user).fetchJoin()
-			.leftJoin(order.orderState, orderState).fetchJoin()
-			.leftJoin(order.payment, payment).fetchJoin()
+			.leftJoin(order.user, user)
+			.leftJoin(order.orderState, orderState)
+			.leftJoin(order.payment, payment)
 			.leftJoin(payment.paymentDetail, paymentDetail)
 			.leftJoin(paymentDetail.paymentType, paymentType)
 			.where(
@@ -157,7 +154,6 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
 		return order.createdAt.between(startDate.atStartOfDay(), endDate.atTime(LocalTime.MAX));
 	}
 
-
 	@Override
 	public Optional<Order> findAdminOrderDetailsByOrderId(Long orderId) {
 		Order result = queryFactory
@@ -173,8 +169,6 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
 			.fetchOne();
 		return Optional.ofNullable(result);
 	}
-
-
 
 	@Override
 	public BigDecimal findTotalPackagingPriceByOrderId(Long orderId) {

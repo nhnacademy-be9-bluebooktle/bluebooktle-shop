@@ -441,6 +441,13 @@
                     </div>
 
                     <div class="summary-row-kitsch"
+                         th:if="${order.totalPackagingFee != null and order.totalPackagingFee > 0}">
+                        <span class="label pixel-font-kitsch">포장비:</span>
+                        <span class="value pixel-font-kitsch"
+                              th:text="'+ ' + ${#numbers.formatDecimal(order.totalPackagingFee, 0, 'COMMA', 0, 'POINT')} + '원'">+ 0원</span>
+                    </div>
+
+                    <div class="summary-row-kitsch"
                          th:if="${order.couponDiscountAmount != null and order.couponDiscountAmount > 0}">
                         <span class="label pixel-font-kitsch">쿠폰 할인:</span>
                         <span class="value discount pixel-font-kitsch"

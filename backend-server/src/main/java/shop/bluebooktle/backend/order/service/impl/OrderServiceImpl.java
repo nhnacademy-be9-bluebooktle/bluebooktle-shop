@@ -33,6 +33,7 @@ import shop.bluebooktle.backend.coupon.entity.CouponType;
 import shop.bluebooktle.backend.coupon.entity.UserCoupon;
 import shop.bluebooktle.backend.coupon.service.CouponCalculationService;
 import shop.bluebooktle.backend.order.dto.response.OrderCancelMessage;
+import shop.bluebooktle.backend.order.dto.response.OrderShippingMessage;
 import shop.bluebooktle.backend.order.entity.DeliveryRule;
 import shop.bluebooktle.backend.order.entity.Order;
 import shop.bluebooktle.backend.order.entity.OrderState;
@@ -112,6 +113,13 @@ public class OrderServiceImpl implements OrderService {
 		}
 
 		return orderPage.map(o -> {
+
+			BigDecimal totalPackagingFee = o.getBookOrders().stream()
+				.flatMap(bookOrder -> bookOrder.getOrderPackagings().stream())
+				.map(packaging -> packaging.getPackagingOption().getPrice()
+					.multiply(BigDecimal.valueOf(packaging.getQuantity())))
+				.reduce(BigDecimal.ZERO, BigDecimal::add);
+
 			BigDecimal paidAmount = o.getOriginalAmount()
 				.subtract(Optional.ofNullable(o.getCouponDiscountAmount())
 					.orElse(BigDecimal.ZERO))
@@ -119,6 +127,7 @@ public class OrderServiceImpl implements OrderService {
 					.orElse(BigDecimal.ZERO))
 				.add(Optional.ofNullable(o.getDeliveryFee())
 					.orElse(BigDecimal.ZERO))
+				.add(totalPackagingFee)
 				.subtract(Optional.ofNullable(o.getSaleDiscountAmount())
 					.orElse(BigDecimal.ZERO));
 
@@ -504,6 +513,21 @@ public class OrderServiceImpl implements OrderService {
 
 	@Override
 	@Transactional
+	public void completeOrder(Long orderId) {
+		Order order = orderRepository.findById(orderId)
+			.orElse(null);
+
+		if (order == null) {
+			throw new OrderNotFoundException();
+		}
+
+		if (order.getOrderState().getState() == OrderStatus.SHIPPING) {
+			updateOrderStatus(orderId, OrderStatus.COMPLETED);
+		}
+	}
+
+	@Override
+	@Transactional
 	public void cancelOrderInternal(Order order) {
 
 		User user = order.getUser();
@@ -572,6 +596,12 @@ public class OrderServiceImpl implements OrderService {
 			.map(PaymentType::getMethod)
 			.orElse(null);
 
+		BigDecimal totalPackagingFee = itemResponses.stream()
+			.flatMap(item -> item.getPackagingOptions().stream())
+			.map(packaging -> packaging.getPrice()
+				.multiply(BigDecimal.valueOf(packaging.getQuantity())))
+			.reduce(BigDecimal.ZERO, BigDecimal::add);
+
 		return new OrderDetailResponse(
 			order.getId(),
 			order.getOrderKey(),
@@ -591,7 +621,8 @@ public class OrderServiceImpl implements OrderService {
 			order.getPointUseAmount(),
 			order.getCouponDiscountAmount(),
 			order.getDeliveryFee(),
-			order.getTrackingNumber()
+			order.getTrackingNumber(),
+			totalPackagingFee
 		);
 	}
 
@@ -608,9 +639,9 @@ public class OrderServiceImpl implements OrderService {
 			paymentMethod = order.getPayment().getPaymentDetail().getPaymentType().getMethod();
 		}
 
-		BigDecimal totalAmount = order.getOriginalAmount()
-			.subtract(Optional.ofNullable(order.getCouponDiscountAmount()).orElse(BigDecimal.ZERO))
-			.subtract(order.getPointUseAmount());
+		BigDecimal actualPaidAmount = Optional.ofNullable(order.getPayment())
+			.map(Payment::getPaidAmount)
+			.orElse(null);
 
 		return new AdminOrderListResponse(
 			order.getId(),
@@ -619,7 +650,7 @@ public class OrderServiceImpl implements OrderService {
 			order.getOrdererName(),
 			order.getUser() != null ? order.getUser().getLoginId() : "비회원",
 			order.getReceiverName(),
-			totalAmount,
+			actualPaidAmount,
 			order.getOrderState().getState(),
 			paymentMethod
 		);
@@ -713,6 +744,14 @@ public class OrderServiceImpl implements OrderService {
 
 		Payment payment = order.getPayment();
 
+		BigDecimal productAmount = order.getOriginalAmount()
+			.subtract(Optional.ofNullable(order.getSaleDiscountAmount()).orElse(BigDecimal.ZERO));
+
+		BigDecimal totalPackagingFee = itemResponses.stream()
+			.flatMap(item -> item.getPackagingOptions().stream())
+			.map(packaging -> packaging.getPrice().multiply(BigDecimal.valueOf(packaging.getQuantity())))
+			.reduce(BigDecimal.ZERO, BigDecimal::add);
+
 		BigDecimal paidAmount = Optional.ofNullable(payment)
 			.map(Payment::getPaidAmount)
 			.orElse(null);
@@ -739,7 +778,8 @@ public class OrderServiceImpl implements OrderService {
 			order.getDetailAddress(),
 			itemResponses,
 			paidMethod,
-			order.getOriginalAmount().subtract(order.getDeliveryFee()),
+			productAmount,
+			totalPackagingFee,
 			order.getPointUseAmount(),
 			order.getCouponDiscountAmount(),
 			order.getDeliveryFee(),
@@ -764,6 +804,10 @@ public class OrderServiceImpl implements OrderService {
 
 		order.changeOrderState(newState);
 		orderRepository.save(order);
+
+		if (status == OrderStatus.SHIPPING) {
+			eventPublisher.publishEvent(new OrderShippingMessage(order.getId()));
+		}
 	}
 
 	@Override
