@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.payment.service.PaymentService;
@@ -23,6 +24,7 @@ import shop.bluebooktle.common.security.UserPrincipal;
 public class PaymentController {
 	private final PaymentService paymentService;
 
+	@Operation(summary = "결제 확정", description = "외부 서비스 결제 이후 결제 완료 데이터를 저장합니다. ")
 	@PostMapping("/{gateway-name}/confirm")
 	public ResponseEntity<JsendResponse<PaymentConfirmResponse>> confirmPayment(
 		@PathVariable(name = "gateway-name") String gatewayName,
@@ -37,6 +39,7 @@ public class PaymentController {
 		return ResponseEntity.ok(JsendResponse.success(responsePayload));
 	}
 
+	@Operation(summary = "결제 취소", description = "결제를 취소합니다.")
 	@PostMapping("/{gateway-name}/cancel")
 	public ResponseEntity<JsendResponse<Void>> cancel(
 		@PathVariable(name = "gateway-name") String gatewayName,
