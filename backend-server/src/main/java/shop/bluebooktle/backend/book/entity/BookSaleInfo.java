@@ -81,4 +81,12 @@ public class BookSaleInfo extends BaseEntity {
 	@Builder.Default
 	@Column(name = "review_count", nullable = false, columnDefinition = "BIGINT DEFAULT 0")
 	private Long reviewCount = 0L;
+
+	public void changeSaleState(BookSaleInfoState newState) {
+		this.bookSaleInfoState = newState;
+	}
+
+	public void updateStock(Integer newStock) {
+		this.stock = newStock;
+	}
 }

@@ -103,16 +103,20 @@ public class OrderController {
 		@Parameter(description = "조회할 주문키") @PathVariable String orderKey,
 		@Parameter(hidden = true) @AuthenticationPrincipal UserPrincipal userPrincipal
 	) {
-		checkPrincipal(userPrincipal);
-		orderService.cancelOrder(orderKey, userPrincipal.getUserId());
+		if (userPrincipal == null || userPrincipal.getUserId() == null) {
+			orderService.cancelOrderNonMember(orderKey);
+		} else {
+			orderService.cancelOrderMember(orderKey, userPrincipal.getUserId());
+		}
 		return ResponseEntity.ok(JsendResponse.success());
 	}
 
-	@Operation(summary = "회원 주문 상세 조회", description = "회원 주문상세 페이지를 조회합니다.")
+	@Operation(summary = "주문 상세 조회", description = "주문상세 페이지를 조회합니다.")
 	@GetMapping("/{orderKey}/detail")
 	public ResponseEntity<JsendResponse<OrderDetailResponse>> getMemberOrderDetail(
 		@Parameter(description = "조회할 주문키") @PathVariable String orderKey,
-		@Parameter(hidden = true) @AuthenticationPrincipal UserPrincipal userPrincipal) {
+		@Parameter(hidden = true) @AuthenticationPrincipal UserPrincipal userPrincipal
+	) {
 		OrderDetailResponse responseDto = orderService.getOrderDetailByUserId(orderKey,
 			userPrincipal != null ? userPrincipal.getUserId() : null);
 		log.info("주문 조회 {}", responseDto);

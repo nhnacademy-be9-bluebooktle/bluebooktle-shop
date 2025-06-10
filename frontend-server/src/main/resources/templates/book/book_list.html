@@ -116,7 +116,7 @@
         </div>
 
         <form method="get"
-              th:action="${category != null} ? '/categories/' + category.categoryId : '/books'"
+              th:action="${category != null} ? '/categories/' + ${category.categoryId} : '/books'"
               id="sortForm">
             <div class="list-controls-kitsch">
                 <div class="control-group-kitsch">

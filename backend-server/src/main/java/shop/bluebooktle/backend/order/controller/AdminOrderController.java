@@ -3,10 +3,6 @@ package shop.bluebooktle.backend.order.controller;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,10 +24,8 @@ import shop.bluebooktle.common.dto.common.JsendResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
 import shop.bluebooktle.common.dto.order.request.AdminOrderSearchRequest;
 import shop.bluebooktle.common.dto.order.request.AdminOrderStatusUpdateRequest;
+import shop.bluebooktle.common.dto.order.request.AdminOrderTrackingNumberUpdateRequest;
 import shop.bluebooktle.common.dto.order.response.AdminOrderDetailResponse;
-import shop.bluebooktle.common.dto.order.response.AdminOrderListResponse;
-import shop.bluebooktle.common.dto.common.PaginationData;
-import shop.bluebooktle.common.dto.order.request.AdminOrderSearchRequest;
 import shop.bluebooktle.common.dto.order.response.AdminOrderListResponse;
 import shop.bluebooktle.common.security.Auth;
 
@@ -81,6 +75,16 @@ public class AdminOrderController {
 	) {
 		log.info("Updating order status for orderId: {}, new status: {}", orderId, status.status());
 		orderService.updateOrderStatus(orderId, status.status());
+		return ResponseEntity.status(HttpStatus.OK)
+			.body(JsendResponse.success(null));
+	}
+
+	@PostMapping("/{orderId}/update-tracking")
+	public ResponseEntity<JsendResponse<Void>> updateTrackingNumber(
+		@PathVariable("orderId") Long orderId,
+		@RequestBody AdminOrderTrackingNumberUpdateRequest trackNumber
+	) {
+		orderService.updateOrderTrackingNumber(orderId, trackNumber.trackingNumber());
 		return ResponseEntity.status(HttpStatus.OK)
 			.body(JsendResponse.success(null));
 	}
