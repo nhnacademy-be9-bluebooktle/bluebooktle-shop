@@ -1,5 +1,6 @@
 package shop.bluebooktle.backend.book.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -32,7 +33,7 @@ public class BookTagServiceImpl implements BookTagService {
 	private final TagRepository tagRepository;
 
 	@Override
-	public void registerBookTag(Long bookId, Long tagId) {
+	public TagInfoResponse registerBookTag(Long bookId, Long tagId) {
 		Book book = findBookOrThrow(bookId);
 		Tag tag = findTagOrThrow(tagId);
 
@@ -44,20 +45,30 @@ public class BookTagServiceImpl implements BookTagService {
 			.book(book)
 			.build();
 		bookTagRepository.save(bookTag);
+
+		return TagInfoResponse.builder()
+			.id(tag.getId())
+			.name(tag.getName())
+			.createdAt(tag.getCreatedAt())
+			.build();
+
 	}
 
 	@Override
-	public void registerBookTag(Long bookId, List<Long> tagIdList) {
+	public List<TagInfoResponse> registerBookTag(Long bookId, List<Long> tagIdList) {
+		List<TagInfoResponse> responses = new ArrayList<>();
 		for (Long tagId : tagIdList) {
-			registerBookTag(bookId, tagId);
+			TagInfoResponse response = registerBookTag(bookId, tagId);
+			responses.add(response);
 		}
+		return responses;
 	}
 
 	@Override
-	public void updateBookTag(Long bookId, List<Long> tagIdList) {
+	public List<TagInfoResponse> updateBookTag(Long bookId, List<Long> tagIdList) {
 		List<BookTag> bookTagList = bookTagRepository.findByBookId(bookId);
 		bookTagRepository.deleteAll(bookTagList);
-		registerBookTag(bookId, tagIdList);
+		return registerBookTag(bookId, tagIdList);
 	}
 
 	@Override

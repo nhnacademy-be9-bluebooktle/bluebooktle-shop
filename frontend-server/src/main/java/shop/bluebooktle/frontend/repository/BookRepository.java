@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import shop.bluebooktle.common.dto.book.BookSortType;
 import shop.bluebooktle.common.dto.book.response.BookDetailResponse;
 import shop.bluebooktle.common.dto.book.response.BookInfoResponse;
 import shop.bluebooktle.common.dto.book.response.BookLikesResponse;
@@ -20,7 +21,8 @@ public interface BookRepository {
 	PaginationData<BookInfoResponse> searchBooks(
 		@RequestParam("page") int page,
 		@RequestParam("size") int size,
-		@RequestParam(value = "searchKeyword", required = false) String searchKeyword
+		@RequestParam(value = "searchKeyword", required = false) String searchKeyword,
+		@RequestParam("bookSortType") BookSortType bookSortType
 	);
 
 	// 도서 상세 조회

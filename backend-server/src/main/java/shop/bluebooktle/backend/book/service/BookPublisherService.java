@@ -11,11 +11,11 @@ import shop.bluebooktle.common.dto.book.response.PublisherInfoResponse;
 public interface BookPublisherService {
 
 	// 도서 출판사 등록
-	void registerBookPublisher(Long bookId, Long publisherId);
+	PublisherInfoResponse registerBookPublisher(Long bookId, Long publisherId);
 
-	void registerBookPublisher(Long bookId, List<Long> publisherIdList);
+	List<PublisherInfoResponse> registerBookPublisher(Long bookId, List<Long> publisherIdList);
 
-	void updateBookPublisher(Long bookId, List<Long> publisherIdList);
+	List<PublisherInfoResponse> updateBookPublisher(Long bookId, List<Long> publisherIdList);
 
 	// 도서 출판사 삭제
 	void deleteBookPublisher(Long bookId, Long publisherId);
