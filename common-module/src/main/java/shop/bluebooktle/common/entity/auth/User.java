@@ -174,9 +174,10 @@ public class User extends BaseEntity {
 		if (pointValue == null || pointValue.compareTo(BigDecimal.ZERO) < 0) {
 			throw new IllegalArgumentException("포인트 사용은 양수이어야 합니다.");
 		}
-		if (this.pointBalance.compareTo(pointValue) < 0) {
-			throw new IllegalArgumentException("사용할 포인트가 부족합니다.");
-		}
+		// TO.DO 주문 확정 시 포인트 부여하는 방식으로 변경하면 주석 제거
+		// if (this.pointBalance.compareTo(pointValue) < 0) {
+		// 	throw new IllegalArgumentException("사용할 포인트가 부족합니다.");
+		// }
 		this.pointBalance = this.pointBalance.subtract(pointValue);
 	}
 }

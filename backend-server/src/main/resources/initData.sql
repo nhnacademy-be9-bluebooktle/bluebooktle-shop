@@ -44,6 +44,9 @@ VALUES (5, 'USE', '결제 사용', now(), null);
 INSERT INTO point_source_type
 VALUES (6, 'EARN', '주문 취소 환불', now(), null);
 
+INSERT INTO point_source_type
+VALUES (7, 'USE', '결제 취소 회수', now(), null);
+
 
 INSERT INTO point_policy
 VALUES (1, 1, 'AMOUNT', 500, true, now(), null);

@@ -490,6 +490,12 @@
                             주문 취소
                         </button>
                     </form>
+
+                    <button class="btn-kitsch secondary-btn-kitsch color2-kitsch retro-shadow-kitsch-small"
+                            onclick="showKitschModal('paymentCancelModal')"
+                            th:if="${order.orderStatus() == T(shop.bluebooktle.common.domain.order.OrderStatus).PREPARING}">
+                        <i class="fas fa-comment-dollar"></i> 결제 취소
+                    </button>
                 </div>
 
             </main>
@@ -549,6 +555,36 @@
             </form>
         </div>
     </div>
+
+    <div class="modal-overlay-kitsch" id="paymentCancelModal">
+        <div class="modal-content-kitsch" style="max-width: 500px;">
+            <button class="modal-close-btn-kitsch" onclick="hideKitschModal('paymentCancelModal')"><i
+                    class="fas fa-times"></i></button>
+            <h2 class="modal-title-kitsch display-font-kitsch"><i class="fas fa-comment-dollar"></i> 결제를 취소하시겠습니까?</h2>
+
+            <form id="paymentCancelForm" method="post" th:action="@{|/mypage/orders/${order.orderKey}/payment-cancel|}">
+                <input name="orderKey" th:value="${order.orderKey}" type="hidden"/>
+
+                <div class="form-group-kitsch" style="margin-top: 1.5rem;">
+                    <label class="label-kitsch handwriting-font-kitsch" for="cancelReasonInput">결제 취소 사유 (선택
+                        사항):</label>
+                    <textarea class="textarea-kitsch handwriting-font-kitsch" id="cancelReasonInput" name="cancelReason"
+                              placeholder="취소 사유를 입력하시면 더 나은 서비스에 도움이 됩니다." rows="4"></textarea>
+                </div>
+
+                <div class="modal-actions-kitsch">
+                    <button class="btn-kitsch secondary-btn-kitsch color5-kitsch retro-shadow-kitsch-small"
+                            onclick="hideKitschModal('paymentCancelModal')" type="button">
+                        아니요
+                    </button>
+                    <button class="btn-kitsch primary-btn-kitsch retro-shadow-kitsch" type="submit">
+                        네, 결제 취소
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
 </div>
 
 <th:block layout:fragment="page_scripts">

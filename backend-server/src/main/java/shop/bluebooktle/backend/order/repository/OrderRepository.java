@@ -22,8 +22,7 @@ public interface OrderRepository extends JpaRepository<Order, Long>, OrderQueryR
 	@EntityGraph(attributePaths = {
 		"user",
 		"orderState",
-		"bookOrders.book.bookSaleInfo,",
-		"payment.paymentPointHistory"
+		"bookOrders.book.bookSaleInfo",
 	})
 	Optional<Order> findOrderForCancelById(Long id);
 
@@ -50,7 +49,8 @@ public interface OrderRepository extends JpaRepository<Order, Long>, OrderQueryR
 		"orderState",
 		"bookOrders.book.bookImgs.img",
 		"user",
-		"payment.paymentDetail"
+		"payment.paymentDetail",
+		"payment.paymentPointHistory.pointHistory"
 	})
 	Optional<Order> findByOrderKey(String orderKey);
 

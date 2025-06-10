@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import shop.bluebooktle.common.dto.payment.request.PaymentCancelRequest;
 import shop.bluebooktle.common.dto.payment.request.PaymentConfirmRequest;
 import shop.bluebooktle.common.dto.payment.response.PaymentConfirmResponse;
 import shop.bluebooktle.frontend.repository.PaymentRepository;
@@ -21,5 +22,12 @@ public class PaymentsServiceImpl implements PaymentsService {
 		// 현재는 TOSS로 고정
 		String gatewayName = "TOSS";
 		return paymentRepository.confirmPayment(gatewayName, req);
+	}
+
+	@Override
+	public Void cancel(PaymentCancelRequest req) {
+		// 현재는 TOSS로 고정
+		String gatewayName = "TOSS";
+		return paymentRepository.cancelPayment(gatewayName, req);
 	}
 }

@@ -34,13 +34,18 @@ import shop.bluebooktle.backend.payment.repository.PaymentDetailRepository;
 import shop.bluebooktle.backend.payment.repository.PaymentRepository;
 import shop.bluebooktle.backend.payment.repository.PaymentTypeRepository;
 import shop.bluebooktle.backend.payment.service.PaymentService;
+import shop.bluebooktle.backend.point.repository.PointHistoryRepository;
+import shop.bluebooktle.backend.user.repository.UserRepository;
 import shop.bluebooktle.common.domain.order.OrderStatus;
+import shop.bluebooktle.common.domain.point.PointSourceTypeEnum;
 import shop.bluebooktle.common.dto.payment.request.PaymentCancelRequest;
 import shop.bluebooktle.common.dto.payment.request.PaymentConfirmRequest;
 import shop.bluebooktle.common.entity.auth.User;
+import shop.bluebooktle.common.entity.point.PointHistory;
 import shop.bluebooktle.common.exception.ApplicationException;
 import shop.bluebooktle.common.exception.ErrorCode;
 import shop.bluebooktle.common.exception.order.OrderNotFoundException;
+import shop.bluebooktle.common.exception.order.order_state.OrderInvalidStateException;
 
 @Service
 @RequiredArgsConstructor
@@ -55,6 +60,8 @@ public class PaymentServiceImpl implements PaymentService {
 	private final OrderService orderService;
 	private final List<PaymentGateway> gatewayList;
 	private final ApplicationEventPublisher eventPublisher;
+	private final UserRepository userRepository;
+	private final PointHistoryRepository pointHistoryRepository;
 
 	private Map<String, PaymentGateway> paymentGateways;
 
@@ -147,15 +154,17 @@ public class PaymentServiceImpl implements PaymentService {
 		}
 		Order order = orderRepository.findByOrderKey(request.orderKey()).orElseThrow(OrderNotFoundException::new);
 
+		if (order.getOrderState().getState() != OrderStatus.PREPARING) {
+			throw new OrderInvalidStateException();
+		}
+
 		User user = order.getUser();
 
 		if (!((user == null && userId == null) || (user != null && Objects.equals(user.getId(), userId)))) {
 			throw new OrderNotFoundException();
 		}
 
-		PaymentDetail paymentDetail = paymentDetailRepository.findByPaymentKey(
-				order.getPayment().getPaymentDetail().getPaymentKey())
-			.orElseThrow(() -> new ApplicationException(ErrorCode.PAYMENT_NOT_FOUND));
+		PaymentDetail paymentDetail = order.getPayment().getPaymentDetail();
 
 		if (paymentDetail.getPaymentStatus() == shop.bluebooktle.common.domain.payment.PaymentStatus.CANCELED) {
 			throw new ApplicationException(ErrorCode.PAYMENT_ALREADY_CANCELLED);
@@ -163,16 +172,28 @@ public class PaymentServiceImpl implements PaymentService {
 
 		GenericPaymentCancelRequest paymentCancelRequest = new GenericPaymentCancelRequest(
 			order.getPayment().getPaymentDetail()
-				.getPaymentKey(), request.cancelReason());
+				.getPaymentKey(), request.cancelReason() == null ? "" : request.cancelReason());
 		GenericPaymentCancelResponse gatewayResponse = selectedGateway.cancelPayment(paymentCancelRequest);
 
 		if (gatewayResponse.status() == PaymentStatus.SUCCESS) {
-			Payment payment = paymentRepository.findByPaymentDetail(paymentDetail)
-				.orElseThrow(() -> new ApplicationException(ErrorCode.PAYMENT_NOT_FOUND));
+			Payment payment = order.getPayment();
 
 			paymentDetail.updateStatus(shop.bluebooktle.common.domain.payment.PaymentStatus.CANCELED);
 
 			orderService.cancelOrderInternal(payment.getOrder());
+
+			BigDecimal earnPoint = payment.getPaymentPointHistory().getPointHistory().getValue();
+			if ((!earnPoint.equals(BigDecimal.ZERO)) && user != null) {
+				user.subtractPoint(earnPoint);
+				userRepository.save(user);
+
+				PointHistory history = PointHistory.builder()
+					.user(user)
+					.sourceType(PointSourceTypeEnum.PAYMENT_CANCEL)
+					.value(earnPoint)
+					.build();
+				pointHistoryRepository.save(history);
+			}
 
 			paymentRepository.save(payment);
 			paymentDetailRepository.save(paymentDetail);

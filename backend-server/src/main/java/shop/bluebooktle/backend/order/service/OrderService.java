@@ -29,8 +29,6 @@ public interface OrderService {
 
 	void cancelOrderInternal(Order order);
 
-	void cancelOrderListener(Long orderId);
-
 	Page<AdminOrderListResponse> searchOrders(AdminOrderSearchRequest searchRequest, Pageable pageable);
 
 	OrderConfirmDetailResponse getOrderByKey(String orderKey, Long userId);
