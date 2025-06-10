@@ -6,8 +6,8 @@ import jakarta.validation.constraints.Size;
 public record PaymentCancelRequest(
 	@NotBlank
 	@Size(min = 1, max = 255)
-	String paymentKey,
-	
+	String orderKey,
+
 	String cancelReason
 ) {
 }

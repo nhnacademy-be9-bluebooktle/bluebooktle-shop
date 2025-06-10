@@ -43,7 +43,9 @@ public interface OrderRepository extends JpaRepository<Order, Long>, OrderQueryR
 
 	@EntityGraph(attributePaths = {
 		"orderState",
-		"bookOrders.book.bookImgs.img"
+		"bookOrders.book.bookImgs.img",
+		"user",
+		"payment.paymentDetail"
 	})
 	Optional<Order> findByOrderKey(String orderKey);
 

@@ -1,8 +1,8 @@
 package shop.bluebooktle.backend.payment.gateway;
 
+import shop.bluebooktle.backend.payment.dto.request.GenericPaymentCancelRequest;
 import shop.bluebooktle.backend.payment.dto.response.GenericPaymentCancelResponse;
 import shop.bluebooktle.backend.payment.dto.response.GenericPaymentConfirmResponse;
-import shop.bluebooktle.common.dto.payment.request.PaymentCancelRequest;
 import shop.bluebooktle.common.dto.payment.request.PaymentConfirmRequest;
 
 public interface PaymentGateway {
@@ -11,5 +11,5 @@ public interface PaymentGateway {
 
 	GenericPaymentConfirmResponse confirmPayment(PaymentConfirmRequest commonRequest);
 
-	GenericPaymentCancelResponse cancelPayment(PaymentCancelRequest request);
+	GenericPaymentCancelResponse cancelPayment(GenericPaymentCancelRequest commonRequest);
 }

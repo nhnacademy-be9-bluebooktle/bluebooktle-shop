@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.payment.client.TossPaymentClient;
+import shop.bluebooktle.backend.payment.dto.request.GenericPaymentCancelRequest;
 import shop.bluebooktle.backend.payment.dto.request.TossApiPaymentCancelRequest;
 import shop.bluebooktle.backend.payment.dto.request.TossApiPaymentConfirmRequest;
 import shop.bluebooktle.backend.payment.dto.response.GenericPaymentCancelResponse;
@@ -21,7 +22,6 @@ import shop.bluebooktle.backend.payment.dto.response.PaymentStatus;
 import shop.bluebooktle.backend.payment.dto.response.TossApiPaymentCancelSuccessResponse;
 import shop.bluebooktle.backend.payment.dto.response.TossApiPaymentConfirmSuccessResponse;
 import shop.bluebooktle.backend.payment.gateway.PaymentGateway;
-import shop.bluebooktle.common.dto.payment.request.PaymentCancelRequest;
 import shop.bluebooktle.common.dto.payment.request.PaymentConfirmRequest;
 
 @Component("TOSS")
@@ -100,7 +100,7 @@ public class TossPaymentGatewayImpl implements PaymentGateway {
 	}
 
 	@Override
-	public GenericPaymentCancelResponse cancelPayment(PaymentCancelRequest request) {
+	public GenericPaymentCancelResponse cancelPayment(GenericPaymentCancelRequest request) {
 		TossApiPaymentCancelRequest tossSpecificRequest = new TossApiPaymentCancelRequest(
 			request.cancelReason()
 		);

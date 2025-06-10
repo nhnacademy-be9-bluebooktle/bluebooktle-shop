@@ -6,5 +6,5 @@ import shop.bluebooktle.common.dto.payment.request.PaymentConfirmRequest;
 public interface PaymentService {
 	void confirmPayment(PaymentConfirmRequest request, String gatewayName);
 
-	void cancelPayment(PaymentCancelRequest request, String gatewayName);
+	void cancelPayment(PaymentCancelRequest request, String gatewayName, Long userId);
 }

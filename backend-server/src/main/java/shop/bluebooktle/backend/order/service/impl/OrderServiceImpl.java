@@ -125,7 +125,7 @@ public class OrderServiceImpl implements OrderService {
 				.flatMap(bookOrder -> {
 					Book book = bookOrder.getBook();
 					if (book == null)
-						return Optional.<BookImg>empty();
+						return Optional.empty();
 					return book.getBookImgs().stream().findFirst();
 				})
 				.map(BookImg::getImg)
@@ -464,7 +464,7 @@ public class OrderServiceImpl implements OrderService {
 			&& order.getOrderState().getState() != OrderStatus.SHIPPING) {
 			throw new OrderInvalidStateException("배송이 시작되면 주문을 취소할 수 없습니다.");
 		}
-		cancelOrderInternal(order.getId());
+		cancelOrderInternal(order);
 	}
 
 	@Override
@@ -473,19 +473,29 @@ public class OrderServiceImpl implements OrderService {
 
 		Order order = orderRepository.findByOrderKey(orderKey)
 			.orElseThrow(OrderNotFoundException::new);
-		
+
 		if (order.getOrderState().getState() != OrderStatus.PENDING
 			&& order.getOrderState().getState() != OrderStatus.SHIPPING) {
 			throw new OrderInvalidStateException("배송이 시작되면 주문을 취소할 수 없습니다.");
 		}
-		cancelOrderInternal(order.getId());
+		cancelOrderInternal(order);
 	}
 
 	@Override
 	@Transactional
-	public void cancelOrderInternal(Long orderId) {
+	public void cancelOrderListener(Long orderId) {
 		Order order = orderRepository.findOrderForCancelById(orderId)
 			.orElseThrow(OrderNotFoundException::new);
+
+		if (order.getOrderState().getState() != OrderStatus.PENDING) {
+			return;
+		}
+		cancelOrderInternal(order);
+	}
+
+	@Override
+	@Transactional
+	public void cancelOrderInternal(Order order) {
 
 		User user = order.getUser();
 		if (user != null) {

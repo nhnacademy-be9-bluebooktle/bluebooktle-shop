@@ -3,6 +3,7 @@ package shop.bluebooktle.backend.payment.service.impl;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -19,6 +20,7 @@ import shop.bluebooktle.backend.order.entity.OrderState;
 import shop.bluebooktle.backend.order.repository.OrderRepository;
 import shop.bluebooktle.backend.order.repository.OrderStateRepository;
 import shop.bluebooktle.backend.order.service.OrderService;
+import shop.bluebooktle.backend.payment.dto.request.GenericPaymentCancelRequest;
 import shop.bluebooktle.backend.payment.dto.response.GenericPaymentCancelResponse;
 import shop.bluebooktle.backend.payment.dto.response.GenericPaymentConfirmResponse;
 import shop.bluebooktle.backend.payment.dto.response.PaymentStatus;
@@ -33,6 +35,7 @@ import shop.bluebooktle.backend.payment.service.PaymentService;
 import shop.bluebooktle.common.domain.order.OrderStatus;
 import shop.bluebooktle.common.dto.payment.request.PaymentCancelRequest;
 import shop.bluebooktle.common.dto.payment.request.PaymentConfirmRequest;
+import shop.bluebooktle.common.entity.auth.User;
 import shop.bluebooktle.common.exception.ApplicationException;
 import shop.bluebooktle.common.exception.ErrorCode;
 import shop.bluebooktle.common.exception.order.OrderNotFoundException;
@@ -130,20 +133,31 @@ public class PaymentServiceImpl implements PaymentService {
 
 	@Override
 	@Transactional
-	public void cancelPayment(PaymentCancelRequest request, String gatewayName) {
+	public void cancelPayment(PaymentCancelRequest request, String gatewayName, Long userId) {
 		PaymentGateway selectedGateway = paymentGateways.get(gatewayName.toUpperCase());
 		if (selectedGateway == null) {
 			throw new ApplicationException(ErrorCode.INVALID_INPUT_VALUE, "지원하지 않는 결제 서비스입니다: " + gatewayName);
 		}
+		Order order = orderRepository.findByOrderKey(request.orderKey()).orElseThrow(OrderNotFoundException::new);
 
-		PaymentDetail paymentDetail = paymentDetailRepository.findByPaymentKey(request.paymentKey())
+		User user = order.getUser();
+
+		if (!((user == null && userId == null) || (user != null && Objects.equals(user.getId(), userId)))) {
+			throw new OrderNotFoundException();
+		}
+
+		PaymentDetail paymentDetail = paymentDetailRepository.findByPaymentKey(
+				order.getPayment().getPaymentDetail().getPaymentKey())
 			.orElseThrow(() -> new ApplicationException(ErrorCode.PAYMENT_NOT_FOUND));
 
 		if (paymentDetail.getPaymentStatus() == shop.bluebooktle.common.domain.payment.PaymentStatus.CANCELED) {
 			throw new ApplicationException(ErrorCode.PAYMENT_ALREADY_CANCELLED);
 		}
 
-		GenericPaymentCancelResponse gatewayResponse = selectedGateway.cancelPayment(request);
+		GenericPaymentCancelRequest paymentCancelRequest = new GenericPaymentCancelRequest(
+			order.getPayment().getPaymentDetail()
+				.getPaymentKey(), request.cancelReason());
+		GenericPaymentCancelResponse gatewayResponse = selectedGateway.cancelPayment(paymentCancelRequest);
 
 		if (gatewayResponse.status() == PaymentStatus.SUCCESS) {
 			Payment payment = paymentRepository.findByPaymentDetail(paymentDetail)
@@ -151,7 +165,7 @@ public class PaymentServiceImpl implements PaymentService {
 
 			paymentDetail.updateStatus(shop.bluebooktle.common.domain.payment.PaymentStatus.CANCELED);
 
-			orderService.cancelOrderInternal(payment.getOrder().getId());
+			orderService.cancelOrderInternal(payment.getOrder());
 
 			paymentRepository.save(payment);
 			paymentDetailRepository.save(paymentDetail);
