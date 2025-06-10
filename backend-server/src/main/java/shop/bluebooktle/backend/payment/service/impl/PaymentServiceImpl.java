@@ -123,8 +123,10 @@ public class PaymentServiceImpl implements PaymentService {
 			}
 			throw new ApplicationException(ErrorCode.PAYMENT_CONFIRMATION_FAILED, failReason);
 		}
-		eventPublisher.publishEvent(
-			new PaymentPointEarnEvent(order.getUser().getId(), gatewayResponse.confirmedAmount()));
+		if (order.getUser() != null) {
+			eventPublisher.publishEvent(
+				new PaymentPointEarnEvent(order.getUser().getId(), gatewayResponse.confirmedAmount()));
+		}
 		orderRepository.save(order);
 	}
 
