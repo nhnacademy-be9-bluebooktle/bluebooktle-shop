@@ -1,5 +1,7 @@
 package shop.bluebooktle.backend.point.service.impl;
 
+import java.math.BigDecimal;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -12,6 +14,7 @@ import shop.bluebooktle.backend.point.repository.PointPolicyRepository;
 import shop.bluebooktle.backend.point.repository.PointSourceTypeRepository;
 import shop.bluebooktle.backend.point.service.PointService;
 import shop.bluebooktle.backend.user.repository.UserRepository;
+import shop.bluebooktle.common.domain.point.ActionType;
 import shop.bluebooktle.common.domain.point.PointSourceTypeEnum;
 import shop.bluebooktle.common.dto.point.request.PointAdjustmentRequest;
 import shop.bluebooktle.common.dto.point.response.PointHistoryResponse;
@@ -33,7 +36,7 @@ public class PointServiceImpl implements PointService {
 	private final PointHistoryRepository pointHistoryRepository;
 	private final UserRepository userRepository;
 	private final PointSourceTypeRepository pointSourceTypeRepository;
-	private final PointPolicyRepository policyRepository;
+	private final PointPolicyRepository pointPolicyRepository;
 
 	@Override
 	@Transactional
@@ -46,7 +49,7 @@ public class PointServiceImpl implements PointService {
 		PointSourceType sourceType = pointSourceTypeRepository.findById(request.pointSourceTypeId())
 			.orElseThrow(PointSourceNotFountException::new);
 
-		PointPolicy policy = policyRepository.findByPointSourceType(sourceType).orElseThrow(
+		PointPolicy policy = pointPolicyRepository.findByPointSourceType(sourceType).orElseThrow(
 			PointPolicyNotFoundException::new);
 
 		if (policy.getIsActive() == false) {
@@ -77,5 +80,46 @@ public class PointServiceImpl implements PointService {
 			),
 			p.getCreatedAt()
 		));
+	}
+
+	@Override
+	@Transactional
+	public void adjustUserPointAndSavePointHistory(Long userId, PointSourceTypeEnum pointSourceTypeEnum,
+		BigDecimal amount) {
+		User user = userRepository.findUserById(userId)
+			.orElseThrow(UserNotFoundException::new);
+
+		PointSourceType sourceType = pointSourceTypeRepository.findById(pointSourceTypeEnum.getId())
+			.orElseThrow(PointSourceNotFountException::new);
+
+		PointPolicy policy = pointPolicyRepository.findByPointSourceType(sourceType).orElseThrow(
+			PointPolicyNotFoundException::new);
+
+		if (policy.getIsActive() == false) {
+			return;
+		}
+		BigDecimal pointValue;
+		if (sourceType.getActionType() == ActionType.EARN) {
+			if (sourceType.getId().equals(PointSourceTypeEnum.PAYMENT_EARN.getId())) {
+				pointValue = amount.multiply((policy.getValue().add(
+						BigDecimal.valueOf(user.getMembershipLevel().getRate()))))
+					.divideToIntegralValue(BigDecimal.valueOf(100L));
+			} else {
+				pointValue = policy.getValue();
+			}
+			user.addPoint(pointValue);
+		} else {
+			pointValue = amount;
+			user.subtractPoint(pointValue);
+		}
+
+		userRepository.save(user);
+
+		PointHistory history = PointHistory.builder()
+			.user(user)
+			.sourceType(pointSourceTypeEnum)
+			.value(pointValue)
+			.build();
+		pointHistoryRepository.save(history);
 	}
 }

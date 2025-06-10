@@ -8,6 +8,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.jetbrains.annotations.NotNull;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +24,7 @@ import shop.bluebooktle.backend.payment.dto.response.GenericPaymentConfirmRespon
 import shop.bluebooktle.backend.payment.entity.Payment;
 import shop.bluebooktle.backend.payment.entity.PaymentDetail;
 import shop.bluebooktle.backend.payment.entity.PaymentType;
+import shop.bluebooktle.backend.payment.event.type.PaymentPointEarnEvent;
 import shop.bluebooktle.backend.payment.gateway.PaymentGateway;
 import shop.bluebooktle.backend.payment.repository.PaymentDetailRepository;
 import shop.bluebooktle.backend.payment.repository.PaymentRepository;
@@ -45,6 +47,7 @@ public class PaymentServiceImpl implements PaymentService {
 	private final PaymentTypeRepository paymentTypeRepository;
 	private final OrderStateRepository orderStateRepository;
 	private final List<PaymentGateway> gatewayList;
+	private final ApplicationEventPublisher eventPublisher;
 
 	private Map<String, PaymentGateway> paymentGateways;
 
@@ -120,7 +123,8 @@ public class PaymentServiceImpl implements PaymentService {
 			}
 			throw new ApplicationException(ErrorCode.PAYMENT_CONFIRMATION_FAILED, failReason);
 		}
-
+		eventPublisher.publishEvent(
+			new PaymentPointEarnEvent(order.getUser().getId(), gatewayResponse.confirmedAmount()));
 		orderRepository.save(order);
 	}
 
