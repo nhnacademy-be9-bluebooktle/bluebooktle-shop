@@ -246,6 +246,12 @@ public class OrderServiceImpl implements OrderService {
 
 			bookOrder.getOrderPackagings().add(packaging);
 
+			int stock = bookSaleInfo.getStock() - item.bookQuantity();
+			bookSaleInfo.updateStock(stock);
+			if (stock <= 0) {
+				bookSaleInfo.changeSaleState(BookSaleInfoState.SALE_ENDED);
+			}
+			bookSaleInfoRepository.save(bookSaleInfo);
 			bookOrderRepository.save(bookOrder);
 		}
 	}
