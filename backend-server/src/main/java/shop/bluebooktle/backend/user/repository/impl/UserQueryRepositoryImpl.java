@@ -14,6 +14,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
@@ -38,6 +39,8 @@ import shop.bluebooktle.backend.user.repository.UserQueryRepository;
 import shop.bluebooktle.common.domain.auth.UserStatus;
 import shop.bluebooktle.common.domain.auth.UserType;
 import shop.bluebooktle.common.dto.user.request.UserSearchRequest;
+import shop.bluebooktle.common.dto.user.response.UserMembershipLevelResponse;
+import shop.bluebooktle.common.entity.auth.QMembershipLevel;
 import shop.bluebooktle.common.entity.auth.QUser;
 import shop.bluebooktle.common.entity.auth.User;
 
@@ -99,36 +102,7 @@ public class UserQueryRepositoryImpl implements UserQueryRepository {
 		QOrder order = QOrder.order;
 		QPayment payment = QPayment.payment;
 
-		QBookOrder bookOrder = QBookOrder.bookOrder;
-		QOrderPackaging orderPackaging = QOrderPackaging.orderPackaging;
-		QPackagingOption packagingOption = QPackagingOption.packagingOption;
-
-		// 포장비 계산
-		NumberExpression<BigDecimal> wrappingPriceExpression =
-			packagingOption.price.multiply(orderPackaging.quantity.castToNum(BigDecimal.class));
-
-		// 한 주문의 포장비
-		SubQueryExpression<BigDecimal> wrappingCostSubquery = JPAExpressions
-			.select(wrappingPriceExpression.sum())
-			.from(bookOrder)
-			.join(orderPackaging).on(orderPackaging.bookOrder.eq(bookOrder))
-			.join(packagingOption).on(packagingOption.eq(orderPackaging.packagingOption))
-			.where(bookOrder.order.eq(order))
-			.groupBy(bookOrder.order.id);
-
-		NumberExpression<BigDecimal> safeWrappingCost = Expressions.numberTemplate(
-			BigDecimal.class, "coalesce({0}, {1})", wrappingCostSubquery, BigDecimal.ZERO
-		);
-
-		NumberExpression<BigDecimal> netAmountExpression =
-			new CaseBuilder()
-				.when(payment.id.isNotNull())
-				.then(
-					order.originalAmount
-						.subtract(order.deliveryFee.coalesce(BigDecimal.ZERO))
-						.subtract(safeWrappingCost)
-				)
-				.otherwise(BigDecimal.ZERO);
+		NumberExpression<BigDecimal> netAmountExpression = getNetAmountExpression(order, payment);
 
 		return queryFactory
 			.select(Projections.constructor(UserNetSpentAmountDto.class,
@@ -144,6 +118,49 @@ public class UserQueryRepositoryImpl implements UserQueryRepository {
 			.leftJoin(payment).on(payment.order.id.eq(order.id))
 			.groupBy(user.id)
 			.fetch();
+	}
+
+	@Override
+	public UserMembershipLevelResponse findUserNetSpentAmountForLastThreeMonthsByUserId(Long userId) {
+		QUser user = QUser.user;
+		QOrder order = QOrder.order;
+		QPayment payment = QPayment.payment;
+		QMembershipLevel membershipLevel = QMembershipLevel.membershipLevel;
+
+		LocalDateTime threeMonthsAgo = LocalDateTime.now().minusMonths(3);
+		NumberExpression<BigDecimal> netAmountExpression = getNetAmountExpression(order, payment);
+
+		BigDecimal netAmount = queryFactory
+			.select(netAmountExpression.sum().coalesce(BigDecimal.ZERO))
+			.from(user)
+			.leftJoin(order).on(
+				order.user.eq(user)
+					.and(order.createdAt.after(threeMonthsAgo))
+					.and(order.deletedAt.isNull())
+			)
+			.leftJoin(payment).on(payment.order.id.eq(order.id))
+			.where(user.id.eq(userId))
+			.fetchOne();
+
+		Tuple levelInfo = queryFactory
+			.select(membershipLevel.id, membershipLevel.name)
+			.from(membershipLevel)
+			.where(
+				membershipLevel.minNetSpent.loe(netAmount),
+				membershipLevel.maxNetSpent.goe(netAmount),
+				membershipLevel.deletedAt.isNull()
+			)
+			.fetchFirst();
+
+		Long membershipLevelId = levelInfo != null ? levelInfo.get(membershipLevel.id) : null;
+		String membershipLevelName = levelInfo != null ? levelInfo.get(membershipLevel.name) : "등급 없음";
+
+		return new UserMembershipLevelResponse(
+			userId,
+			netAmount,
+			membershipLevelId,
+			membershipLevelName
+		);
 	}
 
 	@Override
@@ -215,5 +232,31 @@ public class UserQueryRepositoryImpl implements UserQueryRepository {
 		} catch (IllegalArgumentException e) {
 			return null;
 		}
+	}
+
+	private NumberExpression<BigDecimal> getNetAmountExpression(QOrder order, QPayment payment) {
+		QBookOrder bookOrder = QBookOrder.bookOrder;
+		QOrderPackaging orderPackaging = QOrderPackaging.orderPackaging;
+		QPackagingOption packagingOption = QPackagingOption.packagingOption;
+
+		NumberExpression<BigDecimal> wrappingPriceExpression =
+			packagingOption.price.multiply(orderPackaging.quantity.castToNum(BigDecimal.class));
+
+		SubQueryExpression<BigDecimal> wrappingCostSubquery = JPAExpressions
+			.select(wrappingPriceExpression.sum())
+			.from(bookOrder)
+			.join(orderPackaging).on(orderPackaging.bookOrder.eq(bookOrder))
+			.join(packagingOption).on(packagingOption.eq(orderPackaging.packagingOption))
+			.where(bookOrder.order.eq(order))
+			.groupBy(bookOrder.order.id);
+
+		NumberExpression<BigDecimal> safeWrappingCost = Expressions.numberTemplate(
+			BigDecimal.class, "coalesce({0}, {1})", wrappingCostSubquery, BigDecimal.ZERO
+		);
+
+		return new CaseBuilder()
+			.when(payment.id.isNotNull())
+			.then(order.originalAmount.subtract(safeWrappingCost))
+			.otherwise(BigDecimal.ZERO);
 	}
 }

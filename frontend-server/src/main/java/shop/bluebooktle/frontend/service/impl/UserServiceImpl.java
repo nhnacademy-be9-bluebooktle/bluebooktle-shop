@@ -17,6 +17,7 @@ import shop.bluebooktle.common.dto.user.request.ReactivateDormantUserRequest;
 import shop.bluebooktle.common.dto.user.request.UserSearchRequest;
 import shop.bluebooktle.common.dto.user.request.UserUpdateRequest;
 import shop.bluebooktle.common.dto.user.response.AdminUserResponse;
+import shop.bluebooktle.common.dto.user.response.UserMembershipLevelResponse;
 import shop.bluebooktle.common.dto.user.response.UserResponse;
 import shop.bluebooktle.common.dto.user.response.UserTotalPointResponse;
 import shop.bluebooktle.common.dto.user.response.UserWithAddressResponse;
@@ -78,6 +79,11 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public UserTotalPointResponse getUserTotalPoints() {
 		return userRepository.getUserTotalPoints();
+	}
+
+	@Override
+	public UserMembershipLevelResponse getUserMembership() {
+		return userRepository.getUserMembership();
 	}
 
 	@Override

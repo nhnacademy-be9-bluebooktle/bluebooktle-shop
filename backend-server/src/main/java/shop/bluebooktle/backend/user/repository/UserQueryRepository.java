@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 
 import shop.bluebooktle.backend.user.dto.UserNetSpentAmountDto;
 import shop.bluebooktle.common.dto.user.request.UserSearchRequest;
+import shop.bluebooktle.common.dto.user.response.UserMembershipLevelResponse;
 import shop.bluebooktle.common.entity.auth.User;
 
 public interface UserQueryRepository {
@@ -15,6 +16,8 @@ public interface UserQueryRepository {
 	Page<User> findUsersBySearchRequest(UserSearchRequest request, Pageable pageable);
 
 	List<UserNetSpentAmountDto> findUserNetSpentAmountForLastThreeMonths();
+
+	UserMembershipLevelResponse findUserNetSpentAmountForLastThreeMonthsByUserId(Long userId);
 
 	void updateMembershipLevel(Long userId, Long newMembershipLevelId);
 

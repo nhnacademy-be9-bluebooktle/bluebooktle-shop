@@ -33,6 +33,7 @@ import shop.bluebooktle.common.dto.user.request.ReactivateDormantUserRequest;
 import shop.bluebooktle.common.dto.user.request.UserSearchRequest;
 import shop.bluebooktle.common.dto.user.request.UserUpdateRequest;
 import shop.bluebooktle.common.dto.user.response.AdminUserResponse;
+import shop.bluebooktle.common.dto.user.response.UserMembershipLevelResponse;
 import shop.bluebooktle.common.dto.user.response.UserResponse;
 import shop.bluebooktle.common.dto.user.response.UserTotalPointResponse;
 import shop.bluebooktle.common.dto.user.response.UserWithAddressResponse;
@@ -127,6 +128,17 @@ public class UserController {
 		} catch (UserNotFoundException e) {
 			throw new UserNotFoundException();
 		}
+	}
+
+	@Operation(summary = "내 등급 조회", description = "내 현재 등급을 조회합니다.")
+	@Auth(type = UserType.USER)
+	@GetMapping("/membership")
+	public ResponseEntity<JsendResponse<UserMembershipLevelResponse>> getUserMembershipLevel(
+		@Parameter(hidden = true) @AuthenticationPrincipal UserPrincipal userPrincipal
+	) {
+		UserMembershipLevelResponse response = userService.findUserNetSpentAmountForLastThreeMonthsByUserId(
+			userPrincipal.getUserId());
+		return ResponseEntity.ok(JsendResponse.success(response));
 	}
 
 	@Operation(summary = "내 정보 및 주소 조회", description = "내 정보 및 주소 ")
