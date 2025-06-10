@@ -55,7 +55,7 @@ public class BookController {
 		model.addAttribute("bookSortType", bookSortType);
 		model.addAttribute("searchKeyword", searchKeyword);
 		model.addAttribute("size", size);
-		model.addAttribute("filterCount", 6);
+		model.addAttribute("filterCount", BookSortType.values().length);
 		model.addAttribute("pagedBooks", pagedBooks);
 
 		return "book/book_list";
@@ -80,6 +80,7 @@ public class BookController {
 		model.addAttribute("bookSortType", bookSortType);
 		model.addAttribute("category", category);
 		model.addAttribute("size", size);
+		model.addAttribute("filterCount", BookSortType.values().length);
 		model.addAttribute("pagedBooks", pagedBooksByCategory);
 
 		return "book/book_list";
