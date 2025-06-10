@@ -94,6 +94,8 @@ public class ReviewServiceImpl implements ReviewService {
 
 	private String uploadToMinio(MultipartFile file) {
 		String presignedUploadUrl = adminImgService.getPresignedUploadUrl();
+		log.debug("url : {}", presignedUploadUrl);
+
 		URI uri = URI.create(presignedUploadUrl);
 
 		// 1) path 분해
@@ -110,7 +112,7 @@ public class ReviewServiceImpl implements ReviewService {
 			));
 		Map<String, String> headers = new HashMap<>();
 		headers.put("Content-Type", file.getContentType());
-
+		log.debug("Content-Type : {}", file.getContentType());
 		try {
 			imageServerClient.upload(
 				bucket,

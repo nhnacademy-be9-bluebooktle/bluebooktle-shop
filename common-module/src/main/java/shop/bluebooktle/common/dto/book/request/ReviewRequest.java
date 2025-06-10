@@ -28,6 +28,6 @@ public class ReviewRequest {
 
 	@Size(min = 10, max = 255, message = "리뷰 내용은 10~255자 입니다")
 	private String reviewContent;
-
+	
 	private List<MultipartFile> imageFiles;
 }
