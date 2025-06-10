@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.book.service.TagService;
@@ -30,37 +31,41 @@ public class TagController {
 
 	private final TagService tagService;
 
-	// 태그 등록
+	@Operation(summary = "태그 등록", description = "태그를 등록합니다.")
 	@PostMapping
 	public ResponseEntity<JsendResponse<Void>> addTag(@Valid @RequestBody TagRequest request) {
 		tagService.registerTag(request);
 		return ResponseEntity.status(HttpStatus.CREATED).body(JsendResponse.success());
 	}
 
-	// 태그 수정 (태그명 수정)
-	@PutMapping("/{tagId}")
+	@Operation(summary = "태그 수정", description = "해당 태그의 태그명을 수정합니다.")
+	@PutMapping("/{tag-id}")
 	public ResponseEntity<JsendResponse<Void>> updateTag(
-		@PathVariable Long tagId,
+		@PathVariable(name = "tag-id") Long tagId,
 		@Valid @RequestBody TagRequest request
 	) {
 		tagService.updateTag(tagId, request);
 		return ResponseEntity.ok(JsendResponse.success());
 	}
 
-	// 태그 삭제
-	@DeleteMapping("/{tagId}")
-	public ResponseEntity<JsendResponse<Void>> deleteTag(@PathVariable Long tagId) {
+	@Operation(summary = "태그 삭제", description = "해당 태그를 삭제합니다.")
+	@DeleteMapping("/{tag-id}")
+	public ResponseEntity<JsendResponse<Void>> deleteTag(
+		@PathVariable(name = "tag-id") Long tagId
+	) {
 		tagService.deleteTag(tagId);
 		return ResponseEntity.ok(JsendResponse.success());
 	}
 
-	// 태그 조회
-	@GetMapping("/{tagId}")
-	public ResponseEntity<JsendResponse<TagInfoResponse>> getTag(@PathVariable Long tagId) {
+	@Operation(summary = "태그 조회", description = "해당 태그를 조회합니다.")
+	@GetMapping("/{tag-id}")
+	public ResponseEntity<JsendResponse<TagInfoResponse>> getTag(
+		@PathVariable(name = "tag-id") Long tagId
+	) {
 		return ResponseEntity.ok(JsendResponse.success(tagService.getTag(tagId)));
 	}
 
-	// 태그 목록 조회
+	@Operation(summary = "태그 목록 조회", description = "등록된 태그 목록을 조회합니다.")
 	@GetMapping
 	public ResponseEntity<JsendResponse<PaginationData<TagInfoResponse>>> getTags(
 		@PageableDefault(size = 10, sort = "id") Pageable pageable,
