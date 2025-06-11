@@ -23,6 +23,9 @@ import shop.bluebooktle.frontend.config.feign.FeignGlobalConfig;
 @FeignClient(url = "${server.gateway-url}", name = "adminBookRepository", path = "/api/books", configuration = FeignGlobalConfig.class)
 public interface AdminBookRepository {
 
+	@PostMapping
+	void registerBook(@RequestBody BookAllRegisterRequest bookAllRegisterRequest);
+
 	@GetMapping("/admin")
 	PaginationData<AdminBookResponse> getPagedBooksByAdmin(
 		@RequestParam("page") int page,
@@ -38,9 +41,6 @@ public interface AdminBookRepository {
 		@PathVariable Long bookId,
 		@RequestBody BookUpdateServiceRequest bookUpdateServiceRequest
 	);
-
-	@PostMapping
-	void registerBook(@RequestBody BookAllRegisterRequest bookAllRegisterRequest);
 
 	@DeleteMapping("/{bookId}")
 	void deleteBook(@PathVariable("bookId") Long bookId);

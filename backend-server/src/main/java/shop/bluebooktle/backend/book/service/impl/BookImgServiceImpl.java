@@ -18,7 +18,6 @@ import shop.bluebooktle.backend.book.service.ImgService;
 import shop.bluebooktle.common.dto.book.request.BookImgRegisterRequest;
 import shop.bluebooktle.common.dto.book.request.img.ImgRegisterRequest;
 import shop.bluebooktle.common.dto.book.response.BookImgResponse;
-import shop.bluebooktle.common.dto.book.response.BookInfoResponse;
 import shop.bluebooktle.common.dto.book.response.img.ImgResponse;
 import shop.bluebooktle.common.exception.book.BookIdNullException;
 import shop.bluebooktle.common.exception.book.BookImgAlreadyExistsException;
@@ -100,22 +99,6 @@ public class BookImgServiceImpl implements BookImgService {
 			.imgUrl(bookImage.getImg().getImgUrl())
 			.createdAt(bookImage.getImg().getCreatedAt())
 			.build();
-	}
-
-	@Transactional(readOnly = true)
-	@Override
-	public List<BookInfoResponse> getBookByImgId(Long imgId) {
-		if (imgId == null) {
-			throw new ImgIdNullException();
-		}
-
-		Img img = imgRepository.findById(imgId).orElseThrow(() -> new ImgNotFoundException());
-
-		List<Book> books = bookImgRepository.findBooksByImg(img);
-		/*return books.stream()
-			.map(book -> new BookInfoResponse(book.getId()))
-			.collect(Collectors.toList());*/
-		return null;
 	}
 
 	@Transactional(readOnly = true)
