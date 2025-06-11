@@ -23,6 +23,7 @@ import shop.bluebooktle.backend.book_order.entity.BookOrder;
 import shop.bluebooktle.backend.book_order.jpa.BookOrderRepository;
 import shop.bluebooktle.backend.user.repository.UserRepository;
 import shop.bluebooktle.common.dto.book.request.ReviewRegisterRequest;
+import shop.bluebooktle.common.dto.book.request.ReviewUpdateRequest;
 import shop.bluebooktle.common.dto.book.response.ReviewResponse;
 import shop.bluebooktle.common.entity.auth.User;
 import shop.bluebooktle.common.exception.InvalidInputValueException;
@@ -49,6 +50,10 @@ public class ReviewServiceImpl implements ReviewService {
 
 		BookOrder bookOrder = bookOrderRepository.findById(bookOrderId)
 			.orElseThrow(BookOrderNotFoundException::new);
+
+		if (!bookOrder.getOrder().getUser().getId().equals(userId)) {
+			throw new InvalidInputValueException("리뷰를 작성할 권한이 없습니다. 해당 주문의 사용자가 아닙니다.");
+		}
 
 		Img img = null;
 		List<String> imageUrls = reviewRegisterRequest.getImgUrls();
@@ -90,6 +95,46 @@ public class ReviewServiceImpl implements ReviewService {
 			.reviewContent(saved.getReviewContent())
 			.likes(saved.getLikes())
 			.createdAt(saved.getCreatedAt())
+			.build();
+	}
+
+	@Override
+	public ReviewResponse updateReview(Long reviewId, ReviewUpdateRequest reviewUpdateRequest) {
+		Review review = reviewRepository.findById(reviewId)
+			.orElseThrow(() -> new InvalidInputValueException("Review not found with ID: " + reviewId));
+
+		int oldStar = review.getStar();
+
+		Img imgToUpdate = null;
+		List<String> imageUrls = reviewUpdateRequest.getImgUrls();
+		if (imageUrls != null && !imageUrls.isEmpty()) {
+			String firstImageUrl = imageUrls.getFirst();
+			imgToUpdate = imgRepository.findByImgUrl(firstImageUrl)
+				.orElseGet(() -> {
+					Img newImg = Img.builder().imgUrl(firstImageUrl).build();
+					return imgRepository.save(newImg);
+				});
+		}
+		review.updateDetails(reviewUpdateRequest.getStar(), reviewUpdateRequest.getReviewContent(), imgToUpdate);
+
+		Review updatedReview = reviewRepository.save(review);
+
+		Book book = review.getBookOrder().getBook();
+		BookSaleInfo bookSaleInfo = bookSaleInfoRepository.findByBook(book)
+			.orElseThrow(BookSaleInfoNotFoundException::new);
+
+		bookSaleInfo.updateReviewAndRecalculateStar(oldStar, updatedReview.getStar());
+		bookSaleInfoRepository.save(bookSaleInfo);
+
+		return ReviewResponse.builder()
+			.reviewId(updatedReview.getId())
+			.userId(updatedReview.getUser().getId())
+			.bookOrderId(updatedReview.getBookOrder().getId())
+			.imgUrl(updatedReview.getImg() != null ? updatedReview.getImg().getImgUrl() : null)
+			.star(updatedReview.getStar())
+			.reviewContent(updatedReview.getReviewContent())
+			.likes(updatedReview.getLikes())
+			.createdAt(updatedReview.getCreatedAt())
 			.build();
 	}
 

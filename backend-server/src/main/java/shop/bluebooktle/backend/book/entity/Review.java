@@ -74,6 +74,12 @@ public class Review extends BaseEntity {
 		this.likes = likes;
 	}
 
+	public void updateDetails(int newStar, String newReviewContent, Img newImg) {
+		this.star = newStar;
+		this.reviewContent = newReviewContent;
+		this.img = newImg;
+	}
+
 	public void incrementLikeCount() {
 		this.likes++;
 	}

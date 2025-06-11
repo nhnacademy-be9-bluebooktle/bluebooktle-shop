@@ -22,9 +22,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import shop.bluebooktle.common.dto.book.request.ReviewRegisterRequest;
 import shop.bluebooktle.common.dto.book.request.ReviewRequest;
+import shop.bluebooktle.common.dto.book.request.ReviewUpdateRequest;
 import shop.bluebooktle.common.dto.book.response.ReviewResponse;
+import shop.bluebooktle.common.dto.book.response.img.ImgResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
 import shop.bluebooktle.frontend.repository.ImageServerClient;
+import shop.bluebooktle.frontend.repository.ImgRepository;
 import shop.bluebooktle.frontend.repository.ReviewRepository;
 import shop.bluebooktle.frontend.service.AdminImgService;
 import shop.bluebooktle.frontend.service.ReviewService;
@@ -36,6 +39,7 @@ public class ReviewServiceImpl implements ReviewService {
 	private final ReviewRepository reviewRepository;
 	private final AdminImgService adminImgService;
 	private final ImageServerClient imageServerClient;
+	private final ImgRepository imgRepository;
 
 	// 리뷰작성
 	@Override
@@ -59,6 +63,40 @@ public class ReviewServiceImpl implements ReviewService {
 			.build();
 
 		reviewRepository.addReview(bookOrderId, backendRequest);
+	}
+
+	@Override
+	public void updateReivew(Long reviewId, ReviewRequest reviewRequest) {
+		List<String> finalImgUrlsForRequest = new ArrayList<>();
+
+		if (reviewRequest.getImageFiles() != null && !reviewRequest.getImageFiles().isEmpty()) {
+			ImgResponse existingImg = imgRepository.getImageByReviewId(reviewId);
+			if (existingImg != null && existingImg.getImgUrl() != null && existingImg.getImgUrl()
+				.contains("/bluebooktle-bookimage")) {
+				String oldImageUrl = existingImg.getImgUrl();
+				String oldObjectName = oldImageUrl.substring(oldImageUrl.lastIndexOf("/") + 1);
+
+				adminImgService.deleteImage(oldObjectName);
+				log.info("기존 리뷰 이미지 미니오에서 삭제: {}", oldObjectName);
+
+			}
+
+			for (MultipartFile file : reviewRequest.getImageFiles()) {
+				if (!file.isEmpty()) {
+					String uploadedMinioUrl = uploadToMinio(file);
+					String imageKey = uploadedMinioUrl.substring(uploadedMinioUrl.indexOf("/bluebooktle-bookimage"));
+					finalImgUrlsForRequest.add("/images" + imageKey);
+				}
+			}
+		}
+
+		ReviewUpdateRequest backendRequest = ReviewUpdateRequest.builder()
+			.star(reviewRequest.getStar())
+			.reviewContent(reviewRequest.getReviewContent())
+			.imgUrls(finalImgUrlsForRequest)
+			.build();
+
+		reviewRepository.updateReview(reviewId, backendRequest);
 	}
 
 	// 내가쓴 리뷰 목록조회

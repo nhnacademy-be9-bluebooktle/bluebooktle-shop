@@ -8,6 +8,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -17,6 +18,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.book.service.ReviewService;
 import shop.bluebooktle.common.dto.book.request.ReviewRegisterRequest;
+import shop.bluebooktle.common.dto.book.request.ReviewUpdateRequest;
 import shop.bluebooktle.common.dto.book.response.ReviewResponse;
 import shop.bluebooktle.common.dto.common.JsendResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
@@ -41,8 +43,18 @@ public class ReviewController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(JsendResponse.success(created));
 	}
 
+	// 리뷰 수정
+	@PutMapping("/{reviewId}")
+	public ResponseEntity<JsendResponse<ReviewResponse>> updateReview(
+		@PathVariable Long reviewId,
+		@RequestBody @Valid ReviewUpdateRequest reviewUpdateRequest
+	) {
+		ReviewResponse updatedReview = reviewService.updateReview(reviewId, reviewUpdateRequest);
+		return ResponseEntity.ok(JsendResponse.success(updatedReview));
+	}
+
 	//내가쓴 리뷰 목록조회
-	@GetMapping
+	@GetMapping("/me")
 	public ResponseEntity<JsendResponse<PaginationData<ReviewResponse>>> getMyReviews(
 		@AuthenticationPrincipal UserPrincipal userPrincipal,
 		@RequestParam(value = "page", defaultValue = "0") int page,

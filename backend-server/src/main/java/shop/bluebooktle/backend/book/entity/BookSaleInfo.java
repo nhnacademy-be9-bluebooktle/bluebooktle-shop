@@ -99,6 +99,15 @@ public class BookSaleInfo extends BaseEntity {
 		this.reviewCount = newReviewCount;
 	}
 
+	public void updateReviewAndRecalculateStar(int oldStar, int newStar) {
+
+		BigDecimal currentTotalStars = this.star.multiply(BigDecimal.valueOf(this.reviewCount));
+
+		BigDecimal updatedTotalStars = currentTotalStars.subtract(BigDecimal.valueOf(oldStar))
+			.add(BigDecimal.valueOf(newStar));
+
+		this.star = updatedTotalStars.divide(BigDecimal.valueOf(this.reviewCount), 1, RoundingMode.HALF_UP);
+	}
 
 	public void changeSaleState(BookSaleInfoState newState) {
 		this.bookSaleInfoState = newState;

@@ -63,4 +63,25 @@ public class MyPageReviewController {
 		return "mypage/review_list";
 	}
 
+	@PostMapping("/edit/{reviewId}")
+	public String updateReview(
+		@PathVariable Long reviewId,
+		@ModelAttribute @Valid ReviewRequest reviewRequest,
+		BindingResult bindingResult,
+		RedirectAttributes redirectAttrs
+	) {
+		if (bindingResult.hasErrors()) {
+			redirectAttrs.addFlashAttribute("globalErrorMessage", "리뷰 수정 실패: 입력 값이 올바르지 않습니다.");
+			return "redirect:/mypage/reviews";
+		}
+		try {
+			reviewService.updateReivew(reviewId, reviewRequest);
+			redirectAttrs.addFlashAttribute("globalSuccessMessage", "리뷰가 성공적으로 수정되었습니다.");
+			return "redirect:/mypage/reviews";
+		} catch (Exception e) {
+			redirectAttrs.addFlashAttribute("globalErrorMessage", "리뷰 수정 중 오류가 발생했습니다: " + e.getMessage());
+			return "redirect:/mypage/reviews";
+		}
+	}
+
 }

@@ -89,6 +89,45 @@
             border-left: 3px solid var(--kitsch-color-2);
         }
 
+        .review-image-preview-item {
+            max-width: 70px;
+            max-height: 70px;
+            overflow: hidden;
+            border: 1px solid var(--kitsch-color-4);
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .review-image-preview-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .star-rating-input-kitsch {
+            display: inline-block;
+        }
+
+        .star-rating-input-kitsch .stars {
+            font-size: 2rem;
+            color: #ccc;
+            cursor: pointer;
+        }
+
+        .star-rating-input-kitsch .stars i:hover,
+        .star-rating-input-kitsch .stars i.selected {
+            color: var(--kitsch-accent-orange);
+        }
+
+        .selected-rating-text-kitsch {
+            font-family: var(--font-pixel);
+            font-size: 1rem;
+            margin-left: 0.5em;
+            color: var(--kitsch-color-5);
+        }
+
         .review-card-actions-kitsch {
             text-align: right;
             margin-top: 1rem;
@@ -219,6 +258,22 @@
                              th:text="${review.reviewContent}">
                         </div>
 
+                        <div class="review-update-kitsch">
+                            <button
+                                    type="button"
+                                    class="btn-kitsch primary-btn-kitsch retro-shadow-kitsch-small"
+                                    th:data-review-id="${review.reviewId}"
+                                    th:data-book-order-id="${review.bookOrderId}"
+                                    th:data-book-title="${review.bookTitle}"
+                                    th:data-review-content="${review.reviewContent}"
+                                    th:data-review-star="${review.star}"
+                                    th:data-review-img-url="${review.imgUrl}"
+                                    th:data-mode="edit"
+                                    onclick="openReviewModal(this, event)"><i
+                                    class="fas fa-pencil-alt"></i> 수정
+                            </button>
+                        </div>
+
                     </div>
                     <!-- 반복문 끝 -->
 
@@ -253,9 +308,93 @@
             </main>
         </div>
     </div>
+
+    <div class="modal-overlay-kitsch" id="orderItemReviewModal">
+        <div class="modal-content-kitsch review-form-modal-content">
+            <button class="modal-close-btn-kitsch" onclick="hideKitschModal('orderItemReviewModal')">
+                <i class="fas fa-times"></i>
+            </button>
+            <h2 class="modal-title-kitsch display-font-kitsch" id="orderItemReviewModalTitle">
+                <i class="fas fa-pencil-alt"></i> 리뷰 수정
+            </h2>
+            <p class="pixel-font-kitsch" id="orderItemReviewModalProductInfo"
+               style="text-align:center; margin-bottom:1rem; font-size:0.9em;"></p>
+
+            <form id="reviewForm" onsubmit="handleReviewFormSubmit(event)" enctype="multipart/form-data">
+
+                <input
+                        id="orderItemReviewBookOrderIdInput"
+                        name="bookOrderId"
+                        type="hidden"
+                >
+                <input type="hidden" id="reviewIdInput" name="reviewId">
+
+                <div class="form-group-kitsch">
+                    <label class="label-kitsch handwriting-font-kitsch">별점:</label>
+                    <div class="star-rating-input-kitsch" id="orderItemModalStarRating">
+                        <span class="stars">
+                            <i class="far fa-star" data-value="1"></i>
+                            <i class="far fa-star" data-value="2"></i>
+                            <i class="far fa-star" data-value="3"></i>
+                            <i class="far fa-star" data-value="4"></i>
+                            <i class="far fa-star" data-value="5"></i>
+                        </span>
+                        <span class="selected-rating-text-kitsch"
+                              id="orderItemModalSelectedRatingText">별점을 선택하세요!</span>
+                        <input id="orderItemRatingInput" name="star" required type="hidden">
+                    </div>
+                </div>
+
+                <div class="form-group-kitsch">
+                    <label class="label-kitsch handwriting-font-kitsch" for="orderItemReviewContentInput">리뷰 내용:</label>
+                    <textarea
+                            class="textarea-kitsch handwriting-font-kitsch"
+                            id="orderItemReviewContentInput"
+                            minlength="10"
+                            name="reviewContent"
+                            placeholder="이 상품에 대한 솔직한 리뷰를 남겨주세요! (최소 10자 이상)"
+                            required
+                            rows="5"
+                    ></textarea>
+                </div>
+
+                <div class="form-group-kitsch">
+                    <label class="label-kitsch handwriting-font-kitsch">사진 첨부</label>
+                    <div class="file-input-kitsch-wrapper">
+                        <input
+                                accept="image/*"
+                                class="file-input-kitsch"
+                                id="orderItemReviewImagesInput"
+                                multiple
+                                name="imageFiles" type="file"
+                        >
+                    </div>
+                    <div
+                            id="orderItemReviewImagePreviewContainer"
+                            style="margin-top:0.5rem; display:flex; gap:0.5rem;"
+                    ></div>
+                </div>
+
+                <div class="modal-actions-kitsch">
+                    <button
+                            class="btn-kitsch secondary-btn-kitsch color5-kitsch retro-shadow-kitsch-small"
+                            onclick="hideKitschModal('orderItemReviewModal')"
+                            type="button"
+                    >취소
+                    </button>
+                    <button
+                            class="btn-kitsch primary-btn-kitsch retro-shadow-kitsch"
+                            type="submit"
+                            id="reviewSubmitButton"
+                    >리뷰 수정
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 
-<!-- 페이지 전용 스크립트 -->
+
 <th:block layout:fragment="page_scripts">
     <script>
         document.addEventListener('DOMContentLoaded', function () {
@@ -281,7 +420,222 @@
                 noReviewsMsg.style.display = 'none';
                 if (pagination) pagination.style.display = 'flex';
             }
+
+            // --- 이미지 파일 관련 로직 (미리보기 및 개수 제한) ---
+            const reviewImagesInput = document.getElementById('orderItemReviewImagesInput');
+            const imagePreviewContainer = document.getElementById('orderItemReviewImagePreviewContainer');
+
+            if (reviewImagesInput && imagePreviewContainer) {
+                reviewImagesInput.addEventListener('change', function (event) {
+                    const files = event.target.files;
+                    imagePreviewContainer.innerHTML = ''; // 기존 미리보기 초기화
+
+                    if (files.length > 1) {
+                        alert('사진은 최대 1장까지만 첨부 가능합니다.');
+                        event.target.value = ""; // 파일 선택 초기화
+                        return;
+                    }
+
+                    for (let i = 0; i < files.length; i++) {
+                        const file = files[i];
+                        if (!file) continue;
+
+                        const reader = new FileReader();
+                        reader.onload = function (e) {
+                            const previewItem = document.createElement('div');
+                            previewItem.classList.add('review-image-preview-item');
+
+                            const imgEl = document.createElement('img');
+                            imgEl.src = e.target.result;
+                            imgEl.alt = `미리보기 이미지 ${i + 1}`;
+
+                            previewItem.appendChild(imgEl);
+                            imagePreviewContainer.appendChild(previewItem);
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            }
         });
+
+
+        // 리뷰 모달 열기 함수
+        function openReviewModal(buttonElement, event) {
+            const mode = buttonElement.dataset.mode || 'edit';
+            const reviewId = buttonElement.dataset.reviewId;
+            const bookOrderId = buttonElement.dataset.bookOrderId;
+            const bookTitle = buttonElement.dataset.bookTitle;
+
+            const modalId = 'orderItemReviewModal';
+            const modalTitleEl = document.getElementById('orderItemReviewModalTitle');
+            const modalProductInfoEl = document.getElementById('orderItemReviewModalProductInfo');
+            const reviewForm = document.getElementById('reviewForm');
+            const bookOrderIdInput = document.getElementById('orderItemReviewBookOrderIdInput');
+            const reviewIdInput = document.getElementById('reviewIdInput');
+            const reviewContentInput = document.getElementById('orderItemReviewContentInput');
+            const reviewImagesInput = document.getElementById('orderItemReviewImagesInput');
+            const imagePreviewContainer = document.getElementById('orderItemReviewImagePreviewContainer');
+            const reviewSubmitButton = document.getElementById('reviewSubmitButton');
+
+            // 폼 필드 초기화 (두 모드 공통)
+            reviewContentInput.value = '';
+            reviewImagesInput.value = '';
+            imagePreviewContainer.innerHTML = ''; // 이미지 미리보기 초기화
+
+            // 책 주문 ID 설정 (공통)
+            if (bookOrderIdInput) {
+                bookOrderIdInput.value = bookOrderId;
+            }
+
+            if (modalTitleEl) modalTitleEl.innerHTML = '<i class="fas fa-edit"></i> 리뷰 수정';
+            if (modalProductInfoEl) modalProductInfoEl.textContent = `상품명: ${bookTitle}`;
+            if (reviewSubmitButton) reviewSubmitButton.textContent = '리뷰 수정';
+
+            // reviewId 설정
+            if (reviewIdInput) reviewIdInput.value = reviewId;
+            // 폼 액션 설정 (수정 API)
+            if (reviewForm) {
+                reviewForm.action = `/mypage/reviews/edit/${reviewId}`;
+                reviewForm.method = 'POST'; // 파일 포함을 위해 POST 유지
+            }
+
+            // 기존 데이터 로드
+            const existingReviewContent = buttonElement.dataset.reviewContent;
+            const existingReviewStar = parseInt(buttonElement.dataset.reviewStar || '0');
+            const existingReviewImgUrl = buttonElement.dataset.reviewImgUrl;
+
+            if (reviewContentInput) {
+                reviewContentInput.value = existingReviewContent || '';
+            }
+            // 별점 초기화 및 기존 별점 설정
+            initializeStarRatingForOrder(
+                'orderItemModalStarRating',
+                'orderItemRatingInput',
+                'orderItemModalSelectedRatingText',
+                existingReviewStar // 기존 별점 값으로 초기화
+            );
+
+            // 기존 이미지 미리보기
+            if (imagePreviewContainer && existingReviewImgUrl && existingReviewImgUrl !== 'null' && existingReviewImgUrl !== '') {
+                const imgDiv = document.createElement('div');
+                imgDiv.className = 'review-image-preview-item';
+                imgDiv.innerHTML = `
+                    <img src="${existingReviewImgUrl}" alt="기존 리뷰 이미지">
+                    `;
+                imagePreviewContainer.appendChild(imgDiv);
+            }
+
+            // 모달 열기
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.add('active');
+            }
+        }
+
+
+        function hideKitschModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.remove('active');
+            }
+        }
+
+        // 별점 UI 처리 함수 (초기 별점 값을 받을 수 있도록 수정)
+        function initializeStarRatingForOrder(containerId, hiddenInputId, displayTextId, initialRating = 0) {
+            const starContainer = document.getElementById(containerId);
+            if (!starContainer) return;
+
+            const stars = starContainer.querySelectorAll('.stars i');
+            const hiddenInput = document.getElementById(hiddenInputId);
+            const displayText = document.getElementById(displayTextId);
+            let currentRating = initialRating; // 초기 별점 값 설정
+
+            if (hiddenInput) hiddenInput.value = currentRating;
+            if (displayText) displayText.textContent = currentRating > 0 ? `${currentRating}점 선택됨! ✨` : '별점을 선택하세요!';
+
+            // 초기 별점 UI 반영
+            stars.forEach(s => {
+                s.classList.remove('fas', 'selected');
+                s.classList.add('far');
+            });
+            for (let i = 0; i < currentRating; i++) {
+                stars[i].classList.remove('far');
+                stars[i].classList.add('fas', 'selected');
+            }
+
+
+            stars.forEach(star => {
+                star.addEventListener('mouseover', function () {
+                    stars.forEach(s => {
+                        s.classList.remove('fas', 'selected');
+                        s.classList.add('far');
+                    });
+                    for (let i = 0; i < parseInt(this.dataset.value); i++) {
+                        stars[i].classList.remove('far');
+                        stars[i].classList.add('fas', 'selected');
+                    }
+                });
+                star.addEventListener('mouseout', function () {
+                    stars.forEach(s => {
+                        s.classList.remove('fas', 'selected');
+                        s.classList.add('far');
+                    });
+                    for (let i = 0; i < currentRating; i++) {
+                        stars[i].classList.remove('far');
+                        stars[i].classList.add('fas', 'selected');
+                    }
+                });
+                star.addEventListener('click', function () {
+                    currentRating = parseInt(this.dataset.value);
+                    if (hiddenInput) hiddenInput.value = currentRating;
+                    stars.forEach(s => {
+                        s.classList.remove('fas', 'selected');
+                        s.classList.add('far');
+                    });
+                    for (let i = 0; i < currentRating; i++) {
+                        stars[i].classList.remove('far');
+                        stars[i].classList.add('fas', 'selected');
+                    }
+                    if (displayText) displayText.textContent = `${currentRating}점 선택됨! ✨`;
+                });
+            });
+        }
+
+        function handleReviewFormSubmit(event) {
+            event.preventDefault();
+
+            const form = event.target;
+            const reviewId = document.getElementById('reviewIdInput').value;
+
+            const rating = document.getElementById('orderItemRatingInput').value;
+            const content = document.getElementById('orderItemReviewContentInput').value;
+            const reviewImagesInput = document.getElementById('orderItemReviewImagesInput');
+            const files = reviewImagesInput.files;
+
+            // 유효성 검사
+            if (!rating || Number(rating) < 1) {
+                alert('별점을 선택해주세요.');
+                return;
+            }
+            if (!content || content.length < 10) {
+                alert('리뷰 내용을 10자 이상 입력해주세요.');
+                return;
+            }
+            if (files.length > 1) {
+                alert('사진은 최대 1장까지만 첨부 가능합니다.');
+                reviewImagesInput.value = ""; // 파일 선택 초기화
+                return;
+            }
+
+            if (!reviewId) {
+                alert('리뷰 ID가 올바르지 않습니다. 다시 시도해주세요.');
+                return;
+            }
+            form.action = `/mypage/reviews/edit/${reviewId}`;
+            form.method = 'POST';
+
+            form.submit();
+        }
     </script>
 </th:block>
 </body>

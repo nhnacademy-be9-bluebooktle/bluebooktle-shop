@@ -51,4 +51,12 @@ public class ImgController {
 		minioService.deleteImage(fileName);
 		return ResponseEntity.ok(JsendResponse.success());
 	}
+
+	@GetMapping("/by-review/{reviewId}")
+	public JsendResponse<ImgResponse> getImgByReviewId(
+		@PathVariable Long reviewId
+	) {
+		ImgResponse imgResponse = imgService.getImgByReviewId(reviewId);
+		return JsendResponse.success(imgResponse);
+	}
 }
