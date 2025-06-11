@@ -29,6 +29,4 @@ public interface CategoryRepository extends JpaRepository<Category, Long>, Categ
 	// 최상위 카테고리인지 여부 판단
 	boolean existsByIdAndParentCategoryIsNull(Long id);
 
-	Category findParentCategoryById(Long id);
-
 }
