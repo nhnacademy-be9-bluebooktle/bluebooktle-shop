@@ -1,6 +1,7 @@
 package shop.bluebooktle.frontend.controller.admin;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -64,7 +65,14 @@ public class AdminOrderController {
 		model.addAttribute("pageTitle", "주문 상세 (번호: " + orderDetail.orderId() + ")");
 		model.addAttribute("order", orderDetail);
 
-		model.addAttribute("updatableOrderStatuses", OrderStatus.values());
+		List<OrderStatus> updatableOrderStatuses = Arrays.stream(OrderStatus.values())
+			.filter(status ->
+				status != OrderStatus.RETURNED_REQUEST &&
+					status != OrderStatus.RETURNED &&
+					status != OrderStatus.CANCELED
+			).toList();
+
+		model.addAttribute("updatableOrderStatuses", updatableOrderStatuses);
 
 		return "admin/order/order_detail";
 

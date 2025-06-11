@@ -25,6 +25,7 @@ public record OrderDetailResponse(
 	BigDecimal pointUserAmount,
 	BigDecimal couponDiscountAmount,
 	BigDecimal deliveryFee,
-	String trackingNumber
+	String trackingNumber,
+	BigDecimal totalPackagingFee
 ) {
 }

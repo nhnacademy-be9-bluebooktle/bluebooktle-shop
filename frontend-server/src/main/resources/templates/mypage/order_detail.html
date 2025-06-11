@@ -376,14 +376,14 @@
                         <tr th:each="item : ${order.orderItemResponses}">
                             <td data-label="상품 정보">
                                 <div class="product-info-cell-kitsch">
-                                    <img th:src="${item.bookThumbnailUrl}"
-                                         th:alt="${item.bookTitle}">
+                                    <img th:alt="${item.bookTitle}"
+                                         th:src="${item.bookThumbnailUrl}">
                                     <div>
                                         <a class="product-title-kitsch" th:href="@{/books/{id}(id=${item.bookId})}"
                                            th:text="${item.bookTitle}">상품 제목</a>
 
-                                        <th:block th:if="${!item.packagingOptions.isEmpty()}"
-                                                  th:each="packaging : ${item.packagingOptions}">
+                                        <th:block th:each="packaging : ${item.packagingOptions}"
+                                                  th:if="${!item.packagingOptions.isEmpty()}">
                                             <p class="product-option-kitsch"
                                                th:text="|포장: ${packaging.name} (+${#numbers.formatDecimal(packaging.price, 0, 'COMMA', 0, 'POINT')}원) * ${packaging.quantity}개 |">
                                                 포장 옵션
@@ -417,9 +417,9 @@
 
                             <td data-label="리뷰" style="text-align:center;">
                                 <button class="btn-kitsch primary-btn-kitsch retro-shadow-kitsch-small"
+                                        onclick="openOrderReviewModal(this, event)"
                                         th:data-book-id="${item.bookId}"
-                                        th:data-book-title="${item.bookTitle}"
-                                        onclick="openOrderReviewModal(this, event)">
+                                        th:data-book-title="${item.bookTitle}">
                                     <i class="fas fa-pencil-alt"></i> 작성
                                 </button>
                             </td>
@@ -438,6 +438,13 @@
                         <span class="label pixel-font-kitsch">총 상품 금액:</span>
                         <span class="value pixel-font-kitsch"
                               th:text="${#numbers.formatDecimal(order.originalAmount, 0, 'COMMA', 0, 'POINT')} + '원'">0원</span>
+                    </div>
+
+                    <div class="summary-row-kitsch"
+                         th:if="${order.totalPackagingFee != null and order.totalPackagingFee > 0}">
+                        <span class="label pixel-font-kitsch">포장비:</span>
+                        <span class="value pixel-font-kitsch"
+                              th:text="'+ ' + ${#numbers.formatDecimal(order.totalPackagingFee, 0, 'COMMA', 0, 'POINT')} + '원'">+ 0원</span>
                     </div>
 
                     <div class="summary-row-kitsch"
@@ -478,16 +485,24 @@
                     </a>
 
                     <button class="btn-kitsch secondary-btn-kitsch color2-kitsch retro-shadow-kitsch-small"
-                            onclick="requestReturn()">
+                            onclick="showKitschModal('refundRequestModal')"
+                            th:if="${order.orderStatus() == T(shop.bluebooktle.common.domain.order.OrderStatus).COMPLETED}">
                         <i class="fas fa-undo-alt"></i> 반품 신청
                     </button>
 
-                    <form th:action="@{|/mypage/orders/${order.orderKey()}/cancel|}" method="post">
-                        <button type="submit"
-                                class="btn-kitsch secondary-btn-kitsch color2-kitsch retro-shadow-kitsch-small">
+                    <form method="post" th:action="@{|/mypage/orders/${order.orderKey()}/cancel|}"
+                          th:if="${order.orderStatus() == T(shop.bluebooktle.common.domain.order.OrderStatus).PENDING}">
+                        <button class="btn-kitsch secondary-btn-kitsch color2-kitsch retro-shadow-kitsch-small"
+                                type="submit">
                             주문 취소
                         </button>
                     </form>
+
+                    <button class="btn-kitsch secondary-btn-kitsch color2-kitsch retro-shadow-kitsch-small"
+                            onclick="showKitschModal('paymentCancelModal')"
+                            th:if="${order.orderStatus() == T(shop.bluebooktle.common.domain.order.OrderStatus).PREPARING}">
+                        <i class="fas fa-comment-dollar"></i> 결제 취소
+                    </button>
                 </div>
 
             </main>
@@ -547,6 +562,76 @@
             </form>
         </div>
     </div>
+
+    <div class="modal-overlay-kitsch" id="paymentCancelModal">
+        <div class="modal-content-kitsch" style="max-width: 500px;">
+            <button class="modal-close-btn-kitsch" onclick="hideKitschModal('paymentCancelModal')"><i
+                    class="fas fa-times"></i></button>
+            <h2 class="modal-title-kitsch display-font-kitsch"><i class="fas fa-comment-dollar"></i> 결제를 취소하시겠습니까?</h2>
+
+            <form id="paymentCancelForm" method="post" th:action="@{|/mypage/orders/${order.orderKey}/payment-cancel|}">
+                <input name="orderKey" th:value="${order.orderKey}" type="hidden"/>
+
+                <div class="form-group-kitsch" style="margin-top: 1.5rem;">
+                    <label class="label-kitsch handwriting-font-kitsch" for="cancelReasonInput">결제 취소 사유 (선택
+                        사항):</label>
+                    <textarea class="textarea-kitsch handwriting-font-kitsch" id="cancelReasonInput" name="cancelReason"
+                              placeholder="취소 사유를 입력하시면 더 나은 서비스에 도움이 됩니다." rows="4"></textarea>
+                </div>
+
+                <div class="modal-actions-kitsch">
+                    <button class="btn-kitsch secondary-btn-kitsch color5-kitsch retro-shadow-kitsch-small"
+                            onclick="hideKitschModal('paymentCancelModal')" type="button">
+                        아니요
+                    </button>
+                    <button class="btn-kitsch primary-btn-kitsch retro-shadow-kitsch" type="submit">
+                        네, 결제 취소
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-overlay-kitsch" id="refundRequestModal">
+        <div class="modal-content-kitsch" style="max-width: 550px;">
+            <button class="modal-close-btn-kitsch" onclick="hideKitschModal('refundRequestModal')"><i
+                    class="fas fa-times"></i></button>
+            <h2 class="modal-title-kitsch display-font-kitsch"><i class="fas fa-undo-alt"></i> 반품 신청</h2>
+
+            <form id="refundRequestForm" method="post" th:action="@{/mypage/refunds/request}">
+
+                <input name="orderKey" th:value="${order.orderKey}" type="hidden"/>
+
+                <div class="form-group-kitsch" style="margin-top: 1.5rem;">
+                    <label class="label-kitsch handwriting-font-kitsch" for="refundReason">반품 사유:</label>
+                    <select class="select-kitsch" id="refundReason" name="reason" required>
+                        <option value="">사유를 선택해주세요</option>
+                        <th:block th:each="reason : ${T(shop.bluebooktle.common.domain.refund.RefundReason).values()}">
+                            <option th:text="${reason.description}" th:value="${reason}"></option>
+                        </th:block>
+                    </select>
+                </div>
+
+                <div class="form-group-kitsch" style="margin-top: 1.5rem;">
+                    <label class="label-kitsch handwriting-font-kitsch" for="refundReasonDetail">상세 사유:</label>
+                    <textarea class="textarea-kitsch handwriting-font-kitsch" id="refundReasonDetail"
+                              name="reasonDetail"
+                              placeholder="환불 사유를 입력해주세요." required rows="4"></textarea>
+                </div>
+
+                <div class="modal-actions-kitsch">
+                    <button class="btn-kitsch secondary-btn-kitsch color5-kitsch retro-shadow-kitsch-small"
+                            onclick="hideKitschModal('refundRequestModal')" type="button">
+                        취소
+                    </button>
+                    <button class="btn-kitsch primary-btn-kitsch retro-shadow-kitsch" type="submit">
+                        네, 환불 신청
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
 </div>
 
 <th:block layout:fragment="page_scripts">

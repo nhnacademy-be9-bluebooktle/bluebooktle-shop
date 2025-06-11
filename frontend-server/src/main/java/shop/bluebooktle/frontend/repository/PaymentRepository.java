@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import shop.bluebooktle.common.dto.payment.request.PaymentCancelRequest;
 import shop.bluebooktle.common.dto.payment.request.PaymentConfirmRequest;
 import shop.bluebooktle.common.dto.payment.response.PaymentConfirmResponse;
 import shop.bluebooktle.frontend.config.feign.FeignGlobalConfig;
@@ -15,5 +16,11 @@ public interface PaymentRepository {
 	PaymentConfirmResponse confirmPayment(
 		@PathVariable("gatewayName") String gatewayName,
 		@RequestBody PaymentConfirmRequest request
+	);
+
+	@PostMapping("/{gatewayName}/cancel")
+	Void cancelPayment(
+		@PathVariable("gatewayName") String gatewayName,
+		@RequestBody PaymentCancelRequest request
 	);
 }

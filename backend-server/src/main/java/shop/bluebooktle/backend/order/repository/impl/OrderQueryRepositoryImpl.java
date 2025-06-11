@@ -5,14 +5,14 @@ import static shop.bluebooktle.backend.book_order.entity.QBookOrder.*;
 import static shop.bluebooktle.backend.order.entity.QDeliveryRule.*;
 import static shop.bluebooktle.backend.order.entity.QOrder.*;
 import static shop.bluebooktle.backend.order.entity.QOrderState.*;
+import static shop.bluebooktle.backend.order.entity.QRefund.*;
 import static shop.bluebooktle.backend.payment.entity.QPayment.*;
 import static shop.bluebooktle.backend.payment.entity.QPaymentDetail.*;
 import static shop.bluebooktle.backend.payment.entity.QPaymentType.*;
+import static shop.bluebooktle.backend.point.entity.QPaymentPointHistory.*;
 import static shop.bluebooktle.common.entity.auth.QUser.*;
+import static shop.bluebooktle.common.entity.point.QPointHistory.*;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.List;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -80,9 +80,9 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
 		JPAQuery<Order> query = queryFactory
 			.select(order)
 			.from(order)
-			.leftJoin(order.user, user).fetchJoin()
-			.leftJoin(order.orderState, orderState).fetchJoin()
-			.leftJoin(order.payment, payment).fetchJoin()
+			.leftJoin(order.user, user)
+			.leftJoin(order.orderState, orderState)
+			.leftJoin(order.payment, payment)
 			.leftJoin(payment.paymentDetail, paymentDetail)
 			.leftJoin(paymentDetail.paymentType, paymentType)
 			.where(
@@ -157,7 +157,6 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
 		return order.createdAt.between(startDate.atStartOfDay(), endDate.atTime(LocalTime.MAX));
 	}
 
-
 	@Override
 	public Optional<Order> findAdminOrderDetailsByOrderId(Long orderId) {
 		Order result = queryFactory
@@ -169,12 +168,28 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
 			.leftJoin(payment.paymentDetail, paymentDetail).fetchJoin()
 			.leftJoin(paymentDetail.paymentType, paymentType).fetchJoin()
 			.leftJoin(bookOrder.book, book).fetchJoin()
+			.leftJoin(order.refund, refund).fetchJoin()
 			.where(order.id.eq(orderId))
 			.fetchOne();
 		return Optional.ofNullable(result);
 	}
 
+	@Override
+	public Optional<Order> findOrderForRefund(Long orderId) {
+		Order result = queryFactory
+			.selectFrom(order)
+			.leftJoin(order.orderState, orderState).fetchJoin()
+			.leftJoin(order.user, user).fetchJoin()
+			.leftJoin(order.payment, payment).fetchJoin()
+			.leftJoin(payment.paymentDetail, paymentDetail).fetchJoin()
+			.leftJoin(payment.paymentPointHistory, paymentPointHistory).fetchJoin()
+			.leftJoin(paymentPointHistory.pointHistory, pointHistory).fetchJoin()
+			.leftJoin(order.refund, refund).fetchJoin()
+			.where(order.id.eq(orderId))
+			.fetchOne();
 
+		return Optional.ofNullable(result);
+	}
 
 	@Override
 	public BigDecimal findTotalPackagingPriceByOrderId(Long orderId) {

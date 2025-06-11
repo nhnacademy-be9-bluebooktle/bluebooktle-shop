@@ -29,8 +29,6 @@ public interface OrderService {
 
 	void cancelOrderInternal(Order order);
 
-	void cancelOrderListener(Long orderId);
-
 	Page<AdminOrderListResponse> searchOrders(AdminOrderSearchRequest searchRequest, Pageable pageable);
 
 	OrderConfirmDetailResponse getOrderByKey(String orderKey, Long userId);
@@ -44,4 +42,8 @@ public interface OrderService {
 	void updateOrderStatus(Long orderId, OrderStatus status);
 
 	void updateOrderTrackingNumber(Long orderId, String trackingNumber);
+
+	void cancelOrderListener(Long orderId);
+
+	void completeOrder(Long orderId);
 }

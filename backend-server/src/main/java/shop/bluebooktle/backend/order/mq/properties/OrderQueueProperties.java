@@ -14,4 +14,7 @@ public class OrderQueueProperties {
 	private String orderWait;
 	private String orderCancel;
 	private String orderCancelDlq;
+	private String orderShipping;
+	private String orderComplete;
+	private String orderCompleteDlq;
 }

@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -22,6 +23,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import shop.bluebooktle.backend.order.entity.Order;
+import shop.bluebooktle.backend.point.entity.PaymentPointHistory;
 import shop.bluebooktle.common.entity.BaseEntity;
 
 @Entity
@@ -50,6 +52,9 @@ public class Payment extends BaseEntity {
 
 	@Column(name = "paid_amount", nullable = false, precision = 10, scale = 2)
 	private BigDecimal paidAmount;
+
+	@OneToOne(mappedBy = "payment", cascade = CascadeType.ALL, orphanRemoval = true)
+	private PaymentPointHistory paymentPointHistory;
 
 	@Builder
 	public Payment(Order order, PaymentDetail paymentDetail, BigDecimal paidAmount) {
