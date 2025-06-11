@@ -29,6 +29,7 @@ import shop.bluebooktle.common.entity.auth.User;
 import shop.bluebooktle.common.exception.InvalidInputValueException;
 import shop.bluebooktle.common.exception.auth.UserNotFoundException;
 import shop.bluebooktle.common.exception.book.BookSaleInfoNotFoundException;
+import shop.bluebooktle.common.exception.book.ReviewAuthorizationException;
 import shop.bluebooktle.common.exception.book_order.BookOrderNotFoundException;
 
 @Service
@@ -52,7 +53,7 @@ public class ReviewServiceImpl implements ReviewService {
 			.orElseThrow(BookOrderNotFoundException::new);
 
 		if (!bookOrder.getOrder().getUser().getId().equals(userId)) {
-			throw new InvalidInputValueException("리뷰를 작성할 권한이 없습니다. 해당 주문의 사용자가 아닙니다.");
+			throw new ReviewAuthorizationException();
 		}
 
 		Img img = null;
