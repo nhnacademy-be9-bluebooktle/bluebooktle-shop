@@ -40,6 +40,7 @@ import shop.bluebooktle.backend.order.dto.response.OrderShippingMessage;
 import shop.bluebooktle.backend.order.entity.DeliveryRule;
 import shop.bluebooktle.backend.order.entity.Order;
 import shop.bluebooktle.backend.order.entity.OrderState;
+import shop.bluebooktle.backend.order.entity.Refund;
 import shop.bluebooktle.backend.order.repository.DeliveryRuleRepository;
 import shop.bluebooktle.backend.order.repository.OrderRepository;
 import shop.bluebooktle.backend.order.repository.OrderStateRepository;
@@ -52,6 +53,7 @@ import shop.bluebooktle.backend.point.repository.PointHistoryRepository;
 import shop.bluebooktle.backend.user.repository.UserRepository;
 import shop.bluebooktle.common.domain.order.OrderStatus;
 import shop.bluebooktle.common.domain.point.PointSourceTypeEnum;
+import shop.bluebooktle.common.domain.refund.RefundReason;
 import shop.bluebooktle.common.dto.book.BookSaleInfoState;
 import shop.bluebooktle.common.dto.coupon.CalculatedDiscountDetails;
 import shop.bluebooktle.common.dto.coupon.response.AppliedCouponResponse;
@@ -831,6 +833,10 @@ public class OrderServiceImpl implements OrderService {
 			.map(PaymentType::getMethod)
 			.orElse(null);
 
+		Refund refund = order.getRefund();
+		RefundReason refundReason = Optional.ofNullable(refund).map(Refund::getReason).orElse(null);
+		String refundReasonDetail = Optional.ofNullable(refund).map(Refund::getReasonDetail).orElse(null);
+
 		return new AdminOrderDetailResponse(
 			order.getId(),
 			order.getOrderKey(),
@@ -854,7 +860,9 @@ public class OrderServiceImpl implements OrderService {
 			order.getDeliveryFee(),
 			paidAmount,
 			order.getOrderState().getState(),
-			order.getTrackingNumber()
+			order.getTrackingNumber(),
+			refundReason,
+			refundReasonDetail
 		);
 	}
 
@@ -867,8 +875,15 @@ public class OrderServiceImpl implements OrderService {
 		OrderState newState = orderStateRepository.findByState(status)
 			.orElseThrow(OrderStateNotFoundException::new);
 
-		if (order.getOrderState().getState() == OrderStatus.CANCELED) {
-			throw new OrderInvalidStateException("취소된 주문의 상태를 변경할 수 없습니다.");
+		if (order.getOrderState().getState() == OrderStatus.CANCELED
+			|| order.getOrderState().getState() == OrderStatus.RETURNED_REQUEST
+			|| order.getOrderState().getState() == OrderStatus.RETURNED) {
+			throw new OrderInvalidStateException(
+				"%s 주문의 상태를 변경할 수 없습니다.".formatted(order.getOrderState().getState().getDescription()));
+		}
+
+		if (order.getOrderState().getState() != OrderStatus.SHIPPING && status == OrderStatus.COMPLETED) {
+			throw new OrderInvalidStateException("배송 중이 아닌 상태에서 배송완료 상태로 변경할 수 없습니다.");
 		}
 
 		order.changeOrderState(newState);

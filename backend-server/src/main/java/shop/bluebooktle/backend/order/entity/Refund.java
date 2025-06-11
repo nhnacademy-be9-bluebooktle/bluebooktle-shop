@@ -23,8 +23,8 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import shop.bluebooktle.common.domain.RefundReason;
-import shop.bluebooktle.common.domain.RefundStatus;
+import shop.bluebooktle.common.domain.refund.RefundReason;
+import shop.bluebooktle.common.domain.refund.RefundStatus;
 import shop.bluebooktle.common.entity.BaseEntity;
 
 @Entity

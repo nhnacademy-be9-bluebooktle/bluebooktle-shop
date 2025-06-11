@@ -3,7 +3,6 @@ package shop.bluebooktle.backend.order.controller;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,7 +18,6 @@ import shop.bluebooktle.backend.order.service.RefundService;
 import shop.bluebooktle.common.domain.auth.UserType;
 import shop.bluebooktle.common.dto.common.JsendResponse;
 import shop.bluebooktle.common.dto.refund.request.RefundCreateRequest;
-import shop.bluebooktle.common.dto.refund.request.RefundUpdateRequest;
 import shop.bluebooktle.common.security.Auth;
 import shop.bluebooktle.common.security.UserPrincipal;
 
@@ -42,15 +40,5 @@ public class RefundController {
 		Long userId = userPrincipal == null ? null : userPrincipal.getUserId();
 		refundService.requestRefund(userId, request);
 		return ResponseEntity.status(HttpStatus.CREATED).body(JsendResponse.success());
-	}
-
-	@PatchMapping("/update")
-	@Auth(type = UserType.ADMIN)
-	@Operation(summary = "관리자 환불 처리", description = "관리자가 접수된 환불 요청의 상태를 업데이트합니다.")
-	public ResponseEntity<JsendResponse<Void>> updateRefundStatus(
-		@Valid @RequestBody RefundUpdateRequest request
-	) {
-		refundService.updateRefund(request);
-		return ResponseEntity.ok(JsendResponse.success());
 	}
 }

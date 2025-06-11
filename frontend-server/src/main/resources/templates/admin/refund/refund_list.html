@@ -3,215 +3,123 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title th:text="${pageTitle} ?: '환불 요청 상세'"></title>
-    <th:block layout:fragment="page_css">
-        <style>
-            .refund-detail-grid {
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-                gap: 20px;
-            }
-
-            .refund-section .admin-panel__body {
-                padding: 15px;
-            }
-
-            .refund-section dt {
-                font-weight: bold;
-                margin-bottom: 5px;
-                color: #555;
-            }
-
-            .refund-section dd {
-                margin-left: 0;
-                margin-bottom: 15px;
-                padding-left: 10px;
-                border-left: 3px solid #eee;
-                white-space: pre-wrap;
-            }
-
-            /* pre-wrap for reason */
-            .actions-bar {
-                margin-top: 20px;
-                padding-top: 20px;
-                border-top: 1px solid #eee;
-            }
-
-            .status-REQUESTED {
-                color: #ffc107;
-            }
-
-            .status-PROCESSING {
-                color: #17a2b8;
-            }
-
-            .status-COMPLETED {
-                color: #28a745;
-            }
-
-            .status-REJECTED {
-                color: #dc3545;
-            }
-
-            #rejectionReasonSection {
-                display: none;
-                margin-top: 10px;
-            }
-        </style>
-    </th:block>
+    <title th:text="${pageTitle} ?: '환불 관리'"></title>
 </head>
 <body>
 <div layout:fragment="admin_content">
+
     <div class="admin-page-header">
-        <h1 class="admin-page-title">
-            <i class="fas fa-receipt"></i>
-            <th:block th:text="${pageTitle} ?: '환불 요청 상세'"></th:block>
+        <h1 class="admin-page-title"><i class="fas fa-undo-alt"></i>
+            <th:block th:text="${pageTitle}"></th:block>
         </h1>
-        <div>
-            <a th:href="@{/admin/refunds}" class="admin-btn admin-btn--default">
-                <i class="fas fa-list"></i> 목록으로
-            </a>
+    </div>
+
+    <div class="admin-panel">
+        <div class="admin-panel__header"><h2 class="admin-panel__title"><i class="fas fa-search"></i> 검색 조건</h2></div>
+        <div class="admin-panel__body">
+            <form th:action="@{/admin/refunds}" method="get" class="admin-form--inline" th:object="${searchRequest}">
+                <div class="admin-form-group">
+                    <label for="status">환불 상태</label>
+                    <select id="status" class="admin-form-control" th:field="*{status}">
+                        <option value="">-- 전체 --</option>
+                        <option th:each="opt : ${refundStatusOptions}" th:value="${opt}"
+                                th:text="${opt.description}"></option>
+                    </select>
+                </div>
+                <div class="admin-form-group">
+                    <label for="startDate">요청일 (시작)</label>
+                    <input type="date" id="startDate" class="admin-form-control" th:field="*{startDate}">
+                </div>
+                <div class="admin-form-group">
+                    <label for="endDate">요청일 (종료)</label>
+                    <input type="date" id="endDate" class="admin-form-control" th:field="*{endDate}">
+                </div>
+                <div class="admin-form-group">
+                    <select class="admin-form-control" th:field="*{searchType}" style="flex-grow: 0; min-width: 120px;">
+                        <option th:each="type : ${searchTypeOptions}" th:value="${type}"
+                                th:text="${type.name()}"></option>
+                    </select>
+                    <input type="text" class="admin-form-control" th:field="*{keyword}" placeholder="검색어 입력">
+                </div>
+                <div class="admin-form-actions">
+                    <button type="submit" class="admin-btn admin-btn--primary"><i class="fas fa-search"></i> 검색</button>
+                    <a th:href="@{/admin/refunds}" class="admin-btn admin-btn--default"><i class="fas fa-sync-alt"></i>
+                        초기화</a>
+                </div>
+            </form>
         </div>
     </div>
 
-    <div th:if="${refund}">
-        <div class="refund-detail-grid">
-            <div class="admin-panel refund-section">
-                <div class="admin-panel__header"><h2 class="admin-panel__title"><i class="fas fa-info-circle"></i> 환불 기본
-                    정보</h2></div>
-                <div class="admin-panel__body">
-                    <dl>
-                        <dt>환불 ID</dt>
-                        <dd th:text="${refund.refundId}">1</dd>
-                        <dt>요청일</dt>
-                        <dd th:text="${#temporals.format(refund.requestDate, 'yyyy-MM-dd HH:mm')}">2025-05-16 10:00</dd>
-                        <dt>현재 상태</dt>
-                        <dd><strong th:text="${getStatusDisplayName.apply(refund.status)}"
-                                    th:classappend="'status-' + ${refund.status}">환불 요청</strong></dd>
-                        <dt>요청 금액</dt>
-                        <dd th:text="${#numbers.formatInteger(refund.refundAmount, 0, 'COMMA') + '원'}">35,000원</dd>
-                        <dt>환불 사유</dt>
-                        <dd th:text="${refund.reason}">상품 설명과 다름</dd>
-                        <th:block th:if="${refund.status == 'REJECTED' && refund.rejectionReason != null}">
-                            <dt>거절 사유</dt>
-                            <dd style="color:red;" th:text="${refund.rejectionReason}"></dd>
-                        </th:block>
-                        <th:block th:if="${refund.status == 'COMPLETED' && refund.completedDate != null}">
-                            <dt>환불 완료일</dt>
-                            <dd th:text="${#temporals.format(refund.completedDate, 'yyyy-MM-dd HH:mm')}"></dd>
-                        </th:block>
-                    </dl>
-                </div>
-            </div>
-
-            <div class="admin-panel refund-section"
-                 th:if="${refund.bankName != null || refund.accountNumber != null || refund.accountHolder != null}">
-                <div class="admin-panel__header"><h2 class="admin-panel__title"><i class="fas fa-university"></i> 환불 계좌
-                    정보</h2></div>
-                <div class="admin-panel__body">
-                    <dl>
-                        <dt th:if="${refund.bankName}">은행명</dt>
-                        <dd th:if="${refund.bankName}" th:text="${refund.bankName}">국민은행</dd>
-                        <dt th:if="${refund.accountNumber}">계좌번호</dt>
-                        <dd th:if="${refund.accountNumber}" th:text="${refund.accountNumber}">123-456-7890</dd>
-                        <dt th:if="${refund.accountHolder}">예금주</dt>
-                        <dd th:if="${refund.accountHolder}" th:text="${refund.accountHolder}">홍길동</dd>
-                    </dl>
-                </div>
-            </div>
-
-            <div class="admin-panel refund-section">
-                <div class="admin-panel__header"><h2 class="admin-panel__title"><i class="fas fa-shopping-bag"></i> 연관
-                    주문 정보</h2></div>
-                <div class="admin-panel__body">
-                    <dl>
-                        <dt>주문번호</dt>
-                        <dd>
-                            <a th:href="@{/admin/orders/{orderId}(orderId=${refund.orderId})}"
-                               th:text="${refund.orderNumber}" target="_blank" title="주문 상세 보기">ORD20250510001</a>
-                        </dd>
-                        <dt>주문자</dt>
-                        <dd th:text="${refund.ordererName ?: refund.userNickname}">불만고객</dd>
-                        <dt>환불 대상 상품 (예시)</dt>
-                        <dd th:if="${!#lists.isEmpty(refund.refundedItems)}">
-                            <ul>
-                                <li th:each="item : ${refund.refundedItems}" th:text="${item}">상품 A (2개)</li>
-                            </ul>
-                        </dd>
-                        <dd th:if="${#lists.isEmpty(refund.refundedItems)}">- 정보 없음 -</dd>
-                    </dl>
-                </div>
-            </div>
+    <div class="admin-panel" style="margin-top: 20px;">
+        <div class="admin-panel__header">
+            <h2 class="admin-panel__title"><i class="fas fa-list-ul"></i> 환불 요청 목록</h2>
+            <span class="admin-panel__count" th:text="'총 ' + ${paginationData.pagination.totalElements} + ' 건'"></span>
         </div>
-
-        <div class="admin-panel refund-section" style="margin-top:20px;" th:if="${!#lists.isEmpty(nextStatusOptions)}">
-            <div class="admin-panel__header"><h2 class="admin-panel__title"><i class="fas fa-exchange-alt"></i> 환불 상태 변경
-            </h2></div>
-            <div class="admin-panel__body">
-                <form th:action="@{/admin/refunds/{id}/update-status(id=${refund.refundId})}" method="post"
-                      class="admin-form">
-                    <div class="admin-form-group">
-                        <label for="newStatus" class="admin-form-label">변경할 상태</label>
-                        <select id="newStatus" name="status" class="admin-form-control"
-                                onchange="toggleRejectionReason(this.value)">
-                            <option value="">-- 상태 선택 --</option>
-                            <option th:each="opt : ${nextStatusOptions}" th:value="${opt.value}"
-                                    th:text="${getStatusDisplayName.apply(opt.value)}">상태
-                            </option>
-                        </select>
-                    </div>
-                    <div id="rejectionReasonSection" class="admin-form-group">
-                        <label for="rejectionReason" class="admin-form-label">거절 사유</label>
-                        <textarea id="rejectionReason" name="rejectionReason" class="admin-form-control" rows="3"
-                                  placeholder="환불 거절 사유를 입력하세요."></textarea>
-                    </div>
-                    <div class="admin-form-actions" style="text-align: right;">
-                        <button type="submit" class="admin-btn admin-btn--primary"
-                                onclick="return confirm('정말로 환불 상태를 변경하시겠습니까?');">
-                            <i class="fas fa-check-circle"></i> 상태 변경 적용
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <div class="actions-bar">
-            <div></div>
-            <div>
-                <a th:href="@{/admin/refunds}" class="admin-btn admin-btn--default">
-                    <i class="fas fa-list"></i> 목록으로
-                </a>
-            </div>
-        </div>
-
-    </div>
-    <div th:unless="${refund}" class="admin-panel">
-        <div class="admin-panel__body" style="text-align: center; padding: 20px;">
-            <p>요청하신 환불 정보를 찾을 수 없습니다.</p>
-            <a th:href="@{/admin/refunds}" class="admin-btn admin-btn--primary">
-                <i class="fas fa-list"></i> 환불 목록으로 돌아가기
-            </a>
+        <div class="admin-panel__body">
+            <table class="admin-table">
+                <thead>
+                <tr>
+                    <th>환불ID</th>
+                    <th>주문번호</th>
+                    <th>주문자명</th>
+                    <th>요청일</th>
+                    <th>요청금액</th>
+                    <th>사유</th>
+                    <th>상태</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:if="${#lists.isEmpty(paginationData.content)}">
+                    <td colspan="7" style="text-align: center;">조회된 환불 요청이 없습니다.</td>
+                </tr>
+                <tr th:each="refund : ${paginationData.content}">
+                    <td>
+                        <a th:href="@{/admin/refunds/{id}(id=${refund.refundId})}" th:text="${refund.refundId}"
+                           title="상세 보기"></a>
+                    </td>
+                    <td>
+                        <a th:href="@{/admin/orders/{id}(id=${refund.orderId})}" th:text="${refund.orderKey}"
+                           target="_blank" title="연관 주문 상세 보기"></a>
+                    </td>
+                    <td th:text="${refund.ordererName}"></td>
+                    <td th:text="${#temporals.format(refund.requestDate, 'yyyy-MM-dd HH:mm')}"></td>
+                    <td th:text="${#numbers.formatInteger(refund.refundPrice, 0, 'COMMA') + '원'}"></td>
+                    <td th:text="${refund.reason.description}"></td>
+                    <td th:text="${refund.status.description}"></td>
+                </tr>
+                </tbody>
+            </table>
         </div>
     </div>
+
+    <nav class="admin-pagination" th:if="${paginationData.pagination.totalPages > 0}">
+        <ul class="pagination">
+            <li class="page-item" th:classappend="${paginationData.pagination.isFirst} ? 'disabled'">
+                <a class="page-link"
+                   th:href="@{/admin/refunds(page=0, status=${searchRequest.status}, searchType=${searchRequest.searchType}, keyword=${searchRequest.keyword}, startDate=${searchRequest.startDate}, endDate=${searchRequest.endDate})}">«</a>
+            </li>
+            <li class="page-item" th:classappend="${!paginationData.pagination.hasPrevious} ? 'disabled'">
+                <a class="page-link"
+                   th:href="@{/admin/refunds(page=${paginationData.pagination.currentPage - 1}, status=${searchRequest.status}, searchType=${searchRequest.searchType}, keyword=${searchRequest.keyword}, startDate=${searchRequest.startDate}, endDate=${searchRequest.endDate})}">‹</a>
+            </li>
+
+            <li class="page-item" th:each="i : ${#numbers.sequence(0, paginationData.pagination.totalPages - 1)}"
+                th:classappend="${i == paginationData.pagination.currentPage} ? 'active'">
+                <a class="page-link"
+                   th:href="@{/admin/refunds(page=${i}, status=${searchRequest.status}, searchType=${searchRequest.searchType}, keyword=${searchRequest.keyword}, startDate=${searchRequest.startDate}, endDate=${searchRequest.endDate})}"
+                   th:text="${i + 1}"></a>
+            </li>
+
+            <li class="page-item" th:classappend="${!paginationData.pagination.hasNext} ? 'disabled'">
+                <a class="page-link"
+                   th:href="@{/admin/refunds(page=${paginationData.pagination.currentPage + 1}, status=${searchRequest.status}, searchType=${searchRequest.searchType}, keyword=${searchRequest.keyword}, startDate=${searchRequest.startDate}, endDate=${searchRequest.endDate})}">›</a>
+            </li>
+            <li class="page-item" th:classappend="${paginationData.pagination.isLast} ? 'disabled'">
+                <a class="page-link"
+                   th:href="@{/admin/refunds(page=${paginationData.pagination.totalPages - 1}, status=${searchRequest.status}, searchType=${searchRequest.searchType}, keyword=${searchRequest.keyword}, startDate=${searchRequest.startDate}, endDate=${searchRequest.endDate})}">»</a>
+            </li>
+        </ul>
+    </nav>
 </div>
-
-<th:block layout:fragment="page_scripts">
-    <script th:inline="javascript">
-        function toggleRejectionReason(selectedStatus) {
-            const rejectionSection = document.getElementById('rejectionReasonSection');
-            if (selectedStatus === 'REJECTED') {
-                rejectionSection.style.display = 'block';
-                document.getElementById('rejectionReason').required = true;
-            } else {
-                rejectionSection.style.display = 'none';
-                document.getElementById('rejectionReason').required = false;
-            }
-        }
-
-        // 초기 로드 시 (필요하다면, 하지만 보통은 선택 시에만 동작)
-        // const initialStatusSelect = document.getElementById('newStatus');
-        // if (initialStatusSelect) toggleRejectionReason(initialStatusSelect.value);
-    </script>
-</th:block>
 </body>
 </html>

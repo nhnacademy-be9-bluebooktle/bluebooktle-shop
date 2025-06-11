@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import shop.bluebooktle.common.domain.order.OrderStatus;
+import shop.bluebooktle.common.domain.refund.RefundReason;
 
 public record AdminOrderDetailResponse(
 	Long orderId,
@@ -29,6 +30,8 @@ public record AdminOrderDetailResponse(
 	BigDecimal deliveryFee,
 	BigDecimal paidAmount,
 	OrderStatus orderStatus,
-	String trackingNumber
+	String trackingNumber,
+	RefundReason refundReason,
+	String refundReasonDetail
 ) {
 }

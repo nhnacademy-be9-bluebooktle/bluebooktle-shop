@@ -1,7 +1,6 @@
 package shop.bluebooktle.backend.order.repository;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 
 import org.jetbrains.annotations.NotNull;
@@ -61,7 +60,7 @@ public interface OrderRepository extends JpaRepository<Order, Long>, OrderQueryR
 		"payment.paymentPointHistory.pointHistory",
 		"refund"
 	})
-	Optional<Order> findByOrderIdForRefund(Long orderId);
+	Optional<Order> findOrderForRefund(Long orderId);
 
 	@NotNull
 	@EntityGraph(attributePaths = {
@@ -71,5 +70,8 @@ public interface OrderRepository extends JpaRepository<Order, Long>, OrderQueryR
 	})
 	Optional<Order> findById(@NotNull Long orderId);
 
-	List<Order> getByOrderKey(String orderKey);
+	@EntityGraph(attributePaths = {
+		"payment"
+	})
+	Optional<Order> getOrderByOrderKey(String orderKey);
 }

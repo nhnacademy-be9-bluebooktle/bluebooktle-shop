@@ -109,13 +109,14 @@ CREATE TABLE `category`
 CREATE TABLE `order_state`
 (
     `order_state_id` bigint    NOT NULL AUTO_INCREMENT,
-    `state`          ENUM ('PENDING', 'PREPARING', 'SHIPPING', 'COMPLETED', 'RETURNED', 'CANCELED')
-                               NOT NULL COMMENT '대기,배송중,완료,반품,주문취소',
+    `state`          ENUM ('PENDING', 'PREPARING', 'SHIPPING', 'COMPLETED', 'RETURNED', 'CANCELED','RETURNED_REQUEST')
+                               NOT NULL COMMENT '대기,배송중,완료,반품,주문취소,반품 요청',
     `created_at`     timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `deleted_at`     timestamp NULL,
 
     CONSTRAINT `PK_ORDER_STATE` PRIMARY KEY (`order_state_id`)
 );
+
 
 CREATE TABLE `point_source_type`
 (
@@ -565,7 +566,7 @@ CREATE TABLE `refund`
     `date`          datetime                                                                NOT NULL,
     `reason`        ENUM ('CHANGE_OF_MIND', 'DEFECT', 'DAMAGED', 'WRONG_DELIVERY', 'OTHER') NOT NULL COMMENT '단순 변심, 결함, 파손, 오배송',
     `reason_detail` text                                                                    NOT NULL,
-    `status`        ENUM ('PENDING', 'PROGRESS', 'COMPLETE', 'CANCELED')                    NOT NULL COMMENT '요청, 진행중, 완료, 취소',
+    `status`        ENUM ('PENDING', 'REJECTED', 'COMPLETE')                                NOT NULL COMMENT '요청, 진행중, 완료',
     `price`         decimal(10, 2)                                                          NOT NULL,
     `created_at`    timestamp                                                               NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `deleted_at`    timestamp                                                               NULL,
