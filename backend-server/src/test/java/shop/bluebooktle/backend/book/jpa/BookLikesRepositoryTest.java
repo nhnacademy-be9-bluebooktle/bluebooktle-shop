@@ -138,7 +138,7 @@ class BookLikesRepositoryTest {
 
 		BookLikes found = bookLikesRepository.findByUser_IdAndBook_Id(user.getId(), book.getId());
 		assertThat(found).isNotNull();
-		assertThat(found.getId()).isEqualTo(new BookLikesId(book.getId(), user.getId()));
+		assertThat(found.getId()).isEqualTo(new BookLikesId(user.getId(), book.getId()));
 	}
 
 	@Test

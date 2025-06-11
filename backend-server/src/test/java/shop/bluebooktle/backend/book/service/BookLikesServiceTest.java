@@ -1,8 +1,17 @@
 package shop.bluebooktle.backend.book.service;
 
+import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.*;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.BDDMockito.*;
 
-import org.junit.jupiter.api.BeforeEach;
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Optional;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -10,12 +19,26 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import lombok.extern.slf4j.Slf4j;
 import shop.bluebooktle.backend.book.entity.Author;
+import shop.bluebooktle.backend.book.entity.Book;
+import shop.bluebooktle.backend.book.entity.BookAuthor;
+import shop.bluebooktle.backend.book.entity.BookImg;
+import shop.bluebooktle.backend.book.entity.BookLikes;
+import shop.bluebooktle.backend.book.entity.BookSaleInfo;
+import shop.bluebooktle.backend.book.entity.Img;
 import shop.bluebooktle.backend.book.repository.BookAuthorRepository;
 import shop.bluebooktle.backend.book.repository.BookImgRepository;
 import shop.bluebooktle.backend.book.repository.BookLikesRepository;
 import shop.bluebooktle.backend.book.repository.BookRepository;
+import shop.bluebooktle.backend.book.repository.BookSaleInfoRepository;
+import shop.bluebooktle.backend.book.repository.ImgRepository;
 import shop.bluebooktle.backend.book.service.impl.BookLikesServiceImpl;
 import shop.bluebooktle.backend.user.repository.UserRepository;
+import shop.bluebooktle.common.dto.book.response.BookLikesListResponse;
+import shop.bluebooktle.common.dto.book.response.BookLikesResponse;
+import shop.bluebooktle.common.entity.auth.User;
+import shop.bluebooktle.common.exception.auth.UserNotFoundException;
+import shop.bluebooktle.common.exception.book.BookLikesAlreadyChecked;
+import shop.bluebooktle.common.exception.book.BookNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 @Slf4j
@@ -26,187 +49,211 @@ public class BookLikesServiceTest {
 
 	@Mock
 	private BookLikesRepository bookLikesRepository;
-
 	@Mock
 	private BookRepository bookRepository;
-
 	@Mock
 	private UserRepository userRepository;
-
-	@Mock
-	private BookAuthorRepository bookAuthorRepository;
-
 	@Mock
 	private BookImgRepository bookImgRepository;
+	@Mock
+	private ImgRepository imgRepository;
+	@Mock
+	private BookAuthorRepository bookAuthorRepository;
+	@Mock
+	private BookSaleInfoRepository bookSaleInfoRepository;
 
-	private Author author1;
+	@Test
+	@DisplayName("도서 좋아요 - 성공")
+	void addLike() {
+		// given
+		Long bookId = 1L;
+		Long userId = 10L;
 
-	@BeforeEach
-	void setUp() {
-		author1 = mock(Author.class);
-		when(author1.getName()).thenReturn("작가1");
+		Book book = mock(Book.class);
+		User user = mock(User.class);
+
+		given(bookLikesRepository.existsByUser_IdAndBook_Id(userId, bookId)).willReturn(false);
+		given(bookRepository.findById(bookId)).willReturn(Optional.of(book));
+		given(userRepository.findById(userId)).willReturn(Optional.of(user));
+
+		// when
+		bookLikesService.like(bookId, userId);
+
+		// then
+		verify(bookLikesRepository).save(any(BookLikes.class));
 	}
 
-	// @Test
-	// @DisplayName("도서 좋아요 - 성공")
-	// void like_success() {
-	// 	// given - 좋아요 요청 생성 및 레포지토리 반환 값 설정
-	// 	given(bookLikesRepository.existsByUser_IdAndBook_Id(1L, 1L)).willReturn(false);
-	//
-	// 	Book book = mock(Book.class);
-	// 	given(book.getId()).willReturn(1L);
-	// 	given(bookRepository.findById(1L)).willReturn(Optional.of(book));
-	//
-	// 	User user = mock(User.class);
-	// 	given(user.getId()).willReturn(1L);
-	// 	given(userRepository.findById(1L)).willReturn(Optional.of(user));
-	//
-	// 	// when - 좋아요 요청 실행
-	// 	bookLikesService.like(1L, 1L);
-	//
-	// 	// then - 좋아요 요청 메서드 실행 확인
-	// 	verify(bookLikesRepository).save(argThat(bl -> {
-	// 		bl.getBook().getId().equals(1L);
-	// 		bl.getUser().getId().equals(1L);
-	// 		return true;
-	// 	}));
-	// }
-	//
-	// @Test
-	// @DisplayName("좋아요 중복 예외 발생 - 성공")
-	// void BookLikesAlreadyChecked_exception() {
-	// 	// given
-	// 	given(bookLikesRepository.existsByUser_IdAndBook_Id(1L, 1L)).willReturn(true);
-	//
-	// 	// when & then
-	// 	assertThatThrownBy(() -> bookLikesService.like(1L, 1L))
-	// 		.isInstanceOf(BookLikesAlreadyChecked.class);
-	// 	verify(bookLikesRepository, never()).save(any());
-	// }
-	//
-	// @Test
-	// @DisplayName("책 조회 불가 예외 발생 - 성공")
-	// void BookNotFound_exception() {
-	// 	// given
-	// 	given(bookLikesRepository.existsByUser_IdAndBook_Id(1L, 99L)).willReturn(false);
-	// 	given(bookRepository.findById(99L)).willReturn(Optional.empty());
-	//
-	// 	// when & then
-	// 	assertThatThrownBy(() -> bookLikesService.like(99L, 1L))
-	// 		.isInstanceOf(BookNotFoundException.class);
-	// 	verify(bookLikesRepository, never()).save(any());
-	// }
-	//
-	// @Test
-	// @DisplayName("사용자 조회 불가 예외 발생 - 성공")
-	// void UserNotFoundExceptionTest() {
-	// 	// given
-	// 	Book book = mock(Book.class);
-	// 	given(bookLikesRepository.existsByUser_IdAndBook_Id(1L, 5L)).willReturn(false);
-	// 	given(bookRepository.findById(5L)).willReturn(Optional.of(book));
-	// 	given(userRepository.findById(1L)).willReturn(Optional.empty());
-	//
-	// 	// when & then
-	// 	assertThatThrownBy(() -> bookLikesService.like(5L, 1L))
-	// 		.isInstanceOf(UserNotFoundException.class);
-	// 	verify(bookLikesRepository, never()).save(any());
-	// }
-	//
-	// @Test
-	// @DisplayName("도서 좋아요 삭제 - 성공")
-	// void unlike_success() {
-	// 	// given - 좋아요 요청 엔티티가 미리 있도록 설정
-	// 	Book book = mock(Book.class);
-	// 	when(book.getId()).thenReturn(1L);
-	// 	User user = mock(User.class);
-	// 	when(user.getId()).thenReturn(1L);
-	//
-	// 	BookLikes like = new BookLikes(book, user);
-	// 	given(bookLikesRepository.findByUser_IdAndBook_Id(1L, 1L)).willReturn(like);
-	//
-	// 	// when - 좋아요 요청 실행
-	// 	bookLikesService.unlike(1L, 1L);
-	//
-	// 	// then - 좋아요 요청 메서드 실행 확인
-	// 	verify(bookLikesRepository).delete(argThat(bl ->
-	// 		bl.getBook().getId().equals(1L) &&
-	// 			bl.getUser().getId().equals(1L)
-	// 	));
-	// }
-	//
-	// @Test
-	// @DisplayName("도서 좋아요 여부 조회 - 성공")
-	// void isLiked_success() {
-	// 	//given - 요청 객체 생성
-	// 	given(bookLikesRepository.existsByUser_IdAndBook_Id(1L, 1L)).willReturn(true);
-	// 	given(bookLikesRepository.countByBook_Id(1L)).willReturn(10L);
-	//
-	// 	//when - 좋아요 여부 확인
-	// 	BookLikesResponse response = bookLikesService.isLiked(1L, 1L);
-	//
-	// 	//then
-	// 	assertThat(response.getBookId()).isEqualTo(1L);
-	// 	assertThat(response.isLiked()).isTrue();
-	// 	assertThat(response.getCountLikes()).isEqualTo(10L);
-	// }
-	//
-	// @Test
-	// @DisplayName("도서 좋아요 수 조회 - 성공")
-	// void countLikes_success() {
-	// 	// given - 좋아요 수가 5개인 도서에 대해 요청
-	// 	given(bookLikesRepository.countByBook_Id(1L)).willReturn(5L);
-	//
-	// 	// when - 좋아요 수 조회
-	// 	BookLikesResponse response = bookLikesService.countLikes(1L);
-	//
-	// 	// then
-	// 	assertThat(response.getBookId()).isEqualTo(1L);
-	// 	assertThat(response.isLiked()).isFalse(); // 로그인 안 한 사용자 기준
-	// 	assertThat(response.getCountLikes()).isEqualTo(5L);
-	// }
+	@Test
+	@DisplayName("도서 좋아요 등록 - 이미 등록된 경우 예외 발생")
+	void BookLikesAlreadyCheckedException() {
+		// given
+		Long bookId = 1L;
+		Long userId = 10L;
+		given(bookLikesRepository.existsByUser_IdAndBook_Id(userId, bookId)).willReturn(true);
 
-	// @Test
-	// @DisplayName("좋아요 누른 도서 목록 조회 - 성공")
-	// void getBooksLikedByUser_success() {
-	// 	// given
-	// 	Book book1 = mock(Book.class);
-	// 	given(book1.getId()).willReturn(1L);
-	// 	Book book3 = mock(Book.class);
-	// 	given(book3.getId()).willReturn(3L);
-	//
-	// 	User user1 = mock(User.class);
-	// 	given(user1.getId()).willReturn(10L);
-	//
-	// 	BookImg mockImg1 = mock(BookImg.class);
-	// 	given(bookImgRepository.findFirstByBookIdAndIsThumbnailTrueOrderByIdAsc(1L)).willReturn(Optional.of(mockImg1));
-	//
-	// 	BookImg mockImg3 = mock(BookImg.class);
-	// 	given(bookImgRepository.findFirstByBookIdAndIsThumbnailTrueOrderByIdAsc(3L)).willReturn(Optional.of(mockImg3));
-	//
-	// 	BookLikes like1 = new BookLikes(book1, user1);
-	// 	BookLikes like3 = new BookLikes(book3, user1);
-	//
-	// 	given(bookLikesRepository.findAllByUser_Id(10L)).willReturn(List.of(like1, like3));
-	// 	given(bookLikesRepository.countByBook_Id(1L)).willReturn(2L);
-	// 	given(bookLikesRepository.countByBook_Id(3L)).willReturn(4L);
-	// 	given(bookAuthorRepository.findAuthorsByBook(any())).willReturn(List.of(author1));
-	//
-	// 	UserDto userDto = UserDto.builder()
-	// 		.id(10L)
-	// 		.loginId("test")
-	// 		.nickname("test")
-	// 		.status(UserStatus.ACTIVE)
-	// 		.type(UserType.USER)
-	// 		.build();
-	// 	UserPrincipal userPrincipal = new UserPrincipal(userDto);
-	//
-	// 	// when
-	// 	List<BookLikesListResponse> responses = bookLikesService.getBooksLikedByUser(userPrincipal);
-	//
-	// 	// then
-	// 	assertThat(responses).hasSize(2);
-	// 	assertThat(responses).extracting("bookId").containsExactly(1L, 3L);
-	// 	assertThat(responses).extracting("isLiked").containsOnly(true);
-	// 	assertThat(responses).extracting("countLikes").containsExactly(2, 4);
-	// }
+		// when & then
+		assertThatThrownBy(() -> bookLikesService.like(bookId, userId))
+			.isInstanceOf(BookLikesAlreadyChecked.class);
+	}
+
+	@Test
+	@DisplayName("도서 좋아요 등록 - 도서 찾기 예외 발생")
+	void BookNotFoundException() {
+		// given
+		Long bookId = 100L;
+		Long userId = 10L;
+		given(bookLikesRepository.existsByUser_IdAndBook_Id(userId, bookId)).willReturn(false);
+		given(bookRepository.findById(bookId)).willReturn(Optional.empty());
+
+		// when & then
+		assertThatThrownBy(() -> bookLikesService.like(bookId, userId))
+			.isInstanceOf(BookNotFoundException.class);
+	}
+
+	@Test
+	@DisplayName("도서 좋아요 등록 - 회원 찾기 예외 발생")
+	void UserNotFoundException() {
+		// given
+		Long bookId = 100L;
+		Long userId = 10L;
+		Book book = mock(Book.class);
+		given(bookLikesRepository.existsByUser_IdAndBook_Id(userId, bookId)).willReturn(false);
+		given(bookRepository.findById(bookId)).willReturn(Optional.of(book));
+		given(userRepository.findById(userId)).willReturn(Optional.empty());
+
+		// when & then
+		assertThatThrownBy(() -> bookLikesService.like(bookId, userId))
+			.isInstanceOf(UserNotFoundException.class);
+	}
+
+	@Test
+	@DisplayName("도서 좋아요 수 조회 - 성공")
+	void countLikes() {
+		//given
+		Long bookId = 1L;
+		given(bookLikesRepository.countByBook_Id(bookId)).willReturn(10L);
+
+		// when
+		BookLikesResponse result = bookLikesService.countLikes(bookId);
+
+		// then
+		assertThat(result.getBookId()).isEqualTo(bookId);
+		assertThat(result.getCountLikes()).isEqualTo(10L);
+		assertThat(result.isLiked()).isFalse();
+	}
+
+	@Test
+	@DisplayName("도서 좋아요 상태 조회 - 성공")
+	void isLiked() {
+		// given
+		Long bookId = 1L;
+		Long userId = 10L;
+		given(bookLikesRepository.existsByUser_IdAndBook_Id(userId, bookId)).willReturn(true);
+		given(bookLikesRepository.countByBook_Id(bookId)).willReturn(5L);
+
+		// when
+		BookLikesResponse result = bookLikesService.isLiked(bookId, userId);
+
+		// then
+		assertThat(result.getBookId()).isEqualTo(1L);
+		assertThat(result.isLiked()).isTrue();
+		assertThat(result.getCountLikes()).isEqualTo(5L);
+	}
+
+	@Test
+	@DisplayName("도서 좋아요 삭제 - 성공")
+	void deleteLikes() {
+		// given
+		Long bookId = 1L;
+		Long userId = 10L;
+		BookLikes mockBookLikes = mock(BookLikes.class);
+		given(bookLikesRepository.findByUser_IdAndBook_Id(userId, bookId)).willReturn(mockBookLikes);
+
+		// when
+		bookLikesService.unlike(bookId, userId);
+
+		// then
+		verify(bookLikesRepository).delete(mockBookLikes);
+	}
+
+	@Test
+	@DisplayName("도서 좋아요 삭제 - 등록되지 않은 좋아요 삭제 불가")
+	void deleteNotExistLikes() {
+		// given
+		Long bookId = 1L;
+		Long userId = 10L;
+		given(bookLikesRepository.findByUser_IdAndBook_Id(userId, bookId)).willReturn(null);
+
+		// when
+		bookLikesService.unlike(bookId, userId);
+
+		// then
+		verify(bookLikesRepository, never()).delete(any(BookLikes.class));
+	}
+
+	@Test
+	@DisplayName("좋아요 누른 도서 목록 조회 - 성공")
+	void getBooksLikedByUser() {
+		// given
+		Long bookId = 1L;
+		Long userId = 10L;
+		String title = "녹나무의 파수꾼";
+		List<String> authorNames = List.of("히가시노 게이고", "양윤옥");
+		String thumbnailUrl = "https://image.aladin.co.kr/product/23456/86/cover500/k362638685_1.jpg";
+		BigDecimal price = BigDecimal.valueOf(16020);
+
+		// Mock 객체 생성
+		Book book = mock(Book.class);
+		given(book.getId()).willReturn(bookId);
+		given(book.getTitle()).willReturn(title);
+
+		BookLikes bookLikes = mock(BookLikes.class);
+		given(bookLikes.getBook()).willReturn(book);
+
+		BookAuthor author1 = mock(BookAuthor.class);
+		BookAuthor author2 = mock(BookAuthor.class);
+		Author a1 = mock(Author.class);
+		Author a2 = mock(Author.class);
+		given(a1.getName()).willReturn("히가시노 게이고");
+		given(a2.getName()).willReturn("양윤옥");
+		given(author1.getAuthor()).willReturn(a1);
+		given(author2.getAuthor()).willReturn(a2);
+
+		BookImg bookImg = mock(BookImg.class);
+		Img img = mock(Img.class);
+		given(bookImg.getImg()).willReturn(img);
+		given(img.getId()).willReturn(7L);
+		given(img.getImgUrl()).willReturn(thumbnailUrl);
+
+		BookSaleInfo bookSaleInfo = mock(BookSaleInfo.class);
+		given(bookSaleInfo.getPrice()).willReturn(price);
+
+		// 각 리포지토리 응답 설정
+		given(bookLikesRepository.findAllByUser_Id(userId))
+			.willReturn(List.of(bookLikes));
+
+		given(bookAuthorRepository.findByBook_Id(bookId))
+			.willReturn(List.of(author1, author2));
+
+		given(bookImgRepository.findFirstByBookIdAndIsThumbnailTrueOrderByIdAsc(bookId))
+			.willReturn(Optional.of(bookImg));
+
+		given(imgRepository.findById(7L))
+			.willReturn(Optional.of(img));
+
+		given(bookSaleInfoRepository.findByBookId(bookId))
+			.willReturn(Optional.of(bookSaleInfo));
+
+		// when
+		List<BookLikesListResponse> result = bookLikesService.getBooksLikedByUser(userId);
+
+		// then
+		assertThat(result).hasSize(1);
+		BookLikesListResponse dto = result.get(0);
+		assertThat(dto.getBookId()).isEqualTo(bookId);
+		assertThat(dto.getBookName()).isEqualTo(title);
+		assertThat(dto.getAuthorName()).containsExactlyInAnyOrderElementsOf(authorNames);
+		assertThat(dto.getImgUrl()).isEqualTo(thumbnailUrl);
+		assertThat(dto.getPrice()).isEqualTo(price);
+	}
 }
