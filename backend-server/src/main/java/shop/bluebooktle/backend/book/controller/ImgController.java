@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.book.service.ImgService;
 import shop.bluebooktle.backend.book.service.MinioService;
+import shop.bluebooktle.common.dto.book.response.img.ImgResponse;
 import shop.bluebooktle.common.dto.common.JsendResponse;
 
 @RestController
