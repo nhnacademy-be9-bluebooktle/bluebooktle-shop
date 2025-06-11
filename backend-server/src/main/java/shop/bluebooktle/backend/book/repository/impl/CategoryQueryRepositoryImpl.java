@@ -56,4 +56,29 @@ public class CategoryQueryRepositoryImpl implements CategoryQueryRepository {
 
 		return new PageImpl<>(content, pageable, totalCount);
 	}
+
+	@Override
+	public List<Long> findUnderCategory(Category parentCategory) {
+
+		QCategory category = QCategory.category;
+
+		String categoryPath = queryFactory
+			.select(category.categoryPath)
+			.from(category)
+			.where(category.id.eq(parentCategory.getId()))
+			.fetchOne();
+
+		List<Long> leafCategoryIds = queryFactory
+			.select(category.id)
+			.from(category)
+			.where(
+				category.categoryPath.like(categoryPath + "/%")
+					.or(category.categoryPath.eq(categoryPath)),
+				category.childCategories.isEmpty()
+			)
+			.fetch();
+
+		return leafCategoryIds;
+	}
+
 }

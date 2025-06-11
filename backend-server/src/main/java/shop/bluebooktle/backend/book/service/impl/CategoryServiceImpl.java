@@ -2,6 +2,7 @@ package shop.bluebooktle.backend.book.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
@@ -259,10 +260,16 @@ public class CategoryServiceImpl implements CategoryService {
 	@Override
 	@Transactional(readOnly = true)
 	public List<CategoryTreeResponse> getCategoryTree() {
-		List<Category> roots = categoryRepository.findByParentCategoryIsNull();
-		return roots.stream()
-			.map(this::toTreeDto)
-			.collect(Collectors.toList());
+		List<Category> allCategories = categoryRepository.findAll();
+		Map<Long, List<Category>> parentIdToChildrenMap = allCategories.stream()
+			.filter(c -> c.getParentCategory() != null)
+			.collect(Collectors.groupingBy(c -> c.getParentCategory().getId()));
+
+		List<CategoryTreeResponse> tree = allCategories.stream()
+			.filter(c -> c.getParentCategory() == null)
+			.map(c -> buildTree(c, parentIdToChildrenMap))
+			.toList();
+		return tree;
 	}
 
 	@Override
@@ -323,5 +330,13 @@ public class CategoryServiceImpl implements CategoryService {
 			category.getParentCategory() != null
 				? category.getParentCategory().getName()
 				: "-", category.getCategoryPath());
+	}
+
+	private CategoryTreeResponse buildTree(Category category, Map<Long, List<Category>> parentMap) {
+		List<CategoryTreeResponse> children = parentMap.getOrDefault(category.getId(), List.of()).stream()
+			.map(child -> buildTree(child, parentMap))
+			.collect(Collectors.toList());
+
+		return new CategoryTreeResponse(category.getId(), category.getName(), children);
 	}
 }
