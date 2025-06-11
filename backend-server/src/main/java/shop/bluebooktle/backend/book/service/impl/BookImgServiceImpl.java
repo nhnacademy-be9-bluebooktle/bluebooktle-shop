@@ -105,19 +105,19 @@ public class BookImgServiceImpl implements BookImgService {
 	@Override
 	public Optional<BookImgResponse> getThumbnailByBookId(Long bookId) {
 		if (bookId == null) {
-			throw new IllegalArgumentException("Book ID must not be null");
+			throw new BookIdNullException();
 		}
 		/*return bookImgRepository.findByBookId(bookId).stream()
 			.filter(BookImg::isThumbnail)
 			.findFirst()
-			.map(rel -> BookImgResponse.builder()
+			.map(bookImg -> BookImgResponse.builder()
 				.imgResponse(ImgResponse.builder()
-					.id(rel.getImg().getId())
-					.imgUrl(rel.getImg().getImgUrl())
-					.createdAt(rel.getImg().getCreatedAt())
+					.id(bookImg.getImg().getId())
+					.imgUrl(bookImg.getImg().getImgUrl())
+					.createdAt(bookImg.getImg().getCreatedAt())
 					.build()
 				)
-				.bookInfoResponse(new BookInfoResponse(rel.getBook().getId()))
+				.bookInfoResponse(new BookInfoResponse(bookImg.getBook().getId()))
 				.isThumbnail(true)
 				.build()
 			);*/
@@ -133,10 +133,10 @@ public class BookImgServiceImpl implements BookImgService {
 			throw new ImgIdNullException();
 		}
 
-		BookImg relation = bookImgRepository.findByBookIdAndImgId(bookId, imgId)
+		BookImg bookImg = bookImgRepository.findByBookIdAndImgId(bookId, imgId)
 			.orElseThrow(() -> new BookImgNotFoundException(bookId, imgId));
 
-		bookImgRepository.delete(relation);
+		bookImgRepository.delete(bookImg);
 	}
 
 	@Override
