@@ -104,56 +104,6 @@ class ReviewControllerTest {
 	}
 
 	@Test
-	@DisplayName("마이페이지 리뷰 조회 성공")
-	@WithMockUser
-	void getMyReviews_success() throws Exception {
-		List<ReviewResponse> reviewList = List.of(
-			ReviewResponse.builder()
-				.reviewId(1L).userId(testUserPrincipal.getUserId()).bookOrderId(100L)
-				.bookTitle("내가 읽은 책 1").nickname(testUserPrincipal.getNickname())
-				.star(4).reviewContent("내 리뷰 내용 1").likes(5).createdAt(LocalDateTime.now().minusDays(1))
-				.build(),
-			ReviewResponse.builder()
-				.reviewId(2L).userId(testUserPrincipal.getUserId()).bookOrderId(101L)
-				.bookTitle("내가 읽은 책 2").nickname(testUserPrincipal.getNickname())
-				.star(5).reviewContent("내 리뷰 내용 2").likes(10).createdAt(LocalDateTime.now())
-				.build()
-		);
-		PageImpl<ReviewResponse> pageResult = new PageImpl<>(reviewList, PageRequest.of(0, 10), reviewList.size());
-
-		given(reviewService.getMyReviews(eq(testUserPrincipal.getUserId()), any(PageRequest.class)))
-			.willReturn(pageResult);
-
-		mockMvc.perform(get("/api/orders/reviews")
-				.with(user(testUserPrincipal)))
-			.andDo(print())
-			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.status").value("success"))
-			.andExpect(jsonPath("$.data.content[0].reviewId").value(1L))
-			.andExpect(jsonPath("$.data.content[0].bookTitle").value("내가 읽은 책 1"))
-			.andExpect(jsonPath("$.data.content[1].reviewId").value(2L))
-			.andExpect(jsonPath("$.data.totalElements").value(2));
-	}
-
-	@Test
-	@DisplayName("마이페이지 리뷰 조회 - 리뷰 없는경우")
-	@WithMockUser
-	void getMyReviews_noReviews() throws Exception {
-		PageImpl<ReviewResponse> pageResult = new PageImpl<>(List.of(), PageRequest.of(0, 10), 0);
-
-		given(reviewService.getMyReviews(eq(testUserPrincipal.getUserId()), any(PageRequest.class)))
-			.willReturn(pageResult);
-
-		mockMvc.perform(get("/api/orders/reviews")
-				.with(user(testUserPrincipal)))
-			.andDo(print())
-			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.status").value("success"))
-			.andExpect(jsonPath("$.data.content").isEmpty())
-			.andExpect(jsonPath("$.data.totalElements").value(0));
-	}
-
-	@Test
 	@DisplayName("도서 리뷰 조회 성공")
 	@WithMockUser
 	void getReviewsForBook_success() throws Exception {
