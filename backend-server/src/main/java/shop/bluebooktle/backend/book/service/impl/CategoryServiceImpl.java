@@ -133,6 +133,17 @@ public class CategoryServiceImpl implements CategoryService {
 			}
 		}
 
+		// 자신 포함 전체 카테고리 리스트 생성
+		List<Category> allCategory = new ArrayList<>(descendants);
+		allCategory.add(category); // 본인도 포함
+
+		// 도서가 등록된 카테고리가 하나라도 있으면 삭제 불가
+		for (Category c : allCategory) {
+			if (bookCategoryRepository.existsByCategory(c)) {
+				throw new CategoryCannotDeleteRootException("(도서가 등록된 카테고리 또는 하위 카테고리 존재시 삭제 불가)");
+			}
+		}
+
 		// 최상위 카테고리는 삭제 불가
 		if (categoryRepository.existsByIdAndParentCategoryIsNull(category.getId())) {
 			throw new CategoryCannotDeleteRootException("(최상위 카테고리 삭제 불가)");
@@ -146,8 +157,6 @@ public class CategoryServiceImpl implements CategoryService {
 			}
 		}
 
-		// 연관된 BookCategory 삭제
-		bookCategoryRepository.deleteByCategoryIn(descendants); // 손자 카테고리까지 삭제
 		// 하위 모든 카테고리 삭제
 		for (Category childCategory : descendants) {
 			childCategory.setParentCategory(null);
@@ -159,9 +168,6 @@ public class CategoryServiceImpl implements CategoryService {
 			.filter(bc -> bookCategoryRepository.countByBook(bc.getBook()) == 1)
 			.peek(bc -> bc.setCategory(category.getParentCategory()))  // 상위 카테고리로 교체
 			.toList();
-
-		// 현재 카테고리의 BookCategory 관계 삭제
-		bookCategoryRepository.deleteByCategory(category);
 
 		// 카테고리 삭제
 		categoryRepository.delete(category);
