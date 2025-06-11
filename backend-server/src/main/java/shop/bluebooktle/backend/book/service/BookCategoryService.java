@@ -17,18 +17,7 @@ public interface BookCategoryService {
 
 	void registerBookCategory(Long bookId, List<Long> categoryIdList);
 
-	// 도서 카테고리 삭제
-	void deleteBookCategory(Long bookId, Long categoryId);
-
 	void updateBookCategory(Long bookId, List<Long> categoryIdList);
-
-	// 해당 도서의 카테고리 수정
-	void updateBookCategoryByBookCategoryId(Long updatedCategoryId, Long bookCategoryId);
-
-	void updateBookCategory(Long updatedCategoryId, Long categoryId, Long bookId);
-
-	// 특정 도서의 카테고리 목록 조회
-	List<CategoryResponse> getCategoryByBookId(BookInfoRequest request);
 
 	// 특정 카테고리 안에 등록된 도서 조회
 	Page<BookInfoResponse> searchBooksByCategory(Long categoryId, Pageable pageable, BookSortType bookSortType);

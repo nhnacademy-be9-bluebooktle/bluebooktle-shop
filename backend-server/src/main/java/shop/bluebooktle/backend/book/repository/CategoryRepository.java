@@ -2,12 +2,16 @@ package shop.bluebooktle.backend.book.repository;
 
 import java.util.List;
 
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import shop.bluebooktle.backend.book.entity.Category;
 
 public interface CategoryRepository extends JpaRepository<Category, Long>, CategoryQueryRepository {
-	
+
+	@EntityGraph(attributePaths = {"parentCategory"})
+	List<Category> findAll();
+
 	// 최상위 카테고리들(대분류) 조회 (parentCategory가 null인 경우)
 	List<Category> findByParentCategoryIsNull();
 

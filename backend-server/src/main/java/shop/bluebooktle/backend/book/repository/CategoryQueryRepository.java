@@ -11,4 +11,6 @@ public interface CategoryQueryRepository {
 	Page<Category> searchByNameContaining(String searchKeyword, Pageable pageable);
 
 	List<Long> findUnderCategory(Category category);
+
+	List<Category> getAllDescendantCategories(Category parent);
 }
