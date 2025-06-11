@@ -40,6 +40,11 @@
                 <i class="fas fa-heart"></i> 좋아요 목록
             </a>
         </li>
+        <li>
+            <a th:classappend="${activeMenu == 'membership' ? 'active' : ''}" th:href="@{/mypage/membership}">
+                <i class="fas fa-star"></i> 내 회원 등급
+            </a>
+        </li>
     </ul>
 </aside>
 

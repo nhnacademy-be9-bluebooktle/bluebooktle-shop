@@ -25,6 +25,7 @@ import shop.bluebooktle.common.dto.user.request.UserSearchRequest;
 import shop.bluebooktle.common.dto.user.request.UserUpdateRequest;
 import shop.bluebooktle.common.dto.user.response.AddressResponse;
 import shop.bluebooktle.common.dto.user.response.AdminUserResponse;
+import shop.bluebooktle.common.dto.user.response.UserMembershipLevelResponse;
 import shop.bluebooktle.common.dto.user.response.UserResponse;
 import shop.bluebooktle.common.dto.user.response.UserTotalPointResponse;
 import shop.bluebooktle.common.dto.user.response.UserWithAddressResponse;
@@ -71,7 +72,6 @@ public class UserServiceImpl implements UserService {
 			.email(user.getEmail())
 			.name(user.getName())
 			.loginId(user.getLoginId())
-			.phoneNumber(user.getPhoneNumber())
 			.type(user.getType())
 			.encodedPassword(user.getPassword())
 			.membershipLevel(user.getMembershipLevel())
@@ -103,11 +103,14 @@ public class UserServiceImpl implements UserService {
 	@Override
 	@Transactional
 	public void updateUserAdmin(Long userId, AdminUserUpdateRequest request) {
+
 		User user = userRepository.findById(userId)
 			.orElseThrow(UserNotFoundException::new);
 
 		MembershipLevel membershipLevel = null;
+
 		if (request.getMembershipId() != null) {
+
 			membershipLevel = membershipLevelRepository.findById(request.getMembershipId())
 				.orElseThrow(() -> new MembershipNotFoundException("회원 등급을 찾을 수 없습니다: " + request.getMembershipId()));
 		}
@@ -129,6 +132,14 @@ public class UserServiceImpl implements UserService {
 	@Override
 	@Transactional(readOnly = true)
 	public UserTotalPointResponse findUserTotalPoints(Long userId) {
+
+		if (userId == null) {
+			throw new IllegalArgumentException();
+		}
+		else if (userRepository.findById(userId).isEmpty() ) {
+			throw new UserNotFoundException();
+		}
+
 		BigDecimal totalPoints = userRepository.findPointBalanceByLoginId(userId).orElse(BigDecimal.ZERO);
 		return new UserTotalPointResponse(totalPoints);
 	}
@@ -221,5 +232,11 @@ public class UserServiceImpl implements UserService {
 		messagePayload.setBotName("인증 코드 전송");
 		messagePayload.setText(loginId + ": " + authCode);
 		verificationMessageClient.sendMessage(messagePayload);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public UserMembershipLevelResponse findUserNetSpentAmountForLastThreeMonthsByUserId(Long userId) {
+		return userRepository.findUserNetSpentAmountForLastThreeMonthsByUserId(userId);
 	}
 }
