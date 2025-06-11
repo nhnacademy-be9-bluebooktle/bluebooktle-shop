@@ -3,6 +3,7 @@ package shop.bluebooktle.backend.book.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
@@ -144,12 +145,8 @@ public class CategoryServiceImpl implements CategoryService {
 			}
 		}
 
-		// 최상위 카테고리는 삭제 불가
-		if (categoryRepository.existsByIdAndParentCategoryIsNull(category.getId())) {
-			throw new CategoryCannotDeleteRootException("(최상위 카테고리 삭제 불가)");
-		}
 		// 상위 카테고리가 최상위 카테고리이면서 2단계 카테고리가 1개일 경우 삭제 불가능
-		if (categoryRepository.existsByIdAndParentCategoryIsNull(category.getParentCategory().getId())) {
+		if (category.getParentCategory() != null && categoryRepository.existsByIdAndParentCategoryIsNull(category.getParentCategory().getId())) {
 			Category rootCategory = categoryRepository.findById(category.getParentCategory().getId())
 				.orElseThrow(() -> new CategoryNotFoundException(category.getParentCategory().getId())); // 최상위 카테고리
 			if (rootCategory.getChildCategories().size() == 1) {
