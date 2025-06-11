@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.book.service.AuthorService;
@@ -28,6 +29,7 @@ import shop.bluebooktle.common.dto.common.PaginationData;
 @RestController
 @RequestMapping("/api/authors")
 @RequiredArgsConstructor
+@Tag(name = "관리자 페이지 작가 API", description = "관리자 작가 CRUD API")
 public class AuthorController {
 
 	private final AuthorService authorService;

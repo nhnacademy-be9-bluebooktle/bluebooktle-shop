@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.book.service.AladinBookService;
@@ -23,6 +24,7 @@ import shop.bluebooktle.common.dto.common.JsendResponse;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/aladin/books")
+@Tag(name = "외부 API를 통한 도서 조회 및 도서 등록 API ", description = "알라딘 API를 사용한 조회 및 알라딘 도서 등록 API")
 public class AladinBookController {
 
 	private final AladinBookService aladinBookService;

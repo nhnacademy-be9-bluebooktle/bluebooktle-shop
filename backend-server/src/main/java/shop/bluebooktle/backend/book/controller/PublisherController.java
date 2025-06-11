@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +30,7 @@ import shop.bluebooktle.common.dto.common.PaginationData;
 @RequestMapping("/api/publishers")
 @RequiredArgsConstructor
 @Slf4j
+@Tag(name = "관리자 페이지 출판사 API", description = "관리자 출판사 CRUD API")
 public class PublisherController {
 
 	private final PublisherService publisherService;
@@ -68,7 +70,7 @@ public class PublisherController {
 		PublisherInfoResponse response = publisherService.getPublisher(publisherId);
 		return ResponseEntity.ok(JsendResponse.success(response));
 	}
-	
+
 	@Operation(summary = "출판사 목록 조회", description = "등록된 출판사 목록을 조회합니다.")
 	@GetMapping
 	public ResponseEntity<JsendResponse<PaginationData<PublisherInfoResponse>>> getPublishers(

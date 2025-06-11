@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import shop.bluebooktle.backend.book.service.BookCategoryService;
@@ -23,6 +24,7 @@ import shop.bluebooktle.common.dto.common.PaginationData;
 @RequestMapping("/api/categories/{category-id}/books")
 @RequiredArgsConstructor
 @Slf4j
+@Tag(name = "카테고리 도서 조회 API", description = "카테고리에 해당되는 도서 목록 조회 API")
 public class BookCategoryController {
 
 	private final BookCategoryService bookCategoryService;

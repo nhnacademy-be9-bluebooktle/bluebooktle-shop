@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +35,7 @@ import shop.bluebooktle.common.dto.common.PaginationData;
 @RequestMapping("/api/categories")
 @RequiredArgsConstructor
 @Slf4j
+@Tag(name = "카테고리 API", description = "관리자 카테고리 CRUD 및 카테고리 조회 API")
 public class CategoryController {
 
 	private final CategoryService categoryService;
@@ -63,13 +65,6 @@ public class CategoryController {
 		List<CategoryTreeResponse> tree = categoryService.getCategoryTree();
 		return ResponseEntity.ok(JsendResponse.success(tree));
 	}
-
-	/*// 해당 카테고리 포함한 모든 자식 카테고리를 재귀적으로 포함한 트리 구조 조회
-	@GetMapping("/{categoryId}/tree")
-	public ResponseEntity<JsendResponse<CategoryTreeResponse>> getCategoryTree(@PathVariable Long categoryId) {
-		CategoryTreeResponse tree = categoryService.getCategoryTreeById(categoryId);
-		return ResponseEntity.ok(JsendResponse.success(tree));
-	}*/
 
 	@Operation(
 		summary = "최상위 카테고리 등록",

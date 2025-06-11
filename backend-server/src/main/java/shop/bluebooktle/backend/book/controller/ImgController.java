@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.book.service.ImgService;
 import shop.bluebooktle.backend.book.service.MinioService;
@@ -17,6 +18,7 @@ import shop.bluebooktle.common.dto.common.JsendResponse;
 @RestController
 @RequestMapping("/api/imgs")
 @RequiredArgsConstructor
+@Tag(name = "이미지 API", description = "MinIO 서버 관련 이미지 API")
 public class ImgController {
 	private final ImgService imgService;
 	private final MinioService minioService;

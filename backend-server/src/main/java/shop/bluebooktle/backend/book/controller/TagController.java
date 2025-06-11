@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.book.service.TagService;
@@ -27,6 +28,7 @@ import shop.bluebooktle.common.dto.common.PaginationData;
 @RestController
 @RequestMapping("/api/tags")
 @RequiredArgsConstructor
+@Tag(name = "관리자 페이지 태그 API", description = "관리자 태그 CRUD API")
 public class TagController {
 
 	private final TagService tagService;
