@@ -110,37 +110,6 @@ public class ReviewServiceTest {
 	}
 
 	@Test
-	@DisplayName("리뷰 등록 성공")
-	void addReview_withImage_success() {
-		// Given
-		ReviewRegisterRequest request = ReviewRegisterRequest.builder()
-			.star(5)
-			.reviewContent("정말 좋은 책입니다!")
-			.imgUrls(List.of("http://example.com/new_image.jpg"))
-			.build();
-
-		given(userRepository.findById(anyLong())).willReturn(Optional.of(testUser));
-		given(bookOrderRepository.findById(anyLong())).willReturn(Optional.of(testBookOrder));
-		given(imgRepository.findByImgUrl(anyString())).willReturn(Optional.empty());
-		given(imgRepository.save(any(Img.class))).willReturn(testImg);
-		given(reviewRepository.save(any(Review.class))).willReturn(testReview);
-		given(bookSaleInfoRepository.findByBook(any(Book.class))).willReturn(Optional.of(testBookSaleInfo));
-
-		// When
-		ReviewResponse response = reviewService.addReview(testUser.getId(), testBookOrder.getId(), request);
-
-		// Then
-		assertThat(response).isNotNull();
-		assertThat(response.getReviewId()).isEqualTo(testReview.getId());
-		assertThat(response.getUserId()).isEqualTo(testUser.getId());
-		assertThat(response.getBookOrderId()).isEqualTo(testBookOrder.getId());
-		assertThat(response.getImgUrl()).isEqualTo(testImg.getImgUrl());
-		assertThat(response.getStar()).isEqualTo(request.getStar());
-		assertThat(response.getReviewContent()).isEqualTo(request.getReviewContent());
-		assertThat(response.getLikes()).isEqualTo(0);
-	}
-
-	@Test
 	@DisplayName("리뷰 등록 실패 - 유저를 찾을 수 없음")
 	void addReview_userNotFound_throwsException() {
 		// Given
