@@ -806,6 +806,7 @@ public class OrderServiceImpl implements OrderService {
 		orderRepository.save(order);
 
 		if (status == OrderStatus.SHIPPING) {
+			order.changeShippedAt(LocalDateTime.now());
 			eventPublisher.publishEvent(new OrderShippingMessage(order.getId()));
 		}
 	}

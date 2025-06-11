@@ -15,7 +15,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -41,7 +41,7 @@ public class Refund extends BaseEntity {
 	@Column(name = "refund_id")
 	private Long id;
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "order_id", nullable = false, unique = true)
 	private Order order;
 
@@ -52,7 +52,6 @@ public class Refund extends BaseEntity {
 	@Enumerated(EnumType.STRING)
 	private RefundReason reason;
 
-	//TODO @Lob이 mysql에서 TEXT type인지 확인
 	@Column(name = "reason_detail", columnDefinition = "TEXT", nullable = false)
 	private String reasonDetail;
 
@@ -72,6 +71,10 @@ public class Refund extends BaseEntity {
 		this.reasonDetail = reasonDetail;
 		this.status = status;
 		this.price = price;
+	}
+
+	public void changeStatus(RefundStatus status) {
+		this.status = status;
 	}
 
 }
