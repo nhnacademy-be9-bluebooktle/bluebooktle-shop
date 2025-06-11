@@ -2,7 +2,6 @@ package shop.bluebooktle.backend.book.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -161,17 +160,9 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 	@Transactional(readOnly = true)
 	public Page<BookInfoResponse> searchBooksByCategory(Long categoryId, Pageable pageable, BookSortType bookSortType) {
 		Category category = requireCategory(categoryId);
-		List<Category> descendants = categoryService.getAllDescendantCategories(category);
-		List<Long> categoryIds = new ArrayList<>();
-
-		if (descendants != null) {
-			categoryIds = descendants.stream()
-				.map(Category::getId)
-				.collect(Collectors.toCollection(ArrayList::new));
-		}
-
+		// 하위 카테고리의 ID 조회
+		List<Long> categoryIds = categoryRepository.findUnderCategory(category);
 		categoryIds.add(category.getId());
-
 		log.info("categoryIds : {}", categoryIds);
 
 		// 엘라스틱에서 도서 찾기
