@@ -37,7 +37,7 @@ public enum ErrorCode {
 	AUTH_ACCOUNT_WITHDRAWN(HttpStatus.FORBIDDEN, "A011", "탈퇴한 계정입니다."),
 	AUTH_NOT_DORMANT_ACCOUNT(HttpStatus.BAD_REQUEST, "A012", "휴면 상태가 아닌 계정입니다."),
 	AUTH_ADDRESS_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "A013", "주소는 최대 10개까지 등록할 수 있습니다."),
-	AUTH_ADDRESS_NOT_FOUND(HttpStatus.BAD_REQUEST, "A014", "삭제할 주소를 찾을 수 없거나 권한이 없습니다."),
+	AUTH_ADDRESS_NOT_FOUND(HttpStatus.NOT_FOUND, "A014", "삭제할 주소를 찾을 수 없거나 권한이 없습니다."),
 	AUTH_INVALID_ADDRESS(HttpStatus.BAD_REQUEST, "A015", "유효하지 않은 주소 정보입니다."),
 	AUTH_MEMBERSHIP_LEVEL_NOT_FOUND(HttpStatus.NOT_FOUND, "A016", "회원 등급 정보를 찾을 수 없습니다."),
 	AUTH_INVALID_USER_ID(HttpStatus.BAD_REQUEST, "A017", "유효하지 않은 계정 ID입니다."),
