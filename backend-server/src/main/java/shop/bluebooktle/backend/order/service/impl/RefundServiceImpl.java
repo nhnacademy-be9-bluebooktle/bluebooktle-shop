@@ -88,11 +88,11 @@ public class RefundServiceImpl implements RefundService {
 		}
 
 		if (request.status() == RefundStatus.COMPLETE) {
-			BigDecimal finalAmount;
+			BigDecimal finalAmount = order.getOriginalAmount()
+				.subtract(order.getSaleDiscountAmount())
+				.add(order.getPointUseAmount());
 			if (refund.getReason() != RefundReason.DAMAGED && refund.getReason() != RefundReason.DEFECT) {
-				finalAmount = refund.getPrice().subtract(deliveryFee);
-			} else {
-				finalAmount = refund.getPrice();
+				finalAmount = finalAmount.subtract(deliveryFee);
 			}
 			User user = order.getUser();
 			user.addPoint(finalAmount);
