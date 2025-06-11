@@ -2,6 +2,7 @@ package shop.bluebooktle.backend.order.service.impl;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -28,9 +29,11 @@ import shop.bluebooktle.backend.book_order.entity.PackagingOption;
 import shop.bluebooktle.backend.book_order.entity.UserCouponBookOrder;
 import shop.bluebooktle.backend.book_order.jpa.BookOrderRepository;
 import shop.bluebooktle.backend.book_order.jpa.PackagingOptionRepository;
+import shop.bluebooktle.backend.book_order.jpa.UserCouponBookOrderRepository;
 import shop.bluebooktle.backend.coupon.entity.Coupon;
 import shop.bluebooktle.backend.coupon.entity.CouponType;
 import shop.bluebooktle.backend.coupon.entity.UserCoupon;
+import shop.bluebooktle.backend.coupon.repository.UserCouponRepository;
 import shop.bluebooktle.backend.coupon.service.CouponCalculationService;
 import shop.bluebooktle.backend.order.dto.response.OrderCancelMessage;
 import shop.bluebooktle.backend.order.entity.DeliveryRule;
@@ -69,6 +72,8 @@ import shop.bluebooktle.common.exception.auth.UserNotFoundException;
 import shop.bluebooktle.common.exception.book.BookNotFoundException;
 import shop.bluebooktle.common.exception.book.BookSaleInfoNotFoundException;
 import shop.bluebooktle.common.exception.book_order.PackagingOptionNotFoundException;
+import shop.bluebooktle.common.exception.coupon.UserCouponAlreadyUsedException;
+import shop.bluebooktle.common.exception.coupon.UserCouponNotFoundException;
 import shop.bluebooktle.common.exception.order.BookNotOrderableException;
 import shop.bluebooktle.common.exception.order.OrderNotFoundException;
 import shop.bluebooktle.common.exception.order.StockNotEnoughException;
@@ -94,6 +99,8 @@ public class OrderServiceImpl implements OrderService {
 	private final BookSaleInfoRepository bookSaleInfoRepository;
 	private final PointHistoryRepository pointHistoryRepository;
 	private final ApplicationEventPublisher eventPublisher;
+	private final UserCouponRepository userCouponRepository;
+	private final UserCouponBookOrderRepository userCouponBookOrderRepository;
 
 	@Override
 	public Page<OrderHistoryResponse> getUserOrders(
@@ -198,8 +205,63 @@ public class OrderServiceImpl implements OrderService {
 
 		Order saved = orderRepository.save(order);
 
+		List<BookOrder> savedBookOrders = new ArrayList<>();
 		for (OrderItemRequest itemReq : request.orderItems()) {
-			createSingleBookOrder(saved, itemReq);
+			Book book = bookRepository.findById(itemReq.bookId())
+				.orElseThrow(BookNotFoundException::new);
+
+			BookOrder bookOrder = BookOrder.builder()
+				.order(saved)
+				.book(book)
+				.quantity(itemReq.bookQuantity())
+				.price(itemReq.salePrice())
+				.build();
+
+			BookOrder savedBookOrder = bookOrderRepository.save(bookOrder);
+			savedBookOrders.add(savedBookOrder);
+		}
+
+		if (user != null) {
+			for (int i = 0; i < request.orderItems().size(); i++) {
+				OrderItemRequest itemReq = request.orderItems().get(i);
+				Long itemCouponId = itemReq.itemCouponId();
+				if (itemCouponId != null) {
+					UserCoupon userCoupon = userCouponRepository.findById(itemCouponId)
+						.orElseThrow(UserCouponNotFoundException::new);
+
+					if (userCoupon.getUsedAt() != null) {
+						throw new UserCouponAlreadyUsedException();
+					}
+
+					UserCouponBookOrder usage = UserCouponBookOrder.builder()
+						.user(user)
+						.order(saved)
+						.bookOrder(savedBookOrders.get(i))
+						.userCoupon(userCoupon)
+						.build();
+					userCouponBookOrderRepository.save(usage);
+					userCoupon.useCoupon();
+					userCouponRepository.save(userCoupon);
+				}
+			}
+			if (request.orderCouponId() != null) {
+				UserCoupon orderCoupon = userCouponRepository.findById(request.orderCouponId())
+					.orElseThrow(UserCouponNotFoundException::new);
+
+				if (orderCoupon.getUsedAt() != null) {
+					throw new UserCouponAlreadyUsedException();
+				}
+
+				UserCouponBookOrder usage = UserCouponBookOrder.builder()
+					.user(user)
+					.order(saved)
+					.bookOrder(null)
+					.userCoupon(orderCoupon)
+					.build();
+				userCouponBookOrderRepository.save(usage);
+				orderCoupon.useCoupon();
+				userCouponRepository.save(orderCoupon);
+			}
 		}
 
 		eventPublisher.publishEvent(new OrderCancelMessage(saved.getId()));
@@ -516,6 +578,13 @@ public class OrderServiceImpl implements OrderService {
 					.build();
 				pointHistoryRepository.save(pointHistory);
 			}
+			List<UserCouponBookOrder> couponUsages = userCouponBookOrderRepository.findByOrder(order);
+			for (UserCouponBookOrder usage : couponUsages) {
+				UserCoupon userCoupon = usage.getUserCoupon();
+				userCoupon.cancelCoupon();
+				userCouponRepository.save(userCoupon);
+			}
+			userCouponBookOrderRepository.deleteAll(couponUsages);
 		}
 
 		OrderState canceledState = orderStateRepository.findByState(OrderStatus.CANCELED)

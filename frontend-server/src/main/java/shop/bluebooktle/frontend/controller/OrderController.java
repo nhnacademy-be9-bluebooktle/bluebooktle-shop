@@ -66,15 +66,14 @@ public class OrderController {
 		Model model
 	) {
 		ModelAndView mav = new ModelAndView("order/create_form");
-		List<BookCartOrderResponse> bookItems;
 
+		List<BookCartOrderResponse> bookItems;
 		if (bookId != null) {
 			BookCartOrderResponse bookInfo = bookService.getBookCartOrder(bookId, quantity);
 			bookItems = List.of(bookInfo);
 		} else {
 			bookItems = cartService.getSelectedCartItemsForOrder(guestId, bookIds);
 		}
-
 		mav.addObject("bookItems", bookItems);
 
 		String defaultOrderName;
@@ -107,11 +106,11 @@ public class OrderController {
 				.toList();
 			UsableUserCouponMapResponse coupons = couponService.getUsableCouponsForOrder(bookIdsForCoupon);
 			mav.addObject("coupons", coupons);
-		} //todo else
-		UsableUserCouponMapResponse emptyCoupons = new UsableUserCouponMapResponse();
-		emptyCoupons.setUsableUserCouponMap(new HashMap<>());
-		mav.addObject("coupons", emptyCoupons);
-		// mav.addObject("coupons", new UsableUserCouponMapResponse());
+		} else {//todo else
+			UsableUserCouponMapResponse emptyCoupons = new UsableUserCouponMapResponse();
+			emptyCoupons.setUsableUserCouponMap(new HashMap<>());
+			mav.addObject("coupons", emptyCoupons);
+		}
 
 		return mav;
 	}
@@ -129,7 +128,6 @@ public class OrderController {
 		} catch (Exception e) {
 			ra.addFlashAttribute("globalErrorMessage", e.getMessage());
 			List<OrderItemRequest> items = request.orderItems();
-
 			if (items.size() == 1) {
 				OrderItemRequest item = items.getFirst();
 				return "redirect:/order/create?bookId=%d&quantity=%d".formatted(item.bookId(), item.bookQuantity());

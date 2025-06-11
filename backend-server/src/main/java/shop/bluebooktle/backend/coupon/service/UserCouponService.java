@@ -19,9 +19,4 @@ public interface UserCouponService {
 	Long countAllUsableCoupons(Long userId);
 
 	Long countExpiringThisMonth(Long userId);
-
-	// 쿠폰 사용 - used_at = now
-	void useCoupon(Long id);
-
-	void cancelCouponUse(Long id);
 }

@@ -40,7 +40,7 @@ public class UserCouponBookOrder {
 	private UserCoupon userCoupon;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "book_order_id", nullable = false)
+	@JoinColumn(name = "book_order_id")
 	private BookOrder bookOrder;
 
 	@ManyToOne(fetch = FetchType.LAZY)

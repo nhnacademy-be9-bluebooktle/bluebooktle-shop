@@ -41,14 +41,4 @@ public class CouponServiceImpl implements CouponService {
 	public Long countExpiringThisMonth() {
 		return couponRepository.countExpiringThisMonth();
 	}
-
-	@Override
-	public void useCoupon(Long id) {
-		couponRepository.useCoupon(id);
-	}
-
-	@Override
-	public void cancelCoupon(Long id) {
-		couponRepository.cancelCoupon(id);
-	}
 }
