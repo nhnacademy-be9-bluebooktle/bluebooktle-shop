@@ -72,7 +72,6 @@ public class UserServiceImpl implements UserService {
 			.email(user.getEmail())
 			.name(user.getName())
 			.loginId(user.getLoginId())
-			.phoneNumber(user.getPhoneNumber())
 			.type(user.getType())
 			.encodedPassword(user.getPassword())
 			.membershipLevel(user.getMembershipLevel())
@@ -104,11 +103,14 @@ public class UserServiceImpl implements UserService {
 	@Override
 	@Transactional
 	public void updateUserAdmin(Long userId, AdminUserUpdateRequest request) {
+
 		User user = userRepository.findById(userId)
 			.orElseThrow(UserNotFoundException::new);
 
 		MembershipLevel membershipLevel = null;
+
 		if (request.getMembershipId() != null) {
+
 			membershipLevel = membershipLevelRepository.findById(request.getMembershipId())
 				.orElseThrow(() -> new MembershipNotFoundException("회원 등급을 찾을 수 없습니다: " + request.getMembershipId()));
 		}
@@ -130,6 +132,14 @@ public class UserServiceImpl implements UserService {
 	@Override
 	@Transactional(readOnly = true)
 	public UserTotalPointResponse findUserTotalPoints(Long userId) {
+
+		if (userId == null) {
+			throw new IllegalArgumentException();
+		}
+		else if (userRepository.findById(userId).isEmpty() ) {
+			throw new UserNotFoundException();
+		}
+
 		BigDecimal totalPoints = userRepository.findPointBalanceByLoginId(userId).orElse(BigDecimal.ZERO);
 		return new UserTotalPointResponse(totalPoints);
 	}

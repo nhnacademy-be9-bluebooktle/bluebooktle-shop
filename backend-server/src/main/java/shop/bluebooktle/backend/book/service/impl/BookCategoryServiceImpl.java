@@ -110,19 +110,30 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 		BookCategory bookCategory = bookCategoryRepository.findById(bookCategoryId)
 			.orElseThrow(BookCategoryNotFoundException::new);
 		Category updatedCategory = requireCategory(updatedCategoryId);
+
+		// updatedCategory와 도서가 이미 관계가 있을 시 예외 처리
+		if (bookCategoryRepository.existsByBookAndCategory(bookCategory.getBook(), updatedCategory)) {
+			throw new BookCategoryAlreadyExistsException(bookCategory.getBook().getId(), updatedCategory.getId());
+		}
+
 		bookCategory.setCategory(updatedCategory);
 	}
 
 	@Override
 	public void updateBookCategory(Long updatedCategoryId, Long categoryId, Long bookId) {
+
 		Category category = requireCategory(categoryId);
 		Book book = requireBook(bookId);
-		if (!bookCategoryRepository.existsByBookAndCategory(book, category)) {
-			throw new BookCategoryNotFoundException(book.getId(), category.getId());
-		}
-		Category updatedCategory = requireCategory(updatedCategoryId);
+
 		BookCategory bookCategory = bookCategoryRepository.findByBookAndCategory(book, category)
-			.orElseThrow(BookCategoryNotFoundException::new);
+			.orElseThrow(() -> new BookCategoryNotFoundException(bookId, categoryId));
+
+		Category updatedCategory = requireCategory(updatedCategoryId);
+
+		if (bookCategoryRepository.existsByBookAndCategory(book, updatedCategory)) {
+			throw new BookCategoryAlreadyExistsException(book.getId(), updatedCategory.getId());
+		}
+
 		bookCategory.setCategory(updatedCategory);
 	}
 

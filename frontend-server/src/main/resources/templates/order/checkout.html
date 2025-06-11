@@ -533,6 +533,19 @@
                                       th:text="'- ' + ${#numbers.formatDecimal(coupon.appliedDiscountAmount, 0, 'COMMA', 0, 'POINT')} + '원'"></span>
                             </div>
                         </th:block>
+                        <th:block th:if="${order.appliedCoupons != null}">
+                            <div class="summary-line coupon-detail-header"
+                                 th:if="${order.appliedCoupons.?[target != null && target.toString() == 'BOOK'].size() > 0}">
+                                <span class="label" style="text-decoration: underline;">└ 도서별 적용 쿠폰:</span>
+                            </div>
+                            <div th:each="coupon : ${order.appliedCoupons}"
+                                 th:if="${coupon.target != null && coupon.target.toString() == 'BOOK'}"
+                                 class="summary-line coupon-item-detail">
+                                <span class="label" th:text="${coupon.couponName}"></span>
+                                <span class="value discount"
+                                      th:text="'- ' + ${#numbers.formatDecimal(coupon.appliedDiscountAmount, 0, 'COMMA', 0, 'POINT')} + '원'"></span>
+                            </div>
+                        </th:block>
 
                         <div class="summary-line sub-total-line">
                             <span class="label">쿠폰 적용 후 합계:</span>
@@ -597,7 +610,7 @@
         const tossClientKeyFinal = /*[[${tossClientKey}]]*/ null;
         const orderIdForPaymentFinal = orderData ? orderData.orderKey.toString() : 'UNKNOWN_ORDER_ID';
         const orderNameForPaymentFinal = orderData ? orderData.orderName : '상품명 불명';
-        const successUrlFinal = /*[[${successUrl}]]*/ '';
+        const tossSuccessUrlFinal = /*[[${tossSuccessUrl}]]*/ '';
         const failUrlFinal = /*[[${failUrl}]]*/ '';
         const customerNameForPaymentFinal = /*[[${customerNameForPayment}]]*/ '고객님';
 
@@ -654,99 +667,67 @@
 
         // === 이벤트 리스너 및 초기화 ===
         document.addEventListener('DOMContentLoaded', function () {
-            console.log("DOMContentLoaded event fired.");
-
             if (!orderData) {
-                console.warn("주문 상세 정보(orderData)가 없어 결제 페이지 초기화를 중단합니다.");
+                console.error("주문 상세 정보(orderData)가 없어 결제 페이지 초기화를 중단합니다.");
                 if (paymentButton) paymentButton.disabled = true;
-                const requiredElements = {
-                    pointDiscountDisplay, finalTotalPriceDisplay, paymentButton, customerEmailInput
-                };
-                for (const key in requiredElements) {
-                    if (!requiredElements[key]) {
-                        console.error(`페이지 초기화에 필요한 중요 DOM 요소 '${key}'를 찾을 수 없습니다. HTML ID를 확인해주세요.`);
-                    }
-                }
                 return;
             }
             if (!tossClientKeyFinal) {
-                console.error("Toss Payments 클라이언트 키가 없습니다. 결제를 진행할 수 없습니다.");
+                console.error("Toss Payments 클라이언트 키가 없습니다.");
                 if (paymentButton) paymentButton.disabled = true;
                 return;
             }
 
-            // Initialize Toss Payments (standard SDK)
+            // Toss Payments 객체 초기화
             tossPayments = TossPayments(tossClientKeyFinal);
 
-            updateFinalCheckoutSummary(); // Initial text update and amount calculation
+            // 페이지 로드 시 결제 요약 정보 업데이트
+            updateFinalCheckoutSummary();
 
             if (paymentButton) {
-                console.log("Payment button found, attaching onclick handler.");
                 paymentButton.onclick = function (evt) {
-                    console.log("결제 버튼 클릭됨.");
                     evt.preventDefault();
-                    const customerEmailForPayment = customerEmailInput ? customerEmailInput.value.trim() : "";
-                    console.log("Email for payment:", customerEmailForPayment);
-                    console.log("Current final amount for payment:", currentFinalAmountForPayment);
+                    paymentButton.disabled = true;
+                    paymentButton.querySelector('span').textContent = '주문 처리 중...';
 
+                    const customerEmailForPayment = customerEmailInput ? customerEmailInput.value.trim() : "";
+
+                    // [수정됨] 최종 결제 금액이 0원 이하일 경우 (포인트 전액 사용)
                     if (currentFinalAmountForPayment <= 0) {
-                        alert("결제할 금액이 없습니다. (0원 주문 처리 로직은 서버에서 구현 필요)");
-                        return;
+                        console.log("포인트 전액 결제를 시작합니다. 서버로 리다이렉트합니다.");
+                        // fetch 대신, 컨트롤러로 직접 페이지를 이동시켜 결제를 처리합니다.
+                        // orderKey를 paymentKey로 함께 전달합니다.
+                        const pointProcessUrl = `/order/point/process?orderId=${orderIdForPaymentFinal}&amount=0&paymentKey=${orderIdForPaymentFinal}`;
+                        window.location.href = pointProcessUrl;
+                        return; // 함수 실행 종료
                     }
 
-
+                    // Toss Payments 결제창 호출
                     if (tossPayments) {
-                        const paymentMethod = 'TOSSPAY';
-                        const paymentData = {
-                            amount: Math.max(0, currentFinalAmountForPayment),
-                            currency: 'KRW',
-                            orderId: orderIdForPaymentFinal,
-                            orderName: orderNameForPaymentFinal,
-                            customerName: customerNameForPaymentFinal,
-                            customerEmail: customerEmailForPayment, // 사용자가 입력한 이메일 사용
-                            successUrl: successUrlFinal,
-                            failUrl: failUrlFinal
-                        };
-
-                        console.log("--- Toss Payments Request ---");
-                        console.log("Payment Method:", paymentMethod);
-                        console.log("Payment Data:", JSON.stringify(paymentData, null, 2));
-                        console.log("  amount:", paymentData.amount);
-                        console.log("  currency:", paymentData.currency);
-                        console.log("  orderId:", paymentData.orderId);
-                        console.log("  orderName:", paymentData.orderName);
-                        console.log("  customerName:", paymentData.customerName);
-                        console.log("  customerEmail:", paymentData.customerEmail);
-                        console.log("  successUrl:", paymentData.successUrl);
-                        console.log("  failUrl:", paymentData.failUrl);
-                        console.log("-----------------------------");
                         tossPayments.requestPayment('TOSSPAY', {
                             amount: Math.max(0, currentFinalAmountForPayment),
-                            currency: 'KRW',
                             orderId: orderIdForPaymentFinal,
                             orderName: orderNameForPaymentFinal,
                             customerName: customerNameForPaymentFinal,
                             customerEmail: customerEmailForPayment,
-                            successUrl: successUrlFinal,
+                            successUrl: tossSuccessUrlFinal,
                             failUrl: failUrlFinal
                         }).catch(function (error) {
-                            console.error("Toss Payments Error:", error);
-                            let message = "결제 요청 중 오류가 발생했습니다.";
-                            if (error.code) {
-                                message += ` (오류 코드: ${error.code})`;
-                            }
-                            if (error.message) {
-                                message += `: ${error.message}`;
-                            }
-                            alert(message);
+                            console.error("Toss Payments 오류:", error);
+                            alert(`결제 요청 중 오류가 발생했습니다: ${error.message || '알 수 없는 오류'}`);
+                        }).finally(() => {
+                            // 결제창이 닫히면 버튼을 다시 활성화합니다.
+                            paymentButton.disabled = false;
+                            updateFinalCheckoutSummary();
                         });
                     } else {
-                        alert("Toss Payments가 제대로 초기화되지 않았습니다. 페이지를 새로고침 후 다시 시도해주세요.");
-                        console.error("tossPayments is null at the time of payment request.");
+                        alert("Toss Payments가 초기화되지 않았습니다. 페이지를 새로고침 해주세요.");
+                        paymentButton.disabled = false;
+                        updateFinalCheckoutSummary();
                     }
                 };
             } else {
-                console.error("결제 버튼(id='final-payment-button')을 찾을 수 없습니다!");
+                console.error("결제 버튼(id='final-payment-button')을 찾을 수 없습니다.");
             }
         });
     </script>

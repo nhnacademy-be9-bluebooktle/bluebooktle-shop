@@ -114,37 +114,6 @@ public class CategoryControllerTest {
 	}
 
 	@Test
-	@DisplayName("특정 카테고리 트리 조회 성공")
-	@WithMockUser
-	void getCategoryTreeByIdSuccess() throws Exception {
-		// given
-		Long categoryId = 1L;
-		CategoryTreeResponse categoryTree = new CategoryTreeResponse(categoryId, "카테고리1", List.of(
-			new CategoryTreeResponse(2L, "카테고리1_1", List.of()),
-			new CategoryTreeResponse(3L, "카테고리1_2", List.of()),
-			new CategoryTreeResponse(4L, "카테고리1_3", List.of())
-		));
-		when(categoryService.getCategoryTreeById(categoryId)).thenReturn(categoryTree);
-
-		// when & then
-		mockMvc.perform(get("/api/categories/{categoryId}/tree", categoryId)
-				.accept(MediaType.APPLICATION_JSON).with(csrf()))
-			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.status").value("success"))
-			.andExpect(jsonPath("$.data.id").value(categoryTree.id()))
-			.andExpect(jsonPath("$.data.name").value(categoryTree.name()))
-			.andExpect(jsonPath("$.data.children.length()").value(categoryTree.children().size()))
-			.andExpect(jsonPath("$.data.children[0].id").value(2))
-			.andExpect(jsonPath("$.data.children[0].name").value("카테고리1_1"))
-			.andExpect(jsonPath("$.data.children[1].id").value(3))
-			.andExpect(jsonPath("$.data.children[1].name").value("카테고리1_2"))
-			.andExpect(jsonPath("$.data.children[2].id").value(4))
-			.andExpect(jsonPath("$.data.children[2].name").value("카테고리1_3"));
-
-		verify(categoryService, times(1)).getCategoryTreeById(categoryId);
-	}
-
-	@Test
 	@DisplayName("최상위 카테고리 등록 성공")
 	@WithMockUser
 	void registerRootCategorySuccess() throws Exception {
@@ -239,57 +208,5 @@ public class CategoryControllerTest {
 			.andExpect(status().isOk());
 
 		verify(categoryService, times(1)).updateCategory(eq(categoryId), any(CategoryUpdateRequest.class));
-	}
-
-	@Test
-	@DisplayName("특정 상위 카테고리의 하위 카테고리 목록 조회 성공")
-	@WithMockUser
-	void getSubcategoriesSuccess() throws Exception {
-		// given
-		Long parentCategoryId = 1L;
-		List<CategoryResponse> subcategories = List.of(
-			new CategoryResponse(2L, "Subcategory 1", null, ""),
-			new CategoryResponse(3L, "Subcategory 2", null, "")
-		);
-
-		when(categoryService.getSubcategoriesByParentCategoryId(parentCategoryId))
-			.thenReturn(subcategories);
-
-		// when & then
-		mockMvc.perform(get("/api/categories/{parentCategoryId}/subcategories", parentCategoryId)
-				.accept(MediaType.APPLICATION_JSON).with(csrf()))
-			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.status").value("success"))
-			.andExpect(jsonPath("$.data.length()").value(subcategories.size()))
-			.andExpect(jsonPath("$.data[0].categoryId").value(subcategories.get(0).categoryId()))
-			.andExpect(jsonPath("$.data[0].name").value(subcategories.get(0).name()));
-
-		verify(categoryService, times(1)).getSubcategoriesByParentCategoryId(parentCategoryId);
-	}
-
-	@Test
-	@DisplayName("특정 하위 카테고리가 포함된 상위 카테고리 목록 조회 성공")
-	@WithMockUser
-	void getParentCategoriesSuccess() throws Exception {
-		// given
-		Long childCategoryId = 1L;
-		List<CategoryResponse> parentCategories = List.of(
-			new CategoryResponse(2L, "Parent Category 1", null, "/1/2"),
-			new CategoryResponse(3L, "Parent Category 2", null, "/2/3")
-		);
-
-		when(categoryService.getParentCategoriesByLeafCategoryId(childCategoryId))
-			.thenReturn(parentCategories);
-
-		// when & then
-		mockMvc.perform(get("/api/categories/{categoryId}/parentcategories", childCategoryId)
-				.accept(MediaType.APPLICATION_JSON).with(csrf()))
-			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.status").value("success"))
-			.andExpect(jsonPath("$.data.length()").value(parentCategories.size()))
-			.andExpect(jsonPath("$.data[0].categoryId").value(parentCategories.get(0).categoryId()))
-			.andExpect(jsonPath("$.data[0].name").value(parentCategories.get(0).name()));
-
-		verify(categoryService, times(1)).getParentCategoriesByLeafCategoryId(childCategoryId);
 	}
 }
