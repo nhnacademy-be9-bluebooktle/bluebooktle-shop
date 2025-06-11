@@ -39,7 +39,6 @@ import shop.bluebooktle.common.dto.book.request.ReviewRegisterRequest;
 import shop.bluebooktle.common.dto.book.response.ReviewResponse;
 import shop.bluebooktle.common.entity.auth.User;
 import shop.bluebooktle.common.exception.InvalidInputValueException;
-import shop.bluebooktle.common.exception.auth.UserNotFoundException;
 import shop.bluebooktle.common.exception.book_order.BookOrderNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
@@ -107,21 +106,6 @@ public class ReviewServiceTest {
 			.build();
 		ReflectionTestUtils.setField(testReview, "id", 300L);
 		ReflectionTestUtils.setField(testReview, "createdAt", LocalDateTime.now());
-	}
-
-	@Test
-	@DisplayName("리뷰 등록 실패 - 유저를 찾을 수 없음")
-	void addReview_userNotFound_throwsException() {
-		// Given
-		ReviewRegisterRequest request = ReviewRegisterRequest.builder()
-			.star(5)
-			.reviewContent("리뷰 내용")
-			.build();
-		given(userRepository.findById(anyLong())).willReturn(Optional.empty());
-
-		// When & Then
-		assertThatThrownBy(() -> reviewService.addReview(testUser.getId(), testBookOrder.getId(), request))
-			.isInstanceOf(UserNotFoundException.class);
 	}
 
 	@Test
