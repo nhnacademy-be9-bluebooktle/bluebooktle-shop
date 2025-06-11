@@ -56,7 +56,7 @@ public class ReviewController {
 	}
 
 	// 도서 상세 페이지에서 리뷰 목록 조회
-	@GetMapping("/book/{bookId}") //도서 상세페이지에 맞게 수정필요
+	@GetMapping("/book/{bookId}")
 	public ResponseEntity<JsendResponse<PaginationData<ReviewResponse>>> getReviewsForBook(
 		@PathVariable Long bookId,
 		@RequestParam(value = "page", defaultValue = "0") int page,
