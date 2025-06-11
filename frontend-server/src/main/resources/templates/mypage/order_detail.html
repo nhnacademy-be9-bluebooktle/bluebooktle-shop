@@ -606,7 +606,7 @@
                     <label class="label-kitsch handwriting-font-kitsch" for="refundReason">반품 사유:</label>
                     <select class="select-kitsch" id="refundReason" name="reason" required>
                         <option value="">사유를 선택해주세요</option>
-                        <th:block th:each="reason : ${T(shop.bluebooktle.common.domain.RefundReason).values()}">
+                        <th:block th:each="reason : ${T(shop.bluebooktle.common.domain.refund.RefundReason).values()}">
                             <option th:text="${reason.description}" th:value="${reason}"></option>
                         </th:block>
                     </select>

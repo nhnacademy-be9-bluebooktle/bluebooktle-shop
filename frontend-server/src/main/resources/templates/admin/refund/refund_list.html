@@ -66,6 +66,7 @@
                     <th>요청금액</th>
                     <th>사유</th>
                     <th>상태</th>
+                    <th>관리</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -73,10 +74,7 @@
                     <td colspan="7" style="text-align: center;">조회된 환불 요청이 없습니다.</td>
                 </tr>
                 <tr th:each="refund : ${paginationData.content}">
-                    <td>
-                        <a th:href="@{/admin/refunds/{id}(id=${refund.refundId})}" th:text="${refund.refundId}"
-                           title="상세 보기"></a>
-                    </td>
+                    <td th:text="${refund.refundId}"></td>
                     <td>
                         <a th:href="@{/admin/orders/{id}(id=${refund.orderId})}" th:text="${refund.orderKey}"
                            target="_blank" title="연관 주문 상세 보기"></a>
@@ -86,6 +84,12 @@
                     <td th:text="${#numbers.formatInteger(refund.refundPrice, 0, 'COMMA') + '원'}"></td>
                     <td th:text="${refund.reason.description}"></td>
                     <td th:text="${refund.status.description}"></td>
+                    <td>
+                        <a th:href="@{/admin/refunds/{id}(id=${refund.refundId})}"
+                           class="admin-btn admin-btn--sm admin-btn--info" title="상세 보기">
+                            <i class="fas fa-search-plus"></i> 상세
+                        </a>
+                    </td>
                 </tr>
                 </tbody>
             </table>
