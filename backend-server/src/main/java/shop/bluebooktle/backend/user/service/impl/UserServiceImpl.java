@@ -25,6 +25,7 @@ import shop.bluebooktle.common.dto.user.request.UserSearchRequest;
 import shop.bluebooktle.common.dto.user.request.UserUpdateRequest;
 import shop.bluebooktle.common.dto.user.response.AddressResponse;
 import shop.bluebooktle.common.dto.user.response.AdminUserResponse;
+import shop.bluebooktle.common.dto.user.response.UserMembershipLevelResponse;
 import shop.bluebooktle.common.dto.user.response.UserResponse;
 import shop.bluebooktle.common.dto.user.response.UserTotalPointResponse;
 import shop.bluebooktle.common.dto.user.response.UserWithAddressResponse;
@@ -221,5 +222,11 @@ public class UserServiceImpl implements UserService {
 		messagePayload.setBotName("인증 코드 전송");
 		messagePayload.setText(loginId + ": " + authCode);
 		verificationMessageClient.sendMessage(messagePayload);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public UserMembershipLevelResponse findUserNetSpentAmountForLastThreeMonthsByUserId(Long userId) {
+		return userRepository.findUserNetSpentAmountForLastThreeMonthsByUserId(userId);
 	}
 }

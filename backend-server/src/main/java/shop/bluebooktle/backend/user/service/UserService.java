@@ -8,6 +8,7 @@ import shop.bluebooktle.common.dto.user.request.ReactivateDormantUserRequest;
 import shop.bluebooktle.common.dto.user.request.UserSearchRequest;
 import shop.bluebooktle.common.dto.user.request.UserUpdateRequest;
 import shop.bluebooktle.common.dto.user.response.AdminUserResponse;
+import shop.bluebooktle.common.dto.user.response.UserMembershipLevelResponse;
 import shop.bluebooktle.common.dto.user.response.UserResponse;
 import shop.bluebooktle.common.dto.user.response.UserTotalPointResponse;
 import shop.bluebooktle.common.dto.user.response.UserWithAddressResponse;
@@ -32,4 +33,6 @@ public interface UserService {
 	void reactivateDormantUser(ReactivateDormantUserRequest request);
 
 	void issueDormantAuthCode(String loginId);
+
+	UserMembershipLevelResponse findUserNetSpentAmountForLastThreeMonthsByUserId(Long userId);
 }
