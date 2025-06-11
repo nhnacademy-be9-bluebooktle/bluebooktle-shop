@@ -13,10 +13,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 import shop.bluebooktle.backend.book.service.BookRegisterService;
 import shop.bluebooktle.backend.book.service.BookService;
 import shop.bluebooktle.common.dto.book.BookSortType;
@@ -29,18 +30,18 @@ import shop.bluebooktle.common.dto.book.response.BookDetailResponse;
 import shop.bluebooktle.common.dto.book.response.BookInfoResponse;
 import shop.bluebooktle.common.dto.common.JsendResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
-import shop.bluebooktle.common.dto.book.response.BookDetailResponse;
 
 @RestController
 @RequestMapping("/api/books")
 @RequiredArgsConstructor
 @Slf4j
+@Tag(name = "도서 API", description = "관리자 도서 CRUD 및 도서 조회 API")
 public class BookController {
 
 	private final BookService bookService;
 	private final BookRegisterService bookRegisterService;
 
-	//도서 등록
+	@Operation(summary = "도서 직접 등록", description = "사용자에게 입력받은 값을 사용해 도서를 등록합니다.")
 	@PostMapping
 	public ResponseEntity<JsendResponse<Void>> registerBook(
 		@Valid @RequestBody BookAllRegisterRequest request) {
@@ -48,37 +49,47 @@ public class BookController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(JsendResponse.success());
 	}
 
-	//도서 정보 조회
-	@GetMapping("/{bookId}")
-	public ResponseEntity<JsendResponse<BookDetailResponse>> getBook(@PathVariable Long bookId) {
+	@Operation(summary = "도서 조회 - 상세 페이지", description = "도서 상세 페이지를 위해 해당 도서의 상세 정보를 조회합니다.")
+	@GetMapping("/{book-id}")
+	public ResponseEntity<JsendResponse<BookDetailResponse>> getBook(
+		@PathVariable(name = "book-id") Long bookId
+	) {
 		BookDetailResponse bookResponse = bookService.findBookById(bookId);
 		return ResponseEntity.ok(JsendResponse.success(bookResponse));
 	}
 
-	//도서 정보 조회 - 관리자
-	@GetMapping("/{bookId}/admin")
-	public ResponseEntity<JsendResponse<BookAllResponse>> getBookByAdmin(@PathVariable Long bookId) {
+	@Operation(summary = "도서 조회 - 관리자", description = "관리자 페이지의 도서 수정 페이지를 위해 해당 도서의 상세 정보를 조회합니다.")
+	@GetMapping("/{book-id}/admin")
+	public ResponseEntity<JsendResponse<BookAllResponse>> getBookByAdmin(
+		@PathVariable(name = "book-id") Long bookId
+	) {
 		BookAllResponse bookResponse = bookService.findBookAllById(bookId);
 		return ResponseEntity.ok(JsendResponse.success(bookResponse));
 	}
 
-	//도서 정보 수정
-	@PutMapping("/{bookId}")
+	@Operation(summary = "도서 수정", description = "해당 도서의 정보를 수정합니다.")
+	@PutMapping("/{book-id}")
 	public ResponseEntity<JsendResponse<Void>> updateBook(
-		@PathVariable Long bookId,
-		@Valid @RequestBody BookUpdateServiceRequest request) {
+		@PathVariable(name = "book-id") Long bookId,
+		@Valid @RequestBody BookUpdateServiceRequest request
+	) {
 		bookService.updateBook(bookId, request);
 		return ResponseEntity.ok(JsendResponse.success());
 	}
 
-	//도서 정보 삭제
-	@DeleteMapping("/{bookId}")
-	public ResponseEntity<JsendResponse<Void>> deleteBook(@PathVariable Long bookId) {
+	@Operation(summary = "도서 삭제", description = "해당 도서를 삭제합니다.")
+	@DeleteMapping("/{book-id}")
+	public ResponseEntity<JsendResponse<Void>> deleteBook(
+		@PathVariable(name = "book-id") Long bookId
+	) {
 		bookService.deleteBook(bookId);
 		return ResponseEntity.ok(JsendResponse.success());
 	}
 
-	// 도서 목록 조회 및 검색 기능
+	@Operation(
+		summary = "키워드 검색 및 정렬 결과 도서 목록 조회",
+		description = "키워드 검색 및 정렬한 도서 목록을 조회합니다."
+	)
 	@GetMapping
 	public ResponseEntity<JsendResponse<PaginationData<BookInfoResponse>>> getPagedBooks(
 		@RequestParam("page") int page,
@@ -91,7 +102,10 @@ public class BookController {
 		return ResponseEntity.ok(JsendResponse.success(paginationData));
 	}
 
-	// 관리자 페이지 도서 목록 조회 및 검색 기능
+	@Operation(
+		summary = "도서 목록 조회 및 검색 기능 - 관리자",
+		description = "관리자 페이지에서 등록된 도서 목록 및 키워드 검색 결과 도서 목록을 조회합니다."
+	)
 	@GetMapping("/admin")
 	public ResponseEntity<JsendResponse<PaginationData<AdminBookResponse>>> getPagedBooksByAdmin(
 		@RequestParam("page") int page,
@@ -103,9 +117,9 @@ public class BookController {
 		return ResponseEntity.ok(JsendResponse.success(paginationData));
 	}
 
-	@GetMapping("/order/{bookId}")
+	@GetMapping("/order/{book-id}")
 	public ResponseEntity<JsendResponse<BookCartOrderResponse>> getBookCartOrders(
-		@PathVariable Long bookId,
+		@PathVariable(name = "book-id") Long bookId,
 		@RequestParam("quantity") int quantity
 	) {
 		BookCartOrderResponse response = bookService.getBookCartOrder(bookId, quantity);

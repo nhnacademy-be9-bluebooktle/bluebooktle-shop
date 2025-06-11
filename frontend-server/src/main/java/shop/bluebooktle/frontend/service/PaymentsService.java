@@ -5,5 +5,5 @@ import shop.bluebooktle.common.dto.payment.response.PaymentConfirmResponse;
 
 public interface PaymentsService {
 
-	PaymentConfirmResponse confirm(PaymentConfirmRequest req);
+	PaymentConfirmResponse confirm(PaymentConfirmRequest req, String paymentMethod);
 }

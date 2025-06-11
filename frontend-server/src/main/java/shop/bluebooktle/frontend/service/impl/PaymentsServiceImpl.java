@@ -17,9 +17,7 @@ public class PaymentsServiceImpl implements PaymentsService {
 	private final PaymentRepository paymentRepository;
 
 	@Override
-	public PaymentConfirmResponse confirm(PaymentConfirmRequest req) {
-		// 현재는 TOSS로 고정
-		String gatewayName = "TOSS";
-		return paymentRepository.confirmPayment(gatewayName, req);
+	public PaymentConfirmResponse confirm(PaymentConfirmRequest req, String paymentMethod) {
+		return paymentRepository.confirmPayment(paymentMethod.toUpperCase(), req);
 	}
 }

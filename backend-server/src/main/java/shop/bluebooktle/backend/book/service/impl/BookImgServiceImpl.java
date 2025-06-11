@@ -18,7 +18,6 @@ import shop.bluebooktle.backend.book.service.ImgService;
 import shop.bluebooktle.common.dto.book.request.BookImgRegisterRequest;
 import shop.bluebooktle.common.dto.book.request.img.ImgRegisterRequest;
 import shop.bluebooktle.common.dto.book.response.BookImgResponse;
-import shop.bluebooktle.common.dto.book.response.BookInfoResponse;
 import shop.bluebooktle.common.dto.book.response.img.ImgResponse;
 import shop.bluebooktle.common.exception.book.BookIdNullException;
 import shop.bluebooktle.common.exception.book.BookImgAlreadyExistsException;
@@ -104,37 +103,21 @@ public class BookImgServiceImpl implements BookImgService {
 
 	@Transactional(readOnly = true)
 	@Override
-	public List<BookInfoResponse> getBookByImgId(Long imgId) {
-		if (imgId == null) {
-			throw new ImgIdNullException();
-		}
-
-		Img img = imgRepository.findById(imgId).orElseThrow(() -> new ImgNotFoundException());
-
-		List<Book> books = bookImgRepository.findBooksByImg(img);
-		/*return books.stream()
-			.map(book -> new BookInfoResponse(book.getId()))
-			.collect(Collectors.toList());*/
-		return null;
-	}
-
-	@Transactional(readOnly = true)
-	@Override
 	public Optional<BookImgResponse> getThumbnailByBookId(Long bookId) {
 		if (bookId == null) {
-			throw new IllegalArgumentException("Book ID must not be null");
+			throw new BookIdNullException();
 		}
 		/*return bookImgRepository.findByBookId(bookId).stream()
 			.filter(BookImg::isThumbnail)
 			.findFirst()
-			.map(rel -> BookImgResponse.builder()
+			.map(bookImg -> BookImgResponse.builder()
 				.imgResponse(ImgResponse.builder()
-					.id(rel.getImg().getId())
-					.imgUrl(rel.getImg().getImgUrl())
-					.createdAt(rel.getImg().getCreatedAt())
+					.id(bookImg.getImg().getId())
+					.imgUrl(bookImg.getImg().getImgUrl())
+					.createdAt(bookImg.getImg().getCreatedAt())
 					.build()
 				)
-				.bookInfoResponse(new BookInfoResponse(rel.getBook().getId()))
+				.bookInfoResponse(new BookInfoResponse(bookImg.getBook().getId()))
 				.isThumbnail(true)
 				.build()
 			);*/
@@ -150,10 +133,10 @@ public class BookImgServiceImpl implements BookImgService {
 			throw new ImgIdNullException();
 		}
 
-		BookImg relation = bookImgRepository.findByBookIdAndImgId(bookId, imgId)
+		BookImg bookImg = bookImgRepository.findByBookIdAndImgId(bookId, imgId)
 			.orElseThrow(() -> new BookImgNotFoundException(bookId, imgId));
 
-		bookImgRepository.delete(relation);
+		bookImgRepository.delete(bookImg);
 	}
 
 	@Override

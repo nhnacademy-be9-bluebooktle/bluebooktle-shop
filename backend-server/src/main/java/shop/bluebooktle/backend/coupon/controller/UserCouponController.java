@@ -8,8 +8,6 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -72,20 +70,6 @@ public class UserCouponController {
 		@AuthenticationPrincipal UserPrincipal userPrincipal) {
 		Long count = userCouponService.countExpiringThisMonth(userPrincipal.getUserId());
 		return ResponseEntity.ok(JsendResponse.success(count));
-	}
-
-	@Operation(summary = "쿠폰 사용", description = "유저가 보유한 쿠폰 중 주문에 해당하는 쿠폰을 사용합니다.")
-	@PostMapping("/{id}/use")
-	public ResponseEntity<Void> useCoupon(@PathVariable Long id) {
-		userCouponService.useCoupon(id);
-		return ResponseEntity.ok().build();
-	}
-
-	@Operation(summary = "쿠폰 사용 취소", description = "사용했던 쿠폰을 취소합니다.")
-	@PostMapping("/{id}/cancel")
-	public ResponseEntity<Void> cancelCoupon(@PathVariable Long id) {
-		userCouponService.cancelCouponUse(id);
-		return ResponseEntity.ok().build();
 	}
 
 }

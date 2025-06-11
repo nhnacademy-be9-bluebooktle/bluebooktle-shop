@@ -66,15 +66,14 @@ public class OrderController {
 		Model model
 	) {
 		ModelAndView mav = new ModelAndView("order/create_form");
-		List<BookCartOrderResponse> bookItems;
 
+		List<BookCartOrderResponse> bookItems;
 		if (bookId != null) {
 			BookCartOrderResponse bookInfo = bookService.getBookCartOrder(bookId, quantity);
 			bookItems = List.of(bookInfo);
 		} else {
 			bookItems = cartService.getSelectedCartItemsForOrder(guestId, bookIds);
 		}
-
 		mav.addObject("bookItems", bookItems);
 
 		String defaultOrderName;
@@ -107,11 +106,11 @@ public class OrderController {
 				.toList();
 			UsableUserCouponMapResponse coupons = couponService.getUsableCouponsForOrder(bookIdsForCoupon);
 			mav.addObject("coupons", coupons);
-		} //todo else
-		UsableUserCouponMapResponse emptyCoupons = new UsableUserCouponMapResponse();
-		emptyCoupons.setUsableUserCouponMap(new HashMap<>());
-		mav.addObject("coupons", emptyCoupons);
-		// mav.addObject("coupons", new UsableUserCouponMapResponse());
+		} else {//todo else
+			UsableUserCouponMapResponse emptyCoupons = new UsableUserCouponMapResponse();
+			emptyCoupons.setUsableUserCouponMap(new HashMap<>());
+			mav.addObject("coupons", emptyCoupons);
+		}
 
 		return mav;
 	}
@@ -129,7 +128,6 @@ public class OrderController {
 		} catch (Exception e) {
 			ra.addFlashAttribute("globalErrorMessage", e.getMessage());
 			List<OrderItemRequest> items = request.orderItems();
-
 			if (items.size() == 1) {
 				OrderItemRequest item = items.getFirst();
 				return "redirect:/order/create?bookId=%d&quantity=%d".formatted(item.bookId(), item.bookQuantity());
@@ -169,8 +167,10 @@ public class OrderController {
 
 		String baseUrl = String.format("%s://%s:%d", request.getScheme(), request.getServerName(),
 			request.getServerPort());
-		model.addAttribute("successUrl", baseUrl + "/order/process");
-		model.addAttribute("failUrl", baseUrl + "/order/fail");
+		model.addAttribute("tossSuccessUrl", baseUrl + "/order/toss/process");
+		model.addAttribute("failUrl", baseUrl + "/order/toss/fail");
+
+		model.addAttribute("pointSuccessUrl", baseUrl + "/order/point/process");
 
 		model.addAttribute("initialSubTotal", orderDetails.getSubTotal());
 		model.addAttribute("initialPackagingTotal", orderDetails.getPackagingTotal());
@@ -180,19 +180,28 @@ public class OrderController {
 		return "order/checkout";
 	}
 
-	@GetMapping("/process")
+	@GetMapping("/{paymentMethod}/process")
 	public String processOrder(
+		@PathVariable String paymentMethod,
 		@RequestParam String paymentKey,
 		@RequestParam String orderId,
 		@RequestParam Long amount,
 		RedirectAttributes redirectAttributes,
 		Model model
 	) {
+		if ("point".equalsIgnoreCase(paymentMethod)) {
+			if (amount != 0) {
+				redirectAttributes.addFlashAttribute("GlobalErrorTitle", "결제 오류");
+				redirectAttributes.addFlashAttribute("GlobalErrorMessage", "포인트 전액 결제는 결제 금액이 0원이어야 합니다.");
+				Boolean isLoggedIn = (Boolean)model.getAttribute("isLoggedIn");
+				return Boolean.TRUE.equals(isLoggedIn) ? "redirect:/mypage/orders" : "redirect:/";
+			}
+		}
 
 		PaymentConfirmRequest req = new PaymentConfirmRequest(paymentKey, orderId, amount);
 
 		try {
-			PaymentConfirmResponse resp = paymentsService.confirm(req);
+			PaymentConfirmResponse resp = paymentsService.confirm(req, paymentMethod);
 			redirectAttributes.addFlashAttribute("orderData", resp);
 			return "redirect:/order/complete/" + resp.orderId();
 		} catch (Exception e) {
@@ -204,7 +213,6 @@ public class OrderController {
 			} else {
 				return "redirect:/";
 			}
-
 		}
 	}
 
@@ -243,7 +251,6 @@ public class OrderController {
 		@RequestParam(name = "message", required = false) String message,
 		RedirectAttributes redirectAttributes
 	) {
-
 		if (message != null && !message.isBlank()) {
 			redirectAttributes.addFlashAttribute("GlobalErrorTitle", code);
 			redirectAttributes.addFlashAttribute("GlobalErrorMessage", message);

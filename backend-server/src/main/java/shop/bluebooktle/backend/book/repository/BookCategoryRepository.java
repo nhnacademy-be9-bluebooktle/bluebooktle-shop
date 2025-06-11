@@ -3,8 +3,6 @@ package shop.bluebooktle.backend.book.repository;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,7 +11,7 @@ import shop.bluebooktle.backend.book.entity.Book;
 import shop.bluebooktle.backend.book.entity.BookCategory;
 import shop.bluebooktle.backend.book.entity.Category;
 
-public interface BookCategoryRepository extends JpaRepository<BookCategory, Long>, BookCategoryQueryRepository {
+public interface BookCategoryRepository extends JpaRepository<BookCategory, Long> {
 
 	Optional<BookCategory> findByBookAndCategory(Book book, Category category);
 
@@ -42,6 +40,4 @@ public interface BookCategoryRepository extends JpaRepository<BookCategory, Long
 	@Transactional
 	void deleteByCategoryIn(List<Category> categories);
 
-	// 카테고리에 해당하는 도서 목록 반환
-	Page<BookCategory> findAllByCategory(Category category, Pageable pageable);
 }

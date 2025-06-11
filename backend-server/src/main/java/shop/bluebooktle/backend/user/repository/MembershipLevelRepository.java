@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import shop.bluebooktle.common.entity.auth.MembershipLevel;
 
-public interface MembershipLevelRepository extends JpaRepository<MembershipLevel, Long> {
+public interface MembershipLevelRepository
+	extends JpaRepository<MembershipLevel, Long>, MembershipLevelQueryRepository {
 	Optional<MembershipLevel> findByName(String name);
 }
