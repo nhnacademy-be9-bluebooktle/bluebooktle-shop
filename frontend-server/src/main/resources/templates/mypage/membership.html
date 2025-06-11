@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html layout:decorate="~{_layouts/default_layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <title>마이페이지 - 회원 등급</title>
+
+    <style>
+        .membership-summary-kitsch {
+            display: flex;
+            justify-content: space-around;
+            background-color: var(--kitsch-color-4);
+            color: var(--kitsch-text-light);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            border: 3px solid var(--kitsch-text-dark);
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2), 3px 3px 0 var(--kitsch-color-5);
+        }
+
+        .membership-summary-item-kitsch {
+            text-align: center;
+        }
+
+        .membership-summary-item-kitsch .count-kitsch {
+            font-family: var(--font-display);
+            font-size: 2.2rem;
+            color: var(--kitsch-bg-main);
+            display: block;
+            line-height: 1;
+        }
+
+        .membership-summary-item-kitsch .label-kitsch {
+            font-family: var(--font-pixel);
+            font-size: 0.9rem;
+            margin-top: 0.3rem;
+            display: block;
+            color: var(--kitsch-text-light);
+            opacity: 0.9;
+        }
+
+        /* 세로 나열 */
+        .membership-list-kitsch-vertical {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        /* 등급 카드 */
+        .membership-card-kitsch {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 3px solid var(--kitsch-text-dark);
+            border-radius: 12px;
+            padding: 1.2rem;
+            box-shadow: 3px 3px 0 var(--kitsch-color-2);
+            font-family: var(--font-display);
+            position: relative;
+            transition: transform 0.2s;
+        }
+
+        .membership-card-kitsch:hover {
+            transform: translateY(-3px);
+        }
+
+        .membership-card-kitsch .membership-name {
+            font-size: 1.6rem;
+            font-weight: bold;
+            margin-bottom: 0.7rem;
+        }
+
+        .membership-card-kitsch .membership-benefit {
+            font-family: var(--font-pixel);
+            font-size: 0.95rem;
+            margin-bottom: 0.4rem;
+            color: var(--kitsch-color-5);
+        }
+
+        .membership-card-kitsch .membership-range {
+            font-family: var(--font-pixel);
+            font-size: 0.9rem;
+        }
+
+        /* 등급 ID별 배경색 */
+        .membership-card-kitsch.level-1 { /* 일반 */
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        .membership-card-kitsch.level-2 { /* 로얄 */
+            background-color: #d0e9ff;
+            color: #004085;
+        }
+
+        .membership-card-kitsch.level-3 { /* 골드 */
+            background-color: #fff4cc;
+            color: #8a6d1d;
+        }
+
+        .membership-card-kitsch.level-4 { /* 플래티넘 */
+            background-color: #e6f0f9;
+            color: #1b1e21;
+        }
+
+        /* 현재 내 등급 */
+        .membership-card-kitsch.current-level {
+            outline: 4px solid var(--kitsch-color-4);
+            outline-offset: -6px;
+            background-color: #fffbe6 !important;
+            box-shadow: 0 0 0 3px var(--kitsch-color-4);
+            border-color: var(--kitsch-color-4) !important;
+        }
+
+        .membership-badge-kitsch {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background-color: var(--kitsch-color-4);
+            color: white;
+            font-family: var(--font-pixel);
+            font-size: 0.75rem;
+            padding: 0.3rem 0.6rem;
+            border-radius: 10px;
+            box-shadow: 1px 1px 2px #555;
+            transform: rotate(8deg);
+        }
+
+        .membership-total-gauge-bar-wrapper {
+            height: 20px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .membership-total-gauge-bar {
+            height: 100%;
+        }
+
+        .gauge-progress {
+            width: 90%;
+            height: 100%;
+            display: block;
+            background-color: var(--kitsch-color-4);
+            transition: width 0.3s ease-in-out;
+        }
+
+        .membership-total-gauge-container {
+            margin-top: 2rem;
+        }
+
+        .membership-total-gauge-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            font-family: var(--font-pixel);
+            margin-bottom: 0.4rem;
+            color: var(--kitsch-text-dark);
+        }
+
+        .membership-total-gauge-bar-wrapper {
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            height: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .membership-total-gauge-bar .gauge-progress {
+            width: 0%;
+            height: 100%;
+            background-color: var(--kitsch-color-4);
+            transition: width 0.3s ease-in-out;
+            display: block;
+        }
+
+        /* 게이지 하단 상태 텍스트 (금액 등) */
+        .gauge-status-text {
+            font-size: 1.1rem;
+            font-weight: 500;
+            line-height: 1.6;
+            margin-top: 1rem;
+        }
+
+
+        .membership-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-top: 2rem;
+            font-family: 'Arial', sans-serif;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .membership-table th {
+            background-color: #f5f5f5;
+            color: #333;
+            padding: 1.2rem;
+            text-align: center;
+            font-size: 1rem;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .membership-table td {
+            padding: 1.2rem;
+            text-align: center;
+            border-bottom: 1px solid #eee;
+            font-size: 0.95rem;
+        }
+
+        .membership-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .membership-level-table-kitsch {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 0.8rem;
+        }
+
+        .membership-level-table-kitsch thead tr {
+            background-color: var(--kitsch-color-1);
+            color: var(--kitsch-text-light);
+        }
+
+        .membership-level-table-kitsch th {
+            font-family: var(--font-display);
+            font-size: 1rem;
+            padding: 0.8em 1em;
+            text-align: center;
+            border-radius: 3px;
+        }
+
+        .membership-level-table-kitsch tbody tr {
+            background-color: var(--kitsch-bg-main);
+            border: 2px solid var(--kitsch-color-5);
+            border-radius: 5px;
+            box-shadow: 1px 1px 0 var(--kitsch-color-5);
+        }
+
+        .membership-level-table-kitsch td {
+            padding: 1em;
+            font-family: var(--font-pixel);
+            font-size: 0.9rem;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .membership-level-table-kitsch td::before {
+            content: attr(data-label);
+            float: left;
+            font-weight: bold;
+            margin-right: 1rem;
+            font-family: var(--font-display);
+            color: var(--kitsch-color-1);
+        }
+
+        .membership-level-table-kitsch .highlight {
+            border: 3px solid var(--kitsch-color-4);
+            background-color: var(--kitsch-color-4); /* 예: 청록색 배경 */
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 0 10px var(--kitsch-color-4);
+        }
+
+        .membership-section-title-kitsch {
+            font-family: var(--font-display);
+            font-size: 1.6rem;
+            margin-top: 3rem;
+            margin-bottom: 1rem;
+            color: var(--kitsch-color-1); /* 버건디 등 강조색 */
+            border-bottom: 3px solid var(--kitsch-color-5);
+            display: inline-block;
+            padding-bottom: 0.3rem;
+        }
+
+        .membership-update-notice-kitsch {
+            font-size: 0.8rem;
+            color: #777;
+            margin-top: 0.5rem;
+            text-align: right;
+            font-style: italic;
+        }
+
+        .highlight {
+            background-color: #f0faff;
+        }
+
+    </style>
+
+
+</head>
+
+<body>
+<div layout:fragment="content">
+    <div class="container-kitsch section-padding-kitsch">
+        <div class="mypage-header-kitsch">
+            <h1 class="page-main-title-kitsch display-font-kitsch">
+                <i class="fas fa-user-circle"></i> 나의 회원 등급<i class="fas fa-star"></i></h1>
+        </div>
+
+        <div class="mypage-layout-kitsch">
+            <div th:replace="~{_fragments/mypage_sidebar :: mypageSidebarFragment(activeMenu='membership')}"></div>
+
+            <main class="mypage-content-kitsch">
+
+                <div class="membership-summary-kitsch">
+                    <div class="membership-summary-item-kitsch">
+                        <span class="count-kitsch" th:text="${formattedNetAmount}">0</span>
+                        <span class="label-kitsch">최근 3개월 순수 주문 금액</span>
+                    </div>
+                    <div class="membership-summary-item-kitsch">
+                        <span class="count-kitsch" th:text="${userMembership.membershipLevelName}">등급</span>
+                        <span class="label-kitsch">현재 회원 등급</span>
+                    </div>
+                </div>
+
+                <section class="mypage-section-kitsch">
+                    <h3 class="section-title-kitsch"><i class="fas fa-chart-line"></i>내 등급</h3>
+                    <div class="membership-total-gauge-container">
+                        <div class="membership-total-gauge-labels">
+                            <span>0원</span>
+                            <span>10만원</span>
+                            <span>20만원</span>
+                            <span>30만원</span>
+                        </div>
+
+                        <div class="membership-total-gauge-bar-wrapper">
+                            <div class="membership-total-gauge-bar">
+                                <div class="gauge-progress" th:style="'width:' + ${gaugePercent} + '%'"></div>
+                            </div>
+                        </div>
+
+                        <div class="gauge-status-text">
+                            <p th:text="'나의 순수 주문 금액: ' + ${formattedNetAmount} + '원'"></p>
+
+                            <p th:if="${nextLevelDiff != null and nextLevelDiff > 0}"
+                               th:text="'다음 등급까지 ' + ${formattedNextLevelDiff} + '원 남음'"></p>
+
+                            <p th:if="${nextLevelDiff != null and nextLevelDiff <= 0}">
+                                다음 등급 조건을 만족했어요!
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="mypage-section-kitsch">
+                    <h3 class="section-title-kitsch"><i class="fas fa-medal"></i>회원 등급</h3>
+                    <table class="membership-level-table-kitsch">
+                        <thead>
+                        <tr>
+                            <th>등급</th>
+                            <th>기준 금액</th>
+                            <th>혜택</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="level : ${membershipLevels}"
+                            th:classappend="${level.id.equals(currentLevelId)} ? 'highlight'">
+                            <td th:text="${level.name}">등급명</td>
+                            <td th:text="${level.minNetSpent > 0 ? #numbers.formatInteger(level.minNetSpent, 0) + '원 이상' : '-'}">
+                                기준 금액
+                            </td>
+                            <td th:text="${'결제 포인트 적립률 ' + level.rate + '%'}">혜택</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <p class="membership-update-notice-kitsch">
+                        ※ 회원 등급은 매일 새벽 3시에 업데이트됩니다.
+                    </p>
+                </section>
+
+            </main>
+        </div>
+    </div>
+</div>
+</body>
+
+
+</html>
