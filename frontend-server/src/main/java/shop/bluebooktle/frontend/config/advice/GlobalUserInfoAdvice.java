@@ -39,7 +39,7 @@ public class GlobalUserInfoAdvice {
 		}
 
 		if (request.getRequestURI().startsWith("/admin")) {
-			if (userType == null || !"ADMIN".equalsIgnoreCase(userType)) {
+			if (!"ADMIN".equalsIgnoreCase(userType)) {
 				throw new HandleAccessDeniedException();
 			}
 		}
