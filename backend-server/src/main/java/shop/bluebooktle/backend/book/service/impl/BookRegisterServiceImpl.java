@@ -153,7 +153,10 @@ public class BookRegisterServiceImpl implements BookRegisterService {
 		bookPublisherService.registerBookPublisher(book.getId(), publisher.getId());
 
 		// 도서 이미지 등록
-		bookImgService.registerBookImg(book.getId(), aladinBook.getImgUrl());
+		String imgUrl = aladinBook.getImgUrl();
+		// 해상도 높이기
+		imgUrl = imgUrl.replace("/cover200/", "/cover500/");
+		bookImgService.registerBookImg(book.getId(), imgUrl);
 
 		// 도서 카테고리 등록
 		for (Long categoryId : request.getCategoryIdList()) {
