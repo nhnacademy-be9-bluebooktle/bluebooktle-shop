@@ -38,9 +38,8 @@ public class GlobalUserInfoAdvice {
 			userType = JwtPayloadUtil.getClaim(claims, CLAIM_USER_TYPE, String.class);
 		}
 
-		// TODO: 수정 필요
 		if (request.getRequestURI().startsWith("/admin")) {
-			if (userType == null || !"ADMIN".equals(userType.toLowerCase())) {
+			if (userType == null || !"ADMIN".equalsIgnoreCase(userType)) {
 				throw new HandleAccessDeniedException();
 			}
 		}
