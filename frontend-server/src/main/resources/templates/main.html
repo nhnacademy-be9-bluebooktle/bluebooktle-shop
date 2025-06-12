@@ -69,8 +69,9 @@
                        style="margin-top: 0.5rem; font-size: 1.1em; color: var(--kitsch-color-1);">매주 핫한 도서들로 업데이트!</p>
                 </div>
                 <div class="book-grid-kitsch list-page-grid-kitsch">
-                    <div class="book-item-kitsch" th:classappend="${stat.index % 2 == 0} ? ' tilt-left-kitsch' : ' tilt-right-kitsch'"
-                         th:each="book, stat : ${hotBooks.content}">
+                    <div class="book-item-kitsch"
+                         th:classappend="${stat.index % 2 == 0} ? ' tilt-left-kitsch' : ' tilt-right-kitsch'"
+                         style="max-width: 276px" th:each="book, stat : ${hotBooks.content}">
                         <a class="book-link-kitsch" th:href="@{/books/{id}(id=${book.bookId})}">
                             <div class="book-cover-wrap-kitsch">
                                 <img alt="도서 표지" class="book-cover-kitsch" th:src="${book.imgUrl}"/>
@@ -104,7 +105,8 @@
                 </div>
 
                 <nav aria-label="메인 페이지 HOT 도서 페이징" class="pagination-kitsch">
-                    <a class="page-btn-kitsch prev-kitsch retro-shadow-kitsch-small" th:href="@{/(page=${hotBooks.number - 1}, size=${size})}"
+                    <a class="page-btn-kitsch prev-kitsch retro-shadow-kitsch-small"
+                       th:href="@{/(page=${hotBooks.number - 1}, size=${size})}"
                        th:if="${hotBooks.hasPrevious()}">
                         <i class="fas fa-angle-left"></i> 이전
                     </a>
@@ -115,7 +117,8 @@
                        th:href="@{/(page=${i}, size=${size})}"
                        th:text="${i + 1}">1</a>
 
-                    <a class="page-btn-kitsch next-kitsch retro-shadow-kitsch-small" th:href="@{/(page=${hotBooks.number + 1}, size=${size})}"
+                    <a class="page-btn-kitsch next-kitsch retro-shadow-kitsch-small"
+                       th:href="@{/(page=${hotBooks.number + 1}, size=${size})}"
                        th:if="${hotBooks.hasNext()}">
                         다음 <i class="fas fa-angle-right"></i>
                     </a>
@@ -134,8 +137,9 @@
                         도서들!</p>
                 </div>
                 <div class="book-grid-kitsch list-page-grid-kitsch">
-                    <div class="book-item-kitsch" th:classappend="${stat.index % 2 == 0} ? ' tilt-left-kitsch' : ' tilt-right-kitsch'"
-                         th:each="book, stat : ${newBooks.content}">
+                    <div class="book-item-kitsch"
+                         th:classappend="${stat.index % 2 == 0} ? ' tilt-left-kitsch' : ' tilt-right-kitsch'"
+                         style="max-width: 276px" th:each="book, stat : ${newBooks.content}">
                         <a class="book-link-kitsch" th:href="@{/books/{id}(id=${book.bookId})}">
                             <div class="book-cover-wrap-kitsch">
                                 <img alt="도서 표지" class="book-cover-kitsch" th:src="${book.imgUrl}"/>
@@ -170,7 +174,8 @@
                 </div>
 
                 <nav aria-label="메인 페이지 신규 도서 페이징" class="pagination-kitsch">
-                    <a class="page-btn-kitsch prev-kitsch retro-shadow-kitsch-small" th:href="@{/(page=${newBooks.number - 1}, size=${size})}"
+                    <a class="page-btn-kitsch prev-kitsch retro-shadow-kitsch-small"
+                       th:href="@{/(page=${newBooks.number - 1}, size=${size})}"
                        th:if="${newBooks.hasPrevious()}">
                         <i class="fas fa-angle-left"></i> 이전
                     </a>
@@ -181,7 +186,8 @@
                        th:href="@{/(page=${i}, size=${size})}"
                        th:text="${i + 1}">1</a>
 
-                    <a class="page-btn-kitsch next-kitsch retro-shadow-kitsch-small" th:href="@{/(page=${newBooks.number + 1}, size=${size})}"
+                    <a class="page-btn-kitsch next-kitsch retro-shadow-kitsch-small"
+                       th:href="@{/(page=${newBooks.number + 1}, size=${size})}"
                        th:if="${newBooks.hasNext()}">
                         다음 <i class="fas fa-angle-right"></i>
                     </a>

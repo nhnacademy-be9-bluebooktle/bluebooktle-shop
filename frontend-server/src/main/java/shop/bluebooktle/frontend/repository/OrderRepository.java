@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import shop.bluebooktle.common.domain.order.OrderStatus;
@@ -22,7 +23,8 @@ public interface OrderRepository {
 		@PathVariable Long orderId);
 
 	@PostMapping
-	Long createOrder(@RequestBody OrderCreateRequest request);
+	Long createOrder(@RequestBody OrderCreateRequest request,
+		@RequestHeader(name = "GUEST_ID", required = false) String guestId);
 
 	@GetMapping("/history")
 	PaginationData<OrderHistoryResponse> getOrderHistory(

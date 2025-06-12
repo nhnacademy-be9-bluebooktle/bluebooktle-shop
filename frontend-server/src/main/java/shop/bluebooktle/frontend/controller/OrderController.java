@@ -117,13 +117,14 @@ public class OrderController {
 	}
 
 	@PostMapping("/create")
-	public String createOrder(@ModelAttribute OrderCreateRequest request, RedirectAttributes ra) {
+	public String createOrder(@ModelAttribute OrderCreateRequest request, RedirectAttributes ra,
+		@CookieValue(value = "GUEST_ID", required = false) String guestId) {
 		String orderKey = java.util.UUID.randomUUID().toString();
 		OrderCreateRequest updatedRequest = request.toBuilder()
 			.orderKey(orderKey)
 			.build();
 		try {
-			Long orderId = orderService.createOrder(updatedRequest);
+			Long orderId = orderService.createOrder(updatedRequest, guestId);
 			log.info("주문 생성 :{}", orderId);
 			return "redirect:/order/" + orderId + "/checkout";
 		} catch (Exception e) {
