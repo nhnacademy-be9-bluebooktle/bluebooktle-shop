@@ -462,11 +462,11 @@
 
                             <td data-label="리뷰" style="text-align:center;">
                                 <button
-                                        type="button"
                                         class="btn-kitsch primary-btn-kitsch retro-shadow-kitsch-small"
+                                        onclick="openOrderReviewModalFromData(this, event)"
                                         th:data-book-order-id="${item.bookOrderId}"
                                         th:data-book-title="${item.bookTitle}"
-                                        onclick="openOrderReviewModalFromData(this, event)"><i
+                                        type="button"><i
                                         class="fas fa-pencil-alt"></i> 작성
                                 </button>
                             </td>
@@ -526,11 +526,6 @@
                 </section>
 
                 <div class="order-detail-actions-kitsch">
-                    <a class="btn-kitsch secondary-btn-kitsch color5-kitsch retro-shadow-kitsch-small"
-                       th:href="@{/mypage/orders}">
-                        <i class="fas fa-list"></i> 목록으로 돌아가기
-                    </a>
-
                     <button class="btn-kitsch secondary-btn-kitsch color2-kitsch retro-shadow-kitsch-small"
                             onclick="showKitschModal('refundRequestModal')"
                             th:if="${order.orderStatus() == T(shop.bluebooktle.common.domain.order.OrderStatus).COMPLETED}">
@@ -556,7 +551,6 @@
         </div>
     </div>
 
-    <!-- 팝업 -->
     <div class="modal-overlay-kitsch" id="orderItemReviewModal">
         <div class="modal-content-kitsch review-form-modal-content">
             <button class="modal-close-btn-kitsch" onclick="hideKitschModal('orderItemReviewModal')">
@@ -568,8 +562,8 @@
             <p class="pixel-font-kitsch" id="orderItemReviewModalProductInfo"
                style="text-align:center; margin-bottom:1rem; font-size:0.9em;"></p>
 
-            <form id="orderItemReviewForm" onsubmit="handleOrderItemReviewFormSubmit(event)"
-                  enctype="multipart/form-data">
+            <form enctype="multipart/form-data" id="orderItemReviewForm"
+                  onsubmit="handleOrderItemReviewFormSubmit(event)">
 
                 <input
                         id="orderItemReviewBookOrderIdInput"
@@ -640,6 +634,7 @@
         </div>
     </div>
 
+
     <div class="modal-overlay-kitsch" id="paymentCancelModal">
         <div class="modal-content-kitsch" style="max-width: 500px;">
             <button class="modal-close-btn-kitsch" onclick="hideKitschModal('paymentCancelModal')"><i
@@ -708,6 +703,7 @@
             </form>
         </div>
     </div>
+
 
 </div>
 

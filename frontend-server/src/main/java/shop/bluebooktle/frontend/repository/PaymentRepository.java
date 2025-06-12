@@ -18,9 +18,8 @@ public interface PaymentRepository {
 		@RequestBody PaymentConfirmRequest request
 	);
 
-	@PostMapping("/{gatewayName}/cancel")
+	@PostMapping("/cancel")
 	Void cancelPayment(
-		@PathVariable("gatewayName") String gatewayName,
 		@RequestBody PaymentCancelRequest request
 	);
 }

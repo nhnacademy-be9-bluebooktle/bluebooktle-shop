@@ -61,7 +61,6 @@ public class PointServiceImpl implements PointService {
 			PointPolicyNotFoundException::new);
 
 		if (policy.getIsActive() == false) {
-			log.info("Point policy is not active for source type: {}", sourceType.getSourceType());
 			return;
 		}
 
@@ -92,6 +91,12 @@ public class PointServiceImpl implements PointService {
 
 	@Override
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public void reviewPoint(Long userId) {
+		this.adjustUserPointAndSavePointHistory(userId, PointSourceTypeEnum.REVIEW_EARN, null, null);
+	}
+
+	@Override
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void adjustUserPointAndSavePointHistory(Long userId, PointSourceTypeEnum pointSourceTypeEnum,
 		BigDecimal amount, Long paymentId) {
 		User user = userRepository.findUserById(userId)
@@ -109,6 +114,9 @@ public class PointServiceImpl implements PointService {
 		BigDecimal pointValue;
 		if (sourceType.getActionType() == ActionType.EARN) {
 			if (sourceType.getId().equals(PointSourceTypeEnum.PAYMENT_EARN.getId())) {
+				if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+					return;
+				}
 				pointValue = amount.multiply((policy.getValue().add(
 						BigDecimal.valueOf(user.getMembershipLevel().getRate()))))
 					.divideToIntegralValue(BigDecimal.valueOf(100L));
@@ -117,11 +125,18 @@ public class PointServiceImpl implements PointService {
 			}
 			user.addPoint(pointValue);
 		} else {
+			if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+				return;
+			}
 			pointValue = amount;
 			user.subtractPoint(pointValue);
 		}
 
 		userRepository.save(user);
+
+		if (pointValue == null || pointValue.compareTo(BigDecimal.ZERO) == 0) {
+			return;
+		}
 
 		PointHistory history = PointHistory.builder()
 			.user(user)

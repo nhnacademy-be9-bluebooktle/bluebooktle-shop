@@ -24,8 +24,6 @@ public class PaymentsServiceImpl implements PaymentsService {
 
 	@Override
 	public Void cancel(PaymentCancelRequest req) {
-		// 현재는 TOSS로 고정
-		String gatewayName = "TOSS";
-		return paymentRepository.cancelPayment(gatewayName, req);
+		return paymentRepository.cancelPayment(req);
 	}
 }

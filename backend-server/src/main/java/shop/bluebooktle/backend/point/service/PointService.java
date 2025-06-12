@@ -17,4 +17,6 @@ public interface PointService {
 
 	void adjustUserPointAndSavePointHistory(Long userId, PointSourceTypeEnum pointSourceTypeEnum, BigDecimal amount,
 		Long paymentId);
+
+	void reviewPoint(Long userId);
 }
