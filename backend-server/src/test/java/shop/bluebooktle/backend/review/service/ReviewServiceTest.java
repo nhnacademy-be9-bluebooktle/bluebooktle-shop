@@ -24,16 +24,17 @@ import org.springframework.test.util.ReflectionTestUtils;
 import shop.bluebooktle.backend.book.entity.Book;
 import shop.bluebooktle.backend.book.entity.BookSaleInfo;
 import shop.bluebooktle.backend.book.entity.Img;
-import shop.bluebooktle.backend.review.entity.Review;
-import shop.bluebooktle.backend.review.entity.ReviewLikes;
 import shop.bluebooktle.backend.book.repository.BookSaleInfoRepository;
 import shop.bluebooktle.backend.book.repository.ImgRepository;
+import shop.bluebooktle.backend.book_order.entity.BookOrder;
+import shop.bluebooktle.backend.book_order.jpa.BookOrderRepository;
+import shop.bluebooktle.backend.elasticsearch.service.BookElasticSearchService;
+import shop.bluebooktle.backend.order.entity.Order;
+import shop.bluebooktle.backend.review.entity.Review;
+import shop.bluebooktle.backend.review.entity.ReviewLikes;
 import shop.bluebooktle.backend.review.repository.ReviewLikesRepository;
 import shop.bluebooktle.backend.review.repository.ReviewRepository;
 import shop.bluebooktle.backend.review.service.impl.ReviewServiceImpl;
-import shop.bluebooktle.backend.book_order.entity.BookOrder;
-import shop.bluebooktle.backend.book_order.jpa.BookOrderRepository;
-import shop.bluebooktle.backend.order.entity.Order;
 import shop.bluebooktle.backend.user.repository.UserRepository;
 import shop.bluebooktle.common.dto.review.request.ReviewRegisterRequest;
 import shop.bluebooktle.common.dto.review.response.ReviewResponse;
@@ -60,6 +61,8 @@ public class ReviewServiceTest {
 	private BookSaleInfoRepository bookSaleInfoRepository;
 	@Mock
 	private ReviewLikesRepository reviewLikesRepository;
+	@Mock
+	private BookElasticSearchService bookElasticSearchService;
 
 	private User testUser;
 	private Book testBook;
