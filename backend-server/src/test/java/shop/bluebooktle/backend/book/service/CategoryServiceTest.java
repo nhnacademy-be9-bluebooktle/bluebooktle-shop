@@ -691,7 +691,5 @@ public class CategoryServiceTest {
 				.extracting(CategoryTreeResponse::name)
 				.containsExactlyInAnyOrder("자식1", "자식2");
 		}
-
 	}
-
 }
