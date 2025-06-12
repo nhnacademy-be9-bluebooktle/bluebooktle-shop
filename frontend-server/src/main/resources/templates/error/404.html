@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html layout:decorate="~{_layouts/default_layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>페이지를 찾을 수 없어요 (404)</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <main class="site-main-kitsch">
+        <section class="error-section-kitsch e404">
+            <div class="hero-bg-pattern-kitsch"></div>
+
+            <img alt="길 잃은 블루북틀 마스코트" class="error-mascot-kitsch" th:src="@{/images/mascot_1.png}"/>
+
+            <h2 class="error-code-kitsch">404</h2>
+            <p class="error-title-kitsch">페이지를 찾을 수 없어요!</p>
+            <p class="error-description-kitsch">
+                요청하신 페이지가 사라졌거나, 다른 길로 간 것 같아요.
+                혹시 주소를 잘못 입력하셨는지 다시 한번 확인해주세요!
+            </p>
+
+            <div class="error-actions-kitsch">
+                <a class="btn-kitsch primary-btn-kitsch retro-shadow-kitsch-small" th:href="@{/}">
+                    <i class="fas fa-home"></i> 메인으로 돌아가기
+                </a>
+            </div>
+
+        </section>
+    </main>
+</div>
+</body>
+</html>

@@ -18,10 +18,12 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.book_order.service.PackagingOptionService;
+import shop.bluebooktle.common.domain.auth.UserType;
 import shop.bluebooktle.common.dto.book_order.request.PackagingOptionRequest;
 import shop.bluebooktle.common.dto.book_order.response.PackagingOptionInfoResponse;
 import shop.bluebooktle.common.dto.common.JsendResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
+import shop.bluebooktle.common.security.Auth;
 
 @RestController
 @RequestMapping("/api/options")
@@ -31,6 +33,7 @@ public class PackagingOptionController {
 
 	/** 포장 옵션 등록 */
 	@PostMapping
+	@Auth(type = UserType.ADMIN)
 	public ResponseEntity<JsendResponse<PackagingOptionInfoResponse>> createPackagingOption(
 		@RequestBody @Valid PackagingOptionRequest request) {
 		return ResponseEntity.status(HttpStatus.CREATED)
@@ -65,6 +68,7 @@ public class PackagingOptionController {
 
 	/** 포장 옵션 수정 */
 	@PutMapping("/{packagingOptionId}")
+	@Auth(type = UserType.ADMIN)
 	public ResponseEntity<JsendResponse<PackagingOptionInfoResponse>> updatePackagingOption(
 		@PathVariable Long packagingOptionId,
 		@RequestBody @Valid PackagingOptionRequest request) {
@@ -74,6 +78,7 @@ public class PackagingOptionController {
 
 	/** 포장 옵션 삭제 */
 	@DeleteMapping("/{packagingOptionId}")
+	@Auth(type = UserType.ADMIN)
 	public ResponseEntity<JsendResponse<Void>> deletePackagingOption(
 		@PathVariable Long packagingOptionId) {
 		packagingOptionService.deletePackagingOption(packagingOptionId);

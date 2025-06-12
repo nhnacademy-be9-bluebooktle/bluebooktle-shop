@@ -20,10 +20,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.book.service.TagService;
+import shop.bluebooktle.common.domain.auth.UserType;
 import shop.bluebooktle.common.dto.book.request.TagRequest;
 import shop.bluebooktle.common.dto.book.response.TagInfoResponse;
 import shop.bluebooktle.common.dto.common.JsendResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
+import shop.bluebooktle.common.security.Auth;
 
 @RestController
 @RequestMapping("/api/tags")
@@ -35,6 +37,7 @@ public class TagController {
 
 	@Operation(summary = "태그 등록", description = "태그를 등록합니다.")
 	@PostMapping
+	@Auth(type = UserType.ADMIN)
 	public ResponseEntity<JsendResponse<Void>> addTag(@Valid @RequestBody TagRequest request) {
 		tagService.registerTag(request);
 		return ResponseEntity.status(HttpStatus.CREATED).body(JsendResponse.success());
@@ -42,6 +45,7 @@ public class TagController {
 
 	@Operation(summary = "태그 수정", description = "해당 태그의 태그명을 수정합니다.")
 	@PutMapping("/{tag-id}")
+	@Auth(type = UserType.ADMIN)
 	public ResponseEntity<JsendResponse<Void>> updateTag(
 		@PathVariable(name = "tag-id") Long tagId,
 		@Valid @RequestBody TagRequest request
@@ -52,6 +56,7 @@ public class TagController {
 
 	@Operation(summary = "태그 삭제", description = "해당 태그를 삭제합니다.")
 	@DeleteMapping("/{tag-id}")
+	@Auth(type = UserType.ADMIN)
 	public ResponseEntity<JsendResponse<Void>> deleteTag(
 		@PathVariable(name = "tag-id") Long tagId
 	) {
@@ -61,6 +66,7 @@ public class TagController {
 
 	@Operation(summary = "태그 조회", description = "해당 태그를 조회합니다.")
 	@GetMapping("/{tag-id}")
+	@Auth(type = UserType.ADMIN)
 	public ResponseEntity<JsendResponse<TagInfoResponse>> getTag(
 		@PathVariable(name = "tag-id") Long tagId
 	) {
@@ -69,6 +75,7 @@ public class TagController {
 
 	@Operation(summary = "태그 목록 조회", description = "등록된 태그 목록을 조회합니다.")
 	@GetMapping
+	@Auth(type = UserType.ADMIN)
 	public ResponseEntity<JsendResponse<PaginationData<TagInfoResponse>>> getTags(
 		@PageableDefault(size = 10, sort = "id") Pageable pageable,
 		@RequestParam(value = "searchKeyword", required = false) String searchKeyword) {

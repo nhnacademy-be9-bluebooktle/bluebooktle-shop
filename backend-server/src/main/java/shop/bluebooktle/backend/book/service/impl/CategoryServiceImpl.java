@@ -111,6 +111,13 @@ public class CategoryServiceImpl implements CategoryService {
 					throw new CategoryAlreadyExistsException("이미 존재하는 카테고리명입니다. 카테고리명: " + request.name());
 				}
 			});
+		} else {
+			List<Category> categoryList = categoryRepository.findByParentCategoryIsNull();
+			categoryList.stream().map(Category::getName).forEach(categoryName -> {
+				if (categoryName.equals(request.name())) {
+					throw new CategoryAlreadyExistsException("이미 존재하는 카테고리명입니다. 카테고리명: " + request.name());
+				}
+			});
 		}
 
 		category.setName(request.name());
