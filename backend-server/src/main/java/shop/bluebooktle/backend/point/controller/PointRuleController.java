@@ -12,9 +12,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import shop.bluebooktle.backend.point.service.PointPolicyService;
+import shop.bluebooktle.common.domain.auth.UserType;
 import shop.bluebooktle.common.domain.point.PointSourceTypeEnum;
 import shop.bluebooktle.common.dto.common.JsendResponse;
 import shop.bluebooktle.common.dto.point.response.PointRuleResponse;
+import shop.bluebooktle.common.security.Auth;
 
 @Slf4j
 @RestController
@@ -26,12 +28,14 @@ public class PointRuleController {
 	private final PointPolicyService pointPolicyService;
 
 	@GetMapping
+	@Auth(type = UserType.ADMIN)
 	public ResponseEntity<JsendResponse<List<PointRuleResponse>>> getAllPointRules() {
 		log.info("포인트 규정 목록 조회 요청");
 		return ResponseEntity.ok(JsendResponse.success(pointPolicyService.getAll()));
 	}
 
 	@GetMapping("/type")
+	@Auth(type = UserType.ADMIN)
 	public ResponseEntity<JsendResponse<PointRuleResponse>> getRuleBySourceTypeEnum(
 		@RequestParam PointSourceTypeEnum pointSourceTypeEnum) {
 		return ResponseEntity.ok(

@@ -10,5 +10,5 @@ import shop.bluebooktle.common.domain.auth.UserType;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Auth {
-	UserType type();
+	UserType type() default UserType.USER;
 }

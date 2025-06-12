@@ -17,11 +17,13 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.book.service.ReviewService;
+import shop.bluebooktle.common.domain.auth.UserType;
 import shop.bluebooktle.common.dto.book.request.ReviewRegisterRequest;
 import shop.bluebooktle.common.dto.book.request.ReviewUpdateRequest;
 import shop.bluebooktle.common.dto.book.response.ReviewResponse;
 import shop.bluebooktle.common.dto.common.JsendResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
+import shop.bluebooktle.common.security.Auth;
 import shop.bluebooktle.common.security.UserPrincipal;
 
 @RestController
@@ -33,6 +35,7 @@ public class ReviewController {
 
 	//리뷰작성
 	@PostMapping("{bookOrderId}")
+	@Auth(type = UserType.USER)
 	public ResponseEntity<JsendResponse<ReviewResponse>> addReview(
 		@PathVariable Long bookOrderId,
 		@AuthenticationPrincipal UserPrincipal userPrincipal,
@@ -45,6 +48,7 @@ public class ReviewController {
 
 	// 리뷰 수정
 	@PutMapping("/{reviewId}")
+	@Auth(type = UserType.USER)
 	public ResponseEntity<JsendResponse<ReviewResponse>> updateReview(
 		@PathVariable Long reviewId,
 		@RequestBody @Valid ReviewUpdateRequest reviewUpdateRequest
@@ -55,6 +59,7 @@ public class ReviewController {
 
 	//내가쓴 리뷰 목록조회
 	@GetMapping("/me")
+	@Auth(type = UserType.USER)
 	public ResponseEntity<JsendResponse<PaginationData<ReviewResponse>>> getMyReviews(
 		@AuthenticationPrincipal UserPrincipal userPrincipal,
 		@RequestParam(value = "page", defaultValue = "0") int page,
@@ -81,6 +86,7 @@ public class ReviewController {
 
 	// 리뷰 좋아요
 	@PostMapping("/{reviewId}/like")
+	@Auth(type = UserType.USER)
 	public ResponseEntity<JsendResponse<Boolean>> toggleReviewLike(
 		@PathVariable Long reviewId,
 		@AuthenticationPrincipal UserPrincipal userPrincipal

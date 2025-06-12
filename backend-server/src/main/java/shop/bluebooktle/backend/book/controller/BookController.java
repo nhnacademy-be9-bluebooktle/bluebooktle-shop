@@ -20,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import shop.bluebooktle.backend.book.service.BookRegisterService;
 import shop.bluebooktle.backend.book.service.BookService;
+import shop.bluebooktle.common.domain.auth.UserType;
 import shop.bluebooktle.common.dto.book.BookSortType;
 import shop.bluebooktle.common.dto.book.request.BookAllRegisterRequest;
 import shop.bluebooktle.common.dto.book.request.BookUpdateServiceRequest;
@@ -30,6 +31,7 @@ import shop.bluebooktle.common.dto.book.response.BookDetailResponse;
 import shop.bluebooktle.common.dto.book.response.BookInfoResponse;
 import shop.bluebooktle.common.dto.common.JsendResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
+import shop.bluebooktle.common.security.Auth;
 
 @RestController
 @RequestMapping("/api/books")
@@ -43,6 +45,7 @@ public class BookController {
 
 	@Operation(summary = "도서 직접 등록", description = "사용자에게 입력받은 값을 사용해 도서를 등록합니다.")
 	@PostMapping
+	@Auth(type = UserType.ADMIN)
 	public ResponseEntity<JsendResponse<Void>> registerBook(
 		@Valid @RequestBody BookAllRegisterRequest request) {
 		bookRegisterService.registerBook(request);
@@ -60,6 +63,7 @@ public class BookController {
 
 	@Operation(summary = "도서 조회 - 관리자", description = "관리자 페이지의 도서 수정 페이지를 위해 해당 도서의 상세 정보를 조회합니다.")
 	@GetMapping("/{book-id}/admin")
+	@Auth(type = UserType.ADMIN)
 	public ResponseEntity<JsendResponse<BookAllResponse>> getBookByAdmin(
 		@PathVariable(name = "book-id") Long bookId
 	) {
@@ -69,6 +73,7 @@ public class BookController {
 
 	@Operation(summary = "도서 수정", description = "해당 도서의 정보를 수정합니다.")
 	@PutMapping("/{book-id}")
+	@Auth(type = UserType.ADMIN)
 	public ResponseEntity<JsendResponse<Void>> updateBook(
 		@PathVariable(name = "book-id") Long bookId,
 		@Valid @RequestBody BookUpdateServiceRequest request
@@ -79,6 +84,7 @@ public class BookController {
 
 	@Operation(summary = "도서 삭제", description = "해당 도서를 삭제합니다.")
 	@DeleteMapping("/{book-id}")
+	@Auth(type = UserType.ADMIN)
 	public ResponseEntity<JsendResponse<Void>> deleteBook(
 		@PathVariable(name = "book-id") Long bookId
 	) {
@@ -107,6 +113,7 @@ public class BookController {
 		description = "관리자 페이지에서 등록된 도서 목록 및 키워드 검색 결과 도서 목록을 조회합니다."
 	)
 	@GetMapping("/admin")
+	@Auth(type = UserType.ADMIN)
 	public ResponseEntity<JsendResponse<PaginationData<AdminBookResponse>>> getPagedBooksByAdmin(
 		@RequestParam("page") int page,
 		@RequestParam("size") int size,

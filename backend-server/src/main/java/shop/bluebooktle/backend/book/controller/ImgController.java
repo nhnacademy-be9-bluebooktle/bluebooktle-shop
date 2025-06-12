@@ -13,8 +13,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.book.service.ImgService;
 import shop.bluebooktle.backend.book.service.MinioService;
+import shop.bluebooktle.common.domain.auth.UserType;
 import shop.bluebooktle.common.dto.book.response.img.ImgResponse;
 import shop.bluebooktle.common.dto.common.JsendResponse;
+import shop.bluebooktle.common.security.Auth;
 
 @RestController
 @RequestMapping("/api/imgs")
@@ -26,6 +28,7 @@ public class ImgController {
 
 	@Operation(summary = "이미지 삭제", description = "MinIO 서버에 등록된 해당 이미지를 삭제합니다.")
 	@DeleteMapping("/{image-id}")
+	@Auth(type = UserType.ADMIN)
 	public JsendResponse<Void> deleteImg(
 		@PathVariable(name = "image-id") Long imgId
 	) {
@@ -38,6 +41,7 @@ public class ImgController {
 		description = "MinIO 서버에 이미지 업로드를 위한 Presigned URL을 발급합니다."
 	)
 	@GetMapping("/presignedUploadUrl")
+	@Auth(type = UserType.USER)
 	public ResponseEntity<JsendResponse<String>> getPresignedUploadUrl(@RequestParam String fileName) {
 		String presignedUrl = minioService.getPresignedUploadUrl(fileName);
 		return ResponseEntity.ok(JsendResponse.success(presignedUrl));
@@ -48,6 +52,7 @@ public class ImgController {
 		description = "MinIO 서버에 등록된 이미지 파일을 삭제합니다."
 	)
 	@DeleteMapping("/minioUrl")
+	@Auth(type = UserType.ADMIN)
 	public ResponseEntity<JsendResponse<Void>> deleteImage(@RequestParam String fileName) {
 		minioService.deleteImage(fileName);
 		return ResponseEntity.ok(JsendResponse.success());

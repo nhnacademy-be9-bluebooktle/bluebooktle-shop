@@ -21,10 +21,12 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import shop.bluebooktle.backend.book.service.PublisherService;
+import shop.bluebooktle.common.domain.auth.UserType;
 import shop.bluebooktle.common.dto.book.request.PublisherRequest;
 import shop.bluebooktle.common.dto.book.response.PublisherInfoResponse;
 import shop.bluebooktle.common.dto.common.JsendResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
+import shop.bluebooktle.common.security.Auth;
 
 @RestController
 @RequestMapping("/api/publishers")
@@ -37,14 +39,15 @@ public class PublisherController {
 
 	@Operation(summary = "출판사 등록", description = "출판사를 등록합니다.")
 	@PostMapping
+	@Auth(type = UserType.ADMIN)
 	public ResponseEntity<JsendResponse<Void>> addPublisher(@Valid @RequestBody PublisherRequest request) {
 		publisherService.registerPublisher(request);
 		return ResponseEntity.status(HttpStatus.CREATED).body(JsendResponse.success());
 	}
 
 	@Operation(summary = "출판사 수정", description = "해당 출판사명을 수정합니다.")
-	// @Auth(type = UserType.ADMIN)
 	@PutMapping("/{publisher-id}")
+	@Auth(type = UserType.ADMIN)
 	public ResponseEntity<JsendResponse<Void>> updatePublisher(
 		@PathVariable(name = "publisher-id") Long publisherId,
 		@Valid @RequestBody PublisherRequest request
@@ -55,6 +58,7 @@ public class PublisherController {
 
 	@Operation(summary = "출판사 삭제", description = "해당 출판사를 삭제합니다.")
 	@DeleteMapping("/{publisher-id}")
+	@Auth(type = UserType.ADMIN)
 	public ResponseEntity<JsendResponse<Void>> deletePublisher(
 		@PathVariable(name = "publisher-id") Long publisherId
 	) {
@@ -64,6 +68,7 @@ public class PublisherController {
 
 	@Operation(summary = "출판사 조회", description = "해당 출판사를 조회합니다.")
 	@GetMapping("/{publisher-id}")
+	@Auth(type = UserType.ADMIN)
 	public ResponseEntity<JsendResponse<PublisherInfoResponse>> getPublisher(
 		@PathVariable(name = "publisher-id") Long publisherId
 	) {
@@ -73,6 +78,7 @@ public class PublisherController {
 
 	@Operation(summary = "출판사 목록 조회", description = "등록된 출판사 목록을 조회합니다.")
 	@GetMapping
+	@Auth(type = UserType.ADMIN)
 	public ResponseEntity<JsendResponse<PaginationData<PublisherInfoResponse>>> getPublishers(
 		@PageableDefault(size = 10, sort = "id") Pageable pageable,
 		@RequestParam(value = "searchKeyword", required = false) String searchKeyword) {
