@@ -4,8 +4,6 @@ import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
@@ -17,13 +15,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import shop.bluebooktle.backend.book.adapter.AladinAdaptor;
-import shop.bluebooktle.backend.book.entity.Book;
 import shop.bluebooktle.backend.book.service.impl.AladinBookServiceImpl;
 import shop.bluebooktle.common.dto.book.request.AladinBookItem;
 import shop.bluebooktle.common.dto.book.response.AladinApiResponse;
 import shop.bluebooktle.common.dto.book.response.AladinBookResponse;
-import shop.bluebooktle.common.exception.book.AladinBookNotFoundException;
-import shop.bluebooktle.common.exception.book.AuthorAlreadyExistsException;
 
 @ExtendWith(MockitoExtension.class)
 public class AladinBookServiceTest {
