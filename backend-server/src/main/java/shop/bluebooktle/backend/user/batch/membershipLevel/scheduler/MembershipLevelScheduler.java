@@ -14,8 +14,8 @@ public class MembershipLevelScheduler {
 
 	private final MembershipLauncher launcher;
 
-	// @Scheduled(cron = "0 0/1 * * * *") // TODO test 를 위한 1분주기 (dev 테스트 후 제거)
-	@Scheduled(cron = "0 0 3 * * *")
+	// @Scheduled(cron = "0 0 3 * * *")
+	@Scheduled(cron = "0 0 * * * *") // TODO test 를 위한 1시간 주기 (dev 테스트 후 제거)
 	public void runMembershipLevelUpdateJob() {
 		log.info("회원 등급 배치 스케줄러 실행");
 		launcher.run();
