@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.book.entity.Book;
+import shop.bluebooktle.backend.book.entity.BookSaleInfo;
 import shop.bluebooktle.backend.elasticsearch.document.BookDocument;
 import shop.bluebooktle.backend.elasticsearch.repository.BookElasticSearchCustomRepository;
 import shop.bluebooktle.backend.elasticsearch.repository.BookElasticSearchRepository;
@@ -67,6 +68,15 @@ public class BookElasticSearchServiceImpl implements BookElasticSearchService {
 		BookDocument bookDocument = bookElasticSearchRepository.findById(book.getId())
 			.orElseThrow(ElasticsearchBookNotFoundException::new);
 		bookDocument.setViewCount(bookDocument.getViewCount() + 1);
+		bookElasticSearchRepository.save(bookDocument);
+	}
+
+	@Override
+	public void updateReviewCountAndStar(BookSaleInfo bookSaleInfo) {
+		BookDocument bookDocument = bookElasticSearchRepository.findById(bookSaleInfo.getBook().getId())
+			.orElseThrow(ElasticsearchBookNotFoundException::new);
+		bookDocument.setReviewCount(bookSaleInfo.getReviewCount());
+		bookDocument.setStar(bookSaleInfo.getStar());
 		bookElasticSearchRepository.save(bookDocument);
 	}
 

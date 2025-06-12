@@ -1,10 +1,12 @@
 package shop.bluebooktle.backend.elasticsearch.service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
 
 import shop.bluebooktle.backend.book.entity.Book;
+import shop.bluebooktle.backend.book.entity.BookSaleInfo;
 import shop.bluebooktle.common.dto.book.BookSortType;
 import shop.bluebooktle.common.dto.elasticsearch.BookElasticSearchRegisterRequest;
 import shop.bluebooktle.common.dto.elasticsearch.BookElasticSearchUpdateRequest;
@@ -20,7 +22,8 @@ public interface BookElasticSearchService {
 	// 도서 상세 페이지 접근 시 조회수 증가
 	void updateViewCount(Book book);
 
-	// TODO 리뷰 등록 시 리뷰수 증가 및 평점 수정
+	// 리뷰 등록 시 리뷰수 증가 및 평점 수정
+	void updateReviewCountAndStar(BookSaleInfo bookSaleInfo);
 
 	// 도서 수정 시 엘라스틱 도서 수정
 	void updateBook(BookElasticSearchUpdateRequest request);
