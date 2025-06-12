@@ -2,7 +2,6 @@ package shop.bluebooktle.backend.book.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -79,22 +78,6 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 	}
 
 	@Override
-	public void deleteBookCategory(Long bookId, Long categoryId) {
-		Book book = requireBook(bookId);
-		Category category = requireCategory(categoryId);
-
-		BookCategory bookCategory = bookCategoryRepository.findByBookAndCategory(book, category)
-			.orElseThrow(() -> new BookCategoryNotFoundException(bookId, categoryId));
-
-		long count = bookCategoryRepository.countByBook(book);
-		if (count <= 1) {
-			throw new BookCategoryRequiredException(book.getId());
-		}
-
-		bookCategoryRepository.delete(bookCategory);
-	}
-
-	@Override
 	public void updateBookCategory(Long bookId, List<Long> categoryIdList) {
 		// 도서에 등록 되었던 기존 카테고리 삭제
 		List<BookCategory> bookCategoryList = bookCategoryRepository.findByBook_Id(bookId);
@@ -104,74 +87,13 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 
 	}
 
-	// 해당 도서의 카테고리 수정
-	@Override
-	public void updateBookCategoryByBookCategoryId(Long updatedCategoryId, Long bookCategoryId) {
-		BookCategory bookCategory = bookCategoryRepository.findById(bookCategoryId)
-			.orElseThrow(BookCategoryNotFoundException::new);
-		Category updatedCategory = requireCategory(updatedCategoryId);
-
-		// updatedCategory와 도서가 이미 관계가 있을 시 예외 처리
-		if (bookCategoryRepository.existsByBookAndCategory(bookCategory.getBook(), updatedCategory)) {
-			throw new BookCategoryAlreadyExistsException(bookCategory.getBook().getId(), updatedCategory.getId());
-		}
-
-		bookCategory.setCategory(updatedCategory);
-	}
-
-	@Override
-	public void updateBookCategory(Long updatedCategoryId, Long categoryId, Long bookId) {
-
-		Category category = requireCategory(categoryId);
-		Book book = requireBook(bookId);
-
-		BookCategory bookCategory = bookCategoryRepository.findByBookAndCategory(book, category)
-			.orElseThrow(() -> new BookCategoryNotFoundException(bookId, categoryId));
-
-		Category updatedCategory = requireCategory(updatedCategoryId);
-
-		if (bookCategoryRepository.existsByBookAndCategory(book, updatedCategory)) {
-			throw new BookCategoryAlreadyExistsException(book.getId(), updatedCategory.getId());
-		}
-
-		bookCategory.setCategory(updatedCategory);
-	}
-
-	@Override
-	@Transactional(readOnly = true)
-	public List<CategoryResponse> getCategoryByBookId(BookInfoRequest request) {
-		Book book = requireBook(request.bookId());
-
-		List<BookCategory> bookCategories = bookCategoryRepository.findByBook(book);
-		List<CategoryResponse> result = new ArrayList<>();
-
-		for (BookCategory bookCategory : bookCategories) {
-			Category category = bookCategory.getCategory();
-			result.add(new CategoryResponse(
-				category.getId(),
-				category.getName(),
-				category.getParentCategory().getName(),
-				category.getCategoryPath()));
-		}
-		//TODO book_category_id 도 반환해야할 듯
-		return result;
-	}
-
 	@Override
 	@Transactional(readOnly = true)
 	public Page<BookInfoResponse> searchBooksByCategory(Long categoryId, Pageable pageable, BookSortType bookSortType) {
 		Category category = requireCategory(categoryId);
-		List<Category> descendants = categoryService.getAllDescendantCategories(category);
-		List<Long> categoryIds = new ArrayList<>();
-
-		if (descendants != null) {
-			categoryIds = descendants.stream()
-				.map(Category::getId)
-				.collect(Collectors.toCollection(ArrayList::new));
-		}
-
+		// 하위 카테고리의 ID 조회
+		List<Long> categoryIds = categoryRepository.findUnderCategory(category);
 		categoryIds.add(category.getId());
-
 		log.info("categoryIds : {}", categoryIds);
 
 		// 엘라스틱에서 도서 찾기
