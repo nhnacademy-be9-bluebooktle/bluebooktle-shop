@@ -1,4 +1,4 @@
-package shop.bluebooktle.common.dto.review.request;
+package shop.bluebooktle.common.dto.book.request;
 
 import java.util.List;
 
@@ -9,15 +9,14 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
 @Builder
 @AllArgsConstructor
-@NoArgsConstructor
-public class ReviewUpdateRequest {
+public class ReviewRegisterRequest {
+
 	@NotNull
 	@Min(1)
 	@Max(5)

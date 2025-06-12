@@ -3,8 +3,8 @@ package shop.bluebooktle.frontend.service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import shop.bluebooktle.common.dto.review.request.ReviewRequest;
-import shop.bluebooktle.common.dto.review.response.ReviewResponse;
+import shop.bluebooktle.common.dto.book.request.ReviewRequest;
+import shop.bluebooktle.common.dto.book.response.ReviewResponse;
 
 public interface ReviewService {
 	void addReview(Long userId, Long bookOrderId, ReviewRequest reviewRequest);

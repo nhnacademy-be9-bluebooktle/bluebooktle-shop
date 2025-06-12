@@ -17,8 +17,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import shop.bluebooktle.common.dto.review.request.ReviewRequest;
-import shop.bluebooktle.common.dto.review.response.ReviewResponse;
+import shop.bluebooktle.common.dto.book.request.ReviewRequest;
+import shop.bluebooktle.common.dto.book.response.ReviewResponse;
 import shop.bluebooktle.common.security.UserPrincipal;
 import shop.bluebooktle.frontend.service.ReviewService;
 

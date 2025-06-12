@@ -8,10 +8,10 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import shop.bluebooktle.common.dto.book.request.ReviewRegisterRequest;
+import shop.bluebooktle.common.dto.book.request.ReviewUpdateRequest;
+import shop.bluebooktle.common.dto.book.response.ReviewResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
-import shop.bluebooktle.common.dto.review.request.ReviewRegisterRequest;
-import shop.bluebooktle.common.dto.review.request.ReviewUpdateRequest;
-import shop.bluebooktle.common.dto.review.response.ReviewResponse;
 import shop.bluebooktle.frontend.config.feign.FeignGlobalConfig;
 
 @FeignClient(url = "${server.gateway-url}", name = "reviewRepository", path = "/api/orders/reviews", configuration = FeignGlobalConfig.class)
