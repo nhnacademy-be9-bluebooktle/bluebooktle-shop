@@ -74,4 +74,8 @@ public interface OrderRepository extends JpaRepository<Order, Long>, OrderQueryR
 		"payment"
 	})
 	Optional<Order> getOrderByOrderKey(String orderKey);
+	
+	long countByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
+
+	long countByOrderState_State(OrderStatus status);
 }
