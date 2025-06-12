@@ -5,11 +5,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.book.entity.Img;
+import shop.bluebooktle.backend.book.entity.Review;
 import shop.bluebooktle.backend.book.repository.ImgRepository;
+import shop.bluebooktle.backend.book.repository.ReviewRepository;
 import shop.bluebooktle.backend.book.service.ImgService;
 import shop.bluebooktle.common.dto.book.request.img.ImgRegisterRequest;
 import shop.bluebooktle.common.dto.book.request.img.ImgUpdateRequest;
 import shop.bluebooktle.common.dto.book.response.img.ImgResponse;
+import shop.bluebooktle.common.exception.InvalidInputValueException;
 import shop.bluebooktle.common.exception.book.ImgAlreadyExistsException;
 import shop.bluebooktle.common.exception.book.ImgIdNullException;
 import shop.bluebooktle.common.exception.book.ImgNotFoundException;
@@ -21,6 +24,7 @@ import shop.bluebooktle.common.exception.book.ImgUrlEmptyException;
 public class ImgServiceImpl implements ImgService {
 
 	private final ImgRepository imgRepository;
+	private final ReviewRepository reviewRepository;
 
 	@Override
 	public void registerImg(ImgRegisterRequest imgRegisterRequest) {
@@ -76,5 +80,32 @@ public class ImgServiceImpl implements ImgService {
 			throw new ImgIdNullException();
 		}
 		imgRepository.deleteById(imgId);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public ImgResponse getImgByReviewId(Long reviewId) {
+		if (reviewId == null) {
+			throw new InvalidInputValueException();
+		}
+
+		Review review = reviewRepository.findById(reviewId)
+			.orElseThrow(InvalidInputValueException::new);
+
+		Img reviewImg = review.getImg();
+
+		if (reviewImg == null) {
+			return ImgResponse.builder()
+				.id(null)
+				.imgUrl(null)
+				.createdAt(null)
+				.build();
+		}
+
+		return ImgResponse.builder()
+			.id(reviewImg.getId())
+			.imgUrl(reviewImg.getImgUrl())
+			.createdAt(reviewImg.getCreatedAt())
+			.build();
 	}
 }

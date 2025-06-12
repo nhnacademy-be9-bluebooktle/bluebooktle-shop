@@ -287,6 +287,29 @@
             cursor: pointer;
         }
 
+        .pagination-kitsch {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 2rem;
+        }
+
+        .pagination-kitsch a,
+        .pagination-kitsch span {
+            padding: 0.5rem 0.8rem;
+            border: 1px solid var(--kitsch-color-4);
+            border-radius: 4px;
+            text-decoration: none;
+            color: var(--kitsch-text-dark);
+            font-family: var(--font-pixel);
+        }
+
+        .pagination-kitsch .active {
+            background-color: var(--kitsch-color-3);
+            color: var(--kitsch-text-light);
+            border-color: var(--kitsch-color-3);
+        }
+
 
         .book-detail-layout-kitsch {
             display: grid;
@@ -535,10 +558,18 @@
         }
 
         .review-image-kitsch {
-            max-width: 150px;
+            max-width: 100px;
             border-radius: 5px;
             border: 2px solid var(--kitsch-color-2);
             cursor: pointer;
+        }
+
+        .modal-review-image-kitsch {
+            max-width: 400px;
+            width: 100%;
+            border-radius: 5px;
+            display: block;
+            margin: 0 auto;
         }
 
         /* 리뷰 카드 내 수정/삭제 버튼 스타일은 더 이상 필요 없음 */
@@ -737,74 +768,101 @@
                     <i class="fas fa-list-ul"></i> 목차
                 </button>
 
-                <!--TODO 리뷰 구현 예정 -->
-                <!--                <button class="tab-kitsch-button pixel-font-kitsch" data-tab-target="#reviews-content"><i-->
-                <!--                        class="fas fa-comments"></i> 리뷰 <span class="badge-kitsch hot-badge-kitsch review-tab-count"-->
-                <!--                                                              style="font-size:0.7em; padding:0.1em 0.4em;">1988</span>-->
-                <!--                </button>-->
+                <!-- 리뷰 -->
+                <button class="tab-kitsch-button pixel-font-kitsch" data-tab-target="#reviews-content">
+                    <i class="fas fa-comments"></i> 리뷰
+                    <span class="badge-kitsch hot-badge-kitsch review-tab-count"
+                          style="font-size:0.7em; padding:0.1em 0.4em;"
+                          th:text="${reviewsPage.totalElements}"></span>
+                </button>
+
+                <!-- TODO 배송/반품 -->
                 <!--                <button class="tab-kitsch-button pixel-font-kitsch" data-tab-target="#shipping-info-content"><i-->
                 <!--                        class="fas fa-shipping-fast"></i> 배송/반품-->
                 <!--                </button>-->
+
             </div>
             <div class="tab-content-area-kitsch">
-                <div class="tab-content-area-kitsch">
-                    <div class="tab-pane-kitsch active" id="desc-content">
-                        <h3 class="tab-pane-title-kitsch"><i class="fas fa-scroll"></i> 도서 소개</h3>
-                        <p th:text="${book.description}">도서 소개 텍스트</p>
+                <div class="tab-pane-kitsch active" id="desc-content">
+                    <h3 class="tab-pane-title-kitsch"><i class="fas fa-scroll"></i> 도서 소개</h3>
+                    <p th:text="${book.description}">도서 소개 텍스트</p>
+                </div>
+
+                <div class="tab-pane-kitsch" id="toc-content">
+                    <h3 class="tab-pane-title-kitsch"><i class="fas fa-map-signs"></i> 목차</h3>
+                    <p th:if="${book.index != null}" th:text="${book.index}">도서 목차 텍스트</p>
+                    <p th:if="${book.index == null}" style="font-style: italic; color: gray;">※ 목차 정보가 제공되지
+                        않았습니다.</p>
+                </div>
+
+                <div class="tab-pane-kitsch" id="reviews-content">
+                    <h3 class="tab-pane-title-kitsch"><i class="fas fa-microphone-alt"></i> 리뷰 <span
+                            class="review-tab-count" th:text="${reviewsPage.totalElements}"></span>개</h3>
+
+                    <div class="review-item-kitsch-detail" th:each="rev : ${reviewsPage.content}">
+                        <div class="review-header-kitsch">
+                            <div>
+                                <strong class="review-author-kitsch" th:text="${rev.nickname}"></strong>
+                                <span class="review-date-kitsch"
+                                      th:text="${#temporals.format(rev.createdAt, 'yyyy.MM.dd')}"></span>
+                            </div>
+                            <div class="review-stars-kitsch">
+                                <i th:each="i : ${#numbers.sequence(1, 5)}"
+                                   th:class="${i <= rev.star ? 'fas fa-star' : 'far fa-star'}"></i>
+                            </div>
+                        </div>
+                        <p class="review-text-kitsch" th:text="${rev.reviewContent}"></p>
+                        <img th:if="${rev.imgUrl != null and rev.imgUrl != ''}"
+                             alt="리뷰 이미지" class="review-image-kitsch"
+                             th:data-img-url="${rev.imgUrl}"
+                             onclick="showImageInModalFromData(this, 'bookDetailImageModal')"
+                             th:src="${rev.imgUrl}">
+                        <div style="display: flex; justify-content: flex-end; align-items: center; gap: 0.5rem; margin-top: 0.5rem;">
+                            <span class="pixel-font-kitsch" style="font-size: 0.9rem; color: var(--kitsch-color-5);">
+                                <i class="fas fa-heart" style="color: var(--kitsch-color-3);"></i>
+                                <span th:text="${rev.likes}">0</span>
+                            </span>
+                            <form th:action="@{/reviews/{reviewId}/like(reviewId=${rev.reviewId}, bookId=${bookId})}"
+                                  method="post"
+                                  th:if="${isLoggedIn}">
+                                <button class="btn-kitsch secondary-btn-kitsch color5-kitsch"
+                                        type="submit"
+                                        style="padding: 0.3em 0.6em; font-size: 0.8rem;">
+                                    <i class="far fa-thumbs-up"></i> 좋아요
+                                </button>
+                            </form>
+                        </div>
                     </div>
 
-                    <div class="tab-pane-kitsch" id="toc-content">
-                        <h3 class="tab-pane-title-kitsch"><i class="fas fa-map-signs"></i> 목차</h3>
-                        <p th:if="${book.index != null}" th:text="${book.index}">도서 목차 텍스트</p>
-                        <p th:if="${book.index == null}" style="font-style: italic; color: gray;">※ 목차 정보가 제공되지
-                            않았습니다.</p>
+                    <div th:unless="${reviewsPage.hasContent()}"
+                         style="font-style: italic; color: gray; text-align: center; margin-top: 2rem;">
+                        <p>※ 아직 작성된 리뷰가 없습니다.</p>
+                    </div>
+
+                    <div class="pagination-kitsch" th:if="${reviewsPage.hasContent() and reviewsPage.totalPages > 1}"
+                         style="margin-top: 2rem; display: flex; justify-content: center; align-items: center;">
+                        <a th:if="${reviewsPage.hasPrevious()}"
+                           th:href="@{/books/{bookId}(bookId=${bookId}, page=${reviewsPage.number - 1}, fragment='reviews-content')}"
+                           class="page-link-kitsch">&laquo; 이전</a>
+                        <span th:unless="${reviewsPage.hasPrevious()}"
+                              class="page-link-kitsch disabled">&laquo; 이전</span>
+
+                        <th:block
+                                th:with="startPage=${T(java.lang.Math).max(0, reviewsPage.number - 2)}, endPage=${T(java.lang.Math).min(reviewsPage.totalPages - 1, reviewsPage.number + 2)}">
+                            <a th:each="i : ${#numbers.sequence(startPage, endPage)}"
+                               th:href="@{/books/{bookId}(bookId=${bookId}, page=${i}, fragment='reviews-content')}"
+                               th:classappend="${i == reviewsPage.number} ? 'active'"
+                               class="page-link-kitsch"
+                               th:text="${i + 1}">1</a>
+                        </th:block>
+
+                        <a th:if="${reviewsPage.hasNext()}"
+                           th:href="@{/books/{bookId}(bookId=${bookId}, page=${reviewsPage.number + 1}, fragment='reviews-content')}"
+                           class="page-link-kitsch">다음 &raquo;</a>
+                        <span th:unless="${reviewsPage.hasNext()}" class="page-link-kitsch disabled">다음 &raquo;</span>
                     </div>
 
                 </div>
-                <!--TODO 리뷰 구현 예정 -->
-                <!--                <div class="tab-pane-kitsch" id="reviews-content">-->
-                <!--                    <h3 class="tab-pane-title-kitsch"><i class="fas fa-microphone-alt"></i> 리뷰 <span-->
-                <!--                            class="review-tab-count">1988</span>개</h3>-->
-
-                <!--                    <div class="review-item-kitsch-detail">-->
-                <!--                        <div class="review-header-kitsch">-->
-                <!--                            <div>-->
-                <!--                                <strong class="review-author-kitsch">겜돌이_77</strong>-->
-                <!--                                <span class="review-date-kitsch">2025.05.01</span>-->
-                <!--                            </div>-->
-                <!--                            <div class="review-stars-kitsch">-->
-                <!--                                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i-->
-                <!--                                    class="fas fa-star"></i><i class="fas fa-star"></i>-->
-                <!--                            </div>-->
-                <!--                        </div>-->
-                <!--                        <p class="review-text-kitsch">이거 완전 제 인생겜... 아니 인생책입니다! 시간 가는 줄 모르고 읽었어요! 강추!</p>-->
-                <!--                        <img alt="리뷰 이미지" class="review-image-kitsch"-->
-                <!--                             onclick="showImageInModal(this.src, 'bookDetailImageModal')"-->
-                <!--                             src="https://picsum.photos/150/100?random=231">-->
-                <!--                    </div>-->
-                <!--                    <div class="review-item-kitsch-detail">-->
-                <!--                        <div class="review-header-kitsch">-->
-                <!--                            <div>-->
-                <!--                                <span class="review-author-kitsch">코딩공주</span>-->
-                <!--                                <span class="review-stars-kitsch">-->
-                <!--                                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i-->
-                <!--                                        class="fas fa-star"></i><i class="far fa-star"></i>-->
-                <!--                                </span>-->
-                <!--                            </div>-->
-                <!--                            <span class="review-date-kitsch">2025.04.28</span>-->
-                <!--                        </div>-->
-                <!--                        <p class="review-text-kitsch">주인공 비트 너무 귀여워요 ㅠㅠ 근데 포인터 마왕 너무 어려워서 밤샜어요... 그래도 꿀잼!</p>-->
-                <!--                        <img alt="리뷰 이미지 2" class="review-image-kitsch"-->
-                <!--                             onclick="showImageInModal(this.src, 'bookDetailImageModal')"-->
-                <!--                             src="https://picsum.photos/150/100?random=232">-->
-                <!--                    </div>-->
-                <!--                    <div style="text-align: center; margin-top: 2rem;">-->
-                <!--                        <button class="btn-kitsch secondary-btn-kitsch color4-kitsch retro-shadow-kitsch-small load-more-reviews-btn-kitsch"-->
-                <!--                                onclick="loadMoreReviews()">-->
-                <!--                            <i class="fas fa-plus-circle"></i> 더보기-->
-                <!--                        </button>-->
-                <!--                    </div>-->
-                <!--                </div>-->
             </div>
         </div>
     </div>
@@ -813,8 +871,8 @@
         <div class="modal-content-kitsch" onclick="event.stopPropagation();" style="max-width:600px; padding:1rem;">
             <button class="modal-close-btn-kitsch" onclick="hideKitschModal('bookDetailImageModal')"><i
                     class="fas fa-times"></i></button>
-            <img alt="리뷰 이미지 크게 보기" id="bookDetailModalImageSrc" src="https://picsum.photos/500/300?random=231"
-                 style="width:100%; border-radius:5px;">
+            <img alt="리뷰 이미지 크게 보기" id="bookDetailModalImageSrc" src=""
+                 class="modal-review-image-kitsch">
         </div>
     </div>
 
@@ -945,14 +1003,51 @@
         }
 
 
-        // 이미지 확대 모달 함수는 유지
-        function showImageInModal(src, modalId = 'bookDetailImageModal') {
-            const modalImageElementId = modalId === 'bookDetailImageModal' ? 'bookDetailModalImageSrc' : 'modalImageSrc';
-            const modalImage = document.getElementById(modalImageElementId);
-            if (modalImage) {
-                modalImage.src = src.includes('150/100') ? src.replace('150/100', '500/300') : src.replace('80/80', '500/300');
-                showKitschModal(modalId); // default_layout.html의 전역 함수 사용
+        function showImageInModalFromData(clickedElement, modalId) {
+            // 클릭된 이미지 요소의 'data-img-url' 속성에서 원본 이미지 URL 가져오기
+            const imageUrl = clickedElement.getAttribute('data-img-url');
+            // 모달 내부에 이미지를 표시할 <img> 태그 가져오기
+            const modalImage = document.getElementById('bookDetailModalImageSrc');
+
+            if (modalImage && imageUrl) {
+                modalImage.src = imageUrl; // 모달 이미지의 src를 원본 이미지 URL로 설정
+                showKitschModal(modalId); // 지정된 ID의 모달을 표시
             }
+        }
+
+        function toggleReviewLike(reviewId, bookId, buttonElement) {
+            fetch(`/reviews/${reviewId}/like?bookId=${bookId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        // 응답이 성공(2xx)이 아니면 에러 처리
+                        return response.json().then(err => Promise.reject(err));
+                    }
+                    return response.json(); // JsendResponse.success(boolean liked) 형태이므로 json()으로 파싱
+                })
+                .then(data => {
+                    // 백엔드에서 리다이렉트 처리하므로, 여기서는 단순히 성공 메시지 표시 후 새로고침
+                    if (data.status === 'success') {
+                        const liked = data.data; // 백엔드에서 반환하는 boolean 값
+                        if (liked) {
+                            alert('리뷰를 좋아합니다!'); // 사용자에게 피드백
+                        } else {
+                            alert('리뷰 좋아요를 취소했습니다.'); // 사용자에게 피드백
+                        }
+                        // 페이지 새로고침하여 최신 좋아요 상태 반영
+                        window.location.href = `/books/${bookId}?fragment=reviews-content`; // 리뷰 탭으로 이동
+                    } else {
+                        alert('리뷰 좋아요 토글 실패: ' + (data.message || '알 수 없는 오류'));
+                    }
+                })
+                .catch(error => {
+                    console.error('리뷰 좋아요 요청 중 오류 발생:', error);
+                    alert('리뷰 좋아요 처리 중 오류가 발생했습니다.');
+                });
         }
 
         document.addEventListener('DOMContentLoaded', function () {
@@ -961,6 +1056,20 @@
                 const mainImageSrc = document.getElementById('mainBookImage').src;
                 changeMainImage(mainImageSrc, Array.from(document.querySelectorAll('.book-thumbnails-kitsch img')).find(thumb => thumb.getAttribute('onclick').includes(mainImageSrc)) || firstThumbnail);
             }
+
+            const lastScrollPos = sessionStorage.getItem('bookDetailScrollPos');
+            if (lastScrollPos) {
+                setTimeout(() => {
+                    window.scrollTo({
+                        top: parseInt(lastScrollPos),
+                    });
+                    sessionStorage.removeItem('bookDetailScrollPos');
+                }, 100);
+            }
+
+            window.addEventListener('beforeunload', () => {
+                sessionStorage.setItem('bookDetailScrollPos', window.scrollY);
+            });
             // 리뷰 모달 초기화 JS 제거
 
             // 장바구니 폼 이벤트
@@ -983,9 +1092,52 @@
                     button.classList.add('active');
                     const targetPaneId = button.getAttribute('data-tab-target');
                     document.querySelector(targetPaneId).classList.add('active');
+
+                    const tabHash = targetPaneId; // 예: "#reviews-content"
+                    history.replaceState(null, '', tabHash); // URL 해시만 변경
                 });
             });
 
+            // URL에서 'fragment' 쿼리 파라미터 값 가져오기
+            const urlParams = new URLSearchParams(window.location.search);
+            const fragmentParam = urlParams.get('fragment'); // 'reviews-content' 값을 가져옴
+
+            if (fragmentParam) {
+                // fragment 파라미터가 있으면 해당 탭 활성화
+                const initialTargetButton = document.querySelector(`.tab-kitsch-button[data-tab-target="#${fragmentParam}"]`);
+                const initialTargetPane = document.querySelector(`#${fragmentParam}`);
+
+                if (initialTargetButton && initialTargetPane) {
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    tabPanes.forEach(pane => pane.classList.remove('active'));
+                    initialTargetButton.classList.add('active');
+                    initialTargetPane.classList.add('active');
+                } else {
+                    // 유효하지 않은 fragment 값이면 기본 탭 활성화
+                    document.querySelector('.tab-kitsch-button[data-tab-target="#desc-content"]').classList.add('active');
+                    document.querySelector('#desc-content').classList.add('active');
+                }
+            } else if (window.location.hash) {
+                // fragment 파라미터가 없고 URL 해시가 있다면, 기존 해시 로직으로 탭 활성화
+                const hash = window.location.hash.substring(1); // #reviews-content -> reviews-content
+                const initialTargetButton = document.querySelector(`.tab-kitsch-button[data-tab-target="#${hash}"]`);
+                const initialTargetPane = document.querySelector(`#${hash}`);
+
+                if (initialTargetButton && initialTargetPane) {
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    tabPanes.forEach(pane => pane.classList.remove('active'));
+                    initialTargetButton.classList.add('active');
+                    initialTargetPane.classList.add('active');
+                } else {
+                    // 유효하지 않은 해시 값이면 기본 탭 활성화
+                    document.querySelector('.tab-kitsch-button[data-tab-target="#desc-content"]').classList.add('active');
+                    document.querySelector('#desc-content').classList.add('active');
+                }
+            } else {
+                // URL에 fragment 파라미터도 해시도 없으면 기본으로 도서 소개 탭 활성화
+                document.querySelector('.tab-kitsch-button[data-tab-target="#desc-content"]').classList.add('active');
+                document.querySelector('#desc-content').classList.add('active');
+            }
         });
 
         // 바로 구매 기능
@@ -1000,22 +1152,6 @@
             window.location.href = `/order/create?${params.toString()}`;
         }
 
-        // 리뷰 더보기 Mock 함수 유지
-        let mockReviewPage = 1;
-        const mockReviewsPerPage = 2;
-
-        function loadMoreReviews() {
-            mockReviewPage++;
-            alert(`Mock: 리뷰 ${mockReviewPage}페이지 로드 시도! (실제 데이터 추가 로직 없음)`);
-            const loadMoreButton = document.querySelector('.load-more-reviews-btn-kitsch');
-            if (loadMoreButton) {
-                if (mockReviewPage * mockReviewsPerPage >= 2) {
-                    loadMoreButton.textContent = '모든 리뷰를 봤어요!';
-                    loadMoreButton.classList.add('disabled-btn-kitsch');
-                    loadMoreButton.onclick = null;
-                }
-            }
-        }
     </script>
 </th:block>
 </body>

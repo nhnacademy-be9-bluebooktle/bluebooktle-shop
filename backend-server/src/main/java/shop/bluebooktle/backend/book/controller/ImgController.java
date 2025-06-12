@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.book.service.ImgService;
 import shop.bluebooktle.backend.book.service.MinioService;
+import shop.bluebooktle.common.dto.book.response.img.ImgResponse;
 import shop.bluebooktle.common.dto.common.JsendResponse;
 
 @RestController
@@ -50,5 +51,13 @@ public class ImgController {
 	public ResponseEntity<JsendResponse<Void>> deleteImage(@RequestParam String fileName) {
 		minioService.deleteImage(fileName);
 		return ResponseEntity.ok(JsendResponse.success());
+	}
+
+	@GetMapping("/by-review/{reviewId}")
+	public JsendResponse<ImgResponse> getImgByReviewId(
+		@PathVariable Long reviewId
+	) {
+		ImgResponse imgResponse = imgService.getImgByReviewId(reviewId);
+		return JsendResponse.success(imgResponse);
 	}
 }
