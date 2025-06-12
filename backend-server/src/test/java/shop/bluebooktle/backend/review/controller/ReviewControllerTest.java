@@ -28,6 +28,7 @@ import shop.bluebooktle.common.domain.auth.UserStatus;
 import shop.bluebooktle.common.domain.auth.UserType;
 import shop.bluebooktle.common.dto.auth.UserDto;
 import shop.bluebooktle.common.dto.review.request.ReviewRegisterRequest;
+import shop.bluebooktle.common.dto.review.request.ReviewUpdateRequest;
 import shop.bluebooktle.common.dto.review.response.ReviewResponse;
 import shop.bluebooktle.common.exception.book.ReviewAuthorizationException;
 import shop.bluebooktle.common.security.AuthUserLoader;
@@ -180,6 +181,147 @@ class ReviewControllerTest {
 			.andExpect(jsonPath("$.status").value("success"))
 			.andExpect(jsonPath("$.data.content").isEmpty())
 			.andExpect(jsonPath("$.data.totalElements").value(0));
+	}
+
+	@Test
+	@DisplayName("리뷰 수정 성공")
+	@WithMockUser
+	void updateReview_success() throws Exception {
+		// Given
+		Long reviewId = 1L;
+		ReviewUpdateRequest request = ReviewUpdateRequest.builder()
+			.star(4)
+			.reviewContent("수정된 리뷰 내용입니다. 아주 좋네요.")
+			.imgUrls(List.of("[http://example.com/updated_img.jpg](http://example.com/updated_img.jpg)"))
+			.build();
+
+		ReviewResponse expectedResponse = ReviewResponse.builder()
+			.reviewId(reviewId)
+			.userId(testUserPrincipal.getUserId())
+			.bookOrderId(100L)
+			.bookTitle("수정될 책의 제목")
+			.nickname(testUserPrincipal.getNickname())
+			.imgUrl("[http://example.com/updated_review_thumb.jpg](http://example.com/updated_review_thumb.jpg)")
+			.star(4)
+			.reviewContent("수정된 리뷰 내용입니다. 아주 좋네요.")
+			.likes(5)
+			.createdAt(LocalDateTime.now().minusDays(7))
+			.build();
+
+		given(reviewService.updateReview(eq(reviewId), any(ReviewUpdateRequest.class)))
+			.willReturn(expectedResponse);
+
+		// When & Then
+		mockMvc.perform(put("/api/orders/reviews/{reviewId}", reviewId)
+				.with(user(testUserPrincipal))
+				.with(csrf())
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request)))
+			.andDo(print())
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.status").value("success"))
+			.andExpect(jsonPath("$.data.reviewId").value(reviewId))
+			.andExpect(jsonPath("$.data.star").value(4))
+			.andExpect(jsonPath("$.data.reviewContent").value("수정된 리뷰 내용입니다. 아주 좋네요."));
+
+		verify(reviewService, times(1)).updateReview(eq(reviewId), any(ReviewUpdateRequest.class));
+	}
+
+	@Test
+	@DisplayName("리뷰 수정 실패 - 권한 없음")
+	@WithMockUser(username = "otherUser")
+	void updateReview_failure_unauthorized() throws Exception {
+		// Given
+		Long reviewId = 1L;
+		ReviewUpdateRequest request = ReviewUpdateRequest.builder()
+			.star(3)
+			.reviewContent("다른 사람이 수정 시도.")
+			.build();
+
+		given(reviewService.updateReview(eq(reviewId), any(ReviewUpdateRequest.class)))
+			.willThrow(new ReviewAuthorizationException());
+
+		// When & Then
+		mockMvc.perform(put("/api/orders/reviews/{reviewId}", reviewId)
+				.with(csrf())
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request)))
+			.andDo(print())
+			.andExpect(status().isForbidden()) // 403 Forbidden
+			.andExpect(jsonPath("$.status").value("error"))
+			.andExpect(jsonPath("$.message").exists());
+
+		verify(reviewService, times(1)).updateReview(eq(reviewId), any(ReviewUpdateRequest.class));
+	}
+
+	@Test
+	@DisplayName("내가 쓴 리뷰 목록 조회 성공")
+	@WithMockUser
+	void getMyReviews_success() throws Exception {
+		// Given
+		int page = 0;
+		int size = 10;
+		Long userId = testUserPrincipal.getUserId();
+
+		List<ReviewResponse> myReviewList = List.of(
+			ReviewResponse.builder()
+				.reviewId(10L).userId(userId).bookOrderId(100L)
+				.bookTitle("내 책1").nickname(testUserPrincipal.getNickname())
+				.star(5).reviewContent("내 리뷰 1").likes(10).createdAt(LocalDateTime.now().minusDays(5))
+				.build(),
+			ReviewResponse.builder()
+				.reviewId(11L).userId(userId).bookOrderId(101L)
+				.bookTitle("내 책2").nickname(testUserPrincipal.getNickname())
+				.star(4).reviewContent("내 리뷰 2").likes(3).createdAt(LocalDateTime.now().minusDays(2))
+				.build()
+		);
+		PageImpl<ReviewResponse> pageResult = new PageImpl<>(myReviewList, PageRequest.of(page, size),
+			myReviewList.size());
+
+		given(reviewService.getMyReviews(eq(userId), any(PageRequest.class)))
+			.willReturn(pageResult);
+
+		// When & Then
+		mockMvc.perform(get("/api/orders/reviews/me")
+				.with(user(testUserPrincipal))
+				.param("page", String.valueOf(page))
+				.param("size", String.valueOf(size)))
+			.andDo(print())
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.status").value("success"))
+			.andExpect(jsonPath("$.data.content[0].reviewId").value(10L))
+			.andExpect(jsonPath("$.data.content[0].nickname").value(testUserPrincipal.getNickname()))
+			.andExpect(jsonPath("$.data.totalElements").value(2));
+
+		verify(reviewService, times(1)).getMyReviews(eq(userId), any(PageRequest.class));
+	}
+
+	@Test
+	@DisplayName("내가 쓴 리뷰 목록 조회 성공 - 리뷰 없는 경우")
+	@WithMockUser
+	void getMyReviews_noReviews() throws Exception {
+		// Given
+		int page = 0;
+		int size = 10;
+		Long userId = testUserPrincipal.getUserId();
+
+		PageImpl<ReviewResponse> pageResult = new PageImpl<>(List.of(), PageRequest.of(page, size), 0);
+
+		given(reviewService.getMyReviews(eq(userId), any(PageRequest.class)))
+			.willReturn(pageResult);
+
+		// When & Then
+		mockMvc.perform(get("/api/orders/reviews/me")
+				.with(user(testUserPrincipal))
+				.param("page", String.valueOf(page))
+				.param("size", String.valueOf(size)))
+			.andDo(print())
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.status").value("success"))
+			.andExpect(jsonPath("$.data.content").isEmpty())
+			.andExpect(jsonPath("$.data.totalElements").value(0));
+
+		verify(reviewService, times(1)).getMyReviews(eq(userId), any(PageRequest.class));
 	}
 
 	@Test

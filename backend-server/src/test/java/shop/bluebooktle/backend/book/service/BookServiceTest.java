@@ -43,6 +43,7 @@ import shop.bluebooktle.backend.elasticsearch.service.BookElasticSearchService;
 import shop.bluebooktle.common.dto.book.BookSaleInfoState;
 import shop.bluebooktle.common.dto.book.BookSortType;
 import shop.bluebooktle.common.dto.book.request.BookUpdateServiceRequest;
+import shop.bluebooktle.common.dto.book.response.AdminBookResponse;
 import shop.bluebooktle.common.dto.book.response.BookDetailResponse;
 import shop.bluebooktle.common.dto.book.response.BookInfoResponse;
 import shop.bluebooktle.common.exception.book.BookNotFoundException;
@@ -115,7 +116,7 @@ class BookServiceTest {
 			.publishDate(LocalDateTime.of(2023, 1, 1, 0, 0))
 			.index("목차")
 			.build();
-		setId(book, 1L); // Book의 id 설정
+		setId(book, 1L);
 
 		bookImg = BookImg.builder()
 			.book(book)
@@ -397,7 +398,7 @@ class BookServiceTest {
 		when(bookPublisherRepository.findByBookId(book.getId())).thenReturn(Collections.singletonList(bookPublisher));
 
 		// When
-		org.springframework.data.domain.Page<shop.bluebooktle.common.dto.book.response.AdminBookResponse> responsePage = bookService.findAllBooksByAdmin(
+		Page<AdminBookResponse> responsePage = bookService.findAllBooksByAdmin(
 			page, size, searchKeyword);
 
 		// Then
@@ -418,6 +419,21 @@ class BookServiceTest {
 		verify(bookSaleInfoRepository, times(1)).findByBook(book);
 		verify(bookAuthorRepository, times(1)).findByBookId(book.getId());
 		verify(bookPublisherRepository, times(1)).findByBookId(book.getId());
+	}
+
+	@Test
+	@DisplayName("도서 정보 전체 조회 실패 - 도서 없음")
+	void findBookAllById_BookNotFoundException() {
+		// Given
+		Long nonExistentBookId = 99L;
+		when(bookRepository.findById(nonExistentBookId)).thenReturn(Optional.empty());
+
+		// When & Then
+		assertThatThrownBy(() -> bookService.findBookAllById(nonExistentBookId))
+			.isInstanceOf(BookNotFoundException.class);
+
+		verify(bookRepository, times(1)).findById(nonExistentBookId);
+		verify(bookSaleInfoRepository, never()).findByBookId(anyLong());
 	}
 
 }
