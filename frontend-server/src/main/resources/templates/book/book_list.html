@@ -74,9 +74,9 @@
 
         .book-grid-kitsch.list-page-grid-kitsch {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(240px, 0));
             gap: 2rem;
-            justify-content: center;
+            justify-content: start;
             max-width: 1200px; /* 💡 너무 넓지 않게 제한 */
             margin: 0 auto; /* 💡 가운데 정렬 */
         }
@@ -156,7 +156,7 @@
                         <!-- SALE Badge -->
                         <span th:if="${book.salePrice < book.price}"
                               class="badge-kitsch sale-badge-kitsch"
-                              style="position:absolute; top:10px; right:10px; transform: rotate(10deg);">
+                              style="position:absolute; top:-16px; right:-26px; transform: rotate(10deg);">
                           SALE!
                         </span>
                         <!-- NEW sticker: 생성일로부터 7일 이내 -->
@@ -204,8 +204,8 @@
 
                             <!-- 반쪽 별 출력 -->
 
-                            <span  th:if="${halfStar == 1}">
-                                <i class="fas fa-star-half-alt" ></i>
+                            <span th:if="${halfStar == 1}">
+                                <i class="fas fa-star-half-alt"></i>
                             </span>
 
                             <!-- 빈 별 출력 -->
