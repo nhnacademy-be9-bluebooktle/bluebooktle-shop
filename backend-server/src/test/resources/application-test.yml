@@ -11,6 +11,7 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.H2Dialect
+        globally_quoted_identifiers: true
   sql:
     init:
       mode: never  # <-- schema.sql 무시 :
