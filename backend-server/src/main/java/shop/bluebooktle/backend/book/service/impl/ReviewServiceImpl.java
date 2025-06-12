@@ -3,6 +3,7 @@ package shop.bluebooktle.backend.book.service.impl;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,7 @@ import shop.bluebooktle.backend.book.entity.BookSaleInfo;
 import shop.bluebooktle.backend.book.entity.Img;
 import shop.bluebooktle.backend.book.entity.Review;
 import shop.bluebooktle.backend.book.entity.ReviewLikes;
+import shop.bluebooktle.backend.book.event.type.UserReviewPointEvent;
 import shop.bluebooktle.backend.book.repository.BookSaleInfoRepository;
 import shop.bluebooktle.backend.book.repository.ImgRepository;
 import shop.bluebooktle.backend.book.repository.ReviewLikesRepository;
@@ -43,6 +45,7 @@ public class ReviewServiceImpl implements ReviewService {
 	private final ImgRepository imgRepository;
 	private final BookSaleInfoRepository bookSaleInfoRepository;
 	private final ReviewLikesRepository reviewLikesRepository;
+	private final ApplicationEventPublisher eventPublisher;
 
 	@Override
 	public ReviewResponse addReview(Long userId, Long bookOrderId, ReviewRegisterRequest reviewRegisterRequest) {
@@ -86,6 +89,8 @@ public class ReviewServiceImpl implements ReviewService {
 		bookSaleInfo.addReviewAndCalculateStar(saved.getStar());
 
 		bookSaleInfoRepository.save(bookSaleInfo);
+
+		eventPublisher.publishEvent(new UserReviewPointEvent(userId));
 
 		return ReviewResponse.builder()
 			.reviewId(saved.getId())
