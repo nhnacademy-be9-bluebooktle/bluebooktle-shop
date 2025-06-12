@@ -34,6 +34,7 @@ import shop.bluebooktle.backend.payment.repository.PaymentDetailRepository;
 import shop.bluebooktle.backend.payment.repository.PaymentRepository;
 import shop.bluebooktle.backend.payment.repository.PaymentTypeRepository;
 import shop.bluebooktle.backend.payment.service.PaymentService;
+import shop.bluebooktle.backend.point.entity.PaymentPointHistory;
 import shop.bluebooktle.backend.point.repository.PointHistoryRepository;
 import shop.bluebooktle.backend.user.repository.UserRepository;
 import shop.bluebooktle.common.domain.order.OrderStatus;
@@ -147,12 +148,15 @@ public class PaymentServiceImpl implements PaymentService {
 
 	@Override
 	@Transactional
-	public void cancelPayment(PaymentCancelRequest request, String gatewayName, Long userId) {
+	public void cancelPayment(PaymentCancelRequest request, Long userId) {
+		Order order = orderRepository.findByOrderKey(request.orderKey()).orElseThrow(OrderNotFoundException::new);
+		String paymentMethod = order.getPayment().getPaymentDetail().getPaymentType().getMethod();
+		String gatewayName = paymentMethod.split("_")[0].toUpperCase();
+
 		PaymentGateway selectedGateway = paymentGateways.get(gatewayName.toUpperCase());
 		if (selectedGateway == null) {
 			throw new ApplicationException(ErrorCode.INVALID_INPUT_VALUE, "지원하지 않는 결제 서비스입니다: " + gatewayName);
 		}
-		Order order = orderRepository.findByOrderKey(request.orderKey()).orElseThrow(OrderNotFoundException::new);
 
 		if (order.getOrderState().getState() != OrderStatus.PREPARING) {
 			throw new OrderInvalidStateException();
@@ -182,8 +186,16 @@ public class PaymentServiceImpl implements PaymentService {
 
 			orderService.cancelOrderInternal(payment.getOrder());
 
-			BigDecimal earnPoint = payment.getPaymentPointHistory().getPointHistory().getValue();
-			if ((!earnPoint.equals(BigDecimal.ZERO)) && user != null) {
+			PaymentPointHistory paymentPointHistory = payment.getPaymentPointHistory();
+			if (paymentPointHistory == null) {
+				return;
+			}
+			PointHistory pointHistory = payment.getPaymentPointHistory().getPointHistory();
+			if (pointHistory == null) {
+				return;
+			}
+			BigDecimal earnPoint = pointHistory.getValue();
+			if ((!(earnPoint.compareTo(BigDecimal.ZERO) == 0)) && user != null) {
 				user.subtractPoint(earnPoint);
 				userRepository.save(user);
 

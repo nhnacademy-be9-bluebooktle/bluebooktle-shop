@@ -45,6 +45,7 @@ public class AdminOrderController {
 		@Parameter(description = "주문 검색 조건") @ModelAttribute AdminOrderSearchRequest searchRequest,
 		@PageableDefault(size = 10) Pageable pageable
 	) {
+		log.info("관리자 주문 목록 조회");
 		Page<AdminOrderListResponse> page = orderService.searchOrders(searchRequest, pageable);
 		PaginationData<AdminOrderListResponse> paginationData = new PaginationData<>(page);
 		return ResponseEntity.ok(JsendResponse.success(paginationData));
@@ -64,6 +65,7 @@ public class AdminOrderController {
 	public ResponseEntity<JsendResponse<AdminOrderDetailResponse>> getAdminOrderDetail(
 		@PathVariable("orderId") Long orderId
 	) {
+		log.info("관리자 주문 상세 조회");
 		AdminOrderDetailResponse response = orderService.getAdminOrderDetail(orderId);
 		return ResponseEntity.ok(JsendResponse.success(response));
 	}
@@ -73,7 +75,7 @@ public class AdminOrderController {
 		@PathVariable("orderId") Long orderId,
 		@RequestBody AdminOrderStatusUpdateRequest status
 	) {
-		log.info("Updating order status for orderId: {}, new status: {}", orderId, status.status());
+		log.info("{} 주문 상태 변경", orderId);
 		orderService.updateOrderStatus(orderId, status.status());
 		return ResponseEntity.status(HttpStatus.OK)
 			.body(JsendResponse.success(null));

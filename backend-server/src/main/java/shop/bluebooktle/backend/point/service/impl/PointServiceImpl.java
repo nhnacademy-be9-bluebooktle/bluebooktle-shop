@@ -94,6 +94,9 @@ public class PointServiceImpl implements PointService {
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void adjustUserPointAndSavePointHistory(Long userId, PointSourceTypeEnum pointSourceTypeEnum,
 		BigDecimal amount, Long paymentId) {
+		if (amount.compareTo(BigDecimal.ZERO) == 0) {
+			return;
+		}
 		User user = userRepository.findUserById(userId)
 			.orElseThrow(UserNotFoundException::new);
 

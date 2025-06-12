@@ -40,14 +40,12 @@ public class PaymentController {
 	}
 
 	@Operation(summary = "결제 취소", description = "결제를 취소합니다.")
-	@PostMapping("/{gateway-name}/cancel")
+	@PostMapping("/cancel")
 	public ResponseEntity<JsendResponse<Void>> cancel(
-		@PathVariable(name = "gateway-name") String gatewayName,
 		@Valid @RequestBody PaymentCancelRequest request,
 		@AuthenticationPrincipal UserPrincipal userPrincipal
 	) {
-		paymentService.cancelPayment(request, gatewayName.toUpperCase(),
-			userPrincipal != null ? userPrincipal.getUserId() : null);
+		paymentService.cancelPayment(request, userPrincipal != null ? userPrincipal.getUserId() : null);
 
 		return ResponseEntity.ok(JsendResponse.success());
 	}
