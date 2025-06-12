@@ -3,6 +3,8 @@ package shop.bluebooktle.frontend.controller;
 import java.math.BigDecimal;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,11 +21,13 @@ import shop.bluebooktle.common.dto.book.BookSortType;
 import shop.bluebooktle.common.dto.book.response.BookDetailResponse;
 import shop.bluebooktle.common.dto.book.response.BookInfoResponse;
 import shop.bluebooktle.common.dto.book.response.CategoryResponse;
+import shop.bluebooktle.common.dto.book.response.ReviewResponse;
 import shop.bluebooktle.common.dto.order.response.DeliveryRuleResponse;
 import shop.bluebooktle.common.dto.point.response.PointRuleResponse;
 import shop.bluebooktle.frontend.service.AdminPointService;
 import shop.bluebooktle.frontend.service.BookService;
 import shop.bluebooktle.frontend.service.DeliveryRuleService;
+import shop.bluebooktle.frontend.service.ReviewService;
 
 @Controller
 @RequestMapping
@@ -33,6 +37,7 @@ public class BookController {
 
 	private final BookService bookService;
 	private final DeliveryRuleService deliveryRuleService;
+	private final ReviewService reviewService;
 	private final AdminPointService adminPointService;
 
 	@GetMapping("/books")
@@ -90,7 +95,8 @@ public class BookController {
 	@GetMapping("/books/{bookId}")
 	public String bookDetailPage(@PathVariable Long bookId,
 		Model model,
-		RedirectAttributes redirectAttributes) {
+		@RequestParam(value = "page", defaultValue = "0") int page,
+		RedirectAttributes redirectAttributes, Pageable pageable) {
 		log.info("도서 상세 조회 요청");
 		try {
 
@@ -102,6 +108,10 @@ public class BookController {
 			// 배송 정책 들고오기
 			DeliveryRuleResponse deliveryRule = deliveryRuleService.getDefaultDeliveryRule();
 			model.addAttribute("deliveryRule", deliveryRule);
+
+			// 리뷰 가져오기
+			Page<ReviewResponse> reviewsPage = reviewService.getReviewsForBook(bookId, PageRequest.of(page, 5));
+			model.addAttribute("reviewsPage", reviewsPage);
 
 			// 로그인 여부 확인
 			Object rawIsLoggedIn = model.asMap().get("isLoggedIn");
@@ -163,5 +173,24 @@ public class BookController {
 			redirectAttributes.addFlashAttribute("globalErrorMessage", "찜 취소에 실패했습니다: " + e.getMessage());
 		}
 		return "redirect:/books/" + bookId;
+	}
+
+	// 리뷰 좋아요 (등록/취소)
+	@PostMapping("/reviews/{reviewId}/like")
+	public String toggleReviewLike(@PathVariable Long reviewId,
+		@RequestParam("bookId") Long bookId,
+		RedirectAttributes redirectAttributes) {
+		try {
+			boolean liked = reviewService.toggleReviewLike(reviewId);
+			if (liked) {
+				redirectAttributes.addFlashAttribute("globalSuccessMessage", "리뷰 좋아요!");
+			} else {
+				redirectAttributes.addFlashAttribute("globalSuccessMessage", "리뷰 좋아요 취소!");
+			}
+		} catch (Exception e) {
+			log.error("리뷰 좋아요 토글 실패", e);
+			redirectAttributes.addFlashAttribute("globalErrorMessage", "리뷰 좋아요 처리 중 오류가 발생했습니다: " + e.getMessage());
+		}
+		return "redirect:/books/" + bookId + "?fragment=reviews-content";
 	}
 }

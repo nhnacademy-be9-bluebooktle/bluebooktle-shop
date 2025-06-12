@@ -15,10 +15,4 @@ public class MyPageController {
 	public String myPageDefault() {
 		return "redirect:/mypage/profile";
 	}
-
-	@GetMapping("/reviews")
-	public String userReviewsPage() {
-
-		return "mypage/review_list";
-	}
 }
