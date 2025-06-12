@@ -145,44 +145,46 @@ public class CategoryServiceTest {
 	@Nested
 	@DisplayName("카테고리 수정")
 	class UpdateCategoryTests {
-		private Category root;
+		private Category parent;
 		private Category child;
 		private Category target;
 
 		@BeforeEach
 		void setUpUpdate() {
 			// 부모 카테고리 준비
-			root = Category.builder()
+			parent = Category.builder()
 				.name("상위 카테고리")
 				.build();
-			ReflectionTestUtils.setField(root, "id", 1L);
+			ReflectionTestUtils.setField(parent, "id", 1L);
+
+			// 수정 대상 카테고리 준비(detail)
+			target = Category.builder()
+				.name("기존 이름")
+				.parentCategory(parent)
+				.build();
+			ReflectionTestUtils.setField(target, "id", 2L);
 
 			// 기존 부모에 등록된 자식 카테고리
 			child = Category.builder()
 				.name("중복 이름")
 				.build();
-			ReflectionTestUtils.setField(root, "id", 2L);
+			ReflectionTestUtils.setField(parent, "id", 3L);
 		}
 
 		@Test
-		@DisplayName("성공: 중간 카테고리 수정")
+		@DisplayName("성공: 이름 변경 후 save() 1회 호출")
 		void success() {
-			// 수정 대상 카테고리
-			target = Category.builder()
-				.name("기존 이름")
-				.parentCategory(root)
-				.build();
-			ReflectionTestUtils.setField(target, "id", 3L);
-
 			// repository.findById -> target
-			when(categoryRepository.findById(target.getId()))
+			when(categoryRepository.findById(2L))
 				.thenReturn(Optional.of(target));
 
 			CategoryUpdateRequest request = new CategoryUpdateRequest("새 이름");
 
-			when(categoryRepository.getAllDescendantCategories(any())).thenReturn(List.of(child));
+			// save() stub
+			when(categoryRepository.save(any(Category.class)))
+				.thenAnswer(inv -> inv.getArgument(0));
 
-			categoryService.updateCategory(target.getId(), request);
+			categoryService.updateCategory(2L, request);
 
 			// save 호출 검증
 			verify(categoryRepository, times(1)).save(target);
@@ -191,39 +193,9 @@ public class CategoryServiceTest {
 		}
 
 		@Test
-		@DisplayName("성공: 최상위 카테고리 수정")
-		void successRootCategory() {
-			// 수정 대상 카테고리
-			target = Category.builder()
-				.name("기존 이름")
-				.parentCategory(null)
-				.build();
-			ReflectionTestUtils.setField(target, "id", 3L);
-
-			when(categoryRepository.findById(3L))
-				.thenReturn(Optional.of(target));
-
-			CategoryUpdateRequest request = new CategoryUpdateRequest("새 이름");
-
-			when(categoryRepository.findByParentCategoryIsNull())
-				.thenReturn(List.of(root));
-
-			categoryService.updateCategory(target.getId(), request);
-
-			verify(categoryRepository, times(1)).save(any());
-			assertThat(target.getName()).isEqualTo("새 이름");
-		}
-
-		@Test
 		@DisplayName("실패: 부모 카테고리의 하위 카테고리 중복 이름 예외")
 		void duplicateNameThrows() {
-			target = Category.builder()
-				.name("기존 이름")
-				.parentCategory(root)
-				.build();
-			ReflectionTestUtils.setField(target, "id", 3L);
-
-			when(categoryRepository.findById(3L))
+			when(categoryRepository.findById(2L))
 				.thenReturn(Optional.of(target));
 
 			CategoryUpdateRequest request = new CategoryUpdateRequest("중복 이름");
@@ -231,7 +203,7 @@ public class CategoryServiceTest {
 			when(categoryRepository.getAllDescendantCategories(any()))
 				.thenReturn(List.of(child));
 
-			assertThatThrownBy(() -> categoryService.updateCategory(target.getId(), request))
+			assertThatThrownBy(() -> categoryService.updateCategory(2L, request))
 				.isInstanceOf(CategoryAlreadyExistsException.class)
 				.hasMessageContaining("이미 존재하는 카테고리명입니다.");
 
@@ -239,28 +211,23 @@ public class CategoryServiceTest {
 		}
 
 		@Test
-		@DisplayName("실패: 최상위 카테고리 수정의 경우 최상위 카테고리명 중복 예외")
-		void duplicateNameByRootCategoryThrows() {
-			target = Category.builder()
-				.name("기존 이름")
-				.parentCategory(null)
-				.build();
-			ReflectionTestUtils.setField(target, "id", 3L);
-
-			when(categoryRepository.findById(3L))
+		@DisplayName("성공: 부모 카테고리의 하위 카테고리 중복 이름 예외")
+		void successRootCategory() {
+			when(categoryRepository.findById(2L))
 				.thenReturn(Optional.of(target));
 
-			CategoryUpdateRequest request = new CategoryUpdateRequest("상위 카테고리");
+			CategoryUpdateRequest request = new CategoryUpdateRequest("중복 이름");
 
-			when(categoryRepository.findByParentCategoryIsNull())
-				.thenReturn(List.of(root));
+			when(categoryRepository.getAllDescendantCategories(any()))
+				.thenReturn(List.of(child));
 
-			assertThatThrownBy(() -> categoryService.updateCategory(target.getId(), request))
+			assertThatThrownBy(() -> categoryService.updateCategory(2L, request))
 				.isInstanceOf(CategoryAlreadyExistsException.class)
 				.hasMessageContaining("이미 존재하는 카테고리명입니다.");
 
 			verify(categoryRepository, never()).save(any());
 		}
+
 	}
 
 	@Nested
