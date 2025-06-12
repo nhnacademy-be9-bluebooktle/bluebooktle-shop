@@ -193,6 +193,9 @@ public enum ErrorCode {
 	DEFAULT_DELIVERY_RULE_NOT_FOUND(HttpStatus.NOT_FOUND, "D003", "기본 배송 정책이 없습니다."),
 	DELIVERY_RULE_ALREADY_EXISTS(HttpStatus.CONFLICT, "D004", "해당 이름의 배송정책이 존재합니다."),
 
+	// 리뷰 관련 오류
+	REVIEW_AUTHORIZATION_FAILED(HttpStatus.FORBIDDEN, "R001", "리뷰를 작성할 권한이 없습니다. 해당 주문의 사용자가 아닙니다."),
+
 	// Elasticsearch Error (엘라스틱 서치 오류) - E
 	ELASTIC_SEARCH_SAVE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "E001", "Elasticsearch에 도서 저장을 실패하였습니다."),
 	ELASTIC_SEARCH_BOOK_NOT_FOUND(HttpStatus.NOT_FOUND, "E002", "Elasticsearch에 해당 도서를 찾을 수 없습니다.");
