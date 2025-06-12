@@ -1,4 +1,4 @@
-package shop.bluebooktle.backend.book.controller;
+package shop.bluebooktle.backend.review.controller;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -21,9 +21,13 @@ import shop.bluebooktle.common.domain.auth.UserType;
 import shop.bluebooktle.common.dto.book.request.ReviewRegisterRequest;
 import shop.bluebooktle.common.dto.book.request.ReviewUpdateRequest;
 import shop.bluebooktle.common.dto.book.response.ReviewResponse;
+import shop.bluebooktle.backend.review.service.ReviewService;
 import shop.bluebooktle.common.dto.common.JsendResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
 import shop.bluebooktle.common.security.Auth;
+import shop.bluebooktle.common.dto.review.request.ReviewRegisterRequest;
+import shop.bluebooktle.common.dto.review.request.ReviewUpdateRequest;
+import shop.bluebooktle.common.dto.review.response.ReviewResponse;
 import shop.bluebooktle.common.security.UserPrincipal;
 
 @RestController

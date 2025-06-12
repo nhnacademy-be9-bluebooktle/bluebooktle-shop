@@ -1,4 +1,4 @@
-package shop.bluebooktle.backend.book.controller;
+package shop.bluebooktle.backend.review.controller;
 
 import static org.mockito.BDDMockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
@@ -23,12 +23,12 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import shop.bluebooktle.backend.book.service.ReviewService;
+import shop.bluebooktle.backend.review.service.ReviewService;
 import shop.bluebooktle.common.domain.auth.UserStatus;
 import shop.bluebooktle.common.domain.auth.UserType;
 import shop.bluebooktle.common.dto.auth.UserDto;
-import shop.bluebooktle.common.dto.book.request.ReviewRegisterRequest;
-import shop.bluebooktle.common.dto.book.response.ReviewResponse;
+import shop.bluebooktle.common.dto.review.request.ReviewRegisterRequest;
+import shop.bluebooktle.common.dto.review.response.ReviewResponse;
 import shop.bluebooktle.common.exception.book.ReviewAuthorizationException;
 import shop.bluebooktle.common.security.AuthUserLoader;
 import shop.bluebooktle.common.security.UserPrincipal;
