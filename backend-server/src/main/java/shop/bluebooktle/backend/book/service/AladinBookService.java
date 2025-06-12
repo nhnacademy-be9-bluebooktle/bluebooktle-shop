@@ -12,6 +12,4 @@ public interface AladinBookService {
 
 	AladinBookResponse getBookByIsbn(String isbn);
 
-	// AladinBookItemBySearch searchBookByIsbn(String isbn);
-
 }
