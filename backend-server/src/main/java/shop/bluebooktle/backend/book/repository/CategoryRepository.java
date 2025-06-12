@@ -2,12 +2,21 @@ package shop.bluebooktle.backend.book.repository;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import shop.bluebooktle.backend.book.entity.Category;
 
 public interface CategoryRepository extends JpaRepository<Category, Long>, CategoryQueryRepository {
-	
+
+	@EntityGraph(attributePaths = {"parentCategory"})
+	List<Category> findAll();
+
+	@EntityGraph(attributePaths = {"parentCategory"})
+	Page<Category> findAll(Pageable pageable);
+
 	// 최상위 카테고리들(대분류) 조회 (parentCategory가 null인 경우)
 	List<Category> findByParentCategoryIsNull();
 
@@ -19,7 +28,5 @@ public interface CategoryRepository extends JpaRepository<Category, Long>, Categ
 
 	// 최상위 카테고리인지 여부 판단
 	boolean existsByIdAndParentCategoryIsNull(Long id);
-
-	Category findParentCategoryById(Long id);
 
 }

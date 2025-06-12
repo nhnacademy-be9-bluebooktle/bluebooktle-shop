@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -17,6 +18,7 @@ import shop.bluebooktle.backend.book.repository.CategoryQueryRepository;
 
 @Repository
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class CategoryQueryRepositoryImpl implements CategoryQueryRepository {
 	private final JPAQueryFactory queryFactory;
 
@@ -56,4 +58,55 @@ public class CategoryQueryRepositoryImpl implements CategoryQueryRepository {
 
 		return new PageImpl<>(content, pageable, totalCount);
 	}
+
+	@Override
+	public List<Long> findUnderCategory(Category parentCategory) {
+
+		QCategory category = QCategory.category;
+
+		String categoryPath = queryFactory
+			.select(category.categoryPath)
+			.from(category)
+			.where(category.id.eq(parentCategory.getId()))
+			.fetchOne();
+
+		List<Long> leafCategoryIds = queryFactory
+			.select(category.id)
+			.from(category)
+			.where(
+				category.categoryPath.like(categoryPath + "/%")
+					.or(category.categoryPath.eq(categoryPath)),
+				category.childCategories.isEmpty()
+			)
+			.fetch();
+
+		return leafCategoryIds;
+	}
+
+	@Override
+	public List<Category> getAllDescendantCategories(Category parent) {
+		QCategory category = QCategory.category;
+
+		// 부모 categoryPath 조회
+		String parentPath = queryFactory
+			.select(category.categoryPath)
+			.from(category)
+			.where(category.id.eq(parent.getId()))
+			.fetchOne();
+
+		if (parentPath == null) {
+			return List.of(); // 부모가 존재하지 않으면 빈 리스트
+		}
+
+		// parent 포함 + 하위 포함 전체 자식 카테고리 조회
+		return queryFactory
+			.selectFrom(category)
+			.where(
+				category.categoryPath.eq(parentPath)
+					.or(category.categoryPath.like(parentPath + "/%")),
+				category.deletedAt.isNull()
+			)
+			.fetch();
+	}
+
 }

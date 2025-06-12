@@ -37,6 +37,8 @@ import shop.bluebooktle.backend.payment.service.PaymentService;
 import shop.bluebooktle.backend.point.entity.PaymentPointHistory;
 import shop.bluebooktle.backend.point.repository.PointHistoryRepository;
 import shop.bluebooktle.backend.user.repository.UserRepository;
+import shop.bluebooktle.backend.point.repository.PointHistoryRepository;
+import shop.bluebooktle.backend.user.repository.UserRepository;
 import shop.bluebooktle.common.domain.order.OrderStatus;
 import shop.bluebooktle.common.domain.point.PointSourceTypeEnum;
 import shop.bluebooktle.common.dto.payment.request.PaymentCancelRequest;
@@ -161,6 +163,7 @@ public class PaymentServiceImpl implements PaymentService {
 		if (order.getOrderState().getState() != OrderStatus.PREPARING) {
 			throw new OrderInvalidStateException();
 		}
+
 
 		User user = order.getUser();
 
