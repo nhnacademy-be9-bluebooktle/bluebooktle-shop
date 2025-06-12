@@ -26,12 +26,12 @@ public class ImgController {
 	private final ImgService imgService;
 	private final MinioService minioService;
 
+	// TODO: 본인이 등록한 이미지인지 확인하는 로직 필요(delete review image, book image 구분해서 검증해야 할 듯)
 	@Operation(summary = "이미지 삭제", description = "MinIO 서버에 등록된 해당 이미지를 삭제합니다.")
 	@DeleteMapping("/{image-id}")
-	@Auth(type = UserType.ADMIN)
+	@Auth(type = UserType.USER)
 	public JsendResponse<Void> deleteImg(
-		@PathVariable(name = "image-id") Long imgId
-	) {
+		@PathVariable(name = "image-id") Long imgId) {
 		imgService.deleteImg(imgId);
 		return JsendResponse.success();
 	}
