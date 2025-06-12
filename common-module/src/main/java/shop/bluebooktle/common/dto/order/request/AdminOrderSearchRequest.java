@@ -2,15 +2,20 @@ package shop.bluebooktle.common.dto.order.request;
 
 import java.time.LocalDate;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import shop.bluebooktle.common.domain.order.AdminOrderSearchType;
 import shop.bluebooktle.common.domain.order.OrderStatus;
 
-public record AdminOrderSearchRequest(
-	AdminOrderSearchType searchKeywordType,
-	String searchKeyword,
-	OrderStatus orderStatusFilter,
-	LocalDate startDate,
-	LocalDate endDate,
-	String paymentMethodFilter
-) {
+@Getter
+@Setter
+@NoArgsConstructor
+public class AdminOrderSearchRequest {
+	private AdminOrderSearchType searchKeywordType;
+	private String searchKeyword;
+	private OrderStatus orderStatusFilter;
+	private LocalDate startDate;
+	private LocalDate endDate;
+	private String paymentMethodFilter;
 }
