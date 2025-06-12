@@ -2449,6 +2449,10 @@ ul {
     opacity: 0.9;
 }
 
+.error-actions-kitsch {
+    z-index: 100;
+}
+
 .error-actions-kitsch .btn-kitsch {
     font-size: 1.2rem;
 }
