@@ -132,7 +132,6 @@ public class OrderController {
 
 	@Operation(summary = "주문 취소", description = "주문을 취소합니다.")
 	@PostMapping("/{orderKey}/cancel")
-	@Auth(type = UserType.USER)
 	public ResponseEntity<JsendResponse<Void>> cancelOrder(
 		@Parameter(description = "조회할 주문키") @PathVariable String orderKey,
 		@Parameter(hidden = true) @AuthenticationPrincipal UserPrincipal userPrincipal

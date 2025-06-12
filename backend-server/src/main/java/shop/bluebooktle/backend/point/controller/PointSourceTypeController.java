@@ -18,10 +18,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.point.service.PointSourceTypeService;
+import shop.bluebooktle.common.domain.auth.UserType;
 import shop.bluebooktle.common.domain.point.ActionType;
 import shop.bluebooktle.common.dto.common.JsendResponse;
 import shop.bluebooktle.common.dto.point.request.PointSourceTypeCreateRequest;
 import shop.bluebooktle.common.dto.point.response.PointSourceTypeResponse;
+import shop.bluebooktle.common.security.Auth;
 
 @RestController
 @RequiredArgsConstructor
@@ -33,6 +35,7 @@ public class PointSourceTypeController {
 
 	@Operation(summary = "포인트 발생 유형 생성", description = "포인트 발생 유형을 생성합니다.")
 	@PostMapping
+	@Auth(type = UserType.ADMIN)
 	public ResponseEntity<JsendResponse<Long>> createSource(
 		@Valid @RequestBody PointSourceTypeCreateRequest request) {
 		Long id = pointSourceTypeService.create(request);
@@ -41,6 +44,7 @@ public class PointSourceTypeController {
 
 	@Operation(summary = "단건 조회", description = "포인트 발생 유형을 조회합니다.")
 	@GetMapping("/{id}")
+	@Auth(type = UserType.ADMIN)
 	public ResponseEntity<JsendResponse<PointSourceTypeResponse>> getSource(@PathVariable Long id) {
 		PointSourceTypeResponse resp = pointSourceTypeService.get(id);
 		return ResponseEntity.ok(JsendResponse.success(resp));
@@ -48,6 +52,7 @@ public class PointSourceTypeController {
 
 	@Operation(summary = "포인트 발생 유형 조회", description = " 전체 또는 특정 ActionType별 조회합니다.")
 	@GetMapping
+	@Auth(type = UserType.ADMIN)
 	public ResponseEntity<JsendResponse<List<PointSourceTypeResponse>>> getSourceList(
 		@RequestParam(required = false) String actionType) {
 
@@ -63,6 +68,7 @@ public class PointSourceTypeController {
 
 	@Operation(summary = "포인트 발생 유형 삭제", description = "포인트 발생 유형을 삭제합니다.")
 	@DeleteMapping("/{id}")
+	@Auth(type = UserType.ADMIN)
 	public ResponseEntity<JsendResponse<Void>> deleteSource(@PathVariable Long id) {
 		pointSourceTypeService.delete(id);
 		return ResponseEntity.ok(JsendResponse.success());

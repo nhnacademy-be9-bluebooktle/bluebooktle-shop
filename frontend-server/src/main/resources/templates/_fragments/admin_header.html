@@ -8,7 +8,7 @@
         <span class="admin-header__user-info" th:if="${userNickname}" th:text="|${userNickname}님 (관리자)|">관리자님</span>
         <span class="admin-header__user-info" th:unless="${userNickname}">관리자</span>
 
-        <form th:action="@{/logout}" method="post" style="display: inline;">
+        <form th:action="@{/logout}" method="get" style="display: inline;">
             <button type="submit" class="admin-header__logout-btn">
                 <i class="fas fa-sign-out-alt"></i> 로그아웃
             </button>

@@ -71,6 +71,7 @@ public class AdminOrderController {
 	}
 
 	@PostMapping("/{orderId}/update-status")
+	@Auth(type = UserType.ADMIN)
 	public ResponseEntity<JsendResponse<Void>> updateOrderStatus(
 		@PathVariable("orderId") Long orderId,
 		@RequestBody AdminOrderStatusUpdateRequest status
@@ -82,6 +83,7 @@ public class AdminOrderController {
 	}
 
 	@PostMapping("/{orderId}/update-tracking")
+	@Auth(type = UserType.ADMIN)
 	public ResponseEntity<JsendResponse<Void>> updateTrackingNumber(
 		@PathVariable("orderId") Long orderId,
 		@RequestBody AdminOrderTrackingNumberUpdateRequest trackNumber

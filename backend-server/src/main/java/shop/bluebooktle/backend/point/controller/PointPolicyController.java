@@ -18,10 +18,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.point.service.PointPolicyService;
+import shop.bluebooktle.common.domain.auth.UserType;
 import shop.bluebooktle.common.dto.common.JsendResponse;
 import shop.bluebooktle.common.dto.point.request.PointPolicyCreateRequest;
 import shop.bluebooktle.common.dto.point.request.PointPolicyUpdateRequest;
 import shop.bluebooktle.common.dto.point.response.PointPolicyResponse;
+import shop.bluebooktle.common.security.Auth;
 
 @RestController
 @RequiredArgsConstructor
@@ -33,6 +35,7 @@ public class PointPolicyController {
 
 	@Operation(summary = "포인트 정책 생성", description = "포인트 정책을 생성합니다.")
 	@PostMapping
+	@Auth(type = UserType.ADMIN)
 	public ResponseEntity<JsendResponse<Long>> createPointPolicy(@Valid @RequestBody PointPolicyCreateRequest request) {
 		Long id = pointPolicyService.create(request);
 		return ResponseEntity.status(HttpStatus.CREATED).body(JsendResponse.success(id));
@@ -40,6 +43,7 @@ public class PointPolicyController {
 
 	@Operation(summary = "포인트 정책 조회", description = "포인트 정책을 조회합니다.")
 	@GetMapping("/{id}")
+	@Auth(type = UserType.ADMIN)
 	public ResponseEntity<JsendResponse<PointPolicyResponse>> getPointPolicy(@PathVariable Long id) {
 		PointPolicyResponse response = pointPolicyService.get(id);
 		return ResponseEntity.ok(JsendResponse.success(response));
@@ -47,6 +51,7 @@ public class PointPolicyController {
 
 	@Operation(summary = "포인트 정책 업데이트", description = "포인트 정책을 갱신합니다.")
 	@PutMapping
+	@Auth(type = UserType.ADMIN)
 	public ResponseEntity<JsendResponse<Void>> updatePointPolicy(@Valid @RequestBody PointPolicyUpdateRequest request) {
 		pointPolicyService.update(request);
 		return ResponseEntity.ok(JsendResponse.success());
@@ -54,6 +59,7 @@ public class PointPolicyController {
 
 	@Operation(summary = "포인트 정책 삭제", description = "포인트 정책을 삭제합니다.")
 	@DeleteMapping("/{id}")
+	@Auth(type = UserType.ADMIN)
 	public ResponseEntity<JsendResponse<Void>> deletePointPolicy(@PathVariable Long id) {
 		pointPolicyService.delete(id);
 		return ResponseEntity.ok(JsendResponse.success());
@@ -61,6 +67,7 @@ public class PointPolicyController {
 
 	@Operation(summary = "포인트 정책 전체 조회", description = "포인트 정책 전체 조회.")
 	@GetMapping
+	@Auth(type = UserType.USER)
 	public ResponseEntity<JsendResponse<List<PointPolicyResponse>>> getAllPointPolicies() {
 		List<PointPolicyResponse> response = pointPolicyService.findAll();
 		return ResponseEntity.ok(JsendResponse.success(response));

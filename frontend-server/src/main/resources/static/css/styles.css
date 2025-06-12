@@ -2370,3 +2370,89 @@ ul {
         /* flex-grow: 1; 필요시 버튼들이 공간을 채우도록 */
     }
 }
+
+/* =========================== */
+/* Error Page Styles Kitsch    */
+/* =========================== */
+.error-section-kitsch {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 70vh; /* 헤더, 푸터를 제외한 영역을 채우도록 */
+    text-align: center;
+    background-color: var(--kitsch-bg-alt);
+    padding: 3rem 1rem;
+    position: relative;
+    overflow: hidden;
+}
+
+/* 404 페이지 배경은 청록색 계열 */
+.error-section-kitsch.e404 {
+    background-color: var(--kitsch-color-4);
+    color: var(--kitsch-text-light);
+}
+
+/* 500 페이지 배경은 버건디 계열로 더 심각한 느낌 */
+.error-section-kitsch.e500 {
+    background-color: var(--kitsch-color-1);
+    color: var(--kitsch-text-light);
+}
+
+.error-mascot-kitsch {
+    width: auto;
+    height: 300px;
+    margin-bottom: 1.5rem;
+    animation: float-kitsch 4s ease-in-out infinite; /* 둥실둥실 효과 */
+}
+
+@keyframes float-kitsch {
+    0% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-20px) rotate(5deg);
+    }
+    100% {
+        transform: translateY(0px);
+    }
+}
+
+.error-code-kitsch {
+    font-family: var(--font-display);
+    font-size: 8rem;
+    line-height: 1;
+    text-shadow: 5px 5px 0px var(--kitsch-text-dark);
+}
+
+.error-section-kitsch.e404 .error-code-kitsch {
+    color: var(--kitsch-color-2); /* 머스타드 */
+}
+
+.error-section-kitsch.e500 .error-code-kitsch {
+    color: var(--kitsch-color-3); /* 핫핑크 */
+}
+
+.error-title-kitsch {
+    font-family: var(--font-pixel);
+    font-size: 2rem;
+    margin-top: 1rem;
+    color: inherit; /* 부모 색상 상속 */
+}
+
+.error-description-kitsch {
+    font-family: var(--font-handwriting);
+    font-size: 1.3rem;
+    max-width: 500px;
+    margin: 0.5rem auto 2rem auto;
+    color: inherit;
+    opacity: 0.9;
+}
+
+.error-actions-kitsch {
+    z-index: 100;
+}
+
+.error-actions-kitsch .btn-kitsch {
+    font-size: 1.2rem;
+}
