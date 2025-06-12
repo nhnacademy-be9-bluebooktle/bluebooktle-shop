@@ -11,6 +11,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -44,6 +45,7 @@ public class DeliveryRuleControllerTest {
 
 	@Test
 	@DisplayName("활성 배송 정책 조회 - 성공")
+	@WithMockUser(roles = "USER")
 	void getDeliveryRules_success() throws Exception {
 		DeliveryRuleResponse activeRule = new DeliveryRuleResponse(
 			1L,
@@ -66,6 +68,7 @@ public class DeliveryRuleControllerTest {
 
 	@Test
 	@DisplayName("기본 배송 정책 조회 - 성공")
+	@WithMockUser(roles = "USER")
 	void getDefaultDeliveryRule_success() throws Exception {
 		DeliveryRuleResponse defaultRule = new DeliveryRuleResponse(
 			2L,
