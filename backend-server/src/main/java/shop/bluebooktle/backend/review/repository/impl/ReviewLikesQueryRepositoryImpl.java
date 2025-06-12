@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
-import shop.bluebooktle.backend.book.entity.QReviewLikes;
+import shop.bluebooktle.backend.review.entity.QReviewLikes;
 import shop.bluebooktle.backend.review.entity.ReviewLikes;
 import shop.bluebooktle.backend.review.repository.ReviewLikesQueryRepository;
 

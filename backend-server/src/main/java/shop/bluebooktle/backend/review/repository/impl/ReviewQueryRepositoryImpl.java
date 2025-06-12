@@ -13,10 +13,10 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.book.entity.QBook;
 import shop.bluebooktle.backend.book.entity.QImg;
-import shop.bluebooktle.backend.book.entity.QReview;
+import shop.bluebooktle.backend.book_order.entity.QBookOrder;
+import shop.bluebooktle.backend.review.entity.QReview;
 import shop.bluebooktle.backend.review.entity.Review;
 import shop.bluebooktle.backend.review.repository.ReviewQueryRepository;
-import shop.bluebooktle.backend.book_order.entity.QBookOrder;
 import shop.bluebooktle.common.entity.auth.QUser;
 
 @Repository
