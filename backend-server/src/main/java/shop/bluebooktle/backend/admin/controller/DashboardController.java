@@ -1,4 +1,4 @@
-package shop.bluebooktle.backend.admin.controller; // 패키지 경로는 실제 프로젝트 구조에 맞게 조정하세요.
+package shop.bluebooktle.backend.admin.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

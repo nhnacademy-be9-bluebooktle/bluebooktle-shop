@@ -19,7 +19,7 @@ import shop.bluebooktle.frontend.service.DashboardService;
 @RequiredArgsConstructor
 public class AdminDashboardController {
 
-	private final DashboardService dashboardService; // DashboardService 의존성 주입
+	private final DashboardService dashboardService;
 
 	@GetMapping("/dashboard")
 	public String dashboardPage(Model model, HttpServletRequest request, RedirectAttributes redirectAttributes) {
