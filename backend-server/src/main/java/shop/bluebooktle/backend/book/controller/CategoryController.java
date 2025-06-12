@@ -111,21 +111,7 @@ public class CategoryController {
 		return ResponseEntity.ok(JsendResponse.success());
 	}
 
-	/*// 상위 카테고리에 포함되는 하위 카테고리 목록을 가져옴
-	@GetMapping("/{categoryId}/subcategories")
-	public ResponseEntity<JsendResponse<List<CategoryResponse>>> getSubcategories(@PathVariable Long categoryId) {
-		List<CategoryResponse> subs = categoryService.getSubcategoriesByParentCategoryId(categoryId);
-		return ResponseEntity.ok(JsendResponse.success(subs));
-	}
-
-	// 하위 카테고리가 포함되는 상위 카테고리 목록을 가져옴
-	@GetMapping("/{categoryId}/parentcategories")
-	public ResponseEntity<JsendResponse<List<CategoryResponse>>> getParentCategories(@PathVariable Long categoryId) {
-		List<CategoryResponse> parents = categoryService.getParentCategoriesByLeafCategoryId(categoryId);
-		return ResponseEntity.ok(JsendResponse.success(parents));
-	}*/
-
-	// 카테고리 이름으로 조회
+	@Operation(summary = "최상위 카테고리 이름으로 조회", description = "최상위 카테고리를 이름으로 조회합니다.")
 	@GetMapping("/name/{categoryName}")
 	public ResponseEntity<JsendResponse<CategoryResponse>> getCategoryByName(@PathVariable String categoryName) {
 		CategoryResponse categoryResponse = categoryService.getCategoryByName(categoryName);
