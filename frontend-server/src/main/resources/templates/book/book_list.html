@@ -171,7 +171,13 @@
                         </div>
                     </div>
 
-                    <div class="book-info-kitsch">
+                    <div class="book-info-kitsch"
+                         th:with="
+                                 rawStar=${book.star != null ? book.star.setScale(1, T(java.math.RoundingMode).DOWN) : 0},
+                                 starDouble=${rawStar.doubleValue()},
+                                 fullStars=${T(java.lang.Math).floor(starDouble).intValue()},
+                                 halfStar=${(starDouble % 1.0) >= 0.5 ? 1 : 0},
+                                 emptyStars=${5 - fullStars - halfStar}">
                         <h3 class="book-title-kitsch display-font-kitsch"
                             th:text="${book.title}">제목</h3>
 
@@ -189,21 +195,18 @@
                                   th:text="${#numbers.formatDecimal(book.price, 0, 'COMMA', 0, 'NONE')} + '원'">0원</span>
                         </div>
 
-                        <div class="rating-kitsch"
-                             th:with="
-                                 rawStar=${book.star != null ? book.star.setScale(1, T(java.math.RoundingMode).DOWN) : 0},
-                                 starDouble=${rawStar.doubleValue()},
-                                 fullStars=${T(java.lang.Math).floor(starDouble).intValue()},
-                                 halfStar=${(starDouble % 1.0) >= 0.5 ? 1 : 0},
-                                 emptyStars=${5 - fullStars - halfStar}">
+                        <div class="rating-kitsch">
 
                             <!-- 꽉 찬 별 출력 -->
-                            <span th:each="i : ${#numbers.sequence(1, fullStars)}">
-                                <i class="ll"></i>
+                            <span th:if="${fullStars > 0}" th:each="i : ${#numbers.sequence(1, fullStars)}">
+                                <i class="fas fa-star"></i>
                             </span>
 
                             <!-- 반쪽 별 출력 -->
-                            <i class="fas fa-star-half-alt" th:if="${halfStar == 1}"></i>
+
+                            <span  th:if="${halfStar == 1}">
+                                <i class="fas fa-star-half-alt" ></i>
+                            </span>
 
                             <!-- 빈 별 출력 -->
                             <span th:each="i : ${#numbers.sequence(1, emptyStars)}">
