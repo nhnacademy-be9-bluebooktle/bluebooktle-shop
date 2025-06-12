@@ -15,9 +15,6 @@ import shop.bluebooktle.common.entity.auth.User;
 
 public interface OrderRepository extends JpaRepository<Order, Long>, OrderQueryRepository {
 
-	Page<Order> findByUserAndCreatedAtBetween(User user, LocalDateTime createdAtAfter, LocalDateTime createdAtBefore,
-		Pageable pageable);
-
 	@EntityGraph(attributePaths = {
 		"user",
 		"orderState",
@@ -74,7 +71,7 @@ public interface OrderRepository extends JpaRepository<Order, Long>, OrderQueryR
 		"payment"
 	})
 	Optional<Order> getOrderByOrderKey(String orderKey);
-	
+
 	long countByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
 
 	long countByOrderState_State(OrderStatus status);
