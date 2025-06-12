@@ -1,5 +1,6 @@
 package shop.bluebooktle.backend.book.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -30,7 +31,7 @@ public class BookAuthorServiceImpl implements BookAuthorService {
 	private final BookAuthorRepository bookAuthorRepository;
 
 	@Override
-	public void registerBookAuthor(Long bookId, Long authorId) {
+	public AuthorResponse registerBookAuthor(Long bookId, Long authorId) {
 
 		Author author = authorRepository.findById(authorId)
 			.orElseThrow(() -> new AuthorNotFoundException(authorId));
@@ -46,22 +47,30 @@ public class BookAuthorServiceImpl implements BookAuthorService {
 			.author(author)
 			.build();
 		bookAuthorRepository.save(ba);
+		return AuthorResponse.builder().
+			id(author.getId()).
+			name(author.getName()).
+			createdAt(author.getCreatedAt()).
+			build();
 	}
 
 	@Override
-	public void registerBookAuthor(Long bookId, List<Long> authorIdList) {
+	public List<AuthorResponse> registerBookAuthor(Long bookId, List<Long> authorIdList) {
+		List<AuthorResponse> responses = new ArrayList<>();
 		for (Long authorId : authorIdList) {
-			registerBookAuthor(bookId, authorId);
+			AuthorResponse response = registerBookAuthor(bookId, authorId);
+			responses.add(response);
 		}
+		return responses;
 	}
 
 	@Override
-	public void updateBookAuthor(Long bookId, List<Long> authorIdList) {
+	public List<AuthorResponse> updateBookAuthor(Long bookId, List<Long> authorIdList) {
 		// 도서에 등록되었던 기존 작가 삭제
 		List<BookAuthor> bookAuthorList = bookAuthorRepository.findByBookId(bookId);
 		bookAuthorRepository.deleteAll(bookAuthorList);
 		// 다시 새롭게 등록
-		registerBookAuthor(bookId, authorIdList);
+		return registerBookAuthor(bookId, authorIdList);
 	}
 
 	@Transactional(readOnly = true)

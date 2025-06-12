@@ -6,8 +6,6 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.cloud.openfeign.SpringQueryMap;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import shop.bluebooktle.common.domain.coupon.UserCouponFilterType;
@@ -29,9 +27,9 @@ public interface CouponRepository {
 	@GetMapping("/usable-order")
 	UsableUserCouponMapResponse getUsableCouponsForOrder(@RequestParam("bookIds") List<Long> bookIds);
 
-	@PostMapping("/{id}/use")
-	void useCoupon(@PathVariable Long id);
+	@GetMapping("/count/usable")
+	Long countAllUsableCoupons();
 
-	@PostMapping("/{id}/cancel")
-	void cancelCoupon(@PathVariable Long id);
+	@GetMapping("/count/expiring")
+	Long countExpiringThisMonth();
 }

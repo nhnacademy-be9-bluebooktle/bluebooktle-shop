@@ -15,24 +15,30 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.book.service.AuthorService;
+import shop.bluebooktle.common.domain.auth.UserType;
 import shop.bluebooktle.common.dto.book.request.author.AuthorRegisterRequest;
 import shop.bluebooktle.common.dto.book.request.author.AuthorUpdateRequest;
 import shop.bluebooktle.common.dto.book.response.author.AuthorResponse;
 import shop.bluebooktle.common.dto.common.JsendResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
+import shop.bluebooktle.common.security.Auth;
 
 @RestController
 @RequestMapping("/api/authors")
 @RequiredArgsConstructor
+@Tag(name = "관리자 페이지 작가 API", description = "관리자 작가 CRUD API")
 public class AuthorController {
 
 	private final AuthorService authorService;
 
-	// 작가 생성
+	@Operation(summary = "작가 등록", description = "새로운 작가를 등록합니다.")
 	@PostMapping
+	@Auth(type = UserType.ADMIN)
 	public ResponseEntity<JsendResponse<Void>> registerAuthor(
 		@Valid @RequestBody AuthorRegisterRequest authorRegisterRequest
 	) {
@@ -40,8 +46,9 @@ public class AuthorController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(JsendResponse.success());
 	}
 
-	// 작가 조회
+	@Operation(summary = "작가 조회", description = "해당 작가를 조회합니다.")
 	@GetMapping("/{authorId}")
+	@Auth(type = UserType.ADMIN)
 	public ResponseEntity<JsendResponse<AuthorResponse>> getAuthor(
 		@PathVariable Long authorId
 	) {
@@ -49,8 +56,9 @@ public class AuthorController {
 		return ResponseEntity.ok(JsendResponse.success(authorResponse));
 	}
 
-	// 작가 수정
+	@Operation(summary = "작가 수정", description = "해당 작가의 작가명을 수정합니다.")
 	@PutMapping("/{authorId}")
+	@Auth(type = UserType.ADMIN)
 	public ResponseEntity<JsendResponse<Void>> updateAuthor(
 		@PathVariable Long authorId,
 		@Valid @RequestBody AuthorUpdateRequest authorUpdateRequest
@@ -59,8 +67,9 @@ public class AuthorController {
 		return ResponseEntity.ok(JsendResponse.success());
 	}
 
-	// 작가 삭제
+	@Operation(summary = "작가 삭제", description = "해당 작가를 삭제합니다.")
 	@DeleteMapping("/{authorId}")
+	@Auth(type = UserType.ADMIN)
 	public ResponseEntity<JsendResponse<Void>> deleteAuthor(
 		@PathVariable Long authorId
 	) {
@@ -68,8 +77,9 @@ public class AuthorController {
 		return ResponseEntity.ok(JsendResponse.success());
 	}
 
-	// 작가 목록 조회
+	@Operation(summary = "작가 목록 조회", description = "등록된 작가의 목록을 조회합니다.")
 	@GetMapping
+	@Auth(type = UserType.ADMIN)
 	public ResponseEntity<JsendResponse<PaginationData<AuthorResponse>>> getPagedAuthors(
 		@PageableDefault(size = 10, sort = "id") Pageable pageable,
 		@RequestParam(value = "searchKeyword", required = false) String searchKeyword

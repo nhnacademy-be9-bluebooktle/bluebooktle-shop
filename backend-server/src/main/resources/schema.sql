@@ -109,13 +109,14 @@ CREATE TABLE `category`
 CREATE TABLE `order_state`
 (
     `order_state_id` bigint    NOT NULL AUTO_INCREMENT,
-    `state`          ENUM ('PENDING', 'SHIPPING', 'COMPLETED', 'RETURNED', 'CANCELED')
-                               NOT NULL COMMENT '대기,배송중,완료,반품,주문취소',
+    `state`          ENUM ('PENDING', 'PREPARING', 'SHIPPING', 'COMPLETED', 'RETURNED', 'CANCELED','RETURNED_REQUEST')
+                               NOT NULL COMMENT '대기,배송중,완료,반품,주문취소,반품 요청',
     `created_at`     timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `deleted_at`     timestamp NULL,
 
     CONSTRAINT `PK_ORDER_STATE` PRIMARY KEY (`order_state_id`)
 );
+
 
 CREATE TABLE `point_source_type`
 (
@@ -167,11 +168,14 @@ CREATE TABLE `packaging_option`
 
 CREATE TABLE `payment_detail`
 (
-    `payment_detail_id` bigint       NOT NULL AUTO_INCREMENT,
-    `payment_type_id`   bigint       NOT NULL,
-    `key`               varchar(255) NULL,
-    `created_at`        timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `deleted_at`        timestamp    NULL,
+    `payment_detail_id` bigint                                                                                                      NOT NULL AUTO_INCREMENT,
+    `payment_type_id`   bigint                                                                                                      NOT NULL,
+    `payment_key`       varchar(255)                                                                                                NULL,
+    `payment_status`    ENUM ('READY','IN_PROGRESS','WAITING_FOR_DEPOSIT','DONE','CANCELED','PARTIAL_CANCELED','ABORTED','EXPIRED') NOT NULL DEFAULT 'READY',
+    `requested_at`      timestamp                                                                                                   NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `approved_at`       timestamp                                                                                                   NULL,
+    `created_at`        timestamp                                                                                                   NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `deleted_at`        timestamp                                                                                                   NULL,
 
     CONSTRAINT `PK_PAYMENT_DETAIL` PRIMARY KEY (`payment_detail_id`),
     CONSTRAINT `FK_payment_detail_payment_type_id_payment_type`
@@ -562,7 +566,7 @@ CREATE TABLE `refund`
     `date`          datetime                                                                NOT NULL,
     `reason`        ENUM ('CHANGE_OF_MIND', 'DEFECT', 'DAMAGED', 'WRONG_DELIVERY', 'OTHER') NOT NULL COMMENT '단순 변심, 결함, 파손, 오배송',
     `reason_detail` text                                                                    NOT NULL,
-    `status`        ENUM ('PENDING', 'PROGRESS', 'COMPLETE', 'CANCELED')                    NOT NULL COMMENT '요청, 진행중, 완료, 취소',
+    `status`        ENUM ('PENDING', 'REJECTED', 'COMPLETE')                                NOT NULL COMMENT '요청, 진행중, 완료',
     `price`         decimal(10, 2)                                                          NOT NULL,
     `created_at`    timestamp                                                               NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `deleted_at`    timestamp                                                               NULL,
@@ -614,6 +618,23 @@ CREATE TABLE `review`
             REFERENCES `img` (`img_id`)
 );
 
+CREATE TABLE `review_likes`
+(
+    `review_likes_id` bigint    NOT NULL AUTO_INCREMENT,
+    `user_id`         bigint    NOT NULL,
+    `review_id`       bigint    NOT NULL,
+    `deleted_at`     timestamp NULL,
+    `created_at`     timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT `PK_REVIEW_LIKES` PRIMARY KEY (`review_likes_id`),
+    CONSTRAINT `FK_review_likes_user_id_user`
+        FOREIGN KEY (`user_id`)
+            REFERENCES `users` (`user_id`),
+    CONSTRAINT `FK_review_likes_review_id_review`
+        FOREIGN KEY (`review_id`)
+            REFERENCES `review` (`review_id`)
+);
+
 CREATE TABLE `user_coupon_book_order`
 (
     `user_coupon_book_order_id` bigint NOT NULL AUTO_INCREMENT,
@@ -654,3 +675,127 @@ CREATE TABLE `order_packaging`
         FOREIGN KEY (`book_order_id`)
             REFERENCES `book_order` (`book_order_id`)
 );
+
+CREATE TABLE shedlock
+(
+    name       VARCHAR(64)  NOT NULL PRIMARY KEY,
+    lock_until TIMESTAMP    NOT NULL,
+    locked_at  TIMESTAMP    NOT NULL,
+    locked_by  VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE BATCH_JOB_INSTANCE
+(
+    JOB_INSTANCE_ID BIGINT       NOT NULL PRIMARY KEY,
+    VERSION         BIGINT,
+    JOB_NAME        VARCHAR(100) NOT NULL,
+    JOB_KEY         VARCHAR(32)  NOT NULL,
+    constraint JOB_INST_UN unique (JOB_NAME, JOB_KEY)
+) ENGINE = InnoDB;
+
+CREATE TABLE BATCH_JOB_EXECUTION
+(
+    JOB_EXECUTION_ID BIGINT      NOT NULL PRIMARY KEY,
+    VERSION          BIGINT,
+    JOB_INSTANCE_ID  BIGINT      NOT NULL,
+    CREATE_TIME      DATETIME(6) NOT NULL,
+    START_TIME       DATETIME(6) DEFAULT NULL,
+    END_TIME         DATETIME(6) DEFAULT NULL,
+    STATUS           VARCHAR(10),
+    EXIT_CODE        VARCHAR(2500),
+    EXIT_MESSAGE     VARCHAR(2500),
+    LAST_UPDATED     DATETIME(6),
+    constraint JOB_INST_EXEC_FK foreign key (JOB_INSTANCE_ID)
+        references BATCH_JOB_INSTANCE (JOB_INSTANCE_ID)
+) ENGINE = InnoDB;
+
+CREATE TABLE BATCH_JOB_EXECUTION_PARAMS
+(
+    JOB_EXECUTION_ID BIGINT       NOT NULL,
+    PARAMETER_NAME   VARCHAR(100) NOT NULL,
+    PARAMETER_TYPE   VARCHAR(100) NOT NULL,
+    PARAMETER_VALUE  VARCHAR(2500),
+    IDENTIFYING      CHAR(1)      NOT NULL,
+    constraint JOB_EXEC_PARAMS_FK foreign key (JOB_EXECUTION_ID)
+        references BATCH_JOB_EXECUTION (JOB_EXECUTION_ID)
+) ENGINE = InnoDB;
+
+CREATE TABLE BATCH_STEP_EXECUTION
+(
+    STEP_EXECUTION_ID  BIGINT       NOT NULL PRIMARY KEY,
+    VERSION            BIGINT       NOT NULL,
+    STEP_NAME          VARCHAR(100) NOT NULL,
+    JOB_EXECUTION_ID   BIGINT       NOT NULL,
+    CREATE_TIME        DATETIME(6)  NOT NULL,
+    START_TIME         DATETIME(6) DEFAULT NULL,
+    END_TIME           DATETIME(6) DEFAULT NULL,
+    STATUS             VARCHAR(10),
+    COMMIT_COUNT       BIGINT,
+    READ_COUNT         BIGINT,
+    FILTER_COUNT       BIGINT,
+    WRITE_COUNT        BIGINT,
+    READ_SKIP_COUNT    BIGINT,
+    WRITE_SKIP_COUNT   BIGINT,
+    PROCESS_SKIP_COUNT BIGINT,
+    ROLLBACK_COUNT     BIGINT,
+    EXIT_CODE          VARCHAR(2500),
+    EXIT_MESSAGE       VARCHAR(2500),
+    LAST_UPDATED       DATETIME(6),
+    constraint JOB_EXEC_STEP_FK foreign key (JOB_EXECUTION_ID)
+        references BATCH_JOB_EXECUTION (JOB_EXECUTION_ID)
+) ENGINE = InnoDB;
+
+CREATE TABLE BATCH_STEP_EXECUTION_CONTEXT
+(
+    STEP_EXECUTION_ID  BIGINT        NOT NULL PRIMARY KEY,
+    SHORT_CONTEXT      VARCHAR(2500) NOT NULL,
+    SERIALIZED_CONTEXT TEXT,
+    constraint STEP_EXEC_CTX_FK foreign key (STEP_EXECUTION_ID)
+        references BATCH_STEP_EXECUTION (STEP_EXECUTION_ID)
+) ENGINE = InnoDB;
+
+CREATE TABLE BATCH_JOB_EXECUTION_CONTEXT
+(
+    JOB_EXECUTION_ID   BIGINT        NOT NULL PRIMARY KEY,
+    SHORT_CONTEXT      VARCHAR(2500) NOT NULL,
+    SERIALIZED_CONTEXT TEXT,
+    constraint JOB_EXEC_CTX_FK foreign key (JOB_EXECUTION_ID)
+        references BATCH_JOB_EXECUTION (JOB_EXECUTION_ID)
+) ENGINE = InnoDB;
+
+CREATE TABLE BATCH_STEP_EXECUTION_SEQ
+(
+    ID         BIGINT  NOT NULL,
+    UNIQUE_KEY CHAR(1) NOT NULL,
+    constraint UNIQUE_KEY_UN unique (UNIQUE_KEY)
+) ENGINE = InnoDB;
+
+INSERT INTO BATCH_STEP_EXECUTION_SEQ (ID, UNIQUE_KEY)
+select *
+from (select 0 as ID, '0' as UNIQUE_KEY) as tmp
+where not exists(select * from BATCH_STEP_EXECUTION_SEQ);
+
+CREATE TABLE BATCH_JOB_EXECUTION_SEQ
+(
+    ID         BIGINT  NOT NULL,
+    UNIQUE_KEY CHAR(1) NOT NULL,
+    constraint UNIQUE_KEY_UN unique (UNIQUE_KEY)
+) ENGINE = InnoDB;
+
+INSERT INTO BATCH_JOB_EXECUTION_SEQ (ID, UNIQUE_KEY)
+select *
+from (select 0 as ID, '0' as UNIQUE_KEY) as tmp
+where not exists(select * from BATCH_JOB_EXECUTION_SEQ);
+
+CREATE TABLE BATCH_JOB_SEQ
+(
+    ID         BIGINT  NOT NULL,
+    UNIQUE_KEY CHAR(1) NOT NULL,
+    constraint UNIQUE_KEY_UN unique (UNIQUE_KEY)
+) ENGINE = InnoDB;
+
+INSERT INTO BATCH_JOB_SEQ (ID, UNIQUE_KEY)
+select *
+from (select 0 as ID, '0' as UNIQUE_KEY) as tmp
+where not exists(select * from BATCH_JOB_SEQ);
+

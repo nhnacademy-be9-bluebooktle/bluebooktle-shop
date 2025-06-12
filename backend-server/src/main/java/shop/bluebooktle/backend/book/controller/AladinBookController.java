@@ -11,25 +11,30 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.book.service.AladinBookService;
 import shop.bluebooktle.backend.book.service.BookRegisterService;
+import shop.bluebooktle.common.domain.auth.UserType;
 import shop.bluebooktle.common.dto.book.request.BookAllRegisterByAladinRequest;
 import shop.bluebooktle.common.dto.book.response.AladinBookResponse;
 import shop.bluebooktle.common.dto.common.JsendResponse;
-import shop.bluebooktle.common.exception.book.AladinBookNotFoundException;
+import shop.bluebooktle.common.security.Auth;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/aladin/books")
+@Tag(name = "외부 API를 통한 도서 조회 및 도서 등록 API ", description = "알라딘 API를 사용한 조회 및 알라딘 도서 등록 API")
 public class AladinBookController {
 
 	private final AladinBookService aladinBookService;
 	private final BookRegisterService bookRegisterService;
 
-	// 알라딘 API 도서 검색
+	@Operation(summary = "알라딘 API 도서 검색", description = "알라딘 API를 사용해 키워드에 해당하는 도서를 조회합니다.")
 	@GetMapping("/aladin-search")
+	@Auth(type = UserType.ADMIN)
 	public ResponseEntity<JsendResponse<List<AladinBookResponse>>> searchBooks(
 		@RequestParam("keyword") String keyword,
 		@RequestParam(value = "page", defaultValue = "1") int page,
@@ -39,18 +44,9 @@ public class AladinBookController {
 		return ResponseEntity.ok(JsendResponse.success(result));
 	}
 
-	// isbn으로 도서정보 가져오기
-	@GetMapping("/select")
-	public ResponseEntity<JsendResponse<AladinBookResponse>> selectBook(@RequestParam String isbn) {
-		AladinBookResponse book = aladinBookService.getBookByIsbn(isbn);
-		if (book == null) {
-			throw new AladinBookNotFoundException("해당 ISBN에 대한 도서를 찾을 수 없습니다.");
-		}
-		return ResponseEntity.ok(JsendResponse.success(book));
-	}
-
-	// 알라딘 api로 도서 등록
+	@Operation(summary = "알라딘 API 도서 등록", description = "알라딘 API를 사용해 해당 도서를 등록합니다.")
 	@PostMapping
+	@Auth(type = UserType.ADMIN)
 	public ResponseEntity<JsendResponse<Void>> registerAladinBook(
 		@Valid @RequestBody BookAllRegisterByAladinRequest request) {
 		bookRegisterService.registerBookByAladin(request);

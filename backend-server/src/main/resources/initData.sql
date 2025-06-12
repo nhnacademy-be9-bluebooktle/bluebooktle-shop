@@ -10,13 +10,18 @@ VALUES (3, '도서산간', null, 10000, 'MOUNTAINOUS_AREA', true, now(), null);
 INSERT INTO order_state
 VALUES (1, 'PENDING', now(), null);
 INSERT INTO order_state
-VALUES (2, 'SHIPPING', now(), null);
+VALUES (2, 'PREPARING', now(), null);
 INSERT INTO order_state
-VALUES (3, 'COMPLETED', now(), null);
+VALUES (3, 'SHIPPING', now(), null);
 INSERT INTO order_state
-VALUES (4, 'RETURNED', now(), null);
+VALUES (4, 'COMPLETED', now(), null);
 INSERT INTO order_state
-VALUES (5, 'CANCELED', now(), null);
+VALUES (5, 'RETURNED', now(), null);
+INSERT INTO order_state
+VALUES (6, 'CANCELED', now(), null);
+INSERT INTO order_state
+VALUES (7, 'RETURNED_REQUEST', now(), null);
+
 
 INSERT INTO packaging_option
 VALUES (1, '프리미엄 포장', 3000, now(), null);
@@ -38,6 +43,17 @@ VALUES (4, 'EARN', '결제 적립', now(), null);
 
 INSERT INTO point_source_type
 VALUES (5, 'USE', '결제 사용', now(), null);
+
+INSERT INTO point_source_type
+VALUES (6, 'EARN', '주문 취소 환불', now(), null);
+
+INSERT INTO point_source_type
+VALUES (7, 'USE', '결제 취소 회수', now(), null);
+
+INSERT INTO point_source_type
+VALUES (8, 'EARN', '반품 적립', now(), null);
+
+
 
 INSERT INTO point_policy
 VALUES (1, 1, 'AMOUNT', 500, true, now(), null);
@@ -62,11 +78,11 @@ VALUES ('로얄', 2, 100000.00, 199999.99);
 
 -- 골드 등급 (20만원 이상 ~ 30만원 미만) - 적립률 2%로 가정
 INSERT INTO membership_level (name, rate, min_net_spent, max_net_spent)
-VALUES ('골드', 2, 200000.00, 299999.99);
+VALUES ('골드', 3, 200000.00, 299999.99);
 
 -- 플래티넘 등급 (30만원 이상)
 INSERT INTO membership_level (name, rate, min_net_spent, max_net_spent)
-VALUES ('플래티넘', 3, 300000.00, 99999999.99);
+VALUES ('플래티넘', 4, 300000.00, 99999999.99);
 
 -- 생일 쿠폰 정책 생성
 INSERT INTO coupon_type (coupon_type_id, name, target, minimum_payment, created_at)
@@ -155,5 +171,8 @@ VALUES (1, NULL, '문학', '/1', '2025-05-25 17:48:16', NULL),
        (61, 58, '음악·예술', '/54/58/61', '2025-05-25 18:05:37', NULL),
        (62, 54, '가정·원예', '/54/62', '2025-05-25 18:06:02', NULL),
        (63, 62, '육아·부모', '/54/62/63', '2025-05-25 18:06:23', NULL),
-       (64, 62, '인테리어·DIY', '/54/62/64', '2025-05-25 18:06:39', NULL)
+       (64, 62, '인테리어·DIY', '/54/62/64', '2025-05-25 18:06:39', NULL),
+       (65, NULL, '베스트셀러', '/65', '2025-06-09 10:00:00', NULL),
+       (66, 65, '국내도서', '/65/66', '2025-06-05 10:06:13', NULL),
+       (67, 65, '해외도서', '/65/67', '2025-06-05 10:07:00', NULL)
 ;

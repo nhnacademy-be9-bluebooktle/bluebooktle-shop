@@ -18,4 +18,6 @@ public interface ImgService {
 	// 이미지 삭제
 	void deleteImg(Long imgId);
 
+	ImgResponse getImgByReviewId(Long reviewId);
+
 }

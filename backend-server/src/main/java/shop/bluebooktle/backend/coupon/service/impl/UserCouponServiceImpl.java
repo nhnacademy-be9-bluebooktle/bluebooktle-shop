@@ -8,13 +8,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
-import shop.bluebooktle.backend.coupon.entity.UserCoupon;
 import shop.bluebooktle.backend.coupon.repository.UserCouponRepository;
 import shop.bluebooktle.backend.coupon.service.UserCouponService;
 import shop.bluebooktle.common.domain.coupon.UserCouponFilterType;
 import shop.bluebooktle.common.dto.coupon.response.UsableUserCouponMapResponse;
 import shop.bluebooktle.common.dto.coupon.response.UserCouponResponse;
-import shop.bluebooktle.common.exception.coupon.UserCouponNotFoundException;
 
 @Service
 @RequiredArgsConstructor
@@ -34,18 +32,12 @@ public class UserCouponServiceImpl implements UserCouponService {
 	}
 
 	@Override
-	@Transactional
-	public void useCoupon(Long id) {
-		UserCoupon userCoupon = userCouponRepository.findById(id)
-			.orElseThrow(UserCouponNotFoundException::new);
-		userCoupon.useCoupon();
+	public Long countAllUsableCoupons(Long userId) {
+		return userCouponRepository.couponAllUsableCoupons(userId);
 	}
 
 	@Override
-	@Transactional
-	public void cancelCouponUse(Long id) {
-		UserCoupon userCoupon = userCouponRepository.findById(id)
-			.orElseThrow(UserCouponNotFoundException::new);
-		userCoupon.cancelCoupon();
+	public Long countExpiringThisMonth(Long userId) {
+		return userCouponRepository.couponExpiringThisMonth(userId);
 	}
 }

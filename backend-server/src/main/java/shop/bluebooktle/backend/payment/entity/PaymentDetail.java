@@ -1,10 +1,15 @@
 package shop.bluebooktle.backend.payment.entity;
 
+import java.time.LocalDateTime;
+
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -18,6 +23,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import shop.bluebooktle.common.domain.payment.PaymentStatus;
 import shop.bluebooktle.common.entity.BaseEntity;
 
 @Entity
@@ -39,12 +45,31 @@ public class PaymentDetail extends BaseEntity {
 	@JoinColumn(name = "payment_type_id", nullable = false)
 	private PaymentType paymentType;
 
-	@Column(name = "key", length = 255)
-	private String key;
+	@Column(name = "payment_key", length = 255)
+	private String paymentKey;
+
+	@Enumerated(EnumType.STRING)
+	@Column(name = "payment_status", nullable = false)
+	@ColumnDefault("'READY'")
+	private PaymentStatus paymentStatus;
+
+	@Column(name = "requested_at", nullable = false)
+	private LocalDateTime requestedAt;
+
+	@Column(name = "approved_at")
+	private LocalDateTime approvedAt;
 
 	@Builder
-	public PaymentDetail(PaymentType paymentType, String key) {
+	public PaymentDetail(PaymentType paymentType, String paymentKey, PaymentStatus paymentStatus,
+		LocalDateTime requestedAt, LocalDateTime approvedAt) {
 		this.paymentType = paymentType;
-		this.key = key;
+		this.paymentKey = paymentKey;
+		this.paymentStatus = paymentStatus == null ? PaymentStatus.READY : paymentStatus;
+		this.requestedAt = requestedAt == null ? LocalDateTime.now() : requestedAt;
+		this.approvedAt = approvedAt;
+	}
+
+	public void updateStatus(PaymentStatus newStatus) {
+		this.paymentStatus = newStatus;
 	}
 }

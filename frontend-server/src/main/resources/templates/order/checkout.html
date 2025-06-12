@@ -297,10 +297,6 @@
             display: block;
         }
 
-        #payment-widget, #agreement-widget {
-            margin-bottom: 0.8rem;
-        }
-
         .checkout-submit-btn-kitsch {
             width: 100%;
             font-size: 1.2rem;
@@ -537,6 +533,19 @@
                                       th:text="'- ' + ${#numbers.formatDecimal(coupon.appliedDiscountAmount, 0, 'COMMA', 0, 'POINT')} + '원'"></span>
                             </div>
                         </th:block>
+                        <th:block th:if="${order.appliedCoupons != null}">
+                            <div class="summary-line coupon-detail-header"
+                                 th:if="${order.appliedCoupons.?[target != null && target.toString() == 'BOOK'].size() > 0}">
+                                <span class="label" style="text-decoration: underline;">└ 도서별 적용 쿠폰:</span>
+                            </div>
+                            <div th:each="coupon : ${order.appliedCoupons}"
+                                 th:if="${coupon.target != null && coupon.target.toString() == 'BOOK'}"
+                                 class="summary-line coupon-item-detail">
+                                <span class="label" th:text="${coupon.couponName}"></span>
+                                <span class="value discount"
+                                      th:text="'- ' + ${#numbers.formatDecimal(coupon.appliedDiscountAmount, 0, 'COMMA', 0, 'POINT')} + '원'"></span>
+                            </div>
+                        </th:block>
 
                         <div class="summary-line sub-total-line">
                             <span class="label">쿠폰 적용 후 합계:</span>
@@ -555,32 +564,16 @@
                                   th:text="${#numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT')} + '원'">0원</span>
                         </div>
 
-                        <div class="summary-line form-group-kitsch"
-                             style="flex-direction: column; align-items: flex-start; margin-top:1rem; margin-bottom: 0.3rem;">
-                            <label class="label" for="pointsToUseFinal"
-                                   th:text="'5. 사용할 포인트 (보유: ' + ${#numbers.formatDecimal(userPointBalance, 0, 'COMMA', 0, 'POINT')} + ' P):'"
-                                   style="min-width: unset; margin-bottom:0.3rem; font-family:var(--font-pixel);">포인트
-                                사용</label>
-                            <div style="display:flex; gap:0.5rem; width:100%;">
-                                <input class="input-kitsch pixel-font-kitsch" id="pointsToUseFinal"
-                                       name="pointsToUseFinal" placeholder="0" type="number" value="0"
-                                       th:attr="data-available-points=${userPointBalance}, max=${userPointBalance}"
-                                       min="0" style="flex-grow:1;">
-                                <button class="btn-kitsch secondary-btn-kitsch color2-kitsch small-btn-kitsch retro-shadow-kitsch-small"
-                                        onclick="applyMaxPointsFinal()"
-                                        style="min-width: fit-content; padding: 0.4em 0.8em;" type="button">전액
-                                </button>
-                            </div>
-                        </div>
-                        <div class="summary-line" style="margin-bottom:1rem;">
-                            <span class="label" style="visibility:hidden;">포인트 할인</span>
-                            <span class="value discount" id="finalSummaryPointDiscount">- 0원</span>
+                        <div class="summary-line" style="margin-top:1rem;">
+                            <span class="label">5. 사용할 포인트:</span>
+                            <span class="value discount" id="finalSummaryPointDiscount"
+                                  th:text="'- ' + ${#numbers.formatDecimal(order != null && order.pointUseAmount != null ? order.pointUseAmount : 0, 0, 'COMMA', 0, 'POINT')} + '원'">- 0원</span>
                         </div>
 
                         <div class="total-line summary-line">
                             <span class="label">최종 결제금액:</span>
                             <span class="value" id="finalSummaryFinalTotalPrice"
-                                  th:text="${#numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT')} + '원'">0원</span>
+                                  th:text="${#numbers.formatDecimal(order != null ? (order.totalAmount - (order.pointUseAmount != null ? order.pointUseAmount : 0)) : 0, 0, 'COMMA', 0, 'POINT')} + '원'">0원</span>
                         </div>
                     </div>
                     <div th:unless="${order != null}">
@@ -590,18 +583,12 @@
 
                 <section class="info-section payment-methods-widget-section">
                     <h3 class="section-title-kitsch"><i class="fas fa-credit-card"></i> 결제 수단</h3>
-
                     <div class="payment-gateway-display"
                          style="background-color: var(--kitsch-bg-alt); border: 2px dashed var(--kitsch-color-2); border-radius: 5px; padding: 0.8rem 1rem; margin-bottom: 1rem; text-align: center;">
                         <i class="fas fa-shield-alt" th:styleappend="'color:' + @{var(--kitsch-color-4)}"></i>
                         <span class="pixel-font-kitsch"
                               style="font-size: 1rem; color: var(--kitsch-color-5); margin-left: 0.5em;">토스페이먼츠</span>
-                        <p style="font-size: 0.75rem; color: var(--kitsch-text-dark); margin-top: 0.2em;">아래에서 상세 결제 방법을
-                            선택해주세요.</p>
                     </div>
-
-                    <div id="payment-widget" style="width: 100%;"></div>
-                    <div id="agreement-widget" style="width: 100%; margin-top:10px;"></div>
                 </section>
                 <button class="btn-kitsch primary-btn-kitsch checkout-submit-btn-kitsch retro-shadow-kitsch"
                         id="final-payment-button" type="button" th:disabled="${order == null}">
@@ -613,30 +600,26 @@
 </div>
 
 <th:block layout:fragment="page_scripts">
-    <script src="https://js.tosspayments.com/v1/payment-widget"></script>
+    <script src="https://js.tosspayments.com/v1/payment"></script>
     <script th:inline="javascript">
         /*<![CDATA[*/
         // === HTML 요소 및 데이터 준비 ===
         const orderData = /*[[${order}]]*/ null;
-        const currentUserData = /*[[${currentUser}]]*/ null; // UserWithAddressResponse DTO
+        const currentUserData = /*[[${currentUser}]]*/ null;
 
         const tossClientKeyFinal = /*[[${tossClientKey}]]*/ null;
-        // 아래 변수들은 orderData가 있을 때만 의미가 있으므로, 사용 전에 null 체크 필요
-        const orderIdForPaymentFinal = orderData ? orderData.orderId.toString() : 'UNKNOWN_ORDER_ID';
+        const orderIdForPaymentFinal = orderData ? orderData.orderKey.toString() : 'UNKNOWN_ORDER_ID';
         const orderNameForPaymentFinal = orderData ? orderData.orderName : '상품명 불명';
-        const successUrlFinal = /*[[${successUrl}]]*/ '';
+        const tossSuccessUrlFinal = /*[[${tossSuccessUrl}]]*/ '';
         const failUrlFinal = /*[[${failUrl}]]*/ '';
-        const customerNameForPaymentFinal = /*[[${customerNameForPayment}]]*/ '고객님'; // Controller에서 설정된 값
+        const customerNameForPaymentFinal = /*[[${customerNameForPayment}]]*/ '고객님';
 
-        const availablePointsFinal = parseFloat(orderData ? orderData.userPointBalance : 0);
-        // 포인트 적용 전 최종 금액 (order.totalAmount는 이 값을 의미)
         let amountBeforePointsFinal = parseFloat(orderData ? orderData.totalAmount : 0);
 
-        let paymentWidgetInstance = null;
-        let currentFinalAmountForPayment = amountBeforePointsFinal; // JS에서 실시간으로 계산될 최종 결제 금액
+        let currentFinalAmountForPayment = amountBeforePointsFinal;
+        let tossPayments = null; // Initialize tossPayments variable
 
         // === DOM 요소 ===
-        const pointsToUseInput = document.getElementById('pointsToUseFinal');
         const pointDiscountDisplay = document.getElementById('finalSummaryPointDiscount');
         const finalTotalPriceDisplay = document.getElementById('finalSummaryFinalTotalPrice');
         const paymentButton = document.getElementById('final-payment-button');
@@ -647,208 +630,106 @@
             return Math.round(amount).toLocaleString('ko-KR') + '원';
         }
 
-        function renderTossPaymentWidget(amountToPay) {
-            console.log("Attempting to render widget with amount:", amountToPay);
-            if (!tossClientKeyFinal) {
-                console.error("Toss Payments 클라이언트 키가 설정되지 않았습니다.");
-                if (paymentButton) paymentButton.disabled = true;
-                return;
-            }
-            if (!orderData) { // 주문 정보가 없으면 위젯 렌더링 안 함
-                console.warn("Order data is null, skipping widget rendering.");
-                if (paymentButton) paymentButton.disabled = true;
-                return;
-            }
-
-            let customerKey;
-            if (currentUserData && currentUserData.userId != null) { // UserWithAddressResponse는 record, 필드 직접 접근
-                let userIdStr = currentUserData.userId.toString();
-                // Toss Payments customerKey 요구사항: 영문 대소문자, 숫자, 특수문자(-_=.)@, 최소 2자 ~ 최대 50자
-                if (userIdStr.length < 2 || !/^[a-zA-Z0-9_.\-=@]{2,50}$/.test(userIdStr)) {
-                    customerKey = "user-" + userIdStr; // 예시: "user-1" (userId가 1일 경우 길이 만족)
-                    console.log("Generated customerKey for member:", customerKey);
-                } else {
-                    customerKey = userIdStr;
-                    console.log("Using userId as customerKey for member:", customerKey);
-                }
-            } else {
-                customerKey = PaymentWidget.ANONYMOUS; // SDK 제공 상수
-                console.log("Using ANONYMOUS customerKey for guest.");
-            }
-
-            try {
-                if (!paymentWidgetInstance) {
-                    console.log("Initializing PaymentWidget with clientKey and customerKey:", tossClientKeyFinal, customerKey);
-                    paymentWidgetInstance = PaymentWidget(tossClientKeyFinal, customerKey);
-                    paymentWidgetInstance.renderAgreement("#agreement-widget", {variantKey: "AGREEMENT"});
-                    console.log("PaymentWidget initialized, agreement rendered.");
-                }
-
-                if (amountToPay > 0) {
-                    console.log("Rendering payment methods for amount:", amountToPay);
-                    paymentWidgetInstance.renderPaymentMethods(
-                        "#payment-widget",
-                        {value: amountToPay}, // 금액은 객체 형태로 전달
-                        {variantKey: "DEFAULT"}
-                    );
-                } else { // 0원 결제 시
-                    const widgetContainer = document.getElementById('payment-widget');
-                    if (widgetContainer) widgetContainer.innerHTML = '<p style="text-align:center; font-family:var(--font-pixel); color:var(--kitsch-color-2);">결제할 금액이 없습니다.</p>';
-                    console.log("Amount is 0 or less, showing 'no amount to pay' message in widget area.");
-                }
-            } catch (e) {
-                console.error("PaymentWidget 초기화 또는 렌더링 오류:", e);
-                if (paymentButton) paymentButton.disabled = true;
-                alert("결제 위젯을 불러오는 중 오류가 발생했습니다: " + e.message + "\n(콘솔에서 상세 내용을 확인하세요)");
-            }
-        }
+        // Removed renderTossPaymentWidget function as it's for the widget SDK
 
         function updateFinalCheckoutSummary() {
             console.log("updateFinalCheckoutSummary called");
-            if (!orderData || !pointsToUseInput) {
+            if (!orderData) {
                 console.warn("Order data or points input not found in updateFinalCheckoutSummary. Aborting.");
                 return;
             }
 
-            let pointsUsed = parseInt(pointsToUseInput.value) || 0;
-            console.log("Points entered:", pointsToUseInput.value, "| Parsed pointsUsed:", pointsUsed);
-            console.log("Available points:", availablePointsFinal, "| Amount before points (from JS var):", amountBeforePointsFinal);
+            let pointsUsed = parseInt(orderData.pointUseAmount) || 0;
+            console.log("Points used (from orderData.pointUseAmount):", pointsUsed);
+            console.log("Amount before points (orderData.totalAmount):", amountBeforePointsFinal);
 
+            currentFinalAmountForPayment = amountBeforePointsFinal - pointsUsed;
+            console.log("Calculated currentFinalAmountForPayment (totalAmount - pointUseAmount):", currentFinalAmountForPayment);
 
-            if (pointsUsed > availablePointsFinal) pointsUsed = availablePointsFinal;
-            if (pointsUsed < 0) pointsUsed = 0;
+            if (pointDiscountDisplay) {
+                pointDiscountDisplay.textContent = "- " + formatCurrencyFinal(pointsUsed);
+            } else {
+                console.warn("pointDiscountDisplay not found during summary update.");
+            }
 
-            const maxPointsCanUse = amountBeforePointsFinal < 0 ? 0 : amountBeforePointsFinal;
-            if (pointsUsed > maxPointsCanUse) pointsUsed = maxPointsCanUse;
-            console.log("Max points can use:", maxPointsCanUse, "| Adjusted pointsUsed:", pointsUsed);
-
-
-            pointsToUseInput.value = Math.floor(pointsUsed);
-            currentFinalAmountForPayment = amountBeforePointsFinal - Math.floor(pointsUsed);
-            console.log("Calculated currentFinalAmountForPayment:", currentFinalAmountForPayment);
-
-
-            if (pointDiscountDisplay) pointDiscountDisplay.textContent = "- " + formatCurrencyFinal(Math.floor(pointsUsed));
-            if (finalTotalPriceDisplay) finalTotalPriceDisplay.textContent = formatCurrencyFinal(Math.max(0, currentFinalAmountForPayment));
+            if (finalTotalPriceDisplay) {
+                finalTotalPriceDisplay.textContent = formatCurrencyFinal(Math.max(0, currentFinalAmountForPayment));
+            } else {
+                console.warn("finalTotalPriceDisplay not found during summary update.");
+            }
 
             const paymentButtonSpan = paymentButton ? paymentButton.querySelector('span') : null;
             if (paymentButtonSpan) {
                 paymentButtonSpan.textContent = formatCurrencyFinal(Math.max(0, currentFinalAmountForPayment)) + ' 결제하기';
-            } else {
-                // console.error("Payment button span not found for updating text."); // paymentButton 자체가 null일 수 있음
-            }
-
-            if (paymentWidgetInstance) { // 위젯이 이미 생성된 경우에만 금액 업데이트 시도
-                console.log("Updating widget with new amount:", Math.max(0, currentFinalAmountForPayment));
-                renderTossPaymentWidget(Math.max(0, currentFinalAmountForPayment)); // 금액 변경 시 위젯 재렌더링
-            } else {
-                console.log("Payment widget instance not available when trying to update amount. It will be rendered on DOMContentLoaded if conditions met.");
             }
         }
 
-        function applyMaxPointsFinal() {
-            console.log("applyMaxPointsFinal called.");
-            if (!orderData || !pointsToUseInput) {
-                console.warn("Order data or points input not found in applyMaxPointsFinal. Aborting.");
-                return;
-            }
-            const maxPointsCanUse = amountBeforePointsFinal < 0 ? 0 : amountBeforePointsFinal;
-            const maxPointsToApply = Math.min(availablePointsFinal, maxPointsCanUse);
-            pointsToUseInput.value = Math.floor(maxPointsToApply);
-            console.log("Applying max points:", Math.floor(maxPointsToApply));
-            updateFinalCheckoutSummary();
-        }
 
         // === 이벤트 리스너 및 초기화 ===
         document.addEventListener('DOMContentLoaded', function () {
-            console.log("DOMContentLoaded event fired.");
-
-            // orderData, tossClientKeyFinal 등의 필수 데이터 존재 여부 먼저 확인
             if (!orderData) {
-                console.warn("주문 상세 정보(orderData)가 없어 결제 페이지 초기화를 중단합니다.");
+                console.error("주문 상세 정보(orderData)가 없어 결제 페이지 초기화를 중단합니다.");
                 if (paymentButton) paymentButton.disabled = true;
-                // 필수 DOM 요소들도 확인
-                const requiredElements = {
-                    pointsToUseInput,
-                    pointDiscountDisplay,
-                    finalTotalPriceDisplay,
-                    paymentButton,
-                    customerEmailInput
-                };
-                for (const key in requiredElements) {
-                    if (!requiredElements[key]) {
-                        console.error(`페이지 초기화에 필요한 중요 DOM 요소 '${key}'를 찾을 수 없습니다. HTML ID를 확인해주세요.`);
-                    }
-                }
-                return; // 필수 데이터 없으면 더 이상 진행 안 함
+                return;
             }
             if (!tossClientKeyFinal) {
-                console.error("Toss Payments 클라이언트 키가 없습니다. 결제를 진행할 수 없습니다.");
+                console.error("Toss Payments 클라이언트 키가 없습니다.");
                 if (paymentButton) paymentButton.disabled = true;
                 return;
             }
 
-            // 위젯 인스턴스 생성 및 초기 렌더링 (try-catch는 renderTossPaymentWidget 함수 내부로 이동)
-            renderTossPaymentWidget(Math.max(0, currentFinalAmountForPayment));
+            // Toss Payments 객체 초기화
+            tossPayments = TossPayments(tossClientKeyFinal);
 
-            if (pointsToUseInput) {
-                pointsToUseInput.addEventListener('input', updateFinalCheckoutSummary);
-                console.log("Event listener attached to pointsToUseFinal input.");
-            } else {
-                console.error("pointsToUseFinal input field not found for attaching event listener.");
-            }
-            // updateFinalCheckoutSummary()는 renderTossPaymentWidget 내부에서 금액이 결정된 후
-            // 또는 페이지 로드 시 최초 한 번 호출되어야 금액 표시 및 위젯 렌더링이 동기화됨.
-            // 위에서 renderTossPaymentWidget을 호출했으므로, updateFinalCheckoutSummary는 그 이후 또는 포인트 입력 시 호출됨.
-            // 페이지 로드 직후의 금액 표시는 Thymeleaf가 담당하고, JS는 포인트 변경에 따른 업데이트와 위젯 연동을 담당.
-            // 초기 금액 표시를 위해 한 번 더 호출하거나, Thymeleaf 값으로 충분한지 확인.
-            // 여기서는 renderTossPaymentWidget이 최초 금액으로 렌더링하므로, updateFinalCheckoutSummary는 이벤트 발생 시 호출.
-            // 단, 결제 버튼 텍스트 등은 초기화 필요할 수 있음.
-            updateFinalCheckoutSummary(); // 초기 텍스트 업데이트 및 위젯 금액 동기화
-
+            // 페이지 로드 시 결제 요약 정보 업데이트
+            updateFinalCheckoutSummary();
 
             if (paymentButton) {
-                console.log("Payment button found, attaching onclick handler.");
                 paymentButton.onclick = function (evt) {
-                    console.log("결제 버튼 클릭됨.");
                     evt.preventDefault();
+                    paymentButton.disabled = true;
+                    paymentButton.querySelector('span').textContent = '주문 처리 중...';
+
                     const customerEmailForPayment = customerEmailInput ? customerEmailInput.value.trim() : "";
-                    console.log("Email for payment:", customerEmailForPayment);
-                    console.log("Current final amount for payment:", currentFinalAmountForPayment);
 
+                    // [수정됨] 최종 결제 금액이 0원 이하일 경우 (포인트 전액 사용)
                     if (currentFinalAmountForPayment <= 0) {
-                        alert("결제할 금액이 없습니다. 주문이 자동으로 완료됩니다. (실제로는 서버에서 0원 주문 처리)");
-                        return;
-                    }
-                    if (currentFinalAmountForPayment > 0 && currentFinalAmountForPayment < 100) {
-                        alert("최소 결제 금액은 100원입니다. (Toss Payments 정책 확인 필요)");
-                        return;
+                        console.log("포인트 전액 결제를 시작합니다. 서버로 리다이렉트합니다.");
+                        // fetch 대신, 컨트롤러로 직접 페이지를 이동시켜 결제를 처리합니다.
+                        // orderKey를 paymentKey로 함께 전달합니다.
+                        const pointProcessUrl = `/order/point/process?orderId=${orderIdForPaymentFinal}&amount=0&paymentKey=${orderIdForPaymentFinal}`;
+                        window.location.href = pointProcessUrl;
+                        return; // 함수 실행 종료
                     }
 
-                    if (paymentWidgetInstance) {
-                        console.log("Requesting payment with Toss Widget.");
-                        paymentWidgetInstance.requestPayment({
+                    // Toss Payments 결제창 호출
+                    if (tossPayments) {
+                        tossPayments.requestPayment('TOSSPAY', {
+                            amount: Math.max(0, currentFinalAmountForPayment),
                             orderId: orderIdForPaymentFinal,
                             orderName: orderNameForPaymentFinal,
                             customerName: customerNameForPaymentFinal,
                             customerEmail: customerEmailForPayment,
-                            successUrl: successUrlFinal,
+                            successUrl: tossSuccessUrlFinal,
                             failUrl: failUrlFinal
-                            // amount는 위젯에 이미 설정되어 있으므로 여기서 다시 전달하지 않음
                         }).catch(function (error) {
-                            console.error("Toss Payments Error:", error);
-                            alert("결제 요청 중 오류가 발생했습니다: " + error.message + (error.code ? " (코드: " + error.code + ")" : ""));
+                            console.error("Toss Payments 오류:", error);
+                            alert(`결제 요청 중 오류가 발생했습니다: ${error.message || '알 수 없는 오류'}`);
+                        }).finally(() => {
+                            // 결제창이 닫히면 버튼을 다시 활성화합니다.
+                            paymentButton.disabled = false;
+                            updateFinalCheckoutSummary();
                         });
                     } else {
-                        alert("결제 위젯이 제대로 로드되지 않았거나 초기화에 실패했습니다. 페이지를 새로고침 후 다시 시도해주세요.");
-                        console.error("paymentWidgetInstance is null at the time of payment request.");
+                        alert("Toss Payments가 초기화되지 않았습니다. 페이지를 새로고침 해주세요.");
+                        paymentButton.disabled = false;
+                        updateFinalCheckoutSummary();
                     }
                 };
             } else {
-                console.error("결제 버튼(id='final-payment-button')을 찾을 수 없습니다!");
+                console.error("결제 버튼(id='final-payment-button')을 찾을 수 없습니다.");
             }
         });
-        /*]]>*/
     </script>
 </th:block>
 </body>

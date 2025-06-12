@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
 import shop.bluebooktle.common.domain.auth.UserType;
+import shop.bluebooktle.common.exception.auth.HandleAccessDeniedException;
 import shop.bluebooktle.common.exception.auth.UnauthoriedException;
 
 @Aspect
@@ -45,15 +46,14 @@ public class AuthenticationAspect {
 
 		UserType requiredUserType = authAnnotation.type();
 		if (requiredUserType == null) {
-			log.warn("AuthenticationAspect: @Auth 어노테이션에 UserType이 지정되지 않았습니다. 메소드: {}", method.getName());
-			throw new AccessDeniedException("접근 거부: 필요한 사용자 타입이 지정되지 않았습니다.");
+			requiredUserType = UserType.USER;
 		}
 
 		UserType actualUserType = userPrincipal.getUserType();
 		if (actualUserType == null) {
 			log.error("AuthenticationAspect: 실제 사용자({})의 UserType이 null입니다. UserPrincipal: {}",
 				userPrincipal.getUsername(), userPrincipal);
-			throw new AccessDeniedException("접근 거부: 사용자 타입 정보를 확인할 수 없습니다.");
+			throw new HandleAccessDeniedException("접근 거부: 사용자 타입 정보를 확인할 수 없습니다.");
 		}
 
 		log.debug("AuthenticationAspect: 필요 권한: {}, 실제 권한: {}", requiredUserType, actualUserType);

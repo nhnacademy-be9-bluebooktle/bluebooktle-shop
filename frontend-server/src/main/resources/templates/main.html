@@ -63,109 +63,146 @@
         <section class="section-padding-kitsch">
             <div class="container-kitsch">
                 <div class="section-header-kitsch">
-                    <h2 class="section-title-kitsch display-font-kitsch">추천 도서 <i
+                    <h2 class="section-title-kitsch display-font-kitsch">베스트셀러 도서 <i
                             class="fas fa-star highlight-pink-kitsch"></i></h2>
                     <p class="pixel-font-kitsch"
-                       style="margin-top: 0.5rem; font-size: 1.1em; color: var(--kitsch-color-1);">매일매일 새로운 도서
-                        업데이트!</p>
+                       style="margin-top: 0.5rem; font-size: 1.1em; color: var(--kitsch-color-1);">매주 핫한 도서들로 업데이트!</p>
                 </div>
-                <div class="book-grid-kitsch featured-grid-kitsch">
-                    <div class="book-item-kitsch">
-                        <a class="book-link-kitsch" href="/books/1">
+                <div class="book-grid-kitsch list-page-grid-kitsch">
+                    <div class="book-item-kitsch"
+                         th:classappend="${stat.index % 2 == 0} ? ' tilt-left-kitsch' : ' tilt-right-kitsch'"
+                         style="max-width: 276px" th:each="book, stat : ${hotBooks.content}">
+                        <a class="book-link-kitsch" th:href="@{/books/{id}(id=${book.bookId})}">
                             <div class="book-cover-wrap-kitsch">
-                                <img alt="도서 표지" class="book-cover-kitsch"
-                                     src="https://picsum.photos/255/484?random=101">
+                                <img alt="도서 표지" class="book-cover-kitsch" th:src="${book.imgUrl}"/>
+                                <div class="book-hover-overlay-kitsch">
+                                    <i class="fas fa-search-plus"></i>
+                                    <p class="pixel-font-kitsch">상세 보기</p>
+                                </div>
+                                <span class="sticker-hot-kitsch pixel-font-kitsch">HOT</span>
+                            </div>
 
-                                <div class="book-hover-overlay-kitsch">
-                                    <i class="fas fa-search-plus"></i>
-                                    <p class="pixel-font-kitsch">상세 보기</p>
-                                </div>
-                                <span class="sticker-new-kitsch pixel-font-kitsch">NEW</span>
-                            </div>
                             <div class="book-info-kitsch">
                                 <h3 class="book-title-kitsch pixel-font-kitsch"
-                                    style="font-size: 1.2rem; color: var(--kitsch-color-4);">코딩 대모험</h3>
-                                <p class="book-author-kitsch book-author-pixel">글쓴이: 나코딩</p>
-                                <p class="book-price-kitsch pixel-font-kitsch">25,000원 <span
-                                        class="original-price-kitsch pixel-font-kitsch" style="font-size: 0.8em;">28,000원</span>
+                                    style="font-size: 1.2rem; color: var(--kitsch-color-4);"
+                                    th:text="${book.title}">도서 제목</h3>
+
+                                <p class="book-author-kitsch book-author-pixel">
+                            <span th:each="au, stat : ${book.authors}"
+                                  th:text="${au} + (${stat.last} ? '' : ', ')">저자</span>
                                 </p>
-                            </div>
-                        </a>
-                    </div>
-                    <div class="book-item-kitsch tilt-right-kitsch">
-                        <a class="book-link-kitsch" href="/books/2">
-                            <div class="book-cover-wrap-kitsch">
-                                <img alt="도서 표지" class="book-cover-kitsch"
-                                     src="https://picsum.photos/255/484?random=102">
-                                <div class="book-hover-overlay-kitsch">
-                                    <i class="fas fa-search-plus"></i>
-                                    <p class="pixel-font-kitsch">상세 보기</p>
-                                </div>
-                                <span class="sticker-hot-kitsch display-font-kitsch">HOT</span>
-                            </div>
-                            <div class="book-info-kitsch">
-                                <h3 class="book-title-kitsch pixel-font-kitsch"
-                                    style="font-size: 1.2rem; color: var(--kitsch-color-4);">레트로 픽셀 아트북</h3>
-                                <p class="book-author-kitsch book-author-pixel">만든이: 박도트</p>
-                                <p class="book-price-kitsch pixel-font-kitsch highlight-pink-kitsch">18,000원</p>
-                            </div>
-                        </a>
-                    </div>
-                    <div class="book-item-kitsch">
-                        <a class="book-link-kitsch" href="/books/3">
-                            <div class="book-cover-wrap-kitsch">
-                                <img alt="도서 표지" class="book-cover-kitsch"
-                                     src="https://picsum.photos/255/484?random=103">
-                                <div class="book-hover-overlay-kitsch">
-                                    <i class="fas fa-search-plus"></i>
-                                    <p class="pixel-font-kitsch">상세 보기</p>
-                                </div>
-                            </div>
-                            <div class="book-info-kitsch">
-                                <h3 class="book-title-kitsch pixel-font-kitsch"
-                                    style="font-size: 1.2em; color: var(--kitsch-color-4);">알록달록 웹디자인</h3>
-                                <p class="book-author-kitsch">김컬러 그림</p>
-                                <p class="book-price-kitsch pixel-font-kitsch">32,000원</p>
-                            </div>
-                        </a>
-                    </div>
-                    <div class="book-item-kitsch tilt-left-kitsch">
-                        <a class="book-link-kitsch" href="/books/4">
-                            <div class="book-cover-wrap-kitsch">
-                                <img alt="도서 표지" class="book-cover-kitsch"
-                                     src="https://picsum.photos/255/484?random=104">
-                                <div class="book-hover-overlay-kitsch">
-                                    <i class="fas fa-search-plus"></i>
-                                    <p class="pixel-font-kitsch">상세 보기</p>
-                                </div>
-                            </div>
-                            <div class="book-info-kitsch">
-                                <h3 class="book-title-kitsch pixel-font-kitsch"
-                                    style="font-size: 1.2rem; color: var(--kitsch-color-4);">나만의 작은 정원 만들기</h3>
-                                <p class="book-author-kitsch">이가든 글/사진</p>
-                                <p class="book-price-kitsch pixel-font-kitsch highlight-cyan-kitsch">21,500원 <span
-                                        class="original-price-kitsch pixel-font-kitsch" style="font-size: 0.8em;">23,000원</span>
+
+                                <p class="book-price-kitsch pixel-font-kitsch">
+                                    <span th:text="${#numbers.formatDecimal(book.salePrice, 0, 'COMMA', 0, 'NONE')} + '원'">0원</span>
+                                    <span class="original-price-kitsch pixel-font-kitsch"
+                                          style="font-size: 0.8em;"
+                                          th:if="${book.salePrice < book.price}"
+                                          th:text="${#numbers.formatDecimal(book.price, 0, 'COMMA', 0, 'NONE')} + '원'">0원</span>
                                 </p>
                             </div>
                         </a>
                     </div>
                 </div>
+
+                <nav aria-label="메인 페이지 HOT 도서 페이징" class="pagination-kitsch">
+                    <a class="page-btn-kitsch prev-kitsch retro-shadow-kitsch-small"
+                       th:href="@{/(page=${hotBooks.number - 1}, size=${size})}"
+                       th:if="${hotBooks.hasPrevious()}">
+                        <i class="fas fa-angle-left"></i> 이전
+                    </a>
+
+                    <a class="page-btn-kitsch num-kitsch retro-shadow-kitsch-small"
+                       th:classappend="${i == hotBooks.number} ? ' active-kitsch' : ''"
+                       th:each="i : ${#numbers.sequence(0, hotBooks.totalPages - 1)}"
+                       th:href="@{/(page=${i}, size=${size})}"
+                       th:text="${i + 1}">1</a>
+
+                    <a class="page-btn-kitsch next-kitsch retro-shadow-kitsch-small"
+                       th:href="@{/(page=${hotBooks.number + 1}, size=${size})}"
+                       th:if="${hotBooks.hasNext()}">
+                        다음 <i class="fas fa-angle-right"></i>
+                    </a>
+                </nav>
             </div>
         </section>
+
+
+        <section class="section-padding-kitsch">
+            <div class="container-kitsch">
+                <div class="section-header-kitsch">
+                    <h2 class="section-title-kitsch display-font-kitsch">신규 도서 <i
+                            class="fas fa-bolt highlight-pink-kitsch"></i></h2>
+                    <p class="pixel-font-kitsch"
+                       style="margin-top: 0.5rem; font-size: 1.1em; color: var(--kitsch-color-1);">새롭게 입고된 따끈따끈한
+                        도서들!</p>
+                </div>
+                <div class="book-grid-kitsch list-page-grid-kitsch">
+                    <div class="book-item-kitsch"
+                         th:classappend="${stat.index % 2 == 0} ? ' tilt-left-kitsch' : ' tilt-right-kitsch'"
+                         style="max-width: 276px" th:each="book, stat : ${newBooks.content}">
+                        <a class="book-link-kitsch" th:href="@{/books/{id}(id=${book.bookId})}">
+                            <div class="book-cover-wrap-kitsch">
+                                <img alt="도서 표지" class="book-cover-kitsch" th:src="${book.imgUrl}"/>
+                                <div class="book-hover-overlay-kitsch">
+                                    <i class="fas fa-search-plus"></i>
+                                    <p class="pixel-font-kitsch">상세 보기</p>
+                                </div>
+                                <span class="sticker-new-kitsch pixel-font-kitsch"
+                                      th:if="${book.createdAt.until(T(java.time.LocalDateTime).now(), T(java.time.temporal.ChronoUnit).DAYS) <= 7}">NEW</span>
+                            </div>
+
+                            <div class="book-info-kitsch">
+                                <h3 class="book-title-kitsch pixel-font-kitsch"
+                                    style="font-size: 1.2rem; color: var(--kitsch-color-4);"
+                                    th:text="${book.title}">도서 제목</h3>
+
+                                <p class="book-author-kitsch book-author-pixel">
+                            <span th:each="au, stat : ${book.authors}"
+                                  th:text="${au} + (${stat.last} ? '' : ', ')">저자</span>
+                                </p>
+
+                                <p class="book-price-kitsch pixel-font-kitsch">
+                                    <span th:text="${#numbers.formatDecimal(book.salePrice, 0, 'COMMA', 0, 'NONE')} + '원'">0원</span>
+                                    <span class="original-price-kitsch pixel-font-kitsch"
+                                          style="font-size: 0.8em;"
+                                          th:if="${book.salePrice < book.price}"
+                                          th:text="${#numbers.formatDecimal(book.price, 0, 'COMMA', 0, 'NONE')} + '원'">0원</span>
+                                </p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <nav aria-label="메인 페이지 신규 도서 페이징" class="pagination-kitsch">
+                    <a class="page-btn-kitsch prev-kitsch retro-shadow-kitsch-small"
+                       th:href="@{/(page=${newBooks.number - 1}, size=${size})}"
+                       th:if="${newBooks.hasPrevious()}">
+                        <i class="fas fa-angle-left"></i> 이전
+                    </a>
+
+                    <a class="page-btn-kitsch num-kitsch retro-shadow-kitsch-small"
+                       th:classappend="${i == newBooks.number} ? ' active-kitsch' : ''"
+                       th:each="i : ${#numbers.sequence(0, newBooks.totalPages - 1)}"
+                       th:href="@{/(page=${i}, size=${size})}"
+                       th:text="${i + 1}">1</a>
+
+                    <a class="page-btn-kitsch next-kitsch retro-shadow-kitsch-small"
+                       th:href="@{/(page=${newBooks.number + 1}, size=${size})}"
+                       th:if="${newBooks.hasNext()}">
+                        다음 <i class="fas fa-angle-right"></i>
+                    </a>
+                </nav>
+            </div>
+        </section>
+
+
         <section class="hero-section-main">
             <div class="hero-bg-pattern-kitsch"></div>
             <div class="container-kitsch hero-content-kitsch">
-                <h2 class="hero-title-kitsch display-font-kitsch">오늘의 <span class="highlight-pink-kitsch">도서</span>
-                    발견!</h2>
+                <h2 class="hero-title-kitsch display-font-kitsch">책이란 <span
+                        class="highlight-pink-kitsch">넓디넓은 시간의 바다</span>를 지나가는 배이다</h2>
                 <p class="hero-subtitle-kitsch pixel-font-kitsch" style="font-size: 1.3em; line-height: 1.5;">지금 바로
                     Bluebooktle에서 특별하고 재미난 책들을 만나보세요!</p>
-                <form action="/books" class="search-bar-main" method="get">
-                    <input class="input-kitsch retro-shadow-kitsch-small" name="query" placeholder="어떤 책을 찾으세요?"
-                           type="text">
-                    <button class="btn-kitsch primary-btn-kitsch retro-shadow-kitsch" type="submit"><i
-                            class="fas fa-search"></i> 검색
-                    </button>
-                </form>
             </div>
         </section>
 
@@ -190,7 +227,6 @@
             'color2-kitsch',
             'color4-kitsch',
             'color5-kitsch',
-            'color1-kitsch'
         ];
         const iconClasses = [
             'fa-feather-alt',
@@ -213,7 +249,7 @@
                     'retro-shadow-kitsch-small',
                     colorClasses[idx % colorClasses.length]
                 ].join(' ');
-                
+
                 const i = document.createElement('i');
                 i.className = `fas ${iconClasses[idx % iconClasses.length]}`;
                 a.appendChild(i);

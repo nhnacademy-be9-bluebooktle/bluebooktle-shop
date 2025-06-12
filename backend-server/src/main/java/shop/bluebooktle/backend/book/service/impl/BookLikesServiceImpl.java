@@ -10,10 +10,10 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.book.entity.Author;
 import shop.bluebooktle.backend.book.entity.Book;
+import shop.bluebooktle.backend.book.entity.BookAuthor;
 import shop.bluebooktle.backend.book.entity.BookLikes;
 import shop.bluebooktle.backend.book.entity.BookSaleInfo;
 import shop.bluebooktle.backend.book.entity.Img;
-import shop.bluebooktle.backend.book.repository.AuthorRepository;
 import shop.bluebooktle.backend.book.repository.BookAuthorRepository;
 import shop.bluebooktle.backend.book.repository.BookImgRepository;
 import shop.bluebooktle.backend.book.repository.BookLikesRepository;
@@ -40,7 +40,6 @@ public class BookLikesServiceImpl implements BookLikesService {
 	private final UserRepository userRepository;
 	private final BookImgRepository bookImgRepository;
 	private final ImgRepository imgRepository;
-	private final AuthorRepository authorRepository;
 	private final BookAuthorRepository bookAuthorRepository;
 	private final BookSaleInfoRepository bookSaleInfoRepository;
 
@@ -106,8 +105,9 @@ public class BookLikesServiceImpl implements BookLikesService {
 
 			// 모든 저자 가져오기
 			List<String> authorName = bookAuthorRepository
-				.findAuthorsByBook(book)
+				.findByBook_Id(book.getId())
 				.stream()
+				.map(BookAuthor::getAuthor)
 				.map(Author::getName)
 				.toList();
 

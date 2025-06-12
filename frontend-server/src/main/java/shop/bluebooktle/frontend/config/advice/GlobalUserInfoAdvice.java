@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
+import jakarta.servlet.http.HttpServletRequest;
+import shop.bluebooktle.common.exception.auth.HandleAccessDeniedException;
 import shop.bluebooktle.frontend.util.CookieTokenUtil;
 import shop.bluebooktle.frontend.util.JwtPayloadUtil;
 
@@ -20,7 +22,8 @@ public class GlobalUserInfoAdvice {
 
 	@ModelAttribute
 	public void addUserInfoToModel(Model model,
-		@CookieValue(name = CookieTokenUtil.REFRESH_TOKEN_COOKIE_NAME, required = false) String refreshToken) {
+		@CookieValue(name = CookieTokenUtil.REFRESH_TOKEN_COOKIE_NAME, required = false) String refreshToken,
+		HttpServletRequest request) {
 
 		boolean isLoggedIn = false;
 		Long userId = null;
@@ -33,6 +36,13 @@ public class GlobalUserInfoAdvice {
 			userId = JwtPayloadUtil.getClaim(claims, "sub", Long.class);
 			userNickname = JwtPayloadUtil.getClaim(claims, CLAIM_USER_NICKNAME, String.class);
 			userType = JwtPayloadUtil.getClaim(claims, CLAIM_USER_TYPE, String.class);
+		}
+
+		// TODO: 수정 필요
+		if (request.getRequestURI().startsWith("/admin")) {
+			if (userType == null || !"ADMIN".equals(userType.toLowerCase())) {
+				throw new HandleAccessDeniedException();
+			}
 		}
 
 		model.addAttribute("isLoggedIn", isLoggedIn);

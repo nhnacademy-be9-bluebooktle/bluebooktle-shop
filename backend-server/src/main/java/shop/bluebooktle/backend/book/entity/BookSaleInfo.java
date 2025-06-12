@@ -1,6 +1,7 @@
 package shop.bluebooktle.backend.book.entity;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
@@ -81,4 +82,38 @@ public class BookSaleInfo extends BaseEntity {
 	@Builder.Default
 	@Column(name = "review_count", nullable = false, columnDefinition = "BIGINT DEFAULT 0")
 	private Long reviewCount = 0L;
+
+	/**
+	 * 새로운 리뷰가 등록될 때 도서의 평균 별점과 리뷰 수를 업데이트합니다.
+	 * @param newStar 새로운 리뷰의 별점 (int 타입)
+	 */
+	public void addReviewAndCalculateStar(int newStar) {
+
+		BigDecimal currentTotalStars = this.star.multiply(BigDecimal.valueOf(this.reviewCount));
+
+		long newReviewCount = this.reviewCount + 1;
+
+		BigDecimal newTotalStars = currentTotalStars.add(BigDecimal.valueOf(newStar));
+
+		this.star = newTotalStars.divide(BigDecimal.valueOf(newReviewCount), 1, RoundingMode.HALF_UP);
+		this.reviewCount = newReviewCount;
+	}
+
+	public void updateReviewAndRecalculateStar(int oldStar, int newStar) {
+
+		BigDecimal currentTotalStars = this.star.multiply(BigDecimal.valueOf(this.reviewCount));
+
+		BigDecimal updatedTotalStars = currentTotalStars.subtract(BigDecimal.valueOf(oldStar))
+			.add(BigDecimal.valueOf(newStar));
+
+		this.star = updatedTotalStars.divide(BigDecimal.valueOf(this.reviewCount), 1, RoundingMode.HALF_UP);
+	}
+
+	public void changeSaleState(BookSaleInfoState newState) {
+		this.bookSaleInfoState = newState;
+	}
+
+	public void updateStock(Integer newStock) {
+		this.stock = newStock;
+	}
 }

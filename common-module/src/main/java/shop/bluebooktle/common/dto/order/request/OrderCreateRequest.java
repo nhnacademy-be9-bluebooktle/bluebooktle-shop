@@ -83,7 +83,9 @@ public record OrderCreateRequest(
 	@DecimalMin(value = "0", inclusive = true, message = "결제 원금은 0원 이상이어야 합니다.")
 	BigDecimal originalAmount,
 
-	String orderKey
+	String orderKey,
+
+	Long orderCouponId
 
 ) {
 }

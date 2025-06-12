@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import shop.bluebooktle.backend.book.entity.Book;
 import shop.bluebooktle.backend.book.entity.BookCategory;
 import shop.bluebooktle.backend.book.entity.BookSaleInfo;
@@ -21,6 +22,9 @@ import shop.bluebooktle.backend.book.repository.BookRepository;
 import shop.bluebooktle.backend.book.repository.BookSaleInfoRepository;
 import shop.bluebooktle.backend.book.repository.CategoryRepository;
 import shop.bluebooktle.backend.book.service.BookCategoryService;
+import shop.bluebooktle.backend.book.service.CategoryService;
+import shop.bluebooktle.backend.elasticsearch.service.BookElasticSearchService;
+import shop.bluebooktle.common.dto.book.BookSortType;
 import shop.bluebooktle.common.dto.book.request.BookInfoRequest;
 import shop.bluebooktle.common.dto.book.response.BookInfoResponse;
 import shop.bluebooktle.common.dto.book.response.CategoryResponse;
@@ -34,6 +38,7 @@ import shop.bluebooktle.common.exception.book.CategoryNotFoundException;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class BookCategoryServiceImpl implements BookCategoryService {
 
 	private final BookRepository bookRepository;
@@ -42,6 +47,9 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 	private final BookAuthorRepository bookAuthorRepository;
 	private final BookSaleInfoRepository bookSaleInfoRepository;
 	private final BookImgRepository bookImgRepository;
+
+	private final CategoryService categoryService;
+	private final BookElasticSearchService bookElasticSearchService;
 
 	@Override
 	public void registerBookCategory(Long bookId, Long categoryId) {
@@ -70,22 +78,6 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 	}
 
 	@Override
-	public void deleteBookCategory(Long bookId, Long categoryId) {
-		Book book = requireBook(bookId);
-		Category category = requireCategory(categoryId);
-
-		BookCategory bookCategory = bookCategoryRepository.findByBookAndCategory(book, category)
-			.orElseThrow(() -> new BookCategoryNotFoundException(bookId, categoryId));
-
-		long count = bookCategoryRepository.countByBook(book);
-		if (count <= 1) {
-			throw new BookCategoryRequiredException(book.getId());
-		}
-
-		bookCategoryRepository.delete(bookCategory);
-	}
-
-	@Override
 	public void updateBookCategory(Long bookId, List<Long> categoryIdList) {
 		// 도서에 등록 되었던 기존 카테고리 삭제
 		List<BookCategory> bookCategoryList = bookCategoryRepository.findByBook_Id(bookId);
@@ -95,53 +87,18 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 
 	}
 
-	// 해당 도서의 카테고리 수정
-	@Override
-	public void updateBookCategoryByBookCategoryId(Long updatedCategoryId, Long bookCategoryId) {
-		BookCategory bookCategory = bookCategoryRepository.findById(bookCategoryId)
-			.orElseThrow(BookCategoryNotFoundException::new);
-		Category updatedCategory = requireCategory(updatedCategoryId);
-		bookCategory.setCategory(updatedCategory);
-	}
-
-	@Override
-	public void updateBookCategory(Long updatedCategoryId, Long categoryId, Long bookId) {
-		Category category = requireCategory(categoryId);
-		Book book = requireBook(bookId);
-		if (!bookCategoryRepository.existsByBookAndCategory(book, category)) {
-			throw new BookCategoryNotFoundException(book.getId(), category.getId());
-		}
-		Category updatedCategory = requireCategory(updatedCategoryId);
-		BookCategory bookCategory = bookCategoryRepository.findByBookAndCategory(book, category)
-			.orElseThrow(BookCategoryNotFoundException::new);
-		bookCategory.setCategory(updatedCategory);
-	}
-
 	@Override
 	@Transactional(readOnly = true)
-	public List<CategoryResponse> getCategoryByBookId(BookInfoRequest request) {
-		Book book = requireBook(request.bookId());
-
-		List<BookCategory> bookCategories = bookCategoryRepository.findByBook(book);
-		List<CategoryResponse> result = new ArrayList<>();
-
-		for (BookCategory bookCategory : bookCategories) {
-			Category category = bookCategory.getCategory();
-			result.add(new CategoryResponse(
-				category.getId(),
-				category.getName(),
-				category.getParentCategory().getName(),
-				category.getCategoryPath()));
-		}
-		//TODO book_category_id 도 반환해야할 듯
-		return result;
-	}
-
-	@Override
-	@Transactional(readOnly = true)
-	public Page<BookInfoResponse> searchBooksByCategory(Long categoryId, Pageable pageable) {
+	public Page<BookInfoResponse> searchBooksByCategory(Long categoryId, Pageable pageable, BookSortType bookSortType) {
 		Category category = requireCategory(categoryId);
-		Page<Book> bookPage = bookCategoryRepository.findBookUnderCategory(categoryId, pageable);
+		// 하위 카테고리의 ID 조회
+		List<Long> categoryIds = categoryRepository.findUnderCategory(category);
+		categoryIds.add(category.getId());
+		log.info("categoryIds : {}", categoryIds);
+
+		// 엘라스틱에서 도서 찾기
+		Page<Book> bookPage = bookElasticSearchService.searchBooksByCategoryAndSort(categoryIds, bookSortType,
+			pageable.getPageNumber(), pageable.getPageSize());
 		List<BookInfoResponse> responseList = bookPage.getContent().stream()
 			.map(book -> {
 				BookSaleInfo bookSaleInfo = bookSaleInfoRepository.findByBook(book)

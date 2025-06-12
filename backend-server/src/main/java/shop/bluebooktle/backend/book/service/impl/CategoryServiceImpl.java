@@ -2,6 +2,7 @@ package shop.bluebooktle.backend.book.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -39,20 +40,22 @@ public class CategoryServiceImpl implements CategoryService {
 	@Override
 	public void registerCategory(Long parentCategoryId, CategoryRegisterRequest request) {
 		// 부모 카테고리의 하위카테고리 중 중복된 이름으로 등록 불가능
-		// 부모 카테고리의 하위 카테고리들의 이름들을 가져와야 함 -> HOW? getAllDescendantCategories(Category parent) 일단 불러서 하위 카테고리들 다 가ㅕㅈ오기
 		Category parent = categoryRepository.findById(parentCategoryId)
 			.orElseThrow(() -> new CategoryNotFoundException(parentCategoryId));
 
 		StringBuilder categoryPathBuilder = new StringBuilder();
+		
+		// 부모 카테고리의 하위 카테고리 조회
+		List<Category> categoryList = categoryRepository.getAllDescendantCategories(parent);
 
-		List<Category> categoryList = getAllDescendantCategories(parent);
-		categoryList.stream().map(Category::getName).forEach(categoryName -> {
-			if (categoryName.equals(request.name())) {
-				throw new CategoryAlreadyExistsException("이미 존재하는 카테고리명입니다. 카테고리명: " + request.name());
-			}
-		});
+		boolean nameExists = categoryList.stream()
+			.anyMatch(c -> c.getName().equals(request.name()));
+		// 부모 카테고리의 하위카테고리 중 중복된 이름으로 등록 불가능 : 예외 발생
+		if (nameExists) {
+			throw new CategoryAlreadyExistsException("이미 존재하는 카테고리명입니다. 카테고리명: " + request.name());
+		}
 
-		// 등록할 카테고리 엔티티 생성
+		// 등록할 카테고리 생성
 		Category newCategory = Category.builder()
 			.name(request.name())
 			.parentCategory(parent)
@@ -60,23 +63,16 @@ public class CategoryServiceImpl implements CategoryService {
 
 		newCategory = categoryRepository.save(newCategory);
 
-		// 카테고리 경로 등록하기
-		List<CategoryResponse> categoryResponseList = getParentCategoriesByLeafCategoryId(parent.getId());
-		categoryResponseList = categoryResponseList.reversed();
+		categoryPathBuilder.append(parent.getCategoryPath());
 		categoryPathBuilder.append("/");
-		for (CategoryResponse categoryResponse : categoryResponseList) {
-			categoryPathBuilder.append(categoryResponse.categoryId()).append("/");
-		}
-
-		// 카테고리 경로 (자신의 categoryId도 포함)
 		categoryPathBuilder.append(newCategory.getId());
 		String categoryPathStr = categoryPathBuilder.toString();
 
 		newCategory.setCategoryPath(categoryPathStr);
 		categoryRepository.save(newCategory);
 
-		parent.addChildCategory(newCategory);
-		categoryRepository.save(parent);
+		parent.addChildCategory(newCategory);  // 연관 관계 설정
+		categoryRepository.save(parent);       // dirty checking 보장 목적
 	}
 
 	@Override
@@ -109,7 +105,14 @@ public class CategoryServiceImpl implements CategoryService {
 		Category category = categoryRepository.findById(categoryId)
 			.orElseThrow(() -> new CategoryNotFoundException(categoryId));
 		if (category.getParentCategory() != null) {
-			List<Category> categoryList = getAllDescendantCategories(category.getParentCategory());
+			List<Category> categoryList = categoryRepository.getAllDescendantCategories(category.getParentCategory());
+			categoryList.stream().map(Category::getName).forEach(categoryName -> {
+				if (categoryName.equals(request.name())) {
+					throw new CategoryAlreadyExistsException("이미 존재하는 카테고리명입니다. 카테고리명: " + request.name());
+				}
+			});
+		} else {
+			List<Category> categoryList = categoryRepository.findByParentCategoryIsNull();
 			categoryList.stream().map(Category::getName).forEach(categoryName -> {
 				if (categoryName.equals(request.name())) {
 					throw new CategoryAlreadyExistsException("이미 존재하는 카테고리명입니다. 카테고리명: " + request.name());
@@ -127,24 +130,30 @@ public class CategoryServiceImpl implements CategoryService {
 		Category category = categoryRepository.findById(categoryId)
 			.orElseThrow(() -> new CategoryNotFoundException(categoryId));
 
-		// TODO 카테고리에 도서 등록시 삭제 불가(하위 카테고리 포함)
 		if (bookCategoryRepository.existsByCategory(category)) {
 			throw new CategoryCannotDeleteRootException("(도서가 등록된 카테고리 삭제 불가)");
 		}
 		// 하위 모든 카테고리 수집
-		List<Category> descendants = getAllDescendantCategories(category);
+		List<Category> descendants = categoryRepository.getAllDescendantCategories(category);
 		for (Category descendant : descendants) {
 			if (bookCategoryRepository.existsByCategory(descendant)) {
-				throw new CategoryCannotDeleteRootException("(도서가 등록된 하위 카테고리 존재시 삭제 불가");
+				throw new CategoryCannotDeleteRootException("(도서가 등록된 하위 카테고리 존재시 삭제 불가)");
 			}
 		}
 
-		// 최상위 카테고리는 삭제 불가
-		if (isRootCategory(categoryId)) {
-			throw new CategoryCannotDeleteRootException("(최상위 카테고리 삭제 불가)");
+		// 자신 포함 전체 카테고리 리스트 생성
+		List<Category> allCategory = new ArrayList<>(descendants);
+		allCategory.add(category); // 본인도 포함
+
+		// 도서가 등록된 카테고리가 하나라도 있으면 삭제 불가
+		for (Category c : allCategory) {
+			if (bookCategoryRepository.existsByCategory(c)) {
+				throw new CategoryCannotDeleteRootException("(도서가 등록된 카테고리 또는 하위 카테고리 존재시 삭제 불가)");
+			}
 		}
+
 		// 상위 카테고리가 최상위 카테고리이면서 2단계 카테고리가 1개일 경우 삭제 불가능
-		if (isRootCategory(category.getParentCategory().getId())) {
+		if (category.getParentCategory() != null && categoryRepository.existsByIdAndParentCategoryIsNull(category.getParentCategory().getId())) {
 			Category rootCategory = categoryRepository.findById(category.getParentCategory().getId())
 				.orElseThrow(() -> new CategoryNotFoundException(category.getParentCategory().getId())); // 최상위 카테고리
 			if (rootCategory.getChildCategories().size() == 1) {
@@ -152,8 +161,6 @@ public class CategoryServiceImpl implements CategoryService {
 			}
 		}
 
-		// 연관된 BookCategory 삭제
-		bookCategoryRepository.deleteByCategoryIn(descendants); // 손자 카테고리까지 삭제
 		// 하위 모든 카테고리 삭제
 		for (Category childCategory : descendants) {
 			childCategory.setParentCategory(null);
@@ -166,20 +173,10 @@ public class CategoryServiceImpl implements CategoryService {
 			.peek(bc -> bc.setCategory(category.getParentCategory()))  // 상위 카테고리로 교체
 			.toList();
 
-		// 현재 카테고리의 BookCategory 관계 삭제
-		bookCategoryRepository.deleteByCategory(category);
-
 		// 카테고리 삭제
 		categoryRepository.delete(category);
 	}
 
-	@Override
-	@Transactional(readOnly = true)
-	public boolean isRootCategory(Long id) {
-		Category selectedCategory = categoryRepository.findById(id)
-			.orElseThrow(() -> new CategoryNotFoundException(id));
-		return categoryRepository.existsByIdAndParentCategoryIsNull(selectedCategory.getId());
-	}
 
 	@Override
 	@Transactional(readOnly = true)
@@ -198,57 +195,8 @@ public class CategoryServiceImpl implements CategoryService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<CategoryResponse> getSubcategoriesByParentCategoryId(Long parentCategoryId) {
-		Category parentCategory = categoryRepository.findById(parentCategoryId)
-			.orElseThrow(() -> new CategoryNotFoundException(parentCategoryId));
-		List<Category> categories = parentCategory.getChildCategories();
-		List<CategoryResponse> subcategories = new ArrayList<>();
-		for (Category category : categories) {
-			CategoryResponse response = new CategoryResponse(
-				category.getId(),
-				category.getName(),
-				category.getParentCategory().getName(),
-				category.getCategoryPath());
-			subcategories.add(response);
-		}
-		return subcategories;
-	}
-
-	@Override
-	@Transactional(readOnly = true)
-	// 자기 자신도 포함되어 나가야 함
-	public List<CategoryResponse> getParentCategoriesByLeafCategoryId(Long leafCategoryId) {
-		List<Category> parents = new ArrayList<>();
-		List<CategoryResponse> parentcategories = new ArrayList<>();
-		Category current = categoryRepository.findById(leafCategoryId)
-			.orElseThrow(() -> new CategoryNotFoundException(leafCategoryId));
-
-		while (current.getParentCategory() != null) {
-			parents.add(current);
-			log.info("경로 추가하기 위한 상위 카테고리명 :  {}", current.getName());
-			current = categoryRepository.findParentCategoryById(current.getParentCategory().getId());
-
-		}
-		parents.add(current);
-
-		for (Category category : parents) {
-			CategoryResponse response = new CategoryResponse(
-				category.getId(),
-				category.getName(),
-				category.getParentCategory() != null
-					? category.getParentCategory().getName()
-					: "-",
-				category.getCategoryPath());
-			parentcategories.add(response);
-		}
-		return parentcategories;
-	}
-
-	@Override
-	@Transactional(readOnly = true)
 	public Page<CategoryResponse> getCategories(Pageable pageable) {
 		Page<Category> categoryPage = categoryRepository.findAll(pageable);
-
 		return categoryPage.map(c ->
 			new CategoryResponse(c.getId(),
 				c.getName(),
@@ -262,18 +210,16 @@ public class CategoryServiceImpl implements CategoryService {
 	@Override
 	@Transactional(readOnly = true)
 	public List<CategoryTreeResponse> getCategoryTree() {
-		List<Category> roots = categoryRepository.findByParentCategoryIsNull();
-		return roots.stream()
-			.map(this::toTreeDto)
-			.collect(Collectors.toList());
-	}
+		List<Category> allCategories = categoryRepository.findAll();
+		Map<Long, List<Category>> parentIdToChildrenMap = allCategories.stream()
+			.filter(c -> c.getParentCategory() != null)
+			.collect(Collectors.groupingBy(c -> c.getParentCategory().getId()));
 
-	@Override
-	@Transactional(readOnly = true)
-	public CategoryTreeResponse getCategoryTreeById(Long categoryId) {
-		Category category = categoryRepository.findById(categoryId)
-			.orElseThrow(() -> new CategoryNotFoundException(categoryId));
-		return toTreeDto(category);
+		List<CategoryTreeResponse> tree = allCategories.stream()
+			.filter(c -> c.getParentCategory() == null)
+			.map(c -> buildTree(c, parentIdToChildrenMap))
+			.toList();
+		return tree;
 	}
 
 	@Override
@@ -289,28 +235,20 @@ public class CategoryServiceImpl implements CategoryService {
 				c.getCategoryPath()));
 	}
 
-	private CategoryTreeResponse toTreeDto(Category category) {
-		CategoryTreeResponse response = new CategoryTreeResponse(category.getId(), category.getName());
-		for (Category child : category.getChildCategories()) {
-			response.children().add(toTreeDto(child));
-		}
-		return response;
+	@Override
+	public CategoryResponse getCategoryByName(String categoryName) {
+		Category category = categoryRepository.findByName(categoryName);
+		return new CategoryResponse(category.getId(), category.getName(),
+			category.getParentCategory() != null
+				? category.getParentCategory().getName()
+				: "-", category.getCategoryPath());
 	}
 
-	@Transactional(readOnly = true)
-	protected List<Category> getAllDescendantCategories(Category parent) {
-		List<Category> result = new ArrayList<>();
-		collectDescendants(parent, result);
-		return result;
-	}
+	private CategoryTreeResponse buildTree(Category category, Map<Long, List<Category>> parentMap) {
+		List<CategoryTreeResponse> children = parentMap.getOrDefault(category.getId(), List.of()).stream()
+			.map(child -> buildTree(child, parentMap))
+			.collect(Collectors.toList());
 
-	@Transactional(readOnly = true)
-	protected void collectDescendants(Category category, List<Category> result) {
-		for (Category child : category.getChildCategories()) {
-			if (Objects.isNull(child))
-				return;
-			result.add(child);
-			collectDescendants(child, result); // 재귀 호출로 카테고리에 있는 모든 하위 카테고리를 추가
-		}
+		return new CategoryTreeResponse(category.getId(), category.getName(), children);
 	}
 }

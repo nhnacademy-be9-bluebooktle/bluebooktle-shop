@@ -1,6 +1,7 @@
 package shop.bluebooktle.common.dto.book.request;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Value;
 import lombok.extern.jackson.Jacksonized;
@@ -10,8 +11,8 @@ import lombok.extern.jackson.Jacksonized;
 @Jacksonized
 public class BookImgRegisterRequest {
 
-	@NotBlank
-	long imgId;
+	@NotNull
+	Long imgId;
 
 	@NotBlank
 	String imgUrl;

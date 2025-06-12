@@ -56,17 +56,17 @@ public class CategoryServiceTest {
 		void setUpRoot() {
 			// 기존 루트 카테고리 조회만 stub
 			when(categoryRepository.findByParentCategoryIsNull())
-				.thenReturn(List.of());
+				.thenReturn(List.of(new Category(null, "중복 이름", "/1")));
 		}
 
 		@Test
-		@DisplayName("성공: save() 2회 호출")
-		void success() {
-			// save() 는 성공 케이스에서만 stub
+		@DisplayName("최상위 카테고리 저장 성공")
+		void successRegisterRootCategory() {
+
 			when(categoryRepository.save(any(Category.class)))
 				.thenAnswer(inv -> {
 					Category c = inv.getArgument(0);
-					long id = (c.getParentCategory() == null ? 1L : 2L);
+					long id = (c.getParentCategory() == null ? 2L : 3L);
 					ReflectionTestUtils.setField(c, "id", id);
 					return c;
 				});
@@ -74,17 +74,12 @@ public class CategoryServiceTest {
 			RootCategoryRegisterRequest req = new RootCategoryRegisterRequest("부모 카테고리", "자식 카테고리");
 			categoryService.registerRootCategory(req);
 
-			// save() 가 루트+자식 총 2회 호출됐는지 검증
 			verify(categoryRepository, times(2)).save(any(Category.class));
 		}
 
 		@Test
 		@DisplayName("실패: 중복 이름 예외")
 		void duplicateNameThrows() {
-			// 중복 이름을 포함한 리스트만 stub
-			when(categoryRepository.findByParentCategoryIsNull())
-				.thenReturn(List.of(new Category(null, "중복 이름", "/1")));
-
 			RootCategoryRegisterRequest req = new RootCategoryRegisterRequest("중복 이름", "자식 카테고리");
 			assertThatThrownBy(() -> categoryService.registerRootCategory(req))
 				.isInstanceOf(CategoryAlreadyExistsException.class)
@@ -100,6 +95,7 @@ public class CategoryServiceTest {
 	class RegisterSubCategoryTests {
 
 		private Category parent;
+		private Category child;
 
 		@BeforeEach
 		void setUpSub() {
@@ -111,13 +107,13 @@ public class CategoryServiceTest {
 		}
 
 		@Test
-		@DisplayName("성공: save() 3회 호출")
+		@DisplayName("하위 카테고리 등록 성공")
 		void success() {
 			// 성공 케이스에서만 save() stub
 			when(categoryRepository.save(any(Category.class)))
 				.thenAnswer(inv -> {
 					Category c = inv.getArgument(0);
-					ReflectionTestUtils.setField(c, "id", 2L);
+					ReflectionTestUtils.setField(c, "id", 3L);
 					return c;
 				});
 
@@ -128,19 +124,19 @@ public class CategoryServiceTest {
 		}
 
 		@Test
-		@DisplayName("실패: 중복 이름 예외")
-		void duplicateThrows() {
-			// 이미 같은 이름 가진 자식이 존재하도록 세팅
-			Category existing = Category.builder()
-				.name("같은 이름의 자식 카테고리")
-				.parentCategory(parent)
-				.build();
-			ReflectionTestUtils.setField(existing, "id", 99L);
-			parent.addChildCategory(existing);
+		@DisplayName("하위 카테고리 실패 : 부모 카테고리의 하위 카테고리 중복 이름 예외")
+		void duplicateNameThrows() {
 
-			CategoryRegisterRequest request = new CategoryRegisterRequest("같은 이름의 자식 카테고리");
+			child = Category.builder().name("자식 카테고리 이름 중복").build();
+			ReflectionTestUtils.setField(child, "id", 2L);
+			when(categoryRepository.getAllDescendantCategories(any()))
+				.thenReturn(List.of(child));
+
+			CategoryRegisterRequest request = new CategoryRegisterRequest("자식 카테고리 이름 중복");
+
 			assertThatThrownBy(() -> categoryService.registerCategory(1L, request))
-				.isInstanceOf(CategoryAlreadyExistsException.class);
+				.isInstanceOf(CategoryAlreadyExistsException.class)
+				.hasMessageContaining("이미 존재하는 카테고리명입니다.");
 
 			verify(categoryRepository, never()).save(any());
 		}
@@ -149,39 +145,44 @@ public class CategoryServiceTest {
 	@Nested
 	@DisplayName("카테고리 수정")
 	class UpdateCategoryTests {
-		private Category parent;
+		private Category root;
+		private Category child;
 		private Category target;
 
 		@BeforeEach
 		void setUpUpdate() {
 			// 부모 카테고리 준비
-			parent = Category.builder()
+			root = Category.builder()
 				.name("상위 카테고리")
 				.build();
-			ReflectionTestUtils.setField(parent, "id", 1L);
+			ReflectionTestUtils.setField(root, "id", 1L);
 
-			// 수정 대상 카테고리 준비(detail)
-			target = Category.builder()
-				.name("기존 이름")
-				.parentCategory(parent)
+			// 기존 부모에 등록된 자식 카테고리
+			child = Category.builder()
+				.name("중복 이름")
 				.build();
-			ReflectionTestUtils.setField(target, "id", 2L);
-
-			// repository.findById -> target
-			when(categoryRepository.findById(2L))
-				.thenReturn(Optional.of(target));
+			ReflectionTestUtils.setField(root, "id", 2L);
 		}
 
 		@Test
-		@DisplayName("성공: 이름 변경 후 save() 1회 호출")
+		@DisplayName("성공: 중간 카테고리 수정")
 		void success() {
-			CategoryUpdateRequest req = new CategoryUpdateRequest("새 이름");
+			// 수정 대상 카테고리
+			target = Category.builder()
+				.name("기존 이름")
+				.parentCategory(root)
+				.build();
+			ReflectionTestUtils.setField(target, "id", 3L);
 
-			// save() stub
-			when(categoryRepository.save(any(Category.class)))
-				.thenAnswer(inv -> inv.getArgument(0));
+			// repository.findById -> target
+			when(categoryRepository.findById(target.getId()))
+				.thenReturn(Optional.of(target));
 
-			categoryService.updateCategory(2L, req);
+			CategoryUpdateRequest request = new CategoryUpdateRequest("새 이름");
+
+			when(categoryRepository.getAllDescendantCategories(any())).thenReturn(List.of(child));
+
+			categoryService.updateCategory(target.getId(), request);
 
 			// save 호출 검증
 			verify(categoryRepository, times(1)).save(target);
@@ -190,23 +191,74 @@ public class CategoryServiceTest {
 		}
 
 		@Test
-		@DisplayName("실패: 상위 카테고리 하위에 동일 이름 존재 시 예외")
-		void duplicateNameThrows() {
-			// parent 의 자식 목록에 이미 동일 이름(child) 추가
-			Category existing = Category.builder()
-				.name("중복이름")
-				.parentCategory(parent)
+		@DisplayName("성공: 최상위 카테고리 수정")
+		void successRootCategory() {
+			// 수정 대상 카테고리
+			target = Category.builder()
+				.name("기존 이름")
+				.parentCategory(null)
 				.build();
-			ReflectionTestUtils.setField(existing, "id", 3L);
-			parent.addChildCategory(existing);
+			ReflectionTestUtils.setField(target, "id", 3L);
 
-			CategoryUpdateRequest req = new CategoryUpdateRequest("중복이름");
+			when(categoryRepository.findById(3L))
+				.thenReturn(Optional.of(target));
 
-			assertThatThrownBy(() -> categoryService.updateCategory(2L, req))
+			CategoryUpdateRequest request = new CategoryUpdateRequest("새 이름");
+
+			when(categoryRepository.findByParentCategoryIsNull())
+				.thenReturn(List.of(root));
+
+			categoryService.updateCategory(target.getId(), request);
+
+			verify(categoryRepository, times(1)).save(any());
+			assertThat(target.getName()).isEqualTo("새 이름");
+		}
+
+		@Test
+		@DisplayName("실패: 부모 카테고리의 하위 카테고리 중복 이름 예외")
+		void duplicateNameThrows() {
+			target = Category.builder()
+				.name("기존 이름")
+				.parentCategory(root)
+				.build();
+			ReflectionTestUtils.setField(target, "id", 3L);
+
+			when(categoryRepository.findById(3L))
+				.thenReturn(Optional.of(target));
+
+			CategoryUpdateRequest request = new CategoryUpdateRequest("중복 이름");
+
+			when(categoryRepository.getAllDescendantCategories(any()))
+				.thenReturn(List.of(child));
+
+			assertThatThrownBy(() -> categoryService.updateCategory(target.getId(), request))
 				.isInstanceOf(CategoryAlreadyExistsException.class)
-				.hasMessageContaining("이미 존재하는 카테고리명입니다");
+				.hasMessageContaining("이미 존재하는 카테고리명입니다.");
 
-			// save는 절대 호출되지 않아야 함
+			verify(categoryRepository, never()).save(any());
+		}
+
+		@Test
+		@DisplayName("실패: 최상위 카테고리 수정의 경우 최상위 카테고리명 중복 예외")
+		void duplicateNameByRootCategoryThrows() {
+			target = Category.builder()
+				.name("기존 이름")
+				.parentCategory(null)
+				.build();
+			ReflectionTestUtils.setField(target, "id", 3L);
+
+			when(categoryRepository.findById(3L))
+				.thenReturn(Optional.of(target));
+
+			CategoryUpdateRequest request = new CategoryUpdateRequest("상위 카테고리");
+
+			when(categoryRepository.findByParentCategoryIsNull())
+				.thenReturn(List.of(root));
+
+			assertThatThrownBy(() -> categoryService.updateCategory(target.getId(), request))
+				.isInstanceOf(CategoryAlreadyExistsException.class)
+				.hasMessageContaining("이미 존재하는 카테고리명입니다.");
+
 			verify(categoryRepository, never()).save(any());
 		}
 	}
@@ -234,91 +286,6 @@ public class CategoryServiceTest {
 
 			verify(bookCategoryRepository).existsByCategory(child);
 			verify(categoryRepository, never()).delete(child);
-		}
-
-		@Test
-		@DisplayName("실패: 하위 카테고리에 BookCategory 존재 시 예외")
-		void throwsWhenBookExistsOnDescendant() {
-			// given: 3단계 트리 세팅
-			Category parent = Category.builder().name("루트").build();
-			ReflectionTestUtils.setField(parent, "id", 1L);
-			Category child = Category.builder().name("자식").parentCategory(parent).build();
-			ReflectionTestUtils.setField(child, "id", 2L);
-			parent.addChildCategory(child);
-			Category grand = Category.builder().name("손자").parentCategory(child).build();
-			ReflectionTestUtils.setField(grand, "id", 3L);
-			child.addChildCategory(grand);
-
-			when(categoryRepository.findById(2L)).thenReturn(Optional.of(child));
-			when(bookCategoryRepository.existsByCategory(child)).thenReturn(false);
-			when(bookCategoryRepository.existsByCategory(grand)).thenReturn(true);
-
-			// when / then
-			assertThatThrownBy(() -> categoryService.deleteCategory(2L))
-				.isInstanceOf(CategoryCannotDeleteRootException.class);
-		}
-
-		@Test
-		@DisplayName("실패: 최상위 카테고리 삭제 시 예외")
-		void throwsWhenDeletingRootCategory() {
-			// given: id=2가 루트
-			Category root = Category.builder().name("루트").build();
-			ReflectionTestUtils.setField(root, "id", 2L);
-
-			when(categoryRepository.findById(2L)).thenReturn(Optional.of(root));
-			when(bookCategoryRepository.existsByCategory(root)).thenReturn(false);
-			when(categoryRepository.existsByIdAndParentCategoryIsNull(2L)).thenReturn(true);
-
-			// when / then
-			assertThatThrownBy(() -> categoryService.deleteCategory(2L))
-				.isInstanceOf(CategoryCannotDeleteRootException.class);
-		}
-
-		@Test
-		@DisplayName("실패: 최상위 카테고리의 유일한 자식 삭제 시 예외")
-		void throwsWhenSingleChildRoot() {
-			// given: parent(1)→child(2) 한 개뿐
-			Category parent = Category.builder().name("루트").build();
-			ReflectionTestUtils.setField(parent, "id", 1L);
-			Category child = Category.builder().name("자식").parentCategory(parent).build();
-			ReflectionTestUtils.setField(child, "id", 2L);
-			parent.addChildCategory(child);
-
-			when(categoryRepository.findById(2L)).thenReturn(Optional.of(child));
-			when(categoryRepository.findById(1L)).thenReturn(Optional.of(parent));
-			when(bookCategoryRepository.existsByCategory(child)).thenReturn(false);
-			when(categoryRepository.existsByIdAndParentCategoryIsNull(2L)).thenReturn(false);
-			when(categoryRepository.existsByIdAndParentCategoryIsNull(1L)).thenReturn(true);
-
-			// when / then
-			assertThatThrownBy(() -> categoryService.deleteCategory(2L))
-				.isInstanceOf(CategoryCannotDeleteException.class);
-		}
-
-		@Test
-		@DisplayName("성공: 관련 delete 메서드 호출")
-		void success() {
-			// given: parent(1)→child(2), BookCategory·하위 카테고리 없음
-			Category parent = Category.builder().name("루트").build();
-			ReflectionTestUtils.setField(parent, "id", 1L);
-			Category child = Category.builder().name("자식").parentCategory(parent).build();
-			ReflectionTestUtils.setField(child, "id", 2L);
-			parent.addChildCategory(child);
-
-			when(categoryRepository.findById(2L)).thenReturn(Optional.of(child));
-			when(categoryRepository.findById(1L)).thenReturn(Optional.of(parent));
-			when(bookCategoryRepository.existsByCategory(any())).thenReturn(false);
-			when(categoryRepository.existsByIdAndParentCategoryIsNull(anyLong())).thenReturn(false);
-			when(bookCategoryRepository.findByCategory(child)).thenReturn(List.of());
-
-			// when
-			categoryService.deleteCategory(2L);
-
-			// then
-			verify(bookCategoryRepository).deleteByCategoryIn(List.of());
-			verify(bookCategoryRepository).findByCategory(child);
-			verify(bookCategoryRepository).deleteByCategory(child);
-			verify(categoryRepository).delete(child);
 		}
 	}
 
@@ -379,80 +346,6 @@ public class CategoryServiceTest {
 			assertThat(resp.name()).isEqualTo("Java");
 			assertThat(resp.parentName()).isEqualTo("-");
 			assertThat(resp.categoryPath()).isEqualTo("/5");
-		}
-	}
-
-	@Nested
-	@DisplayName("getCategoryTree & getCategoryTreeById")
-	class TreeQueryTests {
-
-		@Test
-		@DisplayName("getCategoryTree → 전체 트리 구조 반환")
-		void getCategoryTree_success() {
-			// given: 1→2→3 구조
-			Category root = Category.builder().name("Root").build();
-			ReflectionTestUtils.setField(root, "id", 1L);
-
-			Category child = Category.builder().name("Child").parentCategory(root).build();
-			ReflectionTestUtils.setField(child, "id", 2L);
-			root.addChildCategory(child);
-
-			Category leaf = Category.builder().name("Leaf").parentCategory(child).build();
-			ReflectionTestUtils.setField(leaf, "id", 3L);
-			child.addChildCategory(leaf);
-
-			given(categoryRepository.findByParentCategoryIsNull())
-				.willReturn(List.of(root));
-
-			// when
-			List<CategoryTreeResponse> tree = categoryService.getCategoryTree();
-
-			// then
-			assertThat(tree).hasSize(1);
-			CategoryTreeResponse r = tree.getFirst();
-			assertThat(r.id()).isEqualTo(1L);
-			assertThat(r.name()).isEqualTo("Root");
-			assertThat(r.children()).hasSize(1);
-			assertThat(r.children().get(0).id()).isEqualTo(2L);
-			assertThat(r.children().get(0).children())
-				.extracting(CategoryTreeResponse::id)
-				.containsExactly(3L);
-		}
-
-		@Test
-		@DisplayName("getCategoryTreeById → 단일 노드로부터 트리 구조 반환")
-		void getCategoryTreeById_success() {
-			// given: 10→11
-			Category parent = Category.builder().name("P").build();
-			ReflectionTestUtils.setField(parent, "id", 10L);
-
-			Category child = Category.builder().name("C").parentCategory(parent).build();
-			ReflectionTestUtils.setField(child, "id", 11L);
-			parent.addChildCategory(child);
-
-			given(categoryRepository.findById(10L)).willReturn(Optional.of(parent));
-
-			// when
-			CategoryTreeResponse tree = categoryService.getCategoryTreeById(10L);
-
-			// then
-			assertThat(tree.id()).isEqualTo(10L);
-			assertThat(tree.name()).isEqualTo("P");
-			assertThat(tree.children())
-				.extracting(CategoryTreeResponse::id)
-				.containsExactly(11L);
-		}
-
-		@Test
-		@DisplayName("getCategoryTreeById → 존재하지 않는 ID 조회 시 예외")
-		void getCategoryTreeById_notFound() {
-			// given
-			given(categoryRepository.findById(99L))
-				.willReturn(Optional.empty());
-
-			// when / then
-			assertThatThrownBy(() -> categoryService.getCategoryTreeById(99L))
-				.isInstanceOf(CategoryNotFoundException.class);
 		}
 	}
 

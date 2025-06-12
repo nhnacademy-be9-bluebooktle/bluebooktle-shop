@@ -58,6 +58,8 @@ public class AuthorControllerTest {
 			.name("New Author")
 			.build();
 
+		doNothing().when(authorService).registerAuthor(any());
+
 		mockMvc.perform(post("/api/authors")
 				.with(csrf())
 				.contentType(MediaType.APPLICATION_JSON)

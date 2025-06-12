@@ -62,7 +62,7 @@
                 <th:block th:text="${pageTitle} ?: '주문 상세 정보'"></th:block>
             </h1>
             <div>
-                <a th:href="@{/admin/orders}" class="admin-btn admin-btn--default">
+                <a class="admin-btn admin-btn--default" th:href="@{/admin/orders}">
                     <i class="fas fa-list"></i> 목록으로
                 </a>
             </div>
@@ -75,12 +75,12 @@
                 <div class="admin-panel__body">
                     <dl>
                         <dt>주문번호</dt>
-                        <dd th:text="${order.orderNumber}">ORD20250517001</dd>
+                        <dd th:text="${order.orderKey()}"></dd>
                         <dt>주문일시</dt>
-                        <dd th:text="${#temporals.format(order.orderDate, 'yyyy-MM-dd HH:mm:ss')}">2025-05-17 10:00:00
+                        <dd th:text="${#temporals.format(order.orderDate, 'yyyy-MM-dd HH:mm:ss')}">
                         </dd>
                         <dt>현재 주문 상태</dt>
-                        <dd th:text="${order.currentOrderStatus}">결제완료</dd>
+                        <dd th:text="${order.orderStatus().getDescription()}"></dd>
                     </dl>
                 </div>
             </div>
@@ -91,13 +91,18 @@
                 <div class="admin-panel__body">
                     <dl>
                         <dt>주문자명</dt>
-                        <dd th:text="${order.ordererName}">김블루</dd>
-                        <dt th:if="${order.ordererLoginId}">회원 ID</dt>
-                        <dd th:if="${order.ordererLoginId}" th:text="${order.ordererLoginId}">blueuser</dd>
+                        <dd th:if="${order.ordererName()}" th:text="${order.ordererName()}"></dd>
+
+                        <div th:if="${order.ordererLoginId()!= null}">
+                            <dt>이메일</dt>
+                            <dd th:text="${order.ordererLoginId()}"></dd>
+                        </div>
                         <dt>연락처</dt>
-                        <dd th:text="${order.ordererPhoneNumber}">010-1234-5678</dd>
-                        <dt>이메일</dt>
-                        <dd th:text="${order.ordererEmail}">blue@example.com</dd>
+                        <dd th:text="${order.ordererPhoneNumber}"></dd>
+                        <div th:if="${order.ordererEmail!= null}">
+                            <dt>이메일</dt>
+                            <dd th:text="${order.ordererEmail}"></dd>
+                        </div>
                     </dl>
                 </div>
             </div>
@@ -108,9 +113,14 @@
                 <div class="admin-panel__body">
                     <dl>
                         <dt>수령인명</dt>
-                        <dd th:text="${order.recipientName}">이북클</dd>
+                        <dd th:text="${order.receiverName()}"></dd>
+                        <div th:if="${order.receiverEmail() != null}">
+                            <dt>이메일</dt>
+                            <dd th:text="${order.receiverEmail()}"></dd>
+                        </div>
                         <dt>연락처</dt>
-                        <dd th:text="${order.recipientPhoneNumber}">010-9876-5432</dd>
+                        <dd th:text="${order.receiverPhoneNumber()}"></dd>
+
                     </dl>
                 </div>
             </div>
@@ -121,13 +131,11 @@
                 <div class="admin-panel__body">
                     <dl>
                         <dt>우편번호</dt>
-                        <dd th:text="${order.shippingAddressPostcode}">12345</dd>
+                        <dd th:text="${order.postalCode()}"></dd>
                         <dt>기본 주소</dt>
-                        <dd th:text="${order.shippingAddressBase}">서울시 강남구 테헤란로</dd>
+                        <dd th:text="${order.address()}"></dd>
                         <dt>상세 주소</dt>
-                        <dd th:text="${order.shippingAddressDetail}">블루빌딩 101호</dd>
-                        <dt th:if="${order.shippingMemo}">배송 메모</dt>
-                        <dd th:if="${order.shippingMemo}" th:text="${order.shippingMemo}">문 앞에 놓아주세요.</dd>
+                        <dd th:text="${order.detailAddress()}"></dd>
                     </dl>
                 </div>
             </div>
@@ -148,11 +156,13 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr th:each="item : ${order.orderedProducts}">
-                        <td th:text="${item.productName}">코딩의 정석</td>
-                        <td th:text="${item.quantity}">2</td>
-                        <td th:text="${#numbers.formatInteger(item.priceAtOrder, 0, 'COMMA') + '원'}">25,000원</td>
-                        <td th:text="${#numbers.formatInteger(item.totalPrice, 0, 'COMMA') + '원'}">50,000원</td>
+                    <tr th:each="item : ${order.orderItems()}">
+                        <td th:text="${item.getBookTitle()}"></td>
+                        <td th:text="${item.getQuantity()}"></td>
+                        <td th:text="${T(java.lang.String).format('%,d원', item.getPrice().longValue())}">0원</td>
+                        <td th:text="${T(java.lang.String).format('%,d원', item.getPrice().multiply(item.getQuantity()).longValue())}">
+                            0원
+                        </td>
                     </tr>
                     </tbody>
                 </table>
@@ -166,39 +176,80 @@
                 <div class="admin-panel__body">
                     <dl>
                         <dt>결제 수단</dt>
-                        <dd th:text="${order.paymentInfo?.paymentMethod}">신용카드</dd>
-                        <dt>상품 총액</dt>
-                        <dd th:text="${#numbers.formatInteger(order.paymentInfo?.totalProductAmount, 0, 'COMMA') + '원'}">
-                            80,000원
-                        </dd>
+                        <dd th:text="${order.paymentMethod()}"></dd>
+
+                        <dt>상품 금액</dt>
+                        <dd th:text="${#numbers.formatDecimal(order.productAmount(), 0, 'COMMA', 0, 'POINT')} + '원'"></dd>
+
+                        <dt th:if="${order.totalPackagingFee() != null && order.totalPackagingFee() > 0}">포장비</dt>
+                        <dd th:if="${order.totalPackagingFee() != null && order.totalPackagingFee() > 0}"
+                            th:text="'+ ' + ${#numbers.formatDecimal(order.totalPackagingFee(), 0, 'COMMA', 0, 'POINT')} + '원'"></dd>
+
                         <dt>배송비</dt>
-                        <dd th:text="${#numbers.formatInteger(order.paymentInfo?.shippingFee, 0, 'COMMA') + '원'}">3,000원
-                        </dd>
-                        <dt th:if="${order.paymentInfo?.usedPoints > 0}">사용 포인트</dt>
-                        <dd th:if="${order.paymentInfo?.usedPoints > 0}"
-                            th:text="${#numbers.formatInteger(order.paymentInfo?.usedPoints, 0, 'COMMA') + 'P'}">1,000P
-                        </dd>
-                        <dt th:if="${order.paymentInfo?.couponDiscountAmount > 0}">쿠폰 할인액</dt>
-                        <dd th:if="${order.paymentInfo?.couponDiscountAmount > 0}"
-                            th:text="${#numbers.formatInteger(order.paymentInfo?.couponDiscountAmount, 0, 'COMMA') + '원'}">
-                            500원
-                        </dd>
+                        <dd th:text="${order.deliveryFee() == 0 ? '무료' : #numbers.formatDecimal(order.deliveryFee(), 0, 'COMMA', 0, 'POINT') + '원'}"></dd>
+
+                        <div th:if="${order.couponDiscountAmount() != null && order.couponDiscountAmount() > 0}">
+                            <dt>쿠폰 할인</dt>
+                            <dd th:text="'- ' + ${#numbers.formatDecimal(order.couponDiscountAmount(), 0, 'COMMA', 0, 'POINT')} + '원'"></dd>
+                        </div>
+
+                        <div th:if="${order.pointUserAmount() != null && order.pointUserAmount() > 0}">
+                            <dt>포인트 사용</dt>
+                            <dd th:text="'- ' + ${#numbers.formatDecimal(order.pointUserAmount(), 0, 'COMMA', 0, 'POINT')} + '원'"></dd>
+                        </div>
+
                         <dt>최종 결제액</dt>
-                        <dd style="font-weight: bold; font-size: 1.1em;"
-                            th:text="${#numbers.formatInteger(order.paymentInfo?.finalPaymentAmount, 0, 'COMMA') + '원'}">
-                            81,500원
+                        <dd th:if="${order.paidAmount() != null}"
+                            style="font-weight: bold; font-size: 1.2em; color: #007bff;"
+                            th:text="${#numbers.formatDecimal(order.paidAmount(), 0, 'COMMA', 0, 'POINT')} + '원'"></dd>
+                        <dd th:if="${order.paidAmount() == null}"
+                            style="font-weight: bold; font-size: 1.1em; color: #E8A87C;">
+                            결제 대기
                         </dd>
                     </dl>
                 </div>
             </div>
 
-            <div class="admin-panel order-section"
-                 th:if="${order.packagingOptions != null && !order.packagingOptions.isEmpty()}">
+            <div class="admin-panel order-section" th:if="${order.refundReason != null}">
+                <div class="admin-panel__header">
+                    <h2 class="admin-panel__title">
+                        <i class="fas fa-undo-alt"></i> 환불 정보
+                    </h2>
+                </div>
+                <div class="admin-panel__body">
+                    <dl>
+                        <dt>환불 요청 사유</dt>
+                        <dd th:text="${order.refundReason.description}" style="font-weight: bold;"></dd>
+
+                        <dt>상세 사유</dt>
+                        <dd th:text="${order.refundReasonDetail}" style="white-space: pre-wrap;"></dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class="admin-panel order-section">
                 <div class="admin-panel__header"><h2 class="admin-panel__title"><i class="fas fa-gift"></i> 포장 옵션</h2>
                 </div>
                 <div class="admin-panel__body">
                     <ul>
-                        <li th:each="opt : ${order.packagingOptions}" th:text="${opt}">선물 포장 (레드)</li>
+                        <li th:each="item : ${order.orderItems}">
+                            <div th:if="${not #lists.isEmpty(item.packagingOptions)}">
+                                <div>
+                                    <strong>상품명:</strong>
+                                    <span th:text="${item.bookTitle}">책 제목</span>
+                                </div>
+
+                                <strong>포장 옵션:</strong>
+                                <ul>
+                                    <li th:each="packaging : ${item.packagingOptions}">
+                                        <span th:text="${packaging.name}">포장지 이름</span>
+                                        (
+                                        <span th:text="${#numbers.formatCurrency(packaging.price)}">포장 가격</span>
+                                        ) * <span th:text="${packaging.quantity}"></span> 개
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -209,21 +260,15 @@
             <div class="admin-panel__header"><h2 class="admin-panel__title"><i class="fas fa-shipping-fast"></i> 배송 관리
             </h2></div>
             <div class="admin-panel__body">
-                <form th:action="@{/admin/orders/{id}/update-tracking(id=${order.orderId})}" method="post"
-                      class="admin-form">
+                <form class="admin-form" method="post"
+                      th:action="@{/admin/orders/{id}/update-tracking(id=${order.orderId})}">
                     <div class="admin-form-group">
-                        <label for="deliveryStatus" class="admin-form-label">현재 배송 상태</label>
-                        <input type="text" id="deliveryStatus" th:value="${order.deliveryInfo?.deliveryStatus}"
-                               class="admin-form-control" readonly>
-                    </div>
-                    <div class="admin-form-group">
-                        <label for="trackingNumber" class="admin-form-label">운송장 번호</label>
-                        <input type="text" id="trackingNumber" name="trackingNumber"
-                               th:value="${order.deliveryInfo?.trackingNumber}" class="admin-form-control"
-                               placeholder="운송장 번호를 입력하세요">
+                        <label class="admin-form-label" for="trackingNumber">운송장 번호</label>
+                        <input class="admin-form-control" id="trackingNumber" name="trackingNumber"
+                               type="text" placeholder="운송장 번호를 입력하세요" th:value="${order.trackingNumber()}">
                     </div>
                     <div class="admin-form-actions" style="text-align: right;">
-                        <button type="submit" class="admin-btn admin-btn--primary">
+                        <button class="admin-btn admin-btn--primary" type="submit">
                             <i class="fas fa-save"></i> 운송장 번호 저장
                         </button>
                     </div>
@@ -231,22 +276,23 @@
 
                 <hr style="margin: 20px 0;">
 
-                <form th:action="@{/admin/orders/{id}/update-status(id=${order.orderId})}" method="post"
-                      class="admin-form">
+                <form class="admin-form" method="post"
+                      th:action="@{/admin/orders/{id}/update-status(id=${order.orderId})}">
                     <div class="admin-form-group">
-                        <label for="newStatus" class="admin-form-label">주문 상태 변경</label>
-                        <select id="newStatus" name="status" class="admin-form-control">
+                        <label class="admin-form-label" for="newStatus">배송 상태 변경</label>
+                        <select class="admin-form-control" id="newStatus" name="status">
                             <option value="">-- 변경할 상태 선택 --</option>
-                            <option th:each="statusOpt : ${updatableOrderStatuses}" th:value="${statusOpt}"
-                                    th:text="${statusOpt}"
-                                    th:selected="${statusOpt == order.currentOrderStatus}">상태 옵션
+                            <option th:each="statusOpt : ${updatableOrderStatuses}"
+                                    th:selected="${statusOpt == order.orderStatus()}"
+                                    th:text="${statusOpt.getDescription()}"
+                                    th:value="${statusOpt}">
                             </option>
                         </select>
                     </div>
                     <div class="admin-form-actions" style="text-align: right;">
-                        <button type="submit" class="admin-btn admin-btn--warning"
-                                onclick="return confirm('정말로 주문 상태를 변경하시겠습니까?');">
-                            <i class="fas fa-exchange-alt"></i> 주문 상태 변경
+                        <button class="admin-btn admin-btn--warning" onclick="return confirm('정말로 배송 상태를 변경하시겠습니까?');"
+                                type="submit">
+                            <i class="fas fa-exchange-alt"></i> 배송 상태 변경
                         </button>
                     </div>
                 </form>
@@ -256,7 +302,7 @@
         <div class="actions-bar">
             <div></div>
             <div>
-                <a th:href="@{/admin/orders}" class="admin-btn admin-btn--default">
+                <a class="admin-btn admin-btn--default" th:href="@{/admin/orders}">
                     <i class="fas fa-list"></i> 목록으로
                 </a>
             </div>
@@ -272,7 +318,7 @@
         <div class="admin-panel">
             <div class="admin-panel__body" style="text-align: center; padding: 20px;">
                 <p>요청하신 주문 정보를 찾을 수 없습니다. 주문 ID를 확인해주세요.</p>
-                <a th:href="@{/admin/orders}" class="admin-btn admin-btn--primary">
+                <a class="admin-btn admin-btn--primary" th:href="@{/admin/orders}">
                     <i class="fas fa-list"></i> 주문 목록으로 돌아가기
                 </a>
             </div>

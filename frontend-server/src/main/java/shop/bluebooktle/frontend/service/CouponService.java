@@ -13,7 +13,7 @@ public interface CouponService {
 
 	UsableUserCouponMapResponse getUsableCouponsForOrder(List<Long> bookIds);
 
-	void useCoupon(Long id);
+	Long countAllUsableCoupons();
 
-	void cancelCoupon(Long id);
+	Long countExpiringThisMonth();
 }

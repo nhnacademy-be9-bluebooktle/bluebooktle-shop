@@ -3,23 +3,57 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title th:text="${pageTitle} ?: '포장 옵션 관리'"></title>
+    <title th:text="${pageTitle} ?: '환불 상세 정보'"></title>
     <th:block layout:fragment="page_css">
         <style>
-            .status-active {
-                color: green;
+            .refund-detail-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+                gap: 20px;
+            }
+
+            .refund-section .admin-panel__body {
+                padding: 15px;
+            }
+
+            .refund-section dt {
+                font-weight: bold;
+                margin-bottom: 5px;
+                color: #555;
+            }
+
+            .refund-section dd {
+                margin-left: 0;
+                margin-bottom: 15px;
+                padding-left: 10px;
+                border-left: 3px solid #eee;
+            }
+
+            .refund-section dd.reason-detail {
+                white-space: pre-wrap;
+            }
+
+            /* 상세 사유 줄바꿈 처리 */
+
+            /* 상태별 색상 */
+            .status-PENDING {
+                color: #ffc107;
                 font-weight: bold;
             }
 
-            .status-inactive {
-                color: red;
+            .status-COMPLETE {
+                color: #28a745;
+                font-weight: bold;
             }
 
-            .option-image-preview {
-                max-width: 80px;
-                max-height: 80px;
-                object-fit: cover;
-                border-radius: 4px;
+            .status-REJECTED {
+                color: #dc3545;
+                font-weight: bold;
+            }
+
+            .status-CANCELED {
+                color: #6c757d;
+                font-weight: bold;
             }
         </style>
     </th:block>
@@ -28,72 +62,97 @@
 <div layout:fragment="admin_content">
     <div class="admin-page-header">
         <h1 class="admin-page-title">
-            <i class="fas fa-box-open"></i>
-            <th:block th:text="${pageTitle} ?: '포장 옵션 관리'"></th:block>
+            <i class="fas fa-receipt"></i>
+            <th:block th:text="${pageTitle}"></th:block>
         </h1>
         <div>
-            <a th:href="@{/admin/packaging/options/new}" class="admin-btn admin-btn--primary">
-                <i class="fas fa-plus"></i> 새 포장 옵션 추가
+            <a th:href="@{/admin/refunds}" class="admin-btn admin-btn--default">
+                <i class="fas fa-list"></i> 목록으로
             </a>
         </div>
     </div>
 
-    <div class="admin-panel">
-        <div class="admin-panel__header">
-            <h2 class="admin-panel__title"><i class="fas fa-list-ul"></i> 포장 옵션 목록</h2>
+    <div th:if="${refund}">
+        <div class="refund-detail-grid">
+            <div class="admin-panel refund-section">
+                <div class="admin-panel__header"><h2 class="admin-panel__title"><i class="fas fa-info-circle"></i> 환불 기본
+                    정보</h2></div>
+                <div class="admin-panel__body">
+                    <dl>
+                        <dt>환불 ID</dt>
+                        <dd th:text="${refund.refundId}"></dd>
+                        <dt>요청일</dt>
+                        <dd th:text="${#temporals.format(refund.requestDate, 'yyyy-MM-dd HH:mm')}"></dd>
+                        <dt>현재 상태</dt>
+                        <dd><strong th:text="${refund.status.description}"
+                                    th:classappend="'status-' + ${refund.status}"></strong></dd>
+                        <dt>요청 금액</dt>
+                        <dd th:text="${#numbers.formatInteger(refund.refundAmount, 0, 'COMMA') + '원'}"></dd>
+                        <dt>환불 사유</dt>
+                        <dd th:text="${refund.reason.description}"></dd>
+                        <dt>상세 사유</dt>
+                        <dd class="reason-detail" th:text="${refund.reasonDetail}"></dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class="admin-panel refund-section">
+                <div class="admin-panel__header"><h2 class="admin-panel__title"><i class="fas fa-shopping-bag"></i> 연관
+                    주문 정보</h2></div>
+                <div class="admin-panel__body">
+                    <dl>
+                        <dt>주문번호</dt>
+                        <dd>
+                            <a th:href="@{/admin/orders/{orderId}(orderId=${refund.orderId})}"
+                               th:text="${refund.orderKey}" target="_blank" title="주문 상세 보기"></a>
+                        </dd>
+                        <dt>주문자</dt>
+                        <dd th:text="${refund.ordererName}"></dd>
+                        <dt>주문자 ID</dt>
+                        <dd th:text="${refund.userLoginId}"></dd>
+                    </dl>
+                </div>
+            </div>
         </div>
-        <div class="admin-panel__body">
-            <table class="admin-table">
-                <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>이미지</th>
-                    <th>포장명</th>
-                    <th>가격</th>
-                    <th>설명</th>
-                    <th>상태</th>
-                    <th>관리</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:if="${#lists.isEmpty(packagingOptions)}">
-                    <td colspan="7" style="text-align:center;">등록된 포장 옵션이 없습니다.</td>
-                </tr>
-                <tr th:each="option : ${packagingOptions}">
-                    <td th:text="${option.id}">1</td>
-                    <td>
-                        <img th:if="${option.imageUrl != null && !option.imageUrl.isEmpty()}"
-                             th:src="${option.imageUrl}" alt="포장 이미지" class="option-image-preview">
-                        <span th:unless="${option.imageUrl != null && !option.imageUrl.isEmpty()}">-</span>
-                    </td>
-                    <td th:text="${option.name}">기본 선물 포장</td>
-                    <td th:text="${#numbers.formatInteger(option.price, 0, 'COMMA') + '원'}">2,000원</td>
-                    <td th:text="${option.description ?: '-'}">빨간색 포장지 사용</td>
-                    <td>
-                        <span th:text="${option.isActive ? '활성' : '비활성'}"
-                              th:classappend="${option.isActive ? 'status-active' : 'status-inactive'}">활성</span>
-                    </td>
-                    <td>
-                        <a th:href="@{/admin/packaging/options/{id}/edit(id=${option.id})}"
-                           class="admin-btn admin-btn--sm admin-btn--info" title="수정">
-                            <i class="fas fa-edit"></i>
-                        </a>
-                        <form th:action="@{/admin/packaging/options/{id}/delete(id=${option.id})}" method="post"
-                              style="display:inline;"
-                              onsubmit="return confirm('정말로 이 포장 옵션을 삭제하시겠습니까?');">
-                            <button type="submit" class="admin-btn admin-btn--sm admin-btn--danger" title="삭제">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </form>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
+
+        <div class="admin-panel refund-section" style="margin-top:20px;" th:if="${!#lists.isEmpty(nextStatusOptions)}">
+            <div class="admin-panel__header"><h2 class="admin-panel__title"><i class="fas fa-exchange-alt"></i> 환불 상태 변경
+            </h2></div>
+            <div class="admin-panel__body">
+                <form th:action="@{/admin/refunds/update-status}" method="post" th:object="${updateRequest}"
+                      class="admin-form">
+                    <input type="hidden" th:field="*{refundId}"/>
+
+                    <div class="admin-form-group">
+                        <label for="newStatus" class="admin-form-label">변경할 상태</label>
+                        <select id="newStatus" th:field="*{status}" class="admin-form-control">
+                            <option value="">-- 상태 선택 --</option>
+                            <option th:each="opt : ${nextStatusOptions}" th:value="${opt}"
+                                    th:text="${opt.description}"></option>
+                        </select>
+                    </div>
+
+                    <div class="admin-form-actions" style="text-align: right;">
+                        <button type="submit" class="admin-btn admin-btn--primary"
+                                onclick="return confirm('정말로 환불 상태를 변경하시겠습니까?');">
+                            <i class="fas fa-check-circle"></i> 상태 변경 적용
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+    <div th:unless="${refund}" class="admin-panel">
+        <div class="admin-panel__body" style="text-align: center; padding: 20px;">
+            <p>요청하신 환불 정보를 찾을 수 없습니다.</p>
+            <a th:href="@{/admin/refunds}" class="admin-btn admin-btn--primary">
+                <i class="fas fa-list"></i> 환불 목록으로 돌아가기
+            </a>
         </div>
     </div>
 </div>
 
-<th:block layout:fragment="page_scripts">
-</th:block>
 </body>
 </html>

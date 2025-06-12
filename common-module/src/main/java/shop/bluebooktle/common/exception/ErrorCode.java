@@ -37,7 +37,7 @@ public enum ErrorCode {
 	AUTH_ACCOUNT_WITHDRAWN(HttpStatus.FORBIDDEN, "A011", "탈퇴한 계정입니다."),
 	AUTH_NOT_DORMANT_ACCOUNT(HttpStatus.BAD_REQUEST, "A012", "휴면 상태가 아닌 계정입니다."),
 	AUTH_ADDRESS_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "A013", "주소는 최대 10개까지 등록할 수 있습니다."),
-	AUTH_ADDRESS_NOT_FOUND(HttpStatus.BAD_REQUEST, "A014", "삭제할 주소를 찾을 수 없거나 권한이 없습니다."),
+	AUTH_ADDRESS_NOT_FOUND(HttpStatus.NOT_FOUND, "A014", "삭제할 주소를 찾을 수 없거나 권한이 없습니다."),
 	AUTH_INVALID_ADDRESS(HttpStatus.BAD_REQUEST, "A015", "유효하지 않은 주소 정보입니다."),
 	AUTH_MEMBERSHIP_LEVEL_NOT_FOUND(HttpStatus.NOT_FOUND, "A016", "회원 등급 정보를 찾을 수 없습니다."),
 	AUTH_INVALID_USER_ID(HttpStatus.BAD_REQUEST, "A017", "유효하지 않은 계정 ID입니다."),
@@ -101,22 +101,21 @@ public enum ErrorCode {
 	G_ORDER_PACKAGING_OPTION_NOT_FOUND(HttpStatus.NOT_FOUND, "G011", "주문 포장 옵션을 찾을 수 없습니다."),
 	G_ORDER_PACKAGING_OPTION_ALREADY_EXITS(HttpStatus.CONFLICT, "G012", "이미 해당 포장 옵션이 등록되어 있습니다."),
 
-	// 도서 - 이미지
+	// BOOK - 이미지
 	BOOK_IMG_BOOK_ID_NULL(HttpStatus.BAD_REQUEST, "BI01", "도서 ID는 필수입니다."),
 	BOOK_IMG_IMAGE_ID_NULL(HttpStatus.BAD_REQUEST, "BI02", "이미지 ID는 필수입니다."),
 	BOOK_IMG_ALREADY_EXISTS(HttpStatus.CONFLICT, "BI03", "이미 등록된 도서-이미지 매핑입니다."),
 	BOOK_IMG_NOT_FOUND(HttpStatus.NOT_FOUND, "BI04", "도서-이미지 매핑 정보를 찾을 수 없습니다."),
 
-	// Author - 작가
+	// BOOK - 작가
 	AUTHOR_FIELD_NULL(HttpStatus.BAD_REQUEST, "BA01", "작가 등록에 필요한 필드(name, description, authorKey)는 null 일 수 없습니다."),
 	AUTHOR_ID_NULL(HttpStatus.BAD_REQUEST, "BA02", "작가 ID는 필수입니다."),
 	AUTHOR_ALREADY_EXISTS(HttpStatus.CONFLICT, "BA03", "이미 존재하는 작가 이름입니다."),
 	AUTHOR_NOT_FOUND(HttpStatus.NOT_FOUND, "BA04", "존재하지 않는 작가입니다."),
 	AUTHOR_UPDATE_FIELD_MISSING(HttpStatus.BAD_REQUEST, "BA05",
 		"적어도 하나 이상의 필드(name, description, authorKey)를 제공해야 합니다."),
-
-	// 도서 - 작가
 	BOOK_AUTHOR_ALREADY_EXISTS(HttpStatus.CONFLICT, "BA06", "이미 등록된 도서-작가 매핑입니다."),
+	AUTHOR_DELETE_NOT_AVAILABLE(HttpStatus.BAD_REQUEST, "BA07", "도서에 등록된 작가로 삭제할 수 없습니다."),
 
 	IMAGE_ID_NULL(HttpStatus.BAD_REQUEST, "B015", "이미지 ID는 필수입니다."),
 	IMAGE_URL_EMPTY(HttpStatus.BAD_REQUEST, "B016", "이미지 URL은 비어 있을 수 없습니다."),
@@ -140,32 +139,37 @@ public enum ErrorCode {
 	ORDER_DELIVERY_RULE_NOT_FOUND(HttpStatus.NOT_FOUND, "O006", "배송 정책을 찾을 수 없습니다."),
 	ORDER_INVALID_ORDER_KEY(HttpStatus.UNAUTHORIZED, "O007", "유효하지 않은 주문 확인 정보입니다."), // 비회원 주문 확인
 	ORDER_STATE_NOT_FOUND(HttpStatus.NOT_FOUND, "O008", "해당 주문상태가 존재하지 않습니다."),
+	ORDER_STOCK_NOT_ENOUGH(HttpStatus.BAD_REQUEST, "O009", "주문 수량이 재고보다 많습니다."), // 재고 부족
 
 	// Payment & Point Errors (결제/포인트 오류) - P
 	PAYMENT_FAILED(HttpStatus.BAD_GATEWAY, "P001", "결제 시스템 오류가 발생했습니다."), // 외부 결제사 오류
 	PAYMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "P002", "결제 정보를 찾을 수 없습니다."),
 	PAYMENT_TYPE_NOT_FOUND(HttpStatus.NOT_FOUND, "P003", "결제 수단을 찾을 수 없습니다."),
 	PAYMENT_TYPE_ALREADY_EXISTS(HttpStatus.CONFLICT, "P004", "이미 존재하는 결제수단입니다."),
-	POINT_INSUFFICIENT_BALANCE(HttpStatus.BAD_REQUEST, "P005", "포인트 잔액이 부족합니다."),
-	POINT_HISTORY_NOT_FOUND(HttpStatus.NOT_FOUND, "P006", "포인트 이력을 찾을 수 없습니다."),
-	POINT_SOURCE_TYPE_NOT_FOUND(HttpStatus.NOT_FOUND, "P007", "포인트 발생/사용 타입을 찾을 수 없습니다."),
-	POINT_POLICY_CREATION_NOT_ALLOWED(HttpStatus.BAD_REQUEST, "P008", "포인트 정책 생성이 허용되지 않습니다."),
-	POINT_POLICY_NOT_ACTIVE(HttpStatus.BAD_REQUEST, "P009", "비활성화된 포인트 정책입니다."),
-	PAYMENT_INVALID_AMOUNT(HttpStatus.BAD_REQUEST, "P010", "결제 금액이 유효하지 않습니다."),
-	POINT_POLICY_NOT_FOUND(HttpStatus.NOT_FOUND, "P011", "포인트 정책을 찾을 수 없습니다."),
-	POINT_POLICY_ALREADY_EXISTS(HttpStatus.CONFLICT, "P012", "이미 존재하는 포인트 정책입니다."),
-	REFUND_NOT_POSSIBLE(HttpStatus.BAD_REQUEST, "P013", "현재 상태에서는 반품/환불이 불가능합니다."),
-	REFUND_ALREADY_PROCESSED(HttpStatus.CONFLICT, "P0014", "이미 처리된 반품/환불 요청입니다."),
-	REFUND_INVALID_REASON(HttpStatus.BAD_REQUEST, "P015", "유효하지 않은 반품 사유입니다."),
-	REFUND_NOT_FOUND(HttpStatus.NOT_FOUND, "P016", "환불 정보를 찾을 수 없습니다."),
+	PAYMENT_AMOUNT_MISMATCH(HttpStatus.BAD_REQUEST, "P005", "결제 금액이 일치하지 않습니다."),
+	PAYMENT_INVALID_AMOUNT(HttpStatus.BAD_REQUEST, "P006", "결제 금액이 유효하지 않습니다."),
+	PAYMENT_CONFIRMATION_FAILED(HttpStatus.BAD_REQUEST, "P007", "결제 확인 중 오류가 발생했습니다."),
+	POINT_INSUFFICIENT_BALANCE(HttpStatus.BAD_REQUEST, "P008", "포인트 잔액이 부족합니다."),
+	POINT_HISTORY_NOT_FOUND(HttpStatus.NOT_FOUND, "P009", "포인트 이력을 찾을 수 없습니다."),
+	POINT_SOURCE_TYPE_NOT_FOUND(HttpStatus.NOT_FOUND, "P010", "포인트 발생/사용 타입을 찾을 수 없습니다."),
+	POINT_POLICY_NOT_ACTIVE(HttpStatus.BAD_REQUEST, "P011", "비활성화된 포인트 정책입니다."),
+	POINT_POLICY_CREATION_NOT_ALLOWED(HttpStatus.BAD_REQUEST, "P012", "포인트 정책 생성이 허용되지 않습니다."),
+	POINT_POLICY_NOT_FOUND(HttpStatus.NOT_FOUND, "P013", "포인트 정책을 찾을 수 없습니다."),
+	POINT_POLICY_ALREADY_EXISTS(HttpStatus.CONFLICT, "P014", "이미 존재하는 포인트 정책입니다."),
+	REFUND_NOT_POSSIBLE(HttpStatus.BAD_REQUEST, "P015", "현재 상태에서는 반품/환불이 불가능합니다."),
+	REFUND_ALREADY_PROCESSED(HttpStatus.CONFLICT, "P016", "이미 처리된 반품/환불 요청입니다."),
+	REFUND_INVALID_REASON(HttpStatus.BAD_REQUEST, "P017", "유효하지 않은 반품 사유입니다."),
+	REFUND_NOT_FOUND(HttpStatus.NOT_FOUND, "P018", "환불 정보를 찾을 수 없습니다."),
+	PAYMENT_ALREADY_CANCELLED(HttpStatus.BAD_REQUEST, "P019", "이미 취소된 결제입니다."),
+	PAYMENT_CANCELLATION_FAILED(HttpStatus.BAD_REQUEST, "P020", "주문 취소를 실패했습니다."),
 
 	// Coupon Errors (쿠폰 오류) - K (Koopon)
 	K_COUPON_NOT_FOUND(HttpStatus.NOT_FOUND, "K001", "쿠폰을 찾을 수 없습니다."),
 	K_USER_COUPON_NOT_FOUND(HttpStatus.NOT_FOUND, "K002", "사용자의 쿠폰을 찾을 수 없습니다."),
-	K_COUPON_ALREADY_USED(HttpStatus.CONFLICT, "K003", "이미 사용된 쿠폰입니다."),
+	K_COUPON_ALREADY_USED(HttpStatus.CONFLICT, "K003", "이미 사용되거나 만료된 쿠폰입니다."),
 	K_COUPON_EXPIRED(HttpStatus.BAD_REQUEST, "K004", "사용 기간이 만료된 쿠폰입니다."),
 	K_COUPON_NOT_APPLICABLE(HttpStatus.BAD_REQUEST, "K005", "해당 주문/상품에 적용할 수 없는 쿠폰입니다."), // 최소 금액, 대상 상품/카테고리 불일치 등
-	K_COUPON_TYPE_NOT_FOUND(HttpStatus.NOT_FOUND, "K006", "쿠폰 타입을 찾을 수 없습니다."),
+	K_COUPON_TYPE_NOT_FOUND(HttpStatus.NOT_FOUND, "K006", "쿠폰 종류를 찾을 수 없습니다."),
 	K_INVALID_COUPON_POLICY(HttpStatus.INTERNAL_SERVER_ERROR, "K007", "유효하지 않은 쿠폰 정책 설정입니다."),
 	K_COUPON_ISSUANCE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "K008", "쿠폰 발행에 실패했습니다."),
 	K_COUPON_TYPE_NAME_ALREADY_EXISTS(HttpStatus.CONFLICT, "K009", "이미 존재하는 쿠폰 타입 이름입니다."),
@@ -187,7 +191,14 @@ public enum ErrorCode {
 	DELIVERY_RULE_CANNOT_DELETE_DEFAULT(HttpStatus.METHOD_NOT_ALLOWED, "D001", "기본 배송 정책은 삭제할 수 없습니다."),
 	DELIVERY_RULE_NOT_FOUND(HttpStatus.NOT_FOUND, "D002", "해당 배송정책이 없습니다."),
 	DEFAULT_DELIVERY_RULE_NOT_FOUND(HttpStatus.NOT_FOUND, "D003", "기본 배송 정책이 없습니다."),
-	DELIVERY_RULE_ALREADY_EXISTS(HttpStatus.CONFLICT, "D004", "해당 이름의 배송정책이 존재합니다.");
+	DELIVERY_RULE_ALREADY_EXISTS(HttpStatus.CONFLICT, "D004", "해당 이름의 배송정책이 존재합니다."),
+
+	// 리뷰 관련 오류
+	REVIEW_AUTHORIZATION_FAILED(HttpStatus.FORBIDDEN, "R001", "리뷰를 작성할 권한이 없습니다. 해당 주문의 사용자가 아닙니다."),
+
+	// Elasticsearch Error (엘라스틱 서치 오류) - E
+	ELASTIC_SEARCH_SAVE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "E001", "Elasticsearch에 도서 저장을 실패하였습니다."),
+	ELASTIC_SEARCH_BOOK_NOT_FOUND(HttpStatus.NOT_FOUND, "E002", "Elasticsearch에 해당 도서를 찾을 수 없습니다.");
 
 	private final HttpStatus status; // HTTP 상태 코드
 	private final String code;       // 고유 오류 코드 (클라이언트 사용)

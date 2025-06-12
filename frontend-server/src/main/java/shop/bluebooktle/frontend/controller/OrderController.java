@@ -1,12 +1,12 @@
 package shop.bluebooktle.frontend.controller;
 
+import java.util.HashMap;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -18,19 +18,19 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import shop.bluebooktle.common.dto.book.response.BookCartOrderResponse;
 import shop.bluebooktle.common.dto.book_order.response.PackagingOptionInfoResponse;
 import shop.bluebooktle.common.dto.coupon.response.UsableUserCouponMapResponse;
 import shop.bluebooktle.common.dto.order.request.OrderCreateRequest;
+import shop.bluebooktle.common.dto.order.request.OrderItemRequest;
 import shop.bluebooktle.common.dto.order.response.DeliveryRuleResponse;
 import shop.bluebooktle.common.dto.order.response.OrderConfirmDetailResponse;
+import shop.bluebooktle.common.dto.order.response.OrderDetailResponse;
 import shop.bluebooktle.common.dto.payment.request.PaymentConfirmRequest;
 import shop.bluebooktle.common.dto.payment.response.PaymentConfirmResponse;
 import shop.bluebooktle.common.dto.user.response.UserWithAddressResponse;
-import shop.bluebooktle.common.exception.cart.GuestUserNotFoundException;
 import shop.bluebooktle.frontend.service.AdminPackagingOptionService;
 import shop.bluebooktle.frontend.service.BookService;
 import shop.bluebooktle.frontend.service.CartService;
@@ -55,7 +55,7 @@ public class OrderController {
 	private final CartService cartService;
 	private final CouponService couponService;
 
-	@Value("{toss.client-key}")
+	@Value("${toss.client-key}")
 	private String tossPaymentClientKey;
 
 	@GetMapping("/create")
@@ -64,7 +64,7 @@ public class OrderController {
 		@RequestParam(defaultValue = "1", required = false) Integer quantity,
 		@RequestParam(required = false) List<Long> bookIds,
 		@CookieValue(value = "GUEST_ID", required = false) String guestId,
-		@CookieValue(value = "BB_AT", required = false) String token
+		Model model
 	) {
 		ModelAndView mav = new ModelAndView("order/create_form");
 
@@ -95,29 +95,53 @@ public class OrderController {
 		DeliveryRuleResponse deliveryRule = deliveryRuleService.getDefaultDeliveryRule();
 		mav.addObject("deliveryRule", deliveryRule);
 
-		if (token != null) {
+		Boolean isLoggedIn = (Boolean)model.getAttribute("isLoggedIn");
+
+		log.info("isLoggedIn: {}", isLoggedIn);
+
+		if (Boolean.TRUE.equals(isLoggedIn)) {
 			UserWithAddressResponse user = userService.getUserWithAddresses();
 			mav.addObject("user", user);
+			List<Long> bookIdsForCoupon = bookItems.stream()
+				.map(BookCartOrderResponse::bookId)
+				.toList();
+			UsableUserCouponMapResponse coupons = couponService.getUsableCouponsForOrder(bookIdsForCoupon);
+			mav.addObject("coupons", coupons);
+		} else {//todo else
+			UsableUserCouponMapResponse emptyCoupons = new UsableUserCouponMapResponse();
+			emptyCoupons.setUsableUserCouponMap(new HashMap<>());
+			mav.addObject("coupons", emptyCoupons);
 		}
-		List<Long> bookIdsForCoupon = bookItems.stream()
-			.map(BookCartOrderResponse::bookId)
-			.toList();
-
-		UsableUserCouponMapResponse coupons = couponService.getUsableCouponsForOrder(bookIdsForCoupon);
-		mav.addObject("coupons", coupons);
 
 		return mav;
 	}
 
 	@PostMapping("/create")
-	public String createOrder(@ModelAttribute OrderCreateRequest request) {
+	public String createOrder(@ModelAttribute OrderCreateRequest request, RedirectAttributes ra,
+		@CookieValue(value = "GUEST_ID", required = false) String guestId) {
 		String orderKey = java.util.UUID.randomUUID().toString();
 		OrderCreateRequest updatedRequest = request.toBuilder()
 			.orderKey(orderKey)
 			.build();
-		Long orderId = orderService.createOrder(updatedRequest);
-		log.info("주문 생성 :{}", orderId);
-		return "redirect:/order/" + orderId + "/checkout";
+		try {
+			Long orderId = orderService.createOrder(updatedRequest, guestId);
+			log.info("주문 생성 :{}", orderId);
+			return "redirect:/order/" + orderId + "/checkout";
+		} catch (Exception e) {
+			ra.addFlashAttribute("globalErrorMessage", e.getMessage());
+			List<OrderItemRequest> items = request.orderItems();
+			if (items.size() == 1) {
+				OrderItemRequest item = items.getFirst();
+				return "redirect:/order/create?bookId=%d&quantity=%d".formatted(item.bookId(), item.bookQuantity());
+			} else {
+				List<String> bookIdStrings = items.stream()
+					.map(item -> String.valueOf(item.bookId()))
+					.toList();
+				String joinedBookIds = String.join(",", bookIdStrings);
+
+				return "redirect:/order/create?bookIds=" + joinedBookIds;
+			}
+		}
 	}
 
 	@GetMapping("/{orderId}/checkout")
@@ -129,8 +153,12 @@ public class OrderController {
 		OrderConfirmDetailResponse orderDetails = orderService.getOrderConfirmDetail(orderId);
 		model.addAttribute("order", orderDetails);
 
-		UserWithAddressResponse currentUser = userService.getUserWithAddresses();
-		model.addAttribute("currentUser", currentUser);
+		Boolean isLoggedIn = (Boolean)model.getAttribute("isLoggedIn");
+		if (Boolean.TRUE.equals(isLoggedIn)) {
+			UserWithAddressResponse currentUser = userService.getUserWithAddresses();
+			model.addAttribute("currentUser", currentUser);
+		}
+
 		model.addAttribute("userPointBalance", orderDetails.getUserPointBalance());
 
 		model.addAttribute("tossClientKey", tossPaymentClientKey);
@@ -141,8 +169,10 @@ public class OrderController {
 
 		String baseUrl = String.format("%s://%s:%d", request.getScheme(), request.getServerName(),
 			request.getServerPort());
-		model.addAttribute("successUrl", baseUrl + "/order/process");
-		model.addAttribute("failUrl", baseUrl + "/order/fail");
+		model.addAttribute("tossSuccessUrl", baseUrl + "/order/toss/process");
+		model.addAttribute("failUrl", baseUrl + "/order/toss/fail");
+
+		model.addAttribute("pointSuccessUrl", baseUrl + "/order/point/process");
 
 		model.addAttribute("initialSubTotal", orderDetails.getSubTotal());
 		model.addAttribute("initialPackagingTotal", orderDetails.getPackagingTotal());
@@ -152,39 +182,98 @@ public class OrderController {
 		return "order/checkout";
 	}
 
-	@GetMapping("/process")
+	@GetMapping("/{paymentMethod}/process")
 	public String processOrder(
+		@PathVariable String paymentMethod,
 		@RequestParam String paymentKey,
 		@RequestParam String orderId,
-		@RequestParam Integer amount,
-		RedirectAttributes redirectAttributes
+		@RequestParam Long amount,
+		RedirectAttributes redirectAttributes,
+		Model model
 	) {
-		PaymentConfirmRequest req = new PaymentConfirmRequest(paymentKey, orderId, amount);
-		PaymentConfirmResponse resp = paymentsService.confirm(req);
-		redirectAttributes.addFlashAttribute("orderData", resp);
-		return "redirect:/order/complete";
-	}
-
-	@GetMapping("/complete")
-	public String orderCompletePage(@Valid @ModelAttribute("orderData") PaymentConfirmResponse data,
-		BindingResult bindingResult) {
-		if (bindingResult.hasErrors()) {
-			return "order/fail";
+		if ("point".equalsIgnoreCase(paymentMethod)) {
+			if (amount != 0) {
+				redirectAttributes.addFlashAttribute("GlobalErrorTitle", "결제 오류");
+				redirectAttributes.addFlashAttribute("GlobalErrorMessage", "포인트 전액 결제는 결제 금액이 0원이어야 합니다.");
+				Boolean isLoggedIn = (Boolean)model.getAttribute("isLoggedIn");
+				return Boolean.TRUE.equals(isLoggedIn) ? "redirect:/mypage/orders" : "redirect:/";
+			}
 		}
 
-		return "order/complete";
+		PaymentConfirmRequest req = new PaymentConfirmRequest(paymentKey, orderId, amount);
+
+		try {
+			PaymentConfirmResponse resp = paymentsService.confirm(req, paymentMethod);
+			redirectAttributes.addFlashAttribute("orderData", resp);
+			return "redirect:/order/complete/" + resp.orderId();
+		} catch (Exception e) {
+			redirectAttributes.addFlashAttribute("GlobalErrorTitle", "주문 결제 실패");
+			redirectAttributes.addFlashAttribute("GlobalErrorMessage", "결제에 실패했습니다: " + e.getMessage());
+			Boolean isLoggedIn = (Boolean)model.getAttribute("isLoggedIn");
+			if (Boolean.TRUE.equals(isLoggedIn)) {
+				return "redirect:/mypage/orders";
+			} else {
+				return "redirect:/";
+			}
+		}
+	}
+
+	@GetMapping("/complete/{orderKey}")
+	public String orderCompletePage(@PathVariable String orderKey, Model model, RedirectAttributes redirectAttributes
+	) {
+		try {
+			OrderConfirmDetailResponse fullDetails = orderService.getOrderByKey(orderKey);
+
+			model.addAttribute("orderKey", fullDetails.getOrderKey());
+			model.addAttribute("totalAmount", fullDetails.getPaidAmount());
+			model.addAttribute("paymentMethod", fullDetails.getPaymentMethod());
+			model.addAttribute("fullAddress", fullDetails.getAddress() + " " + fullDetails.getDetailAddress());
+			model.addAttribute("orderedItems", fullDetails.getOrderItems());
+			if (fullDetails.getOrdererName() != null) {
+				model.addAttribute("ordererNickname", fullDetails.getOrdererName());
+			} else {
+				model.addAttribute("ordererNickname", "비회원");
+			}
+			return "order/complete";
+		} catch (Exception e) {
+			redirectAttributes.addFlashAttribute("GlobalErrorTitle", "주문 정보 조회 실패");
+			redirectAttributes.addFlashAttribute("GlobalErrorMessage", "주문 정보를 조회할 수 없습니다.");
+			Boolean isLoggedIn = (Boolean)model.getAttribute("isLoggedIn");
+			if (Boolean.TRUE.equals(isLoggedIn)) {
+				return "redirect:/mypage/orders";
+			} else {
+				return "redirect:/";
+			}
+		}
 	}
 
 	@GetMapping("/fail")
-	public String orderFailPage() {
-
-		return "order/fail";
+	public String orderFailPage(
+		@RequestParam(name = "code", required = false) String code,
+		@RequestParam(name = "message", required = false) String message,
+		RedirectAttributes redirectAttributes
+	) {
+		if (message != null && !message.isBlank()) {
+			redirectAttributes.addFlashAttribute("GlobalErrorTitle", code);
+			redirectAttributes.addFlashAttribute("GlobalErrorMessage", message);
+		} else {
+			redirectAttributes.addFlashAttribute("GlobalErrorMessage", "알 수 없는 오류로 결제에 실패했습니다.");
+		}
+		return "redirect:mypage/orders";
 	}
 
-	private void validateGuestId(String guestId) {
-		if (guestId == null || guestId.isBlank()) {
-			log.warn("GUEST_ID 쿠키가 존재하지 않습니다.");
-			throw new GuestUserNotFoundException("guestId가 존재하지 않습니다. 쿠키를 발급받아야 합니다.");
+	@GetMapping("/{orderKey}")
+	public ModelAndView orderDetailPage(@PathVariable String orderKey,
+		RedirectAttributes redirectAttributes
+	) {
+		ModelAndView mav = new ModelAndView("mypage/order_detail");
+		try {
+			OrderDetailResponse orderDetails = orderService.getOrderDetailByOrderKey(orderKey);
+			mav.addObject("order", orderDetails);
+		} catch (Exception e) {
+			redirectAttributes.addFlashAttribute("globalErrorMessage", e.getMessage());
+			mav.setViewName("redirect:/");
 		}
+		return mav;
 	}
 }

@@ -16,10 +16,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.coupon.service.CouponTypeService;
+import shop.bluebooktle.common.domain.auth.UserType;
 import shop.bluebooktle.common.dto.common.JsendResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
 import shop.bluebooktle.common.dto.coupon.request.CouponTypeRegisterRequest;
 import shop.bluebooktle.common.dto.coupon.response.CouponTypeResponse;
+import shop.bluebooktle.common.security.Auth;
 
 @RestController
 @RequiredArgsConstructor
@@ -31,6 +33,7 @@ public class CouponTypeController {
 
 	@Operation(summary = "쿠폰 정책 등록", description = "새로운 쿠폰 정책을 등록합니다.")
 	@PostMapping
+	@Auth(type = UserType.ADMIN)
 	public ResponseEntity<JsendResponse<Void>> registerCouponType(
 		@RequestBody @Valid CouponTypeRegisterRequest request) {
 		couponTypeService.registerCouponType(request);
@@ -39,6 +42,7 @@ public class CouponTypeController {
 
 	@Operation(summary = "쿠폰 정책 조회", description = "등록된 쿠폰 정책을 조회합니다.")
 	@GetMapping
+	@Auth(type = UserType.ADMIN)
 	public ResponseEntity<JsendResponse<PaginationData<CouponTypeResponse>>> findAllCouponTypeList(
 		@PageableDefault(size = 10, sort = "id") Pageable pageable) {
 		Page<CouponTypeResponse> couponTypePage = couponTypeService.getAllCouponTypeList(pageable);

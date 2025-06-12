@@ -22,6 +22,7 @@ import shop.bluebooktle.backend.book.entity.Tag;
 import shop.bluebooktle.backend.book.repository.BookTagRepository;
 import shop.bluebooktle.backend.book.repository.TagRepository;
 import shop.bluebooktle.backend.book.service.impl.TagServiceImpl;
+import shop.bluebooktle.backend.elasticsearch.service.BookElasticSearchService;
 import shop.bluebooktle.common.dto.book.request.TagRequest;
 import shop.bluebooktle.common.dto.book.response.TagInfoResponse;
 import shop.bluebooktle.common.exception.book.TagAlreadyExistsException;
@@ -38,6 +39,9 @@ public class TagServiceTest {
 
 	@Mock
 	private BookTagRepository bookTagRepository;
+
+	@Mock
+	private BookElasticSearchService bookElasticSearchService;
 
 	@Test
 	@DisplayName("태그 등록 성공")
@@ -72,7 +76,7 @@ public class TagServiceTest {
 		TagRequest request = new TagRequest("Updated Tag");
 		Tag existingTag = new Tag(tagId, "Old Tag");
 		when(tagRepository.findById(tagId)).thenReturn(Optional.of(existingTag));
-
+		doNothing().when(bookElasticSearchService).updateTagName(anyList(), anyString(), anyString());
 		// When: updateTag 메서드 호출
 		tagService.updateTag(tagId, request);
 

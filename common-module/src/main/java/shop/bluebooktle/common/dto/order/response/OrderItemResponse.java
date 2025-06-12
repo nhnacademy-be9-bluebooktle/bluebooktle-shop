@@ -23,5 +23,6 @@ public class OrderItemResponse {
 	private int quantity;
 	private BigDecimal price;
 	private List<OrderPackagingResponse> packagingOptions;
-	private List<AppliedCouponResponse> appliedItemCoupons; // <<< 이 필드가 추가되었습니다.
+	private List<AppliedCouponResponse> appliedItemCoupons;
+	private BigDecimal finalItemPrice;
 }

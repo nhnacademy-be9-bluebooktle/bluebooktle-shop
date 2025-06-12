@@ -20,12 +20,14 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 import shop.bluebooktle.backend.book_order.entity.BookOrder;
 import shop.bluebooktle.backend.book_order.entity.UserCouponBookOrder;
@@ -39,7 +41,7 @@ import shop.bluebooktle.common.entity.auth.User;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "orders")
 @EqualsAndHashCode(of = "id", callSuper = false)
-@ToString(exclude = {"orderState", "deliveryRule", "user", "bookOrders", "userCouponBookOrders", "payments"})
+@ToString(exclude = {"orderState", "deliveryRule", "user", "bookOrders", "userCouponBookOrders", "payment"})
 @SQLDelete(sql = "UPDATE orders SET deleted_at = CURRENT_TIMESTAMP WHERE order_id = ?")
 @SQLRestriction("deleted_at IS NULL")
 public class Order extends BaseEntity {
@@ -49,6 +51,7 @@ public class Order extends BaseEntity {
 	@Column(name = "order_id")
 	private Long id;
 
+	@Setter(AccessLevel.PRIVATE)
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "order_state_id", nullable = false)
 	private OrderState orderState;
@@ -132,9 +135,11 @@ public class Order extends BaseEntity {
 	@BatchSize(size = 10)
 	private List<UserCouponBookOrder> userCouponBookOrders = new ArrayList<>();
 
-	@OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-	@BatchSize(size = 10)
-	private List<Payment> payments = new ArrayList<>();
+	@OneToOne(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Payment payment;
+
+	@OneToOne(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Refund refund;
 
 	@Builder
 	public Order(OrderState orderState, DeliveryRule deliveryRule, User user,
@@ -169,5 +174,13 @@ public class Order extends BaseEntity {
 
 	public void changeOrderState(OrderState newState) {
 		this.orderState = newState;
+	}
+
+	public void changeShippedAt(LocalDateTime newShippedAt) {
+		this.shippedAt = newShippedAt;
+	}
+
+	public void changeTrackingNumber(String newTrackingNumber) {
+		this.trackingNumber = newTrackingNumber;
 	}
 }

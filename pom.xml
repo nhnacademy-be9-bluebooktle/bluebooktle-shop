@@ -24,6 +24,7 @@
         <jacoco.version>0.8.13</jacoco.version>
         <maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version>
         <jjwt.version>0.12.5</jjwt.version>
+        <commons-dbcp2.version>2.13.0</commons-dbcp2.version>
     </properties>
 
     <modules>

@@ -17,19 +17,14 @@ import shop.bluebooktle.common.dto.book.response.AdminBookResponse;
 import shop.bluebooktle.common.dto.book.response.AladinBookResponse;
 import shop.bluebooktle.common.dto.book.response.BookAllResponse;
 import shop.bluebooktle.common.dto.book.response.BookCartOrderResponse;
-import shop.bluebooktle.common.dto.book.response.BookInfoResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
 import shop.bluebooktle.frontend.config.feign.FeignGlobalConfig;
 
-@FeignClient(url = "${server.gateway-url}", name = "BookRepository", path = "/api/books", configuration = FeignGlobalConfig.class)
+@FeignClient(url = "${server.gateway-url}", name = "adminBookRepository", path = "/api/books", configuration = FeignGlobalConfig.class)
 public interface AdminBookRepository {
 
-	@GetMapping
-	PaginationData<BookInfoResponse> getPagedBooks(
-		@RequestParam("page") int page,
-		@RequestParam("size") int size,
-		@RequestParam(value = "searchKeyword", required = false) String searchKeyword
-	);
+	@PostMapping
+	void registerBook(@RequestBody BookAllRegisterRequest bookAllRegisterRequest);
 
 	@GetMapping("/admin")
 	PaginationData<AdminBookResponse> getPagedBooksByAdmin(
@@ -38,7 +33,7 @@ public interface AdminBookRepository {
 		@RequestParam(value = "searchKeyword", required = false) String searchKeyword
 	);
 
-	@GetMapping("/{bookId}")
+	@GetMapping("/{bookId}/admin")
 	BookAllResponse getBook(@PathVariable("bookId") Long bookId);
 
 	@PutMapping("/{bookId}")
@@ -46,9 +41,6 @@ public interface AdminBookRepository {
 		@PathVariable Long bookId,
 		@RequestBody BookUpdateServiceRequest bookUpdateServiceRequest
 	);
-
-	@PostMapping
-	void registerBook(@RequestBody BookAllRegisterRequest bookAllRegisterRequest);
 
 	@DeleteMapping("/{bookId}")
 	void deleteBook(@PathVariable("bookId") Long bookId);

@@ -13,9 +13,11 @@ import org.springframework.web.bind.annotation.RestController;
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.order.dto.response.OrderStateResponse;
 import shop.bluebooktle.backend.order.service.OrderStateService;
+import shop.bluebooktle.common.domain.auth.UserType;
 import shop.bluebooktle.common.domain.order.OrderStatus;
 import shop.bluebooktle.common.dto.common.JsendResponse;
 import shop.bluebooktle.common.exception.order.order_state.OrderStateNotFoundException;
+import shop.bluebooktle.common.security.Auth;
 
 @RestController
 @RequestMapping("/api")
@@ -26,6 +28,7 @@ public class OrderStateController {
 
 	// 전체 조회
 	@GetMapping("/admin/order-status/all")
+	@Auth(type = UserType.ADMIN)
 	public ResponseEntity<JsendResponse<List<OrderStateResponse>>> getAllStatus() {
 		List<OrderStateResponse> states = orderStateService.getAll().stream()
 			.map(OrderStateResponse::from)
@@ -35,6 +38,7 @@ public class OrderStateController {
 
 	// 상태명으로 조회
 	@GetMapping("/admin/order-status")
+	@Auth(type = UserType.ADMIN)
 	public ResponseEntity<JsendResponse<OrderStateResponse>> getStatus(@RequestParam OrderStatus name) {
 		Optional<OrderStateResponse> state = orderStateService.getByState(name);
 		return state.map(JsendResponse::success)
