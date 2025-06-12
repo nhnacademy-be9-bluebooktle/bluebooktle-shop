@@ -694,11 +694,11 @@ img, svg {
 
 /* Kitsch 폰트 클래스 - 실제 폰트 파일이 연결되어야 함 */
 .display-font-kitsch {
-    /* font-family: var(--font-family-display-kitsch); */ /* 실제 디스플레이 폰트 지정 */
+    font-family: var(--font-pixel);
 }
 
 .handwriting-font-kitsch {
-    /* font-family: var(--font-family-handwriting-kitsch); */ /* 실제 손글씨 폰트 지정 */
+    font-family: var(--font-pixel);
 }
 
 .modal-actions-kitsch {

@@ -52,7 +52,6 @@ a {
 
 a:hover {
     color: var(--kitsch-color-3); /* 호버시 핫핑크 */
-    transform: scale(1.03) rotate(-2deg);
 }
 
 img {
@@ -706,7 +705,8 @@ ul {
 /* Book Grid & Item Kitsch (참고용 - 컴포넌트 페이지 카드 섹션에 사용) */
 .book-grid-kitsch {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(220px, 0));
+    justify-content: start;
     gap: 1.5rem;
 }
 
@@ -715,6 +715,8 @@ ul {
 }
 
 .book-item-kitsch {
+    display: flex;
+    flex-direction: column;
     background-color: var(--kitsch-bg-alt);
     border: 3px solid var(--kitsch-text-dark);
     border-radius: 8px;
@@ -733,6 +735,10 @@ ul {
 
 .tilt-right-kitsch:hover {
     transform: scale(1.03) rotate(3deg);
+}
+
+.book-item-kitsch .book-item-link-kitsch {
+    flex-grow: 1;
 }
 
 .book-cover-wrap-kitsch {
@@ -1029,6 +1035,7 @@ ul {
 .control-group-kitsch label {
     font-size: 0.9rem;
     color: var(--kitsch-text-dark);
+    width: 100%;
 }
 
 .select-kitsch {
