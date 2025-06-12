@@ -39,6 +39,7 @@ import shop.bluebooktle.common.dto.book.request.ReviewRegisterRequest;
 import shop.bluebooktle.common.dto.book.response.ReviewResponse;
 import shop.bluebooktle.common.entity.auth.User;
 import shop.bluebooktle.common.exception.InvalidInputValueException;
+import shop.bluebooktle.common.exception.book.ReviewAuthorizationException;
 import shop.bluebooktle.common.exception.book_order.BookOrderNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
@@ -66,6 +67,7 @@ public class ReviewServiceTest {
 	private BookSaleInfo testBookSaleInfo;
 	private Review testReview;
 	private Img testImg;
+	private Order orderMock;
 
 	@BeforeEach
 	void setUp() {
@@ -75,8 +77,9 @@ public class ReviewServiceTest {
 		testBook = Book.builder().title("테스트 책 제목").build();
 		ReflectionTestUtils.setField(testBook, "id", 10L);
 
-		Order orderMock = mock(Order.class);
+		orderMock = mock(Order.class);
 		ReflectionTestUtils.setField(orderMock, "id", 11L);
+		lenient().when(orderMock.getUser()).thenReturn(testUser);
 
 		testBookOrder = BookOrder.builder()
 			.order(orderMock)
@@ -106,6 +109,66 @@ public class ReviewServiceTest {
 			.build();
 		ReflectionTestUtils.setField(testReview, "id", 300L);
 		ReflectionTestUtils.setField(testReview, "createdAt", LocalDateTime.now());
+	}
+
+	@Test
+	@DisplayName("리뷰 등록 성공")
+	void addReview_success_withImage() {
+		// Given
+		ReviewRegisterRequest request = ReviewRegisterRequest.builder()
+			.star(5)
+			.reviewContent("정말 좋은 책입니다!")
+			.imgUrls(List.of("http://example.com/test_image.jpg"))
+			.build();
+
+		given(userRepository.findById(testUser.getId())).willReturn(Optional.of(testUser));
+		given(bookOrderRepository.findById(testBookOrder.getId())).willReturn(Optional.of(testBookOrder));
+		given(imgRepository.findByImgUrl(anyString())).willReturn(Optional.empty());
+		given(imgRepository.save(any(Img.class))).willReturn(testImg);
+		given(reviewRepository.save(any(Review.class))).willReturn(testReview);
+		given(bookSaleInfoRepository.findByBook(any(Book.class))).willReturn(Optional.of(testBookSaleInfo));
+		given(bookSaleInfoRepository.save(any(BookSaleInfo.class))).willReturn(testBookSaleInfo);
+
+		// When
+		ReviewResponse response = reviewService.addReview(testUser.getId(), testBookOrder.getId(), request);
+
+		// Then
+		assertThat(response).isNotNull();
+		assertThat(response.getReviewId()).isEqualTo(testReview.getId());
+		assertThat(response.getImgUrl()).isEqualTo(testImg.getImgUrl());
+		assertThat(response.getStar()).isEqualTo(request.getStar());
+		assertThat(response.getReviewContent()).isEqualTo(request.getReviewContent());
+	}
+
+	@Test
+	@DisplayName("리뷰 등록 실패 - 주문자와 리뷰 작성자 불일치")
+	void addReview_authorizationFailed_throwsException() {
+		// Given
+		ReviewRegisterRequest request = ReviewRegisterRequest.builder()
+			.star(5)
+			.reviewContent("리뷰 내용")
+			.build();
+		User anotherUser = User.builder().nickname("another").build();
+		ReflectionTestUtils.setField(anotherUser, "id", 2L);
+
+		Order orderWithAnotherUser = mock(Order.class);
+		given(orderWithAnotherUser.getUser()).willReturn(anotherUser);
+
+		BookOrder bookOrderOfAnotherUser = BookOrder.builder()
+			.order(orderWithAnotherUser)
+			.book(testBook)
+			.quantity(1)
+			.price(BigDecimal.valueOf(10.00))
+			.build();
+		ReflectionTestUtils.setField(bookOrderOfAnotherUser, "id", 101L);
+
+		given(userRepository.findById(testUser.getId())).willReturn(Optional.of(testUser));
+		given(bookOrderRepository.findById(bookOrderOfAnotherUser.getId())).willReturn(
+			Optional.of(bookOrderOfAnotherUser));
+
+		// When & Then
+		assertThatThrownBy(() -> reviewService.addReview(testUser.getId(), bookOrderOfAnotherUser.getId(), request))
+			.isInstanceOf(ReviewAuthorizationException.class);
 	}
 
 	@Test
