@@ -10,7 +10,7 @@ import shop.bluebooktle.common.dto.order.response.OrderHistoryResponse;
 public interface OrderService {
 	OrderConfirmDetailResponse getOrderConfirmDetail(Long orderId);
 
-	Long createOrder(OrderCreateRequest orderCreateRequest);
+	Long createOrder(OrderCreateRequest orderCreateRequest, String guestId);
 
 	PaginationData<OrderHistoryResponse> getOrderHistory(int page, int size, OrderStatus status);
 

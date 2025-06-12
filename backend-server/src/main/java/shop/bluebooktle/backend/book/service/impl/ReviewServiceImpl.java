@@ -23,6 +23,7 @@ import shop.bluebooktle.backend.book.repository.ReviewRepository;
 import shop.bluebooktle.backend.book.service.ReviewService;
 import shop.bluebooktle.backend.book_order.entity.BookOrder;
 import shop.bluebooktle.backend.book_order.jpa.BookOrderRepository;
+import shop.bluebooktle.backend.elasticsearch.service.BookElasticSearchService;
 import shop.bluebooktle.backend.user.repository.UserRepository;
 import shop.bluebooktle.common.dto.book.request.ReviewRegisterRequest;
 import shop.bluebooktle.common.dto.book.request.ReviewUpdateRequest;
@@ -46,6 +47,8 @@ public class ReviewServiceImpl implements ReviewService {
 	private final BookSaleInfoRepository bookSaleInfoRepository;
 	private final ReviewLikesRepository reviewLikesRepository;
 	private final ApplicationEventPublisher eventPublisher;
+
+	private final BookElasticSearchService bookElasticSearchService;
 
 	@Override
 	public ReviewResponse addReview(Long userId, Long bookOrderId, ReviewRegisterRequest reviewRegisterRequest) {
@@ -92,6 +95,9 @@ public class ReviewServiceImpl implements ReviewService {
 
 		eventPublisher.publishEvent(new UserReviewPointEvent(userId));
 
+		// 엘라스틱 서치 도서에 대한 리뷰 정보 등록
+		bookElasticSearchService.updateReviewCountAndStar(bookSaleInfo);
+
 		return ReviewResponse.builder()
 			.reviewId(saved.getId())
 			.userId(saved.getUser().getId())
@@ -131,6 +137,9 @@ public class ReviewServiceImpl implements ReviewService {
 
 		bookSaleInfo.updateReviewAndRecalculateStar(oldStar, updatedReview.getStar());
 		bookSaleInfoRepository.save(bookSaleInfo);
+
+		// 엘라스틱 서치 도서에 대한 리뷰 정보 수정
+		bookElasticSearchService.updateReviewCountAndStar(bookSaleInfo);
 
 		return ReviewResponse.builder()
 			.reviewId(updatedReview.getId())

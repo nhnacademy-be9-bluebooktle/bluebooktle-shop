@@ -22,8 +22,8 @@ public class OrderServiceImpl implements OrderService {
 	}
 
 	@Override
-	public Long createOrder(OrderCreateRequest orderCreateRequest) {
-		return orderRepository.createOrder(orderCreateRequest);
+	public Long createOrder(OrderCreateRequest orderCreateRequest, String guestId) {
+		return orderRepository.createOrder(orderCreateRequest, guestId);
 	}
 
 	@Override
@@ -44,7 +44,6 @@ public class OrderServiceImpl implements OrderService {
 	public OrderDetailResponse getOrderDetailByOrderKey(String orderKey) {
 		return orderRepository.getOrderDetailByOrderKey(orderKey);
 	}
-
 
 	@Override
 	public OrderConfirmDetailResponse getOrderByKey(String orderKey) {
