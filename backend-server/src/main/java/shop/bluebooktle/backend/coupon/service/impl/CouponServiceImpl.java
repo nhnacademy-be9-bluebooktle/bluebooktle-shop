@@ -40,10 +40,8 @@ public class CouponServiceImpl implements CouponService {
 	private final BookRepository bookRepository;
 	private final CategoryRepository categoryRepository;
 
-	// Coupon 등록
 	@Override
 	public void registerCoupon(CouponRegisterRequest request) {
-		// couponType 없을 경우 예외처리
 		CouponType couponType = couponTypeRepository.findById(request.getCouponTypeId())
 			.orElseThrow(CouponTypeNotFoundException::new);
 
@@ -68,26 +66,21 @@ public class CouponServiceImpl implements CouponService {
 		}
 	}
 
-	// 전체 Coupon 조회
 	@Override
 	@Transactional(readOnly = true)
 	public Page<CouponResponse> getAllCoupons(String searchCouponName, Pageable pageable) {
 		return couponRepository.findAllByCoupon(searchCouponName, pageable);
 	}
 
-	// 공통 유효성 검사
 	private void validateCouponTarget(CouponType couponType, Long bookId, Long categoryId) {
-		// 도서와 카테고리 둘 다 지정할 경우
 		if (bookId != null && categoryId != null) {
 			throw new InvalidCouponTargetException("도서 쿠폰과 카테고리 쿠폰은 동시에 설정 할 수 없습니다.");
 		}
-		// target ='BOOK' 인데 도서나 카테고리가 지정 안되었을 경우
 		if (couponType.getTarget() == CouponTypeTarget.BOOK && bookId == null
 			&& categoryId == null
 		) {
 			throw new InvalidCouponTargetException("도서관련 쿠폰은 도서나 카테고리 중 하나를 선택해야 합니다.");
 		}
-		// target = 'ORDER' 인데 도서나 카테고리를 선택한 경우
 		if (couponType.getTarget() == CouponTypeTarget.ORDER && (bookId != null
 			|| categoryId != null)) {
 			throw new InvalidCouponTargetException("주문관련 쿠폰은 도서나 카테고리를 선택할 수 없습니다.");
