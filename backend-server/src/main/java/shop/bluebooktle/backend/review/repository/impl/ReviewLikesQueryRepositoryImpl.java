@@ -1,4 +1,4 @@
-package shop.bluebooktle.backend.book.repository.impl;
+package shop.bluebooktle.backend.review.repository.impl;
 
 import java.util.Optional;
 
@@ -9,8 +9,8 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.book.entity.QReviewLikes;
-import shop.bluebooktle.backend.book.entity.ReviewLikes;
-import shop.bluebooktle.backend.book.repository.ReviewLikesQueryRepository;
+import shop.bluebooktle.backend.review.entity.ReviewLikes;
+import shop.bluebooktle.backend.review.repository.ReviewLikesQueryRepository;
 
 @Repository
 @RequiredArgsConstructor

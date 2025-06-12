@@ -1,8 +1,8 @@
-package shop.bluebooktle.backend.book.repository;
+package shop.bluebooktle.backend.review.repository;
 
 import java.util.Optional;
 
-import shop.bluebooktle.backend.book.entity.ReviewLikes;
+import shop.bluebooktle.backend.review.entity.ReviewLikes;
 
 public interface ReviewLikesQueryRepository {
 	Optional<ReviewLikes> findSoftDeletedByUserIdAndReviewId(Long userId, Long reviewId);
