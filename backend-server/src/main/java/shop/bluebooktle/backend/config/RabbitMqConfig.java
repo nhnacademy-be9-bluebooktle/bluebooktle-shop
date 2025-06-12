@@ -31,6 +31,8 @@ public class RabbitMqConfig {
 
 	private static final int ORDER_TTL = 600000;
 
+	private static final long SHIPPING_COMPLETE_TTL = 600000;
+
 	//----order
 	@Bean
 	public DirectExchange orderExchange() {
@@ -70,6 +72,36 @@ public class RabbitMqConfig {
 			.bind(orderCancelQueue())
 			.to(orderDlxExchange())
 			.with(orderProps.getOrderCancel());
+	}
+
+	@Bean
+	public Queue orderShippingQueue() {
+		return QueueBuilder.durable(orderProps.getOrderShipping())
+			.withArgument("x-message-ttl", SHIPPING_COMPLETE_TTL)
+			.withArgument("x-dead-letter-exchange", orderExchange.getOrderDlx())
+			.withArgument("x-dead-letter-routing-key", orderProps.getOrderComplete())
+			.build();
+	}
+
+	@Bean
+	public Binding orderShippingBinding() {
+		return BindingBuilder
+			.bind(orderShippingQueue())
+			.to(orderExchange())
+			.with(orderProps.getOrderShipping());
+	}
+
+	@Bean
+	public Queue orderCompleteQueue() {
+		return new Queue(orderProps.getOrderComplete(), true);
+	}
+
+	@Bean
+	public Binding orderCompleteDlxBinding() {
+		return BindingBuilder
+			.bind(orderCompleteQueue())
+			.to(orderDlxExchange())
+			.with(orderProps.getOrderComplete());
 	}
 
 	// ---------birthday

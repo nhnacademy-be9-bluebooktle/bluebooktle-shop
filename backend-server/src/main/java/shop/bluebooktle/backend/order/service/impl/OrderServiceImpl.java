@@ -36,9 +36,11 @@ import shop.bluebooktle.backend.coupon.entity.UserCoupon;
 import shop.bluebooktle.backend.coupon.repository.UserCouponRepository;
 import shop.bluebooktle.backend.coupon.service.CouponCalculationService;
 import shop.bluebooktle.backend.order.dto.response.OrderCancelMessage;
+import shop.bluebooktle.backend.order.dto.response.OrderShippingMessage;
 import shop.bluebooktle.backend.order.entity.DeliveryRule;
 import shop.bluebooktle.backend.order.entity.Order;
 import shop.bluebooktle.backend.order.entity.OrderState;
+import shop.bluebooktle.backend.order.entity.Refund;
 import shop.bluebooktle.backend.order.repository.DeliveryRuleRepository;
 import shop.bluebooktle.backend.order.repository.OrderRepository;
 import shop.bluebooktle.backend.order.repository.OrderStateRepository;
@@ -51,6 +53,7 @@ import shop.bluebooktle.backend.point.repository.PointHistoryRepository;
 import shop.bluebooktle.backend.user.repository.UserRepository;
 import shop.bluebooktle.common.domain.order.OrderStatus;
 import shop.bluebooktle.common.domain.point.PointSourceTypeEnum;
+import shop.bluebooktle.common.domain.refund.RefundReason;
 import shop.bluebooktle.common.dto.book.BookSaleInfoState;
 import shop.bluebooktle.common.dto.coupon.CalculatedDiscountDetails;
 import shop.bluebooktle.common.dto.coupon.response.AppliedCouponResponse;
@@ -119,12 +122,22 @@ public class OrderServiceImpl implements OrderService {
 		}
 
 		return orderPage.map(o -> {
+
+			BigDecimal totalPackagingFee = o.getBookOrders().stream()
+				.flatMap(bookOrder -> bookOrder.getOrderPackagings().stream())
+				.map(packaging -> packaging.getPackagingOption().getPrice()
+					.multiply(BigDecimal.valueOf(packaging.getQuantity())))
+				.reduce(BigDecimal.ZERO, BigDecimal::add);
+
 			BigDecimal paidAmount = o.getOriginalAmount()
 				.subtract(Optional.ofNullable(o.getCouponDiscountAmount())
 					.orElse(BigDecimal.ZERO))
 				.subtract(Optional.ofNullable(o.getPointUseAmount())
 					.orElse(BigDecimal.ZERO))
 				.add(Optional.ofNullable(o.getDeliveryFee())
+					.orElse(BigDecimal.ZERO))
+				.add(totalPackagingFee)
+				.subtract(Optional.ofNullable(o.getSaleDiscountAmount())
 					.orElse(BigDecimal.ZERO));
 
 			String thumbnailUrl = o.getBookOrders().stream()
@@ -308,14 +321,15 @@ public class OrderServiceImpl implements OrderService {
 
 			bookOrder.getOrderPackagings().add(packaging);
 
-			int stock = bookSaleInfo.getStock() - item.bookQuantity();
-			bookSaleInfo.updateStock(stock);
-			if (stock <= 0) {
-				bookSaleInfo.changeSaleState(BookSaleInfoState.SALE_ENDED);
-			}
-			bookSaleInfoRepository.save(bookSaleInfo);
 			bookOrderRepository.save(bookOrder);
 		}
+
+		int stock = bookSaleInfo.getStock() - item.bookQuantity();
+		bookSaleInfo.updateStock(stock);
+		if (stock <= 0) {
+			bookSaleInfo.changeSaleState(BookSaleInfoState.SALE_ENDED);
+		}
+		bookSaleInfoRepository.save(bookSaleInfo);
 	}
 
 	@Override
@@ -563,6 +577,21 @@ public class OrderServiceImpl implements OrderService {
 
 	@Override
 	@Transactional
+	public void completeOrder(Long orderId) {
+		Order order = orderRepository.findById(orderId)
+			.orElse(null);
+
+		if (order == null) {
+			throw new OrderNotFoundException();
+		}
+
+		if (order.getOrderState().getState() == OrderStatus.SHIPPING) {
+			updateOrderStatus(orderId, OrderStatus.COMPLETED);
+		}
+	}
+
+	@Override
+	@Transactional
 	public void cancelOrderInternal(Order order) {
 
 		User user = order.getUser();
@@ -638,6 +667,12 @@ public class OrderServiceImpl implements OrderService {
 			.map(PaymentType::getMethod)
 			.orElse(null);
 
+		BigDecimal totalPackagingFee = itemResponses.stream()
+			.flatMap(item -> item.getPackagingOptions().stream())
+			.map(packaging -> packaging.getPrice()
+				.multiply(BigDecimal.valueOf(packaging.getQuantity())))
+			.reduce(BigDecimal.ZERO, BigDecimal::add);
+
 		return new OrderDetailResponse(
 			order.getId(),
 			order.getOrderKey(),
@@ -653,11 +688,12 @@ public class OrderServiceImpl implements OrderService {
 			order.getDetailAddress(),
 			order.getPostalCode(),
 			itemResponses,
-			order.getOriginalAmount(),
+			order.getOriginalAmount().subtract(order.getSaleDiscountAmount()),
 			order.getPointUseAmount(),
 			order.getCouponDiscountAmount(),
 			order.getDeliveryFee(),
-			order.getTrackingNumber()
+			order.getTrackingNumber(),
+			totalPackagingFee
 		);
 	}
 
@@ -674,9 +710,9 @@ public class OrderServiceImpl implements OrderService {
 			paymentMethod = order.getPayment().getPaymentDetail().getPaymentType().getMethod();
 		}
 
-		BigDecimal totalAmount = order.getOriginalAmount()
-			.subtract(Optional.ofNullable(order.getCouponDiscountAmount()).orElse(BigDecimal.ZERO))
-			.subtract(order.getPointUseAmount());
+		BigDecimal actualPaidAmount = Optional.ofNullable(order.getPayment())
+			.map(Payment::getPaidAmount)
+			.orElse(null);
 
 		return new AdminOrderListResponse(
 			order.getId(),
@@ -685,7 +721,7 @@ public class OrderServiceImpl implements OrderService {
 			order.getOrdererName(),
 			order.getUser() != null ? order.getUser().getLoginId() : "비회원",
 			order.getReceiverName(),
-			totalAmount,
+			actualPaidAmount,
 			order.getOrderState().getState(),
 			paymentMethod
 		);
@@ -779,6 +815,14 @@ public class OrderServiceImpl implements OrderService {
 
 		Payment payment = order.getPayment();
 
+		BigDecimal productAmount = order.getOriginalAmount()
+			.subtract(Optional.ofNullable(order.getSaleDiscountAmount()).orElse(BigDecimal.ZERO));
+
+		BigDecimal totalPackagingFee = itemResponses.stream()
+			.flatMap(item -> item.getPackagingOptions().stream())
+			.map(packaging -> packaging.getPrice().multiply(BigDecimal.valueOf(packaging.getQuantity())))
+			.reduce(BigDecimal.ZERO, BigDecimal::add);
+
 		BigDecimal paidAmount = Optional.ofNullable(payment)
 			.map(Payment::getPaidAmount)
 			.orElse(null);
@@ -788,6 +832,10 @@ public class OrderServiceImpl implements OrderService {
 			.map(PaymentDetail::getPaymentType)
 			.map(PaymentType::getMethod)
 			.orElse(null);
+
+		Refund refund = order.getRefund();
+		RefundReason refundReason = Optional.ofNullable(refund).map(Refund::getReason).orElse(null);
+		String refundReasonDetail = Optional.ofNullable(refund).map(Refund::getReasonDetail).orElse(null);
 
 		return new AdminOrderDetailResponse(
 			order.getId(),
@@ -805,13 +853,16 @@ public class OrderServiceImpl implements OrderService {
 			order.getDetailAddress(),
 			itemResponses,
 			paidMethod,
-			order.getOriginalAmount().subtract(order.getDeliveryFee()),
+			productAmount,
+			totalPackagingFee,
 			order.getPointUseAmount(),
 			order.getCouponDiscountAmount(),
 			order.getDeliveryFee(),
 			paidAmount,
 			order.getOrderState().getState(),
-			order.getTrackingNumber()
+			order.getTrackingNumber(),
+			refundReason,
+			refundReasonDetail
 		);
 	}
 
@@ -824,12 +875,24 @@ public class OrderServiceImpl implements OrderService {
 		OrderState newState = orderStateRepository.findByState(status)
 			.orElseThrow(OrderStateNotFoundException::new);
 
-		if (order.getOrderState().getState() == OrderStatus.CANCELED) {
-			throw new OrderInvalidStateException("취소된 주문의 상태를 변경할 수 없습니다.");
+		if (order.getOrderState().getState() == OrderStatus.CANCELED
+			|| order.getOrderState().getState() == OrderStatus.RETURNED_REQUEST
+			|| order.getOrderState().getState() == OrderStatus.RETURNED) {
+			throw new OrderInvalidStateException(
+				"%s 주문의 상태를 변경할 수 없습니다.".formatted(order.getOrderState().getState().getDescription()));
+		}
+
+		if (order.getOrderState().getState() != OrderStatus.SHIPPING && status == OrderStatus.COMPLETED) {
+			throw new OrderInvalidStateException("배송 중이 아닌 상태에서 배송완료 상태로 변경할 수 없습니다.");
 		}
 
 		order.changeOrderState(newState);
 		orderRepository.save(order);
+
+		if (status == OrderStatus.SHIPPING) {
+			order.changeShippedAt(LocalDateTime.now());
+			eventPublisher.publishEvent(new OrderShippingMessage(order.getId()));
+		}
 	}
 
 	@Override

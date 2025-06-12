@@ -19,6 +19,9 @@ INSERT INTO order_state
 VALUES (5, 'RETURNED', now(), null);
 INSERT INTO order_state
 VALUES (6, 'CANCELED', now(), null);
+INSERT INTO order_state
+VALUES (7, 'RETURNED_REQUEST', now(), null);
+
 
 INSERT INTO packaging_option
 VALUES (1, '프리미엄 포장', 3000, now(), null);
@@ -43,6 +46,13 @@ VALUES (5, 'USE', '결제 사용', now(), null);
 
 INSERT INTO point_source_type
 VALUES (6, 'EARN', '주문 취소 환불', now(), null);
+
+INSERT INTO point_source_type
+VALUES (7, 'USE', '결제 취소 회수', now(), null);
+
+INSERT INTO point_source_type
+VALUES (8, 'EARN', '반품 적립', now(), null);
+
 
 
 INSERT INTO point_policy

@@ -33,4 +33,8 @@ public interface UserRepository extends JpaRepository<User, Long>, UserQueryRepo
 	@EntityGraph(attributePaths = "addresses")
 	@Query("SELECT u FROM User u WHERE u.id = :userId")
 	Optional<User> findUserWithAddresses(@Param("userId") Long userId);
+
+	@EntityGraph(attributePaths = "membershipLevel")
+	Optional<User> findUserById(Long id);
+
 }

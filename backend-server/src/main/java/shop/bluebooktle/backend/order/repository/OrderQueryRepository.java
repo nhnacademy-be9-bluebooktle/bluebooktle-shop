@@ -20,4 +20,6 @@ public interface OrderQueryRepository {
 
 	Optional<Order> findAdminOrderDetailsByOrderId(Long orderId);
 
+	Optional<Order> findOrderForRefund(Long orderId);
+
 }

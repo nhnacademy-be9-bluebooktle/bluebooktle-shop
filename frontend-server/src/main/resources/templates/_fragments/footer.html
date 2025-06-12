@@ -14,6 +14,7 @@
             <a href="/legal/terms.html" target="_blank">이용약관</a>
             <a href="/legal/privacy.html" target="_blank">개인정보처리방침</a>
             <a href="/support/faq.html" target="_blank">고객센터</a>
+            <a href="#" onclick="openNonMemberOrderModal(event)">비회원 주문 조회</a>
         </div>
         <div class="footer-social-kitsch">
             <a href="https://github.com/nhnacademy-be9-bluebooktle" target="_blank" title="github"><i
@@ -22,9 +23,46 @@
                target="_blank" title="sw-academy"><i class="fab fa-solid fa-globe"></i></a>
         </div>
         <div class="footer-copyright-kitsch pixel-font-kitsch">
-            &copy; <span th:text="${#dates.year(#dates.createNow())}">2024</span> Bluebooktle. All Rights Reserved.
+            &copy; <span th:text="${#dates.year(#dates.createNow())}">2025</span> Bluebooktle. All Rights Reserved.
         </div>
     </div>
+    <div class="modal-overlay-kitsch" id="nonMemberOrderModal">
+        <div class="modal-content-kitsch" style="max-width: 500px;">
+            <button class="modal-close-btn-kitsch" onclick="closeNonMemberOrderModal()"><i class="fas fa-times"></i>
+            </button>
+            <h2 class="modal-title-kitsch display-font-kitsch">비회원 주문 조회</h2>
+            <form id="nonMemberOrderLookupForm" onsubmit="handleNonMemberOrderLookup(event)">
+                <div class="form-group-kitsch" style="margin-top:1rem;">
+                    <label class="label-kitsch" for="nonMemberOrderKeyInput">주문번호 (Order Key)</label>
+                    <input class="input-kitsch" id="nonMemberOrderKeyInput" required type="text"
+                           placeholder="주문 시 발급받은 주문번호를 입력하세요">
+                </div>
+                <div class="modal-actions-kitsch">
+                    <button class="btn-kitsch primary-btn-kitsch" type="submit">주문 조회</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script>
+        function openNonMemberOrderModal(event) {
+            event.preventDefault();
+            document.getElementById('nonMemberOrderModal').classList.add('active');
+        }
+
+        function closeNonMemberOrderModal() {
+            document.getElementById('nonMemberOrderModal').classList.remove('active');
+        }
+
+        function handleNonMemberOrderLookup(event) {
+            event.preventDefault();
+            const orderKey = document.getElementById('nonMemberOrderKeyInput').value.trim();
+            if (orderKey) {
+                window.location.href = '/order/' + orderKey;
+            } else {
+                alert('주문번호를 입력해주세요.');
+            }
+        }
+    </script>
 </footer>
 </body>
 </html>

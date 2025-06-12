@@ -138,6 +138,9 @@ public class Order extends BaseEntity {
 	@OneToOne(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Payment payment;
 
+	@OneToOne(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Refund refund;
+
 	@Builder
 	public Order(OrderState orderState, DeliveryRule deliveryRule, User user,
 		String orderName, LocalDateTime requestedDeliveryDate, LocalDateTime shippedAt, BigDecimal deliveryFee,

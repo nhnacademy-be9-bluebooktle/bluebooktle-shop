@@ -1,7 +1,6 @@
 package shop.bluebooktle.backend.order.repository;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 
 import org.jetbrains.annotations.NotNull;
@@ -19,7 +18,11 @@ public interface OrderRepository extends JpaRepository<Order, Long>, OrderQueryR
 	Page<Order> findByUserAndCreatedAtBetween(User user, LocalDateTime createdAtAfter, LocalDateTime createdAtBefore,
 		Pageable pageable);
 
-	@EntityGraph(attributePaths = {"user", "orderState", "bookOrders.book.bookSaleInfo"})
+	@EntityGraph(attributePaths = {
+		"user",
+		"orderState",
+		"bookOrders.book.bookSaleInfo",
+	})
 	Optional<Order> findOrderForCancelById(Long id);
 
 	// 사용자 + 상태(enum) 조회
@@ -45,9 +48,19 @@ public interface OrderRepository extends JpaRepository<Order, Long>, OrderQueryR
 		"orderState",
 		"bookOrders.book.bookImgs.img",
 		"user",
-		"payment.paymentDetail"
+		"payment.paymentDetail",
+		"payment.paymentPointHistory.pointHistory"
 	})
 	Optional<Order> findByOrderKey(String orderKey);
+
+	@EntityGraph(attributePaths = {
+		"orderState",
+		"user",
+		"payment.paymentDetail",
+		"payment.paymentPointHistory.pointHistory",
+		"refund"
+	})
+	Optional<Order> findOrderForRefund(Long orderId);
 
 	@NotNull
 	@EntityGraph(attributePaths = {
@@ -57,5 +70,8 @@ public interface OrderRepository extends JpaRepository<Order, Long>, OrderQueryR
 	})
 	Optional<Order> findById(@NotNull Long orderId);
 
-	List<Order> getByOrderKey(String orderKey);
+	@EntityGraph(attributePaths = {
+		"payment"
+	})
+	Optional<Order> getOrderByOrderKey(String orderKey);
 }
