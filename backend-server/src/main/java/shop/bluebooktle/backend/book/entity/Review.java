@@ -1,4 +1,4 @@
-package shop.bluebooktle.backend.review.entity;
+package shop.bluebooktle.backend.book.entity;
 
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
@@ -18,7 +18,6 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import shop.bluebooktle.backend.book.entity.Img;
 import shop.bluebooktle.backend.book_order.entity.BookOrder;
 import shop.bluebooktle.common.entity.BaseEntity;
 import shop.bluebooktle.common.entity.auth.User;

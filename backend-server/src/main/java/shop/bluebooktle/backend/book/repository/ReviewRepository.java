@@ -1,8 +1,8 @@
-package shop.bluebooktle.backend.review.repository;
+package shop.bluebooktle.backend.book.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import shop.bluebooktle.backend.review.entity.Review;
+import shop.bluebooktle.backend.book.entity.Review;
 
 public interface ReviewRepository extends JpaRepository<Review, Long>, ReviewQueryRepository {
 }

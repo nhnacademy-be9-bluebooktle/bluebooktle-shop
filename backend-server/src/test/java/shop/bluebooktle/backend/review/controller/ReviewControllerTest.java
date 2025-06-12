@@ -23,7 +23,8 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import shop.bluebooktle.backend.review.service.ReviewService;
+import shop.bluebooktle.backend.book.controller.ReviewController;
+import shop.bluebooktle.backend.book.service.ReviewService;
 import shop.bluebooktle.common.domain.auth.UserStatus;
 import shop.bluebooktle.common.domain.auth.UserType;
 import shop.bluebooktle.common.dto.auth.UserDto;

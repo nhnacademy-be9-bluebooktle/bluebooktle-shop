@@ -22,6 +22,7 @@ import shop.bluebooktle.common.dto.book.request.ReviewRegisterRequest;
 import shop.bluebooktle.common.dto.book.request.ReviewUpdateRequest;
 import shop.bluebooktle.common.dto.book.response.ReviewResponse;
 import shop.bluebooktle.backend.review.service.ReviewService;
+import shop.bluebooktle.backend.book.service.ReviewService;
 import shop.bluebooktle.common.dto.common.JsendResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
 import shop.bluebooktle.common.security.Auth;

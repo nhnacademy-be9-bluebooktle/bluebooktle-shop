@@ -1,4 +1,4 @@
-package shop.bluebooktle.backend.review.entity;
+package shop.bluebooktle.backend.book.entity;
 
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;

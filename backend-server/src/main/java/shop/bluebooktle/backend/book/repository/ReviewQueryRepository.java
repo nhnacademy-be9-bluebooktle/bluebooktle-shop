@@ -1,9 +1,9 @@
-package shop.bluebooktle.backend.review.repository;
+package shop.bluebooktle.backend.book.repository;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import shop.bluebooktle.backend.review.entity.Review;
+import shop.bluebooktle.backend.book.entity.Review;
 
 public interface ReviewQueryRepository {
 

@@ -1,4 +1,4 @@
-package shop.bluebooktle.backend.review.service;
+package shop.bluebooktle.backend.book.service;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
