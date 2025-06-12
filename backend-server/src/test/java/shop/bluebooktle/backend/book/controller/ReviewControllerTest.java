@@ -29,6 +29,7 @@ import shop.bluebooktle.common.domain.auth.UserType;
 import shop.bluebooktle.common.dto.auth.UserDto;
 import shop.bluebooktle.common.dto.book.request.ReviewRegisterRequest;
 import shop.bluebooktle.common.dto.book.response.ReviewResponse;
+import shop.bluebooktle.common.exception.book.ReviewAuthorizationException;
 import shop.bluebooktle.common.security.AuthUserLoader;
 import shop.bluebooktle.common.security.UserPrincipal;
 import shop.bluebooktle.common.util.JwtUtil;
@@ -101,6 +102,30 @@ class ReviewControllerTest {
 			.andExpect(jsonPath("$.data.nickname").value(testUserPrincipal.getNickname()))
 			.andExpect(jsonPath("$.data.bookTitle").value("책의 제목입니다"))
 			.andExpect(jsonPath("$.data.reviewContent").value("정말 좋았던 책입니다! 강추해요."));
+	}
+
+	@Test
+	@DisplayName("리뷰 등록 실패 - 주문자와 리뷰 작성자 불일치")
+	@WithMockUser
+	void addReview_failure_authorizationFailed() throws Exception {
+		Long bookOrderId = 1L;
+		ReviewRegisterRequest request = ReviewRegisterRequest.builder()
+			.star(5)
+			.reviewContent("이 책은 정말 좋은 책입니다.")
+			.build();
+
+		given(reviewService.addReview(anyLong(), eq(bookOrderId), any(ReviewRegisterRequest.class)))
+			.willThrow(new ReviewAuthorizationException());
+
+		mockMvc.perform(post("/api/orders/reviews/{bookOrderId}", bookOrderId)
+				.with(user(testUserPrincipal))
+				.with(csrf())
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request)))
+			.andDo(print())
+			.andExpect(status().isForbidden())
+			.andExpect(jsonPath("$.status").value("error"))
+			.andExpect(jsonPath("$.message").exists());
 	}
 
 	@Test
