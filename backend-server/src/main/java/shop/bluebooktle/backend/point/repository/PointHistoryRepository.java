@@ -8,5 +8,5 @@ import shop.bluebooktle.common.entity.point.PointHistory;
 
 public interface PointHistoryRepository extends JpaRepository<PointHistory, Long> {
 
-	Page<PointHistory> findByUserIdOrderByCreatedAtDesc(Long userId, Pageable pageable);
+	Page<PointHistory> findByUser_IdOrderByCreatedAtDesc(Long userId, Pageable pageable);
 }

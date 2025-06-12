@@ -17,12 +17,6 @@ public interface UserRepository extends JpaRepository<User, Long>, UserQueryRepo
 
 	Optional<User> findByLoginId(String loginId);
 
-	Optional<User> findByEmail(String email);
-
-	boolean existsByLoginId(String loginId);
-
-	boolean existsByEmail(String email);
-
 	List<User> findByStatus(UserStatus status);
 
 	List<User> findByStatusAndLastLoginAtBefore(UserStatus status, LocalDateTime lastLoginTime);

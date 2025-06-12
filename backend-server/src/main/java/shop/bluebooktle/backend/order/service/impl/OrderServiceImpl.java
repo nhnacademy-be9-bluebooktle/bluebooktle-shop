@@ -69,8 +69,6 @@ import shop.bluebooktle.common.dto.order.response.OrderItemResponse;
 import shop.bluebooktle.common.dto.order.response.OrderPackagingResponse;
 import shop.bluebooktle.common.entity.auth.User;
 import shop.bluebooktle.common.entity.point.PointHistory;
-import shop.bluebooktle.common.exception.ApplicationException;
-import shop.bluebooktle.common.exception.ErrorCode;
 import shop.bluebooktle.common.exception.auth.UserNotFoundException;
 import shop.bluebooktle.common.exception.book.BookNotFoundException;
 import shop.bluebooktle.common.exception.book.BookSaleInfoNotFoundException;
@@ -282,7 +280,7 @@ public class OrderServiceImpl implements OrderService {
 		return saved.getId();
 	}
 
-	private void createSingleBookOrder(Order order, OrderItemRequest item) {
+	public void createSingleBookOrder(Order order, OrderItemRequest item) {
 		Book book = bookRepository.findById(item.bookId())
 			.orElseThrow(BookNotFoundException::new);
 
@@ -786,25 +784,6 @@ public class OrderServiceImpl implements OrderService {
 	}
 
 	@Override
-	public void shipOrder(Long orderId) {
-		Order order = orderRepository.findById(orderId)
-			.orElseThrow(OrderNotFoundException::new);
-
-		if (!OrderStatus.PENDING.equals(order.getOrderState().getState())) {
-			throw new ApplicationException(ErrorCode.INVALID_INPUT_VALUE,
-				"결제 대기 상태의 주문만 배송 처리할 수 있습니다. 현재 상태: " + order.getOrderState().getState().name());
-		}
-
-		OrderState shippingState = orderStateRepository.findByState(OrderStatus.SHIPPING)
-			.orElseThrow(() -> new ApplicationException(ErrorCode.INTERNAL_SERVER_ERROR, "'SHIPPING' 상태를 찾을 수 없습니다."));
-
-		order.changeOrderState(shippingState);
-		order.changeShippedAt(LocalDateTime.now());
-
-		orderRepository.save(order);
-	}
-
-	@Override
 	public AdminOrderDetailResponse getAdminOrderDetail(Long orderId) {
 		Order order = orderRepository.findAdminOrderDetailsByOrderId(orderId)
 			.orElseThrow(OrderNotFoundException::new);
@@ -911,4 +890,5 @@ public class OrderServiceImpl implements OrderService {
 		order.changeTrackingNumber(trackingNumber);
 		orderRepository.save(order);
 	}
+
 }
