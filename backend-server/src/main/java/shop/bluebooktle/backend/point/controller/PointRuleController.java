@@ -35,7 +35,7 @@ public class PointRuleController {
 	}
 
 	@GetMapping("/type")
-	@Auth(type = UserType.ADMIN)
+	@Auth(type = UserType.USER)
 	public ResponseEntity<JsendResponse<PointRuleResponse>> getRuleBySourceTypeEnum(
 		@RequestParam PointSourceTypeEnum pointSourceTypeEnum) {
 		return ResponseEntity.ok(
