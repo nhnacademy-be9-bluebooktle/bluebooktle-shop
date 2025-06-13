@@ -5,12 +5,14 @@ import java.time.LocalDateTime;
 
 import com.querydsl.core.annotations.QueryProjection;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import shop.bluebooktle.common.domain.coupon.CouponTypeTarget;
 
 @Getter
 @NoArgsConstructor
+@Builder
 public class CouponResponse {
 	Long id;
 	String couponName;
