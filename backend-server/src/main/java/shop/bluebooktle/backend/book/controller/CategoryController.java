@@ -23,6 +23,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import shop.bluebooktle.backend.book.service.CategoryService;
+import shop.bluebooktle.common.domain.auth.UserType;
 import shop.bluebooktle.common.dto.book.request.CategoryRegisterRequest;
 import shop.bluebooktle.common.dto.book.request.CategoryUpdateRequest;
 import shop.bluebooktle.common.dto.book.request.RootCategoryRegisterRequest;
@@ -30,6 +31,7 @@ import shop.bluebooktle.common.dto.book.response.CategoryResponse;
 import shop.bluebooktle.common.dto.book.response.CategoryTreeResponse;
 import shop.bluebooktle.common.dto.common.JsendResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
+import shop.bluebooktle.common.security.Auth;
 
 @RestController
 @RequestMapping("/api/categories")
@@ -71,6 +73,7 @@ public class CategoryController {
 		description = "최소 2단계의 카테고리 구조를 위해 최상위 카테고리와 하위 카테고리를 등록합니다."
 	)
 	@PostMapping
+	@Auth(type = UserType.ADMIN)
 	public ResponseEntity<JsendResponse<Void>> addRootCategory(
 		@Valid @RequestBody RootCategoryRegisterRequest request) {
 		categoryService.registerRootCategory(request);
@@ -79,6 +82,7 @@ public class CategoryController {
 
 	@Operation(summary = "중간 카테고리 등록", description = "해당 카테고리 하위의 카테고리를 등록합니다.")
 	@PostMapping("/{parent-category-id}")
+	@Auth(type = UserType.ADMIN)
 	public ResponseEntity<JsendResponse<Void>> addCategory(
 		@PathVariable(name = "parent-category-id") Long parentCategoryId,
 		@Valid @RequestBody CategoryRegisterRequest request
@@ -96,6 +100,7 @@ public class CategoryController {
 
 	@Operation(summary = "카테고리 삭제", description = "해당 카테고리를 삭제합니다.")
 	@DeleteMapping("/{categoryId}")
+	@Auth(type = UserType.ADMIN)
 	public ResponseEntity<JsendResponse<Void>> deleteCategory(@PathVariable Long categoryId) {
 		categoryService.deleteCategory(categoryId);
 		return ResponseEntity.ok(JsendResponse.success());
@@ -103,6 +108,7 @@ public class CategoryController {
 
 	@Operation(summary = "카테고리 수정", description = "해당 카테고리명을 수정합니다.")
 	@PutMapping("/{categoryId}")
+	@Auth(type = UserType.ADMIN)
 	public ResponseEntity<JsendResponse<Void>> updateCategory(
 		@PathVariable Long categoryId,
 		@Valid @RequestBody CategoryUpdateRequest request
@@ -111,21 +117,7 @@ public class CategoryController {
 		return ResponseEntity.ok(JsendResponse.success());
 	}
 
-	/*// 상위 카테고리에 포함되는 하위 카테고리 목록을 가져옴
-	@GetMapping("/{categoryId}/subcategories")
-	public ResponseEntity<JsendResponse<List<CategoryResponse>>> getSubcategories(@PathVariable Long categoryId) {
-		List<CategoryResponse> subs = categoryService.getSubcategoriesByParentCategoryId(categoryId);
-		return ResponseEntity.ok(JsendResponse.success(subs));
-	}
-
-	// 하위 카테고리가 포함되는 상위 카테고리 목록을 가져옴
-	@GetMapping("/{categoryId}/parentcategories")
-	public ResponseEntity<JsendResponse<List<CategoryResponse>>> getParentCategories(@PathVariable Long categoryId) {
-		List<CategoryResponse> parents = categoryService.getParentCategoriesByLeafCategoryId(categoryId);
-		return ResponseEntity.ok(JsendResponse.success(parents));
-	}*/
-
-	// 카테고리 이름으로 조회
+	@Operation(summary = "최상위 카테고리 이름으로 조회", description = "최상위 카테고리를 이름으로 조회합니다.")
 	@GetMapping("/name/{categoryName}")
 	public ResponseEntity<JsendResponse<CategoryResponse>> getCategoryByName(@PathVariable String categoryName) {
 		CategoryResponse categoryResponse = categoryService.getCategoryByName(categoryName);

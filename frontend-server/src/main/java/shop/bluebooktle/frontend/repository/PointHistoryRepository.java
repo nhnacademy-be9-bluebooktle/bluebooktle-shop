@@ -12,6 +12,7 @@ import shop.bluebooktle.common.dto.common.PaginationData;
 import shop.bluebooktle.common.dto.point.request.PointAdjustmentRequest;
 import shop.bluebooktle.common.dto.point.response.PointHistoryResponse;
 import shop.bluebooktle.frontend.config.feign.FeignGlobalConfig;
+import shop.bluebooktle.frontend.config.retry.RetryWithTokenRefresh;
 
 @FeignClient(
 	name = "backend-server",
@@ -22,11 +23,14 @@ import shop.bluebooktle.frontend.config.feign.FeignGlobalConfig;
 public interface PointHistoryRepository {
 
 	@GetMapping("/history")
+	@RetryWithTokenRefresh
 	PaginationData<PointHistoryResponse> getMyPointHistories(Pageable pageable);
 
 	@PostMapping
+	@RetryWithTokenRefresh
 	Void createPointHistory(@RequestBody PointAdjustmentRequest request);
 
 	@GetMapping("/total")
+	@RetryWithTokenRefresh
 	BigDecimal getTotalPoints();
 }

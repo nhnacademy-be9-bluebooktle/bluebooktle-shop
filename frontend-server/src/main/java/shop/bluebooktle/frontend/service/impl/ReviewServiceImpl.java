@@ -20,10 +20,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import shop.bluebooktle.common.dto.book.request.ReviewRegisterRequest;
-import shop.bluebooktle.common.dto.book.request.ReviewRequest;
-import shop.bluebooktle.common.dto.book.request.ReviewUpdateRequest;
-import shop.bluebooktle.common.dto.book.response.ReviewResponse;
+import shop.bluebooktle.common.dto.review.request.ReviewRegisterRequest;
+import shop.bluebooktle.common.dto.review.request.ReviewRequest;
+import shop.bluebooktle.common.dto.review.request.ReviewUpdateRequest;
+import shop.bluebooktle.common.dto.review.response.ReviewResponse;
 import shop.bluebooktle.common.dto.book.response.img.ImgResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
 import shop.bluebooktle.frontend.repository.ImageServerClient;

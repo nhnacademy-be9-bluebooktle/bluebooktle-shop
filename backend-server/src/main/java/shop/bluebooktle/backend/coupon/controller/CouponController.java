@@ -18,11 +18,13 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.coupon.batch.direct.DirectCouponBatchLauncher;
 import shop.bluebooktle.backend.coupon.service.CouponService;
+import shop.bluebooktle.common.domain.auth.UserType;
 import shop.bluebooktle.common.dto.common.JsendResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
 import shop.bluebooktle.common.dto.coupon.request.CouponRegisterRequest;
 import shop.bluebooktle.common.dto.coupon.request.UserCouponRegisterRequest;
 import shop.bluebooktle.common.dto.coupon.response.CouponResponse;
+import shop.bluebooktle.common.security.Auth;
 
 @RestController
 @RequiredArgsConstructor
@@ -35,6 +37,7 @@ public class CouponController {
 
 	@Operation(summary = "쿠폰 등록", description = "새로운 쿠폰을 등록합니다.")
 	@PostMapping
+	@Auth(type = UserType.ADMIN)
 	public ResponseEntity<JsendResponse<Void>> registerCoupon(@Valid @RequestBody CouponRegisterRequest request) {
 		couponService.registerCoupon(request);
 		return ResponseEntity.status(HttpStatus.CREATED).body(JsendResponse.success());
@@ -42,6 +45,7 @@ public class CouponController {
 
 	@Operation(summary = "쿠폰 전체 조회", description = "등록된 쿠폰 전체를 조회합니다.")
 	@GetMapping
+	@Auth(type = UserType.ADMIN)
 	public ResponseEntity<JsendResponse<PaginationData<CouponResponse>>> getAllCoupons(
 		@RequestParam(value = "searchCouponName", required = false) String searchCouponName,
 		@PageableDefault(size = 10) Pageable pageable) {
@@ -52,6 +56,7 @@ public class CouponController {
 
 	@Operation(summary = "쿠폰 직접 발급", description = "쿠폰을 직접 발급합니다.")
 	@PostMapping("/issue")
+	@Auth(type = UserType.ADMIN)
 	public ResponseEntity<JsendResponse<Void>> registerUserCoupon(
 		@RequestBody @Valid UserCouponRegisterRequest request) {
 		directCouponBatchLauncher.run(request);

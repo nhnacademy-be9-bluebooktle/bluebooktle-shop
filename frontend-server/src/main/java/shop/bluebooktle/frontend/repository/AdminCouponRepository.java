@@ -13,15 +13,18 @@ import shop.bluebooktle.common.dto.coupon.request.UserCouponRegisterRequest;
 import shop.bluebooktle.common.dto.coupon.response.CouponResponse;
 import shop.bluebooktle.common.dto.coupon.response.CouponTypeResponse;
 import shop.bluebooktle.frontend.config.feign.FeignGlobalConfig;
+import shop.bluebooktle.frontend.config.retry.RetryWithTokenRefresh;
 
 @FeignClient(url = "${server.gateway-url}", path = "/api/admin/coupons", name = "adminCouponRepository", configuration = FeignGlobalConfig.class)
 public interface AdminCouponRepository {
 	//쿠폰 정책 등록
 	@PostMapping("/type")
+	@RetryWithTokenRefresh
 	void registerCouponType(@RequestBody CouponTypeRegisterRequest request);
 
 	//쿠폰 정책 전체 조회
 	@GetMapping("/type")
+	@RetryWithTokenRefresh
 	PaginationData<CouponTypeResponse> getAllCouponType(
 		@RequestParam("page") int page,
 		@RequestParam("size") int size
@@ -29,10 +32,12 @@ public interface AdminCouponRepository {
 
 	//쿠폰 등록
 	@PostMapping
+	@RetryWithTokenRefresh
 	void registerCoupon(@RequestBody CouponRegisterRequest request);
 
 	//전체 쿠폰 조회
 	@GetMapping
+	@RetryWithTokenRefresh
 	PaginationData<CouponResponse> getAllCoupon(
 		@RequestParam("page") int page,
 		@RequestParam("size") int size,
@@ -41,5 +46,6 @@ public interface AdminCouponRepository {
 
 	//쿠폰 발급
 	@PostMapping("/issue")
+	@RetryWithTokenRefresh
 	void issueCoupon(@RequestBody UserCouponRegisterRequest request);
 }

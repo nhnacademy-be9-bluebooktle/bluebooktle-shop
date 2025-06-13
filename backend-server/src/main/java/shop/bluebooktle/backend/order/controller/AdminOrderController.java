@@ -48,6 +48,9 @@ public class AdminOrderController {
 		log.info("관리자 주문 목록 조회");
 		Page<AdminOrderListResponse> page = orderService.searchOrders(searchRequest, pageable);
 		PaginationData<AdminOrderListResponse> paginationData = new PaginationData<>(page);
+		log.info("검색 파라미터 확인: type={}, keyword={}",
+			searchRequest.getSearchKeywordType(),
+			searchRequest.getSearchKeyword());
 		return ResponseEntity.ok(JsendResponse.success(paginationData));
 	}
 
@@ -71,6 +74,7 @@ public class AdminOrderController {
 	}
 
 	@PostMapping("/{orderId}/update-status")
+	@Auth(type = UserType.ADMIN)
 	public ResponseEntity<JsendResponse<Void>> updateOrderStatus(
 		@PathVariable("orderId") Long orderId,
 		@RequestBody AdminOrderStatusUpdateRequest status
@@ -82,6 +86,7 @@ public class AdminOrderController {
 	}
 
 	@PostMapping("/{orderId}/update-tracking")
+	@Auth(type = UserType.ADMIN)
 	public ResponseEntity<JsendResponse<Void>> updateTrackingNumber(
 		@PathVariable("orderId") Long orderId,
 		@RequestBody AdminOrderTrackingNumberUpdateRequest trackNumber

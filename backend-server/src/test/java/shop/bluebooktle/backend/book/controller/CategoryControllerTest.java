@@ -62,8 +62,9 @@ public class CategoryControllerTest {
 	@MockitoBean
 	private AuthUserLoader authUserLoader;
 
+
 	@Test
-	@DisplayName("모든 카테고리 페이징 조회 성공")
+	@DisplayName("모든 카테고리 페이징 조회 성공 - 검색 키워드 없음")
 	@WithMockUser
 	void getCategoriesWithPaginationSuccess() throws Exception {
 		// given
@@ -87,6 +88,64 @@ public class CategoryControllerTest {
 
 		verify(categoryService, times(1)).getCategories(any(Pageable.class));
 	}
+
+	@Test
+	@DisplayName("모든 카테고리 페이징 조회 성공 - 검색 키워드 없음")
+	@WithMockUser
+	void getCategoriesWithPaginationWithKeywordBlankSuccess() throws Exception {
+		// given
+		List<CategoryResponse> categories = List.of(
+			new CategoryResponse(1L, "Category 1", null, "/1"),
+			new CategoryResponse(2L, "Category 2", null, "/2")
+		);
+		Page<CategoryResponse> categoryPage = new PageImpl<>(categories);
+		when(categoryService.getCategories(any(Pageable.class))).thenReturn(categoryPage);
+
+		// when & then
+		mockMvc.perform(get("/api/categories")
+				.param("page", "0")
+				.param("size", "10")
+				.param("searchKeyword", "")
+				.accept(MediaType.APPLICATION_JSON).with(csrf()))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.status").value("success"))
+			.andExpect(jsonPath("$.data.content.length()").value(categories.size()))
+			.andExpect(jsonPath("$.data.content[0].categoryId").value(categories.get(0).categoryId()))
+			.andExpect(jsonPath("$.data.content[0].name").value(categories.get(0).name()));
+
+		verify(categoryService, times(1)).getCategories(any(Pageable.class));
+	}
+
+	@Test
+	@DisplayName("모든 카테고리 페이징 조회 성공 - 검색 키워드 있음")
+	@WithMockUser
+	void getCategoriesWithPaginationWithSearchKeywordSuccess() throws Exception {
+		// given
+		List<CategoryResponse> categories = List.of(
+			new CategoryResponse(1L, "Category 1", null, "/1"),
+			new CategoryResponse(2L, "Category 2", null, "/2")
+		);
+
+		Page<CategoryResponse> categoryPage = new PageImpl<>(categories);
+		when(categoryService.searchCategories(anyString(), any(Pageable.class))).thenReturn(categoryPage);
+
+		String searchKeyword = "Category";
+		// when & then
+		mockMvc.perform(get("/api/categories")
+				.param("page", "0")
+				.param("size", "10")
+				.param("searchKeyword", searchKeyword)
+				.accept(MediaType.APPLICATION_JSON).with(csrf()))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.status").value("success"))
+			.andExpect(jsonPath("$.data.content.length()").value(categories.size()))
+			.andExpect(jsonPath("$.data.content[0].categoryId").value(categories.get(0).categoryId()))
+			.andExpect(jsonPath("$.data.content[0].name").value(categories.get(0).name()));
+
+		verify(categoryService, times(1)).searchCategories(eq(searchKeyword), any(Pageable.class));
+	}
+
+
 
 	@Test
 	@DisplayName("최상위 카테고리 트리 조회 성공")
@@ -209,4 +268,27 @@ public class CategoryControllerTest {
 
 		verify(categoryService, times(1)).updateCategory(eq(categoryId), any(CategoryUpdateRequest.class));
 	}
+
+
+	@Test
+	@DisplayName("최상위 카테고리 이름으로 조회 성공")
+	@WithMockUser
+	void getCategoryByNameSuccess() throws Exception {
+		String categoryName = "Root Category";
+		CategoryResponse response = new CategoryResponse(1L, "Root Category", null, "/1");
+
+		when(categoryService.getCategoryByName(anyString())).thenReturn(response);
+
+		mockMvc.perform(get("/api/categories/name/{categoryName}", categoryName)
+				.accept(MediaType.APPLICATION_JSON).with(csrf()))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.status").value("success"))
+			.andExpect(jsonPath("$.data.categoryId").value(response.categoryId()))
+			.andExpect(jsonPath("$.data.name").value(response.name()));
+
+		verify(categoryService, times(1)).getCategoryByName(eq(categoryName));
+	}
+
+
+
 }

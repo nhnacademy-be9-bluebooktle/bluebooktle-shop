@@ -50,50 +50,40 @@ public class AdminMemberController {
 
 	@GetMapping
 	public String listMembers(Model model, HttpServletRequest request,
-		@RequestParam(value = "page", defaultValue = "0") int page, // <<< 1. defaultValue를 "0"으로 변경
+		@RequestParam(value = "page", defaultValue = "0") int page,
 		@RequestParam(value = "size", defaultValue = "10") int size,
 		@ModelAttribute UserSearchRequest searchRequest) {
 
 		model.addAttribute("pageTitle", "회원 관리");
 		model.addAttribute("currentURI", request.getRequestURI());
 
-		int zeroBasedPage = (page < 0) ? 0 : page; // <<< 2. 0-based 페이지 처리
+		int zeroBasedPage = (page < 0) ? 0 : page;
 		Pageable pageable = PageRequest.of(zeroBasedPage, size, Sort.by(Sort.Direction.DESC, "id"));
 
-		try {
-			Page<AdminUserResponse> membersPage = userService.listUsers(searchRequest, pageable);
+		Page<AdminUserResponse> membersPage = userService.listUsers(searchRequest, pageable);
 
-			model.addAttribute("members", membersPage.getContent());
-			model.addAttribute("currentPage", membersPage.getNumber()); // <<< 3. 모델에는 0-based 전달
-			model.addAttribute("totalPages", membersPage.getTotalPages());
-			model.addAttribute("totalMembers", membersPage.getTotalElements());
+		model.addAttribute("members", membersPage.getContent());
+		model.addAttribute("currentPage", membersPage.getNumber());
+		model.addAttribute("totalPages", membersPage.getTotalPages());
+		model.addAttribute("totalMembers", membersPage.getTotalElements());
 
-			UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(request.getRequestURI())
-				.queryParam("size", membersPage.getSize());
-			if (searchRequest.getSearchField() != null && !searchRequest.getSearchField().isEmpty())
-				uriBuilder.queryParam("searchField", searchRequest.getSearchField());
-			if (searchRequest.getSearchKeyword() != null && !searchRequest.getSearchKeyword().isEmpty())
-				uriBuilder.queryParam("searchKeyword", searchRequest.getSearchKeyword());
-			if (searchRequest.getUserTypeFilter() != null && !searchRequest.getUserTypeFilter().isEmpty())
-				uriBuilder.queryParam("userTypeFilter", searchRequest.getUserTypeFilter());
-			if (searchRequest.getUserStatusFilter() != null && !searchRequest.getUserStatusFilter().isEmpty())
-				uriBuilder.queryParam("userStatusFilter", searchRequest.getUserStatusFilter());
+		UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(request.getRequestURI())
+			.queryParam("size", membersPage.getSize());
+		if (searchRequest.getSearchField() != null && !searchRequest.getSearchField().isEmpty())
+			uriBuilder.queryParam("searchField", searchRequest.getSearchField());
+		if (searchRequest.getSearchKeyword() != null && !searchRequest.getSearchKeyword().isEmpty())
+			uriBuilder.queryParam("searchKeyword", searchRequest.getSearchKeyword());
+		if (searchRequest.getUserTypeFilter() != null && !searchRequest.getUserTypeFilter().isEmpty())
+			uriBuilder.queryParam("userTypeFilter", searchRequest.getUserTypeFilter());
+		if (searchRequest.getUserStatusFilter() != null && !searchRequest.getUserStatusFilter().isEmpty())
+			uriBuilder.queryParam("userStatusFilter", searchRequest.getUserStatusFilter());
 
-			model.addAttribute("baseUrlWithParams", uriBuilder.toUriString());
+		model.addAttribute("baseUrlWithParams", uriBuilder.toUriString());
 
-			model.addAttribute("searchField", searchRequest.getSearchField());
-			// <<< 4. 프래그먼트를 위해 searchKeyword를 별도로 전달
-			model.addAttribute("searchKeyword", searchRequest.getSearchKeyword());
-			model.addAttribute("userTypeFilter", searchRequest.getUserTypeFilter());
-			model.addAttribute("userStatusFilter", searchRequest.getUserStatusFilter());
-
-		} catch (RuntimeException e) {
-			model.addAttribute("globalErrorMessage", "회원 목록을 불러오는 중 오류가 발생했습니다. " + e.getMessage());
-			model.addAttribute("members", List.of());
-			model.addAttribute("currentPage", 0); // <<< 5. 오류 시에도 0-based
-			model.addAttribute("totalPages", 0);
-			model.addAttribute("totalMembers", 0);
-		}
+		model.addAttribute("searchField", searchRequest.getSearchField());
+		model.addAttribute("searchKeyword", searchRequest.getSearchKeyword());
+		model.addAttribute("userTypeFilter", searchRequest.getUserTypeFilter());
+		model.addAttribute("userStatusFilter", searchRequest.getUserStatusFilter());
 
 		model.addAttribute("userTypeOptions", Arrays.stream(UserType.values()).map(Enum::name).toList());
 		model.addAttribute("userStatusOptions", Arrays.stream(UserStatus.values()).map(Enum::name).toList());

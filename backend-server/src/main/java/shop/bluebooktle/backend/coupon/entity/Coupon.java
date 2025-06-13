@@ -40,7 +40,8 @@ public class Coupon extends BaseEntity {
 	private String couponName;
 
 	@Builder
-	public Coupon(CouponType type, String couponName) {
+	public Coupon(Long id, CouponType type, String couponName) {
+		this.id = id;
 		this.couponType = type;
 		this.couponName = couponName;
 	}
