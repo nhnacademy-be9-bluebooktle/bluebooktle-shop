@@ -45,6 +45,7 @@ public class PublisherRepositoryTest {
 	@BeforeEach
 	void setup() {
 		publisherRepository.deleteAll();  // 남아있는 엔티티 모두 제거
+
 	}
 
 	@Test
@@ -139,7 +140,7 @@ public class PublisherRepositoryTest {
 	}
 
 	@Test
-	@DisplayName("검색어가 일치하는 출판사가 없으면 total==null 경로 커버")
+	@DisplayName("검색어가 일치하는 출판사가 없으면 total==null 커버")
 	void searchByNameContaining_noMatch() {
 		// given: 저장된 출판사 없음
 
@@ -153,24 +154,18 @@ public class PublisherRepositoryTest {
 	}
 
 	@Test
-	@DisplayName("count 쿼리가 null 이면 totalCount 는 0 으로 처리된다")
+	@DisplayName("count 쿼리가 null 이면 totalCount=0 처리")
 	void searchByNameContaining_totalIsNull() {
 
-		/* 1) mock 객체 준비 */
+		// mock 객체
 		JPAQueryFactory factory = mock(JPAQueryFactory.class);
-		// 콘텐츠용 쿼리 mock (Publisher 리스트 반환)
-		@SuppressWarnings("unchecked")
 		JPAQuery<Publisher> contentQuery =
 			(JPAQuery<Publisher>)mock(JPAQuery.class, RETURNS_DEEP_STUBS);
-		// 카운트용 쿼리 mock (Long 반환)
-		@SuppressWarnings("unchecked")
 		JPAQuery<Long> countQuery =
 			(JPAQuery<Long>)mock(JPAQuery.class, RETURNS_DEEP_STUBS);
 
 		QPublisher p = QPublisher.publisher;
 
-		/* 2) 스텁 설정 */
-		// 2-1. selectFrom → 콘텐츠 쿼리 체인
 		when(factory.selectFrom(p)).thenReturn(contentQuery);
 		when(contentQuery.where(any(BooleanBuilder.class))).thenReturn(contentQuery);
 		when(contentQuery.orderBy(any(OrderSpecifier.class))).thenReturn(contentQuery);
@@ -178,19 +173,19 @@ public class PublisherRepositoryTest {
 		when(contentQuery.limit(anyLong())).thenReturn(contentQuery);
 		when(contentQuery.fetch()).thenReturn(Collections.emptyList());
 
-		// 2-2. select(p.count()) → 카운트 쿼리 체인
+		// 카운트 쿼리 체인
 		when(factory.select(p.count())).thenReturn(countQuery);
 		when(countQuery.from(p)).thenReturn(countQuery);
 		when(countQuery.where(any(BooleanBuilder.class))).thenReturn(countQuery);
-		when(countQuery.fetchOne()).thenReturn(null);   // 핵심: null 반환!
+		when(countQuery.fetchOne()).thenReturn(null);
 
-		/* 3) 리포지토리에 주입 후 호출 */
+		// 리포지토리에 주입 후 호출
 		PublisherQueryRepositoryImpl repo = new PublisherQueryRepositoryImpl(factory);
 
 		Page<Publisher> page =
 			repo.searchByNameContaining("no-match", PageRequest.of(0, 5));
 
-		/* 4) 검증 – totalElements == 0 이면 분기 커버 */
+		// 검증 – totalElements == 0 이면 분기
 		assertThat(page.getTotalElements()).isZero();
 		assertThat(page.getContent()).isEmpty();
 	}
