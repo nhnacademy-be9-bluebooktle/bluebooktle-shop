@@ -1,4 +1,4 @@
-package shop.bluebooktle.common.dto.book.response;
+package shop.bluebooktle.common.dto.review.response;
 
 import java.time.LocalDateTime;
 
