@@ -1,7 +1,6 @@
 package shop.bluebooktle.backend.book.service.impl;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -28,11 +27,16 @@ public class AladinBookServiceImpl implements AladinBookService {
 
 	@Override
 	public List<AladinBookResponse> searchBooks(String query, int page, int size) {
+
+		if (page < 1 || size < 1) {
+			throw new IllegalArgumentException("페이지와 사이즈는 1 이상의 값이어야 합니다.");
+		}
+
 		int start = (page - 1) * size + 1;
 		AladinApiResponse apiResp = aladinAdaptor.searchBooks(query, start, size);
 		return apiResp.getItem().stream()
 			.map(AladinBookResponse::from)
-			.collect(Collectors.toList());
+			.toList();
 	}
 
 	@Override
