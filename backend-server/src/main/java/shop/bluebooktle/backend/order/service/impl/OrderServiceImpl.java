@@ -218,18 +218,7 @@ public class OrderServiceImpl implements OrderService {
 
 		List<BookOrder> savedBookOrders = new ArrayList<>();
 		for (OrderItemRequest itemReq : request.orderItems()) {
-			Book book = bookRepository.findById(itemReq.bookId())
-				.orElseThrow(BookNotFoundException::new);
-
-			BookOrder bookOrder = BookOrder.builder()
-				.order(saved)
-				.book(book)
-				.quantity(itemReq.bookQuantity())
-				.price(itemReq.salePrice())
-				.build();
-
-			BookOrder savedBookOrder = bookOrderRepository.save(bookOrder);
-			savedBookOrders.add(savedBookOrder);
+			savedBookOrders.add(createSingleBookOrder(saved, itemReq));
 		}
 
 		if (user != null) {
@@ -280,7 +269,8 @@ public class OrderServiceImpl implements OrderService {
 		return saved.getId();
 	}
 
-	public void createSingleBookOrder(Order order, OrderItemRequest item) {
+	@Transactional
+	public BookOrder createSingleBookOrder(Order order, OrderItemRequest item) {
 		Book book = bookRepository.findById(item.bookId())
 			.orElseThrow(BookNotFoundException::new);
 
@@ -318,8 +308,6 @@ public class OrderServiceImpl implements OrderService {
 				.build();
 
 			bookOrder.getOrderPackagings().add(packaging);
-
-			bookOrderRepository.save(bookOrder);
 		}
 
 		int stock = bookSaleInfo.getStock() - item.bookQuantity();
@@ -328,6 +316,8 @@ public class OrderServiceImpl implements OrderService {
 			bookSaleInfo.changeSaleState(BookSaleInfoState.SALE_ENDED);
 		}
 		bookSaleInfoRepository.save(bookSaleInfo);
+
+		return bookOrder;
 	}
 
 	@Override
