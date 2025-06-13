@@ -16,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import jakarta.persistence.EntityManager;
 import shop.bluebooktle.backend.book.entity.Category;
@@ -44,13 +45,14 @@ public class CategoryRepositoryTest {
 
 	@BeforeEach
 	void setUp() {
-		category1 = categoryRepository.save(new Category(null, "소설"));
-		category2 = categoryRepository.save(new Category(null, "일반 소설"));
-		category3 = categoryRepository.save(new Category(null, "장르 소설"));
+		category1 = categoryRepository.save(new Category(null, "소설", "/1"));
+		category2 = categoryRepository.save(new Category(category1, "일반 소설", "/1/2"));
+		category3 = categoryRepository.save(new Category(category2, "장르 소설", "/1/2/3"));
 
-		category4 = categoryRepository.save(new Category(null, "국내 현대 소설"));
+		category4 = categoryRepository.save(new Category(category1, "국내 현대 소설", "/1/4"));
 		em.flush();
 
+		// category4 삭제
 		em.createQuery(
 				"update Category c set c.deletedAt = :now where c.id = :id")
 			.setParameter("now", LocalDateTime.now())
@@ -97,6 +99,23 @@ public class CategoryRepositoryTest {
 	}
 
 	@Test
+	@DisplayName("검색어 null 전달 시 모든 카테고리 이름순 반환")
+	void searchByNameContaining_nullKeyword() {
+		// given
+		Pageable pageable = PageRequest.of(0, 10);
+
+		// when
+		Page<Category> page = categoryRepository.searchByNameContaining(null, pageable);
+
+		// then
+		assertThat(page.getTotalElements()).isEqualTo(3);
+		assertThat(page.getContent())
+			.extracting(Category::getName)
+			.doesNotContain("국내 현대 소설");
+	}
+
+
+	@Test
 	@DisplayName("페이징 옵션 적용 테스트")
 	void searchByNameContaining_pagination() {
 		// given: 페이지 크기 2
@@ -121,4 +140,67 @@ public class CategoryRepositoryTest {
 		assertThat(allNames).containsExactlyInAnyOrder("소설", "일반 소설", "장르 소설");
 	}
 
+	@Test
+	@DisplayName("검색 결과 없음 테스트")
+	void searchByNameContaining_pagination_noContent() {
+		// given: 페이지 크기 10
+		Pageable pageable = PageRequest.of(0, 10);
+
+		// when
+		Page<Category> page = categoryRepository.searchByNameContaining("없는키워드", pageable);
+
+		// then
+		assertThat(page.getTotalElements()).isEqualTo(0);
+		assertThat(page.getContent()).isEmpty();
+	}
+
+	@Test
+	@DisplayName("하위 leaf 카테고리 ID 조회 테스트")
+	void findUnderCategory_leafCategoryOnly() {
+		// given: 소설 > 일반 소설 > 로맨스 소설 구조
+		Category parent = new Category(null, "소설", "/5");
+		categoryRepository.save(parent);
+
+		Category child1 = new Category(parent, "일반 소설", "/5/6");
+		categoryRepository.save(child1);
+
+		Category child2 = new Category(child1, "로맨스 소설", "/5/6/7");
+		categoryRepository.save(child2);
+
+		em.flush();
+		em.clear();
+
+		// when
+		List<Long> result = categoryRepository.findUnderCategory(parent);
+
+		// then: leaf 노드는 로맨스 소설 하나뿐
+		assertThat(result).hasSize(1);
+		assertThat(result).containsExactly(child2.getId());
+	}
+
+	@Test
+	@DisplayName("deletedAt 설정된 하위 카테고리는 제외")
+	void getAllDescendantCategories_deletedExcluded() {
+		// when
+		List<Category> result = categoryRepository.getAllDescendantCategories(category1);
+
+		// then: 국내 현대 소설은 빠지고 일반소설, 장르소설만 남음
+		assertThat(result)
+			.extracting(Category::getName)
+			.containsExactlyInAnyOrder("소설", "일반 소설", "장르 소설");
+	}
+
+	@Test
+	@DisplayName("존재하지 않는 parent 전달 시 빈 리스트 반환")
+	void getAllDescendantCategories_parentNotFound() {
+		// given: ID는 있으나 실제 DB에 없는 Category
+		Category phantom = new Category(null, "유령");
+		ReflectionTestUtils.setField(phantom, "id", 9999L);
+
+		// when
+		List<Category> result = categoryRepository.getAllDescendantCategories(phantom);
+
+		// then
+		assertThat(result).isEmpty();
+	}
 }

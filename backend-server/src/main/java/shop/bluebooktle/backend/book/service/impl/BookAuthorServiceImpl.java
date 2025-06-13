@@ -1,6 +1,7 @@
 package shop.bluebooktle.backend.book.service.impl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -36,7 +37,7 @@ public class BookAuthorServiceImpl implements BookAuthorService {
 		Author author = authorRepository.findById(authorId)
 			.orElseThrow(() -> new AuthorNotFoundException(authorId));
 		Book book = bookRepository.findById(bookId)
-			.orElseThrow(() -> new BookNotFoundException());
+			.orElseThrow(BookNotFoundException::new);
 
 		if (bookAuthorRepository.existsByBookAndAuthor(book, author)) {
 			throw new BookAuthorAlreadyExistsException(bookId, authorId);
@@ -46,7 +47,9 @@ public class BookAuthorServiceImpl implements BookAuthorService {
 			.book(book)
 			.author(author)
 			.build();
+
 		bookAuthorRepository.save(ba);
+
 		return AuthorResponse.builder().
 			id(author.getId()).
 			name(author.getName()).
@@ -73,46 +76,4 @@ public class BookAuthorServiceImpl implements BookAuthorService {
 		return registerBookAuthor(bookId, authorIdList);
 	}
 
-	@Transactional(readOnly = true)
-	@Override
-	public List<AuthorResponse> getAuthorByBookId(Long bookId) {
-
-		Book book = bookRepository.findById(bookId)
-			.orElseThrow(() -> new BookNotFoundException());
-
-		return bookAuthorRepository.findByBookId(book.getId()).stream()
-			.map(bookAuthor -> AuthorResponse.builder()
-				.id(bookAuthor.getAuthor().getId())
-				.name(bookAuthor.getAuthor().getName())
-				.createdAt(bookAuthor.getAuthor().getCreatedAt())
-				.build())
-			.toList();
-	}
-
-	@Transactional(readOnly = true)
-	@Override
-	public List<BookInfoResponse> getBookByAuthorId(Long authorId) {
-
-		Author author = authorRepository.findById(authorId)
-			.orElseThrow(() -> new AuthorNotFoundException(authorId));
-
-		/*return bookAuthorRepository.findBooksByAuthor(author).stream()
-			.map(b -> new BookInfoResponse(b.getId()))
-			.toList();*/
-		return null;
-	}
-
-	@Override
-	public void deleteBookAuthor(Long bookId, Long authorId) {
-
-		Author author = authorRepository.findById(authorId)
-			.orElseThrow(() -> new AuthorNotFoundException(authorId));
-		Book book = bookRepository.findById(bookId)
-			.orElseThrow(() -> new BookNotFoundException());
-
-		BookAuthor ba = bookAuthorRepository.findByBookAndAuthor(book, author)
-			.orElseThrow(() -> new BookAuthorNotFoundException(bookId, authorId));
-
-		bookAuthorRepository.delete(ba);
-	}
 }

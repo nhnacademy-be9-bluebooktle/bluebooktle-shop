@@ -18,6 +18,7 @@ import shop.bluebooktle.common.dto.book.response.CategoryResponse;
 import shop.bluebooktle.common.dto.book.response.CategoryTreeResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
 import shop.bluebooktle.frontend.config.feign.FeignGlobalConfig;
+import shop.bluebooktle.frontend.config.retry.RetryWithTokenRefresh;
 
 @FeignClient(url = "${server.gateway-url}", name = "categoryRepository", path = "/api/categories", configuration = FeignGlobalConfig.class)
 public interface CategoryRepository {
@@ -33,11 +34,13 @@ public interface CategoryRepository {
 	List<CategoryTreeResponse> allCategoriesTree();
 
 	@PostMapping
+	@RetryWithTokenRefresh
 	Void addRootCategory(
 		@RequestBody RootCategoryRegisterRequest request
 	);
 
 	@PostMapping("/{parentCategoryId}")
+	@RetryWithTokenRefresh
 	void addCategory(
 		@PathVariable Long parentCategoryId,
 		@RequestBody CategoryRegisterRequest categoryRegisterRequest
@@ -49,12 +52,14 @@ public interface CategoryRepository {
 	);
 
 	@PutMapping("/{categoryId}")
+	@RetryWithTokenRefresh
 	void updateCategory(
 		@PathVariable("categoryId") Long categoryId,
 		@RequestBody CategoryUpdateRequest categoryUpdateRequest
 	);
 
 	@DeleteMapping("/{categoryId}")
+	@RetryWithTokenRefresh
 	void deleteCategory(
 		@PathVariable("categoryId") Long categoryId
 	);

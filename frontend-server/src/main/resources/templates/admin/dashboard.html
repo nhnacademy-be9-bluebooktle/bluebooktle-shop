@@ -5,6 +5,16 @@
 
 <head>
     <title th:text="${pageTitle} ?: '대시보드'"></title>
+    <style>
+        .dashboard-link {
+            color: #0d6efd; /* 파란색 계열의 링크 색상 */
+            text-decoration: none; /* 기본 상태에서는 밑줄 없음 */
+        }
+
+        .dashboard-link:hover {
+            text-decoration: underline; /* 마우스를 올렸을 때 밑줄 표시 */
+        }
+    </style>
 </head>
 
 <body>
@@ -16,7 +26,7 @@
         </h1>
     </div>
 
-    <div class="admin-panel">
+    <div class="admin-panel" th:if="${dashboardStatus != null}">
         <div class="admin-panel__header">
             주요 현황
         </div>
@@ -26,35 +36,40 @@
                 <div class="admin-panel" style="flex: 1;">
                     <div class="admin-panel__body" style="text-align: center;">
                         <h3>총 회원 수</h3>
-                        <p style="font-size: 2em; font-weight: bold;">1,234</p>
+                        <p style="font-size: 2em; font-weight: bold;">
+                            <a class="dashboard-link" th:href="@{/admin/members}"
+                               th:text="${dashboardStatus.totalUserCount}">1,234</a>
+                        </p>
                     </div>
                 </div>
                 <div class="admin-panel" style="flex: 1;">
                     <div class="admin-panel__body" style="text-align: center;">
                         <h3>오늘 주문 수</h3>
-                        <p style="font-size: 2em; font-weight: bold;">56</p>
+                        <p style="font-size: 2em; font-weight: bold;">
+                            <a class="dashboard-link" th:href="@{/admin/orders}"
+                               th:text="${dashboardStatus.todayOrderCount}">56</a>
+                        </p>
                     </div>
                 </div>
                 <div class="admin-panel" style="flex: 1;">
                     <div class="admin-panel__body" style="text-align: center;">
-                        <h3>미처리 문의</h3>
-                        <p style="font-size: 2em; font-weight: bold;">7</p>
+                        <h3>미처리 주문</h3>
+                        <p style="font-size: 2em; font-weight: bold;">
+                            <a class="dashboard-link" th:href="@{/admin/orders}"
+                               th:text="${dashboardStatus.pendingOrderCount}">7</a>
+                        </p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="admin-panel">
+    <div class="admin-panel" th:if="${dashboardStatus == null}">
         <div class="admin-panel__header">
-            최근 활동 로그
+            주요 현황
         </div>
         <div class="admin-panel__body">
-            <ul style="list-style: none; padding: 0;">
-                <li>[2025-05-19 00:30:15] 새 도서 등록: "스프링 부트 마스터"</li>
-                <li>[2025-05-19 00:25:40] 회원 등급 변경: 'user123' (일반 -> VIP)</li>
-                <li>[2025-05-18 23:50:02] 카테고리 수정: "소설" -> "현대 소설"</li>
-            </ul>
+            <p>현황 데이터를 불러오는 데 실패했습니다.</p>
         </div>
     </div>
 </div>

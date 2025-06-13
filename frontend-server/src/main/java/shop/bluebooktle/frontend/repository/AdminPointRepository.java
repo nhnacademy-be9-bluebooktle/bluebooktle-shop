@@ -19,6 +19,7 @@ import shop.bluebooktle.common.dto.point.response.PointPolicyResponse;
 import shop.bluebooktle.common.dto.point.response.PointRuleResponse;
 import shop.bluebooktle.common.dto.point.response.PointSourceTypeResponse;
 import shop.bluebooktle.frontend.config.feign.FeignGlobalConfig;
+import shop.bluebooktle.frontend.config.retry.RetryWithTokenRefresh;
 
 @FeignClient(
 	url = "${server.gateway-url}",
@@ -29,37 +30,48 @@ import shop.bluebooktle.frontend.config.feign.FeignGlobalConfig;
 public interface AdminPointRepository {
 
 	@PostMapping("/policies")
+	@RetryWithTokenRefresh
 	Long createPolicy(@RequestBody PointPolicyCreateRequest req);
 
 	@GetMapping("/policies/{id}")
+	@RetryWithTokenRefresh
 	PointPolicyResponse getPolicy(@PathVariable("id") Long id);
 
 	@PutMapping("/policies")
+	@RetryWithTokenRefresh
 	Void updatePolicy(@RequestBody PointPolicyUpdateRequest req);
 
 	@DeleteMapping("/policies/{id}")
+	@RetryWithTokenRefresh
 	Void deletePolicy(@PathVariable("id") Long id);
 
 	@GetMapping("/policies")
+	@RetryWithTokenRefresh
 	List<PointPolicyResponse> getAllPolicies();
 
 	@GetMapping("/rules")
+	@RetryWithTokenRefresh
 	List<PointRuleResponse> getAllRules();
 
 	@GetMapping("/rules/type")
+	@RetryWithTokenRefresh
 	PointRuleResponse getRuleByType(@RequestParam PointSourceTypeEnum pointSourceTypeEnum);
 
 	@PostMapping("/source")
+	@RetryWithTokenRefresh
 	Long createSourceType(@RequestBody PointSourceTypeCreateRequest req);
 
 	@GetMapping("/source/{id}")
+	@RetryWithTokenRefresh
 	PointSourceTypeResponse getSourceType(@PathVariable("id") Long id);
 
 	@GetMapping("/source")
+	@RetryWithTokenRefresh
 	List<PointSourceTypeResponse> getAllSourceTypes(
 		@RequestParam(value = "actionType", required = false) String actionType);
 
 	@DeleteMapping("/source/{id}")
+	@RetryWithTokenRefresh
 	Void deleteSourceType(@PathVariable("id") Long id);
 
 }

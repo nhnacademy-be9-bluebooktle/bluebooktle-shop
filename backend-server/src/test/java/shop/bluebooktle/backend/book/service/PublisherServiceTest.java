@@ -44,7 +44,7 @@ public class PublisherServiceTest {
 
 	@Test
 	@DisplayName("출판사 등록 성공")
-	void registerPublisher_Success() {
+	void registerPublisher_success() {
 		// Given: 출판사 이름이 중복되지 않은 경우
 		PublisherRequest request = new PublisherRequest("New Publisher");
 		when(publisherRepository.existsByName(request.getName())).thenReturn(false);
@@ -58,7 +58,7 @@ public class PublisherServiceTest {
 
 	@Test
 	@DisplayName("출판사 등록 실패 - 출판사 이름중복")
-	void registerPublisher_Fail_AlreadyExists() {
+	void registerPublisher_fail_alreadyExists() {
 		// Given: 이미 존재하는 출판사 이름이 주어진 경우
 		PublisherRequest request = new PublisherRequest("Existing Publisher");
 		when(publisherRepository.existsByName(request.getName())).thenReturn(true);
@@ -70,7 +70,7 @@ public class PublisherServiceTest {
 
 	@Test
 	@DisplayName("출판사 수정 성공")
-	void updatePublisher_Success() {
+	void updatePublisher_success() {
 		// Given: 존재하는 출판사 ID와 새로운 이름이 주어진 경우
 		Long publisherId = 1L;
 		PublisherRequest request = new PublisherRequest("Updated Publisher");
@@ -87,7 +87,7 @@ public class PublisherServiceTest {
 
 	@Test
 	@DisplayName("출판사 수정 실패 - 출판사 존재X")
-	void updatePublisher_Fail_NotFound() {
+	void updatePublisher_fail_notFound() {
 		// Given: 존재하지 않는 출판사 ID가 주어진 경우
 		Long publisherId = 1L;
 		PublisherRequest request = new PublisherRequest("Updated Publisher");
@@ -99,8 +99,24 @@ public class PublisherServiceTest {
 	}
 
 	@Test
+	@DisplayName("출판사 수정 실패 - 출판사 이미 존재")
+	void updatePublisher_fail_alreadyExists() {
+		// Given
+		Long publisherId = 1L;
+		PublisherRequest request = new PublisherRequest("Updated Publisher");
+		Publisher publisher = Publisher.builder().id(publisherId).name("Old Name").build();
+		when(publisherRepository.findById(publisherId)).thenReturn(Optional.of(publisher));
+		when(publisherRepository.existsByName(request.getName())).thenReturn(true);
+
+		// When: updatePublisher 메서드를 호출할 때
+		// Then: PublisherNotFoundException 예외가 발생
+		assertThrows(PublisherAlreadyExistsException.class,
+			() -> publisherService.updatePublisher(publisherId, request));
+	}
+
+	@Test
 	@DisplayName("출판사 조회 성공")
-	void getPublisher_Success() {
+	void getPublisher_success() {
 		// Given: 존재하는 출판사 ID가 주어진 경우
 		Long publisherId = 1L;
 		Publisher publisher = Publisher.builder().id(publisherId).name("Publisher Name").build();
@@ -116,7 +132,7 @@ public class PublisherServiceTest {
 
 	@Test
 	@DisplayName("출판사 조회 실패 - 출판사 존재X")
-	void getPublisher_Fail_NotFound() {
+	void getPublisher_fail_notFound() {
 		// Given: 존재하지 않는 출판사 ID가 주어진 경우
 		Long publisherId = 1L;
 		when(publisherRepository.findById(publisherId)).thenReturn(Optional.empty());
@@ -128,7 +144,7 @@ public class PublisherServiceTest {
 
 	@Test
 	@DisplayName("출판사 목록 조회 성공")
-	void getPublishers_Success() {
+	void getPublishers_success() {
 		// Given: 출판사가 하나 이상 존재하는 경우
 		PageRequest pageable = PageRequest.of(0, 10);
 		Publisher publisher = Publisher.builder().id(1L).name("Publisher Name").build();
@@ -145,7 +161,7 @@ public class PublisherServiceTest {
 
 	@Test
 	@DisplayName("출판사 삭제 성공")
-	void deletePublisher_Success() {
+	void deletePublisher_success() {
 		// Given: 존재하는 출판사 ID가 주어진 경우, 해당 출판사와 관련된 도서가 없는 경우
 		Long publisherId = 1L;
 		Publisher publisher = Publisher.builder().id(publisherId).name("Publisher Name").build();
@@ -161,7 +177,7 @@ public class PublisherServiceTest {
 
 	@Test
 	@DisplayName("출판사 삭제 실패 - 출판사에 연결된 도서 존재")
-	void deletePublisher_Fail_HasBooks() {
+	void deletePublisher_fail_hasBooks() {
 		// Given: 존재하는 출판사 ID가 주어진 경우, 해당 출판사에 관련된 도서가 있는 경우
 		Long publisherId = 1L;
 		Publisher publisher = Publisher.builder().id(publisherId).name("Publisher Name").build();
@@ -175,7 +191,7 @@ public class PublisherServiceTest {
 
 	@Test
 	@DisplayName("출판사 이름으로 등록 성공")
-	void registerPublisherByName_Success_NewPublisher() {
+	void registerPublisherByName_success_newPublisher() {
 		// Given: 새로운 출판사 이름이 주어진 경우
 		String publisherName = "New Publisher";
 
@@ -202,7 +218,7 @@ public class PublisherServiceTest {
 
 	@Test
 	@DisplayName("출판사 이름으로 등록 실패 - 출판사 이름 이미 존재")
-	void registerPublisherByName_Success_ExistingPublisher() {
+	void registerPublisherByName_success_existingPublisher() {
 		// Given: 이미 존재하는 출판사 이름이 주어진 경우
 		String publisherName = "Existing Publisher";
 		Publisher publisher = Publisher.builder().id(1L).name(publisherName).build();
@@ -215,5 +231,21 @@ public class PublisherServiceTest {
 		assertEquals(1L, response.getId());
 		assertEquals(publisherName, response.getName());
 		verify(publisherRepository, never()).save(any(Publisher.class));
+	}
+
+	@Test
+	@DisplayName("검색어로 출판사 조회 - 성공")
+	void searchPublishers_success() {
+		String keyword = "졸음폭탄";
+		PageRequest pageable = PageRequest.of(0, 10);
+		Publisher publisher = Publisher.builder().id(1L).name("졸음폭탄출판사").build();
+		Page<Publisher> publishers = new PageImpl<>(Collections.singletonList(publisher));
+		when(publisherRepository.searchByNameContaining(keyword, pageable)).thenReturn(publishers);
+
+		Page<PublisherInfoResponse> response = publisherService.searchPublishers(keyword, pageable);
+
+		assertEquals(1, response.getTotalElements());
+		assertEquals("졸음폭탄출판사", response.getContent().get(0).getName());
+		verify(publisherRepository, times(1)).searchByNameContaining(keyword, pageable);
 	}
 }
