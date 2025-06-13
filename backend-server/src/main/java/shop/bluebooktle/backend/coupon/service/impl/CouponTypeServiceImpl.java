@@ -28,8 +28,7 @@ public class CouponTypeServiceImpl implements CouponTypeService {
 	private final RelativeCouponRepository relativeCouponRepository;
 
 	@Override
-	public void registerCouponType(CouponTypeRegisterRequest request) { // 쿠폰 정책 등록
-		//이름 중복 예외처리
+	public void registerCouponType(CouponTypeRegisterRequest request) {
 		couponTypeRepository.findByName(request.getName())
 			.ifPresent(couponType -> {
 				throw new CouponTypeNameAlreadyException();
@@ -60,12 +59,11 @@ public class CouponTypeServiceImpl implements CouponTypeService {
 					.build()
 			);
 		} else {
-			throw new InvalidInputValueException("절대값 또는 상대값 할인 정보 중 하나는 필수입니다.");
+			throw new InvalidInputValueException("정액/정률 정보 중 하나는 필수입니다.");
 		}
 
 	}
 
-	//쿠폰 정책 전체 조회
 	@Override
 	@Transactional(readOnly = true)
 	public Page<CouponTypeResponse> getAllCouponTypeList(Pageable pageable) {

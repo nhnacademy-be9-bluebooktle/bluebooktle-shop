@@ -40,7 +40,7 @@ public class CouponTypeController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(JsendResponse.success());
 	}
 
-	@Operation(summary = "쿠폰 정책 조회", description = "등록된 쿠폰 정책을 조회합니다.")
+	@Operation(summary = "쿠폰 정책 전체 조회", description = "등록된 쿠폰 정책을 조회합니다.")
 	@GetMapping
 	@Auth(type = UserType.ADMIN)
 	public ResponseEntity<JsendResponse<PaginationData<CouponTypeResponse>>> findAllCouponTypeList(
