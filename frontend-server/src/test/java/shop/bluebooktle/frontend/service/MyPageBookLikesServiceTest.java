@@ -82,4 +82,55 @@ public class MyPageBookLikesServiceTest {
 		// then
 		then(myPageBookLikesRepository).should().unlike(bookId);
 	}
+
+	@Test
+	@DisplayName("전체 좋아요가 없는 경우 – 빈 페이지 반환")
+	void getMyPageBookLikes_emptyList() {
+		// given: 좋아요 내역이 전혀 없음
+		given(myPageBookLikesRepository.getMyPageBookLikes()).willReturn(List.of());
+
+		int page = 0;
+		int size = 5;
+
+		// when
+		PaginationData<BookLikesListResponse> result = myPageBookLikesService.getMyPageBookLikes(page, size);
+
+		// then
+		assertThat(result.getPagination().getTotalElements()).isEqualTo(0);   // 전체 0건
+		assertThat(result.getContent().size()).isEqualTo(0);                 // 내용도 0건
+	}
+
+	@Test
+	@DisplayName("페이지 범위를 벗어난 요청 – 내용이 비어 있음")
+	void getMyPageBookLikes_pageOutOfRange() {
+		// given: 총 2건의 좋아요가 존재
+		List<BookLikesListResponse> allLikes = List.of(
+			BookLikesListResponse.builder()
+				.bookId(1L)
+				.bookName("도서1")
+				.authorName(List.of("작가1"))
+				.imgUrl("http://book1.png")
+				.price(new BigDecimal("10000"))
+				.build(),
+			BookLikesListResponse.builder()
+				.bookId(2L)
+				.bookName("도서2")
+				.authorName(List.of("작가2"))
+				.imgUrl("http://book2.png")
+				.price(new BigDecimal("15000"))
+				.build()
+		);
+		given(myPageBookLikesRepository.getMyPageBookLikes()).willReturn(allLikes);
+
+		int page = 3;   // start = page*size = 6  > likesList.size() = 2
+		int size = 2;
+
+		// when
+		PaginationData<BookLikesListResponse> result = myPageBookLikesService.getMyPageBookLikes(page, size);
+
+		// then
+		assertThat(result.getPagination().getTotalElements()).isEqualTo(2);  // 전체 2건
+		assertThat(result.getPagination().getCurrentPage()).isEqualTo(3);    // 요청한 page
+		assertThat(result.getContent().size()).isEqualTo(0);                 // 내용은 비어 있어야 함
+	}
 }
