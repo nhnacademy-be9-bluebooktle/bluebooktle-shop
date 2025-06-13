@@ -18,6 +18,7 @@ import shop.bluebooktle.common.dto.point.response.PointPolicyResponse;
 import shop.bluebooktle.common.dto.point.response.PointRuleResponse;
 import shop.bluebooktle.common.dto.point.response.PointSourceTypeResponse;
 import shop.bluebooktle.frontend.config.feign.FeignGlobalConfig;
+import shop.bluebooktle.frontend.config.retry.RetryWithTokenRefresh;
 
 @FeignClient(
 	url = "${server.gateway-url}",
@@ -28,15 +29,18 @@ import shop.bluebooktle.frontend.config.feign.FeignGlobalConfig;
 public interface PointRepository {
 
 	@PostMapping("/policies")
+	@RetryWithTokenRefresh
 	Long createPolicy(@RequestBody PointPolicyCreateRequest req);
 
 	@GetMapping("/policies/{id}")
 	PointPolicyResponse getPolicy(@PathVariable("id") Long id);
 
 	@PutMapping("/policies")
+	@RetryWithTokenRefresh
 	Void updatePolicy(@RequestBody PointPolicyUpdateRequest req);
 
 	@DeleteMapping("/policies/{id}")
+	@RetryWithTokenRefresh
 	Void deletePolicy(@PathVariable("id") Long id);
 
 	@GetMapping("/policies")
@@ -46,6 +50,7 @@ public interface PointRepository {
 	List<PointRuleResponse> getAllRules();
 
 	@PostMapping("/source")
+	@RetryWithTokenRefresh
 	Long createSourceType(@RequestBody PointSourceTypeCreateRequest req);
 
 	@GetMapping("/source/{id}")
@@ -56,6 +61,7 @@ public interface PointRepository {
 		@RequestParam(value = "actionType", required = false) String actionType);
 
 	@DeleteMapping("/source/{id}")
+	@RetryWithTokenRefresh
 	Void deleteSourceType(@PathVariable("id") Long id);
 
 }

@@ -13,11 +13,13 @@ import shop.bluebooktle.common.dto.book.request.PublisherRequest;
 import shop.bluebooktle.common.dto.book.response.PublisherInfoResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
 import shop.bluebooktle.frontend.config.feign.FeignGlobalConfig;
+import shop.bluebooktle.frontend.config.retry.RetryWithTokenRefresh;
 
 @FeignClient(url = "${server.gateway-url}", name = "adminPublisherRepository", path = "/api/publishers", configuration = FeignGlobalConfig.class)
 public interface AdminPublisherRepository {
 	// 출판사 조회
 	@GetMapping
+	@RetryWithTokenRefresh
 	PaginationData<PublisherInfoResponse> getPublishers(
 		@RequestParam("page") int page,
 		@RequestParam("size") int size,
@@ -26,14 +28,17 @@ public interface AdminPublisherRepository {
 
 	// 출판사ID로 단일 조회
 	@GetMapping("/{publisherId}")
+	@RetryWithTokenRefresh
 	PublisherInfoResponse getPublisher(@PathVariable("publisherId") Long id);
 
 	// 출판사 등록
 	@PostMapping
+	@RetryWithTokenRefresh
 	void createPublisher(@RequestBody PublisherRequest request);
 
 	// 출판사명 수정
 	@PutMapping("/{publisherId}")
+	@RetryWithTokenRefresh
 	void updatePublisher(
 		@PathVariable("publisherId") Long id,
 		@RequestBody PublisherRequest request
@@ -41,6 +46,7 @@ public interface AdminPublisherRepository {
 
 	// 출판사 삭제
 	@DeleteMapping("/{publisherId}")
+	@RetryWithTokenRefresh
 	void deletePublisher(@PathVariable("publisherId") Long id);
 }
 

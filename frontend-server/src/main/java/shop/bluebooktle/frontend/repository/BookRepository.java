@@ -13,6 +13,7 @@ import shop.bluebooktle.common.dto.book.response.BookInfoResponse;
 import shop.bluebooktle.common.dto.book.response.BookLikesResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
 import shop.bluebooktle.frontend.config.feign.FeignGlobalConfig;
+import shop.bluebooktle.frontend.config.retry.RetryWithTokenRefresh;
 
 @FeignClient(name = "backend-server", contextId = "bookRepository", path = "/api/books", configuration = FeignGlobalConfig.class)
 public interface BookRepository {
@@ -31,14 +32,17 @@ public interface BookRepository {
 
 	// 좋아요 등록
 	@PostMapping("/{bookId}/likes")
+	@RetryWithTokenRefresh
 	Void likeBook(@PathVariable("bookId") Long bookId);
 
 	// 좋아요 취소
 	@DeleteMapping("/{bookId}/likes")
+	@RetryWithTokenRefresh
 	Void unlikeBook(@PathVariable("bookId") Long bookId);
 
 	// 좋아요 여부 확인
 	@GetMapping("/{bookId}/likes/status")
+	@RetryWithTokenRefresh
 	BookLikesResponse isLiked(@PathVariable("bookId") Long bookId);
 
 	// 좋아요 수 확인
