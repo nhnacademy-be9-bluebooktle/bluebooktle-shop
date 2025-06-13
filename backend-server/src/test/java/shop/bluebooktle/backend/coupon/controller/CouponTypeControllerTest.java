@@ -34,7 +34,7 @@ import shop.bluebooktle.common.security.AuthUserLoader;
 import shop.bluebooktle.common.util.JwtUtil;
 
 @WebMvcTest(controllers = CouponTypeController.class)
-@AutoConfigureMockMvc(addFilters = false) //Security 필터 비활성화
+@AutoConfigureMockMvc(addFilters = false)
 @ActiveProfiles("test")
 class CouponTypeControllerTest {
 

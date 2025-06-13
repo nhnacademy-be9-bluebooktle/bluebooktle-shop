@@ -4,6 +4,9 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import lombok.Builder;
+
+@Builder
 public record BookInfoResponse(
 	Long bookId,
 	String title,

@@ -27,6 +27,7 @@ import shop.bluebooktle.common.dto.book.request.author.AuthorRegisterRequest;
 import shop.bluebooktle.common.dto.book.request.author.AuthorUpdateRequest;
 import shop.bluebooktle.common.dto.book.response.author.AuthorResponse;
 import shop.bluebooktle.common.exception.book.AuthorAlreadyExistsException;
+import shop.bluebooktle.common.exception.book.AuthorCannotDeleteException;
 import shop.bluebooktle.common.exception.book.AuthorNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
@@ -125,7 +126,7 @@ public class AuthorServiceTest {
 
 	@Test
 	@DisplayName("작가 수정 실패 - 유효하지 않은 ID")
-	void updateAuthor_fail_not_found() {
+	void updateAuthor_fail_not_valid_id() {
 		Long authorId = 999L;
 		AuthorUpdateRequest authorUpdateRequest = AuthorUpdateRequest.builder()
 			.name("청길동")
@@ -134,6 +135,28 @@ public class AuthorServiceTest {
 		when(authorRepository.findById(authorId)).thenReturn(Optional.empty());
 
 		assertThrows(AuthorNotFoundException.class, () -> authorService.updateAuthor(authorId, authorUpdateRequest));
+	}
+
+	@Test
+	@DisplayName("작가 수정 실패 - 동일한 이름으로 수정 요청")
+	void updateAuthor_fail_not_valid_name() {
+
+		Long authorId = 1L;
+
+		AuthorUpdateRequest authorUpdateRequest = AuthorUpdateRequest.builder()
+			.name("홍길동")
+			.build();
+
+		Author author = Author.builder()
+			.name("홍길동")
+			.build();
+		ReflectionTestUtils.setField(author, "id", authorId);
+
+		when(authorRepository.findById(authorId)).thenReturn(Optional.of(author));
+		when(authorRepository.existsByName("홍길동")).thenReturn(true);
+
+		assertThrows(AuthorAlreadyExistsException.class, () -> authorService.updateAuthor(authorId, authorUpdateRequest));
+
 	}
 
 	// 작가 삭제
@@ -163,6 +186,23 @@ public class AuthorServiceTest {
 		when(authorRepository.findById(authorId)).thenReturn(Optional.empty());
 
 		assertThrows(AuthorNotFoundException.class, () -> authorService.deleteAuthor(authorId));
+	}
+
+	@Test
+	@DisplayName("작가 삭제 실패 - 출판사에 등록된 도서가 있는 경우")
+	void deleteAuthor_fail_book_exists() {
+		Long authorId = 1L;
+		Author author = Author.builder()
+			.name("홍길동")
+			.build();
+
+		ReflectionTestUtils.setField(author, "id", authorId);
+
+		when(authorRepository.findById(authorId)).thenReturn(Optional.of(author));
+		when(bookAuthorRepository.existsByAuthor(author)).thenReturn(true);
+
+		assertThrows(AuthorCannotDeleteException.class, () -> authorService.deleteAuthor(authorId));
+
 	}
 
 	// 이름으로 작가 등록

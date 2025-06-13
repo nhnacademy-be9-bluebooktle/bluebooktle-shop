@@ -5,9 +5,6 @@ import java.util.List;
 
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.NonTransientResourceException;
-import org.springframework.batch.item.ParseException;
-import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
@@ -24,7 +21,7 @@ public class DirectCouponReader implements ItemReader<User> {
 	private Iterator<User> userIterator;
 
 	@Override
-	public User read() throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException {
+	public User read() {
 		if (userIterator == null) {
 			List<User> users = userRepository.findByStatus(UserStatus.ACTIVE);
 			userIterator = users.iterator();
