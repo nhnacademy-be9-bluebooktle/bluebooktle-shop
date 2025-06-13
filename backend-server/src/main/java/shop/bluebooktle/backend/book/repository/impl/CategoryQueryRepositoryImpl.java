@@ -1,6 +1,7 @@
 package shop.bluebooktle.backend.book.repository.impl;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -43,18 +44,12 @@ public class CategoryQueryRepositoryImpl implements CategoryQueryRepository {
 			.fetch();
 
 		// 전체 개수 카운트 (페이징용 total)
-		Long total = queryFactory
-			.select(category.count())
-			.from(category)
-			.where(where)
-			.fetchOne();
-
-		long totalCount; // total 이 null 인지 아닌지 검사
-		if (total == null) {
-			totalCount = 0;
-		} else {
-			totalCount = total;
-		}
+		long totalCount = Optional.ofNullable(
+			queryFactory.select(category.count())
+				.from(category)
+				.where(where)
+				.fetchOne()
+		).orElse(0L);
 
 		return new PageImpl<>(content, pageable, totalCount);
 	}
