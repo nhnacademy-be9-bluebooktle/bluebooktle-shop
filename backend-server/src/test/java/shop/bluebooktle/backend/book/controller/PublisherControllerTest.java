@@ -14,6 +14,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
@@ -134,7 +135,7 @@ class PublisherControllerTest {
 			1
 		);
 
-		when(publisherService.searchPublishers(eq(searchKeyword), any(PageRequest.class))).thenReturn(page);
+		when(publisherService.searchPublishers(eq(searchKeyword), any(Pageable.class))).thenReturn(page);
 
 		mockMvc.perform(get("/api/publishers")
 				.param("page", "0")
@@ -144,7 +145,7 @@ class PublisherControllerTest {
 			.andExpect(jsonPath("$.status").value("success"))
 			.andExpect(jsonPath("$.data.content[0].name").value("한꿈출판사"));
 
-		verify(publisherService, times(1)).searchPublishers(eq(searchKeyword), any(PageRequest.class));
+		verify(publisherService, times(1)).searchPublishers(eq(searchKeyword), any(Pageable.class));
 	}
 
 	@Test
@@ -161,7 +162,7 @@ class PublisherControllerTest {
 			1
 		);
 
-		when(publisherService.getPublishers(any(PageRequest.class))).thenReturn(page);
+		when(publisherService.getPublishers(any(Pageable.class))).thenReturn(page);
 
 		mockMvc.perform(get("/api/publishers")
 				.param("page", "0")
@@ -170,7 +171,7 @@ class PublisherControllerTest {
 			.andExpect(jsonPath("$.status").value("success"))
 			.andExpect(jsonPath("$.data.content[0].name").value("한꿈출판사"));
 
-		verify(publisherService, times(1)).getPublishers(any(PageRequest.class));
+		verify(publisherService, times(1)).getPublishers(any(Pageable.class));
 	}
 
 	@Test
@@ -187,7 +188,7 @@ class PublisherControllerTest {
 			1
 		);
 
-		when(publisherService.getPublishers(any(PageRequest.class))).thenReturn(page);
+		when(publisherService.getPublishers(any(Pageable.class))).thenReturn(page);
 
 		mockMvc.perform(get("/api/publishers")
 				.param("page", "0")
@@ -197,6 +198,6 @@ class PublisherControllerTest {
 			.andExpect(jsonPath("$.status").value("success"))
 			.andExpect(jsonPath("$.data.content[0].name").value("한꿈출판사"));
 
-		verify(publisherService, times(1)).getPublishers(any(PageRequest.class));
+		verify(publisherService, times(1)).getPublishers(any(Pageable.class));
 	}
 }

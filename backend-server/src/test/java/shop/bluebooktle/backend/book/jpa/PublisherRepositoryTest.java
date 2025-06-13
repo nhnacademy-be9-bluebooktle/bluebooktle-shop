@@ -22,7 +22,6 @@ import shop.bluebooktle.backend.config.QueryDslConfig;
 import shop.bluebooktle.common.converter.ProfileAwareStringCryptoConverter;
 import shop.bluebooktle.common.util.CryptoUtils;
 
-// TODO PublisherQueryRepository 테스트코드 구현
 @DataJpaTest
 @ActiveProfiles("test")
 @Import({QueryDslConfig.class, JpaAuditingConfiguration.class, CryptoUtils.class,
