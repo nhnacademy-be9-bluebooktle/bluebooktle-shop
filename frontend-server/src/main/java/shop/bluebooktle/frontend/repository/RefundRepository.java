@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import shop.bluebooktle.common.dto.refund.request.RefundCreateRequest;
 import shop.bluebooktle.frontend.config.feign.FeignGlobalConfig;
+import shop.bluebooktle.frontend.config.retry.RetryWithTokenRefresh;
 
 @FeignClient(
 	url = "${server.gateway-url}",
@@ -16,5 +17,6 @@ import shop.bluebooktle.frontend.config.feign.FeignGlobalConfig;
 public interface RefundRepository {
 
 	@PostMapping("/request")
+	@RetryWithTokenRefresh
 	Void requestRefund(@RequestBody RefundCreateRequest request);
 }
