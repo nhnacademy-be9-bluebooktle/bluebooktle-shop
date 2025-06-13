@@ -1,0 +1,37 @@
+<svg width="242" height="40" viewBox="6 10 240 40" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <style>
+            .logo-main-text-bright { fill: #faf0d7; }
+            .logo-book-fill { fill: #119EC2; }
+            .logo-shadow-fill { fill: #4A3B31; }
+            .logo-icon-accent { fill: #C2255C; }
+            .logo-icon-pages { fill: #F8F0E3; }
+            .logo-icon-cover { fill: #106175; }
+            .icon-stroke { stroke: #4A3B31; }
+
+            .font-display-bold {
+                font-family: 'Black Han Sans', Impact, sans-serif;
+                font-weight: 900;
+                letter-spacing: 1px; /* 글자 '내부'의 간격은 이 속성으로 제어됩니다 */
+            }
+        </style>
+    </defs>
+
+    <g transform="translate(30 30) rotate(-8) scale(0.75)">
+        <g transform="translate(2.5 2.5)">
+            <rect x="-28" y="-20" width="56" height="38" rx="3" ry="3" class="logo-shadow-fill"/>
+        </g>
+        <rect x="-28" y="-20" width="56" height="38" rx="3" ry="3" class="logo-icon-cover icon-stroke" stroke-width="2"/>
+        <rect x="-22" y="-15" width="44" height="28" rx="1" ry="1" class="logo-icon-pages"/>
+        <line x1="0" y1="-20" x2="0" y2="18" class="icon-stroke" stroke-width="2.5"/>
+        <path d="M 8 -20 L 8 0 L 13 -5 L 18 0 L 18 -20 Z" class="logo-icon-accent icon-stroke" stroke-width="1.5"/>
+    </g>
+
+    <text x="148" y="40" class="font-display-bold" font-size="32" text-anchor="middle">
+        <tspan class="logo-shadow-fill">Blue</tspan><tspan class="logo-shadow-fill">Book</tspan><tspan class="logo-shadow-fill">tle</tspan>
+    </text>
+
+    <text x="146" y="38" class="font-display-bold" font-size="32" text-anchor="middle">
+        <tspan class="logo-main-text-bright">Blue</tspan><tspan class="logo-book-fill">Book</tspan><tspan class="logo-main-text-bright">tle</tspan>
+    </text>
+</svg>
