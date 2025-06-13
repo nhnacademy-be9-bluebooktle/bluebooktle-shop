@@ -39,8 +39,6 @@ class PackagingOptionRepositoryTest {
 	@Autowired
 	private PackagingOptionRepository packagingOptionRepository;
 
-	private PackagingOptionQueryRepositoryImpl repository;
-
 	@Autowired
 	private EntityManager em;
 
