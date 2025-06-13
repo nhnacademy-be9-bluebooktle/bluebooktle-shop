@@ -5,7 +5,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import java.util.Arrays;
+import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,6 +14,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
@@ -25,7 +26,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import shop.bluebooktle.backend.book.service.PublisherService;
 import shop.bluebooktle.common.dto.book.request.PublisherRequest;
 import shop.bluebooktle.common.dto.book.response.PublisherInfoResponse;
-import shop.bluebooktle.common.dto.common.PaginationData;
 import shop.bluebooktle.common.security.AuthUserLoader;
 import shop.bluebooktle.common.util.JwtUtil;
 
@@ -51,7 +51,7 @@ class PublisherControllerTest {
 	@Test
 	@DisplayName("출판사 등록 성공")
 	@WithMockUser
-	void testAddPublisher() throws Exception {
+	void addPublisher() throws Exception {
 		PublisherRequest request = PublisherRequest.builder()
 			.name("New Publisher")
 			.build();
@@ -69,7 +69,7 @@ class PublisherControllerTest {
 	@Test
 	@DisplayName("출판사 수정 성공")
 	@WithMockUser
-	void testUpdatePublisher() throws Exception {
+	void updatePublisher() throws Exception {
 		Long publisherId = 1L;
 		PublisherRequest request = PublisherRequest.builder()
 			.name("Updated Publisher")
@@ -88,7 +88,7 @@ class PublisherControllerTest {
 	@Test
 	@DisplayName("출판사 삭제 성공")
 	@WithMockUser
-	void testDeletePublisher() throws Exception {
+	void deletePublisher() throws Exception {
 		Long publisherId = 1L;
 
 		mockMvc.perform(delete("/api/publishers/{publisherId}", publisherId).with(csrf()))
@@ -101,7 +101,7 @@ class PublisherControllerTest {
 	@Test
 	@DisplayName("출판사 조회 성공")
 	@WithMockUser
-	void testGetPublisher() throws Exception {
+	void getPublisher() throws Exception {
 		Long publisherId = 1L;
 		PublisherInfoResponse response = PublisherInfoResponse.builder()
 			.id(publisherId)
@@ -120,38 +120,84 @@ class PublisherControllerTest {
 	}
 
 	@Test
-	@DisplayName("출판사 목록 조회 성공")
+	@DisplayName("출판사 목록 조회 - 검색어가 있는 경우")
 	@WithMockUser
-	void testGetPublishers() throws Exception {
-		PublisherInfoResponse publisher1 = PublisherInfoResponse.builder()
+	void getPublishersWithSearchKeyword() throws Exception {
+		String searchKeyword = "한꿈";
+
+		PublisherInfoResponse publisher = PublisherInfoResponse.builder()
 			.id(1L)
-			.name("Publisher 1")
+			.name("한꿈출판사")
 			.build();
-
-		PublisherInfoResponse publisher2 = PublisherInfoResponse.builder()
-			.id(2L)
-			.name("Publisher 2")
-			.build();
-
 		Page<PublisherInfoResponse> page = new PageImpl<>(
-			Arrays.asList(publisher1, publisher2),
+			List.of(publisher),
 			PageRequest.of(0, 10),
-			2
+			1
 		);
-		PaginationData<PublisherInfoResponse> paginationData = new PaginationData<>(page);
 
-		when(publisherService.getPublishers(any(PageRequest.class))).thenReturn(page);
+		when(publisherService.searchPublishers(eq(searchKeyword), any(Pageable.class))).thenReturn(page);
+
+		mockMvc.perform(get("/api/publishers")
+				.param("page", "0")
+				.param("size", "10")
+				.param("searchKeyword", searchKeyword))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.status").value("success"))
+			.andExpect(jsonPath("$.data.content[0].name").value("한꿈출판사"));
+
+		verify(publisherService, times(1)).searchPublishers(eq(searchKeyword), any(Pageable.class));
+	}
+
+	@Test
+	@DisplayName("출판사 목록 조회 - 검색어가 null인 경우")
+	@WithMockUser
+	void getPublishersWithoutSearchKeyword() throws Exception {
+		PublisherInfoResponse publisher = PublisherInfoResponse.builder()
+			.id(1L)
+			.name("한꿈출판사")
+			.build();
+		Page<PublisherInfoResponse> page = new PageImpl<>(
+			List.of(publisher),
+			PageRequest.of(0, 10),
+			1
+		);
+
+		when(publisherService.getPublishers(any(Pageable.class))).thenReturn(page);
 
 		mockMvc.perform(get("/api/publishers")
 				.param("page", "0")
 				.param("size", "10"))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.status").value("success"))
-			.andExpect(jsonPath("$.data.content[0].id").value(1))
-			.andExpect(jsonPath("$.data.content[0].name").value("Publisher 1"))
-			.andExpect(jsonPath("$.data.content[1].id").value(2))
-			.andExpect(jsonPath("$.data.content[1].name").value("Publisher 2"));
+			.andExpect(jsonPath("$.data.content[0].name").value("한꿈출판사"));
 
-		verify(publisherService, times(1)).getPublishers(any(PageRequest.class));
+		verify(publisherService, times(1)).getPublishers(any(Pageable.class));
+	}
+
+	@Test
+	@DisplayName("출판사 목록 조회 - 검색어가 blank인 경우")
+	@WithMockUser
+	void getPublishersWithBlankSearchKeyword() throws Exception {
+		PublisherInfoResponse publisher = PublisherInfoResponse.builder()
+			.id(1L)
+			.name("한꿈출판사")
+			.build();
+		Page<PublisherInfoResponse> page = new PageImpl<>(
+			List.of(publisher),
+			PageRequest.of(0, 10),
+			1
+		);
+
+		when(publisherService.getPublishers(any(Pageable.class))).thenReturn(page);
+
+		mockMvc.perform(get("/api/publishers")
+				.param("page", "0")
+				.param("size", "10")
+				.param("searchKeyword", "  "))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.status").value("success"))
+			.andExpect(jsonPath("$.data.content[0].name").value("한꿈출판사"));
+
+		verify(publisherService, times(1)).getPublishers(any(Pageable.class));
 	}
 }
