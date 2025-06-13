@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,6 +15,7 @@ import shop.bluebooktle.common.dto.book.BookSaleInfoState;
 @AllArgsConstructor
 @Getter
 @Setter
+@Builder
 public class AdminBookResponse {
 	Long bookId;
 	String isbn;

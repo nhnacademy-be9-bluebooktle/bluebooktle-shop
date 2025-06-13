@@ -1,6 +1,8 @@
-package shop.bluebooktle.common.dto.book.request;
+package shop.bluebooktle.common.dto.review.request;
 
 import java.util.List;
+
+import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -12,19 +14,20 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter
 @Setter
-@Builder
-@AllArgsConstructor
+@Getter
 @NoArgsConstructor
-public class ReviewUpdateRequest {
+@AllArgsConstructor
+@Builder
+public class ReviewRequest {
+
 	@NotNull
 	@Min(1)
 	@Max(5)
-	Integer star;
+	private Integer star;
 
 	@Size(min = 10, max = 255, message = "리뷰 내용은 10~255자 입니다")
-	String reviewContent;
+	private String reviewContent;
 
-	List<String> imgUrls;
+	private List<MultipartFile> imageFiles;
 }

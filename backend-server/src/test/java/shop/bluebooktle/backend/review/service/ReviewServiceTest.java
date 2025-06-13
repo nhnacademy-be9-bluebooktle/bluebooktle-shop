@@ -1,4 +1,4 @@
-package shop.bluebooktle.backend.book.service;
+package shop.bluebooktle.backend.review.service;
 
 import static org.assertj.core.api.AssertionsForClassTypes.*;
 import static org.mockito.BDDMockito.*;
@@ -15,6 +15,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -24,21 +25,23 @@ import org.springframework.test.util.ReflectionTestUtils;
 import shop.bluebooktle.backend.book.entity.Book;
 import shop.bluebooktle.backend.book.entity.BookSaleInfo;
 import shop.bluebooktle.backend.book.entity.Img;
-import shop.bluebooktle.backend.book.entity.Review;
-import shop.bluebooktle.backend.book.entity.ReviewLikes;
 import shop.bluebooktle.backend.book.repository.BookSaleInfoRepository;
 import shop.bluebooktle.backend.book.repository.ImgRepository;
-import shop.bluebooktle.backend.book.repository.ReviewLikesRepository;
-import shop.bluebooktle.backend.book.repository.ReviewRepository;
-import shop.bluebooktle.backend.book.service.impl.ReviewServiceImpl;
 import shop.bluebooktle.backend.book_order.entity.BookOrder;
 import shop.bluebooktle.backend.book_order.jpa.BookOrderRepository;
+import shop.bluebooktle.backend.elasticsearch.service.BookElasticSearchService;
 import shop.bluebooktle.backend.order.entity.Order;
+import shop.bluebooktle.backend.review.entity.Review;
+import shop.bluebooktle.backend.review.entity.ReviewLikes;
+import shop.bluebooktle.backend.review.repository.ReviewLikesRepository;
+import shop.bluebooktle.backend.review.repository.ReviewRepository;
+import shop.bluebooktle.backend.review.service.impl.ReviewServiceImpl;
 import shop.bluebooktle.backend.user.repository.UserRepository;
-import shop.bluebooktle.common.dto.book.request.ReviewRegisterRequest;
-import shop.bluebooktle.common.dto.book.response.ReviewResponse;
+import shop.bluebooktle.common.dto.review.request.ReviewRegisterRequest;
+import shop.bluebooktle.common.dto.review.response.ReviewResponse;
 import shop.bluebooktle.common.entity.auth.User;
 import shop.bluebooktle.common.exception.InvalidInputValueException;
+import shop.bluebooktle.common.exception.book.ReviewAuthorizationException;
 import shop.bluebooktle.common.exception.book_order.BookOrderNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
@@ -59,6 +62,10 @@ public class ReviewServiceTest {
 	private BookSaleInfoRepository bookSaleInfoRepository;
 	@Mock
 	private ReviewLikesRepository reviewLikesRepository;
+	@Mock
+	private BookElasticSearchService bookElasticSearchService;
+	@Mock
+	private ApplicationEventPublisher eventPublisher;
 
 	private User testUser;
 	private Book testBook;
@@ -66,6 +73,7 @@ public class ReviewServiceTest {
 	private BookSaleInfo testBookSaleInfo;
 	private Review testReview;
 	private Img testImg;
+	private Order orderMock;
 
 	@BeforeEach
 	void setUp() {
@@ -75,8 +83,9 @@ public class ReviewServiceTest {
 		testBook = Book.builder().title("테스트 책 제목").build();
 		ReflectionTestUtils.setField(testBook, "id", 10L);
 
-		Order orderMock = mock(Order.class);
+		orderMock = mock(Order.class);
 		ReflectionTestUtils.setField(orderMock, "id", 11L);
+		lenient().when(orderMock.getUser()).thenReturn(testUser);
 
 		testBookOrder = BookOrder.builder()
 			.order(orderMock)
@@ -106,6 +115,66 @@ public class ReviewServiceTest {
 			.build();
 		ReflectionTestUtils.setField(testReview, "id", 300L);
 		ReflectionTestUtils.setField(testReview, "createdAt", LocalDateTime.now());
+	}
+
+	@Test
+	@DisplayName("리뷰 등록 성공")
+	void addReview_success_withImage() {
+		// Given
+		ReviewRegisterRequest request = ReviewRegisterRequest.builder()
+			.star(5)
+			.reviewContent("정말 좋은 책입니다!")
+			.imgUrls(List.of("http://example.com/test_image.jpg"))
+			.build();
+
+		given(userRepository.findById(testUser.getId())).willReturn(Optional.of(testUser));
+		given(bookOrderRepository.findById(testBookOrder.getId())).willReturn(Optional.of(testBookOrder));
+		given(imgRepository.findByImgUrl(anyString())).willReturn(Optional.empty());
+		given(imgRepository.save(any(Img.class))).willReturn(testImg);
+		given(reviewRepository.save(any(Review.class))).willReturn(testReview);
+		given(bookSaleInfoRepository.findByBook(any(Book.class))).willReturn(Optional.of(testBookSaleInfo));
+		given(bookSaleInfoRepository.save(any(BookSaleInfo.class))).willReturn(testBookSaleInfo);
+
+		// When
+		ReviewResponse response = reviewService.addReview(testUser.getId(), testBookOrder.getId(), request);
+
+		// Then
+		assertThat(response).isNotNull();
+		assertThat(response.getReviewId()).isEqualTo(testReview.getId());
+		assertThat(response.getImgUrl()).isEqualTo(testImg.getImgUrl());
+		assertThat(response.getStar()).isEqualTo(request.getStar());
+		assertThat(response.getReviewContent()).isEqualTo(request.getReviewContent());
+	}
+
+	@Test
+	@DisplayName("리뷰 등록 실패 - 주문자와 리뷰 작성자 불일치")
+	void addReview_authorizationFailed_throwsException() {
+		// Given
+		ReviewRegisterRequest request = ReviewRegisterRequest.builder()
+			.star(5)
+			.reviewContent("리뷰 내용")
+			.build();
+		User anotherUser = User.builder().nickname("another").build();
+		ReflectionTestUtils.setField(anotherUser, "id", 2L);
+
+		Order orderWithAnotherUser = mock(Order.class);
+		given(orderWithAnotherUser.getUser()).willReturn(anotherUser);
+
+		BookOrder bookOrderOfAnotherUser = BookOrder.builder()
+			.order(orderWithAnotherUser)
+			.book(testBook)
+			.quantity(1)
+			.price(BigDecimal.valueOf(10.00))
+			.build();
+		ReflectionTestUtils.setField(bookOrderOfAnotherUser, "id", 101L);
+
+		given(userRepository.findById(testUser.getId())).willReturn(Optional.of(testUser));
+		given(bookOrderRepository.findById(bookOrderOfAnotherUser.getId())).willReturn(
+			Optional.of(bookOrderOfAnotherUser));
+
+		// When & Then
+		assertThatThrownBy(() -> reviewService.addReview(testUser.getId(), bookOrderOfAnotherUser.getId(), request))
+			.isInstanceOf(ReviewAuthorizationException.class);
 	}
 
 	@Test
