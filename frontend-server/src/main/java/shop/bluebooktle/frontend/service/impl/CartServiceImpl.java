@@ -23,9 +23,7 @@ public class CartServiceImpl implements CartService {
 
 	@Override
 	public void addToCart(String guestId, Long bookId, int quantity) {
-		log.debug("🧪 addToCart called with guestId={}, bookId={}, quantity={}", guestId, bookId, quantity);
 		cartRepository.addBookToCart(new CartItemRequest(bookId, quantity), guestId);
-		log.debug("cart add 끝");
 	}
 
 	@Override
