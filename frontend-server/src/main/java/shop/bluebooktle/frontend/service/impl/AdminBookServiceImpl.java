@@ -103,7 +103,7 @@ public class AdminBookServiceImpl implements AdminBookService {
 	@Override
 	public void updateBook(Long bookId, BookUpdateRequest bookUpdateRequest) {
 		// 알라딘 등록 도서가 이미지 수정하는 경우 : 미니오 서버에 저장
-		String imageKey = "";
+		String imageKey = null;
 		if (bookUpdateRequest.isAladinImg() && bookUpdateRequest.getImageFile() != null) {
 			MultipartFile file = bookUpdateRequest.getImageFile();
 			String uploadedUrl = uploadToMinio(file);
