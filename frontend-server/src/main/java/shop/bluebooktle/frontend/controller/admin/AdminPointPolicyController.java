@@ -49,9 +49,6 @@ public class AdminPointPolicyController {
 
 		model.addAttribute("earningTypeOptions", Arrays.asList(PolicyType.values()));
 
-		// TODO: membershipRates 설정
-		model.addAttribute("membershipRates", new ArrayList<>());
-
 		return "admin/point/point_settings_form";
 	}
 

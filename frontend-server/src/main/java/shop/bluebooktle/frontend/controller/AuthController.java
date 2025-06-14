@@ -4,6 +4,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
@@ -34,6 +35,7 @@ import shop.bluebooktle.frontend.util.CookieTokenUtil;
 @Controller
 @RequestMapping("/")
 @RequiredArgsConstructor
+@RefreshScope
 public class AuthController {
 
 	private final UserService userService;

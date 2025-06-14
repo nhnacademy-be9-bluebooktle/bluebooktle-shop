@@ -121,39 +121,6 @@
             </fieldset>
 
 
-            <fieldset class="policy-section">
-                <legend>회원 등급별 구매 시 추가 적립률</legend>
-                <div class="policy-item" th:each="rate,iterStat : ${membershipRates}">
-                    <input th:name="|membershipRates[${iterStat.index}].membershipLevelId|"
-                           th:value="${rate.membershipLevelId}"
-                           type="hidden"/>
-                    <input th:name="|membershipRates[${iterStat.index}].pointPolicyId|"
-                           th:value="${rate.pointPolicyId}"
-                           type="hidden"/>
-                    <span class="item-label" th:text="${rate.membershipLevel}"></span>
-                    <div class="admin-form-group" style="flex-basis:100px;flex-grow:0;">
-                        <input class="admin-form-check-input"
-                               th:checked="${rate.active}"
-                               th:id="'membershipActive_' + ${iterStat.index}"
-                               th:name="|membershipRates[${iterStat.index}].active|"
-                               type="checkbox"/>
-                        <label class="admin-form-check-label"
-                               th:for="'membershipActive_' + ${iterStat.index}">활성화</label>
-                    </div>
-                    <div class="admin-form-group">
-                        <input class="admin-form-control admin-form-control-sm"
-                               placeholder="추가 적립률"
-                               step="0.1"
-                               th:id="'additionalRate_' + ${iterStat.index}"
-                               th:name="|membershipRates[${iterStat.index}].value|"
-                               th:value="${rate.value}"
-                               type="number"/>
-                        <span>%</span>
-                    </div>
-                </div>
-            </fieldset>
-
-
         </div>
     </div>
 </div>

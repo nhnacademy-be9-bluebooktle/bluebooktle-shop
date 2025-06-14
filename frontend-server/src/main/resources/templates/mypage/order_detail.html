@@ -331,10 +331,10 @@
         </div>
 
         <div class="mypage-layout-kitsch">
-            <div th:if="${isMember}"
-                 th:replace="~{_fragments/mypage_sidebar :: mypageSidebarFragment(activeMenu='orders')}"></div>
-
-
+            <div th:if="${isMember}">
+                <div th:replace="~{_fragments/mypage_sidebar :: mypageSidebarFragment(activeMenu='orders')}"></div>
+            </div>
+            <div th:unless="${isMember}"></div>
             <main class="mypage-content-kitsch">
                 <section class="order-detail-section-kitsch">
                     <h3 class="section-title-kitsch"><i class="fas fa-info-circle"></i> 주문 정보</h3>
@@ -768,7 +768,7 @@
             }
         }
 
-        // 별점 UI 처리 함수
+        // 별점 UI 처리 함수payment_type
         function initializeStarRatingForOrder(containerId, hiddenInputId, displayTextId) {
             const starContainer = document.getElementById(containerId);
             if (!starContainer) return;
@@ -909,18 +909,6 @@
             });
         });
 
-        function trackDelivery(trackingNumber) {
-            alert("배송조회 (Mock): " + trackingNumber);
-            // 실제 배송조회 팝업 또는 페이지 이동 로직
-        }
-
-        function writeReviewForOrder(orderId) {
-            alert("주문번호 " + orderId + " 전체 상품 리뷰쓰기 (Mock)");
-        }
-
-        function requestReturn(orderId) {
-            alert("주문번호 " + orderId + " 반품 신청 (Mock)");
-        }
     </script>
 
 </th:block>
