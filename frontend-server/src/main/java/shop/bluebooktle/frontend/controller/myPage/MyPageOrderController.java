@@ -63,6 +63,7 @@ public class MyPageOrderController {
 		try {
 			OrderDetailResponse orderDetails = orderService.getOrderDetailByOrderKey(orderKey);
 			mav.addObject("order", orderDetails);
+			mav.addObject("isMember", true);
 		} catch (Exception e) {
 			redirectAttributes.addFlashAttribute("globalErrorMessage", e.getMessage());
 			mav.setViewName("redirect:/");

@@ -194,7 +194,7 @@ public class PaymentServiceImpl implements PaymentService {
 			if (paymentPointHistory == null) {
 				return;
 			}
-			PointHistory pointHistory = payment.getPaymentPointHistory().getPointHistory();
+			PointHistory pointHistory = paymentPointHistory.getPointHistory();
 			if (pointHistory == null) {
 				return;
 			}

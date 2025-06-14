@@ -35,8 +35,6 @@ public interface OrderService {
 
 	OrderConfirmDetailResponse getOrderById(Long orderId, Long userId);
 
-	void shipOrder(Long orderId);
-
 	AdminOrderDetailResponse getAdminOrderDetail(Long orderKey);
 
 	void updateOrderStatus(Long orderId, OrderStatus status);

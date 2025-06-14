@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.point.repository.PointPolicyRepository;
 import shop.bluebooktle.backend.point.repository.PointSourceTypeRepository;
 import shop.bluebooktle.backend.point.service.PointPolicyService;
-import shop.bluebooktle.common.domain.point.ActionType;
 import shop.bluebooktle.common.domain.point.PointSourceTypeEnum;
 import shop.bluebooktle.common.dto.point.request.PointPolicyCreateRequest;
 import shop.bluebooktle.common.dto.point.request.PointPolicyUpdateRequest;
@@ -18,7 +17,6 @@ import shop.bluebooktle.common.dto.point.response.PointPolicyResponse;
 import shop.bluebooktle.common.dto.point.response.PointRuleResponse;
 import shop.bluebooktle.common.entity.point.PointPolicy;
 import shop.bluebooktle.common.entity.point.PointSourceType;
-import shop.bluebooktle.common.exception.point.PointPolicyCreationNotAllowedException;
 import shop.bluebooktle.common.exception.point.PointPolicyNotFoundException;
 import shop.bluebooktle.common.exception.point.PointSourceNotFountException;
 
@@ -35,10 +33,6 @@ public class PointPolicyServiceImpl implements PointPolicyService {
 		PointSourceType pst = pointSourceTypeRepository.findById(request.pointSourceTypeId())
 			.orElseThrow(PointSourceNotFountException::new);
 
-		if (pst.getActionType() == ActionType.USE) {
-			throw new PointPolicyCreationNotAllowedException();
-		}
-
 		PointPolicy pointPolicy = pointPolicyRepository.save(
 			PointPolicy.builder()
 				.pointSourceType(pst)
@@ -52,7 +46,7 @@ public class PointPolicyServiceImpl implements PointPolicyService {
 	@Override
 	public void update(PointPolicyUpdateRequest request) {
 		PointPolicy policy = pointPolicyRepository.findById(request.pointPolicyId())
-			.orElseThrow(PointSourceNotFountException::new);
+			.orElseThrow(PointPolicyNotFoundException::new);
 
 		if (request.policyType() != null) {
 			policy.changePolicyType(request.policyType());
@@ -69,7 +63,7 @@ public class PointPolicyServiceImpl implements PointPolicyService {
 	@Override
 	public void delete(Long id) {
 		PointPolicy policy = pointPolicyRepository.findById(id)
-			.orElseThrow(PointSourceNotFountException::new);
+			.orElseThrow(PointPolicyNotFoundException::new);
 		pointPolicyRepository.delete(policy);
 	}
 
@@ -77,20 +71,7 @@ public class PointPolicyServiceImpl implements PointPolicyService {
 	@Transactional(readOnly = true)
 	public PointPolicyResponse get(Long id) {
 		PointPolicy policy = pointPolicyRepository.findById(id)
-			.orElseThrow(PointSourceNotFountException::new);
-
-		return new PointPolicyResponse(
-			policy.getId(),
-			policy.getPolicyType(),
-			policy.getValue(),
-			policy.getIsActive()
-		);
-	}
-
-	@Override
-	public PointPolicyResponse getByPointSourceType(PointSourceType sourceType) {
-		PointPolicy policy = pointPolicyRepository.findByPointSourceType(sourceType)
-			.orElseThrow(PointSourceNotFountException::new);
+			.orElseThrow(PointPolicyNotFoundException::new);
 
 		return new PointPolicyResponse(
 			policy.getId(),
