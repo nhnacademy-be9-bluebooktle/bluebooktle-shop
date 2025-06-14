@@ -5,7 +5,8 @@ CREATE TABLE `publisher`
     `created_at`   timestamp   NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `deleted_at`   timestamp   NULL,
 
-    CONSTRAINT `PK_PUBLISHER` PRIMARY KEY (`publisher_id`)
+    CONSTRAINT `PK_PUBLISHER` PRIMARY KEY (`publisher_id`),
+    INDEX `idx_publisher_name` (`name`)
 );
 
 CREATE TABLE `author`
@@ -15,7 +16,8 @@ CREATE TABLE `author`
     `created_at` timestamp   NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `deleted_at` timestamp   NULL,
 
-    CONSTRAINT `PK_AUTHOR` PRIMARY KEY (`author_id`)
+    CONSTRAINT `PK_AUTHOR` PRIMARY KEY (`author_id`),
+    INDEX `idx_author_name` (`name`)
 );
 
 CREATE TABLE `tag`
@@ -25,7 +27,8 @@ CREATE TABLE `tag`
     `created_at` timestamp   NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `deleted_at` timestamp   NULL,
 
-    CONSTRAINT `PK_TAG` PRIMARY KEY (`tag_id`)
+    CONSTRAINT `PK_TAG` PRIMARY KEY (`tag_id`),
+    INDEX `idx_tag_name` (`name`)
 );
 
 CREATE TABLE `delivery_rule`
@@ -103,7 +106,9 @@ CREATE TABLE `category`
     CONSTRAINT `PK_CATEGORY` PRIMARY KEY (`category_id`),
     CONSTRAINT `FK_category_parent_category_id_category`
         FOREIGN KEY (`parent_category_id`)
-            REFERENCES `category` (`category_id`)
+            REFERENCES `category` (`category_id`),
+    INDEX `idx_category_name` (`name`),
+    INDEX `idx_category_category_path` (`category_path`)
 );
 
 CREATE TABLE `order_state`
@@ -114,7 +119,8 @@ CREATE TABLE `order_state`
     `created_at`     timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `deleted_at`     timestamp NULL,
 
-    CONSTRAINT `PK_ORDER_STATE` PRIMARY KEY (`order_state_id`)
+    CONSTRAINT `PK_ORDER_STATE` PRIMARY KEY (`order_state_id`),
+    INDEX `idx_order_state_state` (`state`)
 );
 
 
@@ -126,7 +132,8 @@ CREATE TABLE `point_source_type`
     `created_at`           timestamp            NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `deleted_at`           timestamp            NULL,
 
-    CONSTRAINT `PK_POINT_SOURCE_TYPE` PRIMARY KEY (`point_source_type_id`)
+    CONSTRAINT `PK_POINT_SOURCE_TYPE` PRIMARY KEY (`point_source_type_id`),
+    INDEX `idx_point_source_type_source_type` (`source_type`)
 );
 
 CREATE TABLE `point_policy`
@@ -314,7 +321,9 @@ CREATE TABLE `users`
     CONSTRAINT `PK_USER` PRIMARY KEY (`user_id`),
     CONSTRAINT `FK_user_membership_id_membership_level`
         FOREIGN KEY (`membership_id`)
-            REFERENCES `membership_level` (`membership_id`)
+            REFERENCES `membership_level` (`membership_id`),
+    INDEX `idx_users_last_login_at` (`last_login_at`),
+    INDEX `idx_users_status` (`status`)
 );
 
 CREATE TABLE `book_category`
@@ -398,7 +407,11 @@ CREATE TABLE `user_coupon`
             REFERENCES `coupon` (`coupon_id`),
     CONSTRAINT `FK_user_coupon_user_id_user`
         FOREIGN KEY (`user_id`)
-            REFERENCES `users` (`user_id`)
+            REFERENCES `users` (`user_id`),
+    INDEX `idx_user_coupon_used_at` (`used_at`),
+    INDEX `idx_user_coupon_available_start_at` (`available_start_at`),
+    INDEX `idx_user_coupon_available_end_at` (`available_end_at`),
+    INDEX `idx_user_coupon_user_id_period` (user_id, used_at, available_start_at, available_end_at)
 );
 
 CREATE TABLE `point_history`
@@ -501,7 +514,9 @@ CREATE TABLE `orders`
             REFERENCES `delivery_rule` (`delivery_rule_id`),
     CONSTRAINT `FK_order_user_id_user`
         FOREIGN KEY (`user_id`)
-            REFERENCES `users` (`user_id`)
+            REFERENCES `users` (`user_id`),
+    INDEX `idx_orders_created_at` (`created_at`),
+    INDEX `idx_orders_order_key` (`order_key`)
 );
 
 CREATE TABLE `cart_book`
@@ -574,7 +589,10 @@ CREATE TABLE `refund`
     CONSTRAINT `PK_REFUND` PRIMARY KEY (`refund_id`),
     CONSTRAINT `FK_refund_order_id_order`
         FOREIGN KEY (`order_id`)
-            REFERENCES `orders` (`order_id`)
+            REFERENCES `orders` (`order_id`),
+    INDEX `idx_refund_reason` (`reason`),
+    INDEX `idx_refund_status` (`status`),
+    INDEX `idx_refund_created_at` (`created_at`)
 );
 
 CREATE TABLE `payment_point_history`
