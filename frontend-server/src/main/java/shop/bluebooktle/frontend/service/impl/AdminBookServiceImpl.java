@@ -139,65 +139,6 @@ public class AdminBookServiceImpl implements AdminBookService {
 			.build();
 
 		adminBookRepository.updateBook(bookId, updateServiceRequest);
-
-		/*if (bookUpdateRequest.isAladinImg() && bookUpdateRequest.getImageFile() != null) {
-			MultipartFile file = bookUpdateRequest.getImageFile();
-			String uploadedUrl = uploadToMinio(file);
-			imageKey = "/images" + uploadedUrl.substring(uploadedUrl.indexOf("/bluebooktle-bookimage"));
-
-		} else if (bookUpdateRequest.getImageFile() != null) {
-			ImgResponse image = bookImgRepository.getImgsByBookId(bookId);
-			String imageUrl = image.getImgUrl();
-			log.info("imageUrl : {}", imageUrl);
-			String objectName = imageUrl.substring(imageUrl.lastIndexOf("/") + 1);
-
-			// 기존 이미지 미니오에서 삭제
-			adminImgService.deleteImage(objectName);
-			log.info("기존 이미지 미니오에서 삭제");
-			// 기존 이미지 삭제
-			imgRepository.deleteImg(image.getId());
-
-			// 미니오 등록
-			MultipartFile file = bookUpdateRequest.getImageFile();
-			String uploadedUrl = uploadToMinio(file);
-			imageKey = "/images" + uploadedUrl.substring(uploadedUrl.indexOf("/bluebooktle-bookimage"));
-		}
-		BookUpdateServiceRequest updateServiceRequest;
-		if (imageKey.isBlank()) {
-			updateServiceRequest = BookUpdateServiceRequest.builder()
-				.title(bookUpdateRequest.getTitle())
-				.description(bookUpdateRequest.getDescription())
-				.index(bookUpdateRequest.getIndex())
-				.publishDate(bookUpdateRequest.getPublishDate())
-				.price(bookUpdateRequest.getPrice())
-				.salePrice(bookUpdateRequest.getSalePrice())
-				.stock(bookUpdateRequest.getStock())
-				.isPackable(bookUpdateRequest.getIsPackable())
-				.state(bookUpdateRequest.getState())
-				.authorIdList(bookUpdateRequest.getAuthorIdList())
-				.publisherIdList(bookUpdateRequest.getPublisherIdList())
-				.categoryIdList(bookUpdateRequest.getCategoryIdList())
-				.tagIdList(bookUpdateRequest.getTagIdList())
-				.build();
-		} else {
-			updateServiceRequest = new BookUpdateServiceRequest(
-					bookUpdateRequest.getTitle(),
-					bookUpdateRequest.getDescription(),
-					bookUpdateRequest.getIndex(),
-					bookUpdateRequest.getPublishDate(),
-					bookUpdateRequest.getPrice(),
-					bookUpdateRequest.getSalePrice(),
-					bookUpdateRequest.getStock(),
-					bookUpdateRequest.getIsPackable(),
-					bookUpdateRequest.getState(),
-					bookUpdateRequest.getAuthorIdList(),
-					bookUpdateRequest.getPublisherIdList(),
-					bookUpdateRequest.getCategoryIdList(),
-					bookUpdateRequest.getTagIdList(),
-					imageKey
-				);
-		}
-		adminBookRepository.updateBook(bookId, updateServiceRequest);*/
 	}
 
 	@Override
