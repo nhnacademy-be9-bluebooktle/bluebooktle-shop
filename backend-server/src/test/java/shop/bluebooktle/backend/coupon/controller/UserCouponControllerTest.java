@@ -94,7 +94,6 @@ class UserCouponControllerTest {
 	@WithMockCustomUser
 	@DisplayName("보유한 유저 쿠폰 조회 - 성공")
 	void getAllUserCoupons_success() throws Exception {
-		// Pageable pageable = PageRequest.of(0, 10);
 		given(userCouponService.getAllUserCoupons(eq(1L), eq(UserCouponFilterType.ALL), any(Pageable.class)))
 			.willReturn(new PageImpl<>(dummyCoupons));
 

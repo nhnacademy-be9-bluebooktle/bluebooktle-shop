@@ -264,7 +264,8 @@
                 <div class="points-summary-kitsch">
                     <span class="summary-label-kitsch handwriting-font-kitsch">나의 현재 포인트는?</span>
                     <div class="current-points-kitsch">
-                        <span th:text="${totalPoints}">0</span><span class="points-unit-kitsch">P</span>
+                        <span th:text="${ T(java.lang.String).format('%,d',totalPoints.longValue())}">0</span><span
+                            class="points-unit-kitsch">P</span>
                     </div>
                 </div>
 
@@ -304,16 +305,16 @@
                         <tbody th:each="history : ${pointHistories.getContent()}">
                         <tr>
                             <td data-label="날짜"
-                                th:text="${#temporals.format(history.createdAt, 'yyyy-MM-dd')}">2025-05-27
+                                th:text="${#temporals.format(history.createdAt, 'yyyy-MM-dd HH:mm')}">
                             </td>
                             <td class="point-description-kitsch" data-label="내역"
-                                th:text="${history.pointSourceType.sourceType}">로그인 적립
+                                th:text="${history.pointSourceType.sourceType}">
                             </td>
                             <td class="point-earned-kitsch" data-label="적립"
-                                th:text="${history.pointSourceType.actionType.name() == 'EARN' ? '+' + history.value : ''}">
+                                th:text="${history.pointSourceType.actionType.name() == 'EARN' ? '+' + T(java.lang.String).format('%,dP', history.value.longValue())  : ''}">
                             </td>
                             <td class="point-used-kitsch" data-label="사용"
-                                th:text="${history.pointSourceType.actionType.name() == 'USE' ? '-' + history.value  : ''}">
+                                th:text="${history.pointSourceType.actionType.name() == 'USE' ? '-' + T(java.lang.String).format('%,dP', history.value.longValue())  : ''}">
                             </td>
                         </tr>
                         </tbody>
@@ -342,8 +343,8 @@
                         <!-- 이전 -->
                         <li class="page-item-kitsch"
                             th:classappend="${!pointHistories.pagination.hasPrevious} ? ' disabled'">
-                            <a class="page-link-kitsch"
-                               aria-label="Previous"
+                            <a aria-label="Previous"
+                               class="page-link-kitsch"
                                th:href="@{${currentURI}(page=${pointHistories.pagination.hasPrevious ? pointHistories.pagination.currentPage - 1 : 0})}">
                                 &laquo; 이전
                             </a>
@@ -351,8 +352,8 @@
 
                         <!-- 페이지 번호 (0~lastIndex) -->
                         <li class="page-item-kitsch"
-                            th:each="idx : ${#numbers.sequence(0, lastIndex)}"
-                            th:classappend="${idx == pointHistories.pagination.currentPage} ? ' active-kitsch'">
+                            th:classappend="${idx == pointHistories.pagination.currentPage} ? ' active-kitsch'"
+                            th:each="idx : ${#numbers.sequence(0, lastIndex)}">
                             <a class="page-link-kitsch"
                                th:href="@{${currentURI}(page=${idx})}"
                                th:text="${idx + 1}">1</a>
@@ -361,8 +362,8 @@
                         <!-- 다음 -->
                         <li class="page-item-kitsch"
                             th:classappend="${!pointHistories.pagination.hasNext} ? ' disabled'">
-                            <a class="page-link-kitsch"
-                               aria-label="Next"
+                            <a aria-label="Next"
+                               class="page-link-kitsch"
                                th:href="@{${currentURI}(page=${
             pointHistories.pagination.hasNext
               ? pointHistories.pagination.currentPage + 1

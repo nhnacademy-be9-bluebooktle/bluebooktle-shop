@@ -75,7 +75,7 @@ public class PointServiceImpl implements PointService {
 
 	@Override
 	public Page<PointHistoryResponse> getPointHistoriesByUserId(Long userId, Pageable pageable) {
-		Page<PointHistory> page = pointHistoryRepository.findByUserIdOrderByCreatedAtDesc(userId, pageable);
+		Page<PointHistory> page = pointHistoryRepository.findByUser_IdOrderByCreatedAtDesc(userId, pageable);
 
 		return page.map(p -> new PointHistoryResponse(
 			p.getId(),
