@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -481,7 +482,7 @@ class UserQueryRepositoryImplTest {
 
 	private Book createTestBook(String title) {
 		Book book = Book.builder()
-			.title(title).isbn(String.valueOf(System.nanoTime()).substring(0, 13))
+			.title(title).isbn(UUID.randomUUID().toString().substring(0, 13))
 			.description("설명").index("목차").build();
 		em.persist(book);
 		return book;
