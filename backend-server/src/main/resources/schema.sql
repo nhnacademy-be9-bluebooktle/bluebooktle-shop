@@ -108,7 +108,7 @@ CREATE TABLE `category`
         FOREIGN KEY (`parent_category_id`)
             REFERENCES `category` (`category_id`),
     INDEX `idx_category_name` (`name`),
-    INDEX `idx_category_category_path` (`category_path`)
+    INDEX `idx_category_category_path` (`category_path`(255))
 );
 
 CREATE TABLE `order_state`
