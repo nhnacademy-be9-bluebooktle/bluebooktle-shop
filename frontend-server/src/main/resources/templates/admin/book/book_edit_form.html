@@ -503,14 +503,14 @@
                     const pag = document.getElementById('authorPagination');
                     let html = '';
                     if (data.pageable.pageNumber > 0) {
-                        html += `<button onclick="loadAuthors(${data.pageable.pageNumber - 1},${size},'${keyword}')">&laquo;</button>`;
+                        html += `<button type="button" onclick="loadAuthors(${data.pageable.pageNumber - 1},${size},'${keyword}')">&laquo;</button>`;
                     }
                     for (let i = 0; i < data.totalPages; i++) {
-                        html += `<button class="${i === data.pageable.pageNumber ? 'active' : ''}"
+                        html += `<button type="button" class="${i === data.pageable.pageNumber ? 'active' : ''}"
                     onclick="loadAuthors(${i},${size},'${keyword}')">${i + 1}</button>`;
                     }
                     if (data.pageable.pageNumber < data.totalPages - 1) {
-                        html += `<button onclick="loadAuthors(${data.pageable.pageNumber + 1},${size},'${keyword}')">&raquo;</button>`;
+                        html += `<button type="button" onclick="loadAuthors(${data.pageable.pageNumber + 1},${size},'${keyword}')">&raquo;</button>`;
                     }
                     pag.innerHTML = html;
                 })
@@ -535,14 +535,14 @@
                     const pag = document.getElementById('tagPagination');
                     let html = '';
                     if (data.pageable.pageNumber > 0) {
-                        html += `<button onclick="loadTags(${data.pageable.pageNumber - 1},${size},'${keyword}')">&laquo;</button>`;
+                        html += `<button type="button" onclick="loadTags(${data.pageable.pageNumber - 1},${size},'${keyword}')">&laquo;</button>`;
                     }
                     for (let i = 0; i < data.totalPages; i++) {
-                        html += `<button class="${i === data.pageable.pageNumber ? 'active' : ''}"
+                        html += `<button type="button" class="${i === data.pageable.pageNumber ? 'active' : ''}"
                     onclick="loadTags(${i},${size},'${keyword}')">${i + 1}</button>`;
                     }
                     if (data.pageable.pageNumber < data.totalPages - 1) {
-                        html += `<button onclick="loadTags(${data.pageable.pageNumber + 1},${size},'${keyword}')">&raquo;</button>`;
+                        html += `<button type="button" onclick="loadTags(${data.pageable.pageNumber + 1},${size},'${keyword}')">&raquo;</button>`;
                     }
                     pag.innerHTML = html;
                 })

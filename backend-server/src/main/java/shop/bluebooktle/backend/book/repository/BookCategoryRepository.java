@@ -13,14 +13,6 @@ import shop.bluebooktle.backend.book.entity.Category;
 
 public interface BookCategoryRepository extends JpaRepository<BookCategory, Long> {
 
-	Optional<BookCategory> findByBookAndCategory(Book book, Category category);
-
-	// 특정 책에 연결된 모든 카테고리 조회
-	List<BookCategory> findByBook(Book book);
-
-	// 특정 카테고리에 속한 모든 책 조회
-	List<BookCategory> findByCategory(Category category);
-
 	// 책 ID로 연결된 BookCategory 조회 (연관된 카테고리 목록용)
 	List<BookCategory> findByBook_Id(Long bookId);
 
@@ -31,13 +23,4 @@ public interface BookCategoryRepository extends JpaRepository<BookCategory, Long
 	boolean existsByBookAndCategory(Book book, Category category);
 
 	boolean existsByCategory(Category category);
-
-	@Modifying
-	@Transactional
-	void deleteByCategory(Category category);
-
-	@Modifying
-	@Transactional
-	void deleteByCategoryIn(List<Category> categories);
-
 }

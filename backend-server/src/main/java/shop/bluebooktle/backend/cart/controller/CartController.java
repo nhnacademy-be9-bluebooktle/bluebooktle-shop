@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import shop.bluebooktle.backend.cart.service.CartService;
@@ -30,6 +32,7 @@ import shop.bluebooktle.common.security.UserPrincipal;
 @RestController
 @RequestMapping("/api/cart")
 @RequiredArgsConstructor
+@Tag(name = "장바구니 API", description = "회원/비회원 장바구니 공통 처리 API")
 public class CartController {
 
 	private final CartService cartService;
@@ -49,6 +52,7 @@ public class CartController {
 	}
 
 	/** 공통: 장바구니 담기 */
+	@Operation(summary = "장바구니 도서 추가", description = "회원 또는 비회원의 장바구니에 도서를 추가합니다.")
 	@PostMapping
 	public ResponseEntity<JsendResponse<Void>> addBookToCart(
 		@AuthenticationPrincipal UserPrincipal principal,
@@ -65,6 +69,7 @@ public class CartController {
 	}
 
 	/** 공통: 장바구니 조회 */
+	@Operation(summary = "장바구니 조회", description = "회원 또는 비회원의 장바구니 도서 목록을 조회합니다.")
 	@GetMapping
 	public ResponseEntity<JsendResponse<List<BookCartOrderResponse>>> getCartItems(
 		@AuthenticationPrincipal UserPrincipal principal,
@@ -80,6 +85,7 @@ public class CartController {
 	}
 
 	/** 공통: 수량 증가 */
+	@Operation(summary = "도서 수량 증가", description = "장바구니 내 도서의 수량을 증가시킵니다.")
 	@PostMapping("/increase")
 	public ResponseEntity<JsendResponse<Void>> increaseQuantity(
 		@AuthenticationPrincipal UserPrincipal principal,
@@ -96,6 +102,7 @@ public class CartController {
 	}
 
 	/** 공통: 수량 감소 */
+	@Operation(summary = "도서 수량 감소", description = "장바구니 내 도서의 수량을 감소시킵니다.")
 	@PostMapping("/decrease")
 	public ResponseEntity<JsendResponse<Void>> decreaseQuantity(
 		@AuthenticationPrincipal UserPrincipal principal,
@@ -112,6 +119,7 @@ public class CartController {
 	}
 
 	/** 공통: 도서 1개 삭제 */
+	@Operation(summary = "도서 1개 삭제", description = "장바구니에서 도서 한 권을 삭제합니다.")
 	@DeleteMapping
 	public ResponseEntity<JsendResponse<Void>> removeBook(
 		@AuthenticationPrincipal UserPrincipal principal,
@@ -129,6 +137,7 @@ public class CartController {
 	}
 
 	/** 공통: 선택 삭제 */
+	@Operation(summary = "선택 도서 삭제", description = "장바구니에서 선택한 도서들을 삭제합니다.")
 	@DeleteMapping("/selected")
 	public ResponseEntity<JsendResponse<Void>> removeSelectedBooks(
 		@AuthenticationPrincipal UserPrincipal principal,
@@ -145,6 +154,7 @@ public class CartController {
 	}
 
 	/** 공통: 주문용 선택된 장바구니 도서 조회 */
+	@Operation(summary = "선택 도서 조회 (주문용)", description = "주문을 위해 선택한 도서 목록을 조회합니다.")
 	@PostMapping("/order")
 	public ResponseEntity<JsendResponse<List<BookCartOrderResponse>>> getSelectedCartItemsForOrder(
 		@AuthenticationPrincipal UserPrincipal principal,
@@ -163,6 +173,7 @@ public class CartController {
 	}
 
 	/** 전환 또는 병합: 회원가입 또는 로그인 직후 */
+	@Operation(summary = "비회원 장바구니 전환/병합", description = "회원가입 또는 로그인 후 비회원 장바구니를 회원 장바구니로 전환하거나 병합합니다.")
 	@PostMapping("/convert/merge")
 	public ResponseEntity<JsendResponse<Void>> mergeOrConvertGuestCart(
 		@AuthenticationPrincipal UserPrincipal principal,
@@ -173,6 +184,7 @@ public class CartController {
 		return ResponseEntity.ok(JsendResponse.success());
 	}
 
+	@Operation(summary = "장바구니 수량 조회", description = "회원 또는 비회원 장바구니 내 전체 도서 수량을 조회합니다.")
 	@GetMapping("quantity")
 	public ResponseEntity<JsendResponse<Long>> getQuantity(
 		@AuthenticationPrincipal UserPrincipal principal,

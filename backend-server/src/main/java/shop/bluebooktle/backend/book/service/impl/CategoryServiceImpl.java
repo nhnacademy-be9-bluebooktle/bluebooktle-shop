@@ -141,17 +141,6 @@ public class CategoryServiceImpl implements CategoryService {
 			}
 		}
 
-		// 자신 포함 전체 카테고리 리스트 생성
-		List<Category> allCategory = new ArrayList<>(descendants);
-		allCategory.add(category); // 본인도 포함
-
-		// 도서가 등록된 카테고리가 하나라도 있으면 삭제 불가
-		for (Category c : allCategory) {
-			if (bookCategoryRepository.existsByCategory(c)) {
-				throw new CategoryCannotDeleteRootException("(도서가 등록된 카테고리 또는 하위 카테고리 존재시 삭제 불가)");
-			}
-		}
-
 		// 상위 카테고리가 최상위 카테고리이면서 2단계 카테고리가 1개일 경우 삭제 불가능
 		if (category.getParentCategory() != null && categoryRepository.existsByIdAndParentCategoryIsNull(category.getParentCategory().getId())) {
 			Category rootCategory = categoryRepository.findById(category.getParentCategory().getId())
@@ -167,11 +156,6 @@ public class CategoryServiceImpl implements CategoryService {
 			log.info("자식 카테고리명 : {}", childCategory.getName());
 			categoryRepository.delete(childCategory);
 		}
-		List<BookCategory> categoryLinks = bookCategoryRepository.findByCategory(category);
-		List<BookCategory> toUpdate = categoryLinks.stream()
-			.filter(bc -> bookCategoryRepository.countByBook(bc.getBook()) == 1)
-			.peek(bc -> bc.setCategory(category.getParentCategory()))  // 상위 카테고리로 교체
-			.toList();
 
 		// 카테고리 삭제
 		categoryRepository.delete(category);
@@ -222,6 +206,14 @@ public class CategoryServiceImpl implements CategoryService {
 		return tree;
 	}
 
+	private CategoryTreeResponse buildTree(Category category, Map<Long, List<Category>> parentMap) {
+		List<CategoryTreeResponse> children = parentMap.getOrDefault(category.getId(), List.of()).stream()
+			.map(child -> buildTree(child, parentMap))
+			.collect(Collectors.toList());
+
+		return new CategoryTreeResponse(category.getId(), category.getName(), children);
+	}
+
 	@Override
 	public Page<CategoryResponse> searchCategories(String searchKeyword, Pageable pageable) {
 		Page<Category> categories = categoryRepository.searchByNameContaining(searchKeyword, pageable);
@@ -244,11 +236,5 @@ public class CategoryServiceImpl implements CategoryService {
 				: "-", category.getCategoryPath());
 	}
 
-	private CategoryTreeResponse buildTree(Category category, Map<Long, List<Category>> parentMap) {
-		List<CategoryTreeResponse> children = parentMap.getOrDefault(category.getId(), List.of()).stream()
-			.map(child -> buildTree(child, parentMap))
-			.collect(Collectors.toList());
 
-		return new CategoryTreeResponse(category.getId(), category.getName(), children);
-	}
 }

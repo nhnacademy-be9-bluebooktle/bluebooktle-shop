@@ -103,47 +103,40 @@ public class AdminBookServiceImpl implements AdminBookService {
 	@Override
 	public void updateBook(Long bookId, BookUpdateRequest bookUpdateRequest) {
 		// 알라딘 등록 도서가 이미지 수정하는 경우 : 미니오 서버에 저장
-		String imageKey = "";
-		if (bookUpdateRequest.isAladinImg() && bookUpdateRequest.getImageFile() != null) {
-			MultipartFile file = bookUpdateRequest.getImageFile();
+		String imageKey = null;
+		MultipartFile file = bookUpdateRequest.getImageFile();
+		if (file != null && !file.isEmpty()) {
+
+			if (!bookUpdateRequest.isAladinImg()) {
+				// 기존 이미지 삭제
+				ImgResponse image = bookImgRepository.getImgsByBookId(bookId);
+				String imageUrl = image.getImgUrl();
+				String objectName = imageUrl.substring(imageUrl.lastIndexOf("/") + 1);
+
+				adminImgService.deleteImage(objectName);
+				imgRepository.deleteImg(image.getId());
+			}
+
 			String uploadedUrl = uploadToMinio(file);
-			imageKey = uploadedUrl.substring(uploadedUrl.indexOf("/bluebooktle-bookimage"));
-
-		} else if (bookUpdateRequest.getImageFile() != null) {
-			ImgResponse image = bookImgRepository.getImgsByBookId(bookId);
-			String imageUrl = image.getImgUrl();
-			log.info("imageUrl : {}", imageUrl);
-			String objectName = imageUrl.substring(imageUrl.lastIndexOf("/") + 1);
-
-			// 기존 이미지 미니오에서 삭제
-			adminImgService.deleteImage(objectName);
-			log.info("기존 이미지 미니오에서 삭제");
-			// 기존 이미지 삭제
-			imgRepository.deleteImg(image.getId());
-
-			// 미니오 등록
-			MultipartFile file = bookUpdateRequest.getImageFile();
-			String uploadedUrl = uploadToMinio(file);
-			imageKey = uploadedUrl.substring(uploadedUrl.indexOf("/bluebooktle-bookimage"));
-
+			imageKey = extractImageKey(uploadedUrl);
 		}
-		BookUpdateServiceRequest updateServiceRequest =
-			new BookUpdateServiceRequest(
-				bookUpdateRequest.getTitle(),
-				bookUpdateRequest.getDescription(),
-				bookUpdateRequest.getIndex(),
-				bookUpdateRequest.getPublishDate(),
-				bookUpdateRequest.getPrice(),
-				bookUpdateRequest.getSalePrice(),
-				bookUpdateRequest.getStock(),
-				bookUpdateRequest.getIsPackable(),
-				bookUpdateRequest.getState(),
-				bookUpdateRequest.getAuthorIdList(),
-				bookUpdateRequest.getPublisherIdList(),
-				bookUpdateRequest.getCategoryIdList(),
-				bookUpdateRequest.getTagIdList(),
-				"/images" + imageKey
-			);
+
+		BookUpdateServiceRequest updateServiceRequest = BookUpdateServiceRequest.builder()
+			.title(bookUpdateRequest.getTitle())
+			.description(bookUpdateRequest.getDescription())
+			.index(bookUpdateRequest.getIndex())
+			.publishDate(bookUpdateRequest.getPublishDate())
+			.price(bookUpdateRequest.getPrice())
+			.salePrice(bookUpdateRequest.getSalePrice())
+			.stock(bookUpdateRequest.getStock())
+			.isPackable(bookUpdateRequest.getIsPackable())
+			.state(bookUpdateRequest.getState())
+			.authorIdList(bookUpdateRequest.getAuthorIdList())
+			.publisherIdList(bookUpdateRequest.getPublisherIdList())
+			.categoryIdList(bookUpdateRequest.getCategoryIdList())
+			.tagIdList(bookUpdateRequest.getTagIdList())
+			.imgUrl(imageKey)  // null이면 유지
+			.build();
 
 		adminBookRepository.updateBook(bookId, updateServiceRequest);
 	}
@@ -191,5 +184,9 @@ public class AdminBookServiceImpl implements AdminBookService {
 
 		log.info("업로드 완료 → URL: {}", presignedUploadUrl.split("\\?")[0]);
 		return presignedUploadUrl.split("\\?")[0]; // 순수 URL만 리턴
+	}
+
+	private String extractImageKey(String uploadedUrl) {
+		return "/images" + uploadedUrl.substring(uploadedUrl.indexOf("/bluebooktle-bookimage"));
 	}
 }
