@@ -5,9 +5,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.book.entity.Img;
-import shop.bluebooktle.backend.book.entity.Review;
+import shop.bluebooktle.backend.review.entity.Review;
 import shop.bluebooktle.backend.book.repository.ImgRepository;
-import shop.bluebooktle.backend.book.repository.ReviewRepository;
+import shop.bluebooktle.backend.review.repository.ReviewRepository;
 import shop.bluebooktle.backend.book.service.ImgService;
 import shop.bluebooktle.common.dto.book.request.img.ImgRegisterRequest;
 import shop.bluebooktle.common.dto.book.request.img.ImgUpdateRequest;

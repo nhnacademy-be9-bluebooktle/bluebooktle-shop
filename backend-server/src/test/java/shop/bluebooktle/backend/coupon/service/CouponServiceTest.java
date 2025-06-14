@@ -4,6 +4,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
@@ -12,6 +13,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +34,7 @@ import shop.bluebooktle.backend.coupon.repository.CouponTypeRepository;
 import shop.bluebooktle.backend.coupon.service.impl.CouponServiceImpl;
 import shop.bluebooktle.common.domain.coupon.CouponTypeTarget;
 import shop.bluebooktle.common.dto.coupon.request.CouponRegisterRequest;
+import shop.bluebooktle.common.dto.coupon.response.CouponResponse;
 import shop.bluebooktle.common.exception.coupon.CouponTypeNotFoundException;
 import shop.bluebooktle.common.exception.coupon.InvalidCouponTargetException;
 
@@ -52,6 +58,34 @@ public class CouponServiceTest {
 	private CategoryRepository categoryRepository;
 	@Mock
 	private BookRepository bookRepository;
+
+	@Test
+	@DisplayName("전체 쿠폰 조회 - 성공")
+	void getAllCoupons_success() {
+		// given
+		String keyword = "할인";
+		Pageable pageable = PageRequest.of(0, 10);
+
+		CouponResponse response1 = CouponResponse.builder()
+			.id(1L)
+			.couponName("할인 쿠폰")
+			.build();
+		CouponResponse response2 = CouponResponse.builder()
+			.id(2L)
+			.couponName("무료 배송 쿠폰")
+			.build();
+
+		Page<CouponResponse> pageResult = new PageImpl<>(List.of(response1, response2), pageable, 2);
+		given(couponRepository.findAllByCoupon(keyword, pageable)).willReturn(pageResult);
+
+		// when
+		Page<CouponResponse> result = couponService.getAllCoupons(keyword, pageable);
+
+		// then
+		assertThat(result.getTotalElements()).isEqualTo(2);
+		assertThat(result.getContent().get(0).getCouponName()).contains("할인");
+		verify(couponRepository).findAllByCoupon(keyword, pageable);
+	}
 
 	@Test
 	@DisplayName("특정 도서 쿠폰 등록 - 성공")
@@ -104,7 +138,6 @@ public class CouponServiceTest {
 			.categoryId(2L)
 			.build();
 		given(couponTypeRepository.findById(1L)).willReturn(Optional.of(couponType));
-		// given(categoryRepository.findById(1L)).willReturn(Optional.of(parentCategory));
 		given(categoryRepository.findById(2L)).willReturn(Optional.of(childCategory));
 		given(couponRepository.save(any())).willAnswer(i -> i.getArguments()[0]);
 
@@ -199,19 +232,36 @@ public class CouponServiceTest {
 			.isInstanceOf(InvalidCouponTargetException.class);
 	}
 
+	@DisplayName("주문 쿠폰인데 bookId가 들어옴 - 실패")
 	@Test
-	@DisplayName("주문 쿠폰인데 bookId 또는 categoryId가 들어옴 - 실패")
-	void registerCoupon_orderTargetWithBookOrCategory_fail() {
-		CouponType couponType = CouponType.builder()
-			.target(CouponTypeTarget.ORDER)
-			.build();
+	void registerOrderCoupon_withBookId_shouldFail() {
+		CouponType couponType = CouponType.builder().build();
+		ReflectionTestUtils.setField(couponType, "target", CouponTypeTarget.ORDER);
 
 		CouponRegisterRequest request = CouponRegisterRequest.builder()
 			.couponTypeId(1L)
-			.name("10000원 구매 시 1000할인")
+			.name("주문쿠폰 오류")
 			.bookId(1L)
-			.categoryId(null)
 			.build();
+
+		given(couponTypeRepository.findById(1L)).willReturn(Optional.of(couponType));
+
+		assertThatThrownBy(() -> couponService.registerCoupon(request))
+			.isInstanceOf(InvalidCouponTargetException.class);
+	}
+
+	@DisplayName("주문 쿠폰인데 categoryId가 들어옴 - 실패")
+	@Test
+	void registerOrderCoupon_withCategoryId_shouldFail() {
+		CouponType couponType = CouponType.builder().build();
+		ReflectionTestUtils.setField(couponType, "target", CouponTypeTarget.ORDER);
+
+		CouponRegisterRequest request = CouponRegisterRequest.builder()
+			.couponTypeId(1L)
+			.name("주문쿠폰 오류")
+			.categoryId(2L)
+			.build();
+
 		given(couponTypeRepository.findById(1L)).willReturn(Optional.of(couponType));
 
 		assertThatThrownBy(() -> couponService.registerCoupon(request))

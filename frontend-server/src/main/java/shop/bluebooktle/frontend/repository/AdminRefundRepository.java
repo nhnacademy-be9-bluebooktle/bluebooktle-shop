@@ -14,6 +14,7 @@ import shop.bluebooktle.common.dto.refund.request.RefundUpdateRequest;
 import shop.bluebooktle.common.dto.refund.response.AdminRefundDetailResponse;
 import shop.bluebooktle.common.dto.refund.response.RefundListResponse;
 import shop.bluebooktle.frontend.config.feign.FeignGlobalConfig;
+import shop.bluebooktle.frontend.config.retry.RetryWithTokenRefresh;
 
 @FeignClient(
 	url = "${server.gateway-url}",
@@ -23,14 +24,17 @@ import shop.bluebooktle.frontend.config.feign.FeignGlobalConfig;
 )
 public interface AdminRefundRepository {
 	@PostMapping("/update")
+	@RetryWithTokenRefresh
 	Void updateRefund(@RequestBody RefundUpdateRequest request);
 
 	@GetMapping
+	@RetryWithTokenRefresh
 	PaginationData<RefundListResponse> getRefunds(
 		@SpringQueryMap RefundSearchRequest request,
 		@SpringQueryMap Pageable pageable
 	);
 
 	@GetMapping("/{refundId}")
+	@RetryWithTokenRefresh
 	AdminRefundDetailResponse getRefundDetail(@PathVariable("refundId") Long refundId);
 }

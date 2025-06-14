@@ -15,7 +15,6 @@ import org.springframework.test.context.ActiveProfiles;
 import jakarta.persistence.EntityManager;
 import shop.bluebooktle.backend.book.entity.Book;
 import shop.bluebooktle.backend.book.entity.BookLikes;
-import shop.bluebooktle.backend.book.entity.BookLikesId;
 import shop.bluebooktle.backend.book.repository.BookLikesRepository;
 import shop.bluebooktle.backend.book.repository.BookRepository;
 import shop.bluebooktle.backend.config.JpaAuditingConfiguration;
@@ -137,8 +136,10 @@ class BookLikesRepositoryTest {
 		em.clear();
 
 		BookLikes found = bookLikesRepository.findByUser_IdAndBook_Id(user.getId(), book.getId());
-		assertThat(found).isNotNull();
-		assertThat(found.getId()).isEqualTo(new BookLikesId(user.getId(), book.getId()));
+		// assertThat(found).isNotNull();
+		// assertThat(found.getId()).isEqualTo(new BookLikesId(user.getId(), book.getId()));
+		assertThat(found.getUser().getId()).isEqualTo(user.getId());
+		assertThat(found.getBook().getId()).isEqualTo(book.getId());
 	}
 
 	@Test

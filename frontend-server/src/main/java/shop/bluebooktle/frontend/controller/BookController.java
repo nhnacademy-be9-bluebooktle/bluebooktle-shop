@@ -21,7 +21,7 @@ import shop.bluebooktle.common.dto.book.BookSortType;
 import shop.bluebooktle.common.dto.book.response.BookDetailResponse;
 import shop.bluebooktle.common.dto.book.response.BookInfoResponse;
 import shop.bluebooktle.common.dto.book.response.CategoryResponse;
-import shop.bluebooktle.common.dto.book.response.ReviewResponse;
+import shop.bluebooktle.common.dto.review.response.ReviewResponse;
 import shop.bluebooktle.common.dto.order.response.DeliveryRuleResponse;
 import shop.bluebooktle.common.dto.point.response.PointRuleResponse;
 import shop.bluebooktle.frontend.service.AdminPointService;

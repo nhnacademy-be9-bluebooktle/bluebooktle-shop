@@ -15,14 +15,17 @@ import shop.bluebooktle.common.dto.order.response.OrderConfirmDetailResponse;
 import shop.bluebooktle.common.dto.order.response.OrderDetailResponse;
 import shop.bluebooktle.common.dto.order.response.OrderHistoryResponse;
 import shop.bluebooktle.frontend.config.feign.FeignGlobalConfig;
+import shop.bluebooktle.frontend.config.retry.RetryWithTokenRefresh;
 
 @FeignClient(url = "${server.gateway-url}", name = "OrderRepository", path = "/api/orders", configuration = FeignGlobalConfig.class)
 public interface OrderRepository {
 	@GetMapping("/{orderId}")
+	@RetryWithTokenRefresh
 	OrderConfirmDetailResponse getOrderConfirmDetail(
 		@PathVariable Long orderId);
 
 	@PostMapping
+	@RetryWithTokenRefresh
 	Long createOrder(@RequestBody OrderCreateRequest request,
 		@RequestHeader(name = "GUEST_ID", required = false) String guestId);
 

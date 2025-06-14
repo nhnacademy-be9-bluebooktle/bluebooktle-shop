@@ -13,12 +13,14 @@ import shop.bluebooktle.common.dto.common.PaginationData;
 import shop.bluebooktle.common.dto.coupon.response.UsableUserCouponMapResponse;
 import shop.bluebooktle.common.dto.coupon.response.UserCouponResponse;
 import shop.bluebooktle.frontend.config.feign.FeignGlobalConfig;
+import shop.bluebooktle.frontend.config.retry.RetryWithTokenRefresh;
 
 @FeignClient(url = "${server.gateway-url}", path = "/api/coupons", name = "userCouponRepository", configuration = FeignGlobalConfig.class)
 public interface CouponRepository {
 
 	//전체 유저 쿠폰 조회
 	@GetMapping
+	@RetryWithTokenRefresh
 	PaginationData<UserCouponResponse> getAllCoupons(
 		@RequestParam("target") UserCouponFilterType filter,
 		@SpringQueryMap Pageable pageable);
@@ -28,8 +30,10 @@ public interface CouponRepository {
 	UsableUserCouponMapResponse getUsableCouponsForOrder(@RequestParam("bookIds") List<Long> bookIds);
 
 	@GetMapping("/count/usable")
+	@RetryWithTokenRefresh
 	Long countAllUsableCoupons();
 
 	@GetMapping("/count/expiring")
+	@RetryWithTokenRefresh
 	Long countExpiringThisMonth();
 }

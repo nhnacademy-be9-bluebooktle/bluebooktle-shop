@@ -86,10 +86,10 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
 			.leftJoin(payment.paymentDetail, paymentDetail)
 			.leftJoin(paymentDetail.paymentType, paymentType)
 			.where(
-				searchKeyword(searchRequest.searchKeywordType(), searchRequest.searchKeyword()),
-				orderStatusFilter(searchRequest.orderStatusFilter()),
-				paymentMethodFilter(searchRequest.paymentMethodFilter()),
-				dateRangeFilter(searchRequest.startDate(), searchRequest.endDate())
+				searchKeyword(searchRequest.getSearchKeywordType(), searchRequest.getSearchKeyword()),
+				orderStatusFilter(searchRequest.getOrderStatusFilter()),
+				paymentMethodFilter(searchRequest.getPaymentMethodFilter()),
+				dateRangeFilter(searchRequest.getStartDate(), searchRequest.getEndDate())
 			)
 			.orderBy(order.createdAt.desc());
 
@@ -107,10 +107,10 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
 			.leftJoin(payment.paymentDetail, paymentDetail)
 			.leftJoin(paymentDetail.paymentType, paymentType)
 			.where(
-				searchKeyword(searchRequest.searchKeywordType(), searchRequest.searchKeyword()),
-				orderStatusFilter(searchRequest.orderStatusFilter()),
-				paymentMethodFilter(searchRequest.paymentMethodFilter()),
-				dateRangeFilter(searchRequest.startDate(), searchRequest.endDate())
+				searchKeyword(searchRequest.getSearchKeywordType(), searchRequest.getSearchKeyword()),
+				orderStatusFilter(searchRequest.getOrderStatusFilter()),
+				paymentMethodFilter(searchRequest.getPaymentMethodFilter()),
+				dateRangeFilter(searchRequest.getStartDate(), searchRequest.getEndDate())
 			);
 
 		long total = countQuery.fetchOne();

@@ -4,11 +4,13 @@ import java.math.BigDecimal;
 
 import com.querydsl.core.annotations.QueryProjection;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
+@Builder
 public class UsableUserCouponResponse {
 	Long userCouponId;
 	Long couponId;

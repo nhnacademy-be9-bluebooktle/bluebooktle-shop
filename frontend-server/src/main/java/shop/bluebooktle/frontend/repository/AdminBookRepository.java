@@ -19,6 +19,7 @@ import shop.bluebooktle.common.dto.book.response.BookAllResponse;
 import shop.bluebooktle.common.dto.book.response.BookCartOrderResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
 import shop.bluebooktle.frontend.config.feign.FeignGlobalConfig;
+import shop.bluebooktle.frontend.config.retry.RetryWithTokenRefresh;
 
 @FeignClient(url = "${server.gateway-url}", name = "adminBookRepository", path = "/api/books", configuration = FeignGlobalConfig.class)
 public interface AdminBookRepository {
@@ -27,6 +28,7 @@ public interface AdminBookRepository {
 	void registerBook(@RequestBody BookAllRegisterRequest bookAllRegisterRequest);
 
 	@GetMapping("/admin")
+	@RetryWithTokenRefresh
 	PaginationData<AdminBookResponse> getPagedBooksByAdmin(
 		@RequestParam("page") int page,
 		@RequestParam("size") int size,
@@ -34,24 +36,30 @@ public interface AdminBookRepository {
 	);
 
 	@GetMapping("/{bookId}/admin")
+	@RetryWithTokenRefresh
 	BookAllResponse getBook(@PathVariable("bookId") Long bookId);
 
 	@PutMapping("/{bookId}")
+	@RetryWithTokenRefresh
 	void updateBook(
 		@PathVariable Long bookId,
 		@RequestBody BookUpdateServiceRequest bookUpdateServiceRequest
 	);
 
 	@DeleteMapping("/{bookId}")
+	@RetryWithTokenRefresh
 	void deleteBook(@PathVariable("bookId") Long bookId);
 
 	@GetMapping("/order/{bookId}")
+	@RetryWithTokenRefresh
 	BookCartOrderResponse getBookCartOrder(@PathVariable("bookId") Long bookId, @RequestParam int quantity);
 
 	@GetMapping("/aladin-search")
+	@RetryWithTokenRefresh
 	List<AladinBookResponse> searchAladinBooks(
 		@RequestParam("keyword") String keyword,
 		@RequestParam("page") int page,
 		@RequestParam("size") int size
 	);
 }
+
