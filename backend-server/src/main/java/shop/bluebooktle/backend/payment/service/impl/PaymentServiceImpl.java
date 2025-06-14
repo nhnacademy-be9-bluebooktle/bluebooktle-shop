@@ -114,6 +114,7 @@ public class PaymentServiceImpl implements PaymentService {
 			PaymentDetail paymentDetail = PaymentDetail.builder()
 				.paymentType(paymentType)
 				.paymentKey(gatewayResponse.transactionId())
+				.paymentStatus(shop.bluebooktle.common.domain.payment.PaymentStatus.DONE)
 				.build();
 			paymentDetailRepository.save(paymentDetail);
 
@@ -186,6 +187,9 @@ public class PaymentServiceImpl implements PaymentService {
 
 			orderService.cancelOrderInternal(payment.getOrder());
 
+			paymentRepository.save(payment);
+			paymentDetailRepository.save(paymentDetail);
+			
 			PaymentPointHistory paymentPointHistory = payment.getPaymentPointHistory();
 			if (paymentPointHistory == null) {
 				return;
@@ -206,9 +210,6 @@ public class PaymentServiceImpl implements PaymentService {
 					.build();
 				pointHistoryRepository.save(history);
 			}
-
-			paymentRepository.save(payment);
-			paymentDetailRepository.save(paymentDetail);
 
 		} else {
 			String failReason = "결제 취소 실패";
