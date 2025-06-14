@@ -408,9 +408,6 @@ CREATE TABLE `user_coupon`
     CONSTRAINT `FK_user_coupon_user_id_user`
         FOREIGN KEY (`user_id`)
             REFERENCES `users` (`user_id`),
-    INDEX `idx_user_coupon_used_at` (`used_at`),
-    INDEX `idx_user_coupon_available_start_at` (`available_start_at`),
-    INDEX `idx_user_coupon_available_end_at` (`available_end_at`),
     INDEX `idx_user_coupon_user_id_period` (user_id, used_at, available_start_at, available_end_at)
 );
 
