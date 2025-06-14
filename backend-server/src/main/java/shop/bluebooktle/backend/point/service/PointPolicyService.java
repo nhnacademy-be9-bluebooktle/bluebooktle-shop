@@ -7,7 +7,6 @@ import shop.bluebooktle.common.dto.point.request.PointPolicyCreateRequest;
 import shop.bluebooktle.common.dto.point.request.PointPolicyUpdateRequest;
 import shop.bluebooktle.common.dto.point.response.PointPolicyResponse;
 import shop.bluebooktle.common.dto.point.response.PointRuleResponse;
-import shop.bluebooktle.common.entity.point.PointSourceType;
 
 public interface PointPolicyService {
 
@@ -18,8 +17,6 @@ public interface PointPolicyService {
 	void delete(Long id);
 
 	PointPolicyResponse get(Long id);
-
-	PointPolicyResponse getByPointSourceType(PointSourceType sourceType);
 
 	List<PointRuleResponse> getAll();
 

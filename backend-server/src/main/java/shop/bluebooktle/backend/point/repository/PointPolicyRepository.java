@@ -16,8 +16,6 @@ public interface PointPolicyRepository extends JpaRepository<PointPolicy, Long> 
 
 	Optional<PointPolicy> findByPointSourceType(PointSourceType pointSourceType);
 
-	Optional<PointPolicy> findByPointSourceTypeIdAndIsActiveTrue(Long pointSourceTypeId);
-
 	@EntityGraph(attributePaths = {"pointSourceType"})
 	List<PointPolicy> findAll();
 }
