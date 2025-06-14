@@ -32,7 +32,7 @@ public class PaginationData<T> {
 	@Getter
 	@Setter
 	@NoArgsConstructor
-	private static class PaginationInfo {
+	public static class PaginationInfo {
 		private int totalPages;
 		private long totalElements;
 		private int currentPage;
