@@ -150,6 +150,7 @@ class OrderServiceImplTest {
 		orderStatePending = mock(OrderState.class);
 		book = mock(Book.class);
 		bookImg = mock(BookImg.class);
+
 		img = mock(Img.class);
 		deliveryRule = mock(DeliveryRule.class);
 		pendingOrderState = mock(OrderState.class);
@@ -342,7 +343,9 @@ class OrderServiceImplTest {
 		when(orderRepository.save(any(Order.class))).thenReturn(savedOrder);
 
 		when(bookOrderRepository.save(any(BookOrder.class))).thenAnswer(invocation -> invocation.getArgument(0));
-
+		when(bookSaleInfoRepository.findByBook(book)).thenReturn(Optional.of(bookSaleInfo));
+		when(bookSaleInfo.getBookSaleInfoState()).thenReturn(BookSaleInfoState.AVAILABLE);
+		when(bookSaleInfo.getStock()).thenReturn(100);
 		Long resultOrderId = orderService.createOrder(request);
 
 		assertNotNull(resultOrderId);
@@ -1476,7 +1479,7 @@ class OrderServiceImplTest {
 		// AdminOrderSearchRequest 객체 생성 방식 변경
 		AdminOrderSearchRequest searchRequest = new AdminOrderSearchRequest(
 			AdminOrderSearchType.ORDERER_LOGIN_ID,
-			"주문자",
+			null,
 			null,
 			null,
 			null,

@@ -147,7 +147,7 @@ class RefundServiceTest {
 		given(mockDeliveryRule.getDeliveryFee()).willReturn(new BigDecimal("3000"));
 		given(mockOrder.getOriginalAmount()).willReturn(new BigDecimal("20000"));
 		given(mockOrder.getSaleDiscountAmount()).willReturn(new BigDecimal("1000"));
-		given(mockOrder.getPointUseAmount()).willReturn(new BigDecimal("500"));
+		given(mockOrder.getDeliveryFee()).willReturn(new BigDecimal("0"));
 		given(orderStateRepository.findByState(OrderStatus.RETURNED)).willReturn(
 			Optional.of(new OrderState(OrderStatus.RETURNED)));
 
