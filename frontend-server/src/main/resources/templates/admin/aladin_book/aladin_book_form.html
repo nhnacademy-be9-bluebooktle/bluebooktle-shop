@@ -113,7 +113,8 @@
                      style="margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
                     <input type="text" id="aladinSearchInput" placeholder="알라딘 도서 검색" class="admin-form-control"
                            style="width: 300px;">
-                    <button type="button" class="admin-btn admin-btn--primary" onclick="searchAladinBooks()">검색</button>
+                    <button type="button" id="aladinSearchButton" class="admin-btn admin-btn--primary"
+                            onclick="searchAladinBooks()">검색</button>
                 </div>
 
                 <div class="admin-panel">
@@ -383,7 +384,7 @@
         }
 
         // 검색 버튼 바인딩
-        document.querySelector('.admin-btn--primary')
+        document.getElementById('aladinSearchButton')
             .addEventListener('click', () => searchAladinBooks(1));
 
 
@@ -420,26 +421,31 @@
                 .then(data => {
                     const ul = document.getElementById('tagResults');
                     ul.innerHTML = data.content.map(t => `
-  <li>
-    <label>
-     <input type="checkbox" name="tagIdList" value="${t.id}"/>
-      ${t.name}
-    </label>
-  </li>
-      `).join('');
-                    // 페이징
+                <li>
+                    <label>
+                        <input type="checkbox" name="tagIdList" value="${t.id}"/>
+                        ${t.name}
+                    </label>
+                </li>
+            `).join('');
+
+                    // 페이징 버튼 렌더링
                     const pag = document.getElementById('tagPagination');
                     let html = '';
+
                     if (data.pageable.pageNumber > 0) {
-                        html += `<button onclick="loadTags(${data.pageable.pageNumber - 1},${size},'${keyword}')">&laquo;</button>`;
+                        html += `<button type="button" onclick="loadTags(${data.pageable.pageNumber - 1}, ${size}, '${keyword}')">&laquo;</button>`;
                     }
+
                     for (let i = 0; i < data.totalPages; i++) {
-                        html += `<button class="${i === data.pageable.pageNumber ? 'active' : ''}"
-                    onclick="loadTags(${i},${size},'${keyword}')">${i + 1}</button>`;
+                        html += `<button type="button" class="${i === data.pageable.pageNumber ? 'active' : ''}"
+                            onclick="loadTags(${i}, ${size}, '${keyword}')">${i + 1}</button>`;
                     }
+
                     if (data.pageable.pageNumber < data.totalPages - 1) {
-                        html += `<button onclick="loadTags(${data.pageable.pageNumber + 1},${size},'${keyword}')">&raquo;</button>`;
+                        html += `<button type="button" onclick="loadTags(${data.pageable.pageNumber + 1}, ${size}, '${keyword}')">&raquo;</button>`;
                     }
+
                     pag.innerHTML = html;
                 })
                 .catch(console.error);
@@ -455,11 +461,7 @@
                 const ul = document.getElementById('categoryResults');
                 ul.innerHTML = '';
                 renderCategoryTree(categoryTree, ul);
-            } else if (type === 'publisher') {
-                loadPublishers(0, pubSize, pubKeyword);
-            } else if (type === 'author') {
-                loadAuthors(0, authSize, authKeyword);
-            } else if (type === 'tag') {
+            } else {
                 loadTags(0, tagSize, tagKeyword);
             }
         }
@@ -473,6 +475,8 @@
         });
 
         function saveSelection(type) {
+            event?.preventDefault?.();  // 🔥 추가
+            event?.stopPropagation?.(); // 🔥 추가
             const popup = document.getElementById(type + 'Popup');
             const checked = popup.querySelectorAll('input[type="checkbox"]:checked');
 

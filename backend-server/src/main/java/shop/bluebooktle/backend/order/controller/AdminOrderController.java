@@ -54,14 +54,6 @@ public class AdminOrderController {
 		return ResponseEntity.ok(JsendResponse.success(paginationData));
 	}
 
-	@PostMapping("/{orderId}/ship")
-	@Auth(type = UserType.ADMIN)
-	public ResponseEntity<JsendResponse<Void>> shipOrder(@PathVariable Long orderId) {
-		orderService.shipOrder(orderId);
-		return ResponseEntity.status(HttpStatus.OK)
-			.body(JsendResponse.success(null));
-	}
-
 	@Operation(summary = "관리자 주문 상세 조회", description = "관리자 주문 상세 조회합니다.")
 	@GetMapping("/{orderId}")
 	@Auth(type = UserType.ADMIN)

@@ -270,6 +270,7 @@ public class OrderController {
 		try {
 			OrderDetailResponse orderDetails = orderService.getOrderDetailByOrderKey(orderKey);
 			mav.addObject("order", orderDetails);
+			mav.addObject("isMember", false);
 		} catch (Exception e) {
 			redirectAttributes.addFlashAttribute("globalErrorMessage", e.getMessage());
 			mav.setViewName("redirect:/");

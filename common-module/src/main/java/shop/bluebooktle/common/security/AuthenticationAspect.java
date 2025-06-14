@@ -7,7 +7,6 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -66,7 +65,7 @@ public class AuthenticationAspect {
 		if (!authorized) {
 			log.warn("AuthenticationAspect: 권한 부족. 사용자: {}, 필요 권한: {}, 실제 권한: {}", userPrincipal.getUsername(),
 				requiredUserType, actualUserType);
-			throw new AccessDeniedException("요청한 리소스에 접근할 권한이 없습니다. 필요 권한: " + requiredUserType);
+			throw new HandleAccessDeniedException("요청한 리소스에 접근할 권한이 없습니다. 필요 권한: " + requiredUserType);
 		}
 	}
 }

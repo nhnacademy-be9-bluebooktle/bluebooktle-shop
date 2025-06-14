@@ -1,6 +1,5 @@
 package shop.bluebooktle.backend.book.service.impl;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -25,13 +24,9 @@ import shop.bluebooktle.backend.book.service.BookCategoryService;
 import shop.bluebooktle.backend.book.service.CategoryService;
 import shop.bluebooktle.backend.elasticsearch.service.BookElasticSearchService;
 import shop.bluebooktle.common.dto.book.BookSortType;
-import shop.bluebooktle.common.dto.book.request.BookInfoRequest;
 import shop.bluebooktle.common.dto.book.response.BookInfoResponse;
-import shop.bluebooktle.common.dto.book.response.CategoryResponse;
 import shop.bluebooktle.common.exception.book.BookCategoryAlreadyExistsException;
 import shop.bluebooktle.common.exception.book.BookCategoryLimitExceededException;
-import shop.bluebooktle.common.exception.book.BookCategoryNotFoundException;
-import shop.bluebooktle.common.exception.book.BookCategoryRequiredException;
 import shop.bluebooktle.common.exception.book.BookNotFoundException;
 import shop.bluebooktle.common.exception.book.CategoryNotFoundException;
 
@@ -48,7 +43,6 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 	private final BookSaleInfoRepository bookSaleInfoRepository;
 	private final BookImgRepository bookImgRepository;
 
-	private final CategoryService categoryService;
 	private final BookElasticSearchService bookElasticSearchService;
 
 	@Override

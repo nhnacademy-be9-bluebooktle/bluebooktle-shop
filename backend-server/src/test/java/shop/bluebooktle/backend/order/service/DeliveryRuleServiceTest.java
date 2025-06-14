@@ -23,6 +23,7 @@ import shop.bluebooktle.backend.order.repository.DeliveryRuleRepository;
 import shop.bluebooktle.backend.order.service.impl.DeliveryRuleServiceImpl;
 import shop.bluebooktle.common.domain.order.Region;
 import shop.bluebooktle.common.dto.order.request.DeliveryRuleCreateRequest;
+import shop.bluebooktle.common.dto.order.request.DeliveryRuleUpdateRequest;
 import shop.bluebooktle.common.dto.order.response.DeliveryRuleResponse;
 import shop.bluebooktle.common.exception.order.delivery_rule.CannotDeleteDefaultPolicyException;
 import shop.bluebooktle.common.exception.order.delivery_rule.DefaultDeliveryRuleNotFoundException;
@@ -209,5 +210,59 @@ class DeliveryRuleServiceTest {
 
 		assertThatThrownBy(() -> service.deleteRule(1L))
 			.isInstanceOf(CannotDeleteDefaultPolicyException.class);
+	}
+
+	@Test
+	@DisplayName("활성화된 모든 정책 조회 - 성공")
+	void getAllByIsActive_success() {
+		DeliveryRule activeRule1 = DeliveryRule.builder()
+			.ruleName("활성 정책 1").deliveryFee(BigDecimal.ONE).isActive(true).build();
+		DeliveryRule activeRule2 = DeliveryRule.builder()
+			.ruleName("활성 정책 2").deliveryFee(BigDecimal.TEN).isActive(true).build();
+
+		given(repository.findAllByIsActiveTrue()).willReturn(List.of(activeRule1, activeRule2));
+
+		List<DeliveryRuleResponse> result = service.getAllByIsActive();
+
+		assertThat(result).hasSize(2);
+		assertThat(result).extracting(DeliveryRuleResponse::ruleName)
+			.containsExactly("활성 정책 1", "활성 정책 2");
+	}
+
+	@Test
+	@DisplayName("배송 정책 수정 - 성공")
+	void updateRule_success() {
+		Long ruleId = 1L;
+		DeliveryRuleUpdateRequest request = new DeliveryRuleUpdateRequest(
+			new BigDecimal("3500"),
+			new BigDecimal("70000"),
+			false
+		);
+
+		DeliveryRule mockRule = mock(DeliveryRule.class);
+		given(repository.findById(ruleId)).willReturn(Optional.of(mockRule));
+
+		service.updateRule(ruleId, request);
+
+		verify(mockRule).setDeliveryFee(request.deliveryFee());
+		verify(mockRule).setFreeDeliveryThreshold(request.freeDeliveryThreshold());
+		verify(mockRule).setIsActive(request.isActive());
+		verify(repository).save(mockRule);
+	}
+
+	@Test
+	@DisplayName("배송 정책 수정 실패 - ID를 찾을 수 없음")
+	void updateRule_fail_whenNotFound() {
+
+		Long ruleId = 99L;
+		DeliveryRuleUpdateRequest request = new DeliveryRuleUpdateRequest(
+			BigDecimal.ZERO, BigDecimal.ZERO, true
+		);
+		given(repository.findById(ruleId)).willReturn(Optional.empty());
+
+		assertThatThrownBy(() -> service.updateRule(ruleId, request))
+			.isInstanceOf(DeliveryRuleNotFoundException.class);
+
+		verify(repository, never()).save(any());
 	}
 }

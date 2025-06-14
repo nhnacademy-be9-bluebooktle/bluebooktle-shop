@@ -85,8 +85,10 @@ public class AdminAuthorController {
 
 	// authorForm, saveAuthor, deleteAuthor 메소드는 기존 내용 유지 (필요시 DTO 필드 등 확인)
 	@GetMapping({"/new", "/{authorId}/edit"})
-	public String authorForm(@PathVariable(value = "authorId", required = false) Long authorId,
-		Model model, HttpServletRequest request) {
+	public String authorForm(
+		@PathVariable(value = "authorId", required = false) Long authorId,
+		Model model, HttpServletRequest request
+	) {
 		log.info("어드민 작가 폼 페이지 요청. URI: {}, authorId: {}", request.getRequestURI(), authorId);
 		model.addAttribute("currentURI", request.getRequestURI());
 		AuthorResponse authorDto;
@@ -94,7 +96,7 @@ public class AdminAuthorController {
 
 		if (authorId != null) {
 			pageTitle = "작가 정보 수정 (ID: " + authorId + ")";
-			authorDto = AuthorResponse.builder().id(authorId).build();
+			authorDto = adminAuthorService.getAuthor(authorId);
 			log.warn("Author with ID {} not found in demo data for edit form.", authorId);
 		} else {
 			pageTitle = "새 작가 등록";
