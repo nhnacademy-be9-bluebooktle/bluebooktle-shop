@@ -31,6 +31,8 @@ public class BackendAuthUserLoaderImpl implements AuthUserLoader {
 				.status(user.getStatus())
 				.build();
 			return new UserPrincipal(userDto);
+		} catch (UserNotFoundException e) {
+			throw e;
 		} catch (Exception e) {
 			throw new UserNotFoundException("AuthServer에서 사용자 정보 조회 중 오류 발생 (ID: " + userId + ")", e);
 		}

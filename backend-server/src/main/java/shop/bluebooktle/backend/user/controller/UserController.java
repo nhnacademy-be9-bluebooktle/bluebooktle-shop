@@ -105,7 +105,7 @@ public class UserController {
 	@PutMapping("/{id}")
 	public ResponseEntity<JsendResponse<Void>> updateUser(
 		@PathVariable Long id,
-		@RequestBody UserUpdateRequest request
+		@RequestBody @Valid UserUpdateRequest request
 	) {
 		try {
 			userService.updateUser(id, request);
