@@ -90,7 +90,9 @@ public class RefundServiceImpl implements RefundService {
 		if (request.status() == RefundStatus.COMPLETE) {
 			BigDecimal finalAmount = order.getOriginalAmount()
 				.subtract(order.getSaleDiscountAmount())
-				.add(order.getPointUseAmount());
+				.add(order.getDeliveryFee())
+				.add(Optional.ofNullable(order.getCouponDiscountAmount()).orElse(BigDecimal.ZERO));
+
 			if (refund.getReason() != RefundReason.DAMAGED && refund.getReason() != RefundReason.DEFECT) {
 				finalAmount = finalAmount.subtract(deliveryFee);
 			}

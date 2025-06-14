@@ -331,7 +331,8 @@
         </div>
 
         <div class="mypage-layout-kitsch">
-            <div th:replace="~{_fragments/mypage_sidebar :: mypageSidebarFragment(activeMenu='orders')}"></div>
+            <div th:if="${isMember}"
+                 th:replace="~{_fragments/mypage_sidebar :: mypageSidebarFragment(activeMenu='orders')}"></div>
 
 
             <main class="mypage-content-kitsch">
