@@ -1,12 +1,15 @@
 package shop.bluebooktle.backend.order.repository;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import shop.bluebooktle.backend.order.entity.Order;
+import shop.bluebooktle.common.domain.order.OrderStatus;
 import shop.bluebooktle.common.dto.order.request.AdminOrderSearchRequest;
 
 public interface OrderQueryRepository {
@@ -21,5 +24,7 @@ public interface OrderQueryRepository {
 	Optional<Order> findAdminOrderDetailsByOrderId(Long orderId);
 
 	Optional<Order> findOrderForRefund(Long orderId);
+
+	List<Order> findOrdersByStatusAndRequestedDeliveryDateBefore(OrderStatus status, LocalDateTime dateTime);
 
 }
