@@ -14,7 +14,7 @@ import co.elastic.clients.elasticsearch.ElasticsearchClient;
 
 @Configuration
 @EnableElasticsearchRepositories
-@RefreshScope
+
 public class ElasticsearchConfig extends ElasticsearchConfiguration {
 
 	@Value("${spring.elasticsearch.uris}")
@@ -27,6 +27,7 @@ public class ElasticsearchConfig extends ElasticsearchConfiguration {
 	private String password;
 
 	@Override
+	@RefreshScope
 	public ClientConfiguration clientConfiguration() {
 		return ClientConfiguration.builder()
 			.connectedTo(host)
