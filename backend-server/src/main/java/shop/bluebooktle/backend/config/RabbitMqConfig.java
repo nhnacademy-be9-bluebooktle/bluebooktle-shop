@@ -29,9 +29,9 @@ public class RabbitMqConfig {
 	private final OrderQueueProperties orderProps;
 	private final OrderExchangeProperties orderExchange;
 
-	private static final int ORDER_TTL = 600000;
+	private static final int ORDER_CANCEL_TTL = 600000;
 
-	private static final long SHIPPING_COMPLETE_TTL = 600000;
+	private static final long SHIPPING_COMPLETE_TTL = 3600000 * 24 * 3;
 
 	//----order
 	@Bean
@@ -47,7 +47,7 @@ public class RabbitMqConfig {
 	@Bean
 	public Queue orderWaitQueue() {
 		return QueueBuilder.durable(orderProps.getOrderWait())
-			.withArgument("x-message-ttl", ORDER_TTL)
+			.withArgument("x-message-ttl", ORDER_CANCEL_TTL)
 			.withArgument("x-dead-letter-exchange", orderExchange.getOrderDlx())
 			.withArgument("x-dead-letter-routing-key", orderProps.getOrderCancel())
 			.build();

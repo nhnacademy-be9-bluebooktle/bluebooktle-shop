@@ -10,6 +10,12 @@ spring:
     redis:
       host: localhost
       port: 6379
+  rabbitmq:
+    host: s4.java21.net
+    port: 5672
+    username: ${RABBITMQ_USERNAME}
+    password: ${RABBITMQ_PASSWORD}
+    virtual-host: bluebooktle
 
 eureka:
   client:

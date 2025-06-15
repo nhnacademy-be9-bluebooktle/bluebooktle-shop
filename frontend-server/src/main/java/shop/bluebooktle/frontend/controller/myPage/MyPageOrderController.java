@@ -12,6 +12,7 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import shop.bluebooktle.common.domain.order.OrderStatus;
 import shop.bluebooktle.common.dto.common.PaginationData;
 import shop.bluebooktle.common.dto.order.response.OrderDetailResponse;
@@ -20,6 +21,7 @@ import shop.bluebooktle.common.dto.payment.request.PaymentCancelRequest;
 import shop.bluebooktle.frontend.service.OrderService;
 import shop.bluebooktle.frontend.service.PaymentsService;
 
+@Slf4j
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/mypage/orders")
@@ -61,6 +63,7 @@ public class MyPageOrderController {
 	) {
 		ModelAndView mav = new ModelAndView("mypage/order_detail");
 		try {
+			log.info("회원 주문 조회");
 			OrderDetailResponse orderDetails = orderService.getOrderDetailByOrderKey(orderKey);
 			mav.addObject("order", orderDetails);
 			mav.addObject("isMember", true);

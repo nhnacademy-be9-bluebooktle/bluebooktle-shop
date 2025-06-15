@@ -11,3 +11,10 @@ eureka:
     serviceUrl:
       defaultZone: http://blue:blueBooktle12@localhost:9761/eureka/
 
+spring:
+  rabbitmq:
+    host: s4.java21.net
+    port: 5672
+    username: ${RABBITMQ_USERNAME}
+    password: ${RABBITMQ_PASSWORD}
+    virtual-host: bluebooktle

@@ -1,6 +1,7 @@
 package shop.bluebooktle.backend.coupon.mq.birthday;
 
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ import shop.bluebooktle.common.exception.coupon.CouponNotFoundException;
 @Slf4j
 @RequiredArgsConstructor
 @Component
+@RefreshScope
 public class BirthdayCouponIssueListener {
 	private final UserRepository userRepository;
 	private final CouponRepository couponRepository;

@@ -1,6 +1,7 @@
 package shop.bluebooktle.backend.book.config;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -8,6 +9,7 @@ import io.minio.MinioClient;
 
 //이미지서버 minio
 @Configuration
+@RefreshScope
 public class MinioConfig {
 
 	@Value("${minio.endpoint}")

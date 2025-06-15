@@ -1,6 +1,7 @@
 package shop.bluebooktle.backend.order.mq.listener;
 
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
@@ -11,6 +12,7 @@ import shop.bluebooktle.backend.order.service.OrderService;
 @Slf4j
 @RequiredArgsConstructor
 @Component
+@RefreshScope
 public class OrderCancelRabbitListener {
 	private final OrderService orderService;
 

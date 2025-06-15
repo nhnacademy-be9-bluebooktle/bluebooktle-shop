@@ -146,7 +146,7 @@ public class OrderController {
 
 	@Operation(summary = "주문 상세 조회", description = "주문상세 페이지를 조회합니다.")
 	@GetMapping("/{orderKey}/detail")
-	public ResponseEntity<JsendResponse<OrderDetailResponse>> getMemberOrderDetail(
+	public ResponseEntity<JsendResponse<OrderDetailResponse>> getOrderDetail(
 		@Parameter(description = "조회할 주문키") @PathVariable String orderKey,
 		@Parameter(hidden = true) @AuthenticationPrincipal UserPrincipal userPrincipal
 	) {
