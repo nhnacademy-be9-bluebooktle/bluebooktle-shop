@@ -6,7 +6,6 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
 import com.querydsl.core.BooleanBuilder;
@@ -35,7 +34,6 @@ import shop.bluebooktle.common.dto.coupon.response.QUserCouponResponse;
 import shop.bluebooktle.common.dto.coupon.response.UserCouponResponse;
 
 @Slf4j
-@Repository
 @RequiredArgsConstructor
 public class CouponQueryRepositoryImpl implements CouponQueryRepository {
 

@@ -11,8 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.springframework.stereotype.Repository;
-
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
@@ -34,7 +32,6 @@ import shop.bluebooktle.common.dto.coupon.response.QUsableUserCouponResponse;
 import shop.bluebooktle.common.dto.coupon.response.UsableUserCouponMapResponse;
 import shop.bluebooktle.common.dto.coupon.response.UsableUserCouponResponse;
 
-@Repository
 @RequiredArgsConstructor
 @Slf4j
 public class UserCouponQueryRepositoryImpl implements UserCouponQueryRepository {

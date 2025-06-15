@@ -33,18 +33,25 @@ public class BirthdayCouponIssueListener {
 		log.info("실패 TEST : 생일 쿠폰 message: {}", message);
 		throw new RuntimeException("실패 DLQ Test");
 		 */
-		User user = userRepository.findById(message.getUserId())
-			.orElseThrow(UserNotFoundException::new);
-		Coupon coupon = couponRepository.findById(message.getCouponId())
-			.orElseThrow(CouponNotFoundException::new);
+		try {
+			User user = userRepository.findById(message.getUserId())
+				.orElseThrow(UserNotFoundException::new);
+			Coupon coupon = couponRepository.findById(message.getCouponId())
+				.orElseThrow(CouponNotFoundException::new);
 
-		UserCoupon userCoupon = UserCoupon.builder()
-			.user(user)
-			.coupon(coupon)
-			.availableStartAt(message.getAvailableStartAt())
-			.availableEndAt(message.getAvailableEndAt())
-			.build();
+			UserCoupon userCoupon = UserCoupon.builder()
+				.user(user)
+				.coupon(coupon)
+				.availableStartAt(message.getAvailableStartAt())
+				.availableEndAt(message.getAvailableEndAt())
+				.build();
 
-		userCouponRepository.save(userCoupon);
+			userCouponRepository.save(userCoupon);
+
+		} catch (Exception e) {
+			log.error("생일 쿠폰 발급 실패: userId={}, couponId={}, error={}", message.getUserId(), message.getCouponId(),
+				e.getMessage(), e);
+			throw e;
+		}
 	}
 }

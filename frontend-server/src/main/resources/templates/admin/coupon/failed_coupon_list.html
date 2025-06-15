@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html layout:decorate="~{_layouts/admin_layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>실패한 쿠폰 목록</title>
+    <meta charset="UTF-8"/>
+    <link rel="stylesheet" href="/css/admin_styles.css"/>
+</head>
+<body>
+<div layout:fragment="admin_content">
+    <div th:if="${successMessage != null}" class="alert alert-success" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage != null}" class="alert alert-danger" th:text="${errorMessage}"></div>
+
+
+    <div class="admin-page-header">
+        <h1 class="admin-page-title">
+            <i class="fas fa-exclamation-circle"></i> 쿠폰 발급 실패 목록
+        </h1>
+        <div class="admin-page-actions">
+            <form th:action="@{/admin/coupons/failed/resend-all}" method="post">
+                <button type="submit" class="admin-btn admin-btn--danger">
+                    <i class="fas fa-redo-alt"></i> 전체 재발급
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div class="admin-panel filter-form">
+        <div class="admin-panel__body">
+            <form method="get" th:action="@{/admin/coupons/failed}" class="row gx-2 gy-2 align-items-center">
+                <div class="col-auto">
+                    <select class="admin-form-control" name="type">
+                        <option value="">전체 유형</option>
+                        <option th:each="t : ${T(shop.bluebooktle.common.domain.coupon.CouponIssueType).values()}"
+                                th:value="${t}" th:text="${t}"
+                                th:selected="${searchRequest?.type} == ${t}">유형
+                        </option>
+                    </select>
+                </div>
+                <div class="col-auto">
+                    <select class="admin-form-control" name="status">
+                        <option value="">전체 상태</option>
+                        <option th:each="s : ${T(shop.bluebooktle.common.domain.coupon.CouponIssueStatus).values()}"
+                                th:value="${s}" th:text="${s}"
+                                th:selected="${searchRequest?.status} == ${s}">상태
+                        </option>
+                    </select>
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="admin-btn admin-btn--secondary">
+                        <i class="fas fa-search"></i> 검색
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="admin-panel">
+        <div class="admin-panel__header">실패한 쿠폰 목록</div>
+        <div class="admin-panel__body table-responsive">
+            <table class="admin-table admin-table--striped admin-table--hover">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>유저 ID</th>
+                    <th>쿠폰 ID</th>
+                    <th>유형</th>
+                    <th>상태</th>
+                    <th>사유</th>
+                    <th>재시도</th>
+                    <th>요청일</th>
+                    <th>관리</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="issue : ${coupons}">
+                    <td th:text="${issue.id}">ID</td>
+                    <td th:text="${issue.userId}">101</td>
+                    <td th:text="${issue.couponId}">202</td>
+                    <td th:text="${issue.issueType}">DIRECT</td>
+                    <td th:text="${issue.status}">FAILED</td>
+                    <td th:text="${issue.reason}">rejected</td>
+                    <td th:text="${issue.retryCount}">2</td>
+                    <td th:text="${issue.createdAt != null ? #temporals.format(issue.createdAt, 'yyyy-MM-dd HH:mm') : '-'}">
+                        -
+                    </td>
+                    <td>
+                        <span th:if="${issue.status.name() == 'SUCCESS'}" class="text-success">완료</span>
+                        <form th:if="${issue.status.name() != 'SUCCESS'}"
+                              th:action="@{'/admin/coupons/failed/' + ${issue.id} + '/resend'}"
+                              method="post">
+                            <div class="admin-form-group">
+                                <button type="submit" class="admin-btn admin-btn--sm admin-btn--primary">
+                                    재발급
+                                </button>
+                            </div>
+                        </form>
+                    </td>
+                </tr>
+                <tr th:if="${coupons == null or #lists.isEmpty(coupons)}">
+                    <td colspan="9" class="text-center">실패한 쿠폰이 없습니다.</td>
+                </tr>
+                </tbody>
+            </table>
+
+            <div th:if="${pagination.totalPages > 1}" class="pagination-container">
+                <th:block th:replace="~{_fragments/admin_pagination :: commonPagination(
+      currentPage=${pagination.currentPage + 1},
+      totalPages=${pagination.totalPages},
+      baseUrl='/admin/coupons/failed',
+      searchKeyword=null
+  )}"/>
+            </div>
+        </div>
+        <div class="admin-form-actions" style="text-align: right; margin-top: 20px;">
+            <a th:href="@{/admin/coupons}" class="admin-btn admin-btn--default">
+                <i class="fas fa-arrow-left"></i> 취소
+            </a>
+        </div>
+
+    </div>
+
+
+</div>
+</body>
+</html>
