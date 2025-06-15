@@ -104,24 +104,4 @@ public class BookDocument {
 		this.tagNames = tagNames;
 		this.categoryIds = categoryIds;
 	}
-
-	public static BookDocument from(Book book, BookSaleInfo bookSaleInfo, List<BookAuthor> bookAuthors,
-		List<BookPublisher> bookPublishers, List<BookTag> bookTags, List<BookCategory> bookCategories) {
-		return BookDocument.builder()
-			.id(book.getId())
-			.title(book.getTitle())
-			.description(book.getDescription())
-			.publishDate(book.getPublishDate())
-			.salePrice(bookSaleInfo.getSalePrice())
-			.star(bookSaleInfo.getStar())
-			.viewCount(bookSaleInfo.getViewCount())
-			.searchCount(bookSaleInfo.getSearchCount())
-			.reviewCount(bookSaleInfo.getReviewCount())
-			.authorNames(bookAuthors.stream().map(bookAuthor -> bookAuthor.getAuthor().getName()).toList())
-			.publisherNames(
-				bookPublishers.stream().map(bookPublisher -> bookPublisher.getPublisher().getName()).toList())
-			.tagNames(bookTags.stream().map(bookTag -> bookTag.getTag().getName()).toList())
-			.categoryIds(bookCategories.stream().map(bookCategory -> bookCategory.getCategory().getId()).toList())
-			.build();
-	}
 }
