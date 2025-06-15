@@ -269,7 +269,7 @@ public class OrderServiceImpl implements OrderService {
 		return saved.getId();
 	}
 
-	public BookOrder createSingleBookOrder(Order order, OrderItemRequest item) {
+	private BookOrder createSingleBookOrder(Order order, OrderItemRequest item) {
 		Book book = bookRepository.findById(item.bookId())
 			.orElseThrow(BookNotFoundException::new);
 

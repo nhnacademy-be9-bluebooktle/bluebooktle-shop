@@ -14,7 +14,6 @@ import co.elastic.clients.elasticsearch.ElasticsearchClient;
 
 @Configuration
 @EnableElasticsearchRepositories
-
 public class ElasticsearchConfig extends ElasticsearchConfiguration {
 
 	@Value("${spring.elasticsearch.uris}")

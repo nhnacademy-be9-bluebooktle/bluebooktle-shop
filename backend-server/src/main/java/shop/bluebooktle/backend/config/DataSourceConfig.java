@@ -6,11 +6,11 @@ import javax.sql.DataSource;
 
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-// @RefreshScope
 public class DataSourceConfig {
 
 	@Value("${spring.datasource.driver-class-name}")
@@ -26,6 +26,7 @@ public class DataSourceConfig {
 	private String password;
 
 	@Bean()
+	@RefreshScope
 	public DataSource dataSource() {
 		BasicDataSource dataSource = new BasicDataSource();
 		dataSource.setDriverClassName(driverClassName);
