@@ -20,6 +20,13 @@ spring:
     redis:
       host: localhost
       port: 6379
+
+  elasticsearch:
+    uris: dummy-host:9200
+    username: dummy
+    password: dummy
+
+
 jwt:
   secret: F22T/ZZH9vtITsBb8DYLXMiPt/ogfuCKE2QDKubLE/wOz3+9GB2wJUtDxilTH6x/Vy8pQ8NTXa1KhAwj6Zos5gE9LzrEfpJ+G3TbPqa/qZg9ULHsK6Udw7UzF/aSIhTA7ccm3hWsJY/Me9SNIMJWj3/60k1acorA/vU9syUI0yI=
   access-token-validity-seconds: 1800
