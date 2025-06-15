@@ -18,8 +18,6 @@ public class BookDetailResponse {
 	private String title; // 책 제목
 	private List<String> authors; // 작가 목록
 	private List<String> publishers; // 출판사 목록
-	//TODO 평점 추가
-	//TODO 리뷰 개수 추가
 	private BigDecimal price; // 정가
 	private BigDecimal salePrice; // 판매 가격
 	private Integer salePercentage; // 할인율

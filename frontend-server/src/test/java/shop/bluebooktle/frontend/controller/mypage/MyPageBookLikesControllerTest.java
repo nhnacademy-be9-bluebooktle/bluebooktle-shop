@@ -1,4 +1,4 @@
-package shop.bluebooktle.frontend.controller.mypage;
+package shop.bluebooktle.frontend.controller.myPage;
 
 import static org.mockito.BDDMockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;

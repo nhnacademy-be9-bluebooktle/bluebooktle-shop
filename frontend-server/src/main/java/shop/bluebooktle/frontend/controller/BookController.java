@@ -93,10 +93,12 @@ public class BookController {
 
 	// 도서 상세 페이지
 	@GetMapping("/books/{bookId}")
-	public String bookDetailPage(@PathVariable Long bookId,
+	public String bookDetailPage(
+		@PathVariable Long bookId,
 		Model model,
 		@RequestParam(value = "page", defaultValue = "0") int page,
-		RedirectAttributes redirectAttributes, Pageable pageable) {
+		RedirectAttributes redirectAttributes
+	) {
 		log.info("도서 상세 조회 요청");
 		try {
 
