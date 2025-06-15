@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -44,6 +45,7 @@ import shop.bluebooktle.frontend.service.UserService;
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/order")
+@RefreshScope
 public class OrderController {
 
 	private final PaymentsService paymentsService;
@@ -268,6 +270,7 @@ public class OrderController {
 	) {
 		ModelAndView mav = new ModelAndView("mypage/order_detail");
 		try {
+			log.info("비회원 주문 조회");
 			OrderDetailResponse orderDetails = orderService.getOrderDetailByOrderKey(orderKey);
 			mav.addObject("order", orderDetails);
 			mav.addObject("isMember", false);

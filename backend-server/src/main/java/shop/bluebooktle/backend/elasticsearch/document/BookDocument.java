@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.data.elasticsearch.annotations.DateFormat;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
@@ -24,6 +25,7 @@ import shop.bluebooktle.backend.book.entity.BookPublisher;
 import shop.bluebooktle.backend.book.entity.BookSaleInfo;
 import shop.bluebooktle.backend.book.entity.BookTag;
 
+@RefreshScope
 @Getter
 @Document(indexName = "#{@environment.getProperty('search.index.name')}")
 @Setting(settingPath = "elasticsearch/book-setting.json")

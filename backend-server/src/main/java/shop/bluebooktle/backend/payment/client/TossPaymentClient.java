@@ -1,5 +1,6 @@
 package shop.bluebooktle.backend.payment.client;
 
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,6 +14,7 @@ import shop.bluebooktle.backend.payment.dto.request.TossApiPaymentConfirmRequest
 import shop.bluebooktle.backend.payment.dto.response.TossApiPaymentCancelSuccessResponse;
 import shop.bluebooktle.backend.payment.dto.response.TossApiPaymentConfirmSuccessResponse;
 
+@RefreshScope
 @FeignClient(
 	name = "tossPaymentsClient",
 	url = "${toss.api.url}",
