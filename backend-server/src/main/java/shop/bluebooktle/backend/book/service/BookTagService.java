@@ -15,13 +15,4 @@ public interface BookTagService {
 	List<TagInfoResponse> registerBookTag(Long bookId, List<Long> tagIdList);
 
 	List<TagInfoResponse> updateBookTag(Long bookId, List<Long> tagIdList);
-
-	// 도서 태그 삭제
-	void deleteBookTag(Long tagId, Long bookId);
-
-	// 특정 도서의 태그 목록 조회
-	List<TagInfoResponse> getTagsByBookId(Long bookId);
-
-	// 특정 태그 안에 등록된 도서 조회
-	Page<BookInfoResponse> searchBooksByTag(Long tagId, Pageable pageable);
 }
