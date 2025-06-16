@@ -47,20 +47,20 @@ public class AuthorController {
 	}
 
 	@Operation(summary = "작가 조회", description = "해당 작가를 조회합니다.")
-	@GetMapping("/{authorId}")
+	@GetMapping("/{author-id}")
 	@Auth(type = UserType.ADMIN)
 	public ResponseEntity<JsendResponse<AuthorResponse>> getAuthor(
-		@PathVariable Long authorId
+		@PathVariable(name = "author-id") Long authorId
 	) {
 		AuthorResponse authorResponse = authorService.getAuthor(authorId);
 		return ResponseEntity.ok(JsendResponse.success(authorResponse));
 	}
 
 	@Operation(summary = "작가 수정", description = "해당 작가의 작가명을 수정합니다.")
-	@PutMapping("/{authorId}")
+	@PutMapping("/{author-id}")
 	@Auth(type = UserType.ADMIN)
 	public ResponseEntity<JsendResponse<Void>> updateAuthor(
-		@PathVariable Long authorId,
+		@PathVariable(name = "author-id") Long authorId,
 		@Valid @RequestBody AuthorUpdateRequest authorUpdateRequest
 	) {
 		authorService.updateAuthor(authorId, authorUpdateRequest);
@@ -68,10 +68,10 @@ public class AuthorController {
 	}
 
 	@Operation(summary = "작가 삭제", description = "해당 작가를 삭제합니다.")
-	@DeleteMapping("/{authorId}")
+	@DeleteMapping("/{author-id}")
 	@Auth(type = UserType.ADMIN)
 	public ResponseEntity<JsendResponse<Void>> deleteAuthor(
-		@PathVariable Long authorId
+		@PathVariable(name = "author-id") Long authorId
 	) {
 		authorService.deleteAuthor(authorId);
 		return ResponseEntity.ok(JsendResponse.success());

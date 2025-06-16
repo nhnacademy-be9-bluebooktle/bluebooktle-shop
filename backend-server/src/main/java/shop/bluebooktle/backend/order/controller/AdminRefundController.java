@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.order.service.RefundService;
@@ -28,6 +29,7 @@ import shop.bluebooktle.common.security.Auth;
 @RestController
 @RequestMapping("/api/admin/refunds")
 @RequiredArgsConstructor
+@Tag(name = "관리자 환불 API", description = "관리자 환불 조회 및 관리합니다.")
 public class AdminRefundController {
 
 	private final RefundService refundService;

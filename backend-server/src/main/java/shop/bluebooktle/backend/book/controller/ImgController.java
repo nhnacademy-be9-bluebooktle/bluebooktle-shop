@@ -58,9 +58,13 @@ public class ImgController {
 		return ResponseEntity.ok(JsendResponse.success());
 	}
 
-	@GetMapping("/by-review/{reviewId}")
+	@Operation(
+		summary = "리뷰 이미지 조회",
+		description = "MinIO 서버에 등록된 리뷰 이미지 파일을 조회합니다."
+	)
+	@GetMapping("/by-review/{review-id}")
 	public JsendResponse<ImgResponse> getImgByReviewId(
-		@PathVariable Long reviewId
+		@PathVariable(name = "review-id") Long reviewId
 	) {
 		ImgResponse imgResponse = imgService.getImgByReviewId(reviewId);
 		return JsendResponse.success(imgResponse);

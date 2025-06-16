@@ -35,10 +35,8 @@ import shop.bluebooktle.common.dto.book.response.author.AuthorResponse;
 import shop.bluebooktle.frontend.service.AdminAuthorService;
 import shop.bluebooktle.frontend.service.AdminBookService;
 import shop.bluebooktle.frontend.service.AdminCategoryService;
-import shop.bluebooktle.frontend.service.AdminImgService;
 import shop.bluebooktle.frontend.service.AdminPublisherService;
 import shop.bluebooktle.frontend.service.AdminTagService;
-import shop.bluebooktle.frontend.service.BookService;
 
 // AdminCategoryController.CategoryDto를 사용하기 위해 import (같은 패키지면 필요 없을 수 있음)
 // import shop.bluebooktle.frontend.controller.admin.AdminCategoryController.CategoryDto;
@@ -50,13 +48,11 @@ import shop.bluebooktle.frontend.service.BookService;
 @RequiredArgsConstructor
 public class AdminBookController {
 
-	private final AdminImgService imgService;
 	private final AdminPublisherService adminPublisherService;
 	private final AdminAuthorService adminAuthorService;
 	private final AdminTagService adminTagService;
 	private final AdminBookService adminBookService;
 	private final AdminCategoryService adminCategoryService;
-	private final BookService bookService;
 
 	@GetMapping
 	public String listBooks(
@@ -261,7 +257,7 @@ public class AdminBookController {
 			adminBookService.registerBook(bookFormRequest);
 		} catch (Exception e) {
 			redirectAttributes.addFlashAttribute("globalErrorMessage", "책 등록 중 오류 발생: " + e.getMessage());
-			redirectAttributes.addAttribute("bookForm", bookFormRequest);
+			redirectAttributes.addFlashAttribute("bookForm", bookFormRequest);
 			return "redirect:/admin/books/new";
 		}
 		redirectAttributes.addFlashAttribute("globalSuccessMessage",

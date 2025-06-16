@@ -18,6 +18,13 @@ public class SecurityConfig {
 
 	private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
+	private static final String[] SWAGGER_PATHS = {
+		"/api/swagger-ui.html",
+		"/api/api-docs/**",
+		"/v3/api-docs/**",
+		"/swagger-ui/**"
+	};
+
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http
@@ -26,6 +33,7 @@ public class SecurityConfig {
 			.httpBasic(httpBasic -> httpBasic.disable())
 			.formLogin(formLogin -> formLogin.disable())
 			.authorizeHttpRequests(authz -> authz
+				.requestMatchers(SWAGGER_PATHS).permitAll()
 				.anyRequest().permitAll()
 			);
 
