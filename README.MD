@@ -153,11 +153,8 @@ Spring Boot 기반의 RESTful API를 중심으로 구현되었으며, MySQL, Red
 
 ### ⚙ CI/CD
 ![GitHub Actions](https://img.shields.io/badge/GitHub%20Actions-2088FF?style=flat&logo=GitHub%20Actions&logoColor=white)
-![Jenkins](https://img.shields.io/badge/Jenkins-D24939?style=flat&logo=Jenkins&logoColor=white)
 
 ### ☁ DevOps & Infra
-![NHN Cloud](https://img.shields.io/badge/NHN%20Cloud-000000?style=flat)
-![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat&logo=Docker&logoColor=white)
 ![SonarQube](https://img.shields.io/badge/SonarQube-4E9BCD?style=flat&logo=SonarQube&logoColor=white)
 ![Nginx](https://img.shields.io/badge/Nginx-009639?style=flat&logo=nginx&logoColor=white)
 
@@ -166,8 +163,6 @@ Spring Boot 기반의 RESTful API를 중심으로 구현되었으며, MySQL, Red
 ![GitHub](https://img.shields.io/badge/GitHub-181717?style=flat&logo=GitHub)
 ![Junit5](https://img.shields.io/badge/JUnit5-25A162?style=flat)
 ![IntelliJ IDEA](https://img.shields.io/badge/IntelliJ%20IDEA-000000?style=flat&logo=IntelliJ%20IDEA)
-![SonarLint](https://img.shields.io/badge/SonarLint-F3702A?style=flat)
-![DataGrip](https://img.shields.io/badge/DataGrip-000000?style=flat&logo=DataGrip)
 ![Elasticsearch](https://img.shields.io/badge/Elasticsearch-005571?style=flat&logo=Elasticsearch)
 ![Linux](https://img.shields.io/badge/Linux-FCC624?style=flat&logo=Linux&logoColor=black)
 ![Ubuntu](https://img.shields.io/badge/Ubuntu-E95420?style=flat&logo=Ubuntu&logoColor=white)
