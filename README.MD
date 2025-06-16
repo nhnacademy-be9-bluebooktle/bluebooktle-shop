@@ -73,12 +73,12 @@ Spring Boot 기반의 RESTful API를 중심으로 구현되었으며, MySQL, Red
 
 # 📦 개발 환경
 
-## 🧰 개발 도구
+## 개발 도구
 - **IDE**: IntelliJ IDEA - Ultimate
 - **언어**: Java 21 LTS
 - **빌드 도구**: Maven
 
-## 🧱 개발 프레임워크 및 라이브러리
+## 개발 프레임워크 및 라이브러리
 - **Spring Framework**: 5.3
 - **Spring Boot**: 3.3.4
 
@@ -88,7 +88,7 @@ Spring Boot 기반의 RESTful API를 중심으로 구현되었으며, MySQL, Red
 - Spring Cloud Config
 - Spring Cloud OpenFeign
 
-### 💾 데이터 접근
+###  데이터 접근
 - Spring Data
 - Spring Data JPA
 - Spring Data Elasticsearch
@@ -96,35 +96,32 @@ Spring Boot 기반의 RESTful API를 중심으로 구현되었으며, MySQL, Red
 - JPA
 - QueryDSL
 
-## 🧪 테스트 환경
+##  테스트 환경
 - JUnit 5
 - AssertJ
 - Mockito
 - SonarQube (테스트 커버리지 80% 이상 유지)
 
-## 🗄 데이터베이스
+##  데이터베이스
 - **MySQL**: 8.0.25
 - **Redis**
 
-## 🔍 검색 엔진
+##  검색 엔진
 - **Elasticsearch**: 8.6.2
 
-## 🧮 모델링 도구
+##  모델링 도구
 - **ERD Cloud**
 
-## 🤝 협업 도구
+##  협업 도구
 - **GitHub Project**
 
-## 🚀 CI/CD
+##  CI/CD
 - **CI**: Continuous Integration
 - **CD**: Continuous Delivery / Deployment
 - **도구**: GitHub Actions
 
-## 🎨 UI 프레임워크
+##  UI 프레임워크
 - **Bootstrap 5**
-
-
-# 📦 사용 기술
 
 ## 🛠 Tech Stack
 
