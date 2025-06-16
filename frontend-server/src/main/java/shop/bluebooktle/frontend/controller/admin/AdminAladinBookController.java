@@ -37,13 +37,9 @@ import shop.bluebooktle.frontend.service.AdminTagService;
 @RequiredArgsConstructor
 public class AdminAladinBookController {
 
-	private final AdminImgService adminImgService;
-	private final AdminPublisherService adminPublisherService;
-	private final AdminAuthorService adminAuthorService;
 	private final AdminTagService adminTagService;
 	private final AdminBookService adminBookService;
 	private final AdminCategoryService adminCategoryService;
-	private Model model;
 
 	@GetMapping({"/new"})
 	public String bookForm(
