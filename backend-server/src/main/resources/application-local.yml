@@ -115,3 +115,11 @@ toss:
     url: https://api.tosspayments.com/v1
   secret-key: test_sk_LlDJaYngroXzQGEQlMlv8ezGdRpX
   client-key: test_ck_0RnYX2w532oJMLLx9JBPVNeyqApQ
+
+springdoc:
+  swagger-ui:
+    path: /api/swagger-ui.html
+  api-docs:
+    path: /api/api-docs
+  packagesToScan: shop.bluebooktle.backend
+  default-produces-media-type: application/json

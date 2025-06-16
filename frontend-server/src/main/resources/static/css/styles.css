@@ -14,20 +14,34 @@
 
 :root {
     /* === 키치 컬러 테마 === */
-    --kitsch-color-1: #750B30; /* 진한 버건디/와인 */
-    --kitsch-color-2: #C2B638; /* 올리브 그린/머스타드 옐로우 */
-    --kitsch-color-3: #C2255C; /* 핫핑크/마젠타 */
-    --kitsch-color-4: #119EC2; /* 선명한 청록/터콰이즈 */
-    --kitsch-color-5: #106175; /* 짙은 청록/틸 */
+    /*--kitsch-color-1: #750B30; !* 진한 버건디/와인 *!*/
+    /*--kitsch-color-2: #C2B638; !* 올리브 그린/머스타드 옐로우 *!*/
+    /*--kitsch-color-3: #C2255C; !* 핫핑크/마젠타 *!*/
+    /*--kitsch-color-4: #119EC2; !* 선명한 청록/터콰이즈 *!*/
+    /*--kitsch-color-5: #106175; !* 짙은 청록/틸 *!*/
 
-    /* 추가 색상 제안 */
+    /*!* 추가 색상 제안 *!*/
+    /*--kitsch-bg-main: #FFF9E5; !* 밝은 크림/오프화이트 배경 *!*/
+    /*--kitsch-bg-alt: #F8F0E3; !* 약간 더 어두운 크림 배경 *!*/
+    /*--kitsch-text-dark: #4A3B31; !* 어두운 갈색 텍스트 *!*/
+    /*--kitsch-text-light: #FAF0D7; !* 매우 밝은 크림색 텍스트 (어두운 배경 위) *!*/
+
+    /*--kitsch-accent-orange: #FF8C00; !* 오렌지 액센트 *!*/
+    /*--kitsch-accent-purple: #9370DB; !* 밝은 보라 액센트 *!*/
+    --kitsch-color-1: #D93D3D; /* 핫핑크 (메인 포인트) */
+    --kitsch-color-2: #F2C230; /* 청록색 */
+    --kitsch-color-3: #F24B88; /* 황금색/머스타드 */
+    --kitsch-color-4: #119EC2; /* 오렌지 */
+    --kitsch-color-5: #63AEBF; /* 진한 레드 */
+
+    /* 추가 색상 제안 (기존 키치 테마에서 유용했던 컨셉 유지) */
     --kitsch-bg-main: #FFF9E5; /* 밝은 크림/오프화이트 배경 */
     --kitsch-bg-alt: #F8F0E3; /* 약간 더 어두운 크림 배경 */
     --kitsch-text-dark: #4A3B31; /* 어두운 갈색 텍스트 */
-    --kitsch-text-light: #FAF0D7; /* 매우 밝은 크림색 텍스트 (어두운 배경 위) */
+    --kitsch-text-light: #FFFFFF; /* 흰색 텍스트 (어두운 배경 위) */
 
-    --kitsch-accent-orange: #FF8C00; /* 오렌지 액센트 */
-    --kitsch-accent-purple: #9370DB; /* 밝은 보라 액센트 */
+    --kitsch-accent-orange: #F29544; /* kitsch-color-4와 동일 */
+    --kitsch-accent-purple: #9370DB; /* 기존 보라 액센트 유지 */
 
     /* 폰트 */
     --font-pixel: 'DungGeunMo', cursive;
@@ -706,7 +720,7 @@ ul {
 .book-grid-kitsch {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 0));
-    justify-content: start;
+    justify-content: center;
     gap: 1.5rem;
 }
 
