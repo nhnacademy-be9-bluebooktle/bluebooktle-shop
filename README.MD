@@ -175,3 +175,38 @@ Spring Boot 기반의 RESTful API를 중심으로 구현되었으며, MySQL, Red
 ![Bootstrap5](https://img.shields.io/badge/Bootstrap-7952B3?style=flat&logo=Bootstrap&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=JavaScript&logoColor=black)
 
+
+
+## 🧱 시스템 아키텍처
+> 전체 시스템 구성도 및 마이크로서비스 흐름  
+> (이미지 추가 예정)
+
+
+---
+
+## 🗃 ERD (DB 모델링)
+> MySQL 기반 ERD 모델 추가
+
+
+
+---
+
+## 🔄 CI/CD 파이프라인
+> GitHub Actions & Jenkins 기반 CI/CD 흐름 설명
+
+---
+
+## 🧪 테스트 & 커버리지
+- SonarQube 커버리지 80% 이상 유지
+- 단위 테스트(JUnit5, Mockito), 통합 테스트 포함
+
+---
+
+## 🗓 개발 일정 및 협업 방식
+- GitHub Projects
+- Daily Scrum, Sprint Review, Retrospective
+
+---
+
+
+
