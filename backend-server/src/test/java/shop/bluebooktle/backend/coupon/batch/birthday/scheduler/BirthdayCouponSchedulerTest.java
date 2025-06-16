@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import shop.bluebooktle.backend.coupon.batch.birthday.BirthdayCouponLauncher;
+import shop.bluebooktle.backend.coupon.scheduler.BirthdayCouponScheduler;
 
 class BirthdayCouponSchedulerTest {
 
