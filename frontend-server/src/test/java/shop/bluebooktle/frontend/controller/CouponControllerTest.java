@@ -28,8 +28,13 @@ import shop.bluebooktle.frontend.service.CartService;
 import shop.bluebooktle.frontend.service.CategoryService;
 import shop.bluebooktle.frontend.service.CouponService;
 
-@WebMvcTest(controllers = CouponController.class,
-	excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = GlobalUserInfoAdvice.class))
+@WebMvcTest(
+	controllers = CouponController.class,
+	excludeFilters = @ComponentScan.Filter(
+		type = FilterType.ASSIGNABLE_TYPE,
+		classes = GlobalUserInfoAdvice.class
+	)
+)
 @ActiveProfiles("test")
 class CouponControllerTest {
 
