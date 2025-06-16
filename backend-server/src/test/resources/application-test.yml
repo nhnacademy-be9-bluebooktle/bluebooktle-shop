@@ -32,6 +32,7 @@ server:
 dooray:
   webhook:
     verification-channel: https://nhnacademy.dooray.com/services/3204376758577275363/4082541783774462190/kziab347QWW2oZ_D2rumEA
+    coupon-failure-channel: https://nhnacademy.dooray.com/services/3204376758577275363/4091450631177669408/e7_0nTpvS6CpXH9sf3Q0Eg
 
 toss:
   api:
