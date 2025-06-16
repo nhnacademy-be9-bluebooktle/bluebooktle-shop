@@ -1,7 +1,7 @@
 # 📚 My-Books
 
 <p align="center">
-  <img src="https://bluebooktle.shop/images/logo.svg" width="300" alt="BlueBooktle Logo" />
+  <img src="https://github.com/nhnacademy-be9-bluebooktle/bluebooktle-shop/blob/master/frontend-server/src/main/resources/static/images/logo.png?raw=true" width="300" alt="BlueBooktle Logo" />
 </p>
 
 <p align="center">
