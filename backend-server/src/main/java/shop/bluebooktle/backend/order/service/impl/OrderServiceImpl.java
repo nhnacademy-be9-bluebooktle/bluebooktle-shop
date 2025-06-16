@@ -269,7 +269,9 @@ public class OrderServiceImpl implements OrderService {
 		return saved.getId();
 	}
 
-	private BookOrder createSingleBookOrder(Order order, OrderItemRequest item) {
+
+	@Transactional
+	public BookOrder createSingleBookOrder(Order order, OrderItemRequest item) {
 		Book book = bookRepository.findById(item.bookId())
 			.orElseThrow(BookNotFoundException::new);
 
