@@ -395,6 +395,64 @@ class BookControllerTest {
 	}
 
 	@Test
+	@DisplayName("도서 조회 - 관리자 (성공)")
+	@WithMockUser(roles = "ADMIN")
+	void getBookByAdmin_success() throws Exception {
+		// Given
+		Long bookId = 1L;
+		BookAllResponse mockResponse = BookAllResponse.builder()
+			.isbn("9791160508488")
+			.title("관리자용 도서")
+			.description("관리자용 상세 설명")
+			.publishDate(LocalDate.of(2023, 1, 1).atStartOfDay())
+			.index("관리자용 목차")
+			.price(new BigDecimal("25000.00"))
+			.salePrice(new BigDecimal("20000.00"))
+			.stock(100)
+			.isPackable(true)
+			.bookSaleInfoState(BookSaleInfoState.AVAILABLE)
+			.authors(Collections.singletonList(AuthorResponse.builder().build()))
+			.publishers(Collections.singletonList(PublisherInfoResponse.builder().build()))
+			.categories(Collections.singletonList(CategoryResponse.builder().build()))
+			.tags(Collections.singletonList(TagInfoResponse.builder().build()))
+			.imgUrl("http://example.com/admin_cover.jpg")
+			.build();
+
+		given(bookService.findBookAllById(bookId)).willReturn(mockResponse);
+
+		// When & Then
+		mockMvc.perform(get("/api/books/{bookId}/admin", bookId)
+				.with(user("admin").roles("ADMIN"))
+				.accept(MediaType.APPLICATION_JSON))
+			.andDo(print())
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.status").value("success"))
+			.andExpect(jsonPath("$.data.title").value("관리자용 도서"))
+			.andExpect(jsonPath("$.data.isbn").value("9791160508488"));
+
+		verify(bookService, times(1)).findBookAllById(bookId);
+	}
+
+	@Test
+	@DisplayName("도서 조회 - 관리자 (실패 - 도서 없음)")
+	@WithMockUser(roles = "ADMIN")
+	void getBookByAdmin_notFound() throws Exception {
+		// Given
+		Long bookId = 999L;
+		given(bookService.findBookAllById(bookId)).willThrow(new BookNotFoundException(String.valueOf(bookId)));
+
+		// When & Then
+		mockMvc.perform(get("/api/books/{bookId}/admin", bookId)
+				.with(user("admin").roles("ADMIN"))
+				.accept(MediaType.APPLICATION_JSON))
+			.andDo(print())
+			.andExpect(status().isNotFound())
+			.andExpect(jsonPath("$.status").value("error"));
+
+		verify(bookService, times(1)).findBookAllById(bookId);
+	}
+
+	@Test
 	@DisplayName("관리자 도서 목록 조회 성공 - 검색어 없이")
 	@WithMockUser(roles = {"ADMIN"})
 	void getPagedBooksByAdmin_noKeyword_success() throws Exception {
