@@ -18,6 +18,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import jakarta.persistence.EntityManager;
 import shop.bluebooktle.backend.book.entity.Tag;
+import shop.bluebooktle.backend.book.repository.TagRepository;
 import shop.bluebooktle.backend.book.repository.impl.TagQueryRepositoryImpl;
 import shop.bluebooktle.backend.config.JpaAuditingConfiguration;
 import shop.bluebooktle.backend.config.QueryDslConfig;
@@ -31,7 +32,7 @@ import shop.bluebooktle.common.util.CryptoUtils;
 class TagRepositoryTest {
 
 	@Autowired
-	private TagQueryRepositoryImpl tagQueryRepository;
+	private TagRepository tagRepository;
 
 	@Autowired
 	private EntityManager em;
@@ -56,7 +57,7 @@ class TagRepositoryTest {
 	@Test
 	@DisplayName("이름에 키워드가 포함된 태그 검색 - 삭제되지 않은 항목만")
 	void searchByNameContaining() {
-		Page<Tag> result = tagQueryRepository.searchByNameContaining("ja", PageRequest.of(0, 10));
+		Page<Tag> result = tagRepository.searchByNameContaining("ja", PageRequest.of(0, 10));
 		List<String> names = result.getContent().stream().map(Tag::getName).toList();
 		assertThat(names).containsExactly("Java");
 		assertThat(names).doesNotContain("Javascript");
@@ -66,7 +67,7 @@ class TagRepositoryTest {
 	@Test
 	@DisplayName("빈 검색어 전달 시 전체 반환 (삭제 제외)")
 	void searchWithEmptyKeyword() {
-		Page<Tag> result = tagQueryRepository.searchByNameContaining("", PageRequest.of(0, 10));
+		Page<Tag> result = tagRepository.searchByNameContaining("", PageRequest.of(0, 10));
 		assertThat(result.getTotalElements()).isEqualTo(3);
 		assertThat(result.getContent())
 			.extracting(Tag::getName)
@@ -76,8 +77,8 @@ class TagRepositoryTest {
 	@Test
 	@DisplayName("페이징 동작 확인")
 	void searchWithPaging() {
-		Page<Tag> page1 = tagQueryRepository.searchByNameContaining("", PageRequest.of(0, 2));
-		Page<Tag> page2 = tagQueryRepository.searchByNameContaining("", PageRequest.of(1, 2));
+		Page<Tag> page1 = tagRepository.searchByNameContaining("", PageRequest.of(0, 2));
+		Page<Tag> page2 = tagRepository.searchByNameContaining("", PageRequest.of(1, 2));
 
 		List<String> combined = Stream.concat(
 			page1.getContent().stream(),

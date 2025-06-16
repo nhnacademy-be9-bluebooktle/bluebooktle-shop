@@ -15,7 +15,6 @@ import shop.bluebooktle.backend.book.entity.Publisher;
 import shop.bluebooktle.backend.book.entity.QPublisher;
 import shop.bluebooktle.backend.book.repository.PublisherQueryRepository;
 
-@Repository
 @RequiredArgsConstructor
 public class PublisherQueryRepositoryImpl implements PublisherQueryRepository {
 	private final JPAQueryFactory queryFactory;

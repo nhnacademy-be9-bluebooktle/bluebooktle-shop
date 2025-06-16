@@ -15,7 +15,6 @@ import shop.bluebooktle.backend.book.entity.QTag;
 import shop.bluebooktle.backend.book.entity.Tag;
 import shop.bluebooktle.backend.book.repository.TagQueryRepository;
 
-@Repository
 @RequiredArgsConstructor
 public class TagQueryRepositoryImpl implements TagQueryRepository {
 	private final JPAQueryFactory queryFactory;
