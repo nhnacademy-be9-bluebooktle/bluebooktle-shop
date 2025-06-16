@@ -46,17 +46,19 @@ public class PaymentTypeController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(JsendResponse.success());
 	}
 
-	@PutMapping("/{id}")
+	@PutMapping("/{payment-type-id}")
 	public ResponseEntity<JsendResponse<Void>> updatePaymentType(
-		@PathVariable Long id,
+		@PathVariable(name = "payment-type-id") Long paymentTypeId,
 		@Valid @RequestBody PaymentTypeRequest request) {
-		paymentTypeService.update(id, request);
+		paymentTypeService.update(paymentTypeId, request);
 		return ResponseEntity.ok(JsendResponse.success());
 	}
 
-	@DeleteMapping("/{id}")
-	public ResponseEntity<JsendResponse<Void>> deletePaymentType(@PathVariable Long id) {
-		paymentTypeService.delete(id);
+	@DeleteMapping("/{payment-type-id}")
+	public ResponseEntity<JsendResponse<Void>> deletePaymentType(
+		@PathVariable(name = "payment-type-id") Long paymentTypeId
+	) {
+		paymentTypeService.delete(paymentTypeId);
 		return ResponseEntity.ok().body(JsendResponse.success());
 	}
 	

@@ -39,10 +39,10 @@ public class AdminDeliveryRuleController {
 		return ResponseEntity.ok(JsendResponse.success(dto));
 	}
 
-	@GetMapping("/{id}")
+	@GetMapping("/{delivery-rule-id}")
 	@Auth(type = UserType.ADMIN)
-	public ResponseEntity<JsendResponse<DeliveryRuleResponse>> getById(@PathVariable Long id) {
-		DeliveryRuleResponse dto = service.getRule(id);
+	public ResponseEntity<JsendResponse<DeliveryRuleResponse>> getById(@PathVariable(name = "delivery-rule-id") Long deliveryRuleId) {
+		DeliveryRuleResponse dto = service.getRule(deliveryRuleId);
 		return ResponseEntity.ok(JsendResponse.success(dto));
 	}
 
@@ -68,20 +68,22 @@ public class AdminDeliveryRuleController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(JsendResponse.success(id));
 	}
 
-	@PutMapping("/{id}")
+	@PutMapping("/{delivery-rule-id}")
 	@Auth(type = UserType.ADMIN)
 	public ResponseEntity<JsendResponse<Void>> update(
-		@PathVariable Long id,
+		@PathVariable(name = "delivery-rule-id") Long deliveryRuleId,
 		@RequestBody DeliveryRuleUpdateRequest request
 	) {
-		service.updateRule(id, request);
+		service.updateRule(deliveryRuleId, request);
 		return ResponseEntity.ok(JsendResponse.success());
 	}
 
-	@DeleteMapping("/{id}")
+	@DeleteMapping("/{delivery-rule-id}")
 	@Auth(type = UserType.ADMIN)
-	public ResponseEntity<JsendResponse<Void>> delete(@PathVariable Long id) {
-		service.deleteRule(id);
+	public ResponseEntity<JsendResponse<Void>> delete(
+		@PathVariable(name = "delivery-rule-id") Long deliveryRuleId
+	) {
+		service.deleteRule(deliveryRuleId);
 		return ResponseEntity.ok(JsendResponse.success());
 	}
 }
