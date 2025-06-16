@@ -59,28 +59,28 @@ public class PackagingOptionController {
 	}
 
 	/** 포장 옵션 단건 조회 */
-	@GetMapping("/{packagingOptionId}")
+	@GetMapping("/{packaging-option-id}")
 	public ResponseEntity<JsendResponse<PackagingOptionInfoResponse>> getPackagingOption(
-		@PathVariable Long packagingOptionId) {
+		@PathVariable(name = "packaging-option-id") Long packagingOptionId) {
 		PackagingOptionInfoResponse response = packagingOptionService.getPackagingOption(packagingOptionId);
 		return ResponseEntity.ok(JsendResponse.success(response));
 	}
 
 	/** 포장 옵션 수정 */
-	@PutMapping("/{packagingOptionId}")
+	@PutMapping("/{packaging-option-id}")
 	@Auth(type = UserType.ADMIN)
 	public ResponseEntity<JsendResponse<PackagingOptionInfoResponse>> updatePackagingOption(
-		@PathVariable Long packagingOptionId,
+		@PathVariable(name = "packaging-option-id") Long packagingOptionId,
 		@RequestBody @Valid PackagingOptionRequest request) {
 		return ResponseEntity.ok(
 			JsendResponse.success(packagingOptionService.updatePackagingOption(packagingOptionId, request)));
 	}
 
 	/** 포장 옵션 삭제 */
-	@DeleteMapping("/{packagingOptionId}")
+	@DeleteMapping("/{packaging-option-id}")
 	@Auth(type = UserType.ADMIN)
 	public ResponseEntity<JsendResponse<Void>> deletePackagingOption(
-		@PathVariable Long packagingOptionId) {
+		@PathVariable(name = "packaging-option-id") Long packagingOptionId) {
 		packagingOptionService.deletePackagingOption(packagingOptionId);
 		return ResponseEntity.ok(JsendResponse.success());
 	}

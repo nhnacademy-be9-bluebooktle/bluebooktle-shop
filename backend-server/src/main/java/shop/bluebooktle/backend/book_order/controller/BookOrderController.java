@@ -39,57 +39,57 @@ public class BookOrderController {
 	}
 
 	/** 도서 주문 단건 조회 */
-	@GetMapping("/{bookOrderId}")
+	@GetMapping("/{book-order-id}")
 	public ResponseEntity<JsendResponse<BookOrderResponse>> getBookOrder(
-		@PathVariable Long bookOrderId) {
+		@PathVariable(name = "book-order-id") Long bookOrderId) {
 		return ResponseEntity.ok(JsendResponse.success(bookOrderService.getBookOrder(bookOrderId)));
 	}
 
 	/** 도서 주문 수정 */
-	@PutMapping("/{bookOrderId}")
+	@PutMapping("/{book-order-id}")
 	public ResponseEntity<JsendResponse<BookOrderResponse>> updateBookOrder(
 		@RequestBody @Valid BookOrderUpdateRequest request,
-		@PathVariable Long bookOrderId) {
+		@PathVariable(name = "book-order-id") Long bookOrderId) {
 		return ResponseEntity.ok(JsendResponse.success(bookOrderService.updateBookOrder(bookOrderId, request)));
 	}
 
 	/** 도서 주문 삭제 */
-	@DeleteMapping("/{bookOrderId}")
+	@DeleteMapping("/{book-order-id}")
 	public ResponseEntity<JsendResponse<Void>> deleteBookOrder(
-		@PathVariable Long bookOrderId) {
+		@PathVariable(name = "book-order-id") Long bookOrderId) {
 		bookOrderService.deleteBookOrder(bookOrderId);
 		return ResponseEntity.ok(JsendResponse.success());
 	}
 
 	/** 포장 추가 */
-	@PostMapping("/{bookOrderId}/packaging")
+	@PostMapping("/{book-order-id}/packaging")
 	public ResponseEntity<JsendResponse<OrderPackagingResponse>> addPackaging(
-		@PathVariable Long bookOrderId,
+		@PathVariable(name = "book-order-id") Long bookOrderId,
 		@RequestBody @Valid OrderPackagingRegisterRequest request) {
 		return ResponseEntity.status(HttpStatus.CREATED)
 			.body(JsendResponse.success(orderPackagingService.addOrderPackaging(bookOrderId, request)));
 	}
 
 	/** 포장 단건 조회 */
-	@GetMapping("/packagings/{orderPackagingId}")
+	@GetMapping("/packagings/{order-packaging-id}")
 	public ResponseEntity<JsendResponse<OrderPackagingResponse>> getPackaging(
-		@PathVariable Long orderPackagingId) {
+		@PathVariable(name = "order-packaging-id") Long orderPackagingId) {
 		return ResponseEntity.ok(JsendResponse.success(orderPackagingService.getOrderPackaging(orderPackagingId)));
 	}
 
 	/** 포장 수정 */
-	@PutMapping("/packagings/{orderPackagingId}")
+	@PutMapping("/packagings/{order-packaging-id}")
 	public ResponseEntity<JsendResponse<OrderPackagingResponse>> updatePackaging(
-		@PathVariable Long orderPackagingId,
+		@PathVariable(name = "order-packaging-id") Long orderPackagingId,
 		@RequestBody @Valid OrderPackagingUpdateRequest request) {
 		return ResponseEntity.ok(
 			JsendResponse.success(orderPackagingService.updateOrderPackaging(orderPackagingId, request)));
 	}
 
 	/** 포장 삭제 */
-	@DeleteMapping("/packagings/{orderPackagingId}")
+	@DeleteMapping("/packagings/{order-packaging-id}")
 	public ResponseEntity<JsendResponse<Void>> deletePackaging(
-		@PathVariable Long orderPackagingId) {
+		@PathVariable(name = "order-packaging-id") Long orderPackagingId) {
 		orderPackagingService.deleteOrderPackaging(orderPackagingId);
 		return ResponseEntity.ok(JsendResponse.success());
 	}
