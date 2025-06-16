@@ -51,10 +51,8 @@ public class BookCategoryControllerTest {
 
 	@MockitoBean
 	private BookCategoryService bookCategoryService;
-
 	@MockitoBean
 	private JwtUtil jwtUtil;
-
 	@MockitoBean
 	private AuthUserLoader authUserLoader;
 

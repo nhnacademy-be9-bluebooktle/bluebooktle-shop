@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -125,6 +126,87 @@ public class AuthorControllerTest {
 			.andExpect(jsonPath("$.data.content[1].name").value("Author2"));
 
 		verify(authorService, times(1)).getAuthors(any(PageRequest.class));
+	}
+
+	@Test
+	@DisplayName("작가 목록 조회 성공 - 검색어 없음")
+	@WithMockUser
+	void testGetPagedAuthors_noKeyword() throws Exception {
+		AuthorResponse author1 = AuthorResponse.builder().id(1L).name("Author1").build();
+		AuthorResponse author2 = AuthorResponse.builder().id(2L).name("Author2").build();
+
+		Page<AuthorResponse> page = new PageImpl<>(
+			List.of(author1, author2),
+			PageRequest.of(0, 10),
+			2
+		);
+
+		when(authorService.getAuthors(any(PageRequest.class))).thenReturn(page);
+
+		mockMvc.perform(get("/api/authors")
+				.param("page", "0")
+				.param("size", "10"))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.status").value("success"))
+			.andExpect(jsonPath("$.data.content[0].id").value(1))
+			.andExpect(jsonPath("$.data.content[0].name").value("Author1"))
+			.andExpect(jsonPath("$.data.content[1].id").value(2))
+			.andExpect(jsonPath("$.data.content[1].name").value("Author2"));
+
+		verify(authorService, times(1)).getAuthors(any(PageRequest.class));
+	}
+
+	@Test
+	@DisplayName("작가 목록 조회 성공 - 검색어 존재")
+	@WithMockUser
+	void testGetPagedAuthors_withKeyword() throws Exception {
+		AuthorResponse author = AuthorResponse.builder().id(3L).name("검색된 작가").build();
+
+		Page<AuthorResponse> page = new PageImpl<>(
+			List.of(author),
+			PageRequest.of(0, 10),
+			1
+		);
+
+		when(authorService.searchAuthors(eq("검색"), any(PageRequest.class))).thenReturn(page);
+
+		mockMvc.perform(get("/api/authors")
+				.param("page", "0")
+				.param("size", "10")
+				.param("searchKeyword", "검색"))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.status").value("success"))
+			.andExpect(jsonPath("$.data.content[0].id").value(3))
+			.andExpect(jsonPath("$.data.content[0].name").value("검색된 작가"));
+
+		verify(authorService, times(1)).searchAuthors(eq("검색"), any(PageRequest.class));
+	}
+
+	@Test
+	@DisplayName("작가 목록 조회 성공 - 공백 검색어 (isBlank=true)")
+	@WithMockUser
+	void testGetPagedAuthors_blankKeyword() throws Exception {
+		AuthorResponse author = AuthorResponse.builder().id(10L).name("Blank Author").build();
+
+		Page<AuthorResponse> page = new PageImpl<>(
+			List.of(author),
+			PageRequest.of(0, 10),
+			1
+		);
+
+		when(authorService.getAuthors(any(PageRequest.class))).thenReturn(page);
+
+		mockMvc.perform(get("/api/authors")
+				.param("page", "0")
+				.param("size", "10")
+				.param("searchKeyword", " ")) // 공백 문자열
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.status").value("success"))
+			.andExpect(jsonPath("$.data.content[0].id").value(10))
+			.andExpect(jsonPath("$.data.content[0].name").value("Blank Author"));
+
+		verify(authorService, times(1)).getAuthors(any(PageRequest.class));
+		verify(authorService, never()).searchAuthors(anyString(), any(PageRequest.class));
 	}
 
 	@Test
