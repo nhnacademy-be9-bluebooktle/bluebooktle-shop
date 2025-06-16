@@ -62,20 +62,20 @@ public class UserController {
 	}
 
 	@Operation(summary = "회원 상세 조회 (관리자)", description = "특정 회원의 상세 정보를 조회합니다.")
-	@GetMapping("/admin/{userId}")
+	@GetMapping("/admin/{user-id}")
 	@Auth(type = UserType.ADMIN)
 	public ResponseEntity<JsendResponse<AdminUserResponse>> getUserDetail(
-		@PathVariable Long userId) {
+		@PathVariable(name = "user-id") Long userId) {
 
 		AdminUserResponse user = userService.findUserByIdAdmin(userId);
 		return ResponseEntity.ok(JsendResponse.success(user));
 	}
 
 	@Operation(summary = "회원 정보 수정 (관리자)", description = "특정 회원의 정보를 수정합니다.")
-	@PutMapping("/admin/{userId}")
+	@PutMapping("/admin/{user-id}")
 	@Auth(type = UserType.ADMIN)
 	public ResponseEntity<JsendResponse<Void>> updateUser(
-		@PathVariable Long userId,
+		@PathVariable(name = "user-id") Long userId,
 		@Valid @RequestBody AdminUserUpdateRequest request) {
 
 		userService.updateUserAdmin(userId, request);
@@ -102,13 +102,13 @@ public class UserController {
 
 	@Operation(summary = "내 유저 정보 수정", description = "내 유저 정보를 수정합니다.")
 	@Auth(type = UserType.USER)
-	@PutMapping("/{id}")
+	@PutMapping("/{user-id}")
 	public ResponseEntity<JsendResponse<Void>> updateUser(
-		@PathVariable Long id,
+		@PathVariable(name = "user-id") Long userId,
 		@RequestBody @Valid UserUpdateRequest request
 	) {
 		try {
-			userService.updateUser(id, request);
+			userService.updateUser(userId, request);
 			return ResponseEntity.ok(JsendResponse.success(null));
 		} catch (UserNotFoundException e) {
 			throw new UserNotFoundException();

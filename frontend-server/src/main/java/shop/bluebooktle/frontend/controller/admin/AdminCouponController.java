@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
@@ -11,6 +12,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -21,10 +23,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import shop.bluebooktle.common.domain.coupon.CouponIssueStatus;
+import shop.bluebooktle.common.domain.coupon.CouponIssueType;
 import shop.bluebooktle.common.dto.book.response.CategoryTreeResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
 import shop.bluebooktle.common.dto.coupon.request.CouponRegisterRequest;
 import shop.bluebooktle.common.dto.coupon.request.CouponTypeRegisterRequest;
+import shop.bluebooktle.common.dto.coupon.request.FailedCouponIssueSearchRequest;
 import shop.bluebooktle.common.dto.coupon.request.UserCouponRegisterRequest;
 import shop.bluebooktle.common.dto.coupon.response.CouponResponse;
 import shop.bluebooktle.common.dto.coupon.response.CouponTypeResponse;
@@ -223,6 +228,48 @@ public class AdminCouponController {
 		redirectAttributes.addFlashAttribute("globalSuccessMessage", "쿠폰이 성공적으로 발급되었습니다.");
 		redirectAttributes.addFlashAttribute("globalSuccessTitle", "발급 완료");
 		return "redirect:/admin/coupons";
+	}
+
+	@GetMapping("/failed")
+	public String showFailedCoupons(
+		@RequestParam(required = false) CouponIssueType type,
+		@RequestParam(required = false) CouponIssueStatus status,
+		@PageableDefault(size = 10, sort = "createdAt") Pageable pageable,
+		Model model,
+		HttpServletRequest request
+	) {
+		model.addAttribute("currentURI", request.getRequestURI());
+
+		var searchRequest = FailedCouponIssueSearchRequest.builder()
+			.type(type)
+			.status(status)
+			.build();
+
+		var result = adminCouponService.getAllFailedCouponIssue(pageable, searchRequest);
+
+		model.addAttribute("coupons", result.getContent());
+		model.addAttribute("pagination", result.getPagination());
+		model.addAttribute("searchRequest", searchRequest);
+
+		return "admin/coupon/failed_coupon_list";
+	}
+
+	@PostMapping("/failed/{issueId}/resend")
+	public String resendFailedCoupon(
+		@PathVariable Long issueId,
+		RedirectAttributes redirectAttributes) {
+		adminCouponService.resendFailedCoupon(issueId);
+		redirectAttributes.addFlashAttribute("globalSuccessMessage", "선택한 쿠폰을 재발급 시도합니다.");
+		redirectAttributes.addFlashAttribute("globalSuccessTitle", "재발급 시도 완료");
+		return "redirect:/admin/coupons/failed";
+	}
+
+	@PostMapping("/failed/resend-all")
+	public String resendAllFailedCoupons(RedirectAttributes redirectAttributes) {
+		adminCouponService.resendAllFailedCoupons();
+		redirectAttributes.addFlashAttribute("globalSuccessMessage", "모든 실패한 쿠폰을 다시 시도합니다.");
+		redirectAttributes.addFlashAttribute("globalSuccessTitle", "재발급 시도 완료");
+		return "redirect:/admin/coupons/failed";
 	}
 
 	@ExceptionHandler(ApplicationException.class)

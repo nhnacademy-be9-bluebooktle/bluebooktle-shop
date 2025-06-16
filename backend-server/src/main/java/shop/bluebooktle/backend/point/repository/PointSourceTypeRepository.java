@@ -9,7 +9,7 @@ import shop.bluebooktle.common.domain.point.ActionType;
 import shop.bluebooktle.common.entity.point.PointSourceType;
 
 public interface PointSourceTypeRepository extends JpaRepository<PointSourceType, Long> {
-	Optional<PointSourceType> findById(Long id);
 
 	List<PointSourceType> findAllByActionType(ActionType actionType);
+
 }

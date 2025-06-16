@@ -40,6 +40,7 @@ spring:
     port: 5672
     username: ${RABBITMQ_USERNAME}
     password: ${RABBITMQ_PASSWORD}
+    virtual-host: bluebooktle
   couchbase:
     env:
       timeouts:
@@ -104,6 +105,7 @@ encrypt:
 dooray:
   webhook:
     verification-channel: https://nhnacademy.dooray.com/services/3204376758577275363/4082541783774462190/kziab347QWW2oZ_D2rumEA
+    coupon-failure-channel: https://nhnacademy.dooray.com/services/3204376758577275363/4091450631177669408/e7_0nTpvS6CpXH9sf3Q0Eg
 #    notification-channel: 추후 사용
 search:
   index:
@@ -114,3 +116,11 @@ toss:
     url: https://api.tosspayments.com/v1
   secret-key: test_sk_LlDJaYngroXzQGEQlMlv8ezGdRpX
   client-key: test_ck_0RnYX2w532oJMLLx9JBPVNeyqApQ
+
+springdoc:
+  swagger-ui:
+    path: /api/swagger-ui.html
+  api-docs:
+    path: /api/api-docs
+  packagesToScan: shop.bluebooktle.backend
+  default-produces-media-type: application/json

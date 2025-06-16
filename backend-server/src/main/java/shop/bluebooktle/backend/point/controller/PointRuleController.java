@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +28,7 @@ public class PointRuleController {
 
 	private final PointPolicyService pointPolicyService;
 
+	@Operation(summary = "포인트 규정 목록 조회", description = "포인트 규정 목록 조회합니다.")
 	@GetMapping
 	@Auth(type = UserType.ADMIN)
 	public ResponseEntity<JsendResponse<List<PointRuleResponse>>> getAllPointRules() {
@@ -34,6 +36,7 @@ public class PointRuleController {
 		return ResponseEntity.ok(JsendResponse.success(pointPolicyService.getAll()));
 	}
 
+	@Operation(summary = "포인트 규정 조회", description = "포인트 생성 유형으로 포인트 규정을 조회합니다.")
 	@GetMapping("/type")
 	@Auth(type = UserType.USER)
 	public ResponseEntity<JsendResponse<PointRuleResponse>> getRuleBySourceTypeEnum(

@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.order.dto.response.OrderStateResponse;
 import shop.bluebooktle.backend.order.service.OrderStateService;
@@ -22,11 +24,12 @@ import shop.bluebooktle.common.security.Auth;
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
+@Tag(name = "관리자 주문 상태 API", description = "주문 상태를 조회합니다.")
 public class OrderStateController {
 
 	private final OrderStateService orderStateService;
 
-	// 전체 조회
+	@Operation(summary = "모든 주문 상태 조회", description = "관리자 페이지에서 모든 주문 상태를 조회합니다.")
 	@GetMapping("/admin/order-status/all")
 	@Auth(type = UserType.ADMIN)
 	public ResponseEntity<JsendResponse<List<OrderStateResponse>>> getAllStatus() {
@@ -36,7 +39,7 @@ public class OrderStateController {
 		return ResponseEntity.ok(JsendResponse.success(states));
 	}
 
-	// 상태명으로 조회
+	@Operation(summary = "주문 상태 조회", description = "관리자 페이지에서 주문 상태명에 따른 주문 상태를 조회합니다.")
 	@GetMapping("/admin/order-status")
 	@Auth(type = UserType.ADMIN)
 	public ResponseEntity<JsendResponse<OrderStateResponse>> getStatus(@RequestParam OrderStatus name) {

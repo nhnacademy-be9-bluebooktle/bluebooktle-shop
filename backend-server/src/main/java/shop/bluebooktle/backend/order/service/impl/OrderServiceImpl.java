@@ -269,6 +269,7 @@ public class OrderServiceImpl implements OrderService {
 		return saved.getId();
 	}
 
+
 	@Transactional
 	public BookOrder createSingleBookOrder(Order order, OrderItemRequest item) {
 		Book book = bookRepository.findById(item.bookId())
@@ -572,7 +573,6 @@ public class OrderServiceImpl implements OrderService {
 		if (order == null) {
 			throw new OrderNotFoundException();
 		}
-
 		if (order.getOrderState().getState() == OrderStatus.SHIPPING) {
 			updateOrderStatus(orderId, OrderStatus.COMPLETED);
 		}
@@ -860,7 +860,9 @@ public class OrderServiceImpl implements OrderService {
 
 		if (status == OrderStatus.SHIPPING) {
 			order.changeShippedAt(LocalDateTime.now());
-			eventPublisher.publishEvent(new OrderShippingMessage(order.getId()));
+			if (order.getRequestedDeliveryDate() == null) {
+				eventPublisher.publishEvent(new OrderShippingMessage(order.getId()));
+			}
 		}
 	}
 

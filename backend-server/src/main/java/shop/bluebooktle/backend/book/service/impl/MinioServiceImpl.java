@@ -1,6 +1,7 @@
 package shop.bluebooktle.backend.book.service.impl;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Service;
 
 import io.minio.GetPresignedObjectUrlArgs;
@@ -12,6 +13,7 @@ import shop.bluebooktle.backend.book.service.MinioService;
 
 @Service
 @RequiredArgsConstructor
+@RefreshScope
 public class MinioServiceImpl implements MinioService {
 
 	private final MinioClient minioClient;

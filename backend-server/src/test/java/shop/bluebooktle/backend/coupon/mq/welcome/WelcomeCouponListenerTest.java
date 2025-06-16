@@ -35,6 +35,9 @@ class WelcomeCouponListenerTest {
 	@Mock
 	private CouponRepository couponRepository;
 
+	@Mock
+	private shop.bluebooktle.backend.coupon.client.CouponFailureMessageClient messageClient;
+
 	@InjectMocks
 	private WelcomeCouponListener listener;
 
@@ -63,6 +66,7 @@ class WelcomeCouponListenerTest {
 		verify(userRepository).findById(userId);
 		verify(couponRepository).findById(couponId);
 		verify(userCouponRepository).save(any(UserCoupon.class));
+		verifyNoInteractions(messageClient); // 메시지 전송 안됨
 	}
 
 	@Test
@@ -77,6 +81,8 @@ class WelcomeCouponListenerTest {
 		// when & then
 		assertThatThrownBy(() -> listener.handleWelcomeCoupon(message))
 			.isInstanceOf(UserNotFoundException.class);
+
+		verify(messageClient).sendMessage(any());
 	}
 
 	@Test
@@ -95,5 +101,7 @@ class WelcomeCouponListenerTest {
 		// when & then
 		assertThatThrownBy(() -> listener.handleWelcomeCoupon(message))
 			.isInstanceOf(CouponNotFoundException.class);
+
+		verify(messageClient).sendMessage(any());
 	}
 }

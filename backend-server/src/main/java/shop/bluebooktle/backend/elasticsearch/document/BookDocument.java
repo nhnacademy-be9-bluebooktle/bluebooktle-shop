@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.data.elasticsearch.annotations.DateFormat;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
@@ -24,6 +25,7 @@ import shop.bluebooktle.backend.book.entity.BookPublisher;
 import shop.bluebooktle.backend.book.entity.BookSaleInfo;
 import shop.bluebooktle.backend.book.entity.BookTag;
 
+@RefreshScope
 @Getter
 @Document(indexName = "#{@environment.getProperty('search.index.name')}")
 @Setting(settingPath = "elasticsearch/book-setting.json")
@@ -101,25 +103,5 @@ public class BookDocument {
 		this.publisherNames = publisherNames;
 		this.tagNames = tagNames;
 		this.categoryIds = categoryIds;
-	}
-
-	public static BookDocument from(Book book, BookSaleInfo bookSaleInfo, List<BookAuthor> bookAuthors,
-		List<BookPublisher> bookPublishers, List<BookTag> bookTags, List<BookCategory> bookCategories) {
-		return BookDocument.builder()
-			.id(book.getId())
-			.title(book.getTitle())
-			.description(book.getDescription())
-			.publishDate(book.getPublishDate())
-			.salePrice(bookSaleInfo.getSalePrice())
-			.star(bookSaleInfo.getStar())
-			.viewCount(bookSaleInfo.getViewCount())
-			.searchCount(bookSaleInfo.getSearchCount())
-			.reviewCount(bookSaleInfo.getReviewCount())
-			.authorNames(bookAuthors.stream().map(bookAuthor -> bookAuthor.getAuthor().getName()).toList())
-			.publisherNames(
-				bookPublishers.stream().map(bookPublisher -> bookPublisher.getPublisher().getName()).toList())
-			.tagNames(bookTags.stream().map(bookTag -> bookTag.getTag().getName()).toList())
-			.categoryIds(bookCategories.stream().map(bookCategory -> bookCategory.getCategory().getId()).toList())
-			.build();
 	}
 }

@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
@@ -34,9 +35,14 @@ import shop.bluebooktle.common.dto.book.BookSortType;
 import shop.bluebooktle.common.dto.book.request.BookAllRegisterRequest;
 import shop.bluebooktle.common.dto.book.request.BookUpdateServiceRequest;
 import shop.bluebooktle.common.dto.book.response.AdminBookResponse;
+import shop.bluebooktle.common.dto.book.response.BookAllResponse;
 import shop.bluebooktle.common.dto.book.response.BookCartOrderResponse;
 import shop.bluebooktle.common.dto.book.response.BookDetailResponse;
 import shop.bluebooktle.common.dto.book.response.BookInfoResponse;
+import shop.bluebooktle.common.dto.book.response.CategoryResponse;
+import shop.bluebooktle.common.dto.book.response.PublisherInfoResponse;
+import shop.bluebooktle.common.dto.book.response.TagInfoResponse;
+import shop.bluebooktle.common.dto.book.response.author.AuthorResponse;
 import shop.bluebooktle.common.exception.book.BookNotFoundException;
 import shop.bluebooktle.common.security.AuthUserLoader;
 import shop.bluebooktle.common.util.JwtUtil;
@@ -53,13 +59,10 @@ class BookControllerTest {
 
 	@MockitoBean
 	private BookService bookService;
-
 	@MockitoBean
 	private BookRegisterService bookRegisterService;
-
 	@MockitoBean
 	private JwtUtil jwtUtil;
-
 	@MockitoBean
 	private AuthUserLoader authUserLoader;
 
@@ -173,6 +176,54 @@ class BookControllerTest {
 			.andExpect(jsonPath("$.status").value("success"));
 
 		verify(bookService, times(1)).updateBook(eq(bookId), any(BookUpdateServiceRequest.class));
+	}
+
+	@Test
+	@DisplayName("관리자용 도서 상세 조회 성공")
+	@WithMockUser(roles = {"ADMIN"})
+	void getBookByAdmin_success() throws Exception {
+		// Given
+		Long bookId = 1L;
+
+		BookAllResponse response = BookAllResponse.builder()
+			.id(bookId)
+			.title("관리자 도서")
+			.description("이 도서는 관리자 테스트용입니다.")
+			.publishDate(LocalDateTime.of(2024, 5, 10, 0, 0))
+			.index("목차 정보")
+			.isbn("1234567890123")
+			.price(new BigDecimal("15000"))
+			.salePrice(new BigDecimal("12000"))
+			.stock(20)
+			.salePercentage(new BigDecimal("20.0"))
+			.imgUrl("http://example.com/test.jpg")
+			.isPackable(true)
+			.authors(List.of(new AuthorResponse(1L, "작가A", LocalDateTime.now())))
+			.publishers(List.of(new PublisherInfoResponse(1L, "출판사A", LocalDateTime.now())))
+			.categories(List.of(new CategoryResponse(1L, "소설", "-", "/1")))
+			.tags(List.of(new TagInfoResponse(1L, "감성", LocalDateTime.now())))
+			.bookSaleInfoState(BookSaleInfoState.AVAILABLE)
+			.viewCount(100L)
+			.searchCount(50L)
+			.reviewCount(5L)
+			.star(new BigDecimal("4.5"))
+			.createdAt(LocalDateTime.now())
+			.build();
+
+		given(bookService.findBookAllById(bookId)).willReturn(response);
+
+		// When & Then
+		mockMvc.perform(get("/api/books/{bookId}/admin", bookId)
+				.accept(MediaType.APPLICATION_JSON)
+				.with(user("admin").roles("ADMIN")))
+			.andDo(print())
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.status").value("success"))
+			.andExpect(jsonPath("$.data.id").value(bookId))
+			.andExpect(jsonPath("$.data.title").value("관리자 도서"))
+			.andExpect(jsonPath("$.data.isbn").value("1234567890123"));
+
+		verify(bookService, times(1)).findBookAllById(bookId);
 	}
 
 	@Test

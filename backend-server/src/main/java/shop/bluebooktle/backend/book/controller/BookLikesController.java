@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.book.service.BookLikesService;
 import shop.bluebooktle.common.domain.auth.UserType;
@@ -26,6 +27,7 @@ import shop.bluebooktle.common.security.UserPrincipal;
 @RestController
 @RequestMapping("/api/books")
 @RequiredArgsConstructor
+@Tag(name = "도서 좋아요 API", description = "도서 좋아요를 관리합니다.")
 public class BookLikesController {
 	private final BookLikesService bookLikesService;
 

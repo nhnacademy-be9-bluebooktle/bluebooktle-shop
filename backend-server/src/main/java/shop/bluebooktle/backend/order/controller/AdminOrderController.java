@@ -55,20 +55,21 @@ public class AdminOrderController {
 	}
 
 	@Operation(summary = "관리자 주문 상세 조회", description = "관리자 주문 상세 조회합니다.")
-	@GetMapping("/{orderId}")
+	@GetMapping("/{order-id}")
 	@Auth(type = UserType.ADMIN)
 	public ResponseEntity<JsendResponse<AdminOrderDetailResponse>> getAdminOrderDetail(
-		@PathVariable("orderId") Long orderId
+		@PathVariable(name = "order-id") Long orderId
 	) {
 		log.info("관리자 주문 상세 조회");
 		AdminOrderDetailResponse response = orderService.getAdminOrderDetail(orderId);
 		return ResponseEntity.ok(JsendResponse.success(response));
 	}
 
-	@PostMapping("/{orderId}/update-status")
+	@Operation(summary = "관리자 주문 상태 변경", description = "관리자가 주문의 상태를 변경합니다.")
+	@PostMapping("/{order-id}/update-status")
 	@Auth(type = UserType.ADMIN)
 	public ResponseEntity<JsendResponse<Void>> updateOrderStatus(
-		@PathVariable("orderId") Long orderId,
+		@PathVariable(name = "order-id") Long orderId,
 		@RequestBody AdminOrderStatusUpdateRequest status
 	) {
 		log.info("{} 주문 상태 변경", orderId);
@@ -77,10 +78,11 @@ public class AdminOrderController {
 			.body(JsendResponse.success(null));
 	}
 
-	@PostMapping("/{orderId}/update-tracking")
+	@Operation(summary = "관리자 배송 상태 변경", description = "관리자가 배송 운송장 정보를 추가합니다.")
+	@PostMapping("/{order-id}/update-tracking")
 	@Auth(type = UserType.ADMIN)
 	public ResponseEntity<JsendResponse<Void>> updateTrackingNumber(
-		@PathVariable("orderId") Long orderId,
+		@PathVariable(name = "order-id") Long orderId,
 		@RequestBody AdminOrderTrackingNumberUpdateRequest trackNumber
 	) {
 		orderService.updateOrderTrackingNumber(orderId, trackNumber.trackingNumber());

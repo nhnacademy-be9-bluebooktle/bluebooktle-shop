@@ -98,6 +98,11 @@ public class BookElasticSearchCustomRepository {
 	}
 
 	private void applySorts(CriteriaQuery query, BookSortType sortType) {
+		if (sortType == null) {
+			query.addSort(Sort.by(Sort.Direction.DESC, "publishDate")); // 기본 정렬
+			return;
+		}
+
 		switch (sortType) {
 			case POPULARITY -> {
 				query.addSort(Sort.by(Sort.Direction.DESC, "viewCount"));
@@ -108,8 +113,6 @@ public class BookElasticSearchCustomRepository {
 			case PRICE_DESC -> query.addSort(Sort.by(Sort.Direction.DESC, "salePrice"));
 			case RATING -> query.addSort(Sort.by(Sort.Direction.DESC, "star"));
 			case REVIEW_COUNT -> query.addSort(Sort.by(Sort.Direction.DESC, "reviewCount"));
-			default -> query.addSort(Sort.by(Sort.Direction.DESC, "publishDate"));
 		}
 	}
-
 }

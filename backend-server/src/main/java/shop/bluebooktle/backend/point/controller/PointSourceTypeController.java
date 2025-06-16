@@ -43,10 +43,12 @@ public class PointSourceTypeController {
 	}
 
 	@Operation(summary = "단건 조회", description = "포인트 발생 유형을 조회합니다.")
-	@GetMapping("/{id}")
+	@GetMapping("/{point-source-type-id}")
 	@Auth(type = UserType.ADMIN)
-	public ResponseEntity<JsendResponse<PointSourceTypeResponse>> getSource(@PathVariable Long id) {
-		PointSourceTypeResponse resp = pointSourceTypeService.get(id);
+	public ResponseEntity<JsendResponse<PointSourceTypeResponse>> getSource(
+		@PathVariable(name = "point-source-type-id") Long pointSourceTypeId
+	) {
+		PointSourceTypeResponse resp = pointSourceTypeService.get(pointSourceTypeId);
 		return ResponseEntity.ok(JsendResponse.success(resp));
 	}
 
@@ -67,10 +69,12 @@ public class PointSourceTypeController {
 	}
 
 	@Operation(summary = "포인트 발생 유형 삭제", description = "포인트 발생 유형을 삭제합니다.")
-	@DeleteMapping("/{id}")
+	@DeleteMapping("/{point-source-type-id}")
 	@Auth(type = UserType.ADMIN)
-	public ResponseEntity<JsendResponse<Void>> deleteSource(@PathVariable Long id) {
-		pointSourceTypeService.delete(id);
+	public ResponseEntity<JsendResponse<Void>> deleteSource(
+		@PathVariable(name = "point-source-type-id") Long pointSourceTypeId
+	) {
+		pointSourceTypeService.delete(pointSourceTypeId);
 		return ResponseEntity.ok(JsendResponse.success());
 	}
 }

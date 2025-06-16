@@ -15,6 +15,7 @@ import static shop.bluebooktle.common.entity.point.QPointHistory.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
@@ -45,6 +46,19 @@ import shop.bluebooktle.common.dto.order.request.AdminOrderSearchRequest;
 public class OrderQueryRepositoryImpl implements OrderQueryRepository {
 
 	private final JPAQueryFactory queryFactory;
+
+	@Override
+	public List<Order> findOrdersByStatusAndRequestedDeliveryDateBefore(OrderStatus status, LocalDateTime dateTime) {
+		return queryFactory
+			.selectFrom(order)
+			.join(order.orderState, orderState).fetchJoin()
+			.where(
+				orderState.state.eq(status),
+				order.requestedDeliveryDate.isNotNull(),
+				order.requestedDeliveryDate.before(dateTime)
+			)
+			.fetch();
+	}
 
 	@Override
 	public Optional<Order> findFullOrderDetailsById(Long orderId) {

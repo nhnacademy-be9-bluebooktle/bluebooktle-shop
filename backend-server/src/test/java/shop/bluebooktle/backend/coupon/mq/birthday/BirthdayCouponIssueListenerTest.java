@@ -13,11 +13,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import shop.bluebooktle.backend.coupon.client.CouponFailureMessageClient;
 import shop.bluebooktle.backend.coupon.dto.CouponIssueMessage;
 import shop.bluebooktle.backend.coupon.entity.Coupon;
 import shop.bluebooktle.backend.coupon.entity.UserCoupon;
 import shop.bluebooktle.backend.coupon.repository.CouponRepository;
 import shop.bluebooktle.backend.coupon.repository.UserCouponRepository;
+import shop.bluebooktle.backend.user.dto.DoorayMessagePayload;
 import shop.bluebooktle.backend.user.repository.UserRepository;
 import shop.bluebooktle.common.entity.auth.User;
 import shop.bluebooktle.common.exception.auth.UserNotFoundException;
@@ -34,6 +36,9 @@ class BirthdayCouponIssueListenerTest {
 
 	@Mock
 	private UserCouponRepository userCouponRepository;
+
+	@Mock
+	private CouponFailureMessageClient messageClient;
 
 	@InjectMocks
 	private BirthdayCouponIssueListener listener;
@@ -62,6 +67,7 @@ class BirthdayCouponIssueListenerTest {
 		verify(userRepository).findById(userId);
 		verify(couponRepository).findById(couponId);
 		verify(userCouponRepository).save(any(UserCoupon.class));
+		verifyNoInteractions(messageClient); // 실패가 아니므로 메시지 전송 없음
 	}
 
 	@Test
@@ -69,7 +75,8 @@ class BirthdayCouponIssueListenerTest {
 	void birthdayCouponIssue_userNotFound() {
 		// given
 		Long userId = 99L;
-		CouponIssueMessage message = new CouponIssueMessage(userId, 2L, LocalDateTime.now(),
+		Long couponId = 1L;
+		CouponIssueMessage message = new CouponIssueMessage(userId, couponId, LocalDateTime.now(),
 			LocalDateTime.now().plusDays(1));
 
 		when(userRepository.findById(userId)).thenReturn(Optional.empty());
@@ -77,6 +84,8 @@ class BirthdayCouponIssueListenerTest {
 		// when & then
 		assertThatThrownBy(() -> listener.birthdayCouponIssue(message))
 			.isInstanceOf(UserNotFoundException.class);
+
+		verify(messageClient).sendMessage(any(DoorayMessagePayload.class));
 	}
 
 	@Test
@@ -95,5 +104,7 @@ class BirthdayCouponIssueListenerTest {
 		// when & then
 		assertThatThrownBy(() -> listener.birthdayCouponIssue(message))
 			.isInstanceOf(CouponNotFoundException.class);
+
+		verify(messageClient).sendMessage(any(DoorayMessagePayload.class));
 	}
 }

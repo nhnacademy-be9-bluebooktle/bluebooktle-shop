@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -56,6 +57,7 @@ import shop.bluebooktle.common.util.JwtUtil;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 @Slf4j
+@RefreshScope
 public class AuthServiceImpl implements AuthService {
 
 	private final UserRepository userRepository;

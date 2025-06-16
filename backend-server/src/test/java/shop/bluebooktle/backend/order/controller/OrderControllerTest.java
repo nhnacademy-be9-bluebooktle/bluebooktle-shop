@@ -275,7 +275,7 @@ public class OrderControllerTest {
 			expectedResponse);
 
 		ResponseEntity<JsendResponse<OrderDetailResponse>> responseEntity =
-			orderController.getMemberOrderDetail(orderKey, principal);
+			orderController.getOrderDetail(orderKey, principal);
 
 		assertThat(responseEntity.getStatusCodeValue()).isEqualTo(200);
 		assertThat(responseEntity.getBody()).isNotNull();
@@ -294,7 +294,7 @@ public class OrderControllerTest {
 		given(orderService.getOrderDetailByUserId(eq(orderKey), isNull())).willReturn(expectedResponse);
 
 		ResponseEntity<JsendResponse<OrderDetailResponse>> responseEntity =
-			orderController.getMemberOrderDetail(orderKey, null);
+			orderController.getOrderDetail(orderKey, null);
 
 		assertThat(responseEntity.getStatusCodeValue()).isEqualTo(200);
 		assertThat(responseEntity.getBody()).isNotNull();

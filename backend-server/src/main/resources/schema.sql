@@ -814,3 +814,24 @@ select *
 from (select 0 as ID, '0' as UNIQUE_KEY) as tmp
 where not exists(select * from BATCH_JOB_SEQ);
 
+CREATE TABLE failed_user_coupon
+(
+    failed_coupon_issue_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    issue_id               VARCHAR(36) NOT NULL UNIQUE,
+    user_id                BIGINT      NOT NULL,
+    coupon_id              BIGINT      NOT NULL,
+    available_start_at     DATETIME    NOT NULL,
+    available_end_at       DATETIME    NOT NULL,
+    issue_type             VARCHAR(20) NOT NULL,
+    status                 VARCHAR(20) NOT NULL,
+    retry_count            INT         NOT NULL DEFAULT 0,
+    reason                 VARCHAR(50) NOT NULL,
+    created_at             DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at             DATETIME    NOT NULL,
+    deleted_at             DATETIME,
+
+    INDEX                  idx_failed_user_coupon_deleted_at (deleted_at),
+    INDEX                  idx_failed_user_coupon_created_at (created_at),
+    INDEX                  idx_failed_user_coupon_status (status),
+    INDEX                  idx_failed_user_coupon_issue_type (issue_type)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
