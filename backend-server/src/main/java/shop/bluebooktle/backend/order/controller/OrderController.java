@@ -70,9 +70,9 @@ public class OrderController {
 	}
 
 	@Operation(summary = "주문 확인 및 결제 정보 조회(orderId)", description = "특정 주문 ID에 대한 상세 내역(주문 도서, 배송, 쿠폰, 포인트)을 조회하여 결제 전 확인 페이지에 사용합니다.")
-	@GetMapping("/{orderId}")
+	@GetMapping("/{order-id}")
 	public ResponseEntity<JsendResponse<OrderConfirmDetailResponse>> getOrderConfirmationDetails(
-		@Parameter(description = "조회할 주문의 ID") @PathVariable Long orderId,
+		@Parameter(description = "조회할 주문의 ID") @PathVariable(name = "order-id") Long orderId,
 		@Parameter(hidden = true) @AuthenticationPrincipal UserPrincipal userPrincipal) {
 		log.info("주문조회");
 		OrderConfirmDetailResponse responseDto = orderService.getOrderById(orderId,
@@ -81,9 +81,9 @@ public class OrderController {
 	}
 
 	@Operation(summary = "주문 확인 및 결제 정보 조회", description = "특정 주문 KEY에 대한 상세 내역(주문 도서, 배송, 쿠폰, 포인트)을 조회하여 결제 전 확인 페이지에 사용합니다.")
-	@GetMapping("/key/{orderKey}")
+	@GetMapping("/key/{order-key}")
 	public ResponseEntity<JsendResponse<OrderConfirmDetailResponse>> getOrderConfirmationDetails(
-		@Parameter(description = "조회할 주문의 KEY") @PathVariable String orderKey,
+		@Parameter(description = "조회할 주문의 KEY") @PathVariable(name = "order-key") String orderKey,
 		@Parameter(hidden = true) @AuthenticationPrincipal UserPrincipal userPrincipal) {
 		OrderConfirmDetailResponse responseDto = orderService.getOrderByKey(orderKey,
 			userPrincipal != null ? userPrincipal.getUserId() : null);
@@ -131,9 +131,9 @@ public class OrderController {
 	}
 
 	@Operation(summary = "주문 취소", description = "주문을 취소합니다.")
-	@PostMapping("/{orderKey}/cancel")
+	@PostMapping("/{order-key}/cancel")
 	public ResponseEntity<JsendResponse<Void>> cancelOrder(
-		@Parameter(description = "조회할 주문키") @PathVariable String orderKey,
+		@Parameter(description = "조회할 주문키") @PathVariable(name = "order-key") String orderKey,
 		@Parameter(hidden = true) @AuthenticationPrincipal UserPrincipal userPrincipal
 	) {
 		if (userPrincipal == null || userPrincipal.getUserId() == null) {
@@ -145,9 +145,9 @@ public class OrderController {
 	}
 
 	@Operation(summary = "주문 상세 조회", description = "주문상세 페이지를 조회합니다.")
-	@GetMapping("/{orderKey}/detail")
+	@GetMapping("/{order-key}/detail")
 	public ResponseEntity<JsendResponse<OrderDetailResponse>> getOrderDetail(
-		@Parameter(description = "조회할 주문키") @PathVariable String orderKey,
+		@Parameter(description = "조회할 주문키") @PathVariable(name = "order-key") String orderKey,
 		@Parameter(hidden = true) @AuthenticationPrincipal UserPrincipal userPrincipal
 	) {
 		OrderDetailResponse responseDto = orderService.getOrderDetailByUserId(orderKey,
