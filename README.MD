@@ -71,202 +71,111 @@ Spring Boot 기반의 RESTful API를 중심으로 구현되었으며, MySQL, Red
 
 ---
 
-= 개발환경
+# 📦 개발 환경
 
-== 개발도구
-* Intellij IDEA - Ultimate
-  * https://www.jetbrains.com/ko-kr/idea/download
-* 라이선스 만료되면 TA에게 별도 문의하세요
+## 🧰 개발 도구
+- **IDE**: IntelliJ IDEA - Ultimate
+- **언어**: Java 21 LTS
+- **빌드 도구**: Maven
 
-== Language
-* java 21 LTS
-* Eclipse Temurin
-** https://adoptium.net/temurin/releases/?version=21
+## 🧱 개발 프레임워크 및 라이브러리
+- **Spring Framework**: 5.3
+- **Spring Boot**: 3.3.4
 
-== 빌드도구
-* Maven
+### 🌩 Spring Cloud
+- Spring Cloud Gateway
+- Spring Cloud Netflix (Eureka)
+- Spring Cloud Config
+- Spring Cloud OpenFeign
 
-== 개발 환경
+### 💾 데이터 접근
+- Spring Data
+- Spring Data JPA
+- Spring Data Elasticsearch
+- Spring Data Redis
+- JPA
+- QueryDSL
 
-* Spring Framework
-** 6.x
-* Spring Boot
-** 3.3.x
-* Spring Cloud 
-** Spring Cloud Gateway
-*** https://spring.io/projects/spring-cloud-gateway
-** Spring Cloud Netflex(eureka)
-*** https://spring.io/projects/spring-cloud-netflix
-** Spring Cloud Config
-*** https://spring.io/projects/spring-cloud-config
-** Spring cloud OpenFeign
-*** https://spring.io/projects/spring-cloud-openfeign
+## 🧪 테스트 환경
+- JUnit 5
+- AssertJ
+- Mockito
+- SonarQube (테스트 커버리지 80% 이상 유지)
 
-* JPA
-** QueryDSL
-*** http://querydsl.com
+## 🗄 데이터베이스
+- **MySQL**: 8.0.25
+- **Redis**
 
-* Connection Pool
-** Apache Commons DBCP2
-*** https://commons.apache.org/proper/commons-dbcp/
+## 🔍 검색 엔진
+- **Elasticsearch**: 8.6.2
 
-== 테스트 환경
+## 🧮 모델링 도구
+- **ERD Cloud**
 
-* Junit5
-** https://junit.org/junit5/docs/current/user-guide/
-* AssertJ
-** https://assertj.github.io/doc/
-* Mokito
-** https://site.mockito.org/
-* SonarQube
-** http://133.186.241.167:9000/
-** Test Coverage : 80% 이상
+## 🤝 협업 도구
+- **GitHub Project**
 
-----
-id : nhnacademy
-pw : nhnacademy123!
-----
+## 🚀 CI/CD
+- **CI**: Continuous Integration
+- **CD**: Continuous Delivery / Deployment
+- **도구**: GitHub Actions
+
+## 🎨 UI 프레임워크
+- **Bootstrap 5**
 
 
-== 데이터베이스
-* MySQL : 8.x
-** admin tool
-*** WEB : http://133.186.241.167:18080
-*** GUI : https://dev.mysql.com/downloads/workbench/
-** MYSQL 계정은 TA에게 요청하세요.
+# 📦 사용 기술
 
-----
-ip : 133.186.241.167
-port : 3306
-----
+## 🛠 Tech Stack
 
-* Redis
-** Redis database no 는 팀별로 제공될 예정 입니다. TA에게 요청하세요.
-** 팀별 10개씩 제공 합니다.
+### 🖥 Language
+![Java](https://img.shields.io/badge/Java-007396?style=flat&logo=OpenJDK&logoColor=white)
 
-----
-ip : 133.186.241.167
-port : 6379
-공통 password : *N2vya7H@muDTwdNMR!
-----
+### 💡 Framework & Library
+![Spring](https://img.shields.io/badge/Spring-6DB33F?style=flat&logo=Spring&logoColor=white)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-6DB33F?style=flat&logo=Spring%20Boot&logoColor=white)
+![Spring RestDocs](https://img.shields.io/badge/Spring%20RestDocs-6DB33F?style=flat)
+![Spring Data JPA](https://img.shields.io/badge/Spring%20Data%20JPA-6DB33F?style=flat)
+![Spring Cloud Gateway](https://img.shields.io/badge/Spring%20Cloud%20Gateway-6DB33F?style=flat)
+![Spring Batch](https://img.shields.io/badge/Spring%20Batch-6DB33F?style=flat)
+![Eureka](https://img.shields.io/badge/Eureka-6DB33F?style=flat)
+![JWT](https://img.shields.io/badge/JWT-000000?style=flat&logo=JSON%20Web%20Tokens)
+![Hibernate](https://img.shields.io/badge/Hibernate-59666C?style=flat&logo=Hibernate)
+![MyBatis](https://img.shields.io/badge/MyBatis-0052CC?style=flat)
+![QueryDSL](https://img.shields.io/badge/QueryDSL-0095D5?style=flat)
 
+### 🔧 Build Tool
+![Maven](https://img.shields.io/badge/Maven-C71A36?style=flat&logo=Apache%20Maven)
 
-== 검색엔진
-* Elastic Search : 8.x
+### 🗄 Database
+![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=flat&logo=MySQL&logoColor=white)
+![Redis](https://img.shields.io/badge/Redis-DC382D?style=flat&logo=Redis&logoColor=white)
 
-** kibana
-*** http://115.94.72.197:5601/
+### ⚙ CI/CD
+![GitHub Actions](https://img.shields.io/badge/GitHub%20Actions-2088FF?style=flat&logo=GitHub%20Actions&logoColor=white)
+![Jenkins](https://img.shields.io/badge/Jenkins-D24939?style=flat&logo=Jenkins&logoColor=white)
 
-** plugin 제공
+### ☁ DevOps & Infra
+![NHN Cloud](https://img.shields.io/badge/NHN%20Cloud-000000?style=flat)
+![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat&logo=Docker&logoColor=white)
+![SonarQube](https://img.shields.io/badge/SonarQube-4E9BCD?style=flat&logo=SonarQube&logoColor=white)
+![Nginx](https://img.shields.io/badge/Nginx-009639?style=flat&logo=nginx&logoColor=white)
 
-*** jaso
-**** https://github.com/netcrazy/elasticsearch-jaso-analyzer
-
-*** Korean (nori) analysis plugin
-**** https://www.elastic.co/guide/en/elasticsearch/plugins/current/analysis-nori.html
-
-*** icu
-**** https://www.elastic.co/guide/en/elasticsearch/plugins/current/analysis-icu.html
-
-----
-id : elastic
-pw : nhnacademy123!
-
-- port list -
-5044: Logstash Beats input
-50000: Logstash TCP input
-9600: Logstash monitoring API
-9200: Elasticsearch HTTP
-9300: Elasticsearch TCP transport
-5601: Kibana
-----
-
-== 모델링 (ERD)
-* ERDCloud
-  - https://www.erdcloud.com
-* marco@nhnacademy.com 관리자 맴버 초대하기
-
-== Message Queue
-
-* RabbitMQ
-** Official
-*** https://www.rabbitmq.com
-
-** WEB Management
-*** http://133.186.241.167:15672/
-
-----
-id : admin
-pw : nhnacademy123!
-
-- port list -
-AMQP : 5672
-WEB Management : 15672
-----
+### 🧰 ETC
+![Git](https://img.shields.io/badge/Git-F05032?style=flat&logo=Git&logoColor=white)
+![GitHub](https://img.shields.io/badge/GitHub-181717?style=flat&logo=GitHub)
+![Junit5](https://img.shields.io/badge/JUnit5-25A162?style=flat)
+![IntelliJ IDEA](https://img.shields.io/badge/IntelliJ%20IDEA-000000?style=flat&logo=IntelliJ%20IDEA)
+![SonarLint](https://img.shields.io/badge/SonarLint-F3702A?style=flat)
+![DataGrip](https://img.shields.io/badge/DataGrip-000000?style=flat&logo=DataGrip)
+![Elasticsearch](https://img.shields.io/badge/Elasticsearch-005571?style=flat&logo=Elasticsearch)
+![Linux](https://img.shields.io/badge/Linux-FCC624?style=flat&logo=Linux&logoColor=black)
+![Ubuntu](https://img.shields.io/badge/Ubuntu-E95420?style=flat&logo=Ubuntu&logoColor=white)
+![MinIO](https://img.shields.io/badge/MinIO-EE1C25?style=flat&logo=data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIiIGhlaWdodD0iMTIiIHZpZXdCb3g9IjAgMCAxMjAgMTIwIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik01OS45IDQzLjJDMzUuNDE2IDQzLjIgMTMuNTYzIDQ5LjgyOSAxMy41NjMgNTguNDQyQzEzLjU2MyA2Ny4wNTUgMzUuNDE2IDczLjY4MiA1OS45IDczLjY4MkM4NC40ODQgNzMuNjgyIDEwNi4zMzggNjcuMDU1IDEwNi4zMzggNTguNDQyQzEwNi4zMzggNDkuODI5IDg0LjQ4NCA0My4yIDU5LjkgNDMuMlpNNTkuOSA3MS41MjVDMzcuMDU1IDcxLjUyNSAxOC41MjggNjYuMjU5IDE4LjUyOCA1OC40NDJDMjAuODUxIDUwLjYyNSAzNy4wNTUgNDUuMzU5IDU5LjkgNDUuMzU5Qzg2LjYyNSA0NS4zNTkgMTAxLjI1NSA1MC42MjUgMTAxLjI1NSA1OC40NDJDMTAxLjI1NSA2Ni4yNTkgODYuNjI1IDcxLjUyNSA1OS45IDcxLjUyNVoiIGZpbGw9IndoaXRlIi8+PC9zdmc+)
 
 
-== 협업 도구
-* GitHub Project
-** https://docs.github.com/ko/issues/planning-and-tracking-with-projects/learning-about-projects/quickstart-for-projects
-* 브랜치 전략
-** Git Flow
-*** https://nhnacademy.dooray.com/share/pages/iV0jBBZeTIy1tIC-m9gmRg/3375804732742205244
+### 💻 Frontend
+![Thymeleaf](https://img.shields.io/badge/Thymeleaf-005F0F?style=flat)
+![Bootstrap5](https://img.shields.io/badge/Bootstrap-7952B3?style=flat&logo=Bootstrap&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=JavaScript&logoColor=black)
 
-== CI/CD
-* Continuous Integration
-** github
-*** Contributor로 초대할 예정
-* Continuous (Delivery, Deployment)
-** GitHub Action
-*** https://docs.github.com/ko/actions
-
-// ** Jenkins
-// *** Cloud에 직접 Jenkins 설치 후 진행 합니다.
-** Docker
-*** NHN Container Registry (NCR)
-*** https://docs.nhncloud.com/ko/Container/NCR/ko/overview/
-
-== UI 개발
-* BootStrap 사용
-** https://getbootstrap.com
-** free template
-*** https://tabler.io/
-*** https://adminlte.io/
-*** https://startbootstrap.com/theme/sb-admin-2
-*** 기타 free template 사용가능
-
-== NHN Cloud
-
-=== Instance
-* https://docs.nhncloud.com/ko/Compute/Instance/ko/overview/
-* 인스턴스는 가상의 CPU, 메모리, 기본 디스크로 구성된 가상 서버
-
-=== Secure Key Manager
-* https://docs.nhncloud.com/ko/Security/Secure%20Key%20Manager/ko/overview/
-* 기밀 데이터, 대칭키, 비대칭키 저장
-
-=== Object Storage
-* https://docs.nhncloud.com/ko/Storage/Object%20Storage/ko/Overview/
-* 다양한 유형의 데이터를 원하는 만큼 저장하고 필요할 때마다 가져올 수 있는 객체 스토리지 서비스
-
-=== Image Manager
-* https://docs.nhncloud.com/ko/Contents%20Delivery/Image%20Manager/ko/Overview/
-* 이미지의 저장, 편집 그리고 전송 기능까지 한번에 제공하는 서비스
-
-=== Container Registry
-* https://docs.nhncloud.com/ko/Container/NCR/ko/overview/
-* Docker 컨테이너 이미지를 쉽고 안전하게 저장, 관리하고 배포할 수 있는 컨테이너 레지스트리 서비스
-
-=== Load Balancer
-* https://docs.nhncloud.com/ko/Network/Load%20Balancer/ko/overview/
-* 로드 밸런서, 부하 분산
-
-=== Log & Crash Search
-* 로그를 수집하여 원하는 로그를 검색하고 조회하는 시스템
-** https://docs.nhncloud.com/ko/Data%20&%20Analytics/Log%20&%20Crash%20Search/ko/Overview/
-
-
-== 기타
-=== Dooray Hook Sender
-* 알림 관련된 메시지는 Dooray Hook Sender를 이용합니다.
-** https://nhnent.dooray.com/share/pages/zbJkAsWKRWiiLFiAxI7Jtw/3250156109508415493
