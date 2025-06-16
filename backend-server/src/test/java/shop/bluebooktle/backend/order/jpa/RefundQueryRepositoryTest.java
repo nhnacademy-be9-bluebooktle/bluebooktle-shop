@@ -221,7 +221,7 @@ class RefundQueryRepositoryTest {
 			RefundSearchType.ORDERER_NAME, "홍길동");
 		Page<Refund> page = refundQueryRepository.searchRefunds(req, Pageable.ofSize(10));
 
-		// 주문자명이 홍길동인 환불이 2건
+		// 주문자명이 홍길동인 환불이 1건
 		assertThat(page.getTotalElements()).isEqualTo(1);
 	}
 
