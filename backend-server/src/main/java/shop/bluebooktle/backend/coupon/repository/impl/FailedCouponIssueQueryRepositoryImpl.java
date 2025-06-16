@@ -1,11 +1,17 @@
 package shop.bluebooktle.backend.coupon.repository.impl;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
+import com.querydsl.core.Tuple;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -27,11 +33,12 @@ public class FailedCouponIssueQueryRepositoryImpl implements FailedCouponIssueQu
 
 	private final JPAQueryFactory queryFactory;
 
+	private final QFailedCouponIssue failedCouponIssue = QFailedCouponIssue.failedCouponIssue;
+
 	@Override
 	public Page<FailedCouponIssueResponse> findAllFailedCouponIssue(FailedCouponIssueSearchRequest request,
 		Pageable pageable) {
 
-		QFailedCouponIssue failedCouponIssue = QFailedCouponIssue.failedCouponIssue;
 		QUserCoupon userCoupon = QUserCoupon.userCoupon;
 
 		BooleanExpression filterByType = eqIssueType(request.getType());
@@ -89,6 +96,45 @@ public class FailedCouponIssueQueryRepositoryImpl implements FailedCouponIssueQu
 			.toList();
 
 		return new PageImpl<>(responses, pageable, total != null ? total : 0);
+	}
+
+	@Override
+	public Map<CouponIssueType, Long> countTodayTotalByType() {
+		LocalDateTime start = LocalDate.now().atStartOfDay();
+		LocalDateTime end = start.plusDays(1);
+
+		List<Tuple> list = queryFactory
+			.select(failedCouponIssue.issueType, failedCouponIssue.count())
+			.from(failedCouponIssue)
+			.where(failedCouponIssue.createdAt.between(start, end))
+			.groupBy(failedCouponIssue.issueType)
+			.fetch();
+
+		return list.stream()
+			.collect(Collectors.toMap(
+				t -> t.get(failedCouponIssue.issueType),
+				t -> Optional.ofNullable(t.get(failedCouponIssue.count())).orElse(0L)
+			));
+	}
+
+	@Override
+	public Map<CouponIssueType, Long> countTodayByTypeAndStatus(CouponIssueStatus status) {
+		LocalDateTime start = LocalDate.now().atStartOfDay();
+		LocalDateTime end = start.plusDays(1);
+
+		List<Tuple> list = queryFactory
+			.select(failedCouponIssue.issueType, failedCouponIssue.count())
+			.from(failedCouponIssue)
+			.where(failedCouponIssue.createdAt.between(start, end)
+				.and(failedCouponIssue.status.eq(status)))
+			.groupBy(failedCouponIssue.issueType)
+			.fetch();
+
+		return list.stream()
+			.collect(Collectors.toMap(
+				t -> t.get(failedCouponIssue.issueType),
+				t -> Optional.ofNullable(t.get(failedCouponIssue.count())).orElse(0L)
+			));
 	}
 
 	private BooleanExpression eqIssueType(CouponIssueType issueType) {

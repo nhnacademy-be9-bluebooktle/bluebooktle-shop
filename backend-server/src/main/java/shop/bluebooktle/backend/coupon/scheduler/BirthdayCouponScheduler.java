@@ -1,4 +1,4 @@
-package shop.bluebooktle.backend.coupon.batch.birthday.scheduler;
+package shop.bluebooktle.backend.coupon.scheduler;
 
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
