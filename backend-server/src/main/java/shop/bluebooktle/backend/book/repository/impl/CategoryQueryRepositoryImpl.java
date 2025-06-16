@@ -17,7 +17,6 @@ import shop.bluebooktle.backend.book.entity.Category;
 import shop.bluebooktle.backend.book.entity.QCategory;
 import shop.bluebooktle.backend.book.repository.CategoryQueryRepository;
 
-@Repository
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class CategoryQueryRepositoryImpl implements CategoryQueryRepository {

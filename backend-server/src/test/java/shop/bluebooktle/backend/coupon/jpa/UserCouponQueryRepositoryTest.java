@@ -26,6 +26,8 @@ import shop.bluebooktle.backend.coupon.entity.CategoryCoupon;
 import shop.bluebooktle.backend.coupon.entity.Coupon;
 import shop.bluebooktle.backend.coupon.entity.CouponType;
 import shop.bluebooktle.backend.coupon.entity.UserCoupon;
+import shop.bluebooktle.backend.coupon.repository.UserCouponQueryRepository;
+import shop.bluebooktle.backend.coupon.repository.UserCouponRepository;
 import shop.bluebooktle.backend.coupon.repository.impl.UserCouponQueryRepositoryImpl;
 import shop.bluebooktle.common.converter.ProfileAwareStringCryptoConverter;
 import shop.bluebooktle.common.domain.auth.UserProvider;
@@ -46,7 +48,7 @@ import shop.bluebooktle.common.util.CryptoUtils;
 public class UserCouponQueryRepositoryTest {
 
 	@Autowired
-	private UserCouponQueryRepositoryImpl userCouponQueryRepository;
+	private UserCouponRepository userCouponQueryRepository;
 
 	@Autowired
 	private EntityManager em;

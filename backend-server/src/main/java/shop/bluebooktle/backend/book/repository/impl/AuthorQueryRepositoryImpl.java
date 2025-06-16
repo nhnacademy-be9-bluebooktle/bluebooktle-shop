@@ -15,7 +15,6 @@ import shop.bluebooktle.backend.book.entity.Author;
 import shop.bluebooktle.backend.book.entity.QAuthor;
 import shop.bluebooktle.backend.book.repository.AuthorQueryRepository;
 
-@Repository
 @RequiredArgsConstructor
 public class AuthorQueryRepositoryImpl implements AuthorQueryRepository {
 	private final JPAQueryFactory queryFactory;
