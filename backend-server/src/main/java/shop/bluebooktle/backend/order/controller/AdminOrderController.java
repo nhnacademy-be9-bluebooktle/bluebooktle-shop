@@ -65,6 +65,7 @@ public class AdminOrderController {
 		return ResponseEntity.ok(JsendResponse.success(response));
 	}
 
+	@Operation(summary = "관리자 주문 상태 변경", description = "관리자가 주문의 상태를 변경합니다.")
 	@PostMapping("/{order-id}/update-status")
 	@Auth(type = UserType.ADMIN)
 	public ResponseEntity<JsendResponse<Void>> updateOrderStatus(
@@ -77,6 +78,7 @@ public class AdminOrderController {
 			.body(JsendResponse.success(null));
 	}
 
+	@Operation(summary = "관리자 배송 상태 변경", description = "관리자가 배송 운송장 정보를 추가합니다.")
 	@PostMapping("/{order-id}/update-tracking")
 	@Auth(type = UserType.ADMIN)
 	public ResponseEntity<JsendResponse<Void>> updateTrackingNumber(

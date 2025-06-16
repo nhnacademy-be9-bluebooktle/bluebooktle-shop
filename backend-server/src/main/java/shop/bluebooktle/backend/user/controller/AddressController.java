@@ -69,10 +69,10 @@ public class AddressController {
 
 	@Operation(summary = "내 주소 수정", description = "로그인한 사용자의 특정 주소를 수정합니다.")
 	@Auth(type = UserType.USER)
-	@PutMapping("/{addressId}")
+	@PutMapping("/{address-id}")
 	public ResponseEntity<JsendResponse<AddressResponse>> updateAddress(
 		@Parameter(hidden = true) @AuthenticationPrincipal UserPrincipal userPrincipal,
-		@PathVariable Long addressId,
+		@PathVariable(name = "address-id") Long addressId,
 		@Valid @RequestBody AddressRequest request
 	) {
 		checkPrincipal(userPrincipal);
@@ -82,10 +82,10 @@ public class AddressController {
 
 	@Operation(summary = "내 주소 삭제", description = "로그인한 사용자의 특정 주소를 삭제합니다.")
 	@Auth(type = UserType.USER)
-	@DeleteMapping("/{addressId}")
+	@DeleteMapping("/{address-id}")
 	public ResponseEntity<JsendResponse<Void>> deleteAddress(
 		@Parameter(hidden = true) @AuthenticationPrincipal UserPrincipal userPrincipal,
-		@PathVariable Long addressId
+		@PathVariable(name = "address-id") Long addressId
 	) {
 		checkPrincipal(userPrincipal);
 		addressService.deleteAddress(userPrincipal.getUserId(), addressId);

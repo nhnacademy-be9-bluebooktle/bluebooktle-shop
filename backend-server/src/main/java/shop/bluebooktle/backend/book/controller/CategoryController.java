@@ -92,25 +92,29 @@ public class CategoryController {
 	}
 
 	@Operation(summary = "카테고리 조회", description = "해당 카테고리를 조회합니다.")
-	@GetMapping("/{categoryId}")
-	public ResponseEntity<JsendResponse<CategoryResponse>> getCategory(@PathVariable Long categoryId) {
+	@GetMapping("/{category-id}")
+	public ResponseEntity<JsendResponse<CategoryResponse>> getCategory(
+		@PathVariable(name = "category-id") Long categoryId
+	) {
 		CategoryResponse categoryResponse = categoryService.getCategory(categoryId);
 		return ResponseEntity.ok(JsendResponse.success(categoryResponse));
 	}
 
 	@Operation(summary = "카테고리 삭제", description = "해당 카테고리를 삭제합니다.")
-	@DeleteMapping("/{categoryId}")
+	@DeleteMapping("/{category-id}")
 	@Auth(type = UserType.ADMIN)
-	public ResponseEntity<JsendResponse<Void>> deleteCategory(@PathVariable Long categoryId) {
+	public ResponseEntity<JsendResponse<Void>> deleteCategory(
+		@PathVariable(name = "category-id") Long categoryId
+	) {
 		categoryService.deleteCategory(categoryId);
 		return ResponseEntity.ok(JsendResponse.success());
 	}
 
 	@Operation(summary = "카테고리 수정", description = "해당 카테고리명을 수정합니다.")
-	@PutMapping("/{categoryId}")
+	@PutMapping("/{category-id}")
 	@Auth(type = UserType.ADMIN)
 	public ResponseEntity<JsendResponse<Void>> updateCategory(
-		@PathVariable Long categoryId,
+		@PathVariable(name = "category-id") Long categoryId,
 		@Valid @RequestBody CategoryUpdateRequest request
 	) {
 		categoryService.updateCategory(categoryId, request);
@@ -118,8 +122,10 @@ public class CategoryController {
 	}
 
 	@Operation(summary = "최상위 카테고리 이름으로 조회", description = "최상위 카테고리를 이름으로 조회합니다.")
-	@GetMapping("/name/{categoryName}")
-	public ResponseEntity<JsendResponse<CategoryResponse>> getCategoryByName(@PathVariable String categoryName) {
+	@GetMapping("/name/{category-name}")
+	public ResponseEntity<JsendResponse<CategoryResponse>> getCategoryByName(
+		@PathVariable(name = "category-name") String categoryName
+	) {
 		CategoryResponse categoryResponse = categoryService.getCategoryByName(categoryName);
 		return ResponseEntity.ok(JsendResponse.success(categoryResponse));
 	}
