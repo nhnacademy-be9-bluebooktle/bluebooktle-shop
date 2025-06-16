@@ -446,7 +446,6 @@ class BookServiceTest {
 	void updateBook_Success_AllFields() {
 		// Given
 		Long bookId = 1L;
-		// Mocking 반환 값을 위해 실제 엔티티 ID와 일치하도록 설정
 		AuthorResponse authorResp1 = AuthorResponse.builder().id(20L).name("새로운 작가1").build();
 		AuthorResponse authorResp2 = AuthorResponse.builder().id(21L).name("새로운 작가2").build();
 		PublisherInfoResponse publisherResp1 = PublisherInfoResponse.builder().id(30L).name("새로운 출판사1").build();
@@ -466,15 +465,15 @@ class BookServiceTest {
 			.state(BookSaleInfoState.AVAILABLE)
 			.authorIdList(List.of(20L, 21L))
 			.publisherIdList(List.of(30L, 31L))
-			.categoryIdList(List.of(1L, 2L)) // 기존 category 객체 id가 1L이므로, 다른 id 추가
+			.categoryIdList(List.of(1L, 2L))
 			.tagIdList(List.of(40L, 41L))
 			.imgUrl("http://example.com/updated_thumbnail.jpg")
 			.build();
 
 		when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
 		when(bookSaleInfoRepository.findByBook(book)).thenReturn(Optional.of(bookSaleInfo));
-		when(bookRepository.save(any(Book.class))).thenReturn(book); // 업데이트된 book 반환
-		when(bookSaleInfoRepository.save(any(BookSaleInfo.class))).thenReturn(bookSaleInfo); // 업데이트된 saleInfo 반환
+		when(bookRepository.save(any(Book.class))).thenReturn(book);
+		when(bookSaleInfoRepository.save(any(BookSaleInfo.class))).thenReturn(bookSaleInfo);
 
 		when(bookAuthorService.updateBookAuthor(eq(bookId), anyList()))
 			.thenReturn(List.of(authorResp1, authorResp2));
@@ -486,11 +485,8 @@ class BookServiceTest {
 		doNothing().when(bookImgService).updateBookImg(eq(bookId), anyString());
 		doNothing().when(bookElasticSearchService).updateBook(any(BookElasticSearchUpdateRequest.class));
 
-		// When
 		bookService.updateBook(bookId, request);
 
-		// Then
-		// Book 엔티티 업데이트 검증
 		verify(bookRepository, times(1)).findById(bookId);
 		verify(bookRepository, times(1)).save(argThat(updatedBook ->
 			updatedBook.getTitle().equals(request.getTitle()) &&
@@ -499,19 +495,16 @@ class BookServiceTest {
 				updatedBook.getPublishDate().equals(request.getPublishDate().atStartOfDay())
 		));
 
-		// BookSaleInfo 엔티티 업데이트 검증
 		verify(bookSaleInfoRepository, times(1)).findByBook(book);
 		verify(bookSaleInfoRepository, times(1)).save(argThat(updatedSaleInfo ->
-				updatedSaleInfo.getPrice().compareTo(request.getPrice()) == 0 &&
-					updatedSaleInfo.getSalePrice().compareTo(request.getSalePrice()) == 0 &&
-					updatedSaleInfo.getStock().equals(request.getStock()) &&
-					updatedSaleInfo.isPackable() == request.getIsPackable() &&
-					updatedSaleInfo.getBookSaleInfoState().equals(request.getState()) &&
-					updatedSaleInfo.getSalePercentage().compareTo(new BigDecimal("20.00")) == 0
-			// (25000-20000)/25000 * 100 = 20
+			updatedSaleInfo.getPrice().compareTo(request.getPrice()) == 0 &&
+				updatedSaleInfo.getSalePrice().compareTo(request.getSalePrice()) == 0 &&
+				updatedSaleInfo.getStock().equals(request.getStock()) &&
+				updatedSaleInfo.isPackable() == request.getIsPackable() &&
+				updatedSaleInfo.getBookSaleInfoState().equals(request.getState()) &&
+				updatedSaleInfo.getSalePercentage().compareTo(new BigDecimal("20.00")) == 0
 		));
 
-		// 각 서브 서비스 호출 검증
 		verify(bookAuthorService, times(1)).updateBookAuthor(eq(bookId), eq(request.getAuthorIdList()));
 		verify(bookPublisherService, times(1)).updateBookPublisher(eq(bookId), eq(request.getPublisherIdList()));
 		verify(bookCategoryService, times(1)).updateBookCategory(eq(bookId), eq(request.getCategoryIdList()));
