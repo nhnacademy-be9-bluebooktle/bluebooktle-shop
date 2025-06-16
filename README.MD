@@ -7,11 +7,6 @@
 - **목적**: 도서를 검색하고 구매할 수 있는 온라인 서점 플랫폼 구현
 - **기술스택**: Spring Boot, MySQL, Redis, Minio 등
 - **개발 기간**: 2025.04.28 ~ 2025.06.13
-
----
-
-## 🔗 배포 주소
-
 - **웹사이트**: [https://bluebooktle.shop](https://bluebooktle.shop)
 
 ---
