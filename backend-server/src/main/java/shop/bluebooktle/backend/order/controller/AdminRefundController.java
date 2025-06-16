@@ -44,10 +44,12 @@ public class AdminRefundController {
 		return ResponseEntity.ok(JsendResponse.success(paginationData));
 	}
 
-	@GetMapping("/{refundId}")
+	@GetMapping("/{refund-id}")
 	@Auth(type = UserType.ADMIN)
 	@Operation(summary = "관리자 환불 상세 조회", description = "관리자가 환불 건의 상세 내역을 조회합니다.")
-	public ResponseEntity<JsendResponse<AdminRefundDetailResponse>> getRefundDetail(@PathVariable Long refundId) {
+	public ResponseEntity<JsendResponse<AdminRefundDetailResponse>> getRefundDetail(
+		@PathVariable(name = "refund-id") Long refundId
+	) {
 		AdminRefundDetailResponse refundDetail = refundService.getAdminRefundDetail(refundId);
 		return ResponseEntity.ok(JsendResponse.success(refundDetail));
 	}

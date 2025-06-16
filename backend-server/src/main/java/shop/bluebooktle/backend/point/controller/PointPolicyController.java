@@ -42,10 +42,12 @@ public class PointPolicyController {
 	}
 
 	@Operation(summary = "포인트 정책 조회", description = "포인트 정책을 조회합니다.")
-	@GetMapping("/{id}")
+	@GetMapping("/{point-policy-id}")
 	@Auth(type = UserType.ADMIN)
-	public ResponseEntity<JsendResponse<PointPolicyResponse>> getPointPolicy(@PathVariable Long id) {
-		PointPolicyResponse response = pointPolicyService.get(id);
+	public ResponseEntity<JsendResponse<PointPolicyResponse>> getPointPolicy(
+		@PathVariable(name = "point-policy-id") Long pointPolicyId
+	) {
+		PointPolicyResponse response = pointPolicyService.get(pointPolicyId);
 		return ResponseEntity.ok(JsendResponse.success(response));
 	}
 
@@ -58,10 +60,12 @@ public class PointPolicyController {
 	}
 
 	@Operation(summary = "포인트 정책 삭제", description = "포인트 정책을 삭제합니다.")
-	@DeleteMapping("/{id}")
+	@DeleteMapping("/{point-policy-id}")
 	@Auth(type = UserType.ADMIN)
-	public ResponseEntity<JsendResponse<Void>> deletePointPolicy(@PathVariable Long id) {
-		pointPolicyService.delete(id);
+	public ResponseEntity<JsendResponse<Void>> deletePointPolicy(
+		@PathVariable(name = "point-policy-id") Long pointPolicyId
+	) {
+		pointPolicyService.delete(pointPolicyId);
 		return ResponseEntity.ok(JsendResponse.success());
 	}
 
