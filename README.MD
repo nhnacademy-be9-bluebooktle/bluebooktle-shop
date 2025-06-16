@@ -167,6 +167,7 @@ Spring Boot 기반의 RESTful API를 중심으로 구현되었으며, MySQL, Red
 ![Linux](https://img.shields.io/badge/Linux-FCC624?style=flat&logo=Linux&logoColor=black)
 ![Ubuntu](https://img.shields.io/badge/Ubuntu-E95420?style=flat&logo=Ubuntu&logoColor=white)
 ![MinIO](https://img.shields.io/badge/MinIO-EE1C25?style=flat&logo=data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIiIGhlaWdodD0iMTIiIHZpZXdCb3g9IjAgMCAxMjAgMTIwIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik01OS45IDQzLjJDMzUuNDE2IDQzLjIgMTMuNTYzIDQ5LjgyOSAxMy41NjMgNTguNDQyQzEzLjU2MyA2Ny4wNTUgMzUuNDE2IDczLjY4MiA1OS45IDczLjY4MkM4NC40ODQgNzMuNjgyIDEwNi4zMzggNjcuMDU1IDEwNi4zMzggNTguNDQyQzEwNi4zMzggNDkuODI5IDg0LjQ4NCA0My4yIDU5LjkgNDMuMlpNNTkuOSA3MS41MjVDMzcuMDU1IDcxLjUyNSAxOC41MjggNjYuMjU5IDE4LjUyOCA1OC40NDJDMjAuODUxIDUwLjYyNSAzNy4wNTUgNDUuMzU5IDU5LjkgNDUuMzU5Qzg2LjYyNSA0NS4zNTkgMTAxLjI1NSA1MC42MjUgMTAxLjI1NSA1OC40NDJDMTAxLjI1NSA2Ni4yNTkgODYuNjI1IDcxLjUyNSA1OS45IDcxLjUyNVoiIGZpbGw9IndoaXRlIi8+PC9zdmc+)
+![RabbitMQ](https://img.shields.io/badge/RabbitMQ-FF6600?style=flat&logo=RabbitMQ&logoColor=white)
 
 
 ### 💻 Frontend
