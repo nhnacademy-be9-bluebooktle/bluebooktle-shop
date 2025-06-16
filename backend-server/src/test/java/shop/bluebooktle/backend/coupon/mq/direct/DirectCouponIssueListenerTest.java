@@ -35,6 +35,9 @@ class DirectCouponIssueListenerTest {
 	@Mock
 	private UserCouponRepository userCouponRepository;
 
+	@Mock
+	private shop.bluebooktle.backend.coupon.client.CouponFailureMessageClient messageClient;
+
 	@InjectMocks
 	private DirectCouponIssueListener listener;
 
@@ -63,6 +66,7 @@ class DirectCouponIssueListenerTest {
 		verify(userRepository).findById(userId);
 		verify(couponRepository).findById(couponId);
 		verify(userCouponRepository).save(any(UserCoupon.class));
+		verifyNoInteractions(messageClient); // 성공 시 메시지 전송 안됨
 	}
 
 	@Test
@@ -77,6 +81,8 @@ class DirectCouponIssueListenerTest {
 		// when & then
 		assertThatThrownBy(() -> listener.handleCouponIssue(message))
 			.isInstanceOf(UserNotFoundException.class);
+
+		verify(messageClient).sendMessage(any());
 	}
 
 	@Test
@@ -97,5 +103,7 @@ class DirectCouponIssueListenerTest {
 		// when & then
 		assertThatThrownBy(() -> listener.handleCouponIssue(message))
 			.isInstanceOf(CouponNotFoundException.class);
+
+		verify(messageClient).sendMessage(any());
 	}
 }
