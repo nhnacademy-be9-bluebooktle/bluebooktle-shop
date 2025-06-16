@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.book_order.service.BookOrderService;
@@ -26,11 +28,12 @@ import shop.bluebooktle.common.dto.common.JsendResponse;
 @RestController
 @RequestMapping("/api/book-orders")
 @RequiredArgsConstructor
+@Tag(name = "도서 주문 API", description = "도서 주문에 관련 조회 및 관리를 합니다.")
 public class BookOrderController {
 	private final BookOrderService bookOrderService;
 	private final OrderPackagingService orderPackagingService;
 
-	/** 도서 주문 등록 */
+	@Operation(summary= "도서 주문 등록", description = "도서 주문을 등록합니다.")
 	@PostMapping
 	public ResponseEntity<JsendResponse<BookOrderResponse>> createBookOrder(
 		@Valid @RequestBody BookOrderRegisterRequest request) {
@@ -38,14 +41,14 @@ public class BookOrderController {
 			.body(JsendResponse.success(bookOrderService.createBookOrder(request)));
 	}
 
-	/** 도서 주문 단건 조회 */
+	@Operation(summary= "도서 주문 단건 조회", description = "도서 주문을 조회합니다.")
 	@GetMapping("/{book-order-id}")
 	public ResponseEntity<JsendResponse<BookOrderResponse>> getBookOrder(
 		@PathVariable(name = "book-order-id") Long bookOrderId) {
 		return ResponseEntity.ok(JsendResponse.success(bookOrderService.getBookOrder(bookOrderId)));
 	}
 
-	/** 도서 주문 수정 */
+	@Operation(summary= "도서 주문 수정", description = "도서 주문을 수정합니다.")
 	@PutMapping("/{book-order-id}")
 	public ResponseEntity<JsendResponse<BookOrderResponse>> updateBookOrder(
 		@RequestBody @Valid BookOrderUpdateRequest request,
@@ -53,7 +56,7 @@ public class BookOrderController {
 		return ResponseEntity.ok(JsendResponse.success(bookOrderService.updateBookOrder(bookOrderId, request)));
 	}
 
-	/** 도서 주문 삭제 */
+	@Operation(summary= "도서 주문 삭제", description = "도서 주문을 삭제합니다.")
 	@DeleteMapping("/{book-order-id}")
 	public ResponseEntity<JsendResponse<Void>> deleteBookOrder(
 		@PathVariable(name = "book-order-id") Long bookOrderId) {
@@ -61,7 +64,7 @@ public class BookOrderController {
 		return ResponseEntity.ok(JsendResponse.success());
 	}
 
-	/** 포장 추가 */
+	@Operation(summary= "도서 주문 포장 추가", description = "도서 주문에 대한 포장을 추가합니다.")
 	@PostMapping("/{book-order-id}/packaging")
 	public ResponseEntity<JsendResponse<OrderPackagingResponse>> addPackaging(
 		@PathVariable(name = "book-order-id") Long bookOrderId,
@@ -70,14 +73,14 @@ public class BookOrderController {
 			.body(JsendResponse.success(orderPackagingService.addOrderPackaging(bookOrderId, request)));
 	}
 
-	/** 포장 단건 조회 */
+	@Operation(summary= "포장 단건 조회", description = "포장에 대한 정보를 조회합니다.")
 	@GetMapping("/packagings/{order-packaging-id}")
 	public ResponseEntity<JsendResponse<OrderPackagingResponse>> getPackaging(
 		@PathVariable(name = "order-packaging-id") Long orderPackagingId) {
 		return ResponseEntity.ok(JsendResponse.success(orderPackagingService.getOrderPackaging(orderPackagingId)));
 	}
 
-	/** 포장 수정 */
+	@Operation(summary= "포장 수정", description = "포장 정보를 수정합니다.")
 	@PutMapping("/packagings/{order-packaging-id}")
 	public ResponseEntity<JsendResponse<OrderPackagingResponse>> updatePackaging(
 		@PathVariable(name = "order-packaging-id") Long orderPackagingId,
@@ -86,7 +89,7 @@ public class BookOrderController {
 			JsendResponse.success(orderPackagingService.updateOrderPackaging(orderPackagingId, request)));
 	}
 
-	/** 포장 삭제 */
+	@Operation(summary= "포장 삭제", description = "포장 정보를 삭제합니다.")
 	@DeleteMapping("/packagings/{order-packaging-id}")
 	public ResponseEntity<JsendResponse<Void>> deletePackaging(
 		@PathVariable(name = "order-packaging-id") Long orderPackagingId) {

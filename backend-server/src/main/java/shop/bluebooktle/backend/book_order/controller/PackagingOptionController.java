@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.book_order.service.PackagingOptionService;
@@ -28,10 +30,11 @@ import shop.bluebooktle.common.security.Auth;
 @RestController
 @RequestMapping("/api/options")
 @RequiredArgsConstructor
+@Tag(name = "포장 옵션 API", description = "포장 옵션 조회 및 관리합니다.")
 public class PackagingOptionController {
 	private final PackagingOptionService packagingOptionService;
-
-	/** 포장 옵션 등록 */
+	
+	@Operation(summary = "포장 옵션 등록", description = "포장 옵션을 등록합니다.")
 	@PostMapping
 	@Auth(type = UserType.ADMIN)
 	public ResponseEntity<JsendResponse<PackagingOptionInfoResponse>> createPackagingOption(
@@ -40,7 +43,7 @@ public class PackagingOptionController {
 			.body(JsendResponse.success(packagingOptionService.createPackagingOption(request)));
 	}
 
-	/** 포장 옵션 전체 조회 */
+	@Operation(summary = "포장 옵션 목록 조회", description = "포장 옵션 목록을 조회합니다.")
 	@GetMapping
 	public ResponseEntity<JsendResponse<PaginationData<PackagingOptionInfoResponse>>> getPackagingOptions(
 		@PageableDefault(size = 10, sort = "id") Pageable pageable,
@@ -58,7 +61,7 @@ public class PackagingOptionController {
 		return ResponseEntity.ok(JsendResponse.success(paginationData));
 	}
 
-	/** 포장 옵션 단건 조회 */
+	@Operation(summary = "포장 옵션 조회", description = "포장 옵션을 조회합니다.")
 	@GetMapping("/{packaging-option-id}")
 	public ResponseEntity<JsendResponse<PackagingOptionInfoResponse>> getPackagingOption(
 		@PathVariable(name = "packaging-option-id") Long packagingOptionId) {
@@ -66,7 +69,7 @@ public class PackagingOptionController {
 		return ResponseEntity.ok(JsendResponse.success(response));
 	}
 
-	/** 포장 옵션 수정 */
+	@Operation(summary = "포장 옵션 수정", description = "포장 옵션을 수정합니다.")
 	@PutMapping("/{packaging-option-id}")
 	@Auth(type = UserType.ADMIN)
 	public ResponseEntity<JsendResponse<PackagingOptionInfoResponse>> updatePackagingOption(
@@ -76,7 +79,7 @@ public class PackagingOptionController {
 			JsendResponse.success(packagingOptionService.updatePackagingOption(packagingOptionId, request)));
 	}
 
-	/** 포장 옵션 삭제 */
+	@Operation(summary = "포장 옵션 삭제", description = "포장 옵션을 삭제합니다.")
 	@DeleteMapping("/{packaging-option-id}")
 	@Auth(type = UserType.ADMIN)
 	public ResponseEntity<JsendResponse<Void>> deletePackagingOption(

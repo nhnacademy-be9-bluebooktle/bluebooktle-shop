@@ -124,6 +124,10 @@ public class BookController {
 		return ResponseEntity.ok(JsendResponse.success(paginationData));
 	}
 
+	@Operation(
+		summary = "장바구니 도서 조회",
+		description = "장바구니에 담긴 도서를 주문으로 넘기기 위한 도서를 조회합니다."
+	)
 	@GetMapping("/order/{book-id}")
 	public ResponseEntity<JsendResponse<BookCartOrderResponse>> getBookCartOrders(
 		@PathVariable(name = "book-id") Long bookId,
