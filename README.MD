@@ -16,20 +16,55 @@
 
 ---
 
-## 👥 팀 소개
+<h3 align="left">👥 팀 소개</h3>
 
-| 이름     | GitHub |
-|----------|--------|
-| 박태희   | [@marf3927](https://github.com/marf3927) |
-| 신건수   | [@gunsurius](https://github.com/Shin-Gunsu) |
-| 이용준   | [@yoplenople](https://github.com/yoplenople) |
-| 문소연   | [@oonsy99](https://github.com/oonsy99) |
-| 손동훈   | [@sondonghun97](https://github.com/sondonghun97) |
-| 조수아   | [@chossa](https://github.com/chossa) |
-| 김재혁   | [@Combro-Kim](https://github.com/Combro-Kim) |
-| 이서인   | [@sslynn22](https://github.com/sslynn22) |
+<table>
+  <tr>
+    <td align="center">
+      <img src="https://github.com/marf3927.png" width="100" /><br/>
+      <sub><b>박태희</b></sub><br/>
+      <a href="https://github.com/marf3927" target="_blank">@marf3927</a>
+    </td>
+    <td align="center">
+      <img src="https://github.com/Shin-Gunsu.png" width="100" /><br/>
+      <sub><b>신건수</b></sub><br/>
+      <a href="https://github.com/Shin-Gunsu" target="_blank">@gunsurius</a>
+    </td>
+    <td align="center">
+      <img src="https://github.com/yoplenople.png" width="100" /><br/>
+      <sub><b>이용준</b></sub><br/>
+      <a href="https://github.com/yoplenople" target="_blank">@yoplenople</a>
+    </td>
+    <td align="center">
+      <img src="https://github.com/oonsy99.png" width="100" /><br/>
+      <sub><b>문소연</b></sub><br/>
+      <a href="https://github.com/oonsy99" target="_blank">@oonsy99</a>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="https://github.com/sondonghun97.png" width="100" /><br/>
+      <sub><b>손동훈</b></sub><br/>
+      <a href="https://github.com/sondonghun97" target="_blank">@sondonghun97</a>
+    </td>
+    <td align="center">
+      <img src="https://github.com/chossa.png" width="100" /><br/>
+      <sub><b>조수아</b></sub><br/>
+      <a href="https://github.com/chossa" target="_blank">@chossa</a>
+    </td>
+    <td align="center">
+      <img src="https://github.com/Combro-Kim.png" width="100" /><br/>
+      <sub><b>김재혁</b></sub><br/>
+      <a href="https://github.com/Combro-Kim" target="_blank">@Combro-Kim</a>
+    </td>
+    <td align="center">
+      <img src="https://github.com/sslynn22.png" width="100" /><br/>
+      <sub><b>이서인</b></sub><br/>
+      <a href="https://github.com/sslynn22" target="_blank">@sslynn22</a>
+    </td>
+  </tr>
+</table>
 
-> 구성원 프로필 사진을 포함하고 싶다면 각자 `img` 태그를 통해 추가할 수 있습니다. 필요 시 예시도 제공해 드릴 수 있어요.
 
 ---
 
