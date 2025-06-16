@@ -1,15 +1,5 @@
-# 📚 My-Books
-
-<p align="center">
-  <img src="https://github.com/nhnacademy-be9-bluebooktle/bluebooktle-shop/blob/master/frontend-server/src/main/resources/static/images/logo.png?raw=true" width="300" alt="BlueBooktle Logo" />
-</p>
-
-<p align="center">
-  <a href="https://hits.seeyoufarm.com">
-    <img src="https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https://github.com/your-org/my-books&count_bg=%2379C83D&title_bg=%23555555&icon=github.svg&icon_color=%23E7E7E7&title=visits&edge_flat=false"/>
-  </a>
-</p>
-
+# <img src="https://github.com/nhnacademy-be9-bluebooktle/bluebooktle-shop/blob/master/frontend-server/src/main/resources/static/images/logo.png?raw=true" width="300" alt="BlueBooktle Logo" />
+  
 ---
 
 ## 📌 프로젝트 정보
