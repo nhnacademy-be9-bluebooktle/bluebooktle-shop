@@ -26,7 +26,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import shop.bluebooktle.backend.book.service.TagService;
 import shop.bluebooktle.common.dto.book.request.TagRequest;
 import shop.bluebooktle.common.dto.book.response.TagInfoResponse;
-import shop.bluebooktle.common.dto.common.PaginationData;
 import shop.bluebooktle.common.security.AuthUserLoader;
 import shop.bluebooktle.common.util.JwtUtil;
 
@@ -117,7 +116,6 @@ class TagControllerTest {
 		TagInfoResponse tag1 = new TagInfoResponse(1L, "Tag 1", LocalDateTime.now());
 		TagInfoResponse tag2 = new TagInfoResponse(2L, "Tag 2", LocalDateTime.now());
 		Page<TagInfoResponse> tagPage = new PageImpl<>(List.of(tag1, tag2));
-		PaginationData<TagInfoResponse> paginationData = new PaginationData<>(tagPage);
 		when(tagService.getTags(any(Pageable.class))).thenReturn(tagPage);
 
 		mockMvc.perform(get("/api/tags").param("size", "10").param("sort", "id,asc"))

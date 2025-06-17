@@ -88,16 +88,6 @@ class BookRegisterServiceTest {
 
 		final Long expectedBookId = 1L;
 
-		BookSaleInfo mockSaleInfo = BookSaleInfo.builder()
-			.id(1L)
-			.price(new BigDecimal("25000.00"))
-			.salePrice(new BigDecimal("20000.00"))
-			.stock(100)
-			.isPackable(true)
-			.bookSaleInfoState(BookSaleInfoState.AVAILABLE)
-			.salePercentage(new BigDecimal("20.00"))
-			.build();
-
 		AuthorResponse authorResponse = AuthorResponse.builder().id(1L).name("테스트 작가").build();
 		PublisherInfoResponse publisherResponse = PublisherInfoResponse.builder().id(1L).name("테스트 출판사").build();
 		TagInfoResponse tagResponse = TagInfoResponse.builder().id(1L).name("테스트 태그").build();
@@ -141,12 +131,12 @@ class BookRegisterServiceTest {
 		verify(bookRepository, times(1)).findByIsbn(request.getIsbn());
 		verify(bookRepository, times(1)).save(any(Book.class));
 		verify(bookSaleInfoRepository, times(1)).save(any(BookSaleInfo.class));
-		verify(bookAuthorService, times(1)).registerBookAuthor(eq(expectedBookId), eq(request.getAuthorIdList()));
-		verify(bookPublisherService, times(1)).registerBookPublisher(eq(expectedBookId),
-			eq(request.getPublisherIdList()));
-		verify(bookCategoryService, times(1)).registerBookCategory(eq(expectedBookId), eq(request.getCategoryIdList()));
-		verify(bookTagService, times(1)).registerBookTag(eq(expectedBookId), eq(request.getTagIdList()));
-		verify(bookImgService, times(1)).registerBookImg(eq(expectedBookId), eq(request.getImgUrl()));
+		verify(bookAuthorService, times(1)).registerBookAuthor(expectedBookId, request.getAuthorIdList());
+		verify(bookPublisherService, times(1)).registerBookPublisher((expectedBookId),
+			request.getPublisherIdList());
+		verify(bookCategoryService, times(1)).registerBookCategory(expectedBookId, request.getCategoryIdList());
+		verify(bookTagService, times(1)).registerBookTag(expectedBookId, request.getTagIdList());
+		verify(bookImgService, times(1)).registerBookImg(expectedBookId, request.getImgUrl());
 		verify(bookElasticSearchService, times(1)).registerBook(any());
 	}
 
@@ -167,16 +157,6 @@ class BookRegisterServiceTest {
 			.build();
 
 		final Long expectedBookId = 2L;
-
-		BookSaleInfo mockSaleInfo = BookSaleInfo.builder()
-			.id(2L)
-			.price(new BigDecimal("10000.00"))
-			.salePrice(new BigDecimal("9000.00"))
-			.stock(10)
-			.isPackable(false)
-			.bookSaleInfoState(BookSaleInfoState.AVAILABLE)
-			.salePercentage(new BigDecimal("10.00"))
-			.build();
 
 		AuthorResponse authorResponse = AuthorResponse.builder().id(1L).name("테스트 작가").build();
 		PublisherInfoResponse publisherResponse = PublisherInfoResponse.builder().id(1L).name("테스트 출판사").build();
@@ -220,13 +200,13 @@ class BookRegisterServiceTest {
 		verify(bookRepository, times(1)).findByIsbn(request.getIsbn());
 		verify(bookRepository, times(1)).save(any(Book.class));
 		verify(bookSaleInfoRepository, times(1)).save(any(BookSaleInfo.class));
-		verify(bookAuthorService, times(1)).registerBookAuthor(eq(expectedBookId), eq(request.getAuthorIdList()));
-		verify(bookPublisherService, times(1)).registerBookPublisher(eq(expectedBookId),
-			eq(request.getPublisherIdList()));
-		verify(bookCategoryService, times(1)).registerBookCategory(eq(expectedBookId),
-			eq(request.getCategoryIdList()));
+		verify(bookAuthorService, times(1)).registerBookAuthor(expectedBookId, request.getAuthorIdList());
+		verify(bookPublisherService, times(1)).registerBookPublisher(expectedBookId,
+			request.getPublisherIdList());
+		verify(bookCategoryService, times(1)).registerBookCategory(expectedBookId,
+			request.getCategoryIdList());
 		verify(bookTagService, never()).registerBookTag(anyLong(), anyList());
-		verify(bookImgService, times(1)).registerBookImg(eq(expectedBookId), eq(request.getImgUrl()));
+		verify(bookImgService, times(1)).registerBookImg(expectedBookId, request.getImgUrl());
 		verify(bookElasticSearchService, times(1)).registerBook(any());
 	}
 
@@ -280,20 +260,6 @@ class BookRegisterServiceTest {
 			.imgUrl("http://image.aladin.co.kr/cover/cover200/K123456789_1.jpg")
 			.build();
 
-		Book mockBook = Book.builder()
-			.id(3L)
-			.isbn("978-0134685991")
-			.title("Effective Java")
-			.build();
-
-		BookSaleInfo mockSaleInfo = BookSaleInfo.builder()
-			.id(3L)
-			.book(mockBook)
-			.stock(50)
-			.isPackable(true)
-			.bookSaleInfoState(BookSaleInfoState.AVAILABLE)
-			.build();
-
 		AuthorResponse authorResponse = AuthorResponse.builder().id(2L).name("Joshua Bloch").build();
 		PublisherInfoResponse publisherResponse = PublisherInfoResponse.builder().id(2L).name("Addison-Wesley").build();
 		TagInfoResponse tagResponse1 = TagInfoResponse.builder().id(100L).name("알라딘 태그1").build();
@@ -345,16 +311,17 @@ class BookRegisterServiceTest {
 		verify(aladinBookService, times(1)).getBookByIsbn(request.getIsbn());
 		verify(bookRepository, times(1)).save(any(Book.class));
 		verify(bookSaleInfoRepository, times(1)).save(any(BookSaleInfo.class));
-		verify(authorService, times(1)).registerAuthorByName(eq("Joshua Bloch"));
-		verify(bookAuthorService, times(1)).registerBookAuthor(eq(expectedBookId),
-			eq(authorResponse.getId())); // **여기서 mockBook.getId() 대신 expectedBookId 사용**
-		verify(publisherService, times(1)).registerPublisherByName(eq("Addison-Wesley"));
-		verify(bookPublisherService, times(1)).registerBookPublisher(eq(expectedBookId),
-			eq(publisherResponse.getId()));
-		verify(bookImgService, times(1)).registerBookImg(eq(expectedBookId), endsWith("/cover500/K123456789_1.jpg"));
+		verify(authorService, times(1)).registerAuthorByName("Joshua Bloch");
+		verify(bookAuthorService, times(1)).registerBookAuthor(expectedBookId,
+			authorResponse.getId());
+		verify(publisherService, times(1)).registerPublisherByName("Addison-Wesley");
+		verify(bookPublisherService, times(1)).registerBookPublisher(expectedBookId,
+			publisherResponse.getId());
+		verify(bookImgService, times(1))
+			.registerBookImg(eq(expectedBookId), endsWith("/cover500/K123456789_1.jpg"));
 		verify(bookCategoryService, times(request.getCategoryIdList().size())).registerBookCategory(
 			eq(expectedBookId), anyLong());
-		verify(bookTagService, times(1)).registerBookTag(eq(expectedBookId), eq(request.getTagIdList()));
+		verify(bookTagService, times(1)).registerBookTag(expectedBookId, request.getTagIdList());
 		verify(bookElasticSearchService, times(1)).registerBook(any());
 	}
 
@@ -385,7 +352,6 @@ class BookRegisterServiceTest {
 			.build();
 
 		final Long expectedBookId = 4L;
-		BookSaleInfo mockSaleInfo = BookSaleInfo.builder().id(4L).build();
 		AuthorResponse authorResponse = AuthorResponse.builder().id(3L).name("Some Author").build();
 		PublisherInfoResponse publisherResponse = PublisherInfoResponse.builder().id(3L).name("Publisher A").build();
 

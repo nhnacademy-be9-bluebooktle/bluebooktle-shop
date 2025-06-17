@@ -27,7 +27,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import shop.bluebooktle.backend.book.service.BookCategoryService;
-import shop.bluebooktle.backend.book.service.CategoryService;
 import shop.bluebooktle.common.dto.book.BookSortType;
 import shop.bluebooktle.common.dto.book.response.BookInfoResponse;
 import shop.bluebooktle.common.security.AuthUserLoader;
@@ -41,7 +40,7 @@ import shop.bluebooktle.common.util.JwtUtil;
 	}
 )
 @ActiveProfiles("test")
-public class BookCategoryControllerTest {
+class BookCategoryControllerTest {
 
 	@Autowired
 	private MockMvc mockMvc;

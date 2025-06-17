@@ -24,7 +24,7 @@ import shop.bluebooktle.common.exception.payment.PaymentNotFoundException;
 import shop.bluebooktle.common.exception.point.PointHistoryNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
-public class PaymentPointHistoryServiceTest {
+class PaymentPointHistoryServiceTest {
 
 	@InjectMocks
 	private PaymentPointHistoryServiceImpl service;

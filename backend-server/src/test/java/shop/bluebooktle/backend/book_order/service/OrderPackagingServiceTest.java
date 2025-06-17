@@ -35,7 +35,7 @@ import shop.bluebooktle.common.exception.book_order.PackagingQuantityExceedExcep
 
 @ExtendWith(MockitoExtension.class)
 @Slf4j
-public class OrderPackagingServiceTest {
+class OrderPackagingServiceTest {
 
 	@InjectMocks
 	private OrderPackagingServiceImpl service;

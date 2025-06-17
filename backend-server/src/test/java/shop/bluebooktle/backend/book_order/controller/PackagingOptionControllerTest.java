@@ -32,7 +32,7 @@ import shop.bluebooktle.common.util.JwtUtil;
 @WebMvcTest(controllers = PackagingOptionController.class)
 @WithMockUser
 @ActiveProfiles("test")
-public class PackagingOptionControllerTest {
+class PackagingOptionControllerTest {
 
 	@Autowired
 	private MockMvc mockMvc;

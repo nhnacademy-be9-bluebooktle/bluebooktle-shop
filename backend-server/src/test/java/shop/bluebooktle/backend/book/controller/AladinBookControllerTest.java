@@ -77,7 +77,7 @@ class AladinBookControllerTest {
 			.build();
 		List<AladinBookResponse> expectedResponse = Collections.singletonList(bookResponse);
 
-		when(aladinBookService.searchBooks(eq(keyword), eq(page), eq(size)))
+		when(aladinBookService.searchBooks(keyword, page, size))
 			.thenReturn(expectedResponse);
 
 		mockMvc.perform(get("/api/aladin/books/aladin-search")
@@ -91,7 +91,7 @@ class AladinBookControllerTest {
 			.andExpect(jsonPath("$.data[0].author").value("Joshua Bloch"))
 			.andExpect(jsonPath("$.data[0].isbn").value("978-0134685991"));
 
-		verify(aladinBookService, times(1)).searchBooks(eq(keyword), eq(page), eq(size));
+		verify(aladinBookService, times(1)).searchBooks(keyword, page, size);
 	}
 
 	@Test
@@ -102,8 +102,10 @@ class AladinBookControllerTest {
 		int page = 1;
 		int size = 10;
 
-		when(aladinBookService.searchBooks(eq(keyword), eq(page), eq(size)))
+
+		when(aladinBookService.searchBooks(keyword, page, size))
 			.thenReturn(Collections.emptyList());
+
 
 		mockMvc.perform(get("/api/aladin/books/aladin-search")
 				.param("keyword", keyword)
@@ -114,7 +116,7 @@ class AladinBookControllerTest {
 			.andExpect(jsonPath("$.status").value("success"))
 			.andExpect(jsonPath("$.data").isEmpty());
 
-		verify(aladinBookService, times(1)).searchBooks(eq(keyword), eq(page), eq(size));
+		verify(aladinBookService, times(1)).searchBooks(keyword, page, size);
 	}
 
 	@Test

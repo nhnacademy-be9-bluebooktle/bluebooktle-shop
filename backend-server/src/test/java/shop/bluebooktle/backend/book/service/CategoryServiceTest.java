@@ -37,7 +37,7 @@ import shop.bluebooktle.common.exception.book.CategoryNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 @Slf4j
-public class CategoryServiceTest {
+class CategoryServiceTest {
 
 	@InjectMocks
 	private CategoryServiceImpl categoryService;
@@ -222,6 +222,7 @@ public class CategoryServiceTest {
 				.parentCategory(root)
 				.build();
 			ReflectionTestUtils.setField(target, "id", 3L);
+			Long targetId = target.getId();
 
 			when(categoryRepository.findById(3L))
 				.thenReturn(Optional.of(target));
@@ -231,7 +232,7 @@ public class CategoryServiceTest {
 			when(categoryRepository.getAllDescendantCategories(any()))
 				.thenReturn(List.of(child));
 
-			assertThatThrownBy(() -> categoryService.updateCategory(target.getId(), request))
+			assertThatThrownBy(() -> categoryService.updateCategory(targetId, request))
 				.isInstanceOf(CategoryAlreadyExistsException.class)
 				.hasMessageContaining("이미 존재하는 카테고리명입니다.");
 
@@ -246,6 +247,7 @@ public class CategoryServiceTest {
 				.parentCategory(null)
 				.build();
 			ReflectionTestUtils.setField(target, "id", 3L);
+			Long targetId = target.getId();
 
 			when(categoryRepository.findById(3L))
 				.thenReturn(Optional.of(target));
@@ -255,7 +257,7 @@ public class CategoryServiceTest {
 			when(categoryRepository.findByParentCategoryIsNull())
 				.thenReturn(List.of(root));
 
-			assertThatThrownBy(() -> categoryService.updateCategory(target.getId(), request))
+			assertThatThrownBy(() -> categoryService.updateCategory(targetId, request))
 				.isInstanceOf(CategoryAlreadyExistsException.class)
 				.hasMessageContaining("이미 존재하는 카테고리명입니다.");
 
@@ -359,11 +361,13 @@ public class CategoryServiceTest {
 			ReflectionTestUtils.setField(target, "id", 3L);
 			root.addChildCategory(target);
 
+			Long targetId = target.getId();
+
 			when(categoryRepository.findById(target.getId())).thenReturn(Optional.of(target));
 			when(bookCategoryRepository.existsByCategory(target)).thenReturn(true);
 
 			// when / then
-			assertThatThrownBy(() -> categoryService.deleteCategory(target.getId()))
+			assertThatThrownBy(() -> categoryService.deleteCategory(targetId))
 				.isInstanceOf(CategoryCannotDeleteRootException.class);
 
 			verify(bookCategoryRepository).existsByCategory(target);
@@ -379,6 +383,7 @@ public class CategoryServiceTest {
 				.parentCategory(root)
 				.build();
 			ReflectionTestUtils.setField(target, "id", 3L);
+			Long targetId = target.getId();
 
 			Category targetChild = Category.builder()
 				.name("삭제 대상 하위 카테고리")
@@ -393,7 +398,7 @@ public class CategoryServiceTest {
 			when(bookCategoryRepository.existsByCategory(targetChild)).thenReturn(true);
 
 			// when / then
-			assertThatThrownBy(() -> categoryService.deleteCategory(target.getId()))
+			assertThatThrownBy(() -> categoryService.deleteCategory(targetId))
 				.isInstanceOf(CategoryCannotDeleteRootException.class)
 				.hasMessageContaining("(도서가 등록된 하위 카테고리 존재시 삭제 불가)");
 			verify(bookCategoryRepository, times(1)).existsByCategory(targetChild);
@@ -408,8 +413,11 @@ public class CategoryServiceTest {
 			when(categoryRepository.getAllDescendantCategories(child)).thenReturn(List.of());
 			when(categoryRepository.existsByIdAndParentCategoryIsNull(child.getParentCategory().getId())).thenReturn(true);
 			when(categoryRepository.findById(root.getId())).thenReturn(Optional.of(root));
+
+			Long childId = child.getId();
+
 			// when / then
-			assertThatThrownBy(() -> categoryService.deleteCategory(child.getId()))
+			assertThatThrownBy(() -> categoryService.deleteCategory(childId))
 				.isInstanceOf(CategoryCannotDeleteException.class)
 				.hasMessageContaining("(카테고리는 최소 2단계 카테고리 유지)");
 			verify(categoryRepository, never()).delete(target);

@@ -118,7 +118,7 @@ class PackagingOptionRepositoryTest {
 		Page<PackagingOption> result = packagingOptionRepository.searchNameContaining("       ", PageRequest.of(0, 10));
 
 		// then
-		assertThat(result.getTotalElements()).isEqualTo(0);
+		assertThat(result.getTotalElements()).isZero();
 	}
 
 	@Test

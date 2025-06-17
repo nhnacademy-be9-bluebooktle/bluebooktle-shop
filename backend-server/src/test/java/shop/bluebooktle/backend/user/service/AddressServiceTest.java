@@ -27,7 +27,7 @@ import shop.bluebooktle.common.exception.user.AddressLimitExceededException;
 import shop.bluebooktle.common.exception.user.AddressNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
-public class AddressServiceTest {
+class AddressServiceTest {
 
 	@Mock
 	private UserRepository userRepository;
