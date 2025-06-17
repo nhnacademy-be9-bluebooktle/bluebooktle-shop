@@ -9,15 +9,4 @@ public class PaymentTypeNotFoundException extends ApplicationException {
 		super(ErrorCode.PAYMENT_TYPE_NOT_FOUND);
 	}
 
-	public PaymentTypeNotFoundException(Throwable cause) {
-		super(ErrorCode.PAYMENT_TYPE_NOT_FOUND, cause);
-	}
-
-	public PaymentTypeNotFoundException(String customMessage) {
-		super(ErrorCode.PAYMENT_TYPE_NOT_FOUND, customMessage);
-	}
-
-	public PaymentTypeNotFoundException(String customMessage, Throwable cause) {
-		super(ErrorCode.PAYMENT_TYPE_NOT_FOUND, customMessage, cause);
-	}
 }

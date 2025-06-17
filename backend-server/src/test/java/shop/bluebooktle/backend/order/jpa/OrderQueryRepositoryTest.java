@@ -18,7 +18,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
 
 import shop.bluebooktle.backend.book.entity.Book;
 import shop.bluebooktle.backend.book_order.entity.BookOrder;
@@ -48,7 +47,7 @@ import shop.bluebooktle.common.util.CryptoUtils;
 	JpaAuditingConfiguration.class,
 	CryptoUtils.class, ProfileAwareStringCryptoConverter.class,
 })
-public class OrderQueryRepositoryTest {
+class OrderQueryRepositoryTest {
 
 	@Autowired
 	private OrderRepository orderQueryRepository;
@@ -135,8 +134,6 @@ public class OrderQueryRepositoryTest {
 			.paidAmount(BigDecimal.valueOf(10000))
 			.build());
 
-
-
 		searchKeyword = order.getOrdererName();
 		orderStatus = order.getOrderState().getState();
 		startDate = order.getCreatedAt().toLocalDate().minusDays(1);
@@ -216,7 +213,6 @@ public class OrderQueryRepositoryTest {
 		assertThat(result).hasSize(1);
 		assertThat(result.getContent().get(0).getCreatedAt()).isBeforeOrEqualTo(endDate.atTime(23, 59));
 	}
-
 
 	@Test
 	@DisplayName("포장 가격 합계 조회 - 결과 없음")
@@ -315,6 +311,7 @@ public class OrderQueryRepositoryTest {
 
 		// then
 		assertThat(result).hasSize(1);
-		assertThat(result.getContent().get(0).getPayment().getPaymentDetail().getPaymentType().getMethod()).isEqualTo("카드");
+		assertThat(result.getContent().get(0).getPayment().getPaymentDetail().getPaymentType().getMethod()).isEqualTo(
+			"카드");
 	}
 }

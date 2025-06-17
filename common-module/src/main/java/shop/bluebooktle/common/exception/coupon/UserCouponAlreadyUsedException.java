@@ -8,15 +8,4 @@ public class UserCouponAlreadyUsedException extends ApplicationException {
 		super(ErrorCode.K_COUPON_ALREADY_USED);
 	}
 
-	public UserCouponAlreadyUsedException(Throwable cause) {
-		super(ErrorCode.K_COUPON_ALREADY_USED, cause);
-	}
-
-	public UserCouponAlreadyUsedException(String customMessage) {
-		super(ErrorCode.K_COUPON_ALREADY_USED, customMessage);
-	}
-
-	public UserCouponAlreadyUsedException(String customMessage, Throwable cause) {
-		super(ErrorCode.K_COUPON_ALREADY_USED, customMessage, cause);
-	}
 }

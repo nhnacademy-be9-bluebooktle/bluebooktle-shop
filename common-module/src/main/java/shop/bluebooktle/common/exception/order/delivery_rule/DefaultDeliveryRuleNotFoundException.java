@@ -8,15 +8,4 @@ public class DefaultDeliveryRuleNotFoundException extends ApplicationException {
 		super(ErrorCode.DEFAULT_DELIVERY_RULE_NOT_FOUND);
 	}
 
-	public DefaultDeliveryRuleNotFoundException(String message) {
-		super(ErrorCode.DEFAULT_DELIVERY_RULE_NOT_FOUND, message);
-	}
-
-	public DefaultDeliveryRuleNotFoundException(Throwable cause) {
-		super(ErrorCode.DEFAULT_DELIVERY_RULE_NOT_FOUND, cause);
-	}
-
-	public DefaultDeliveryRuleNotFoundException(String message, Throwable cause) {
-		super(ErrorCode.DEFAULT_DELIVERY_RULE_NOT_FOUND, message, cause);
-	}
 }

@@ -8,7 +8,4 @@ public class CartNotFoundException extends ApplicationException {
 		super(ErrorCode.CART_NOT_FOUND);
 	}
 
-	public CartNotFoundException(String message) {
-		super(ErrorCode.CART_NOT_FOUND, message);
-	}
 }
