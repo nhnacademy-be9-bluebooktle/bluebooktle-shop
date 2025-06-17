@@ -22,7 +22,7 @@ import shop.bluebooktle.common.exception.payment.PaymentTypeAlreadyExistExceptio
 import shop.bluebooktle.common.exception.payment.PaymentTypeNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
-public class PaymentTypeServiceTest {
+class PaymentTypeServiceTest {
 
 	@InjectMocks
 	private PaymentTypeServiceImpl paymentTypeService;

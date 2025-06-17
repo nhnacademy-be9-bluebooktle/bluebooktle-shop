@@ -27,7 +27,7 @@ import shop.bluebooktle.common.exception.book.BookImgNotFoundException;
 import shop.bluebooktle.common.exception.book.BookNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
-public class BookImgServiceTest {
+class BookImgServiceTest {
 
 	@Mock
 	private BookRepository bookRepository;
@@ -208,8 +208,6 @@ public class BookImgServiceTest {
 
 		when(bookImgRepository.findByBookId(bookId)).thenReturn(bookImgList);
 		when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
-
-		Img newImg = Img.builder().imgUrl(newImageUrl).build();
 
 		bookImgService.updateBookImg(bookId, newImageUrl);
 

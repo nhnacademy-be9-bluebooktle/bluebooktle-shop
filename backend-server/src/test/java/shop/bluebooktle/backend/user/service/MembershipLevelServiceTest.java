@@ -19,7 +19,7 @@ import shop.bluebooktle.backend.user.service.impl.MembershipLevelServiceImpl;
 import shop.bluebooktle.common.dto.membership.MembershipLevelDetailDto;
 
 @ExtendWith(MockitoExtension.class)
-public class MembershipLevelServiceTest {
+class MembershipLevelServiceTest {
 
 	@Mock
 	private MembershipLevelRepository membershipLevelRepository;

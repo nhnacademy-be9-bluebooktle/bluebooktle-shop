@@ -46,7 +46,7 @@ import shop.bluebooktle.common.exception.book.ReviewAuthorizationException;
 import shop.bluebooktle.common.exception.book_order.BookOrderNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
-public class ReviewServiceTest {
+class ReviewServiceTest {
 
 	@InjectMocks
 	private ReviewServiceImpl reviewService;
@@ -359,7 +359,7 @@ public class ReviewServiceTest {
 
 		// Then
 		assertThat(liked).isFalse();
-		assertThat(testReview.getLikes()).isEqualTo(0);
+		assertThat(testReview.getLikes()).isZero();
 		then(reviewLikesRepository).should().deleteByUserIdAndReviewId(testUser.getId(), testReview.getId());
 		then(reviewRepository).should().save(testReview);
 	}

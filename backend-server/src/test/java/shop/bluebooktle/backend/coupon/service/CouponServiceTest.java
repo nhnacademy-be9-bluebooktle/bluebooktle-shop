@@ -40,7 +40,7 @@ import shop.bluebooktle.common.exception.coupon.InvalidCouponTargetException;
 
 @ExtendWith(MockitoExtension.class)
 @Slf4j
-public class CouponServiceTest {
+class CouponServiceTest {
 
 	@InjectMocks
 	private CouponServiceImpl couponService;

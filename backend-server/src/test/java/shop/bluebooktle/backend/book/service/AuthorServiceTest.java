@@ -31,7 +31,7 @@ import shop.bluebooktle.common.exception.book.AuthorCannotDeleteException;
 import shop.bluebooktle.common.exception.book.AuthorNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
-public class AuthorServiceTest {
+class AuthorServiceTest {
 
 	@InjectMocks
 	private AuthorServiceImpl authorService;

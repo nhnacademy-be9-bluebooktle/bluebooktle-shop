@@ -42,8 +42,8 @@ import shop.bluebooktle.common.exception.book.BookNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 @Slf4j
-public class BookLikesServiceTest {
-	//TODO 서비스 테스트 구현
+class BookLikesServiceTest {
+	// 할 일 : 서비스 테스트 구현
 	@InjectMocks
 	private BookLikesServiceImpl bookLikesService;
 
