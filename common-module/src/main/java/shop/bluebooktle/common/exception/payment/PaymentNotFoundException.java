@@ -8,15 +8,4 @@ public class PaymentNotFoundException extends ApplicationException {
 		super(ErrorCode.PAYMENT_NOT_FOUND);
 	}
 
-	public PaymentNotFoundException(Throwable cause) {
-		super(ErrorCode.PAYMENT_NOT_FOUND, cause);
-	}
-
-	public PaymentNotFoundException(String customMessage) {
-		super(ErrorCode.PAYMENT_NOT_FOUND, customMessage);
-	}
-
-	public PaymentNotFoundException(String customMessage, Throwable cause) {
-		super(ErrorCode.PAYMENT_NOT_FOUND, customMessage, cause);
-	}
 }

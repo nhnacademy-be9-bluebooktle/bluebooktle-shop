@@ -8,15 +8,4 @@ public class OrderPackagingNotFoundException extends ApplicationException {
 		super(ErrorCode.G_ORDER_PACKAGING_NOT_FOUND);
 	}
 
-	public OrderPackagingNotFoundException(String message) {
-		super(ErrorCode.G_ORDER_PACKAGING_NOT_FOUND, message);
-	}
-
-	public OrderPackagingNotFoundException(Throwable cause) {
-		super(ErrorCode.G_ORDER_PACKAGING_NOT_FOUND, cause);
-	}
-
-	public OrderPackagingNotFoundException(String message, Throwable cause) {
-		super(ErrorCode.G_ORDER_PACKAGING_NOT_FOUND, message, cause);
-	}
 }

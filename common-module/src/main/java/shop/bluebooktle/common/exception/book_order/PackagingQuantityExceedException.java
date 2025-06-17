@@ -8,15 +8,4 @@ public class PackagingQuantityExceedException extends ApplicationException {
 		super(ErrorCode.G_PACKAGING_QUANTITY_EXCEEDS_BOOK_ORDER);
 	}
 
-	public PackagingQuantityExceedException(String message) {
-		super(ErrorCode.G_PACKAGING_QUANTITY_EXCEEDS_BOOK_ORDER, message);
-	}
-
-	public PackagingQuantityExceedException(Throwable cause) {
-		super(ErrorCode.G_PACKAGING_QUANTITY_EXCEEDS_BOOK_ORDER, cause);
-	}
-
-	public PackagingQuantityExceedException(String message, Throwable cause) {
-		super(ErrorCode.G_PACKAGING_QUANTITY_EXCEEDS_BOOK_ORDER, message, cause);
-	}
 }
