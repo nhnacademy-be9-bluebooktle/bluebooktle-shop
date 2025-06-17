@@ -28,7 +28,7 @@ import shop.bluebooktle.backend.book.repository.BookRepository;
 import shop.bluebooktle.backend.elasticsearch.document.BookDocument;
 import shop.bluebooktle.common.dto.book.BookSortType;
 
-public class BookElasticSearchCustomRepositoryTest {
+class BookElasticSearchCustomRepositoryTest {
 	@Mock
 	private ElasticsearchOperations operations;
 

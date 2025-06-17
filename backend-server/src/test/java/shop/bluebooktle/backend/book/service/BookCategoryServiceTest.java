@@ -44,7 +44,7 @@ import shop.bluebooktle.common.exception.book.BookNotFoundException;
 import shop.bluebooktle.common.exception.book.CategoryNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
-public class BookCategoryServiceTest {
+class BookCategoryServiceTest {
 
 	@Mock
 	private BookRepository bookRepository;
@@ -98,9 +98,7 @@ public class BookCategoryServiceTest {
 	@DisplayName("도서 카테고리 등록 시 도서 아이디가 유효하지 않아 실패하는 경우")
 	void registerBookCategory_fail_book_id_invalid() {
 		when(bookRepository.findById(1L)).thenReturn(Optional.empty());
-		assertThrows(BookNotFoundException.class, () -> {
-			bookCategoryService.registerBookCategory(1L, 1L);
-		});
+		assertThrows(BookNotFoundException.class, () -> bookCategoryService.registerBookCategory(1L, 1L));
 
 		verify(bookCategoryRepository, never()).save(any(BookCategory.class));
 	}
@@ -109,13 +107,16 @@ public class BookCategoryServiceTest {
 	@DisplayName("도서 카테고리 등록 시 카테고리 아이디가 유효하지 않아 실패하는 경우")
 	void registerBookCategory_fail_category_id_invalid() {
 		Book book = Book.builder().id(1L).build();
+		Long bookId = book.getId();
 
 		when(bookRepository.findById(1L)).thenReturn(Optional.of(book));
 		when(categoryRepository.findById(1L)).thenReturn(Optional.empty());
 
-		assertThrows(CategoryNotFoundException.class, () -> {
-			bookCategoryService.registerBookCategory(book.getId(), 1L);
-		});
+
+		assertThrows(
+			CategoryNotFoundException.class,
+			() -> bookCategoryService.registerBookCategory(bookId, 1L)
+		);
 
 		verify(bookCategoryRepository, never()).save(any(BookCategory.class));
 	}
@@ -125,15 +126,17 @@ public class BookCategoryServiceTest {
 	void registerBookCategory_fail_already_registered() {
 		Book book = Book.builder().id(1L).build();
 		Category category = Category.builder().build();
+
+		Long bookId = book.getId();
 		ReflectionTestUtils.setField(category, "id", 1L);
+
+		Long categoryId = category.getId();
 
 		when(bookRepository.findById(1L)).thenReturn(Optional.of(book));
 		when(categoryRepository.findById(1L)).thenReturn(Optional.of(category));
 		when(bookCategoryRepository.existsByBookAndCategory(book, category)).thenReturn(true);
 
-		assertThrows(BookCategoryAlreadyExistsException.class, () -> {
-			bookCategoryService.registerBookCategory(book.getId(), category.getId());
-		});
+		assertThrows(BookCategoryAlreadyExistsException.class, () -> bookCategoryService.registerBookCategory(bookId, categoryId));
 
 		verify(bookCategoryRepository, never()).save(any(BookCategory.class));
 	}
@@ -145,19 +148,19 @@ public class BookCategoryServiceTest {
 		Category category = Category.builder().build();
 		ReflectionTestUtils.setField(category, "id", 1L);
 
+		Long bookId = book.getId();
+		Long categoryId = category.getId();
+
+
 		when(bookRepository.findById(1L)).thenReturn(Optional.of(book));
 		when(categoryRepository.findById(1L)).thenReturn(Optional.of(category));
 		when(bookCategoryRepository.existsByBookAndCategory(book, category)).thenReturn(false);
 		when(bookCategoryRepository.countByBook(book)).thenReturn(10L);
 
-		assertThrows(BookCategoryLimitExceededException.class, () -> {
-			bookCategoryService.registerBookCategory(book.getId(), category.getId());
-		});
+		assertThrows(BookCategoryLimitExceededException.class, () -> bookCategoryService.registerBookCategory(bookId, categoryId));
 
 		verify(bookCategoryRepository, never()).save(any(BookCategory.class));
 	}
-
-	// registerBookCategory(Long bookId, List<Long> categoryIdList) : 오버로딩 메서드 2
 
 	@Test
 	@DisplayName("도서에 카테고리 등록 성공")
@@ -198,10 +201,13 @@ public class BookCategoryServiceTest {
 	void registerBookCategory_with_categoryIdList_fail_book_id_invalid() {
 
 		when(bookRepository.findById(1L)).thenReturn(Optional.empty());
+		when(bookRepository.findById(1L)).thenReturn(Optional.empty());
+		List<Long> categoryIds = List.of(1L);
 
-		assertThrows(BookNotFoundException.class, () -> {
-			bookCategoryService.registerBookCategory(1L, List.of(1L));
-		});
+		assertThrows(
+			BookNotFoundException.class,
+			() -> bookCategoryService.registerBookCategory(1L, categoryIds)
+		);
 
 		verify(bookCategoryRepository, never()).save(any(BookCategory.class));
 	}
@@ -220,11 +226,10 @@ public class BookCategoryServiceTest {
 		when(categoryRepository.findById(2L)).thenReturn(Optional.empty());
 		when(bookCategoryRepository.countByBook(book)).thenReturn(0L);
 		when(bookCategoryRepository.existsByBookAndCategory(book, category1)).thenReturn(false);
+		List<Long> categoryIds = List.of(category1.getId(),  2L);
+		Long bookId = book.getId();
 
-		assertThrows(CategoryNotFoundException.class, () -> {
-			bookCategoryService.registerBookCategory(book.getId(), List.of(category1.getId(), 2L));
-		});
-
+		assertThrows(CategoryNotFoundException.class, () -> bookCategoryService.registerBookCategory(bookId, categoryIds));
 		verify(bookCategoryRepository, times(1)).save(any(BookCategory.class));
 	}
 
@@ -244,11 +249,10 @@ public class BookCategoryServiceTest {
 		when(bookCategoryRepository.existsByBookAndCategory(book, category1)).thenReturn(false);
 		when(bookCategoryRepository.existsByBookAndCategory(book, category2)).thenReturn(true);
 		when(bookCategoryRepository.countByBook(book)).thenReturn(0L);
+		List<Long> categoryIds = List.of(category1.getId(), category2.getId());
+		Long bookId = book.getId();
 
-		assertThrows(BookCategoryAlreadyExistsException.class, () -> {
-			bookCategoryService.registerBookCategory(book.getId(), List.of(category1.getId(), category2.getId()));
-		});
-
+		assertThrows(BookCategoryAlreadyExistsException.class, () -> bookCategoryService.registerBookCategory(bookId, categoryIds));
 		verify(bookCategoryRepository, times(1)).save(any(BookCategory.class));
 	}
 
@@ -270,9 +274,10 @@ public class BookCategoryServiceTest {
 		when(bookCategoryRepository.existsByBookAndCategory(book, category1)).thenReturn(false);
 		when(bookCategoryRepository.existsByBookAndCategory(book, category2)).thenReturn(false);
 
-		assertThrows(BookCategoryLimitExceededException.class, () -> {
-			bookCategoryService.registerBookCategory(book.getId(), List.of(category1.getId(), 2L));
-		});
+		List<Long> categoryIds = List.of(category1.getId(), category2.getId());
+		Long bookId = book.getId();
+
+		assertThrows(BookCategoryLimitExceededException.class, () -> bookCategoryService.registerBookCategory(bookId, categoryIds));
 
 		verify(bookCategoryRepository, times(1)).save(any(BookCategory.class));
 	}
@@ -312,10 +317,18 @@ public class BookCategoryServiceTest {
 	@DisplayName("카테고리 아이디로 도서 조회 시 카테고리 아이디가 유효하지 않아 실패하는 경우")
 	void searchBooksByCategory_fail_category_id_invalid() {
 
+		// given
 		when(categoryRepository.findById(999L)).thenReturn(Optional.empty());
-		assertThrows(CategoryNotFoundException.class, () -> {
-			bookCategoryService.searchBooksByCategory(999L, PageRequest.of(0, 10), BookSortType.NEWEST);
-		});
+
+		// PageRequest와 sortType은 람다 밖에서 미리 준비
+		var pageable = PageRequest.of(0, 10);
+		var sortType = BookSortType.NEWEST;
+
+		// then: 람다 내부에는 오직 service 호출만 남김
+		assertThrows(
+			CategoryNotFoundException.class,
+			() -> bookCategoryService.searchBooksByCategory(999L, pageable, sortType)
+		);
 	}
 
 

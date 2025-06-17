@@ -24,7 +24,7 @@ import shop.bluebooktle.common.dto.refund.request.RefundCreateRequest;
 import shop.bluebooktle.common.security.UserPrincipal;
 
 @ExtendWith(MockitoExtension.class)
-public class RefundControllerTest {
+class RefundControllerTest {
 
 	@Mock
 	private RefundService refundService;

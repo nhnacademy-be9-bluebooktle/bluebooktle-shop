@@ -45,7 +45,7 @@ import shop.bluebooktle.common.util.JwtUtil;
 )
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-public class CategoryControllerTest {
+class CategoryControllerTest {
 
 	@Autowired
 	private MockMvc mockMvc;
@@ -286,7 +286,7 @@ public class CategoryControllerTest {
 			.andExpect(jsonPath("$.data.categoryId").value(response.categoryId()))
 			.andExpect(jsonPath("$.data.name").value(response.name()));
 
-		verify(categoryService, times(1)).getCategoryByName(eq(categoryName));
+		verify(categoryService, times(1)).getCategoryByName(categoryName);
 	}
 
 

@@ -1,4 +1,4 @@
-package shop.bluebooktle.backend.book.service.impl;
+package shop.bluebooktle.backend.book.service;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -8,6 +8,8 @@ import io.minio.GetPresignedObjectUrlArgs;
 import io.minio.MinioClient;
 import io.minio.RemoveObjectArgs;
 import io.minio.http.Method;
+import shop.bluebooktle.backend.book.service.impl.MinioServiceImpl;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,7 +20,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-public class MinioServiceTest {
+class MinioServiceTest {
 
 	@Mock
 	private MinioClient minioClient;

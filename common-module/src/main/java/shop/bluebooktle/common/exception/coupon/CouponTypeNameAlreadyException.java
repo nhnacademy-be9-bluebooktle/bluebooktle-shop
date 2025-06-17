@@ -9,15 +9,4 @@ public class CouponTypeNameAlreadyException extends ApplicationException {
 		super(ErrorCode.K_COUPON_TYPE_NAME_ALREADY_EXISTS);
 	}
 
-	public CouponTypeNameAlreadyException(String message) {
-		super(ErrorCode.K_COUPON_TYPE_NAME_ALREADY_EXISTS, message);
-	}
-
-	public CouponTypeNameAlreadyException(Throwable cause) {
-		super(ErrorCode.K_COUPON_TYPE_NAME_ALREADY_EXISTS, cause);
-	}
-
-	public CouponTypeNameAlreadyException(String message, Throwable cause) {
-		super(ErrorCode.K_COUPON_TYPE_NAME_ALREADY_EXISTS, message, cause);
-	}
 }

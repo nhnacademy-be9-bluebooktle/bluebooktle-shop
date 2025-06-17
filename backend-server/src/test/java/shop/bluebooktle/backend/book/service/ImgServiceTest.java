@@ -31,7 +31,7 @@ import shop.bluebooktle.common.exception.book.ImgNotFoundException;
 import shop.bluebooktle.common.exception.book.ImgUrlEmptyException;
 
 @ExtendWith(MockitoExtension.class)
-public class ImgServiceTest {
+class ImgServiceTest {
 
 	@InjectMocks
 	private ImgServiceImpl imgService;

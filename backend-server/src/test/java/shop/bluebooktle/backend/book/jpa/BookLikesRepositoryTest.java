@@ -131,13 +131,11 @@ class BookLikesRepositoryTest {
 		User user = createUser();
 		Book book = createBook("눈보라 체이스");
 
-		BookLikes saved = bookLikesRepository.save(new BookLikes(book, user));
+		bookLikesRepository.save(new BookLikes(book, user));
 		em.flush();
 		em.clear();
 
 		BookLikes found = bookLikesRepository.findByUser_IdAndBook_Id(user.getId(), book.getId());
-		// assertThat(found).isNotNull();
-		// assertThat(found.getId()).isEqualTo(new BookLikesId(user.getId(), book.getId()));
 		assertThat(found.getUser().getId()).isEqualTo(user.getId());
 		assertThat(found.getBook().getId()).isEqualTo(book.getId());
 	}

@@ -302,7 +302,7 @@ class BookControllerTest {
 			.build();
 		Page<BookInfoResponse> mockPage = new PageImpl<>(List.of(book1, book2), PageRequest.of(page, size), 2);
 
-		given(bookService.findAllBooks(eq(page), eq(size), eq(searchKeyword), eq(sortType))).willReturn(mockPage);
+		given(bookService.findAllBooks(page, size, searchKeyword, sortType)).willReturn(mockPage);
 
 		// When & Then
 		mockMvc.perform(get("/api/books")
@@ -317,7 +317,7 @@ class BookControllerTest {
 			.andExpect(jsonPath("$.data.content[0].bookId").value(1L))
 			.andExpect(jsonPath("$.data.totalElements").value(2));
 
-		verify(bookService, times(1)).findAllBooks(eq(page), eq(size), eq(searchKeyword), eq(sortType));
+		verify(bookService, times(1)).findAllBooks(page, size, searchKeyword, sortType);
 	}
 
 	@Test
@@ -327,7 +327,6 @@ class BookControllerTest {
 		// Given
 		int page = 0;
 		int size = 10;
-		String searchKeyword = null;
 		BookSortType sortType = BookSortType.NEWEST;
 
 		BookInfoResponse book1 = BookInfoResponse.builder()
@@ -376,8 +375,7 @@ class BookControllerTest {
 			.build();
 		Page<AdminBookResponse> mockPage = new PageImpl<>(List.of(adminBook1), PageRequest.of(page, size), 1);
 
-		given(bookService.findAllBooksByAdmin(eq(page), eq(size), eq(searchKeyword))).willReturn(mockPage);
-
+		given(bookService.findAllBooksByAdmin(page, size, searchKeyword)).willReturn(mockPage);
 		// When & Then
 		mockMvc.perform(get("/api/books/admin")
 				.param("page", String.valueOf(page))
@@ -391,7 +389,7 @@ class BookControllerTest {
 			.andExpect(jsonPath("$.data.content[0].bookId").value(1L))
 			.andExpect(jsonPath("$.data.totalElements").value(1));
 
-		verify(bookService, times(1)).findAllBooksByAdmin(eq(page), eq(size), eq(searchKeyword));
+		verify(bookService, times(1)).findAllBooksByAdmin(page, size, searchKeyword);
 	}
 
 	@Test
@@ -401,7 +399,6 @@ class BookControllerTest {
 		// Given
 		int page = 0;
 		int size = 10;
-		String searchKeyword = null; // 검색어 없음
 
 		AdminBookResponse adminBook1 = AdminBookResponse.builder()
 			.bookId(1L)
@@ -414,7 +411,9 @@ class BookControllerTest {
 			.build();
 		Page<AdminBookResponse> mockPage = new PageImpl<>(List.of(adminBook1), PageRequest.of(page, size), 1);
 
-		given(bookService.findAllBooksByAdmin(eq(page), eq(size), isNull())).willReturn(mockPage);
+		given(bookService.findAllBooksByAdmin(page, size, null))
+			.willReturn(mockPage);
+
 
 		// When & Then
 		mockMvc.perform(get("/api/books/admin")

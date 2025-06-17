@@ -12,11 +12,4 @@ public class OrderInvalidStateException extends ApplicationException {
 		super(ErrorCode.ORDER_INVALID_STATE);
 	}
 
-	public OrderInvalidStateException(Throwable cause) {
-		super(ErrorCode.ORDER_INVALID_STATE, cause);
-	}
-
-	public OrderInvalidStateException(String message, Throwable cause) {
-		super(ErrorCode.ORDER_INVALID_STATE, message, cause);
-	}
 }

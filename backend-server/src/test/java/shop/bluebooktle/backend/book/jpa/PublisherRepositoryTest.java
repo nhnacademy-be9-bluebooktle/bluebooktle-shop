@@ -35,7 +35,7 @@ import shop.bluebooktle.common.util.CryptoUtils;
 @ActiveProfiles("test")
 @Import({QueryDslConfig.class, JpaAuditingConfiguration.class, CryptoUtils.class,
 	ProfileAwareStringCryptoConverter.class})
-public class PublisherRepositoryTest {
+class PublisherRepositoryTest {
 	@Autowired
 	private PublisherRepository publisherRepository;
 

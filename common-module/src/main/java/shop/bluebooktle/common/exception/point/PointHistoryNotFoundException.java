@@ -8,15 +8,4 @@ public class PointHistoryNotFoundException extends ApplicationException {
 		super(ErrorCode.POINT_HISTORY_NOT_FOUND);
 	}
 
-	public PointHistoryNotFoundException(Throwable cause) {
-		super(ErrorCode.POINT_HISTORY_NOT_FOUND, cause);
-	}
-
-	public PointHistoryNotFoundException(String customMessage) {
-		super(ErrorCode.POINT_HISTORY_NOT_FOUND, customMessage);
-	}
-
-	public PointHistoryNotFoundException(String customMessage, Throwable cause) {
-		super(ErrorCode.POINT_HISTORY_NOT_FOUND, customMessage, cause);
-	}
 }

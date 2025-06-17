@@ -31,7 +31,7 @@ import shop.bluebooktle.common.exception.order.OrderNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 @Slf4j
-public class BookOrderServiceTest {
+class BookOrderServiceTest {
 
 	@InjectMocks
 	private BookOrderServiceImpl service;

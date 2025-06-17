@@ -46,7 +46,7 @@ import shop.bluebooktle.common.exception.membership.MembershipNotFoundException;
 import shop.bluebooktle.common.exception.user.InvalidUserIdException;
 
 @ExtendWith(MockitoExtension.class)
-public class UserServiceTest {
+class UserServiceTest {
 
 	@Mock
 	private UserRepository userRepository;

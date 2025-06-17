@@ -9,7 +9,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import shop.bluebooktle.backend.user.service.AddressService;
 import shop.bluebooktle.common.exception.auth.InvalidTokenException;
 
-public class AddressControllerUnitTest {
+class AddressControllerUnitTest {
 
 	private final AddressController addressController = new AddressController(mock(AddressService.class));
 
