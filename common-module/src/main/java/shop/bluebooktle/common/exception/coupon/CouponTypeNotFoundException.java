@@ -8,15 +8,4 @@ public class CouponTypeNotFoundException extends ApplicationException {
 		super(ErrorCode.K_COUPON_TYPE_NOT_FOUND);
 	}
 
-	public CouponTypeNotFoundException(String message) {
-		super(ErrorCode.K_COUPON_TYPE_NOT_FOUND, message);
-	}
-
-	public CouponTypeNotFoundException(Throwable cause) {
-		super(ErrorCode.K_COUPON_TYPE_NOT_FOUND, cause);
-	}
-
-	public CouponTypeNotFoundException(String message, Throwable cause) {
-		super(ErrorCode.K_COUPON_TYPE_NOT_FOUND, message, cause);
-	}
 }

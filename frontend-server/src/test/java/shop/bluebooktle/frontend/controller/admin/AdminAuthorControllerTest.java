@@ -33,7 +33,7 @@ import shop.bluebooktle.frontend.service.CategoryService;
 	)
 )
 @ActiveProfiles("test")
-public class AdminAuthorControllerTest {
+class AdminAuthorControllerTest {
 	@Autowired
 	private MockMvc mockMvc;
 
@@ -45,7 +45,6 @@ public class AdminAuthorControllerTest {
 
 	@MockitoBean
 	CategoryService categoryService;
-
 
 	@Test
 	@DisplayName("작가 목록 페이지 뷰 반환")

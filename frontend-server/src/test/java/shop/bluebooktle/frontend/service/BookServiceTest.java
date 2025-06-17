@@ -18,17 +18,28 @@ import org.springframework.data.domain.Page;
 
 import shop.bluebooktle.common.dto.book.BookSaleInfoState;
 import shop.bluebooktle.common.dto.book.BookSortType;
-import shop.bluebooktle.common.dto.book.response.*;
+import shop.bluebooktle.common.dto.book.response.BookCartOrderResponse;
+import shop.bluebooktle.common.dto.book.response.BookDetailResponse;
+import shop.bluebooktle.common.dto.book.response.BookInfoResponse;
+import shop.bluebooktle.common.dto.book.response.BookLikesResponse;
+import shop.bluebooktle.common.dto.book.response.CategoryResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
-import shop.bluebooktle.frontend.repository.*;
+import shop.bluebooktle.frontend.repository.AdminBookRepository;
+import shop.bluebooktle.frontend.repository.BookCategoryRepository;
+import shop.bluebooktle.frontend.repository.BookRepository;
+import shop.bluebooktle.frontend.repository.CategoryRepository;
 import shop.bluebooktle.frontend.service.impl.BookServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
-public class BookServiceTest {
-	@Mock private AdminBookRepository adminBookRepository;
-	@Mock private BookRepository bookRepository;
-	@Mock private BookCategoryRepository bookCategoryRepository;
-	@Mock private CategoryRepository categoryRepository;
+class BookServiceTest {
+	@Mock
+	private AdminBookRepository adminBookRepository;
+	@Mock
+	private BookRepository bookRepository;
+	@Mock
+	private BookCategoryRepository bookCategoryRepository;
+	@Mock
+	private CategoryRepository categoryRepository;
 
 	@InjectMocks
 	private BookServiceImpl bookService;
@@ -112,9 +123,11 @@ public class BookServiceTest {
 	void getPagedBooksByCategoryId_success() {
 		Long categoryId = 1L;
 		int page = 0, size = 5;
-		when(bookCategoryRepository.getBooksByCategory(page, size, BookSortType.NEWEST, categoryId)).thenReturn(paginationData);
+		when(bookCategoryRepository.getBooksByCategory(page, size, BookSortType.NEWEST, categoryId)).thenReturn(
+			paginationData);
 
-		Page<BookInfoResponse> result = bookService.getPagedBooksByCategoryId(page, size, BookSortType.NEWEST, categoryId);
+		Page<BookInfoResponse> result = bookService.getPagedBooksByCategoryId(page, size, BookSortType.NEWEST,
+			categoryId);
 
 		assertThat(result.getContent()).contains(book);
 		assertThat(result.getTotalElements()).isEqualTo(1);

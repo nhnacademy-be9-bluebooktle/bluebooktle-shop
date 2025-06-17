@@ -26,7 +26,7 @@ import shop.bluebooktle.common.util.JwtUtil;
 
 @WebMvcTest(BookImgController.class)
 @ActiveProfiles("test")
-public class BookImgControllerTest {
+class BookImgControllerTest {
 
 	@Autowired
 	private MockMvc mockMvc;

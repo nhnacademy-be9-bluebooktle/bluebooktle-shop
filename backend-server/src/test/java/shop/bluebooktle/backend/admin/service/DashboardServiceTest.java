@@ -20,7 +20,7 @@ import shop.bluebooktle.common.domain.order.OrderStatus;
 import shop.bluebooktle.common.dto.admin.DashboardStatusResponse;
 
 @ExtendWith(MockitoExtension.class)
-public class DashboardServiceTest {
+class DashboardServiceTest {
 
 	@Mock
 	private UserRepository userRepository;

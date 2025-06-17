@@ -17,8 +17,10 @@ class SecurityConfigTest {
 	@DisplayName("PasswordEncoder는 BCryptPasswordEncoder를 사용한다")
 	void passwordEncoder_create_success() {
 		PasswordEncoder encoder = config.passwordEncoder();
-		assertThat(encoder).isNotNull();
-		assertThat(encoder).isInstanceOf(PasswordEncoder.class);
+		assertThat(encoder)
+			.isNotNull()
+			.isInstanceOf(PasswordEncoder.class);
+
 	}
 
 	@Test

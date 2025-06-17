@@ -8,15 +8,4 @@ public class RefundNotFoundException extends ApplicationException {
 		super(ErrorCode.REFUND_NOT_FOUND);
 	}
 
-	public RefundNotFoundException(Throwable cause) {
-		super(ErrorCode.REFUND_NOT_FOUND, cause);
-	}
-
-	public RefundNotFoundException(String customMessage) {
-		super(ErrorCode.REFUND_NOT_FOUND, customMessage);
-	}
-
-	public RefundNotFoundException(String customMessage, Throwable cause) {
-		super(ErrorCode.REFUND_NOT_FOUND, customMessage, cause);
-	}
 }

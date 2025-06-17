@@ -28,7 +28,7 @@ import shop.bluebooktle.common.exception.book.BookAuthorAlreadyExistsException;
 import shop.bluebooktle.common.exception.book.BookNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
-public class BookAuthorServiceTest {
+class BookAuthorServiceTest {
 
 	@Mock
 	private BookRepository bookRepository;

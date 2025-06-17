@@ -7,16 +7,5 @@ public class DeliveryRuleNotFoundException extends ApplicationException {
 	public DeliveryRuleNotFoundException() {
 		super(ErrorCode.DELIVERY_RULE_NOT_FOUND);
 	}
-
-	public DeliveryRuleNotFoundException(String message) {
-		super(ErrorCode.DELIVERY_RULE_NOT_FOUND, message);
-	}
-
-	public DeliveryRuleNotFoundException(Throwable cause) {
-		super(ErrorCode.DELIVERY_RULE_NOT_FOUND, cause);
-	}
-
-	public DeliveryRuleNotFoundException(String message, Throwable cause) {
-		super(ErrorCode.DELIVERY_RULE_NOT_FOUND, message, cause);
-	}
+	
 }

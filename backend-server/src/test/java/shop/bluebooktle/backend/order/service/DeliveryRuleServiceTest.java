@@ -49,7 +49,6 @@ class DeliveryRuleServiceTest {
 			.region(Region.ALL)
 			.isActive(true)
 			.build();
-		// 구현체는 findByRegion(...)을 호출합니다.
 		given(repository.findByRegion(Region.ALL))
 			.willReturn(Optional.of(entity));
 

@@ -8,15 +8,4 @@ public class RefundAlreadyProcessedException extends ApplicationException {
 		super(ErrorCode.REFUND_ALREADY_PROCESSED);
 	}
 
-	public RefundAlreadyProcessedException(Throwable cause) {
-		super(ErrorCode.REFUND_ALREADY_PROCESSED, cause);
-	}
-
-	public RefundAlreadyProcessedException(String customMessage) {
-		super(ErrorCode.REFUND_ALREADY_PROCESSED, customMessage);
-	}
-
-	public RefundAlreadyProcessedException(String customMessage, Throwable cause) {
-		super(ErrorCode.REFUND_ALREADY_PROCESSED, customMessage, cause);
-	}
 }

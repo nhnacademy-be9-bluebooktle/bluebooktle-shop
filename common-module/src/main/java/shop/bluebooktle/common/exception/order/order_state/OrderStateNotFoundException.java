@@ -12,11 +12,4 @@ public class OrderStateNotFoundException extends ApplicationException {
 		super(ErrorCode.ORDER_STATE_NOT_FOUND);
 	}
 
-	public OrderStateNotFoundException(Throwable cause) {
-		super(ErrorCode.ORDER_STATE_NOT_FOUND, cause);
-	}
-
-	public OrderStateNotFoundException(String message, Throwable cause) {
-		super(ErrorCode.ORDER_STATE_NOT_FOUND, message, cause);
-	}
 }

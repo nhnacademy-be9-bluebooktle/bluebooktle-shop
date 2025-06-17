@@ -31,7 +31,7 @@ import shop.bluebooktle.common.exception.point.PointPolicyNotFoundException;
 import shop.bluebooktle.common.exception.point.PointSourceNotFountException;
 
 @ExtendWith(MockitoExtension.class)
-public class PointPolicyServiceTest {
+class PointPolicyServiceTest {
 
 	@InjectMocks
 	private PointPolicyServiceImpl service;

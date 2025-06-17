@@ -26,7 +26,7 @@ import shop.bluebooktle.frontend.repository.AdminTagRepository;
 import shop.bluebooktle.frontend.service.impl.AdminTagServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
-public class AdminTagServiceTest {
+class AdminTagServiceTest {
 	@Mock
 	private AdminTagRepository tagRepository;
 
