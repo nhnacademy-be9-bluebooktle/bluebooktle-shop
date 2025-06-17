@@ -53,6 +53,7 @@ class AddressControllerTest {
 	@Test
 	@DisplayName("userAddressesPage: 주소 목록 로드 성공")
 	void userAddressesPage_success() {
+		// Given
 		List<AddressResponse> mockAddresses = Arrays.asList(
 			AddressResponse.builder()
 				.addressId(1L)
