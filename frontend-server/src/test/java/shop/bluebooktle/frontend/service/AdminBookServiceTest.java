@@ -24,27 +24,20 @@ import shop.bluebooktle.common.dto.book.request.BookAllRegisterByAladinRequest;
 import shop.bluebooktle.common.dto.book.request.BookAllRegisterRequest;
 import shop.bluebooktle.common.dto.book.request.BookFormRequest;
 import shop.bluebooktle.common.dto.book.request.BookUpdateRequest;
-import shop.bluebooktle.common.dto.book.request.CategoryRegisterRequest;
-import shop.bluebooktle.common.dto.book.request.CategoryUpdateRequest;
-import shop.bluebooktle.common.dto.book.request.RootCategoryRegisterRequest;
 import shop.bluebooktle.common.dto.book.response.AdminBookResponse;
 import shop.bluebooktle.common.dto.book.response.AladinBookResponse;
 import shop.bluebooktle.common.dto.book.response.BookAllResponse;
-import shop.bluebooktle.common.dto.book.response.CategoryResponse;
-import shop.bluebooktle.common.dto.book.response.CategoryTreeResponse;
 import shop.bluebooktle.common.dto.book.response.img.ImgResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
 import shop.bluebooktle.frontend.repository.AdminAladinBookRepository;
 import shop.bluebooktle.frontend.repository.AdminBookRepository;
 import shop.bluebooktle.frontend.repository.BookImgRepository;
-import shop.bluebooktle.frontend.repository.CategoryRepository;
 import shop.bluebooktle.frontend.repository.ImageServerClient;
 import shop.bluebooktle.frontend.repository.ImgRepository;
 import shop.bluebooktle.frontend.service.impl.AdminBookServiceImpl;
-import shop.bluebooktle.frontend.service.impl.AdminCategoryServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
-public class AdminBookServiceTest {
+class AdminBookServiceTest {
 	@Mock
 	AdminBookRepository adminBookRepository;
 	@Mock
@@ -371,7 +364,6 @@ public class AdminBookServiceTest {
 
 		verifyNoInteractions(bookImgRepository, imgRepository); // 삭제 전 실패
 	}
-
 
 	@Test
 	@DisplayName("알라딘 기반 도서 등록 성공")
