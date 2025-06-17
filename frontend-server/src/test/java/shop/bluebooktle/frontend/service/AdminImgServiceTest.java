@@ -16,7 +16,7 @@ import shop.bluebooktle.frontend.repository.AdminImgRepository;
 import shop.bluebooktle.frontend.service.impl.AdminImgServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
-public class AdminImgServiceTest {
+class AdminImgServiceTest {
 	@Mock
 	AdminImgRepository adminImgRepository;
 

@@ -29,7 +29,7 @@ import shop.bluebooktle.common.exception.book.TagAlreadyExistsException;
 import shop.bluebooktle.common.exception.book.TagNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
-public class TagServiceTest {
+class TagServiceTest {
 
 	@InjectMocks
 	private TagServiceImpl tagService;

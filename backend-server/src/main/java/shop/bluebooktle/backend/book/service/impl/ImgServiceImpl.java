@@ -60,14 +60,11 @@ public class ImgServiceImpl implements ImgService {
 
 	@Override
 	public void updateImg(Long imgId, ImgUpdateRequest imgUpdateRequest) {
-		if (imgId == null) {
-			throw new ImgIdNullException();
-		}
 		if (imgUpdateRequest.getImgUrl() == null || imgUpdateRequest.getImgUrl().trim().isEmpty()) {
 			throw new ImgUrlEmptyException();
 		}
 
-		Img img = imgRepository.findById(imgId).orElseThrow(() -> new ImgNotFoundException());
+		Img img = imgRepository.findById(imgId).orElseThrow(ImgNotFoundException::new);
 
 		img.setImgUrl(imgUpdateRequest.getImgUrl());
 

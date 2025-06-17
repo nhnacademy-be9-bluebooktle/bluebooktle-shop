@@ -9,15 +9,4 @@ public class PackagingOptionNotFoundException extends ApplicationException {
 		super(ErrorCode.G_ORDER_PACKAGING_OPTION_NOT_FOUND);
 	}
 
-	public PackagingOptionNotFoundException(String message) {
-		super(ErrorCode.G_ORDER_PACKAGING_OPTION_NOT_FOUND, message);
-	}
-
-	public PackagingOptionNotFoundException(Throwable cause) {
-		super(ErrorCode.G_ORDER_PACKAGING_OPTION_NOT_FOUND, cause);
-	}
-
-	public PackagingOptionNotFoundException(String message, Throwable cause) {
-		super(ErrorCode.G_ORDER_PACKAGING_OPTION_NOT_FOUND, message, cause);
-	}
 }

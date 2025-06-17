@@ -1,5 +1,6 @@
 package shop.bluebooktle.backend.user.service;
 
+import static org.assertj.core.api.AssertionsForClassTypes.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -19,7 +20,7 @@ import org.springframework.data.redis.core.ValueOperations;
 import shop.bluebooktle.backend.user.service.impl.RedisDormantAuthCodeServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
-public class RedisDormantAuthCodeServiceTest {
+class RedisDormantAuthCodeServiceTest {
 
 	@Mock
 	private RedisTemplate<String, String> redisTemplate; // 키와 값을 String 형태로 저장할 수 있는 Redis
@@ -56,21 +57,18 @@ public class RedisDormantAuthCodeServiceTest {
 
 	@Test
 	@DisplayName("인증 코드 생성 실패 - 인증 코드 길이가 0보다 작은 경우")
-	void generateAndSaveAuthCode_fail_authCodeLength_lessThanZero() {
-		try {
-			Method method = redisDormantAuthCodeService.getClass().getDeclaredMethod("generateNumericCode", int.class);
-			method.setAccessible(true);
+	void generateAndSaveAuthCode_fail_authCodeLength_lessThanZero() throws NoSuchMethodException {
+		Method method = redisDormantAuthCodeService.getClass()
+			.getDeclaredMethod("generateNumericCode", int.class);
+		method.setAccessible(true);
 
+		Throwable exception = assertThrows(InvocationTargetException.class, () -> {
 			method.invoke(redisDormantAuthCodeService, 0);
+		});
 
-			fail("예외가 발생하지 않았습니다");
-		} catch (InvocationTargetException e) {
-			Throwable targetException = e.getTargetException();
-			assertTrue(targetException instanceof IllegalArgumentException);
-			assertEquals("인증 코드 길이는 0보다 커야 합니다.", targetException.getMessage());
-		} catch (Exception e) {
-			fail("예상치 못한 예외 발생: " + e.getClass().getSimpleName());
-		}
+		Throwable cause = exception.getCause();
+		assertThat(cause).isInstanceOf(IllegalArgumentException.class)
+			.hasMessage("인증 코드 길이는 0보다 커야 합니다.");
 	}
 
 	@Test

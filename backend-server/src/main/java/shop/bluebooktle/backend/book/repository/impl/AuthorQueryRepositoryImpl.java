@@ -5,7 +5,6 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Repository;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -15,7 +14,6 @@ import shop.bluebooktle.backend.book.entity.Author;
 import shop.bluebooktle.backend.book.entity.QAuthor;
 import shop.bluebooktle.backend.book.repository.AuthorQueryRepository;
 
-@Repository
 @RequiredArgsConstructor
 public class AuthorQueryRepositoryImpl implements AuthorQueryRepository {
 	private final JPAQueryFactory queryFactory;

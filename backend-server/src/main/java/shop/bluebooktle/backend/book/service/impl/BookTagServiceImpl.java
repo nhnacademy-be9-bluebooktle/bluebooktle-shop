@@ -71,38 +71,6 @@ public class BookTagServiceImpl implements BookTagService {
 		return registerBookTag(bookId, tagIdList);
 	}
 
-	@Override
-	public void deleteBookTag(Long tagId, Long bookId) {
-		Tag tag = findTagOrThrow(tagId);
-		Book book = findBookOrThrow(bookId);
-
-		BookTag bookTag = bookTagRepository.findByBookAndTag(book, tag)
-			.orElseThrow(() -> new BookTagNotFoundException(bookId, tagId));
-		bookTagRepository.delete(bookTag);
-	}
-
-	@Override
-	@Transactional(readOnly = true)
-	public List<TagInfoResponse> getTagsByBookId(Long bookId) {
-		Book book = findBookOrThrow(bookId);
-		List<BookTag> bookTagsByBook = bookTagRepository.findByBook(book);
-		return bookTagsByBook.stream()
-			.map(t -> new TagInfoResponse(
-				t.getTag().getId(),
-				t.getTag().getName(),
-				t.getTag().getCreatedAt()))
-			.toList();
-	}
-
-	@Override
-	@Transactional(readOnly = true)
-	public Page<BookInfoResponse> searchBooksByTag(Long tagId, Pageable pageable) {
-		Tag tag = findTagOrThrow(tagId);
-		Page<BookTag> bookTagPage = bookTagRepository.findAllByTag(tag, pageable);
-		// return bookTagPage.map(bt -> new BookInfoResponse(bt.getBook().getId()));
-		return null;
-	}
-
 	private Book findBookOrThrow(Long bookId) {
 		return bookRepository.findById(bookId)
 			.orElseThrow(BookNotFoundException::new);
@@ -112,5 +80,4 @@ public class BookTagServiceImpl implements BookTagService {
 		return tagRepository.findById(tagId)
 			.orElseThrow(() -> new TagNotFoundException(tagId));
 	}
-
 }

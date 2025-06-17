@@ -39,7 +39,7 @@ import shop.bluebooktle.common.util.JwtUtil;
 
 @ActiveProfiles("test")
 @WebMvcTest(controllers = AdminRefundController.class)
-public class AdminRefundControllerTest {
+class AdminRefundControllerTest {
 
 	@Autowired
 	private MockMvc mockMvc;

@@ -18,7 +18,7 @@ import shop.bluebooktle.frontend.repository.CategoryRepository;
 import shop.bluebooktle.frontend.service.impl.CategoryServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
-public class CategoryServiceTest {
+class CategoryServiceTest {
 
 	@Mock
 	private CategoryRepository categoryRepository;

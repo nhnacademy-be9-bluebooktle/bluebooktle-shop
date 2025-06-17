@@ -72,6 +72,8 @@ public class AuthServiceImpl implements AuthService {
 	private final WelcomeCouponIssueProducer welcomeCouponIssueProducer;
 	private final ApplicationEventPublisher eventPublisher;
 
+	private static final String PHONE_NO = "01000000000";
+
 	@Value("${oauth.payco.client-id}")
 	private String paycoClientId;
 	@Value("${oauth.payco.client-secret}")
@@ -260,8 +262,8 @@ public class AuthServiceImpl implements AuthService {
 
 		// 정보 없으면 기본값 사용
 		String nickname = NicknameGenerator.generate();
-		String finalBirth = StringUtils.hasText(birthday) ? birthday.replaceAll("[^0-9]", "") : "00000000";
-		String finalPhoneNumber = StringUtils.hasText(mobile) ? normalizePhoneNumber(mobile) : "01000000000";
+		String finalBirth = StringUtils.hasText(birthday) ? birthday.replaceAll("\\D", "") : "00000000";
+		String finalPhoneNumber = StringUtils.hasText(mobile) ? normalizePhoneNumber(mobile) : PHONE_NO;
 
 		if (!StringUtils.hasText(name)) {
 			throw new ApplicationException(ErrorCode.AUTH_OAUTH_LOGIN_FAILED, "페이코에서 사용자 이름을 전달받지 못했습니다.");
@@ -287,14 +289,14 @@ public class AuthServiceImpl implements AuthService {
 
 	private String normalizePhoneNumber(String paycoMobile) {
 		if (paycoMobile == null)
-			return "01000000000";
-		String normalized = paycoMobile.replaceAll("[^0-9]", "");
+			return PHONE_NO;
+		String normalized = paycoMobile.replaceAll("\\D", "");
 		if (normalized.startsWith("8210") && normalized.length() == 12) {
 			return "010" + normalized.substring(4);
 		} else if (normalized.startsWith("010") && normalized.length() == 11) {
 			return normalized;
 		}
-		return "01000000000";
+		return PHONE_NO;
 	}
 
 	private PaycoTokenResponse requestPaycoToken(String code) {

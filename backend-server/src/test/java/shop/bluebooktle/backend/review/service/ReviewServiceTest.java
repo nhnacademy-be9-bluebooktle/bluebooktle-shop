@@ -38,6 +38,7 @@ import shop.bluebooktle.backend.review.repository.ReviewRepository;
 import shop.bluebooktle.backend.review.service.impl.ReviewServiceImpl;
 import shop.bluebooktle.backend.user.repository.UserRepository;
 import shop.bluebooktle.common.dto.review.request.ReviewRegisterRequest;
+import shop.bluebooktle.common.dto.review.request.ReviewUpdateRequest;
 import shop.bluebooktle.common.dto.review.response.ReviewResponse;
 import shop.bluebooktle.common.entity.auth.User;
 import shop.bluebooktle.common.exception.InvalidInputValueException;
@@ -45,7 +46,7 @@ import shop.bluebooktle.common.exception.book.ReviewAuthorizationException;
 import shop.bluebooktle.common.exception.book_order.BookOrderNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
-public class ReviewServiceTest {
+class ReviewServiceTest {
 
 	@InjectMocks
 	private ReviewServiceImpl reviewService;
@@ -97,8 +98,8 @@ public class ReviewServiceTest {
 
 		testBookSaleInfo = BookSaleInfo.builder()
 			.book(testBook)
-			.star(BigDecimal.valueOf(0))
-			.reviewCount(0L)
+			.star(BigDecimal.valueOf(5))
+			.reviewCount(1L)
 			.build();
 		ReflectionTestUtils.setField(testBookSaleInfo, "id", 200L);
 
@@ -194,6 +195,59 @@ public class ReviewServiceTest {
 	}
 
 	@Test
+	@DisplayName("리뷰 수정 성공")
+	void updateReview_success_newImage() {
+		// Given
+		String newImageUrl = "http://example.com/new_image.jpg";
+		Img newImg = Img.builder().imgUrl(newImageUrl).build();
+		ReflectionTestUtils.setField(newImg, "id", 2L);
+
+		ReviewUpdateRequest request = ReviewUpdateRequest.builder()
+			.star(3)
+			.reviewContent("이미지 변경된 리뷰입니다.")
+			.imgUrls(List.of(newImageUrl))
+			.build();
+
+		ReflectionTestUtils.setField(testReview, "star", 5);
+
+		given(reviewRepository.findById(testReview.getId())).willReturn(Optional.of(testReview));
+		given(imgRepository.findByImgUrl(newImageUrl)).willReturn(Optional.empty()); // 새로운 이미지는 DB에 없음
+		given(imgRepository.save(any(Img.class))).willReturn(newImg); // 새로운 이미지 저장
+		given(reviewRepository.save(any(Review.class))).willReturn(testReview);
+		given(bookSaleInfoRepository.findByBook(any(Book.class))).willReturn(Optional.of(testBookSaleInfo));
+		given(bookSaleInfoRepository.save(any(BookSaleInfo.class))).willReturn(testBookSaleInfo);
+
+		// When
+		ReviewResponse response = reviewService.updateReview(testReview.getId(), request);
+
+		// Then
+		assertThat(response).isNotNull();
+		assertThat(response.getReviewId()).isEqualTo(testReview.getId());
+		assertThat(response.getStar()).isEqualTo(request.getStar());
+		assertThat(response.getReviewContent()).isEqualTo(request.getReviewContent());
+		assertThat(response.getImgUrl()).isEqualTo(newImageUrl); // 새로운 이미지 URL로 변경되었는지 확인
+		then(imgRepository).should().save(any(Img.class)); // 새로운 이미지 저장 호출 검증
+		then(bookElasticSearchService).should().updateReviewCountAndStar(any(BookSaleInfo.class));
+	}
+
+	@Test
+	@DisplayName("리뷰 수정 실패 - 리뷰를 찾을 수 없음")
+	void updateReview_reviewNotFound_throwsException() {
+		// Given
+		ReviewUpdateRequest request = ReviewUpdateRequest.builder()
+			.star(4)
+			.reviewContent("수정할 내용")
+			.build();
+
+		given(reviewRepository.findById(anyLong())).willReturn(Optional.empty());
+
+		// When & Then
+		assertThatThrownBy(() -> reviewService.updateReview(testReview.getId(), request))
+			.isInstanceOf(InvalidInputValueException.class)
+			.hasMessageContaining("Review not found with ID");
+	}
+
+	@Test
 	@DisplayName("마이페이지 리뷰 조회 성공")
 	void getMyReviews_success() {
 		// Given
@@ -280,6 +334,34 @@ public class ReviewServiceTest {
 		// When & Then
 		assertThatThrownBy(() -> reviewService.toggleReviewLike(testReview.getId(), testUser.getId()))
 			.isInstanceOf(InvalidInputValueException.class);
+	}
+
+	@Test
+	@DisplayName("리뷰 좋아요 취소 성공")
+	void toggleReviewLike_likeExists_removesLike() {
+		// Given
+		ReviewLikes existingLike = ReviewLikes.builder()
+			.user(testUser)
+			.review(testReview)
+			.build();
+		ReflectionTestUtils.setField(existingLike, "id", 400L);
+
+		ReflectionTestUtils.setField(testReview, "likes", 1);
+
+		given(reviewLikesRepository.findByUserIdAndReviewId(testUser.getId(), testReview.getId()))
+			.willReturn(Optional.of(existingLike));
+		given(reviewLikesRepository.findSoftDeletedByUserIdAndReviewId(testUser.getId(), testReview.getId()))
+			.willReturn(Optional.empty());
+		given(reviewRepository.findById(testReview.getId())).willReturn(Optional.of(testReview));
+
+		// When
+		boolean liked = reviewService.toggleReviewLike(testReview.getId(), testUser.getId());
+
+		// Then
+		assertThat(liked).isFalse();
+		assertThat(testReview.getLikes()).isZero();
+		then(reviewLikesRepository).should().deleteByUserIdAndReviewId(testUser.getId(), testReview.getId());
+		then(reviewRepository).should().save(testReview);
 	}
 
 }

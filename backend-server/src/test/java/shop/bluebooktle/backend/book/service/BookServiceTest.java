@@ -5,6 +5,7 @@ import static org.mockito.Mockito.*;
 
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -46,6 +47,10 @@ import shop.bluebooktle.common.dto.book.request.BookUpdateServiceRequest;
 import shop.bluebooktle.common.dto.book.response.AdminBookResponse;
 import shop.bluebooktle.common.dto.book.response.BookDetailResponse;
 import shop.bluebooktle.common.dto.book.response.BookInfoResponse;
+import shop.bluebooktle.common.dto.book.response.PublisherInfoResponse;
+import shop.bluebooktle.common.dto.book.response.TagInfoResponse;
+import shop.bluebooktle.common.dto.book.response.author.AuthorResponse;
+import shop.bluebooktle.common.dto.elasticsearch.BookElasticSearchUpdateRequest;
 import shop.bluebooktle.common.exception.book.BookNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
@@ -434,6 +439,77 @@ class BookServiceTest {
 
 		verify(bookRepository, times(1)).findById(nonExistentBookId);
 		verify(bookSaleInfoRepository, never()).findByBookId(anyLong());
+	}
+
+	@Test
+	@DisplayName("도서 업데이트 성공 - 모든 필드")
+	void updateBook_Success_AllFields() {
+		// Given
+		Long bookId = 1L;
+		AuthorResponse authorResp1 = AuthorResponse.builder().id(20L).name("새로운 작가1").build();
+		AuthorResponse authorResp2 = AuthorResponse.builder().id(21L).name("새로운 작가2").build();
+		PublisherInfoResponse publisherResp1 = PublisherInfoResponse.builder().id(30L).name("새로운 출판사1").build();
+		PublisherInfoResponse publisherResp2 = PublisherInfoResponse.builder().id(31L).name("새로운 출판사2").build();
+		TagInfoResponse tagResp1 = TagInfoResponse.builder().id(40L).name("새로운 태그1").build();
+		TagInfoResponse tagResp2 = TagInfoResponse.builder().id(41L).name("새로운 태그2").build();
+
+		BookUpdateServiceRequest request = BookUpdateServiceRequest.builder()
+			.title("업데이트된 책 제목")
+			.description("업데이트된 설명입니다.")
+			.index("업데이트된 목차")
+			.publishDate(LocalDate.of(2024, 1, 1))
+			.price(new BigDecimal("25000.00"))
+			.salePrice(new BigDecimal("20000.00"))
+			.stock(150)
+			.isPackable(false)
+			.state(BookSaleInfoState.AVAILABLE)
+			.authorIdList(List.of(20L, 21L))
+			.publisherIdList(List.of(30L, 31L))
+			.categoryIdList(List.of(1L, 2L))
+			.tagIdList(List.of(40L, 41L))
+			.imgUrl("http://example.com/updated_thumbnail.jpg")
+			.build();
+
+		when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
+		when(bookSaleInfoRepository.findByBook(book)).thenReturn(Optional.of(bookSaleInfo));
+		when(bookRepository.save(any(Book.class))).thenReturn(book);
+		when(bookSaleInfoRepository.save(any(BookSaleInfo.class))).thenReturn(bookSaleInfo);
+
+		when(bookAuthorService.updateBookAuthor(eq(bookId), anyList()))
+			.thenReturn(List.of(authorResp1, authorResp2));
+		when(bookPublisherService.updateBookPublisher(eq(bookId), anyList()))
+			.thenReturn(List.of(publisherResp1, publisherResp2));
+		doNothing().when(bookCategoryService).updateBookCategory(eq(bookId), anyList());
+		when(bookTagService.updateBookTag(eq(bookId), anyList()))
+			.thenReturn(List.of(tagResp1, tagResp2));
+		doNothing().when(bookImgService).updateBookImg(eq(bookId), anyString());
+		doNothing().when(bookElasticSearchService).updateBook(any(BookElasticSearchUpdateRequest.class));
+
+		bookService.updateBook(bookId, request);
+
+		verify(bookRepository, times(1)).findById(bookId);
+		verify(bookRepository, times(1)).save(argThat(updatedBook ->
+			updatedBook.getTitle().equals(request.getTitle()) &&
+				updatedBook.getDescription().equals(request.getDescription()) &&
+				updatedBook.getIndex().equals(request.getIndex()) &&
+				updatedBook.getPublishDate().equals(request.getPublishDate().atStartOfDay())
+		));
+
+		verify(bookSaleInfoRepository, times(1)).findByBook(book);
+		verify(bookSaleInfoRepository, times(1)).save(argThat(updatedSaleInfo ->
+			updatedSaleInfo.getPrice().compareTo(request.getPrice()) == 0 &&
+				updatedSaleInfo.getSalePrice().compareTo(request.getSalePrice()) == 0 &&
+				updatedSaleInfo.getStock().equals(request.getStock()) &&
+				updatedSaleInfo.isPackable() == request.getIsPackable() &&
+				updatedSaleInfo.getBookSaleInfoState().equals(request.getState()) &&
+				updatedSaleInfo.getSalePercentage().compareTo(new BigDecimal("20.00")) == 0
+		));
+
+		verify(bookAuthorService, times(1)).updateBookAuthor(bookId, request.getAuthorIdList());
+		verify(bookPublisherService, times(1)).updateBookPublisher(bookId, request.getPublisherIdList());
+		verify(bookCategoryService, times(1)).updateBookCategory(bookId, request.getCategoryIdList());
+		verify(bookTagService, times(1)).updateBookTag(bookId, request.getTagIdList());
+		verify(bookImgService, times(1)).updateBookImg(bookId, request.getImgUrl());
 	}
 
 }

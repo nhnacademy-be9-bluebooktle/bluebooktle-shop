@@ -26,7 +26,7 @@ import shop.bluebooktle.common.util.JwtUtil;
 
 @ActiveProfiles("test")
 @WebMvcTest(controllers = OrderStateController.class)
-public class OrderStateControllerTest {
+class OrderStateControllerTest {
 
 	@Autowired
 	private MockMvc mockMvc;

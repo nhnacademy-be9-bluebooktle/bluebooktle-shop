@@ -8,15 +8,4 @@ public class PackagingOptionAlreadyExistsException extends ApplicationException 
 		super(ErrorCode.G_ORDER_PACKAGING_OPTION_ALREADY_EXITS);
 	}
 
-	public PackagingOptionAlreadyExistsException(String message) {
-		super(ErrorCode.G_ORDER_PACKAGING_OPTION_ALREADY_EXITS, message);
-	}
-
-	public PackagingOptionAlreadyExistsException(Throwable cause) {
-		super(ErrorCode.G_ORDER_PACKAGING_OPTION_ALREADY_EXITS, cause);
-	}
-
-	public PackagingOptionAlreadyExistsException(String message, Throwable cause) {
-		super(ErrorCode.G_ORDER_PACKAGING_OPTION_ALREADY_EXITS, message, cause);
-	}
 }
