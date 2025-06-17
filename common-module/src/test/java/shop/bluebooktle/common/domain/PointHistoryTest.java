@@ -56,7 +56,7 @@ class PointHistoryTest {
 
 		// then
 		assertThat(one).isEqualTo(two);
-		assertThat(one.hashCode()).isEqualTo(two.hashCode());
+		assertThat(one).hasSameHashCodeAs(two);
 	}
 
 	private void setId(PointHistory obj, Long id) throws Exception {

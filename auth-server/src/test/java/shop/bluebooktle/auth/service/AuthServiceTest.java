@@ -192,8 +192,8 @@ class AuthServiceTest {
 
 		when(userRepository.findByLoginId(loginId)).thenReturn(Optional.of(user));
 		when(passwordEncoder.matches(password, "encoded")).thenReturn(true);
-		when(jwtUtil.createAccessToken(eq(1L), eq("nick"), eq(UserType.USER))).thenReturn("access");
-		when(jwtUtil.createRefreshToken(eq(1L), eq("nick"), eq(UserType.USER))).thenReturn("refresh");
+		when(jwtUtil.createAccessToken(1L, "nick", UserType.USER)).thenReturn("access");
+		when(jwtUtil.createRefreshToken(1L, "nick", UserType.USER)).thenReturn("refresh");
 		when(jwtUtil.getRefreshTokenExpirationMillis()).thenReturn(1000L);
 
 		// when
@@ -202,7 +202,7 @@ class AuthServiceTest {
 		// then
 		assertThat(response.getAccessToken()).isEqualTo("access");
 		assertThat(response.getRefreshToken()).isEqualTo("refresh");
-		verify(refreshTokenService).save(eq(1L), eq("refresh"), eq(1000L));
+		verify(refreshTokenService).save(1L, "refresh", 1000L);
 		verify(eventPublisher).publishEvent(any(UserLoginEvent.class));
 	}
 
