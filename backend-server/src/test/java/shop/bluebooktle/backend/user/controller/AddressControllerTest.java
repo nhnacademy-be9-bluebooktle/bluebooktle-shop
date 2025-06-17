@@ -1,6 +1,5 @@
 package shop.bluebooktle.backend.user.controller;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -30,7 +29,6 @@ import shop.bluebooktle.common.dto.user.request.AddressRequest;
 import shop.bluebooktle.common.dto.user.response.AddressResponse;
 import shop.bluebooktle.common.entity.auth.Address;
 import shop.bluebooktle.common.entity.auth.User;
-import shop.bluebooktle.common.exception.auth.InvalidTokenException;
 import shop.bluebooktle.common.exception.user.AddressNotFoundException;
 import shop.bluebooktle.common.security.AuthUserLoader;
 import shop.bluebooktle.common.security.UserPrincipal;
@@ -302,7 +300,7 @@ class AddressControllerTest {
 			.detailAddress("updatedDetailAddress")
 			.build();
 
-		Address updatedAddress = Address.builder()
+		 Address.builder()
 			.alias(addressRequest.getAlias())
 			.roadAddress(addressRequest.getRoadAddress())
 			.detailAddress(addressRequest.getDetailAddress())
@@ -367,7 +365,7 @@ class AddressControllerTest {
 				.build();
 			ReflectionTestUtils.setField(updatedAddress, "id", 1L);
 
-			AddressResponse addressResponse = AddressResponse.fromEntity(updatedAddress);
+			AddressResponse.fromEntity(updatedAddress);
 
 			Long missingAddressId = 99L;
 

@@ -329,7 +329,7 @@ class ReviewControllerTest {
 	@WithMockUser
 	void toggleReviewLike_success_addLike() throws Exception {
 		Long reviewId = 1L;
-		given(reviewService.toggleReviewLike(eq(reviewId), eq(testUserPrincipal.getUserId())))
+		given(reviewService.toggleReviewLike(reviewId, testUserPrincipal.getUserId()))
 			.willReturn(true);
 
 		mockMvc.perform(post("/api/orders/reviews/{reviewId}/like", reviewId)
@@ -346,7 +346,7 @@ class ReviewControllerTest {
 	@WithMockUser
 	void toggleReviewLike_success_removeLike() throws Exception {
 		Long reviewId = 1L;
-		given(reviewService.toggleReviewLike(eq(reviewId), eq(testUserPrincipal.getUserId())))
+		given(reviewService.toggleReviewLike(reviewId, testUserPrincipal.getUserId()))
 			.willReturn(false);
 
 		mockMvc.perform(post("/api/orders/reviews/{reviewId}/like", reviewId)

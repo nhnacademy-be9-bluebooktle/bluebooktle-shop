@@ -129,7 +129,8 @@ class PointPaymentGatewayTest {
 		assertThat(response.status()).isEqualTo(PaymentStatus.FAILURE);
 		assertThat(response.paymentMethodDetail()).isEqualTo("UNKNOWN_ERROR");
 		assertThat(response.additionalData()).containsKey("errorMessage");
-		assertThat(response.additionalData().get("errorMessage")).isEqualTo("주문을 찾을 수 없습니다.");
+		assertThat(response.additionalData())
+			.containsEntry("errorMessage", "주문을 찾을 수 없습니다.");
 		verify(orderRepository).findByOrderKey(mockGenericPaymentCancelRequest.paymentKey());
 	}
 
@@ -145,7 +146,8 @@ class PointPaymentGatewayTest {
 		assertThat(response.status()).isEqualTo(PaymentStatus.FAILURE);
 		assertThat(response.paymentMethodDetail()).isEqualTo("UNKNOWN_ERROR");
 		assertThat(response.additionalData()).containsKey("errorMessage");
-		assertThat(response.additionalData().get("errorMessage")).isEqualTo(exceptionMessage);
+		assertThat(response.additionalData())
+			.containsEntry("errorMessage", exceptionMessage);
 		verify(orderRepository).findByOrderKey(mockGenericPaymentCancelRequest.paymentKey());
 	}
 }

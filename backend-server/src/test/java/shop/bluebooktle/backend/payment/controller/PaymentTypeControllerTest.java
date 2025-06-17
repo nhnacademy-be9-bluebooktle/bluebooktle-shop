@@ -159,14 +159,14 @@ class PaymentTypeControllerTest {
 	@DisplayName("deletePaymentType: 결제 수단 삭제 성공")
 	void deletePaymentType_success() throws Exception {
 		Long paymentTypeId = 1L;
-		doNothing().when(paymentTypeService).delete(eq(paymentTypeId));
+		doNothing().when(paymentTypeService).delete(paymentTypeId);
 
 		mockMvc.perform(delete("/api/payments/types/{paymentTypeId}", paymentTypeId)
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.status").value("success"));
 
-		verify(paymentTypeService).delete(eq(paymentTypeId));
+		verify(paymentTypeService).delete(paymentTypeId);
 	}
 
 	@Test
@@ -174,7 +174,7 @@ class PaymentTypeControllerTest {
 	void deletePaymentType_notFound() throws Exception {
 		Long nonExistentId = 999L;
 		doThrow(new RuntimeException("PaymentType not found")).when(paymentTypeService)
-			.delete(eq(nonExistentId));
+			.delete(nonExistentId);
 
 		mockMvc.perform(delete("/api/payments/types/{paymentTypeId}", nonExistentId)
 				.contentType(MediaType.APPLICATION_JSON))
