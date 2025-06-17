@@ -39,7 +39,7 @@ import shop.bluebooktle.common.util.JwtUtil;
 @ActiveProfiles("test")
 @WebMvcTest(AddressController.class)
 @AutoConfigureMockMvc(addFilters = true)
-public class AddressControllerTest {
+class AddressControllerTest {
 
 	@Autowired
 	private MockMvc mockMvc;

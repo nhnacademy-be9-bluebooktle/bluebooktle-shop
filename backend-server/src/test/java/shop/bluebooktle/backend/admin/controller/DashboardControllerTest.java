@@ -24,7 +24,7 @@ import shop.bluebooktle.common.util.JwtUtil;
 @WebMvcTest(DashboardController.class)
 @ActiveProfiles("test")
 @AutoConfigureMockMvc(addFilters = false)
-public class DashboardControllerTest {
+class DashboardControllerTest {
 
 	@Autowired
 	private MockMvc mockMvc;

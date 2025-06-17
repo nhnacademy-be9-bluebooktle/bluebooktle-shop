@@ -41,7 +41,7 @@ import shop.bluebooktle.common.exception.auth.InvalidTokenException;
 import shop.bluebooktle.common.security.UserPrincipal;
 
 @ExtendWith(MockitoExtension.class)
-public class OrderControllerTest {
+class OrderControllerTest {
 
 	private final String GUEST_ID = "testGuestId123";
 	@Mock
