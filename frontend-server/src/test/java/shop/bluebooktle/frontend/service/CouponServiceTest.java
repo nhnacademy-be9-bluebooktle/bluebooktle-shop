@@ -27,7 +27,7 @@ import shop.bluebooktle.frontend.repository.CouponRepository;
 import shop.bluebooktle.frontend.service.impl.CouponServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
-public class CouponServiceTest {
+class CouponServiceTest {
 
 	@Mock
 	CouponRepository couponRepository;

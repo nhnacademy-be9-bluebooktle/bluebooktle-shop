@@ -70,7 +70,7 @@ class RedisAccessTokenServiceTest {
 
 		accessTokenService.addToBlacklist(ACCESS_TOKEN);
 
-		verify(redisTemplate.opsForValue()).set(eq(BLACKLIST_KEY), eq("true"), eq(Duration.ofMillis(5000L)));
+		verify(redisTemplate.opsForValue()).set(BLACKLIST_KEY, "true", Duration.ofMillis(5000L));
 	}
 
 	@Test

@@ -16,7 +16,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -28,9 +27,6 @@ import shop.bluebooktle.common.dto.book.request.BookFormRequest;
 import shop.bluebooktle.common.dto.book.response.AdminBookResponse;
 import shop.bluebooktle.common.dto.book.response.BookAllResponse;
 import shop.bluebooktle.common.dto.book.response.CategoryResponse;
-import shop.bluebooktle.common.dto.book.response.PublisherInfoResponse;
-import shop.bluebooktle.common.dto.book.response.TagInfoResponse;
-import shop.bluebooktle.common.dto.book.response.author.AuthorResponse;
 import shop.bluebooktle.frontend.config.advice.GlobalUserInfoAdvice;
 import shop.bluebooktle.frontend.service.AdminAuthorService;
 import shop.bluebooktle.frontend.service.AdminBookService;
@@ -50,7 +46,7 @@ import shop.bluebooktle.frontend.service.CategoryService;
 	)
 )
 @ActiveProfiles("test")
-public class AdminBookControllerTest {
+class AdminBookControllerTest {
 	@Autowired
 	private MockMvc mockMvc;
 
@@ -68,7 +64,6 @@ public class AdminBookControllerTest {
 	private AdminTagService adminTagService;
 	@MockitoBean
 	private BookService bookService;
-
 
 	@MockitoBean
 	private CartService cartService;
@@ -394,7 +389,6 @@ public class AdminBookControllerTest {
 			.andExpect(flash().attributeExists("bookForm")); // 입력값 보존 확인
 	}
 
-
 	@Test
 	@DisplayName("도서 수정 - 유효성 검사 실패 시 리디렉션")
 	void updateBook_validationFail() throws Exception {
@@ -429,7 +423,7 @@ public class AdminBookControllerTest {
 					.param("categoryIdList", "1")
 					.param("tagIdList", "1")
 					.param("isAladinImg", "false")
-					.with((RequestPostProcessor) request -> {
+					.with((RequestPostProcessor)request -> {
 						request.setMethod("POST");
 						return request;
 					})
@@ -438,6 +432,7 @@ public class AdminBookControllerTest {
 			.andExpect(redirectedUrl("/admin/books"))
 			.andExpect(flash().attributeExists("globalSuccessMessage"));
 	}
+
 	@Test
 	@DisplayName("도서 수정 - 예외 발생 시 실패 처리")
 	void updateBook_exception() throws Exception {

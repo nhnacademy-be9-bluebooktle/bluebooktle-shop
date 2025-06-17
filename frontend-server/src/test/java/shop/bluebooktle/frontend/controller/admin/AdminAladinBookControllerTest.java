@@ -4,8 +4,6 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
@@ -15,27 +13,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
 import shop.bluebooktle.common.dto.book.BookSaleInfoState;
 import shop.bluebooktle.common.dto.book.request.BookAllRegisterByAladinRequest;
-import shop.bluebooktle.common.dto.book.request.BookFormRequest;
-import shop.bluebooktle.common.dto.book.response.AdminBookResponse;
 import shop.bluebooktle.common.dto.book.response.AladinBookResponse;
-import shop.bluebooktle.common.dto.book.response.BookAllResponse;
-import shop.bluebooktle.common.dto.book.response.CategoryResponse;
 import shop.bluebooktle.frontend.config.advice.GlobalUserInfoAdvice;
-import shop.bluebooktle.frontend.service.AdminAuthorService;
 import shop.bluebooktle.frontend.service.AdminBookService;
 import shop.bluebooktle.frontend.service.AdminCategoryService;
-import shop.bluebooktle.frontend.service.AdminImgService;
-import shop.bluebooktle.frontend.service.AdminPublisherService;
 import shop.bluebooktle.frontend.service.AdminTagService;
 import shop.bluebooktle.frontend.service.BookService;
 import shop.bluebooktle.frontend.service.CartService;
@@ -49,7 +37,7 @@ import shop.bluebooktle.frontend.service.CategoryService;
 	)
 )
 @ActiveProfiles("test")
-public class AdminAladinBookControllerTest {
+class AdminAladinBookControllerTest {
 	@Autowired
 	private MockMvc mockMvc;
 
@@ -61,7 +49,6 @@ public class AdminAladinBookControllerTest {
 	private AdminTagService adminTagService;
 	@MockitoBean
 	private BookService bookService;
-
 
 	@MockitoBean
 	private CartService cartService;
@@ -88,7 +75,8 @@ public class AdminAladinBookControllerTest {
 	@DisplayName("알라딘 도서 등록 폼 - aladinBookForm 속성이 이미 존재할 경우 초기값 설정 로직은 실행되지 않는다")
 	void bookForm_withExistingAladinBookForm_doesNotOverride() throws Exception {
 		BookAllRegisterByAladinRequest existingForm =
-			new BookAllRegisterByAladinRequest("기존 제목", "1234567890123", 10, true, BookSaleInfoState.AVAILABLE, List.of(1L), List.of(1L));
+			new BookAllRegisterByAladinRequest("기존 제목", "1234567890123", 10, true, BookSaleInfoState.AVAILABLE,
+				List.of(1L), List.of(1L));
 
 		when(adminCategoryService.getCategoryTree()).thenReturn(List.of());
 		when(adminTagService.getTags(anyInt(), anyInt(), any())).thenReturn(new PageImpl<>(List.of()));
@@ -108,7 +96,6 @@ public class AdminAladinBookControllerTest {
 				BookSaleInfoState.DELETED.name()
 			)));
 	}
-
 
 	@Test
 	@DisplayName("알라딘 도서 저장 성공")

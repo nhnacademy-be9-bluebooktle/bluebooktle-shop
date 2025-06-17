@@ -14,24 +14,15 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 
-import shop.bluebooktle.common.dto.book.request.TagRequest;
 import shop.bluebooktle.common.dto.book.request.author.AuthorRegisterRequest;
 import shop.bluebooktle.common.dto.book.request.author.AuthorUpdateRequest;
-import shop.bluebooktle.common.dto.book.response.TagInfoResponse;
 import shop.bluebooktle.common.dto.book.response.author.AuthorResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
-import shop.bluebooktle.common.exception.book.TagCreateException;
-import shop.bluebooktle.common.exception.book.TagDeleteException;
-import shop.bluebooktle.common.exception.book.TagListFetchException;
-import shop.bluebooktle.common.exception.book.TagNotFoundException;
-import shop.bluebooktle.common.exception.book.TagUpdateException;
 import shop.bluebooktle.frontend.repository.AdminAuthorRepository;
-import shop.bluebooktle.frontend.repository.AdminTagRepository;
 import shop.bluebooktle.frontend.service.impl.AdminAuthorServiceImpl;
-import shop.bluebooktle.frontend.service.impl.AdminTagServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
-public class AdminAuthorServiceTest {
+class AdminAuthorServiceTest {
 	@Mock
 	AdminAuthorRepository authorRepository;
 

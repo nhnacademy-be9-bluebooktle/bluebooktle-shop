@@ -47,7 +47,7 @@ import shop.bluebooktle.frontend.service.ReviewService;
 	)
 )
 @ActiveProfiles("test")
-public class BookControllerTest {
+class BookControllerTest {
 	@Autowired
 	private MockMvc mockMvc;
 
@@ -63,7 +63,6 @@ public class BookControllerTest {
 	CartService cartService;
 	@MockitoBean
 	CategoryService categoryService;
-
 
 	Long bookId;
 	BookDetailResponse bookDetail;
@@ -109,7 +108,6 @@ public class BookControllerTest {
 		likeCount = 42;
 	}
 
-
 	@Test
 	@DisplayName("도서 목록 페이지 조회 성공")
 	void getBookListPage_success() throws Exception {
@@ -135,8 +133,10 @@ public class BookControllerTest {
 		mockMvc.perform(get("/categories/{categoryId}", categoryId))
 			.andExpect(status().isOk())
 			.andExpect(view().name("book/book_list"))
-			.andExpect(model().attributeExists("pagedBooks", "sortTypes", "bookSortType", "category", "size", "filterCount"));
+			.andExpect(
+				model().attributeExists("pagedBooks", "sortTypes", "bookSortType", "category", "size", "filterCount"));
 	}
+
 	@Test
 	@DisplayName("도서 상세 페이지 조회 성공 (비로그인)")
 	void getBookDetailPage_success_withoutLogin() throws Exception {
@@ -167,9 +167,11 @@ public class BookControllerTest {
 				.flashAttr("isLoggedIn", true))
 			.andExpect(status().isOk())
 			.andExpect(view().name("book/book_detail"))
-			.andExpect(model().attributeExists("book", "bookId", "deliveryRule", "reviewsPage", "likeCount", "isLiked", "earnedPoints"))
+			.andExpect(model().attributeExists("book", "bookId", "deliveryRule", "reviewsPage", "likeCount", "isLiked",
+				"earnedPoints"))
 			.andExpect(model().attribute("isLiked", true))
-			.andExpect(model().attribute("earnedPoints", (int)(rule.value().intValue() * bookDetail.getSalePrice().longValue() / 100)));
+			.andExpect(model().attribute("earnedPoints",
+				(int)(rule.value().intValue() * bookDetail.getSalePrice().longValue() / 100)));
 	}
 
 	@Test
@@ -206,7 +208,6 @@ public class BookControllerTest {
 	@DisplayName("도서 찜 등록 성공")
 	void likeBook_success() throws Exception {
 		// given
-		long bookId = 1L;
 		willDoNothing().given(bookService).like(bookId);
 
 		// when & then
@@ -221,7 +222,6 @@ public class BookControllerTest {
 	@Test
 	@DisplayName("도서 찜 등록 실패")
 	void likeBook_failure() throws Exception {
-		long bookId = 1L;
 		willThrow(new RuntimeException("fail")).given(bookService).like(bookId);
 
 		mockMvc.perform(get("/books/{bookId}/likes", bookId))
@@ -235,7 +235,6 @@ public class BookControllerTest {
 	@Test
 	@DisplayName("도서 찜 취소 성공")
 	void unlikeBook_success() throws Exception {
-		long bookId = 1L;
 		willDoNothing().given(bookService).unlike(bookId);
 
 		mockMvc.perform(post("/books/{bookId}/unlikes", bookId))
@@ -249,7 +248,6 @@ public class BookControllerTest {
 	@Test
 	@DisplayName("도서 찜 취소 실패")
 	void unlikeBook_failure() throws Exception {
-		long bookId = 1L;
 		willThrow(new RuntimeException("fail")).given(bookService).unlike(bookId);
 
 		mockMvc.perform(post("/books/{bookId}/unlikes", bookId))
@@ -260,13 +258,11 @@ public class BookControllerTest {
 		then(bookService).should().unlike(bookId);
 	}
 
-
 	@Test
 	@DisplayName("리뷰 좋아요 등록 성공")
 	void toggleReviewLike_likedTrue() throws Exception {
 		// given
 		long reviewId = 1L;
-		long bookId = 10L;
 		given(reviewService.toggleReviewLike(reviewId)).willReturn(true);
 
 		// when & then
@@ -284,7 +280,6 @@ public class BookControllerTest {
 	void toggleReviewLike_likedFalse() throws Exception {
 		// given
 		long reviewId = 1L;
-		long bookId = 10L;
 		given(reviewService.toggleReviewLike(reviewId)).willReturn(false);
 
 		// when & then
@@ -302,7 +297,6 @@ public class BookControllerTest {
 	void toggleReviewLike_failure() throws Exception {
 		// given
 		long reviewId = 1L;
-		long bookId = 10L;
 		given(reviewService.toggleReviewLike(reviewId)).willThrow(new RuntimeException("DB 에러"));
 
 		// when & then

@@ -46,7 +46,8 @@ class PointSourceTypeTest {
 		setId(two, 1L);
 
 		assertThat(one).isEqualTo(two);
-		assertThat(one.hashCode()).isEqualTo(two.hashCode());
+		assertThat(one).hasSameHashCodeAs(two);
+
 	}
 
 	private void setId(PointSourceType obj, Long id) {
