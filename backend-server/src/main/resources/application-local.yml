@@ -1,0 +1,126 @@
+server:
+  port: 9012
+  gateway-url: localhost:9000
+
+spring:
+  batch:
+    jdbc:
+      initialize-schema: never
+  datasource:
+    url: jdbc:mysql://s4.java21.net:13306/nhn_academy_123
+    username: ${MYSQL_USERNAME}
+    password: ${MYSQL_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+        highlight_sql: true
+        auto_quote_keyword: true
+    #    database-platform: org.hibernate.dialect.H2Dialect
+    database-platform: org.hibernate.dialect.MySQLDialect
+    defer-datasource-initialization: true
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      database: 0
+  # 엘라스틱 서치
+  elasticsearch:
+    uris: s4.java21.net:9200
+    username: elastic
+    password: nhnacademy123!
+
+  rabbitmq:
+    host: s4.java21.net
+    port: 5672
+    username: ${RABBITMQ_USERNAME}
+    password: ${RABBITMQ_PASSWORD}
+    virtual-host: bluebooktle
+  couchbase:
+    env:
+      timeouts:
+        search:
+
+
+eureka:
+  client:
+    service-url:
+      defaultZone: "http://${EUREKA_ID}:${EUREKA_PASSWORD}@localhost:9761/eureka"
+
+# 이미지저장서버 minio
+minio:
+  endpoint: http://storage.java21.net:8000
+  access-key: ${MINIO_ACCESS_KEY}
+  secret-key: ${MINIO_SECRET_KEY}
+  bucket: bluebooktle-bookimage
+
+jwt:
+  secret: ${JWT_SECRET_KEY_LOCAL}
+  access-token-validity-seconds: 1800
+  refresh-token-validity-seconds: 3600
+
+logging:
+  level:
+    shop.bluebooktle: DEBUG
+    org.hibernate.SQL: info
+    org.hibernate.orm.jdbc.bind: trace
+    org.springframework.transaction.interceptor: trace
+    net.javacrumbs.shedlock: DEBUG
+
+mq:
+  queue:
+    birthday: BB.local.birthday.queue
+    birthday-dlq: BB.local.birthday.queue.dlq
+    direct: BB.local.direct.queue
+    direct-dlq: BB.local.direct.queue.dlq
+    welcome: BB.local.welcome.queue
+    welcome-dlq: BB.local.welcome.queue.dlq
+  exchange:
+    birthday: local.birthday.exchange
+    birthday-dlx: local.birthday.dlx
+    direct: local.direct.exchange
+    direct-dlx: local.direct.dlx
+    welcome: local.welcome.exchange
+    welcome-dlx: local.welcome.dlx
+  order:
+    queue:
+      order-wait: BB.local.order.payment.waiting.queue
+      order-cancel: BB.local.order.cancel.queue
+      order-cancel-dlq: BB.local.order.cancel.dlq
+      order-shipping: BB.local.order.shipping.queue
+      order-complete: BB.local.order.complete.queue
+      order-complete-dlq: BB.local.order.complete.dlq
+    exchange:
+      order: local.order.exchange
+      order-dlx: local.order.dlx
+
+encrypt:
+  key: WpqWJ+qndIaLgP1udQD7lUUuaeARZEvOzHefTNS23hA=
+
+dooray:
+  webhook:
+    verification-channel: https://nhnacademy.dooray.com/services/3204376758577275363/4082541783774462190/kziab347QWW2oZ_D2rumEA
+    coupon-failure-channel: https://nhnacademy.dooray.com/services/3204376758577275363/4091450631177669408/e7_0nTpvS6CpXH9sf3Q0Eg
+#    notification-channel: 추후 사용
+search:
+  index:
+    name: bluebooktle-books-local
+
+toss:
+  api:
+    url: https://api.tosspayments.com/v1
+  secret-key: test_sk_LlDJaYngroXzQGEQlMlv8ezGdRpX
+  client-key: test_ck_0RnYX2w532oJMLLx9JBPVNeyqApQ
+
+springdoc:
+  swagger-ui:
+    path: /api/swagger-ui.html
+  api-docs:
+    path: /api/api-docs
+  packagesToScan: shop.bluebooktle.backend
+  default-produces-media-type: application/json

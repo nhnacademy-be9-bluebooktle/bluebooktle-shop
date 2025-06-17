@@ -1,0 +1,43 @@
+server:
+  port: 9080
+  baseUrl: "http://www.localhost:9080"
+  gateway-url: localhost:9000
+
+spring:
+  cache:
+    type: redis
+  data:
+    redis:
+      host: localhost
+      port: 6379
+  rabbitmq:
+    host: s4.java21.net
+    port: 5672
+    username: ${RABBITMQ_USERNAME}
+    password: ${RABBITMQ_PASSWORD}
+    virtual-host: bluebooktle
+
+eureka:
+  client:
+    service-url:
+      defaultZone: "http://${EUREKA_ID}:${EUREKA_PASSWORD}@localhost:9761/eureka"
+
+toss:
+  api:
+    url: https://api.tosspayments.com/v1
+  secret-key: test_sk_LlDJaYngroXzQGEQlMlv8ezGdRpX
+  client-key: test_ck_0RnYX2w532oJMLLx9JBPVNeyqApQ
+
+logging:
+  level:
+    shop.bluebooktle.book: DEBUG
+    org.hibernate.SQL: DEBUG
+    shop.bluebooktle.frontend.repository: DEBUG
+
+oauth:
+  payco:
+    client-id: "3RDKLuGWlBifp1UfHtinDmZ"
+    redirect-uri: "http://www.localhost:9080/oauth/payco"
+
+minio:
+  endpoint: http://storage.java21.net:8000

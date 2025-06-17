@@ -1,0 +1,20 @@
+server:
+  port: 9761
+
+
+eureka:
+  instance:
+    hostname: localhost
+    instance-id: ${spring.application.name}:${server.port}
+  client:
+    enabled: true
+    serviceUrl:
+      defaultZone: http://blue:blueBooktle12@localhost:9761/eureka/
+
+spring:
+  rabbitmq:
+    host: s4.java21.net
+    port: 5672
+    username: ${RABBITMQ_USERNAME}
+    password: ${RABBITMQ_PASSWORD}
+    virtual-host: bluebooktle
