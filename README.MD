@@ -149,18 +149,16 @@ Spring Boot 기반의 RESTful API를 중심으로 구현되었으며, MySQL, Red
 ![Bootstrap5](https://img.shields.io/badge/Bootstrap-7952B3?style=flat&logo=Bootstrap&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=JavaScript&logoColor=black)
 
-## 🧱 시스템 아키텍처
+## 🧱 아키텍처 구조
 
-> 전체 시스템 구성도 및 마이크로서비스 흐름  
-> (이미지 추가 예정)
+![아키텍처 구조.png](resources/%EC%95%84%ED%82%A4%ED%85%8D%EC%B2%98%20%EA%B5%AC%EC%A1%B0.png)
 
 
 ---
 
 ## 🗃 ERD (DB 모델링)
 
-> MySQL 기반 ERD 모델 추가
-
+![ERD.png](resources/ERD.png)
 
 
 ---
@@ -180,8 +178,27 @@ Spring Boot 기반의 RESTful API를 중심으로 구현되었으며, MySQL, Red
 
 ## 🗓 개발 일정 및 협업 방식
 
-- GitHub Projects
-- Daily Scrum, Sprint Review, Retrospective
+> GitHub Projects를 활용하여 전반적인 프로젝트 관리
+
+### Scrum
+
+![스크럼.jpg](resources/%EC%8A%A4%ED%81%AC%EB%9F%BC.jpg)
+
+- 시간
+    - 매일 9:10 스크럼 미팅 진행
+- 회의 내용
+    - 어제/주말동안 진행한 내용 공유
+    - 오늘 진행할 내용 공유
+    - 진행하면서 발생한 장애물
+    - 함께 의논할 사항
+
+### 일정관리
+
+- github WBS를 통한 전체적인 진행사항 관리
+- 요구사항을 이슈로 작성해 역할 분담 후 일정 관리
+  ![WBS.jpg](resources/WBS.jpg)
+
+- 백로그를 통한 현재, 그리고 진행사항을 볼 수 있도록 함
 
 ---
 
@@ -210,6 +227,24 @@ Spring Boot 기반의 RESTful API를 중심으로 구현되었으며, MySQL, Red
 - 메인 페이지 표시 도서 작업
 - 홈페이지에 표시될 도서 등록 작업
 - Header 및 Footer 링크 작업
+
+## 이서인
+
+### 도서
+
+- 도서 좋아요 백엔드 CRUD 기능 구현
+- 도서 주문 백엔드 CRUD 기능 구현
+- 주문 포장 백엔드 CRUD 기능 구현
+- 포장 옵션 백엔드 CRUD 기능 구현
+- 도서 상세 페이지 프론트 구현
+- 마이페이지 도서 좋아요 프론트 구현
+    - 로그인한 회원에게만 좋아요 버튼이 표시되도록 구현
+
+### 관리자
+
+- 포장 옵션 프론트 CRUD 기능 구현
+- 도서 태그 프론트 CRUD 기능 구현
+- 도서 출판사 프론트 CRUD 기능 구현
 
 ## 팀원 공통
 
