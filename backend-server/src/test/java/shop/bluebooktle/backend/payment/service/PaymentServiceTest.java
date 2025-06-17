@@ -51,7 +51,7 @@ import shop.bluebooktle.common.exception.order.OrderNotFoundException;
 import shop.bluebooktle.common.exception.order.order_state.OrderInvalidStateException;
 
 @ExtendWith(MockitoExtension.class)
-public class PaymentServiceTest {
+class PaymentServiceTest {
 
 	@InjectMocks
 	private PaymentServiceImpl paymentService;

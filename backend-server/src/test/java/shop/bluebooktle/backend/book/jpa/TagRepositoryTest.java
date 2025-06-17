@@ -19,7 +19,6 @@ import org.springframework.test.context.ActiveProfiles;
 import jakarta.persistence.EntityManager;
 import shop.bluebooktle.backend.book.entity.Tag;
 import shop.bluebooktle.backend.book.repository.TagRepository;
-import shop.bluebooktle.backend.book.repository.impl.TagQueryRepositoryImpl;
 import shop.bluebooktle.backend.config.JpaAuditingConfiguration;
 import shop.bluebooktle.backend.config.QueryDslConfig;
 import shop.bluebooktle.common.converter.ProfileAwareStringCryptoConverter;

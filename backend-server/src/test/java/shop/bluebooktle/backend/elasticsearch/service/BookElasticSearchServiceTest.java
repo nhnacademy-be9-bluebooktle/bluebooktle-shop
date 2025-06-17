@@ -30,7 +30,7 @@ import shop.bluebooktle.common.dto.elasticsearch.BookElasticSearchUpdateRequest;
 import shop.bluebooktle.common.exception.elasticsearch.ElasticsearchBookDocumentSaveException;
 import shop.bluebooktle.common.exception.elasticsearch.ElasticsearchBookNotFoundException;
 
-public class BookElasticSearchServiceTest {
+class BookElasticSearchServiceTest {
 
 	@Mock
 	private BookElasticSearchRepository repository;
@@ -94,8 +94,9 @@ public class BookElasticSearchServiceTest {
 	@Test
 	@DisplayName("조회 수 증가 - 예외 발생(엘라스틱 존재 하지 않음)")
 	void updateViewCount_notFound() {
+		Book book = Book.builder().id(1L).build();
 		when(repository.findById(1L)).thenReturn(Optional.empty());
-		assertThatThrownBy(() -> service.updateViewCount(Book.builder().id(1L).build()))
+		assertThatThrownBy(() -> service.updateViewCount(book))
 			.isInstanceOf(ElasticsearchBookNotFoundException.class);
 	}
 
@@ -217,7 +218,8 @@ public class BookElasticSearchServiceTest {
 	@DisplayName("도서 삭제 - 예외 발생(엘라스틱 존재 하지 않음)")
 	void deleteBook_notFound() {
 		when(repository.findById(1L)).thenReturn(Optional.empty());
-		assertThatThrownBy(() -> service.deleteBook(Book.builder().id(1L).build()))
+		Book book = Book.builder().id(1L).build();
+		assertThatThrownBy(() -> service.deleteBook(book))
 			.isInstanceOf(ElasticsearchBookNotFoundException.class);
 	}
 

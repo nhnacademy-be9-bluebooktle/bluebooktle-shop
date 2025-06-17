@@ -221,18 +221,6 @@ class UserControllerTest {
 			.andExpect(status().isNotFound());
 	}
 
-	// @Valid 어노테이션이 UserController.java의 UserUpdateRequest에 없으므로, 해당 테스트는 수정/제거 필요
-	// @Test
-	// @DisplayName("사용자 - 내 정보 수정 실패 (유효성 검사 실패, 400 Bad Request)")
-	// void updateUser_fail_validation() throws Exception {
-	// 	UserUpdateRequest request = new UserUpdateRequest("", "", "");
-	// 	mockMvc.perform(put("/api/users/{id}", userPrincipal.getUserId())
-	// 			.with(user(userPrincipal)).with(csrf())
-	// 			.contentType(MediaType.APPLICATION_JSON)
-	// 			.content(objectMapper.writeValueAsString(request)))
-	// 		.andExpect(status().isBadRequest());
-	// }
-
 	@Test
 	@DisplayName("사용자 - 내 포인트 조회 성공")
 	void getUserTotalPoints_success() throws Exception {

@@ -28,7 +28,7 @@ import shop.bluebooktle.common.exception.book.PublisherCannotDeleteException;
 import shop.bluebooktle.common.exception.book.PublisherNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
-public class PublisherServiceTest {
+class PublisherServiceTest {
 
 	@Mock
 	private PublisherRepository publisherRepository;

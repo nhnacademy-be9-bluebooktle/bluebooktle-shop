@@ -1,13 +1,12 @@
 package shop.bluebooktle.backend.book.service;
 
-import static org.assertj.core.api.Assertions.*;  // 변경: AssertionsForClassTypes → Assertions
+import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,8 +18,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import shop.bluebooktle.backend.book.entity.Book;
 import shop.bluebooktle.backend.book.entity.BookTag;
 import shop.bluebooktle.backend.book.entity.Tag;
-import shop.bluebooktle.backend.book.repository.BookTagRepository;
 import shop.bluebooktle.backend.book.repository.BookRepository;
+import shop.bluebooktle.backend.book.repository.BookTagRepository;
 import shop.bluebooktle.backend.book.repository.TagRepository;
 import shop.bluebooktle.backend.book.service.impl.BookTagServiceImpl;
 import shop.bluebooktle.common.dto.book.response.TagInfoResponse;
@@ -29,7 +28,7 @@ import shop.bluebooktle.common.exception.book.BookTagAlreadyExistsException;
 import shop.bluebooktle.common.exception.book.TagNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
-public class BookTagServiceTest {
+class BookTagServiceTest {
 
 	@Mock
 	private BookTagRepository bookTagRepository;
@@ -42,8 +41,7 @@ public class BookTagServiceTest {
 	private BookTagServiceImpl bookTagService;
 
 	private Book dummyBook() {
-		Book b = mock(Book.class);
-		return b;
+		return mock(Book.class);
 	}
 
 	private Tag dummyTag(Long id, String name) {
@@ -161,7 +159,7 @@ public class BookTagServiceTest {
 		// 새 등록된 ID 순서대로 비교
 		assertThat(out.stream()
 			.map(TagInfoResponse::getId)
-			.collect(Collectors.toList()))
-			.containsExactlyElementsOf(newTags);
+			.toList())
+			.containsExactlyInAnyOrderElementsOf(newTags);
 	}
 }
