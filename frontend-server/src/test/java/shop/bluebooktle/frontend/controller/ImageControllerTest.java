@@ -28,7 +28,7 @@ import shop.bluebooktle.frontend.service.CategoryService;
 	)
 )
 @ActiveProfiles("test")
-public class ImageControllerTest {
+class ImageControllerTest {
 
 	@Autowired
 	private MockMvc mockMvc;
@@ -45,7 +45,7 @@ public class ImageControllerTest {
 	@Test
 	@DisplayName("이미지 다운로드 성공 - 정상 반환")
 	void proxyPngImage_success() throws Exception {
-		byte[] dummyImage = new byte[]{1, 2, 3};
+		byte[] dummyImage = new byte[] {1, 2, 3};
 
 		when(imageServerClient.download("test-bucket", "image.png"))
 			.thenReturn(dummyImage);

@@ -3,7 +3,6 @@ package shop.bluebooktle.frontend.service;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.*;
 import static org.mockito.Mockito.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
@@ -17,23 +16,14 @@ import org.springframework.data.domain.Page;
 import shop.bluebooktle.common.dto.book.request.CategoryRegisterRequest;
 import shop.bluebooktle.common.dto.book.request.CategoryUpdateRequest;
 import shop.bluebooktle.common.dto.book.request.RootCategoryRegisterRequest;
-import shop.bluebooktle.common.dto.book.request.TagRequest;
 import shop.bluebooktle.common.dto.book.response.CategoryResponse;
 import shop.bluebooktle.common.dto.book.response.CategoryTreeResponse;
-import shop.bluebooktle.common.dto.book.response.TagInfoResponse;
 import shop.bluebooktle.common.dto.common.PaginationData;
-import shop.bluebooktle.common.exception.book.TagCreateException;
-import shop.bluebooktle.common.exception.book.TagDeleteException;
-import shop.bluebooktle.common.exception.book.TagListFetchException;
-import shop.bluebooktle.common.exception.book.TagNotFoundException;
-import shop.bluebooktle.common.exception.book.TagUpdateException;
-import shop.bluebooktle.frontend.repository.AdminTagRepository;
 import shop.bluebooktle.frontend.repository.CategoryRepository;
 import shop.bluebooktle.frontend.service.impl.AdminCategoryServiceImpl;
-import shop.bluebooktle.frontend.service.impl.AdminTagServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
-public class AdminCategoryServiceTest {
+class AdminCategoryServiceTest {
 	@Mock
 	CategoryRepository categoryRepository;
 

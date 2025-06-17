@@ -84,7 +84,7 @@ class ReviewServiceTest {
 
 	@Test
 	@DisplayName("리뷰 작성 성공 - 이미지 포함")
-	void addReview_successWithImage() throws IOException {
+	void addReview_successWithImage() {
 		when(adminImgService.getPresignedUploadUrl()).thenReturn(minioPresignedUrl);
 		doNothing().when(imageServerClient).upload(
 			anyString(), anyString(), anyMap(), anyMap(), any(byte[].class)
@@ -167,7 +167,7 @@ class ReviewServiceTest {
 
 	@Test
 	@DisplayName("리뷰 수정 성공 - 기존 이미지 삭제 후 새 이미지 업로드")
-	void updateReview_successWithImageReplacement() throws IOException {
+	void updateReview_successWithImageReplacement() {
 		ImgResponse existingImg = ImgResponse.builder()
 			.id(1L)
 			.imgUrl("http://localhost:9000/bluebooktle-bookimage/old-object-name")
