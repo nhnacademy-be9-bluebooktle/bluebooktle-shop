@@ -7,6 +7,8 @@ import java.util.Map;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
+
 import lombok.RequiredArgsConstructor;
 import shop.bluebooktle.backend.coupon.client.CouponFailureMessageClient;
 import shop.bluebooktle.backend.coupon.repository.FailedCouponIssueRepository;
@@ -22,6 +24,7 @@ public class CouponFailureSummaryScheduler {
 	private final CouponFailureMessageClient messageClient;
 
 	@Scheduled(cron = "0 0 0 * * *")
+	@SchedulerLock(name = "CouponFailureSummaryScheduler", lockAtLeastFor = "PT1M", lockAtMostFor = "PT5M")
 	public void notifyTodayFailures() {
 		Map<CouponIssueType, Long> totalMap = repo.countTodayTotalByType();
 		if (totalMap.isEmpty())
