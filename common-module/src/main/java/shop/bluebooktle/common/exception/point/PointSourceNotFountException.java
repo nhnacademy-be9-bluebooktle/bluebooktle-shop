@@ -8,15 +8,4 @@ public class PointSourceNotFountException extends ApplicationException {
 		super(ErrorCode.POINT_SOURCE_TYPE_NOT_FOUND);
 	}
 
-	public PointSourceNotFountException(Throwable cause) {
-		super(ErrorCode.POINT_SOURCE_TYPE_NOT_FOUND, cause);
-	}
-
-	public PointSourceNotFountException(String customMessage) {
-		super(ErrorCode.POINT_SOURCE_TYPE_NOT_FOUND, customMessage);
-	}
-
-	public PointSourceNotFountException(String customMessage, Throwable cause) {
-		super(ErrorCode.POINT_SOURCE_TYPE_NOT_FOUND, customMessage, cause);
-	}
 }

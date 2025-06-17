@@ -28,7 +28,7 @@ import shop.bluebooktle.common.entity.auth.User;
 import shop.bluebooktle.common.security.UserPrincipal;
 
 @ExtendWith(MockitoExtension.class)
-class CartControllerGuestTest {
+class CartControllerTest {
 
 	@Mock
 	CartService cartService;

@@ -3,9 +3,7 @@ package shop.bluebooktle.backend.order.jpa;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.*;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -19,30 +17,19 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 
-import shop.bluebooktle.backend.book.entity.Book;
-import shop.bluebooktle.backend.book_order.entity.BookOrder;
 import shop.bluebooktle.backend.config.JpaAuditingConfiguration;
 import shop.bluebooktle.backend.config.QueryDslConfig;
 import shop.bluebooktle.backend.order.entity.DeliveryRule;
 import shop.bluebooktle.backend.order.entity.Order;
 import shop.bluebooktle.backend.order.entity.OrderState;
 import shop.bluebooktle.backend.order.entity.Refund;
-import shop.bluebooktle.backend.order.repository.OrderRepository;
-import shop.bluebooktle.backend.order.repository.RefundQueryRepository;
 import shop.bluebooktle.backend.order.repository.RefundRepository;
-import shop.bluebooktle.backend.order.repository.impl.RefundQueryRepositoryImpl;
-import shop.bluebooktle.backend.payment.entity.Payment;
-import shop.bluebooktle.backend.payment.entity.PaymentDetail;
-import shop.bluebooktle.backend.payment.entity.PaymentType;
 import shop.bluebooktle.common.converter.ProfileAwareStringCryptoConverter;
-import shop.bluebooktle.common.domain.order.AdminOrderSearchType;
 import shop.bluebooktle.common.domain.order.OrderStatus;
 import shop.bluebooktle.common.domain.order.Region;
-import shop.bluebooktle.common.domain.payment.PaymentStatus;
 import shop.bluebooktle.common.domain.refund.RefundReason;
 import shop.bluebooktle.common.domain.refund.RefundSearchType;
 import shop.bluebooktle.common.domain.refund.RefundStatus;
-import shop.bluebooktle.common.dto.order.request.AdminOrderSearchRequest;
 import shop.bluebooktle.common.dto.refund.request.RefundSearchRequest;
 import shop.bluebooktle.common.entity.auth.MembershipLevel;
 import shop.bluebooktle.common.entity.auth.User;
@@ -168,7 +155,6 @@ class RefundQueryRepositoryTest {
 		em.flush();
 		em.clear();
 	}
-
 
 	@Test
 	@DisplayName("환불 검색 - 필터 없이 전체 조회")

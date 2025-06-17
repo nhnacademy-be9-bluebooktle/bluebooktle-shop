@@ -8,15 +8,4 @@ public class PointPolicyNotFoundException extends ApplicationException {
 		super(ErrorCode.POINT_POLICY_NOT_FOUND);
 	}
 
-	public PointPolicyNotFoundException(Throwable cause) {
-		super(ErrorCode.POINT_POLICY_NOT_FOUND, cause);
-	}
-
-	public PointPolicyNotFoundException(String customMessage) {
-		super(ErrorCode.POINT_POLICY_NOT_FOUND, customMessage);
-	}
-
-	public PointPolicyNotFoundException(String customMessage, Throwable cause) {
-		super(ErrorCode.POINT_POLICY_NOT_FOUND, customMessage, cause);
-	}
 }
