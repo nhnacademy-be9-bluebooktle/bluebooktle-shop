@@ -133,7 +133,7 @@ class BookRegisterServiceTest {
 		verify(bookSaleInfoRepository, times(1)).save(any(BookSaleInfo.class));
 		verify(bookAuthorService, times(1)).registerBookAuthor(expectedBookId, request.getAuthorIdList());
 		verify(bookPublisherService, times(1)).registerBookPublisher((expectedBookId),
-			eq(request.getPublisherIdList()));
+			request.getPublisherIdList());
 		verify(bookCategoryService, times(1)).registerBookCategory(expectedBookId, request.getCategoryIdList());
 		verify(bookTagService, times(1)).registerBookTag(expectedBookId, request.getTagIdList());
 		verify(bookImgService, times(1)).registerBookImg(expectedBookId, request.getImgUrl());
@@ -313,11 +313,12 @@ class BookRegisterServiceTest {
 		verify(bookSaleInfoRepository, times(1)).save(any(BookSaleInfo.class));
 		verify(authorService, times(1)).registerAuthorByName("Joshua Bloch");
 		verify(bookAuthorService, times(1)).registerBookAuthor(expectedBookId,
-			eq(authorResponse.getId()));
+			authorResponse.getId());
 		verify(publisherService, times(1)).registerPublisherByName("Addison-Wesley");
 		verify(bookPublisherService, times(1)).registerBookPublisher(expectedBookId,
-			eq(publisherResponse.getId()));
-		verify(bookImgService, times(1)).registerBookImg(expectedBookId, endsWith("/cover500/K123456789_1.jpg"));
+			publisherResponse.getId());
+		verify(bookImgService, times(1))
+			.registerBookImg(eq(expectedBookId), endsWith("/cover500/K123456789_1.jpg"));
 		verify(bookCategoryService, times(request.getCategoryIdList().size())).registerBookCategory(
 			eq(expectedBookId), anyLong());
 		verify(bookTagService, times(1)).registerBookTag(expectedBookId, request.getTagIdList());
