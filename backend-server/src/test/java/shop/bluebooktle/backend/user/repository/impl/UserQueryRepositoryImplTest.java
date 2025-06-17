@@ -2,15 +2,20 @@ package shop.bluebooktle.backend.user.repository.impl;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.params.provider.Arguments.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
@@ -218,7 +223,7 @@ class UserQueryRepositoryImplTest {
 	}
 
 	@Test
-	@DisplayName("사용자 검색 성공 - 검색 조건이 null이면 전체 조회")
+	@DisplayName("사용자 검색 성공 - keyword가 null인 경우 조건 필터 없이 전체 조회")
 	void findUsersBySearchRequest_success_whenSearchConditionIsNull() {
 		UserSearchRequest request = new UserSearchRequest();
 		PageRequest pageable = PageRequest.of(0, 10);
@@ -240,28 +245,23 @@ class UserQueryRepositoryImplTest {
 		assertThat(result.getTotalElements()).isEqualTo(3);
 	}
 
-	@Test
-	@DisplayName("사용자 검색 성공 - 검색 필드(field)만 null일 경우 무시")
-	void findUsersBySearchRequest_success_whenFieldIsNull() {
+	@ParameterizedTest(name = "searchField: {0}, searchKeyword: {1}")
+	@MethodSource("provideInvalidSearchConditions")
+	void findUsersBySearchRequest_success_withInvalidSearchConditions(String field, String keyword) {
 		UserSearchRequest request = new UserSearchRequest();
-		request.setSearchField(null);
-		request.setSearchKeyword("some-keyword");
+		request.setSearchField(field);
+		request.setSearchKeyword(keyword);
 
 		Page<User> result = userQueryRepository.findUsersBySearchRequest(request, PageRequest.of(0, 10));
 
 		assertThat(result.getTotalElements()).isEqualTo(3);
 	}
 
-	@Test
-	@DisplayName("사용자 검색 성공 - 유효하지 않은 검색 필드는 무시")
-	void findUsersBySearchRequest_success_whenSearchFieldIsInvalid() {
-		UserSearchRequest request = new UserSearchRequest();
-		request.setSearchField("invalidField");
-		request.setSearchKeyword("user1");
-
-		Page<User> result = userQueryRepository.findUsersBySearchRequest(request, PageRequest.of(0, 10));
-
-		assertThat(result.getTotalElements()).isEqualTo(3);
+	private static Stream<Arguments> provideInvalidSearchConditions() {
+		return Stream.of(
+			arguments("name", null),         // keyword null
+			arguments(null, "some-keyword")  // field null
+		);
 	}
 
 	@Test
@@ -357,9 +357,11 @@ class UserQueryRepositoryImplTest {
 			.findFirst()
 			.get();
 
-		assertThat(user1Dto.netAmount().compareTo(new BigDecimal("130000"))).isZero();
-		assertThat(user3Dto.netAmount().compareTo(new BigDecimal("50000"))).isZero();
-		assertThat(user2Dto.netAmount().compareTo(BigDecimal.ZERO)).isZero();
+		assertThat(user1Dto.netAmount()).isEqualByComparingTo(new BigDecimal("130000"));
+		assertThat(user3Dto.netAmount()).isEqualByComparingTo(new BigDecimal("50000"));
+		assertThat(user2Dto.netAmount()).isEqualByComparingTo(BigDecimal.ZERO);
+
+
 	}
 
 	@Test
@@ -374,7 +376,7 @@ class UserQueryRepositoryImplTest {
 		UserMembershipLevelResponse response = userQueryRepository.findUserNetSpentAmountForLastThreeMonthsByUserId(
 			user1.getId());
 
-		assertThat(response.netAmount().compareTo(BigDecimal.ZERO)).isZero();
+		assertThat(response.netAmount()).isEqualByComparingTo(BigDecimal.ZERO);
 	}
 
 	@Test
@@ -409,7 +411,7 @@ class UserQueryRepositoryImplTest {
 		UserMembershipLevelResponse response = userQueryRepository.findUserNetSpentAmountForLastThreeMonthsByUserId(
 			user1.getId());
 
-		assertThat(response.netAmount().compareTo(new BigDecimal("48000"))).isZero();
+		assertThat(response.netAmount()).isEqualByComparingTo(new BigDecimal("48000"));
 	}
 
 	@Test
@@ -420,7 +422,7 @@ class UserQueryRepositoryImplTest {
 		UserMembershipLevelResponse response = userQueryRepository.findUserNetSpentAmountForLastThreeMonthsByUserId(
 			testUser2.getId());
 
-		assertThat(response.netAmount().compareTo(BigDecimal.ZERO)).isEqualTo(0);
+		assertThat(response.netAmount()).isEqualByComparingTo(BigDecimal.ZERO);
 		assertThat(response.membershipLevelName()).isEqualTo("일반");
 	}
 
@@ -455,7 +457,7 @@ class UserQueryRepositoryImplTest {
 		UserMembershipLevelResponse response = userQueryRepository.findUserNetSpentAmountForLastThreeMonthsByUserId(
 			testUser.getId());
 
-		assertThat(response.netAmount().compareTo(BigDecimal.ZERO)).isZero();
+		assertThat(response.netAmount()).isEqualByComparingTo(BigDecimal.ZERO);
 		assertThat(response.membershipLevelId()).isNull();
 		assertThat(response.membershipLevelName()).isEqualTo("등급 없음");
 	}

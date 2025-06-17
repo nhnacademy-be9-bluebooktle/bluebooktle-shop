@@ -128,7 +128,7 @@ class OrderQueryRepositoryTest {
 			.approvedAt(LocalDateTime.now())
 			.build());
 
-		Payment payment = em.persist(Payment.builder()
+		em.persist(Payment.builder()
 			.paymentDetail(detail)
 			.order(order)
 			.paidAmount(BigDecimal.valueOf(10000))
@@ -232,7 +232,7 @@ class OrderQueryRepositoryTest {
 			.publishDate(LocalDateTime.now())
 			.build());
 
-		BookOrder bookOrder = em.persist(BookOrder.builder()
+		em.persist(BookOrder.builder()
 			.book(book)
 			.order(order)
 			.quantity(1)

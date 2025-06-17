@@ -362,7 +362,6 @@ class PointServiceTest {
 		Long userId = 1L;
 
 		PointHistory history1 = mock(PointHistory.class);
-		PointSourceType pst1 = mock(PointSourceType.class);
 		given(history1.getId()).willReturn(100L);
 		given(history1.getValue()).willReturn(new BigDecimal("500"));
 		given(history1.getCreatedAt()).willReturn(LocalDateTime.now());

@@ -112,8 +112,9 @@ class PointSourceTypeServiceTest {
 
 		List<PointSourceTypeResponse> responses = pointSourceTypeService.getAll();
 
-		assertThat(responses).isNotNull();
-		assertThat(responses).hasSize(2);
+		assertThat(responses)
+			.isNotNull()
+			.hasSize(2);
 	}
 
 	@Test
@@ -128,8 +129,9 @@ class PointSourceTypeServiceTest {
 
 		List<PointSourceTypeResponse> responses = pointSourceTypeService.getAllByActionType(ActionType.EARN);
 
-		assertThat(responses).isNotNull();
-		assertThat(responses).hasSize(2);
+		assertThat(responses)
+			.isNotNull()
+			.hasSize(2);
 		verify(pointSourceTypeRepository).findAllByActionType(ActionType.EARN);
 	}
 }
