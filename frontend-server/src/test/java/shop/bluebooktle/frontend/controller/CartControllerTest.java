@@ -144,6 +144,6 @@ class CartControllerTest {
 			.andExpect(status().is3xxRedirection())
 			.andExpect(redirectedUrl("/cart"));
 
-		verify(cartService).removeSelected(eq(guestId), eq(List.of(1L, 2L)));
+		verify(cartService).removeSelected(guestId, List.of(1L, 2L));
 	}
 }

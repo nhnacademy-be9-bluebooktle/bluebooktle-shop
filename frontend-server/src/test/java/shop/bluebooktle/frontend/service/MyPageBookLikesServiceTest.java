@@ -12,10 +12,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 
 import lombok.extern.slf4j.Slf4j;
 import shop.bluebooktle.common.dto.book.response.BookLikesListResponse;
@@ -25,7 +21,7 @@ import shop.bluebooktle.frontend.service.impl.MyPageBookLikesServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
 @Slf4j
-public class MyPageBookLikesServiceTest {
+class MyPageBookLikesServiceTest {
 
 	@InjectMocks
 	private MyPageBookLikesServiceImpl myPageBookLikesService;
@@ -57,15 +53,13 @@ public class MyPageBookLikesServiceTest {
 
 		int page = 0;
 		int size = 1;
-		Pageable pageable = PageRequest.of(page, size);
-		Page<BookLikesListResponse> expectedPage = new PageImpl<>(allLikes.subList(0, 1), pageable, allLikes.size());
 
 		// when
 		PaginationData<BookLikesListResponse> result = myPageBookLikesService.getMyPageBookLikes(page, size);
 
 		// then
 		assertThat(result.getPagination().getTotalElements()).isEqualTo(2);
-		assertThat(result.getPagination().getCurrentPage()).isEqualTo(0);
+		assertThat(result.getPagination().getCurrentPage()).isZero();
 		assertThat(result.getPagination().getPageSize()).isEqualTo(1);
 	}
 
@@ -96,7 +90,7 @@ public class MyPageBookLikesServiceTest {
 		PaginationData<BookLikesListResponse> result = myPageBookLikesService.getMyPageBookLikes(page, size);
 
 		// then
-		assertThat(result.getPagination().getTotalElements()).isEqualTo(0);   // 전체 0건
+		assertThat(result.getPagination().getTotalElements()).isZero();   // 전체 0건
 		assertThat(result.getContent().size()).isEqualTo(0);                 // 내용도 0건
 	}
 
