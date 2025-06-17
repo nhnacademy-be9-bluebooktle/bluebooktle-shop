@@ -121,7 +121,7 @@ class PointPolicyServiceTest {
 	@DisplayName("포인트 정책 삭제 -  NotFound 실패")
 	void delete_fail() {
 		given(pointPolicyRepository.findById(anyLong())).willReturn(Optional.empty());
-		assertThrows(PointPolicyNotFoundException.class, () -> service.delete(anyLong()));
+		assertThrows(PointPolicyNotFoundException.class, () -> service.delete(99L));
 	}
 
 	@Test
@@ -146,7 +146,8 @@ class PointPolicyServiceTest {
 	@DisplayName("포인트 단건 조회 - 실패")
 	void get_fail() {
 		given(pointPolicyRepository.findById(anyLong())).willReturn(Optional.empty());
-		assertThrows(PointPolicyNotFoundException.class, () -> service.get(anyLong()));
+
+		assertThrows(PointPolicyNotFoundException.class, () -> service.get(99L));
 	}
 
 	@Test

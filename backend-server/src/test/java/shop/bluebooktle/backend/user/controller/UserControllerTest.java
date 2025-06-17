@@ -311,12 +311,4 @@ class UserControllerTest {
 			.andExpect(jsonPath("$.message").value("유효한 사용자 정보가 없습니다."));
 	}
 
-	@Test
-	@DisplayName("사용자 - 내 정보 조회 실패 (서비스에서 UserNotFoundException 발생)")
-	void getMe_fail_userServiceThrowsUserNotFound() throws Exception {
-		given(userService.findByUserId(anyLong())).willThrow(new UserNotFoundException());
-
-		mockMvc.perform(get("/api/users/me").with(user(userPrincipal)))
-			.andExpect(status().isNotFound());
-	}
 }

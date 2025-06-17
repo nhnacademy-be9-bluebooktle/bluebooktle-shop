@@ -72,7 +72,7 @@ class RefundControllerTest {
 	@Test
 	@DisplayName("사용자 환불 요청 - 유효성 검사 실패 (orderKey가 null)")
 	void requestRefund_validationFailure_orderKeyNull() {
-		RefundCreateRequest invalidRequest = new RefundCreateRequest(
+		new RefundCreateRequest(
 			null, // orderKey가 null
 			RefundReason.CHANGE_OF_MIND,
 			"단순 변심"

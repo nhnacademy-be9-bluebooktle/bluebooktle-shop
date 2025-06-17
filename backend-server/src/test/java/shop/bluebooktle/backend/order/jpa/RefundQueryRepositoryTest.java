@@ -51,7 +51,7 @@ class RefundQueryRepositoryTest {
 	private TestEntityManager em;
 
 	private Order order;
-	private Refund refund1, refund2;
+	private Refund refund1;
 	private LocalDateTime now;
 
 	@BeforeEach
@@ -142,8 +142,8 @@ class RefundQueryRepositoryTest {
 			.price(BigDecimal.valueOf(5000))
 			.build());
 
-		// refund2 → order2 에 매핑
-		refund2 = em.persist(Refund.builder()
+		// refund → order2 에 매핑
+		em.persist(Refund.builder()
 			.order(order2)
 			.date(now.plusDays(5))
 			.reason(RefundReason.CHANGE_OF_MIND)

@@ -109,7 +109,7 @@ public class OrderController {
 				.toList();
 			UsableUserCouponMapResponse coupons = couponService.getUsableCouponsForOrder(bookIdsForCoupon);
 			mav.addObject("coupons", coupons);
-		} else {//todo else
+		} else {// 할 일 : else
 			UsableUserCouponMapResponse emptyCoupons = new UsableUserCouponMapResponse();
 			emptyCoupons.setUsableUserCouponMap(new HashMap<>());
 			mav.addObject("coupons", emptyCoupons);

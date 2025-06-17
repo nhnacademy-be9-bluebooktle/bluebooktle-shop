@@ -13,8 +13,8 @@ public class AladinAdaptor {
 
 	private final RestTemplate restTemplate = new RestTemplate();
 
-	private final String TTB_KEY = "ttbsua64581504003";
-	private final String BASE_URL = "http://www.aladin.co.kr/ttb/api/ItemSearch.aspx";
+	private static final String TTB_KEY = "ttbsua64581504003";
+	private static final  String BASE_URL = "http://www.aladin.co.kr/ttb/api/ItemSearch.aspx";
 
 	/** 기존 단순 검색 그대로 유지 */
 	public AladinApiResponse searchBooks(String query) {

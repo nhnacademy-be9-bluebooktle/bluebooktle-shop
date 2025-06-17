@@ -43,7 +43,7 @@ import shop.bluebooktle.common.security.UserPrincipal;
 @ExtendWith(MockitoExtension.class)
 class OrderControllerTest {
 
-	private final String GUEST_ID = "testGuestId123";
+	private static final String GUEST_ID = "testGuestId123";
 	@Mock
 	private OrderService orderService;
 	@Mock
@@ -73,17 +73,17 @@ class OrderControllerTest {
 		Long orderId = 1L;
 		OrderConfirmDetailResponse expectedResponse = createOrderConfirmDetailResponse(orderId, "MEMBER-ORD-123", true);
 
-		given(orderService.getOrderById(eq(orderId), eq(principal.getUserId()))).willReturn(expectedResponse);
+		given(orderService.getOrderById(orderId, principal.getUserId())).willReturn(expectedResponse);
 
 		ResponseEntity<JsendResponse<OrderConfirmDetailResponse>> responseEntity =
 			orderController.getOrderConfirmationDetails(orderId, principal);
 
-		assertThat(responseEntity.getStatusCodeValue()).isEqualTo(200);
+		assertThat(responseEntity.getStatusCode().value()).isEqualTo(200);
 		assertThat(responseEntity.getBody()).isNotNull();
 		assertThat(responseEntity.getBody().status()).isEqualTo("success");
 		assertThat(responseEntity.getBody().data()).isEqualTo(expectedResponse);
 
-		verify(orderService).getOrderById(eq(orderId), eq(principal.getUserId()));
+		verify(orderService).getOrderById(orderId, principal.getUserId());
 	}
 
 	@Test
@@ -97,7 +97,7 @@ class OrderControllerTest {
 		ResponseEntity<JsendResponse<OrderConfirmDetailResponse>> responseEntity =
 			orderController.getOrderConfirmationDetails(orderId, null); // principal에 null 전달
 
-		assertThat(responseEntity.getStatusCodeValue()).isEqualTo(200);
+		assertThat(responseEntity.getStatusCode().value()).isEqualTo(200);
 		assertThat(responseEntity.getBody()).isNotNull();
 		assertThat(responseEntity.getBody().status()).isEqualTo("success");
 		assertThat(responseEntity.getBody().data()).isEqualTo(expectedResponse);
@@ -111,17 +111,17 @@ class OrderControllerTest {
 		String orderKey = "MEMBER-ORD-KEY-456";
 		OrderConfirmDetailResponse expectedResponse = createOrderConfirmDetailResponse(2L, orderKey, true);
 
-		given(orderService.getOrderByKey(eq(orderKey), eq(principal.getUserId()))).willReturn(expectedResponse);
+		given(orderService.getOrderByKey(orderKey, principal.getUserId())).willReturn(expectedResponse);
 
 		ResponseEntity<JsendResponse<OrderConfirmDetailResponse>> responseEntity =
 			orderController.getOrderConfirmationDetails(orderKey, principal);
 
-		assertThat(responseEntity.getStatusCodeValue()).isEqualTo(200);
+		assertThat(responseEntity.getStatusCode().value()).isEqualTo(200);
 		assertThat(responseEntity.getBody()).isNotNull();
 		assertThat(responseEntity.getBody().status()).isEqualTo("success");
 		assertThat(responseEntity.getBody().data()).isEqualTo(expectedResponse);
 
-		verify(orderService).getOrderByKey(eq(orderKey), eq(principal.getUserId()));
+		verify(orderService).getOrderByKey(orderKey, principal.getUserId());
 	}
 
 	@Test
@@ -135,7 +135,7 @@ class OrderControllerTest {
 		ResponseEntity<JsendResponse<OrderConfirmDetailResponse>> responseEntity =
 			orderController.getOrderConfirmationDetails(orderKey, null);
 
-		assertThat(responseEntity.getStatusCodeValue()).isEqualTo(200);
+		assertThat(responseEntity.getStatusCode().value()).isEqualTo(200);
 		assertThat(responseEntity.getBody()).isNotNull();
 		assertThat(responseEntity.getBody().status()).isEqualTo("success");
 		assertThat(responseEntity.getBody().data()).isEqualTo(expectedResponse);
@@ -155,20 +155,21 @@ class OrderControllerTest {
 			.build();
 
 		given(orderService.createOrder(any(OrderCreateRequest.class))).willReturn(createdOrderId);
-		given(cartService.findUserEntityById(eq(principal.getUserId()))).willReturn(user);
+		given(cartService.findUserEntityById(principal.getUserId())).willReturn(user);
 		doNothing().when(cartService).removeSelectedBooksFromUserCart(eq(user), anyList());
 
 		ResponseEntity<JsendResponse<Long>> responseEntity =
 			orderController.createOrder(principal, request, null);
 
-		assertThat(responseEntity.getStatusCodeValue()).isEqualTo(200);
+		assertThat(responseEntity.getStatusCode().value()).isEqualTo(200);
 		assertThat(responseEntity.getBody()).isNotNull();
 		assertThat(responseEntity.getBody().status()).isEqualTo("success");
 		assertThat(responseEntity.getBody().data()).isEqualTo(createdOrderId);
 
 		verify(orderService).createOrder(any(OrderCreateRequest.class));
-		verify(cartService).removeSelectedBooksFromUserCart(eq(user),
-			eq(orderItemRequests.stream().map(OrderItemRequest::bookId).toList()));
+
+		verify(cartService).removeSelectedBooksFromUserCart(user,
+			orderItemRequests.stream().map(OrderItemRequest::bookId).toList());
 	}
 
 	@Test
@@ -188,14 +189,14 @@ class OrderControllerTest {
 		ResponseEntity<JsendResponse<Long>> responseEntity =
 			orderController.createOrder(null, request, GUEST_ID);
 
-		assertThat(responseEntity.getStatusCodeValue()).isEqualTo(200);
+		assertThat(responseEntity.getStatusCode().value()).isEqualTo(200);
 		assertThat(responseEntity.getBody()).isNotNull();
 		assertThat(responseEntity.getBody().status()).isEqualTo("success");
 		assertThat(responseEntity.getBody().data()).isEqualTo(createdOrderId);
 
 		verify(orderService).createOrder(any(OrderCreateRequest.class));
-		verify(cartService).removeSelectedBooksFromGuestCart(eq(GUEST_ID),
-			eq(orderItemRequests.stream().map(OrderItemRequest::bookId).toList()));
+		verify(cartService).removeSelectedBooksFromGuestCart(GUEST_ID,
+			orderItemRequests.stream().map(OrderItemRequest::bookId).toList());
 	}
 
 	@Test
@@ -213,7 +214,7 @@ class OrderControllerTest {
 		ResponseEntity<JsendResponse<PaginationData<OrderHistoryResponse>>> responseEntity =
 			orderController.getOrderHistory(principal, null, PageRequest.of(0, 10));
 
-		assertThat(responseEntity.getStatusCodeValue()).isEqualTo(200);
+		assertThat(responseEntity.getStatusCode().value()).isEqualTo(200);
 		assertThat(responseEntity.getBody()).isNotNull();
 		assertThat(responseEntity.getBody().status()).isEqualTo("success");
 		assertThat(responseEntity.getBody().data().getContent()).hasSize(1);
@@ -225,7 +226,9 @@ class OrderControllerTest {
 	@Test
 	@DisplayName("내 주문 전체 조회 - 비로그인 사용자 실패 (InvalidTokenException 발생)")
 	void getOrderHistory_nonLoggedInUser_failure() {
-		assertThatThrownBy(() -> orderController.getOrderHistory(null, null, PageRequest.of(0, 10)))
+		Pageable pageable = PageRequest.of(0, 10);
+
+		assertThatThrownBy(() -> orderController.getOrderHistory(null, null, pageable))
 			.isInstanceOf(InvalidTokenException.class);
 
 		verify(orderService, times(0)).getUserOrders(anyLong(), any(), any());
@@ -236,16 +239,16 @@ class OrderControllerTest {
 	void cancelOrder_loggedInUser_success() {
 		String orderKey = "CANCEL-MEMBER-123";
 
-		doNothing().when(orderService).cancelOrderMember(eq(orderKey), eq(principal.getUserId()));
+		doNothing().when(orderService).cancelOrderMember(orderKey, principal.getUserId());
 
 		ResponseEntity<JsendResponse<Void>> responseEntity =
 			orderController.cancelOrder(orderKey, principal);
 
-		assertThat(responseEntity.getStatusCodeValue()).isEqualTo(200);
+		assertThat(responseEntity.getStatusCode().value()).isEqualTo(200);
 		assertThat(responseEntity.getBody()).isNotNull();
 		assertThat(responseEntity.getBody().status()).isEqualTo("success");
 
-		verify(orderService).cancelOrderMember(eq(orderKey), eq(principal.getUserId()));
+		verify(orderService).cancelOrderMember(orderKey, principal.getUserId());
 	}
 
 	@Test
@@ -253,16 +256,16 @@ class OrderControllerTest {
 	void cancelOrder_nonLoggedInUser_success() {
 		String orderKey = "CANCEL-GUEST-456";
 
-		doNothing().when(orderService).cancelOrderNonMember(eq(orderKey));
+		doNothing().when(orderService).cancelOrderNonMember(orderKey);
 
 		ResponseEntity<JsendResponse<Void>> responseEntity =
 			orderController.cancelOrder(orderKey, null);
 
-		assertThat(responseEntity.getStatusCodeValue()).isEqualTo(200);
+		assertThat(responseEntity.getStatusCode().value()).isEqualTo(200);
 		assertThat(responseEntity.getBody()).isNotNull();
 		assertThat(responseEntity.getBody().status()).isEqualTo("success");
 
-		verify(orderService).cancelOrderNonMember(eq(orderKey));
+		verify(orderService).cancelOrderNonMember(orderKey);
 	}
 
 	@Test
@@ -271,18 +274,18 @@ class OrderControllerTest {
 		String orderKey = "DETAIL-MEMBER-789";
 		OrderDetailResponse expectedResponse = createOrderDetailResponse(4L, orderKey, true);
 
-		given(orderService.getOrderDetailByUserId(eq(orderKey), eq(principal.getUserId()))).willReturn(
+		given(orderService.getOrderDetailByUserId(orderKey, principal.getUserId())).willReturn(
 			expectedResponse);
 
 		ResponseEntity<JsendResponse<OrderDetailResponse>> responseEntity =
 			orderController.getOrderDetail(orderKey, principal);
 
-		assertThat(responseEntity.getStatusCodeValue()).isEqualTo(200);
+		assertThat(responseEntity.getStatusCode().value()).isEqualTo(200);
 		assertThat(responseEntity.getBody()).isNotNull();
 		assertThat(responseEntity.getBody().status()).isEqualTo("success");
 		assertThat(responseEntity.getBody().data()).isEqualTo(expectedResponse);
 
-		verify(orderService).getOrderDetailByUserId(eq(orderKey), eq(principal.getUserId()));
+		verify(orderService).getOrderDetailByUserId(orderKey, principal.getUserId());
 	}
 
 	@Test
@@ -296,7 +299,7 @@ class OrderControllerTest {
 		ResponseEntity<JsendResponse<OrderDetailResponse>> responseEntity =
 			orderController.getOrderDetail(orderKey, null);
 
-		assertThat(responseEntity.getStatusCodeValue()).isEqualTo(200);
+		assertThat(responseEntity.getStatusCode().value()).isEqualTo(200);
 		assertThat(responseEntity.getBody()).isNotNull();
 		assertThat(responseEntity.getBody().status()).isEqualTo("success");
 		assertThat(responseEntity.getBody().data()).isEqualTo(expectedResponse);
