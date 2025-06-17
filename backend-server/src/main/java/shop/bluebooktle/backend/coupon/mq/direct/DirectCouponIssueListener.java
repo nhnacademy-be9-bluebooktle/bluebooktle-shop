@@ -1,6 +1,7 @@
 package shop.bluebooktle.backend.coupon.mq.direct;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
@@ -52,8 +53,9 @@ public class DirectCouponIssueListener {
 		} catch (Exception e) {
 			DoorayMessagePayload payload = new DoorayMessagePayload();
 			payload.setBotName("직접 쿠폰 발급 실패");
+			String now = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 			payload.setText(
-				"실패 시간 = " + LocalDateTime.now() + "\n" +
+				"발생 시간 = " + now + "\n" +
 					"유저 ID = " + message.getUserId() + "\n" +
 					"쿠폰 ID = " + message.getCouponId()
 			);
