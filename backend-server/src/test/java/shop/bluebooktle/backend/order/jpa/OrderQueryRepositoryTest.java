@@ -48,7 +48,7 @@ import shop.bluebooktle.common.util.CryptoUtils;
 	JpaAuditingConfiguration.class,
 	CryptoUtils.class, ProfileAwareStringCryptoConverter.class,
 })
-public class OrderQueryRepositoryTest {
+class OrderQueryRepositoryTest {
 
 	@Autowired
 	private OrderRepository orderQueryRepository;

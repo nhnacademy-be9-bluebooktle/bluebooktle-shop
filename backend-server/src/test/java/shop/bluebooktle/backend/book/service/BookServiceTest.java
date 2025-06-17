@@ -505,11 +505,11 @@ class BookServiceTest {
 				updatedSaleInfo.getSalePercentage().compareTo(new BigDecimal("20.00")) == 0
 		));
 
-		verify(bookAuthorService, times(1)).updateBookAuthor(eq(bookId), eq(request.getAuthorIdList()));
-		verify(bookPublisherService, times(1)).updateBookPublisher(eq(bookId), eq(request.getPublisherIdList()));
-		verify(bookCategoryService, times(1)).updateBookCategory(eq(bookId), eq(request.getCategoryIdList()));
-		verify(bookTagService, times(1)).updateBookTag(eq(bookId), eq(request.getTagIdList()));
-		verify(bookImgService, times(1)).updateBookImg(eq(bookId), eq(request.getImgUrl()));
+		verify(bookAuthorService, times(1)).updateBookAuthor(bookId, request.getAuthorIdList());
+		verify(bookPublisherService, times(1)).updateBookPublisher(bookId, request.getPublisherIdList());
+		verify(bookCategoryService, times(1)).updateBookCategory(bookId, request.getCategoryIdList());
+		verify(bookTagService, times(1)).updateBookTag(bookId, request.getTagIdList());
+		verify(bookImgService, times(1)).updateBookImg(bookId, request.getImgUrl());
 	}
 
 }

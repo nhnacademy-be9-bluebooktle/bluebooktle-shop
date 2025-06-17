@@ -55,7 +55,7 @@ class FailedCouponDlqListenerTest {
 		Message message = new Message(body, properties);
 
 		when(queueProperties.getBirthdayDlq()).thenReturn("queue.birthday.dlq");
-		when(objectMapper.readValue(eq(body), eq(CouponIssueMessage.class))).thenReturn(mockPayload);
+		when(objectMapper.readValue(body, CouponIssueMessage.class)).thenReturn(mockPayload);
 
 		// when
 		listener.listen(message);
@@ -73,7 +73,7 @@ class FailedCouponDlqListenerTest {
 		properties.setConsumerQueue("unsupported.queue");
 		Message message = new Message(body, properties);
 
-		when(objectMapper.readValue(eq(body), eq(CouponIssueMessage.class))).thenReturn(payload);
+		when(objectMapper.readValue(body, CouponIssueMessage.class)).thenReturn(payload);
 		when(queueProperties.getBirthdayDlq()).thenReturn("birthday.dlq");
 		when(queueProperties.getWelcomeDlq()).thenReturn("welcome.dlq");
 		when(queueProperties.getDirectDlq()).thenReturn("direct.dlq");
@@ -93,7 +93,7 @@ class FailedCouponDlqListenerTest {
 		Message message = new Message(body, props);
 
 		when(queueProperties.getWelcomeDlq()).thenReturn("queue.welcome.dlq");
-		when(objectMapper.readValue(eq(body), eq(CouponIssueMessage.class))).thenReturn(payload);
+		when(objectMapper.readValue(body, CouponIssueMessage.class)).thenReturn(payload);
 
 		listener.listen(message);
 

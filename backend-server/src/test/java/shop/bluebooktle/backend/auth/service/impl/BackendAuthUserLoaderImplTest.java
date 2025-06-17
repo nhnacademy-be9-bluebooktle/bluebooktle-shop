@@ -20,7 +20,7 @@ import shop.bluebooktle.common.exception.auth.UserNotFoundException;
 import shop.bluebooktle.common.security.UserPrincipal;
 
 @ExtendWith(MockitoExtension.class)
-public class BackendAuthUserLoaderImplTest {
+class BackendAuthUserLoaderImplTest {
 
 	@InjectMocks
 	private BackendAuthUserLoaderImpl backendAuthUserLoader;

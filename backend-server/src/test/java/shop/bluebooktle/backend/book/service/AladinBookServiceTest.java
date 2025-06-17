@@ -21,7 +21,7 @@ import shop.bluebooktle.common.dto.book.response.AladinApiResponse;
 import shop.bluebooktle.common.dto.book.response.AladinBookResponse;
 
 @ExtendWith(MockitoExtension.class)
-public class AladinBookServiceTest {
+class AladinBookServiceTest {
 
 	@Mock
 	private AladinAdaptor aladinAdaptor;
@@ -144,7 +144,7 @@ public class AladinBookServiceTest {
 
 		AladinBookResponse aladinBookResponse = aladinBookService.getBookByIsbn(isbn);
 
-		assertEquals(aladinBookResponse.getTitle(), "title");
-		assertEquals(aladinBookResponse.getIsbn(), isbn);
+		assertEquals("title", aladinBookResponse.getTitle());
+		assertEquals(isbn, aladinBookResponse.getIsbn());
 	}
 }

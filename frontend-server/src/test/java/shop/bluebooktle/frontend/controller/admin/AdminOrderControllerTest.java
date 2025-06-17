@@ -46,7 +46,7 @@ import shop.bluebooktle.frontend.service.AdminOrderService;
 	"minio.endpoint=http://localhost:9000", // 더미값
 	"toss.client-key=testClientKey"
 })
-public class AdminOrderControllerTest {
+class AdminOrderControllerTest {
 
 	@Autowired
 	private MockMvc mockMvc;

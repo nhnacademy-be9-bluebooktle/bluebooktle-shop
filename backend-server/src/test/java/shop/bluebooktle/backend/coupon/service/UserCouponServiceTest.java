@@ -25,7 +25,7 @@ import shop.bluebooktle.common.dto.coupon.response.UsableUserCouponMapResponse;
 import shop.bluebooktle.common.dto.coupon.response.UserCouponResponse;
 
 @ExtendWith(MockitoExtension.class)
-public class UserCouponServiceTest {
+class UserCouponServiceTest {
 
 	@InjectMocks
 	private UserCouponServiceImpl userCouponService;

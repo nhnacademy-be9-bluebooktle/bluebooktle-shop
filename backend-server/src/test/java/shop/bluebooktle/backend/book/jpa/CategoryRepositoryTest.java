@@ -30,7 +30,7 @@ import shop.bluebooktle.common.util.CryptoUtils;
 @ActiveProfiles("test")
 @Import({QueryDslConfig.class, JpaAuditingConfiguration.class, CryptoUtils.class,
 	ProfileAwareStringCryptoConverter.class})
-public class CategoryRepositoryTest {
+class CategoryRepositoryTest {
 
 	@Autowired
 	private CategoryRepository categoryRepository;
@@ -39,17 +39,14 @@ public class CategoryRepositoryTest {
 	private EntityManager em;
 
 	private Category category1;
-	private Category category2;
-	private Category category3;
-	private Category category4;
 
 	@BeforeEach
 	void setUp() {
 		category1 = categoryRepository.save(new Category(null, "소설", "/1"));
-		category2 = categoryRepository.save(new Category(category1, "일반 소설", "/1/2"));
-		category3 = categoryRepository.save(new Category(category2, "장르 소설", "/1/2/3"));
+		Category category2 = categoryRepository.save(new Category(category1, "일반 소설", "/1/2"));
+		categoryRepository.save(new Category(category2, "장르 소설", "/1/2/3"));
 
-		category4 = categoryRepository.save(new Category(category1, "국내 현대 소설", "/1/4"));
+		Category category4 = categoryRepository.save(new Category(category1, "국내 현대 소설", "/1/4"));
 		em.flush();
 
 		// category4 삭제
@@ -78,8 +75,10 @@ public class CategoryRepositoryTest {
 			.map(Category::getName)
 			.toList();
 		// 이름 오름차순 정렬: "소설, "일반 소설", "장르 소설" (ASCII 기준 대문자 < 소문자)
-		assertThat(names).containsExactly("소설", "일반 소설", "장르 소설");
-		assertThat(names).doesNotContain("국내 현대 소설");
+		assertThat(names)
+			.containsExactly("소설", "일반 소설", "장르 소설")
+			.doesNotContain("국내 현대 소설");
+
 	}
 
 	@Test
@@ -150,7 +149,7 @@ public class CategoryRepositoryTest {
 		Page<Category> page = categoryRepository.searchByNameContaining("없는키워드", pageable);
 
 		// then
-		assertThat(page.getTotalElements()).isEqualTo(0);
+		assertThat(page.getTotalElements()).isZero();
 		assertThat(page.getContent()).isEmpty();
 	}
 
@@ -174,8 +173,9 @@ public class CategoryRepositoryTest {
 		List<Long> result = categoryRepository.findUnderCategory(parent);
 
 		// then: leaf 노드는 로맨스 소설 하나뿐
-		assertThat(result).hasSize(1);
-		assertThat(result).containsExactly(child2.getId());
+		assertThat(result)
+			.hasSize(1)
+			.containsExactly(child2.getId());
 	}
 
 	@Test
