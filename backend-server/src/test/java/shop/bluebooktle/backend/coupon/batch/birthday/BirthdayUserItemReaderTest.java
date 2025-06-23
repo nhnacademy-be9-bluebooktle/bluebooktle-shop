@@ -25,6 +25,8 @@ class BirthdayUserItemReaderTest {
 	@InjectMocks
 	private BirthdayUserItemReader reader;
 
+	private static final int PAGE_SIZE = 100;
+
 	@Test
 	@DisplayName("read - 생일자가 하나씩 반환")
 	void read() {
@@ -33,8 +35,7 @@ class BirthdayUserItemReaderTest {
 		User user1 = User.builder().id(1L).loginId("user1").build();
 		User user2 = User.builder().id(2L).loginId("user2").build();
 
-		when(userRepository.findByBirthdayMonth(currentMonth)).thenReturn(List.of(user1, user2));
-
+		when(userRepository.findByBirthdayMonth(currentMonth, 0, PAGE_SIZE)).thenReturn(List.of(user1, user2));
 		// when & then
 		assertThat(reader.read()).isEqualTo(user1);
 		assertThat(reader.read()).isEqualTo(user2);
@@ -46,13 +47,12 @@ class BirthdayUserItemReaderTest {
 	void read_return_null() {
 		// given
 		String currentMonth = String.format("%02d", LocalDate.now().getMonthValue());
-		when(userRepository.findByBirthdayMonth(currentMonth)).thenReturn(List.of());
-
+		when(userRepository.findByBirthdayMonth(currentMonth, 0, PAGE_SIZE)).thenReturn(List.of());
 		// when
 		User result = reader.read();
 
 		// then
 		assertThat(result).isNull();
-		verify(userRepository).findByBirthdayMonth(currentMonth);
+		verify(userRepository).findByBirthdayMonth(currentMonth, 0, PAGE_SIZE);
 	}
 }

@@ -52,7 +52,7 @@ public class UserQueryRepositoryImpl implements UserQueryRepository {
 	private final JPAQueryFactory queryFactory;
 
 	@Override
-	public List<User> findByBirthdayMonth(String month) {
+	public List<User> findByBirthdayMonth(String month, int page, int size) {
 		QUser user = QUser.user;
 
 		BooleanBuilder builder = new BooleanBuilder();
@@ -60,15 +60,12 @@ public class UserQueryRepositoryImpl implements UserQueryRepository {
 		builder.and(Expressions.stringTemplate("substring({0}, 5, 2)", user.birth).eq(month))
 			.and(user.status.eq(UserStatus.ACTIVE));
 
-		List<User> users = queryFactory
+		return queryFactory
 			.selectFrom(user)
 			.where(builder)
+			.offset((long)page * size)
+			.limit(size)
 			.fetch();
-
-		for (User u : users) {
-			log.info("{}의 생일 월: {}", u.getLoginId(), u.getBirth());
-		}
-		return users;
 	}
 
 	@Override

@@ -11,7 +11,7 @@ import shop.bluebooktle.common.dto.user.response.UserMembershipLevelResponse;
 import shop.bluebooktle.common.entity.auth.User;
 
 public interface UserQueryRepository {
-	List<User> findByBirthdayMonth(String month);
+	List<User> findByBirthdayMonth(String month, int page, int size);
 
 	Page<User> findUsersBySearchRequest(UserSearchRequest request, Pageable pageable);
 
