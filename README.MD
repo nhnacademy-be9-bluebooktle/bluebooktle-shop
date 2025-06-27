@@ -321,6 +321,11 @@ Spring Boot 기반의 RESTful API를 중심으로 구현되었으며, MySQL, Red
 ### DBA
 - MySQL 스키마 및 ERD 버전 관리
 
+## 문소연
+
+### 도서
+- 도서 관련 CRUD 기능 구현(작가, 이미지)
+
 ## 팀원 공통
 
 - database ERD 설계
