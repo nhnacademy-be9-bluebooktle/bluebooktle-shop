@@ -154,11 +154,17 @@ class UserQueryRepositoryImplTest {
 	@Test
 	@DisplayName("사용자 검색 성공 - 생일 월로 조회")
 	void findByBirthdayMonth_success() {
+		// given
 		User activeJuneUser = em.find(User.class, user1.getId());
 		User adminJuneUser = em.find(User.class, user3.getId());
 
-		List<User> users = userQueryRepository.findByBirthdayMonth("06");
+		int page = 0;
+		int size = 10;
 
+		// when
+		List<User> users = userQueryRepository.findByBirthdayMonth("06", page, size);
+
+		// then
 		assertThat(users).hasSize(2)
 			.extracting(User::getId)
 			.containsExactlyInAnyOrder(activeJuneUser.getId(), adminJuneUser.getId());
@@ -167,7 +173,14 @@ class UserQueryRepositoryImplTest {
 	@Test
 	@DisplayName("사용자 검색 성공 - 생일 월에 해당하는 사용자가 없을 때")
 	void findByBirthdayMonth_noMatchingUser_returnsEmptyList() {
-		List<User> users = userQueryRepository.findByBirthdayMonth("12");
+		// given
+		int page = 0;
+		int size = 10;
+
+		// when
+		List<User> users = userQueryRepository.findByBirthdayMonth("12", page, size);
+
+		// then
 		assertThat(users).isEmpty();
 	}
 
@@ -360,7 +373,6 @@ class UserQueryRepositoryImplTest {
 		assertThat(user1Dto.netAmount()).isEqualByComparingTo(new BigDecimal("130000"));
 		assertThat(user3Dto.netAmount()).isEqualByComparingTo(new BigDecimal("50000"));
 		assertThat(user2Dto.netAmount()).isEqualByComparingTo(BigDecimal.ZERO);
-
 
 	}
 

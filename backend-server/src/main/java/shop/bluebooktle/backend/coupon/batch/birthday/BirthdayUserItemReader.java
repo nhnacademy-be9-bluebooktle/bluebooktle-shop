@@ -20,15 +20,25 @@ import shop.bluebooktle.common.entity.auth.User;
 public class BirthdayUserItemReader implements ItemReader<User> {
 
 	private final UserRepository userRepository;
+
+	private static final int PAGE_SIZE = 100;
+
+	private int currentPage = 0;
 	private Iterator<User> userIterator;
 
 	@Override
 	public User read() {
-		if (userIterator == null) {
+		if (userIterator == null || !userIterator.hasNext()) {
 			String month = String.format("%02d", LocalDate.now().getMonthValue());
-			List<User> users = userRepository.findByBirthdayMonth(month);
+			List<User> users = userRepository.findByBirthdayMonth(month, currentPage, PAGE_SIZE);
+
+			if (users.isEmpty()) {
+				return null;
+			}
+
 			log.info("Reader : 생일자 {}월 유저 수 : {}", month, users.size());
 			userIterator = users.iterator();
+			currentPage++;
 		}
 		return userIterator.hasNext() ? userIterator.next() : null;
 	}
